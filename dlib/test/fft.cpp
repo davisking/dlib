@@ -481,6 +481,76 @@ namespace
     }
 #endif
     
+    template<typename R>
+    void test_vector_overload_outplace()
+    {
+        static constexpr double tol = std::is_same<R,double>::value ? 1e-15 : 5e-2;
+        static constexpr const char* typelabel = std::is_same<R,double>::value ? "double" : "float";
+        
+        int test = 0;
+        
+        auto func = [&](long size)
+        {
+            if (++test % 100 == 0)
+                print_spinner();
+
+            const matrix<complex<R>,0,1>  m1 = rand_complex<R>(size,1);
+            const matrix<complex<R>,0,1>  f1 = fft(m1); //this fft uses the dlib::matrix overload
+            
+            const std::vector<complex<R>> m1_v(m1.begin(), m1.end()); //target
+            const std::vector<complex<R>> f1_v(f1.begin(), f1.end()); //target
+            
+            const matrix<complex<R>,0,1>  f2 = fft(m1_v); //this fft uses the std::vector overload
+            const matrix<complex<R>,0,1>  m2 = ifft(f1_v); //this ifft uses the std::vector overload
+            
+            R diff = max(norm(f2 - f1));
+            DLIB_TEST_MSG(diff < tol, "diff " << diff << " not within tol " << tol << " where (size) = (" << size << ")" << " type " << typelabel);
+
+            diff = max(norm(m2 - m1));
+            DLIB_TEST_MSG(diff < tol, "diff " << diff << " not within tol " << tol << " where (size) = (" << size << ")" << " type " << typelabel);
+        };
+        
+        for (long size = 1; size <= 64; size++)
+            func(size);
+        
+        //some odd balls...
+        func(103);  print_spinner();
+        func(123); print_spinner();
+        func(131);  print_spinner();
+    }
+    
+    template<typename R>
+    void test_vector_overload_inplace()
+    {
+        static constexpr double tol = std::is_same<R,double>::value ? 1e-15 : 5e-2;
+        static constexpr const char* typelabel = std::is_same<R,double>::value ? "double" : "float";
+        
+        int test = 0;
+        
+        auto func = [&](long size)
+        {
+            if (++test % 100 == 0)
+                print_spinner();
+
+            matrix<complex<R>,0,1>  m1 = rand_complex<R>(size,1);
+            std::vector<complex<R>> m1_v(m1.begin(), m1.end());
+            
+            fft_inplace(m1);
+            fft_inplace(m1_v);
+            
+            R diff = max(norm(m1 - mat(m1_v)));
+            DLIB_TEST_MSG(diff < tol, "diff " << diff << " not within tol " << tol << " where (size) = (" << size << ")" << " type " << typelabel);
+        };
+        
+        for (long size = 1; size <= 64; size++)
+            func(size);
+        
+        //some odd balls...
+        func(103);  print_spinner();
+        func(123); print_spinner();
+        func(131);  print_spinner();
+    }
+    
     class test_fft : public tester
     {
     public:
@@ -511,6 +581,10 @@ namespace
             test_kiss_vs_mkl<float>();
             test_kiss_vs_mkl<double>();
 #endif
+            test_vector_overload_outplace<float>();
+            test_vector_overload_outplace<double>();
+            test_vector_overload_inplace<float>();
+            test_vector_overload_inplace<double>();
         }
     } a;
 

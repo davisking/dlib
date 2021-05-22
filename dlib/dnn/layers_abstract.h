@@ -83,6 +83,26 @@ namespace dlib
                   begins with layer2.
         !*/
 
+        const INPUT_LAYER& input_layer(
+        ) const;
+        /*!
+            ensures
+                - returns the very first layer in *this network.  It's equivalent to calling
+                  subnet() recursively until you get to the first layer.  This means it will return
+                  the object that is an implementation of the EXAMPLE_INPUT_LAYER interface defined
+                  in input_abstract.h
+        !*/
+
+        INPUT_LAYER& input_layer(
+        );
+        /*!
+            ensures
+                - returns the very first layer in *this network.  It's equivalent to calling
+                  subnet() recursively until you get to the first layer.  This means it will return
+                  the object that is an implementation of the EXAMPLE_INPUT_LAYER interface defined
+                  in input_abstract.h
+        !*/
+
         const layer_details_type& layer_details(
         ) const; 
         /*!
@@ -2394,6 +2414,9 @@ namespace dlib
                 passes its inputs through the function
                     f(x)= x*tanh(log(1+exp(x)))
                 where f() is applied pointwise across the input tensor.
+
+                This is the layer type introduced in the paper:
+                Diganta Misra. "Mish: A Self Regularized Non-Monotonic Activation Function"
         !*/
 
     public:
@@ -2452,6 +2475,103 @@ namespace dlib
 
     template <typename SUBNET>
     using htan = add_layer<htan_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class clipped_relu_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines a clipped version of the relu layer.
+                Therefore, it passes its inputs through the function
+                    f(x) = min(max(x, 0), ceiling)
+                where f() is applied pointwise across the input tensor and ceiling is a
+                non-learned scalar.
+        !*/
+
+    public:
+
+        clipped_relu_(
+            const float ceiling = 6.0f
+        );
+        /*!
+            ensures
+                - the ceiling parameter will be initialized with the ceiling value
+        !*/
+
+        float get_ceiling() const;
+        /*!
+            ensures
+                - returns the celiling parameter of the clipped_relu
+        !*/
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        void forward_inplace(const tensor& input, tensor& output);
+        void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_
+            interface.  Note that this layer doesn't have any parameters, so the tensor
+            returned by get_layer_params() is always empty.
+        !*/
+    };
+
+    template <typename SUBNET>
+    using clipped_relu = add_layer<clipped_relu_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class elu_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines an exponential linear unit.
+                Therefore, it passes its inputs through the function
+                    f(x) = x>0 ? x : alpha*(exp(x)-1)
+                where f() is applied pointwise across the input tensor and alpha is a
+                non-learned scalar.
+
+                This is the layer type introduced in the paper:
+                Djork-Arné Clevert, Thomas Unterthiner, Sepp Hochreiter.
+                "Fast and Accurate Deep Network Learning by Exponential Linear Units (ELUs)".
+        !*/
+
+    public:
+
+        elu_(
+            const float alpha = 1.0f
+        );
+        /*!
+            ensures
+                - the alpha parameter will be initialized with the alpha value
+        !*/
+
+        float get_alpha() const;
+        /*!
+            ensures
+                - returns the alpha parameter of the elu
+        !*/
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        void forward_inplace(const tensor& input, tensor& output);
+        void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_
+            interface.  Note that this layer doesn't have any parameters, so the tensor
+            returned by get_layer_params() is always empty.
+        !*/
+    };
+
+    template <typename SUBNET>
+    using elu = add_layer<elu_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

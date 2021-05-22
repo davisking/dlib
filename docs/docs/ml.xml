@@ -157,6 +157,10 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                   <link>dlib/dnn/layers_abstract.h.html#scale_</link>
                </item>
                <item>
+                  <name>scale_prev</name>
+                  <link>dlib/dnn/layers_abstract.h.html#scale_prev_</link>
+               </item>
+               <item>
                   <name>extract</name>
                   <link>dlib/dnn/layers_abstract.h.html#extract_</link>
                </item>
@@ -179,6 +183,10 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                <item>
                   <name>l2normalize</name>
                   <link>dlib/dnn/layers_abstract.h.html#l2normalize_</link>
+               </item>
+               <item>
+                  <name>layer_norm</name>
+                  <link>dlib/dnn/layers_abstract.h.html#layer_norm_</link>
                </item>
                <item>
                   <name>dropout</name>
@@ -215,6 +223,10 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                <item>
                   <name>relu</name>
                   <link>dlib/dnn/layers_abstract.h.html#relu_</link>
+               </item>
+               <item>
+                  <name>gelu</name>
+                  <link>dlib/dnn/layers_abstract.h.html#gelu_</link>
                </item>
                <item>
                   <name>concat</name>
@@ -324,6 +336,10 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                <item>
                   <name>loss_mean_squared_per_channel_and_pixel</name>
                   <link>dlib/dnn/loss_abstract.h.html#loss_mean_squared_per_channel_and_pixel_</link>
+               </item>
+               <item>
+                  <name>loss_multibinary_log</name>
+                  <link>dlib/dnn/loss_abstract.h.html#loss_multibinary_log_</link>
                </item>
             </sub>
          </item>
@@ -474,6 +490,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <name>Data IO</name>
          <item>load_image_dataset_metadata</item> 
          <item>load_image_dataset</item> 
+         <item>load_cifar_10_dataset</item> 
          <item>save_image_dataset_metadata</item> 
          <item>load_libsvm_formatted_data</item> 
          <item>save_libsvm_formatted_data</item> 
@@ -2866,6 +2883,17 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             <example>train_object_detector.cpp.html</example>
          </examples>
                                  
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>load_cifar_10_dataset</name>
+         <file>dlib/data_io.h</file>
+         <spec_file link="true">dlib/data_io/cifar_abstract.h</spec_file>
+         <description>
+            Loads the <a href="https://www.cs.toronto.edu/~kriz/cifar.html">CIFAR-10</a> from disk.
+         </description>
       </component>
       
    <!-- ************************************************************************* -->

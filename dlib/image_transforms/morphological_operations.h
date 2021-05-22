@@ -758,7 +758,7 @@ namespace dlib
     {
         /*
             The implementation of this function is based on the paper
-            "A fast parallel algorithm for thinning digital patterns” by T.Y. Zhang and C.Y. Suen.
+            "A fast parallel algorithm for thinning digital patterns" by T.Y. Zhang and C.Y. Suen.
             and also the excellent discussion of it at:
             http://opencv-code.com/quick-tips/implementation-of-thinning-algorithm-in-opencv/
         */

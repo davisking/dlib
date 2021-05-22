@@ -422,6 +422,36 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        void clipped_relu (
+            tensor& dest,
+            const tensor& src,
+            const float coef
+        );
+
+        void clipped_relu_gradient (
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input,
+            const float ceiling
+        );
+
+    // ------------------------------------------------------------------------------------
+
+        void elu (
+            tensor& dest,
+            const tensor& src,
+            const float alpha
+        );
+
+        void elu_gradient (
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input,
+            const float alpha
+        );
+
+    // ----------------------------------------------------------------------------------------
+
         void gelu (
             tensor& dest,
             const tensor& src
@@ -713,7 +743,7 @@ namespace dlib
                 for (long i = 0; i < subnetwork_output.num_samples(); ++i, ++truth)
                 {
                     const auto& t = *truth;
-                    DLIB_ASSERT(t.size() == subnetwork_output.k());
+                    DLIB_ASSERT(static_cast<long>(t.size()) == subnetwork_output.k());
                     for (size_t j = 0; j < t.size(); ++j) {
                         DLIB_ASSERT(t[j].nr() == subnetwork_output.nr());
                         DLIB_ASSERT(t[j].nc() == subnetwork_output.nc());

@@ -1767,6 +1767,17 @@ namespace dlib
             {
             }
 
+            // handle skip layer case
+            template <layer_mode mode, template <typename> class TAG, typename U, typename E>
+            void disable_input_bias(add_layer<bn_<mode>, add_skip_layer<TAG, U>, E>& )
+            {
+            }
+
+            template <template <typename> class TAG, typename U, typename E>
+            void disable_input_bias(add_layer<layer_norm_, add_skip_layer<TAG, U>, E>& )
+            {
+            }
+
             template<typename input_layer_type>
             void operator()(size_t , input_layer_type& ) const
             {
@@ -3457,6 +3468,164 @@ namespace dlib
 
     template <typename SUBNET>
     using htan = add_layer<htan_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class clipped_relu_
+    {
+    public:
+        clipped_relu_(
+            const float ceiling_ = 6.0f
+        ) : ceiling(ceiling_)
+        {
+        }
+
+        float get_ceiling(
+        ) const {
+            return ceiling;
+        }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& /*sub*/)
+        {
+        }
+
+        void forward_inplace(const tensor& input, tensor& output)
+        {
+            tt::clipped_relu(output, input, ceiling);
+        }
+
+        void backward_inplace(
+            const tensor& computed_output,
+            const tensor& gradient_input,
+            tensor& data_grad,
+            tensor&
+        )
+        {
+            tt::clipped_relu_gradient(data_grad, computed_output, gradient_input, ceiling);
+        }
+
+        inline dpoint map_input_to_output (const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input (const dpoint& p) const { return p; }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const clipped_relu_& item, std::ostream& out)
+        {
+            serialize("clipped_relu_", out);
+            serialize(item.ceiling, out);
+        }
+
+        friend void deserialize(clipped_relu_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "clipped_relu_")
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::clipped_relu_.");
+            deserialize(item.ceiling, in);
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const clipped_relu_& item)
+        {
+            out << "clipped_relu\t("
+                << "ceiling=" << item.ceiling
+                << ")";
+            return out;
+        }
+
+        friend void to_xml(const clipped_relu_& item, std::ostream& out)
+        {
+            out << "<clipped_relu ceiling='" << item.ceiling << "'/>\n";
+        }
+
+
+    private:
+        resizable_tensor params;
+        float ceiling;
+    };
+
+    template <typename SUBNET>
+    using clipped_relu = add_layer<clipped_relu_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class elu_
+    {
+    public:
+        elu_(
+            const float alpha_ = 1.0f
+        ) : alpha(alpha_)
+        {
+        }
+
+        float get_alpha(
+        ) const {
+            return alpha;
+        }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& /*sub*/)
+        {
+        }
+
+        void forward_inplace(const tensor& input, tensor& output)
+        {
+            tt::elu(output, input, alpha);
+        }
+
+        void backward_inplace(
+            const tensor& computed_output,
+            const tensor& gradient_input,
+            tensor& data_grad,
+            tensor&
+        )
+        {
+            tt::elu_gradient(data_grad, computed_output, gradient_input, alpha);
+        }
+
+        inline dpoint map_input_to_output (const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input (const dpoint& p) const { return p; }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const elu_& item, std::ostream& out)
+        {
+            serialize("elu_", out);
+            serialize(item.alpha, out);
+        }
+
+        friend void deserialize(elu_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "elu_")
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::elu_.");
+            deserialize(item.alpha, in);
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const elu_& item)
+        {
+            out << "elu\t ("
+                << "alpha=" << item.alpha
+                << ")";
+            return out;
+        }
+
+        friend void to_xml(const elu_& item, std::ostream& out)
+        {
+            out << "<elu alpha='" << item.alpha << "'/>\n";
+        }
+
+
+    private:
+        resizable_tensor params;
+        float alpha;
+    };
+
+    template <typename SUBNET>
+    using elu = add_layer<elu_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

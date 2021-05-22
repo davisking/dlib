@@ -969,6 +969,70 @@ namespace dlib
 
     template <
         typename image_type1,
+        typename image_type2,
+        typename interpolation_type
+        >
+    point_transform_affine letterbox_image (
+        const image_type1& img_in,
+        image_type2& img_out,
+        long size,
+        const interpolation_type& interp
+    )
+    {
+        DLIB_CASSERT(size > 0, "size must be bigger than zero, but was " << size);
+        const_image_view<image_type1> vimg_in(img_in);
+        image_view<image_type2> vimg_out(img_out);
+
+        const auto scale = size / std::max<double>(vimg_in.nr(), vimg_in.nc());
+
+        // early return if the image has already the requested size and no padding is needed
+        if (scale == 1 && vimg_in.nr() == vimg_in.nc())
+        {
+            assign_image(vimg_out, vimg_in);
+            return point_transform_affine();
+        }
+
+        vimg_out.set_size(size, size);
+
+        const long nr = std::round(scale * vimg_in.nr());
+        const long nc = std::round(scale * vimg_in.nc());
+        dpoint offset((size - nc) / 2.0, (size - nr) / 2.0);
+        const auto r = rectangle(offset.x(), offset.y(), offset.x() + nc - 1, offset.y() + nr - 1);
+        zero_border_pixels(vimg_out, r);
+        auto si = sub_image(img_out, r);
+        resize_image(vimg_in, si, interp);
+        return point_transform_affine(identity_matrix<double>(2) * scale, offset);
+    }
+
+    template <
+        typename image_type1,
+        typename image_type2
+        >
+    point_transform_affine letterbox_image (
+        const image_type1& img_in,
+        image_type2& img_out,
+        long size
+    )
+    {
+        return letterbox_image(img_in, img_out, size, interpolate_bilinear());
+    }
+
+    template <
+        typename image_type1,
+        typename image_type2
+        >
+    point_transform_affine letterbox_image (
+        const image_type1& img_in,
+        image_type2& img_out
+    )
+    {
+        return letterbox_image(img_in, img_out, std::max(num_rows(img_in), num_columns(img_in)), interpolate_bilinear());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type1,
         typename image_type2
         >
     point_transform_affine flip_image_left_right (

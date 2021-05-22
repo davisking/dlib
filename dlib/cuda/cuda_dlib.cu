@@ -1482,6 +1482,129 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        __global__ void _cuda_clipped_relu(const float* s, float* d, size_t n, const float alpha)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                if (s[i] < 0)
+                    d[i] = 0;
+                else if (s[i] > alpha)
+                    d[i] = alpha;
+                else
+                    d[i] = s[i];
+            }
+        }
+
+        void clipped_relu (
+            tensor& dest,
+            const tensor &src,
+            const float alpha
+        )
+        {
+            launch_kernel(_cuda_clipped_relu, max_jobs(dest.size()),
+                src.device(), dest.device(), src.size(), alpha);
+        }
+
+    // ----------------------------------------------------------------------------------------
+
+        __global__ void _cuda_clipped_relu_gradient_inplace(float* out, const float* s, const float* gi, size_t n, const float alpha)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                if (s[i] > 0 && s[i] < alpha)
+                    out[i] = gi[i];
+                else
+                    out[i] = 0.f;
+            }
+        }
+
+        __global__ void _cuda_clipped_relu_gradient(float* out, const float* s, const float* gi, size_t n, const float alpha)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                if (s[i] > 0 && s[i] < alpha)
+                    out[i] += gi[i];
+            }
+        }
+
+        void clipped_relu_gradient (
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input,
+            const float alpha
+        )
+        {
+            float* out = grad.device();
+            const float* gi = gradient_input.device();
+            if (out == gi)
+                launch_kernel(_cuda_clipped_relu_gradient_inplace, max_jobs(grad.size()), out, dest.device(), gi, grad.size(), alpha);
+            else
+                launch_kernel(_cuda_clipped_relu_gradient, max_jobs(grad.size()), out, dest.device(), gi, grad.size(), alpha);
+        }
+
+    // ----------------------------------------------------------------------------------------
+
+        __global__ void _cuda_elu(const float* s, float* d, size_t n, const float alpha)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                if (s[i] > 0)
+                    d[i] = s[i];
+                else
+                    d[i] = alpha * (std::exp(s[i]) - 1.0f);
+            }
+        }
+
+        void elu (
+            tensor& dest,
+            const tensor &src,
+            const float alpha
+        )
+        {
+            launch_kernel(_cuda_elu, max_jobs(dest.size()), src.device(), dest.device(), src.size(), alpha);
+        }
+
+    // ----------------------------------------------------------------------------------------
+
+        __global__ void _cuda_elu_gradient_inplace(float* out, const float* s, const float* gi, size_t n, const float alpha)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                if (s[i] > 0)
+                    out[i] = gi[i];
+                else
+                    out[i] = (alpha + s[i]) * gi[i];
+            }
+        }
+
+        __global__ void _cuda_elu_gradient(float* out, const float* s, const float* gi, size_t n, const float alpha)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                if (s[i] > 0)
+                    out[i] += gi[i];
+                else
+                    out[i] += (alpha + s[i]) * gi[i];
+            }
+        }
+
+        void elu_gradient (
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input,
+            const float alpha
+        )
+        {
+            float* out = grad.device();
+            const float* gi = gradient_input.device();
+            if (out == gi)
+                launch_kernel(_cuda_elu_gradient_inplace, max_jobs(grad.size()), out, dest.device(), gi, grad.size(), alpha);
+            else
+                launch_kernel(_cuda_elu_gradient, max_jobs(grad.size()), out, dest.device(), gi, grad.size(), alpha);
+        }
+
+    // ----------------------------------------------------------------------------------------
+
         __global__ void _cuda_gelu(const float* s, float* d, size_t n)
         {
             for (auto i : grid_stride_range(0, n))

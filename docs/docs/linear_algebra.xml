@@ -163,6 +163,10 @@
                   <name>tanh</name>
                   <link>dlib/matrix/matrix_math_functions_abstract.h.html#tanh</link>
                </item>
+               <item>
+                  <name>soft_max</name>
+                  <link>dlib/matrix/matrix_math_functions_abstract.h.html#soft_max</link>
+               </item>
             </sub>
          </item>
          <item nolink="true">
@@ -548,6 +552,10 @@
                <item>
                   <name>pointwise_multiply</name>
                   <link>dlib/matrix/matrix_utilities_abstract.h.html#pointwise_multiply</link>
+               </item>
+               <item>
+                  <name>pointwise_pow</name>
+                  <link>dlib/matrix/matrix_utilities_abstract.h.html#pointwise_pow</link>
                </item>
                <item>
                   <name>join_rows</name>

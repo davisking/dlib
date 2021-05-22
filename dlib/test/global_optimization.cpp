@@ -172,7 +172,7 @@ namespace
         DLIB_TEST_MSG(max(abs(true_x-result.x)) < 1e-5, max(abs(true_x-result.x)));
         print_spinner();
 
-        result = find_max_global(rosen, {0.1, 0.1}, {2, 2}, max_function_calls(100), 0, {function_evaluation({1.1, 0.9}, rosen({1.1, 0.9}))});
+        result = find_max_global(rosen, {0.1, 0.1}, {2, 2}, max_function_calls(100), 0, std::vector<function_evaluation>{function_evaluation({1.1, 0.9}, rosen({1.1, 0.9}))});
         dlog << LINFO << "rosen: " <<  trans(result.x);
         DLIB_TEST_MSG(max(abs(true_x-result.x)) < 1e-5, max(abs(true_x-result.x)));
         print_spinner();
@@ -182,7 +182,28 @@ namespace
         DLIB_TEST_MSG(max(abs(true_x-result.x)) < 1e-5, max(abs(true_x-result.x)));
         print_spinner();
 
+        result = find_max_global(rosen, {0.1, 0.1}, {2, 2}, std::chrono::seconds(5), 0.0);
+        dlog << LINFO << "rosen: " <<  trans(result.x);
+        DLIB_TEST_MSG(max(abs(true_x-result.x)) < 1e-5, max(abs(true_x-result.x)));
+        print_spinner();
+
+        result = find_max_global(rosen, {0.1, 0.1}, {2, 2}, std::chrono::seconds(5), max_function_calls(100));
+        dlog << LINFO << "rosen: " <<  trans(result.x);
+        DLIB_TEST_MSG(max(abs(true_x-result.x)) < 1e-5, max(abs(true_x-result.x)));
+        print_spinner();
+
+        result = find_max_global(rosen, {0.1, 0.1}, {2, 2}, max_function_calls(100), std::chrono::seconds(5));
+        dlog << LINFO << "rosen: " <<  trans(result.x);
+        DLIB_TEST_MSG(max(abs(true_x-result.x)) < 1e-5, max(abs(true_x-result.x)));
+        print_spinner();
+
+
         result = find_max_global(rosen, {0.1, 0.1}, {2, 2}, {false,false}, max_function_calls(100));
+        dlog << LINFO << "rosen: " <<  trans(result.x);
+        DLIB_TEST_MSG(max(abs(true_x-result.x)) < 1e-5, max(abs(true_x-result.x)));
+        print_spinner();
+
+        result = find_max_global(rosen, {0.1, 0.1}, {2, 2}, {false,false}, max_function_calls(100), 0.0);
         dlog << LINFO << "rosen: " <<  trans(result.x);
         DLIB_TEST_MSG(max(abs(true_x-result.x)) < 1e-5, max(abs(true_x-result.x)));
         print_spinner();
@@ -199,16 +220,26 @@ namespace
         DLIB_TEST(std::abs(result.x - 2) < 1e-9);
         print_spinner();
 
-        result = find_max_global([](double x){ return -std::pow(x-2,2.0); }, -10, 1, max_function_calls(10));
-        dlog << LINFO << "(x-2)^2, bound at 1: " <<  trans(result.x);
-        DLIB_TEST(result.x.size()==1);
-        DLIB_TEST(std::abs(result.x - 1) < 1e-9);
+        unsigned int normal_evals=0, early_evals=0;
+        auto normal_result = find_max_global([&normal_evals](double x){ normal_evals++; return -std::pow(x-2,2.0); }, -10, 1, max_function_calls(10));
+        dlog << LINFO << "(x-2)^2, bound at 1: " <<  trans(normal_result.x);
+        DLIB_TEST(normal_result.x.size()==1);
+        DLIB_TEST(std::abs(normal_result.x - 1) < 1e-9);
         print_spinner();
 
         result = find_max_global([](double x){ return -std::pow(x-2,2.0); }, -10, 1, std::chrono::seconds(2));
         dlog << LINFO << "(x-2)^2, bound at 1: " <<  trans(result.x);
         DLIB_TEST(result.x.size()==1);
         DLIB_TEST(std::abs(result.x - 1) < 1e-9);
+        print_spinner();
+
+        constexpr auto close_enough = -16.0;
+        auto early_result = find_max_global([&early_evals](double x){ early_evals++; return -std::pow(x-2,2.0); }, -10, 1, max_function_calls(10), 0.0, std::vector<function_evaluation>{}, [&](double y){ return (y >= close_enough);});
+        dlog << LINFO << "(x-2)^2, bound at 1: " <<  trans(early_result.x);
+        DLIB_TEST(early_result.x.size()==1);
+        DLIB_TEST(std::abs(early_result.y) <= std::abs(close_enough));
+        DLIB_TEST(std::abs(early_result.x - 1) <= 4);
+        DLIB_TEST(normal_evals >= early_evals);
         print_spinner();
 
 

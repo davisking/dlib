@@ -24,15 +24,16 @@ namespace dlib
 {
     class vectorstream : public std::iostream
     {
+        template<typename CharType>
         class vector_streambuf : public std::streambuf
         {
-            typedef std::vector<char>::size_type size_type;
-            size_type read_pos; // buffer[read_pos] == next byte to read from buffer
+            typedef typename std::vector<CharType>::size_type size_type;
+            size_type read_pos = 0; // buffer[read_pos] == next byte to read from buffer
         public:
-            std::vector<char>& buffer;
+            std::vector<CharType>& buffer;
 
             vector_streambuf(
-                std::vector<char>& buffer_
+                std::vector<CharType>& buffer_
             ) :
                 read_pos(0),
                 buffer(buffer_) 
@@ -142,16 +143,44 @@ namespace dlib
 
         vectorstream (
             std::vector<char>& buffer
-        ) :
-            std::iostream(&buf),
-            buf(buffer)
-        {}
+        ) : std::iostream(0),
+            buf1(buffer),
+            buf2(dummy2),
+            buf3(dummy3)
+        {
+            rdbuf(&buf1);
+        }
+        
+        vectorstream (
+            std::vector<int8_t>& buffer
+        ) : std::iostream(0),
+            buf1(dummy1),
+            buf2(buffer),
+            buf3(dummy3)
+        {
+            rdbuf(&buf2);
+        }
+        
+        vectorstream (
+            std::vector<uint8_t>& buffer
+        ) : std::iostream(0),
+            buf1(dummy1),
+            buf2(dummy2),
+            buf3(buffer)
+        {
+            rdbuf(&buf3);
+        }
             
         vectorstream(const vectorstream& ori) = delete;
         vectorstream(vectorstream&& item) = delete;
-            
+                
     private:
-        vector_streambuf buf;
+        std::vector<char>           dummy1;
+        std::vector<int8_t>         dummy2;
+        std::vector<uint8_t>        dummy3;
+        vector_streambuf<char>      buf1;
+        vector_streambuf<int8_t>    buf2;
+        vector_streambuf<uint8_t>   buf3;
     };
 }
 

@@ -76,6 +76,8 @@
          <item>count_steps_without_decrease_robust</item> 
          <item>count_steps_without_decrease</item> 
          <item>count_steps_without_increase</item> 
+         <item>probability_values_are_increasing</item> 
+         <item>probability_values_are_increasing_robust</item> 
 
          <item>binomial_random_vars_are_different</item> 
          <item>event_correlation</item> 
@@ -747,6 +749,32 @@
          <description>
             This function behaves just like <a
             href="#count_steps_without_decrease">count_steps_without_decrease</a> except
+            that it ignores times series values that are anomalously large.  This makes it
+            robust to sudden noisy but transient spikes in the time series values.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>probability_values_are_increasing</name>
+         <file>dlib/statistics/running_gradient.h</file>
+         <spec_file link="true">dlib/statistics/running_gradient_abstract.h</spec_file>
+         <description>
+            Given a potentially noisy time series, this function returns the probability that those
+            values are increasing in magnitude.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>probability_values_are_increasing_robust</name>
+         <file>dlib/statistics/running_gradient.h</file>
+         <spec_file link="true">dlib/statistics/running_gradient_abstract.h</spec_file>
+         <description>
+            This function behaves just like <a
+            href="#probability_values_are_increasing">probability_values_are_increasing</a> except
             that it ignores times series values that are anomalously large.  This makes it
             robust to sudden noisy but transient spikes in the time series values.
          </description>

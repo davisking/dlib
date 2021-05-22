@@ -314,6 +314,9 @@ namespace
             serialize(c2,sout);
             serialize(d1,sout);
             serialize(d2,sout);
+            
+            std::vector<int8_t> buf1;
+            dlib::serialize(buf1) << a1 << a2 << b1 << b2 << c1 << c2 << d1 << d2;
 
             DLIB_TEST(a1 == orig1);
             DLIB_TEST(a2 == orig2);
@@ -361,8 +364,27 @@ namespace
             DLIB_TEST(c2 == orig2);
             DLIB_TEST(d1 == orig1);
             DLIB_TEST(d2 == orig2);
-
-
+            
+            set_all_elements(a1,99);
+            set_all_elements(a2,99);
+            set_all_elements(b1,99);
+            set_all_elements(b2,99);
+            set_all_elements(c1,99);
+            set_all_elements(c2,99);
+            set_all_elements(d1,99);
+            set_all_elements(d2,99);
+            
+            std::vector<uint8_t> buf2(buf1.begin(), buf1.end());
+            dlib::deserialize(buf2) >> a1 >> a2 >> b1 >> b2 >> c1 >> c2 >> d1 >> d2;
+            
+            DLIB_TEST(a1 == orig1);
+            DLIB_TEST(a2 == orig2);
+            DLIB_TEST(b1 == orig1);
+            DLIB_TEST(b2 == orig2);
+            DLIB_TEST(c1 == orig1);
+            DLIB_TEST(c2 == orig2);
+            DLIB_TEST(d1 == orig1);
+            DLIB_TEST(d2 == orig2);
         }
 
         {
@@ -1495,6 +1517,23 @@ namespace
             set_rowm(a,0) = trans(m*b);
             DLIB_TEST(equal(rowm(a,0) , trans(m*b)));
             DLIB_TEST(!equal(rowm(a,0) , m*b));
+        }
+        {
+            matrix<double> x, y;
+            x = 10 * gaussian_randm(100, 1) - 10;
+            y = soft_max(x);
+
+            double max_val = -std::numeric_limits<double>::infinity();
+            for (const auto i : x)
+                max_val = std::max(max_val, i);
+
+            double sum_exps = 0;
+            for (const auto i : x)
+                sum_exps += std::exp(i - max_val);
+            double scale = 1.0 / sum_exps;
+
+            for (long i = 0; i < x.nr(); ++i)
+                DLIB_CASSERT(y(i) == std::exp(x(i) - max_val) * scale);
         }
     }
 
