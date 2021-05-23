@@ -662,6 +662,8 @@ namespace dlib
         class sw_audio_fifo
         {
         public:
+            sw_audio_fifo() = default;
+            
             sw_audio_fifo(
                 int codec_frame_size,
                 int sample_format,
@@ -676,6 +678,17 @@ namespace dlib
                     if (fifo == nullptr)
                         throw std::bad_alloc();
                 }
+            }
+            
+            sw_audio_fifo(sw_audio_fifo&& other)
+            {
+                swap(other);
+            }
+            
+            sw_audio_fifo& operator=(sw_audio_fifo&& other)
+            {
+                swap(other);
+                return *this;
             }
 
             ~sw_audio_fifo()
@@ -727,17 +740,31 @@ namespace dlib
 
                 return outs;
             }
+            
+            void swap(sw_audio_fifo& other)
+            {
+                std::swap(frame_size,   other.frame_size);
+                std::swap(fmt,          other.fmt);
+                std::swap(channels,     other.channels);
+                std::swap(sample_count, other.sample_count);
+                std::swap(fifo,         other.fifo);
+            }
 
         private:
             sw_audio_fifo(const sw_audio_fifo& ori)             = delete;
             sw_audio_fifo& operator=(const sw_audio_fifo& ori)  = delete;
 
-            const int frame_size;
-            const int fmt;
-            const int channels;
+            int frame_size  = 0;
+            int fmt         = 0;
+            int channels    = 0;
             uint64_t sample_count   = 0;
             AVAudioFifo* fifo       = nullptr;
         };
+        
+        inline void swap(sw_audio_fifo& a, sw_audio_fifo& b)
+        {
+            a.swap(b);
+        }
     }
 }
 
