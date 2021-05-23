@@ -191,6 +191,11 @@ namespace dlib
         {
             return _channel_video.is_enabled() ? _channel_video._pCodecCtx->frame_number : -1;
         }
+        
+        std::chrono::milliseconds duration() const
+        {
+            return std::chrono::milliseconds(_pFormatCtx ? av_rescale(_pFormatCtx->duration, 1000, AV_TIME_BASE) : 0);
+        }
 
         /*audio dims*/
         int sample_rate() const
@@ -215,7 +220,14 @@ namespace dlib
             {
                 _channel_video._resizer_image.resize(f, tmp);
                 array2d<rgb_pixel> frame_image(tmp.frame->height, tmp.frame->width);
-                memcpy(frame_image.begin(), tmp.frame->data[0], frame_image.size()*3);
+                
+                for (size_t row = 0 ; row < tmp.frame->height ; row++)
+                {
+                    memcpy(frame_image.begin() + row * tmp.frame->width, 
+                           tmp.frame->data[0]  + row * tmp.frame->linesize[0], 
+                           tmp.frame->width*3);
+                }
+
                 frame = std::move(frame_image);
             }
             else
