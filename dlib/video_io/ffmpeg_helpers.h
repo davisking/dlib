@@ -64,7 +64,10 @@ namespace dlib
             av_dict(const std::vector<std::pair<std::string,std::string>>& options)
             {
                 for (const auto& opt : options)
-                    assert(av_dict_set(&avdic, opt.first.c_str(), opt.second.c_str(), 0) == 0); 
+                {
+                    if (av_dict_set(&avdic, opt.first.c_str(), opt.second.c_str(), 0) != 0)
+                        throw std::runtime_error("av_dict() failed to set option");
+                }
             }
 
             av_dict(const av_dict& ori)
