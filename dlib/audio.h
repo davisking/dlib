@@ -6,13 +6,18 @@
 
 #include <stdint.h>
 #include <vector>
-#include <utility>
 
 namespace dlib
 {
     struct audio_frame
     {
-        std::vector<std::pair<int16_t,int16_t>> samples;
+        struct sample
+        {
+            int16_t ch1;
+            int16_t ch2;
+        };
+        
+        std::vector<sample> samples;
         float sample_rate;
     };
 }
