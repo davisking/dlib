@@ -127,9 +127,8 @@ namespace dlib
     inline std::vector<codec_details> ffmpeg_list_available_codecs()
     {
         std::vector<codec_details> details;
-        void* opaque = nullptr;
         const AVCodec* codec = NULL;
-        while ((codec = av_codec_iterate(&opaque)))
+        while ((codec = av_codec_next(codec)))
         {
             codec_details detail;
             detail.codec_name = codec->name;
