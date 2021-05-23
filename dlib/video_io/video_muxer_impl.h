@@ -27,43 +27,165 @@ namespace dlib
     {
         struct channel_args
         {
+            /*
+             * This is the codec ID.
+             * The user is REQUIRED to either set this correctly or codec_name.
+             */
+            AVCodecID codec = AV_CODEC_ID_NONE;
+            
+            /*
+             * This is the codec name.
+             * The user is REQUIRED to either set this correctly or codec.
+             */
+            std::string codec_name  = ""; //only used if codec==AV_CODEC_ID_NONE
+            
+            /*
+             * These are codec specific options.
+             * You might need to set some options for H264 for example.
+             * These are passed to avcodec_open2() in avcodec.h
+             * Please see the ffmpeg/libavcodec documentation.
+             */
             std::vector<std::pair<std::string,std::string>> codec_options;
-            AVCodecID       codec       = AV_CODEC_ID_NONE;
-            std::string     codec_name  = ""; //only used if codec==AV_CODEC_ID_NONE
-            int64_t         bitrate     = 400000; //this seems a sensible default
-            int             nthreads    = -1; //-1 means use std::thread::hardware_concurrency()
+            
+            /*
+             * This is the bitrate of the stream.
+             * 0 means the default value in the codec is used.
+             * This is used to set AVCodecContext::bit_rate in avcodec.h
+             * Please see the ffmpeg/libavcodec documentation.
+             */
+            int64_t bitrate = 0;
+            
+            /*
+             * Number of threads used by the codec.
+             * -1 means std::thread::hardware_concurrency() / 2 is used
+             */
+            int nthreads = -1;
         };
         
         struct video_args
         {
-            channel_args    common;
-            size_t          h   = 512;
-            size_t          w   = 512;
-            AVPixelFormat   fmt = AV_PIX_FMT_YUV420P;
-            ffmpeg::rational fps      = {25,1};
-            int             gop_size = 10;
+            channel_args common;
+            
+            /*
+             * Frames are resized to this height before being passed to the 
+             * codec. You should probably set this manually.
+             */
+            size_t h = 512;
+            
+            /*
+             * Frames are resized to this width before being passed to the 
+             * codec. You should probably set this manually.
+             */
+            
+            size_t w = 512;
+            
+            /*
+             * Frames are resized to this pixel format before being passed to 
+             * the codec. You should probably set this manually.
+             * Note, for libx264 encoder, you need this to be AV_PIX_FMT_YUV420P.
+             * If you want to use AV_PIX_FMT_RGB24, then you need to use
+             * the libx264rgb codec.
+             */
+            AVPixelFormat fmt = AV_PIX_FMT_YUV420P;
+            
+            /*
+             * This is the frames-per-second of the encoded stream.
+             * This will determine how slow or how fast your video plays.
+             */
+            ffmpeg::rational fps = {25,1};
+            
+            /*
+             * This is passed to AVCodecContext::gop_size in avcodec.h
+             * Please see the ffmpeg/libavcodec documentation. 
+             */
+            int gop_size = 10;
         };
 
         struct audio_args
         {
-            channel_args    common;
-            int             sample_rate     = 0;                    //pick the default in the codec
-            uint64_t        channel_layout  = 0;                    //pick the default in the codec
-            AVSampleFormat  fmt             = AV_SAMPLE_FMT_NONE;   //pick the default in the codec
+            channel_args common;
+            
+            /*
+             * Audio frames are resampled to this sample rate before being 
+             * passed to the codec.
+             * If 0, the codec default is used.
+             */
+            int sample_rate = 0;
+            
+            /*
+             * Audio frames are reshaped to have this layout.
+             * You could set this to AV_CH_LAYOUT_STEREO for example.
+             * Note, some codecs only support a handful of values.
+             * dlib will reset this to one of the supported values if 
+             * it's incorrect or not supported.
+             * If 0, the codec default is used.
+             */
+            uint64_t channel_layout = 0;
+            
+            /*
+             * Audio frames are resampled to have this format before being
+             * passed to the codec.
+             * You could set this to AV_SAMPLE_FMT_S16 for example.
+             * Note, some codecs only support a handful of values.
+             * dlib will reset this to one of the supported values if 
+             * it's incorrect or not supported.
+             * If AV_SAMPLE_FMT_NONE, the codec default is used.
+             */
+            AVSampleFormat fmt = AV_SAMPLE_FMT_NONE;
         };
 
         typedef std::function<bool()> interrupter_t;
 
-        std::string filepath        = "";   //REQUIRED
-        std::string output_format   = "";   //if empty, this is guessed from dest_name
+        /*
+         * The user is REQUIRED to set this.
+         * This could be:
+         *  - filepath of video file (.mp4)
+         *  - filepath of audio file (.mp3, .wav, ...)
+         *  - url of RTSP stream
+         *  - audio device (hw:0) provided output_format is set correctly. and avdevice_register_all() is called globally
+         */
+        std::string filepath = "";
+        
+        /*
+         * This is the output format of the muxer.
+         * Most of the time, the user need not set this and it is guessed by
+         * libavformat from the filepath.
+         * However, for devices, the user is required to set this correctly.
+         * This could be:
+         *  - "alsa" for audio device
+         *  - "rtsp" for RTSP stream
+         */
+        std::string output_format = "";
         
         bool enable_image = true;
         video_args image_options;
         bool enable_audio = false;
         audio_args audio_options;
 
+        /*
+         * These are muxer/format specific options.
+         * These are passed to avformat_write_header().
+         * Please lookup the ffmpeg/libavformat documentation.
+         */
         std::vector<std::pair<std::string,std::string>> format_options;
+        
+        /*
+         * These are passed avio_open2().
+         * Please lookup the ffmpeg/libavformat documentation.
+         */
         std::vector<std::pair<std::string,std::string>> protocol_options;
+        
+        /*
+         * This is an optional callback which is called internally by ffmpeg.
+         * If this returns true, ffmpeg will interrupt and close.
+         * This is useful for example if creating a listening RTSP muxer 
+         * and is hanging while waiting for a peer to connect. 
+         * In this case, avformat_alloc_output_context2() will block until a 
+         * peer connects. The user might have an external thread which keeps
+         * track of time and may trigger an interruption if a timeout has elapsed
+         * for example.
+         * However, the user is not required to set this.
+         */
         interrupter_t interrupter;
     };
     
@@ -184,7 +306,10 @@ namespace dlib
                 }
 
                 ch._pCodecCtx->thread_count = common.nthreads > 0 ? common.nthreads : std::thread::hardware_concurrency() / 2;
-                ch._pCodecCtx->bit_rate     = common.bitrate;
+                
+                if (common.bitrate > 0)
+                    ch._pCodecCtx->bit_rate = common.bitrate;
+                
                 if (_pFormatCtx->oformat->flags & AVFMT_GLOBALHEADER)
                     ch._pCodecCtx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 
