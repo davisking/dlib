@@ -222,7 +222,7 @@ namespace dlib
             for (size_t row = 0 ; row < tmp.frame->height ; row++)
             {
                 memcpy(tmp.frame->data[0]  + row * tmp.frame->linesize[0],
-                       frame_image.begin() + row * tmp.frame->width, 
+                       frame.begin() + row * tmp.frame->width, 
                        tmp.frame->width*3);
             }
             
