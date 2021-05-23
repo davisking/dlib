@@ -159,6 +159,7 @@ set (tests
    cublas.cpp
    find_optimal_parameters.cpp
    elastic_net.cpp
+   video.cpp
    )
 
 
