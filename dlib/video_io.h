@@ -68,6 +68,11 @@ namespace dlib
         {
             return _state ? _state->video_frame_number() : -1;
         }
+        
+        std::chrono::milliseconds duration() const
+        {
+            return _state ? _state->duration() : std::chrono::milliseconds(0);
+        }
 
         /*audio dims*/
         int sample_rate() const
