@@ -218,7 +218,14 @@ namespace dlib
         {
             ffmpeg::sw_frame tmp;
             tmp.resize_image(frame.nr(), frame.nc(), AV_PIX_FMT_RGB24, timestamp_us);
-            memcpy(tmp.frame->data[0], frame.begin(), frame.size()*3);
+            
+            for (size_t row = 0 ; row < tmp.frame->height ; row++)
+            {
+                memcpy(tmp.frame->data[0]  + row * tmp.frame->linesize[0],
+                       frame_image.begin() + row * tmp.frame->width, 
+                       tmp.frame->width*3);
+            }
+            
             return push(tmp);
         }
         
