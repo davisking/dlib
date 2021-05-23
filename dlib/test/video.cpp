@@ -1,5 +1,8 @@
 // Copyright (C) 2008  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
+
+#ifdef DLIB_USE_FFMPEG
+
 #include <sstream>
 #include <string>
 #include <cstdlib>
@@ -46,3 +49,5 @@ namespace
         }
     } a;
 }
+
+#endif
