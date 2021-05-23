@@ -95,6 +95,11 @@ namespace dlib
             return _state ? _state->get_video_metadata() : empty;
         }
         
+        float get_rotation_angle() const
+        {
+            return _state ? _state->get_rotation_angle() : 0;
+        }
+        
     private:
         std::unique_ptr<video_demuxer_impl> _state;
     };
