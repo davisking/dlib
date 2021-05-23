@@ -88,6 +88,28 @@ namespace dlib
         {
             return _connected;
         }
+        
+        bool push(
+            const array2d<rgb_pixel>& frame,
+            uint64_t timestamp_us = 0
+        )
+        {
+            ffmpeg::sw_frame tmp;
+            tmp.resize_image(frame.nr(), frame.nc(), AV_PIX_FMT_RGB24, timestamp_us);
+            memcpy(tmp.frame->data[0], frame.begin(), frame.size()*3);
+            return push(tmp);
+        }
+        
+        bool push(
+            const audio_frame& frame,
+            uint64_t timestamp_us = 0
+        )
+        {
+            ffmpeg::sw_frame tmp;
+            tmp.resize_audio(frame.sample_rate, frame.samples.size(), AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16, timestamp_us);
+            memcpy(tmp.frame->data[0], frame.samples.data(), frame.samples.size()*sizeof(decltype(frame.samples)::value_type));
+            return push(tmp);
+        }
 
     private:
         video_muxer_impl(const video_muxer_impl& orig) = delete;
