@@ -224,7 +224,7 @@ namespace dlib
                 audio_frame frame_audio;
                 frame_audio.sample_rate = tmp.frame->sample_rate;
                 frame_audio.samples.resize(tmp.frame->nb_samples);
-                memcpy(frame_audio.samples.data(), tmp.frame->data[0], frame_audio.samples.size()*2);
+                memcpy(frame_audio.samples.data(), tmp.frame->data[0], frame_audio.samples.size()*sizeof(decltype(frame_audio.samples)::value_type));
                 frame = std::move(frame_audio);
             }
             
