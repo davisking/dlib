@@ -5,6 +5,7 @@
 *.so
 *.pyc
 build
+imglab/build
 build2
 dist
 *.egg-info/

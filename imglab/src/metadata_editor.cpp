@@ -62,10 +62,10 @@ metadata_editor(
     display.set_overlay_rect_selected_handler(*this, &metadata_editor::on_overlay_rect_selected);
     overlay_label.set_text_modified_handler(*this, &metadata_editor::on_overlay_label_changed);
 
-    mbar.set_number_of_menus(2);
+    mbar.set_number_of_menus(3);
     mbar.set_menu_name(0,"File",'F');
-    mbar.set_menu_name(1,"Help",'H');
-
+    mbar.set_menu_name(1,"Chip");
+    mbar.set_menu_name(2,"Help",'H');
 
     mbar.menu(0).add_menu_item(menu_item_text("Save",*this,&metadata_editor::file_save,'S'));
     mbar.menu(0).add_menu_item(menu_item_text("Save As",*this,&metadata_editor::file_save_as,'A'));
@@ -74,7 +74,9 @@ metadata_editor(
     mbar.menu(0).add_menu_item(menu_item_separator());
     mbar.menu(0).add_menu_item(menu_item_text("Exit",static_cast<base_window&>(*this),&drawable_window::close_window,'x'));
 
-    mbar.menu(1).add_menu_item(menu_item_text("About",*this,&metadata_editor::display_about,'A'));
+    mbar.menu(1).add_menu_item(menu_item_text("Start",*this,&metadata_editor::executeChipping));
+
+    mbar.menu(2).add_menu_item(menu_item_text("About",*this,&metadata_editor::display_about,'A'));
 
     // set the size of this window.
     on_window_resized();
@@ -683,3 +685,11 @@ display_about(
 
 // ----------------------------------------------------------------------------------------
 
+void metadata_editor::
+executeChipping(
+)
+{
+    string str = "python ../../sealFindr.py ../../../SealNet2/Whaleboat_1_1";
+    const char *command = str.c_str();
+    system(command);
+}
