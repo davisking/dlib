@@ -9,7 +9,7 @@ cmake_minimum_required(VERSION 2.8.12)
 set (target_name imglab)
 
 PROJECT(${target_name})
-add_subdirectory(../dlib dlib_build)
+add_subdirectory(../include/dlib dlib_build)
 
 # add all the cpp files we want to compile to this list.  This tells
 # cmake that they are part of our target (which is the executable named imglab)
