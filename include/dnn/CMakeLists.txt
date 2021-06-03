@@ -42,14 +42,14 @@ include(${DLIB_PATH}/dlib/cmake)
 # files you would simply list them here in the add_executable() statement.  
 
 
-add_executable(seal.exe dnn_mmod_dog_hipsterizer.cpp)
+add_executable(seal dnn_mmod_dog_hipsterizer.cpp)
 
 
 # Finally, you need to tell CMake that this program, assignment_learning_ex,
 # depends on dlib.  You do that with this statement: 
 
 
-#target_link_libraries(SealFace dlib::dlib)
+target_link_libraries(seal dlib::dlib)
 
 
 

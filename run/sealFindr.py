@@ -21,7 +21,15 @@ def main(args):
 		os.mkdir(chipfolder)
 	except:
 		pass
-	os.system("seal.exe seal.dat " + chipfolder + " " + arguments)
+	#
+	#except:
+	print(os.listdir())
+	if str(os.name) == "posix":
+		print("test")
+		os.system("./seal.exe seal.dat " + chipfolder + " " + arguments)
+	if str(os.name) == 'nt':
+		print('windo$e')
+		os.system("seal.exe seal.dat " + chipfolder + " " + arguments)
 
 if __name__ == "__main__":		
 	SEALROOT = str(pathlib.Path('data'))

@@ -14,8 +14,9 @@ build_dnn()
 }
 
 export MAKEFLAGS=-j$(($(grep -c ^processor /proc/cpuinfo) - 1))
+DIR=$(reldir=$(dirname -- "$0"; echo x); reldir=${reldir%?x}; cd -- "$reldir" && pwd && echo x); 
+PJ_ROOT=${DIR%?x}
 
-PJ_ROOT=$(exec pwd)
 
 DLIB_PATH=$PJ_ROOT/include/
 DNN_ROOT=$PJ_ROOT/include/dnn
@@ -54,6 +55,12 @@ if [ ! -d ${DNN_BUILD} ]
 fi
 
 build_img
-
+build_dnn
+IMGLAB=$IMG_BUILD/imglab
+SEALEXEC=$DNN_BUILD/seal
+SEALPY=$IMG_ROOT/src/sealFindr.py
+cp "$IMGLAB" "$PJ_ROOT/run"
+cp "$SEALEXEC" "$PJ_ROOT/run"
+cp "$SEALPY" "$PJ_ROOT/run"
 
 
