@@ -6,6 +6,7 @@
 *.pyc
 build
 imglab/build
+imglab/run/dataChips
 build2
 dist
 *.egg-info/
