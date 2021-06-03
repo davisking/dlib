@@ -88,47 +88,29 @@ int main(int argc, char** argv) try
     if (argc < 3)
     {
         cout << "Call this program like this:" << endl;
-        cout << "./dnn_mmod_dog_hipsterizer mmod_dog_hipsterizer.dat faces/dogs.jpg" << endl;
-        cout << "\nYou can get the mmod_dog_hipsterizer.dat file from:\n";
-        cout << "http://dlib.net/files/mmod_dog_hipsterizer.dat.bz2" << endl;
+        cout << "./seal.exe seal.dat PHOTO_DIR photo1 photo2 ..." << endl;
         return 0;
     }
 
     // load the models
     net_type net;
-    shape_predictor sp;
-    deserialize(argv[1]) >> net >> sp;
-
-    //image_window 
-
-    // Now process each image, find seals, create chips
+    deserialize(argv[1]) >> net;
 
     int num_chips = 0;
+    string curFolder = argv[2];
+    string chipFolder = curFolder + "Chips";
 
+    //go through and chip each image
     for (int i = 3; i < argc; ++i)
     {
+        string curImg = argv[i];
+        string curImageFile = curFolder + "/" + curImg;
         matrix<rgb_pixel> img;
-        load_image(img, argv[i]);
-
-        //Initial downscale?
-
-        //cout << "pyramid 1... " << endl;
-        //pyramid_up(img);
-	//cout << "pyramid 2... " << endl;
-        //pyramid_up(img); //Command line arg?
-	// cout << "dets " << endl;    
-        // auto dets = net(img);
-        // while (dets.size() == 0) { //Expand until max_size reached, or face found
-	    //     if (!upscale_image(img)) {
-        //         break;
-        //     }
-        //     cout << "trying again... " << endl;
-	    //     dets = net(img);
-        // }
+        load_image(img, curImageFile);
 
         std::vector<dlib::mmod_rect> dets;
         try {
-            cout << "try pyramid up" << endl;
+            cout << "try pyramid up " << curImageFile << endl;
             pyramid_up(img);
             dets = net(img);
         }
@@ -136,7 +118,7 @@ int main(int argc, char** argv) try
             cout << "bad alloc pyramid up" << endl;
             try {
                 cout << "try pyramid down" << endl;
-                load_image(img, argv[i]); //Reload image, smaller
+                load_image(img, curImageFile); //Reload image, smaller
                 dets = net(img);
             }
             catch(std::bad_alloc& ba) {
@@ -151,18 +133,25 @@ int main(int argc, char** argv) try
             matrix<rgb_pixel> face_chip;
             cout << "d.rect... " << endl;
             chip_details face_chip_details = chip_details(d.rect, chip_dims(CHIP_SIZE, CHIP_SIZE)); //Optionally add angle
+            int left = face_chip_details.rect.left(), top = face_chip_details.rect.top();
+            int right = face_chip_details.rect.right(), bottom = face_chip_details.rect.bottom();
             extract_image_chip(img, face_chip_details, face_chip); //Img, rectangle for each chip, chip destination
 
-            // save the face chip
-            string filename = (string)argv[2] + "/chip" + to_string(num_chips) + ".jpeg";
-            //"C:/Users/james/Desktop/SealNet/SealNet/Chips/chip"
-            num_chips++;
-            save_jpeg(face_chip, filename, 100); //Img, location, quality 0-100
-            // Bolster data? add_image_left_right_flips, add_image_rotations, disturb_colors
-        }
+            //remove the .jpg part of the curImg
+            int dotIdx = curImg.find(".");
+            if (dotIdx != std::string::npos) curImg = curImg.substr(0, dotIdx);
 
-        // cout << "Hit enter to process the next image." << endl;
-        // cin.get();
+            // save the face chip
+            // the name of the chipped photo will be in the format:
+            // <count>_<original_photo>_ChippedAt_<top_left_coordinate_of_the_chipped_photo_within_the_original_photo>.jpeg
+            // located in the folder <original_folder>Chips
+            string location = "(" + to_string(left) + "," + to_string(top) + "),(" + to_string(right) + "," + to_string(bottom) + ")";
+            string filename = to_string(num_chips) + "_" + curImg + "_ChippedAt_" + location + ".jpeg";
+            string filedir = chipFolder + "/" + filename;
+            num_chips++;
+            save_jpeg(face_chip, filedir, 100); 
+            cout << filename << " saved to " << chipFolder << endl;
+        }
     }
 }
 catch (std::exception& e)

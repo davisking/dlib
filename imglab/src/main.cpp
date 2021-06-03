@@ -47,7 +47,8 @@ void create_new_dataset (
         depth = 30;
 
     dataset meta;
-    meta.name = "imglab dataset";
+    
+    //meta.name = "Data Set";
     meta.comment = "Created by imglab tool.";
     for (unsigned long i = 0; i < parser.number_of_arguments(); ++i)
     {
@@ -59,6 +60,7 @@ void create_new_dataset (
         catch (dlib::file::file_not_found&)
         {
             // then parser[i] should be a directory
+            meta.folderList.push_back(parser[i]);
 
             std::vector<file> files = get_files_in_directory_tree(parser[i], 
                                                                   match_endings(".png .PNG .jpeg .JPEG .jpg .JPG .bmp .BMP .dng .DNG .gif .GIF"),

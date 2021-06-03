@@ -689,7 +689,12 @@ void metadata_editor::
 executeChipping(
 )
 {
-    string str = "python ../../sealFindr.py ../../../SealNet2/Whaleboat_1_1";
-    const char *command = str.c_str();
-    system(command);
+    //std::cout << metadata.folderList[0] << std::endl;
+    std::cout << metadata.name << std::endl;
+    for (std::string folder : metadata.folderList){
+        //std::cout << folder << std::endl;
+        string str = "python ./sealFindr.py " + folder;
+        const char *command = str.c_str();
+        system(command);
+    }
 }

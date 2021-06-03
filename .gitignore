@@ -5,6 +5,7 @@
 *.so
 *.pyc
 build
+dataChips
 imglab/build
 build2
 dist

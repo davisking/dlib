@@ -18,16 +18,16 @@ namespace dlib
 {
     namespace image_dataset_metadata
     {
-
-    // ------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------
 
         const std::string get_decoded_string();
-        void create_image_metadata_stylesheet_file(const std::string& main_filename)
+        void create_image_metadata_stylesheet_file(const std::string &main_filename)
         {
             std::string path;
             std::string::size_type pos = main_filename.find_last_of("/\\");
             if (pos != std::string::npos)
-                path = main_filename.substr(0,pos+1);
+                path = main_filename.substr(0, pos + 1);
 
             std::ofstream fout((path + "image_metadata_stylesheet.xsl").c_str());
             if (!fout)
@@ -39,14 +39,13 @@ namespace dlib
                 throw dlib::error("ERROR: Unable to write to image_metadata_stylesheet.xsl.");
         }
 
-        void save_image_dataset_metadata (
-            const dataset& meta,
-            const std::string& filename
-        )
+        void save_image_dataset_metadata(
+            const dataset &meta,
+            const std::string &filename)
         {
             create_image_metadata_stylesheet_file(filename);
 
-            const std::vector<image>& images = meta.images;
+            const std::vector<image> &images = meta.images;
 
             std::ofstream fout(filename.c_str());
             if (!fout)
@@ -57,6 +56,14 @@ namespace dlib
             fout << "<dataset>\n";
             fout << "<name>" << meta.name << "</name>\n";
             fout << "<comment>" << meta.comment << "</comment>\n";
+            fout << "<folderList>";
+            for (int i = 0; i < meta.folderList.size(); ++i)
+            {
+                std::string folder = meta.folderList[i];
+                if (i < meta.folderList.size() - 1) fout << folder << " ";
+                else fout << folder;
+            }
+            fout << "</folderList>\n";
             fout << "<images>\n";
             for (unsigned long i = 0; i < images.size(); ++i)
             {
@@ -65,11 +72,11 @@ namespace dlib
                 // save all the boxes
                 for (unsigned long j = 0; j < images[i].boxes.size(); ++j)
                 {
-                    const box& b = images[i].boxes[j];
+                    const box &b = images[i].boxes[j];
                     fout << "    <box top='" << b.rect.top() << "' "
-                                 << "left='" << b.rect.left() << "' "
-                                << "width='" << b.rect.width() << "' "
-                               << "height='" << b.rect.height() << "'";
+                         << "left='" << b.rect.left() << "' "
+                         << "width='" << b.rect.width() << "' "
+                         << "height='" << b.rect.height() << "'";
                     if (b.difficult)
                         fout << " difficult='" << b.difficult << "'";
                     if (b.truncated)
@@ -97,12 +104,12 @@ namespace dlib
 
                         if (b.has_label())
                             fout << "      <label>" << b.label << "</label>\n";
-                        
+
                         // save all the parts
-                        std::map<std::string,point>::const_iterator itr;
+                        std::map<std::string, point>::const_iterator itr;
                         for (itr = b.parts.begin(); itr != b.parts.end(); ++itr)
                         {
-                            fout << "      <part name='"<< itr->first << "' x='"<< itr->second.x() <<"' y='"<< itr->second.y() <<"'/>\n";
+                            fout << "      <part name='" << itr->first << "' x='" << itr->second.x() << "' y='" << itr->second.y() << "'/>\n";
                         }
 
                         fout << "    </box>\n";
@@ -113,8 +120,6 @@ namespace dlib
                     }
                 }
 
-
-
                 fout << "  </image>\n";
 
                 if (!fout)
@@ -124,9 +129,9 @@ namespace dlib
             fout << "</dataset>";
         }
 
-    // ------------------------------------------------------------------------------------
-    // ------------------------------------------------------------------------------------
-    // ------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------
 
         class doc_handler : public document_handler
         {
@@ -134,19 +139,15 @@ namespace dlib
             image temp_image;
             box temp_box;
 
-            dataset& meta;
+            dataset &meta;
 
         public:
-
             doc_handler(
-                dataset& metadata_
-            ):
-                meta(metadata_) 
-            {}
+                dataset &metadata_) : meta(metadata_)
+            {
+            }
 
-
-            virtual void start_document (
-            )
+            virtual void start_document()
             {
                 meta = dataset();
                 ts.clear();
@@ -154,20 +155,18 @@ namespace dlib
                 temp_box = box();
             }
 
-            virtual void end_document (
-            )
+            virtual void end_document()
             {
             }
 
-            virtual void start_element ( 
+            virtual void start_element(
                 const unsigned long line_number,
-                const std::string& name,
-                const dlib::attribute_list& atts
-            )
+                const std::string &name,
+                const dlib::attribute_list &atts)
             {
                 try
                 {
-                    if (ts.size() == 0) 
+                    if (ts.size() == 0)
                     {
                         if (name != "dataset")
                         {
@@ -182,28 +181,41 @@ namespace dlib
                         }
                     }
 
-
                     if (name == "box")
                     {
-                        if (atts.is_in_list("top")) temp_box.rect.top() = sa = atts["top"];
-                        else throw dlib::error("<box> missing required attribute 'top'");
+                        if (atts.is_in_list("top"))
+                            temp_box.rect.top() = sa = atts["top"];
+                        else
+                            throw dlib::error("<box> missing required attribute 'top'");
 
-                        if (atts.is_in_list("left")) temp_box.rect.left() = sa = atts["left"];
-                        else throw dlib::error("<box> missing required attribute 'left'");
+                        if (atts.is_in_list("left"))
+                            temp_box.rect.left() = sa = atts["left"];
+                        else
+                            throw dlib::error("<box> missing required attribute 'left'");
 
-                        if (atts.is_in_list("width")) temp_box.rect.right() = sa = atts["width"];
-                        else throw dlib::error("<box> missing required attribute 'width'");
+                        if (atts.is_in_list("width"))
+                            temp_box.rect.right() = sa = atts["width"];
+                        else
+                            throw dlib::error("<box> missing required attribute 'width'");
 
-                        if (atts.is_in_list("height")) temp_box.rect.bottom() = sa = atts["height"];
-                        else throw dlib::error("<box> missing required attribute 'height'");
+                        if (atts.is_in_list("height"))
+                            temp_box.rect.bottom() = sa = atts["height"];
+                        else
+                            throw dlib::error("<box> missing required attribute 'height'");
 
-                        if (atts.is_in_list("difficult")) temp_box.difficult = sa = atts["difficult"];
-                        if (atts.is_in_list("truncated")) temp_box.truncated = sa = atts["truncated"];
-                        if (atts.is_in_list("occluded"))  temp_box.occluded  = sa = atts["occluded"];
-                        if (atts.is_in_list("ignore"))  temp_box.ignore  = sa = atts["ignore"];
-                        if (atts.is_in_list("angle"))  temp_box.angle  = sa = atts["angle"];
-                        if (atts.is_in_list("age"))  temp_box.age  = sa = atts["age"];
-                        if (atts.is_in_list("gender"))  
+                        if (atts.is_in_list("difficult"))
+                            temp_box.difficult = sa = atts["difficult"];
+                        if (atts.is_in_list("truncated"))
+                            temp_box.truncated = sa = atts["truncated"];
+                        if (atts.is_in_list("occluded"))
+                            temp_box.occluded = sa = atts["occluded"];
+                        if (atts.is_in_list("ignore"))
+                            temp_box.ignore = sa = atts["ignore"];
+                        if (atts.is_in_list("angle"))
+                            temp_box.angle = sa = atts["angle"];
+                        if (atts.is_in_list("age"))
+                            temp_box.age = sa = atts["age"];
+                        if (atts.is_in_list("gender"))
                         {
                             if (atts["gender"] == "male")
                                 temp_box.gender = MALE;
@@ -214,24 +226,30 @@ namespace dlib
                             else
                                 throw dlib::error("Invalid gender string in box attribute.");
                         }
-                        if (atts.is_in_list("pose"))  temp_box.pose  = sa = atts["pose"];
-                        if (atts.is_in_list("detection_score"))  temp_box.detection_score  = sa = atts["detection_score"];
+                        if (atts.is_in_list("pose"))
+                            temp_box.pose = sa = atts["pose"];
+                        if (atts.is_in_list("detection_score"))
+                            temp_box.detection_score = sa = atts["detection_score"];
 
-                        temp_box.rect.bottom() += temp_box.rect.top()-1;
-                        temp_box.rect.right() += temp_box.rect.left()-1;
+                        temp_box.rect.bottom() += temp_box.rect.top() - 1;
+                        temp_box.rect.right() += temp_box.rect.left() - 1;
                     }
                     else if (name == "part" && ts.back() == "box")
                     {
                         point temp;
-                        if (atts.is_in_list("x")) temp.x() = sa = atts["x"];
-                        else throw dlib::error("<part> missing required attribute 'x'");
+                        if (atts.is_in_list("x"))
+                            temp.x() = sa = atts["x"];
+                        else
+                            throw dlib::error("<part> missing required attribute 'x'");
 
-                        if (atts.is_in_list("y")) temp.y() = sa = atts["y"];
-                        else throw dlib::error("<part> missing required attribute 'y'");
+                        if (atts.is_in_list("y"))
+                            temp.y() = sa = atts["y"];
+                        else
+                            throw dlib::error("<part> missing required attribute 'y'");
 
-                        if (atts.is_in_list("name")) 
+                        if (atts.is_in_list("name"))
                         {
-                            if (temp_box.parts.count(atts["name"])==0)
+                            if (temp_box.parts.count(atts["name"]) == 0)
                             {
                                 temp_box.parts[atts["name"]] = temp;
                             }
@@ -240,7 +258,7 @@ namespace dlib
                                 throw dlib::error("<part> with name '" + atts["name"] + "' is defined more than one time in a single box.");
                             }
                         }
-                        else 
+                        else
                         {
                             throw dlib::error("<part> missing required attribute 'name'");
                         }
@@ -249,22 +267,23 @@ namespace dlib
                     {
                         temp_image.boxes.clear();
 
-                        if (atts.is_in_list("file")) temp_image.filename = atts["file"];
-                        else throw dlib::error("<image> missing required attribute 'file'");
+                        if (atts.is_in_list("file"))
+                            temp_image.filename = atts["file"];
+                        else
+                            throw dlib::error("<image> missing required attribute 'file'");
                     }
 
                     ts.push_back(name);
                 }
-                catch (error& e)
+                catch (error &e)
                 {
                     throw dlib::error("Error on line " + cast_to_string(line_number) + ": " + e.what());
                 }
             }
 
-            virtual void end_element ( 
-                const unsigned long ,
-                const std::string& name
-            )
+            virtual void end_element(
+                const unsigned long,
+                const std::string &name)
             {
                 ts.pop_back();
                 if (ts.size() == 0)
@@ -282,46 +301,57 @@ namespace dlib
                 }
             }
 
-            virtual void characters ( 
-                const std::string& data
-            )
+            virtual void characters(
+                const std::string &data)
             {
                 if (ts.size() == 2 && ts[1] == "name")
                 {
+                    std::cout << data << std::endl;
                     meta.name = trim(data);
                 }
                 else if (ts.size() == 2 && ts[1] == "comment")
                 {
+                    std::cout << data << std::endl;
                     meta.comment = trim(data);
                 }
-                else if (ts.size() >= 2 && ts[ts.size()-1] == "label" && 
-                                           ts[ts.size()-2] == "box")
+                else if (ts.size() == 2 && ts[1] == "folderList")
+                {
+                    std::string s = trim(data);
+                    std::string delimiter = " ";
+
+                    size_t pos = 0;
+                    while ((pos = s.find(delimiter)) != std::string::npos)
+                    {
+                        meta.folderList.push_back(s.substr(0, pos));
+                        s.erase(0, pos + delimiter.length());
+                    }
+                    meta.folderList.push_back(s);
+                }
+                else if (ts.size() >= 2 && ts[ts.size() - 1] == "label" &&
+                         ts[ts.size() - 2] == "box")
                 {
                     temp_box.label = trim(data);
                 }
             }
 
-            virtual void processing_instruction (
-                const unsigned long ,
-                const std::string& ,
-                const std::string& 
-            )
+            virtual void processing_instruction(
+                const unsigned long,
+                const std::string &,
+                const std::string &)
             {
             }
         };
 
-    // ----------------------------------------------------------------------------------------
+        // ----------------------------------------------------------------------------------------
 
         class xml_error_handler : public error_handler
         {
         public:
-            virtual void error (
-                const unsigned long 
-            ) { }
+            virtual void error(
+                const unsigned long) {}
 
-            virtual void fatal_error (
-                const unsigned long line_number
-            )
+            virtual void fatal_error(
+                const unsigned long line_number)
             {
                 std::ostringstream sout;
                 sout << "There is a fatal error on line " << line_number << " so parsing will now halt.";
@@ -329,12 +359,11 @@ namespace dlib
             }
         };
 
-    // ------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------
 
-        void load_image_dataset_metadata (
-            dataset& meta,
-            const std::string& filename
-        )
+        void load_image_dataset_metadata(
+            dataset &meta,
+            const std::string &filename)
         {
             xml_error_handler eh;
             doc_handler dh(meta);
@@ -349,9 +378,9 @@ namespace dlib
             parser.parse(fin);
         }
 
-    // ------------------------------------------------------------------------------------
-    // ------------------------------------------------------------------------------------
-    // ------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------
 
         // This function returns the contents of the file 'images.xsl'
         const std::string get_decoded_string()
@@ -381,25 +410,22 @@ namespace dlib
             sout << "MKpiG9g1cHW74HYbUb/yAbtVWt40eB7M637umdo2jWz/r/vP5WnfSMXEbkyWebsa1fFceg/TLWy6";
             sout << "E8OTc4XKB48h1oFIlGagOiprxho3+F3TIcxDSwA=";
 
-
-
             // Put the data into the istream sin
             sin.str(sout.str());
             sout.str("");
 
             // Decode the base64 text into its compressed binary form
-            base64_coder.decode(sin,sout);
+            base64_coder.decode(sin, sout);
             sin.clear();
             sin.str(sout.str());
             sout.str("");
 
             // Decompress the data into its original form
-            compressor.decompress(sin,sout);
+            compressor.decompress(sin, sout);
 
             // Return the decoded and decompressed data
             return sout.str();
         }
-
 
     }
 }
@@ -407,5 +433,3 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
 #endif // DLIB_IMAGE_DAtASET_METADATA_CPPh_
-
-

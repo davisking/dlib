@@ -14,7 +14,7 @@ namespace dlib
     namespace image_dataset_metadata
     {
 
-    // ------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------
 
         enum gender_t
         {
@@ -23,7 +23,7 @@ namespace dlib
             FEMALE
         };
 
-    // ------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------
 
         struct box
         {
@@ -37,37 +37,35 @@ namespace dlib
                     the box.  All the other variables are optional.
             !*/
 
-            box(
-            ) : 
-                difficult(false),
-                truncated(false),
-                occluded(false),
-                ignore(false),
-                pose(0),
-                detection_score(0),
-                angle(0),
-                gender(UNKNOWN),
-                age(0)
-            {}
+            box() : difficult(false),
+                    truncated(false),
+                    occluded(false),
+                    ignore(false),
+                    pose(0),
+                    detection_score(0),
+                    angle(0),
+                    gender(UNKNOWN),
+                    age(0)
+            {
+            }
 
-            box (
-                const rectangle& rect_
-            ) : 
-                rect(rect_), 
-                difficult(false),
-                truncated(false),
-                occluded(false),
-                ignore(false),
-                pose(0),
-                detection_score(0),
-                angle(0),
-                gender(UNKNOWN),
-                age(0)
-            {}
+            box(
+                const rectangle &rect_) : rect(rect_),
+                                          difficult(false),
+                                          truncated(false),
+                                          occluded(false),
+                                          ignore(false),
+                                          pose(0),
+                                          detection_score(0),
+                                          angle(0),
+                                          gender(UNKNOWN),
+                                          age(0)
+            {
+            }
 
             rectangle rect;
 
-            std::map<std::string,point> parts;
+            std::map<std::string, point> parts;
 
             // optional fields
             std::string label;
@@ -83,7 +81,7 @@ namespace dlib
             // value of 0 would indicate that the object is in its "standard" upright pose.
             // Therefore, to make the object appear upright we would have to rotate the
             // image counter-clockwise by angle radians.
-            double angle; 
+            double angle;
 
             gender_t gender;
             double age;
@@ -95,7 +93,7 @@ namespace dlib
             !*/
         };
 
-    // ------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------
 
         struct image
         {
@@ -105,13 +103,13 @@ namespace dlib
             !*/
 
             image() {}
-            image(const std::string& f) : filename(f) {}
+            image(const std::string &f) : filename(f) {}
 
             std::string filename;
             std::vector<box> boxes;
         };
 
-    // ------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------
 
         struct dataset
         {
@@ -124,14 +122,14 @@ namespace dlib
             std::vector<image> images;
             std::string comment;
             std::string name;
+            std::vector<std::string> folderList;
         };
 
-    // ------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------
 
-        void save_image_dataset_metadata (
-            const dataset& meta,
-            const std::string& filename
-        );
+        void save_image_dataset_metadata(
+            const dataset &meta,
+            const std::string &filename);
         /*!
             ensures
                 - Writes the contents of the meta object to a file with the given
@@ -142,12 +140,11 @@ namespace dlib
                   this function from succeeding.
         !*/
 
-    // ------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------
 
-        void load_image_dataset_metadata (
-            dataset& meta,
-            const std::string& filename
-        );
+        void load_image_dataset_metadata(
+            dataset &meta,
+            const std::string &filename);
         /*!
             ensures
                 - Attempts to interpret filename as a file containing XML formatted data
@@ -159,8 +156,7 @@ namespace dlib
                   this function from succeeding.
         !*/
 
-    // ------------------------------------------------------------------------------------
-
+        // ------------------------------------------------------------------------------------
     }
 }
 
@@ -171,4 +167,3 @@ namespace dlib
 #endif
 
 #endif // DLIB_IMAGE_DAtASET_METADATA_Hh_
-
