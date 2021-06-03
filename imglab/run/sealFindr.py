@@ -10,7 +10,7 @@ def main(args):
 		return
 	
 	directory = SEALROOT#args[1] 
-	#fix this in arg call, no hardcode bullshit, even for testing. Should be $ROOT_PATH+/path/to/dir
+	#fix this in arg call, even for testing. Should be $ROOT_PATH+/path/to/dir
 	
 	arguments = ""
 	for filename in os.listdir(directory):
@@ -21,14 +21,12 @@ def main(args):
 		os.mkdir(chipfolder)
 	except:
 		pass
-	#
-	#except:
-	print(os.listdir())
+
 	if str(os.name) == "posix":
-		print("test")
+		print("MacOS")
 		os.system("./seal.exe seal.dat " + chipfolder + " " + arguments)
 	if str(os.name) == 'nt':
-		print('windo$e')
+		print('Window')
 		os.system("seal.exe seal.dat " + chipfolder + " " + arguments)
 
 if __name__ == "__main__":		
