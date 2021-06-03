@@ -15,7 +15,7 @@ def main(args):
 	arguments = ""
 	for filename in os.listdir(directory):
 		if filename.endswith(".jpg") or filename.endswith(".jpeg") or filename.endswith(".png") or filename.endswith(".JPG"): 
-			arguments += (directory + "/" + filename + " ")
+			arguments += (filename + " ")
 	chipfolder = directory+"Chips"
 	try:
 		os.mkdir(chipfolder)
@@ -24,10 +24,10 @@ def main(args):
 
 	if str(os.name) == "posix":
 		print("MacOS")
-		os.system("./seal.exe seal.dat " + chipfolder + " " + arguments)
+		os.system("./seal seal.dat " + directory + " " + arguments)
 	if str(os.name) == 'nt':
 		print('Window')
-		os.system("seal.exe seal.dat " + chipfolder + " " + arguments)
+		os.system("seal.exe seal.dat " + directory + " " + arguments)
 
 if __name__ == "__main__":		
 	SEALROOT = str(pathlib.Path('data'))
