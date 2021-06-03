@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 build_img()
 {
   cd ${IMG_BUILD}
@@ -16,6 +17,7 @@ build_dnn()
 export MAKEFLAGS=-j$(($(grep -c ^processor /proc/cpuinfo) - 1))
 DIR=$(reldir=$(dirname -- "$0"; echo x); reldir=${reldir%?x}; cd -- "$reldir" && pwd && echo x); 
 PJ_ROOT=${DIR%?x}
+
 
 
 DLIB_PATH=$PJ_ROOT/include/
