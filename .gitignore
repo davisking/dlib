@@ -9,6 +9,4 @@ dataChips
 imglab/build
 run/imglab
 run/seal
-*.xml
-*.xsl
 .vscode

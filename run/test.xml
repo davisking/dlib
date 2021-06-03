@@ -6,6 +6,7 @@
 <folderList>./data</folderList>
 <images>
   <image file='data/DSCN3217.JPG'>
+    <box top='255' left='298' width='57' height='56'/>
   </image>
   <image file='data/DSCN3218.JPG'>
   </image>
