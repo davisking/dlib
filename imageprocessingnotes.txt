@@ -1,0 +1,323 @@
+./dnn/loss.h:#include "../image_processing/box_overlap_testing.h"
+./dnn/loss.h:#include "../image_processing/full_object_detection.h"
+./dnn/loss_abstract.h:#include "../image_processing/full_object_detection_abstract.h"
+./dnn/input.h:#include "../image_processing.h"
+./data_io/load_image_dataset_abstract.h:#include "../image_processing/full_object_detection_abstract.h"
+./data_io/load_image_dataset_abstract.h:              dlib/image_processing/generic_image.h.
+./data_io/load_image_dataset_abstract.h:              dlib/image_processing/generic_image.h.
+./data_io/load_image_dataset_abstract.h:              dlib/image_processing/generic_image.h.
+./data_io/load_image_dataset_abstract.h:              dlib/image_processing/generic_image.h.
+./data_io/load_image_dataset_abstract.h:              dlib/image_processing/generic_image.h.
+./data_io/load_image_dataset_abstract.h:              dlib/image_processing/generic_image.h.
+./data_io/load_image_dataset_abstract.h:              dlib/image_processing/generic_image.h.
+./data_io/load_image_dataset.h:#include "../image_processing/full_object_detection.h"
+./image_saver/image_saver_abstract.h:#include "../image_processing/generic_image.h"
+./image_saver/image_saver_abstract.h:              dlib/image_processing/generic_image.h or any kind of matrix expression.
+./image_saver/image_saver_abstract.h:              dlib/image_processing/generic_image.h or any kind of matrix expression.
+./image_saver/image_saver_abstract.h:              dlib/image_processing/generic_image.h or any kind of matrix expression.
+./image_saver/image_saver_abstract.h:              dlib/image_processing/generic_image.h or any kind of matrix expression.
+./image_saver/save_png_abstract.h:#include "../image_processing/generic_image.h"
+./image_saver/save_png_abstract.h:              dlib/image_processing/generic_image.h or a matrix expression
+./image_saver/save_jpeg_abstract.h:#include "../image_processing/generic_image.h"
+./image_saver/save_jpeg_abstract.h:              dlib/image_processing/generic_image.h or a matrix expression
+./image_saver/save_jpeg.h:#include "../image_processing/generic_image.h"
+./image_processing.h:#include "image_processing/scan_image.h"
+./image_processing.h:#include "image_processing/scan_image_pyramid.h"
+./image_processing.h:#include "image_processing/detection_template_tools.h"
+./image_processing.h:#include "image_processing/object_detector.h"
+./image_processing.h:#include "image_processing/box_overlap_testing.h"
+./image_processing.h:#include "image_processing/scan_image_pyramid_tools.h"
+./image_processing.h:#include "image_processing/setup_hashed_features.h"
+./image_processing.h:#include "image_processing/scan_image_boxes.h"
+./image_processing.h:#include "image_processing/scan_image_custom.h"
+./image_processing.h:#include "image_processing/remove_unobtainable_rectangles.h"
+./image_processing.h:#include "image_processing/scan_fhog_pyramid.h"
+./image_processing.h:#include "image_processing/shape_predictor.h"
+./image_processing.h:#include "image_processing/shape_predictor_trainer.h"
+./image_processing.h:#include "image_processing/correlation_tracker.h"
+./image_processing/frontal_face_detector.h:#include "../image_processing/object_detector.h"
+./image_processing/frontal_face_detector.h:#include "../image_processing/scan_fhog_pyramid.h"
+./image_processing/scan_image_pyramid_abstract.h:#include "../image_processing.h"
+./image_processing/correlation_tracker_abstract.h:                  dlib/image_processing/generic_image.h 
+./image_processing/correlation_tracker_abstract.h:                  dlib/image_processing/generic_image.h 
+./image_processing/correlation_tracker_abstract.h:                  dlib/image_processing/generic_image.h 
+./image_processing/correlation_tracker_abstract.h:                  dlib/image_processing/generic_image.h 
+./image_processing/correlation_tracker_abstract.h:                  dlib/image_processing/generic_image.h 
+./image_processing/scan_image_boxes.h:#include "../image_processing/full_object_detection.h"
+./image_processing/scan_image_custom.h:#include "../image_processing/full_object_detection.h"
+./image_processing/scan_image_boxes_abstract.h:#include "../image_processing.h"
+./image_processing/shape_predictor.h:                  dlib/image_processing/generic_image.h 
+./image_processing/object_detector_abstract.h:                dlib/image_processing/scan_image_pyramid_abstract.h or 
+./image_processing/object_detector_abstract.h:                dlib/image_processing/scan_fhog_pyramid.h or 
+./image_processing/object_detector_abstract.h:                dlib/image_processing/scan_image_custom.h or 
+./image_processing/object_detector_abstract.h:                dlib/image_processing/scan_image_boxes_abstract.h 
+./image_processing/scan_image_pyramid_tools_abstract.h:              object defined in dlib/image_processing/scan_image_pyramid_tools_abstract.h
+./image_processing/scan_image_pyramid_tools_abstract.h:              object defined in dlib/image_processing/scan_image_pyramid_tools_abstract.h
+./image_processing/scan_image_pyramid_tools_abstract.h:              object defined in dlib/image_processing/scan_image_pyramid_tools_abstract.h
+./image_processing/scan_image_pyramid_tools_abstract.h:              object defined in dlib/image_processing/scan_image_pyramid_tools_abstract.h
+./image_processing/scan_image_abstract.h:#include "../image_processing/generic_image.h"
+./image_processing/scan_image_abstract.h:              defined in dlib/image_processing/generic_image.h 
+./image_processing/scan_image_abstract.h:              defined in dlib/image_processing/generic_image.h.  Moreover, these objects must
+./image_processing/scan_image_abstract.h:              defined in dlib/image_processing/generic_image.h.  Moreover, these objects must
+./image_processing/scan_image_abstract.h:              dlib/image_processing/generic_image.h.  Moreover, these it must contain a
+./image_processing/scan_image_abstract.h:              dlib/image_processing/generic_image.h.  Moreover, these it must contain a
+./image_processing/scan_image_abstract.h:              defined in dlib/image_processing/generic_image.h.  Moreover, these objects must
+./image_processing/scan_image_abstract.h:              defined in dlib/image_processing/generic_image.h.  Moreover, these objects must
+./image_processing/shape_predictor_abstract.h:                  dlib/image_processing/generic_image.h 
+./image_processing/shape_predictor_abstract.h:                  dlib/image_processing/generic_image.h 
+./image_processing/shape_predictor_abstract.h:              implements the interface defined in dlib/image_processing/generic_image.h 
+./image_processing/shape_predictor_abstract.h:              implements the interface defined in dlib/image_processing/generic_image.h 
+./image_processing/shape_predictor_trainer_abstract.h:                  implements the interface defined in dlib/image_processing/generic_image.h 
+./image_processing/scan_image_custom_abstract.h:#include "../image_processing/full_object_detection_abstract.h"
+./image_processing/scan_image_pyramid.h:#include "../image_processing/generic_image.h"
+./test/object_detector.cpp:#include <dlib/image_processing.h>
+./test/scan_image.cpp:#include "dlib/image_processing.h"
+./test/face.cpp:#include <dlib/image_processing/frontal_face_detector.h>
+./test/face.cpp:#include <dlib/image_processing.h>
+./test/face.cpp://#include <dlib/image_processing/render_face_detections.h>
+./test/correlation_tracker.cpp:#include <dlib/image_processing.h>
+./gui_widgets/widgets_abstract.h:#include "../image_processing/full_object_detection_abstract.h"
+./gui_widgets/widgets.h:#include "../image_processing/full_object_detection.h"
+./image_loader/png_loader_abstract.h:#include "../image_processing/generic_image.h"
+./image_loader/png_loader_abstract.h:                  dlib/image_processing/generic_image.h 
+./image_loader/png_loader_abstract.h:              dlib/image_processing/generic_image.h 
+./image_loader/png_loader_abstract.h:              dlib/image_processing/generic_image.h 
+./image_loader/png_loader_abstract.h:              dlib/image_processing/generic_image.h 
+./image_loader/jpeg_loader_abstract.h:#include "../image_processing/generic_image.h"
+./image_loader/jpeg_loader_abstract.h:                  dlib/image_processing/generic_image.h 
+./image_loader/jpeg_loader_abstract.h:              dlib/image_processing/generic_image.h 
+./image_loader/jpeg_loader_abstract.h:              dlib/image_processing/generic_image.h 
+./image_loader/jpeg_loader_abstract.h:              dlib/image_processing/generic_image.h 
+./image_loader/image_loader_abstract.h:#include "../image_processing/generic_image.h"
+./image_loader/image_loader_abstract.h:              dlib/image_processing/generic_image.h 
+./image_loader/image_loader_abstract.h:              dlib/image_processing/generic_image.h 
+./image_loader/image_loader_abstract.h:              dlib/image_processing/generic_image.h 
+./image_loader/image_loader_abstract.h:              dlib/image_processing/generic_image.h 
+./image_loader/load_image_abstract.h:#include "../image_processing/generic_image.h"
+./image_loader/load_image_abstract.h:              dlib/image_processing/generic_image.h 
+./array2d/array2d_generic_image.h:#include "../image_processing/generic_image.h"
+./svm/structural_svm_object_detection_problem_abstract.h:#include "../image_processing/full_object_detection_abstract.h"
+./svm/structural_svm_object_detection_problem_abstract.h:#include "../image_processing/box_overlap_testing.h"
+./svm/structural_svm_object_detection_problem_abstract.h:                dlib/image_processing/scan_fhog_pyramid_abstract.h or
+./svm/structural_svm_object_detection_problem_abstract.h:                dlib/image_processing/scan_image_custom_abstract.h or
+./svm/structural_svm_object_detection_problem_abstract.h:                dlib/image_processing/scan_image_pyramid_abstract.h or
+./svm/structural_svm_object_detection_problem_abstract.h:                dlib/image_processing/scan_image_boxes_abstract.h
+./svm/structural_object_detection_trainer_abstract.h:#include "../image_processing/object_detector_abstract.h"
+./svm/structural_object_detection_trainer_abstract.h:#include "../image_processing/box_overlap_testing_abstract.h"
+./svm/structural_object_detection_trainer_abstract.h:#include "../image_processing/full_object_detection_abstract.h"
+./svm/structural_object_detection_trainer_abstract.h:                dlib/image_processing/scan_fhog_pyramid_abstract.h or
+./svm/structural_object_detection_trainer_abstract.h:                dlib/image_processing/scan_image_custom_abstract.h or
+./svm/structural_object_detection_trainer_abstract.h:                dlib/image_processing/scan_image_pyramid_abstract.h or
+./svm/structural_object_detection_trainer_abstract.h:                dlib/image_processing/scan_image_boxes_abstract.h
+./svm/cross_validate_object_detection_trainer_abstract.h:#include "../image_processing/full_object_detection_abstract.h"
+./svm/structural_object_detection_trainer.h:#include "../image_processing/object_detector.h"
+./svm/structural_object_detection_trainer.h:#include "../image_processing/box_overlap_testing.h"
+./svm/structural_object_detection_trainer.h:#include "../image_processing/full_object_detection.h"
+./svm/structural_svm_object_detection_problem.h:#include "../image_processing/full_object_detection.h"
+./svm/structural_svm_object_detection_problem.h:#include "../image_processing/box_overlap_testing.h"
+./svm/cross_validate_object_detection_trainer.h:#include "../image_processing/full_object_detection.h"
+./svm/cross_validate_object_detection_trainer.h:#include "../image_processing/box_overlap_testing.h"
+./matrix/matrix_mat.h:#include "../image_processing/generic_image.h"
+./matrix/matrix_mat_abstract.h:              dlib/image_processing/generic_image.h or image_type is a image_view or
+./matrix/matrix_generic_image.h:#include "../image_processing/generic_image.h"
+./opencv/cv_image.h:#include "../image_processing/generic_image.h"
+./opencv/cv_image.h:// ../image_processing/generic_image.h
+./opencv/to_open_cv_abstract.h:              dlib/image_processing/generic_image.h or a dlib::matrix object which uses a
+./geometry/rectangle.h:#include "../image_processing/generic_image.h"
+./image_transforms/colormaps_abstract.h:#include "../image_processing/generic_image.h"
+./image_transforms/colormaps_abstract.h:              dlib/image_processing/generic_image.h, or something convertible to a matrix
+./image_transforms/colormaps_abstract.h:              dlib/image_processing/generic_image.h, or something convertible to a matrix
+./image_transforms/colormaps_abstract.h:              dlib/image_processing/generic_image.h, or something convertible to a matrix
+./image_transforms/colormaps_abstract.h:              dlib/image_processing/generic_image.h, or something convertible to a matrix
+./image_transforms/colormaps_abstract.h:              dlib/image_processing/generic_image.h, or something convertible to a matrix
+./image_transforms/draw_abstract.h:#include "../image_processing/generic_image.h"
+./image_transforms/draw_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/draw_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/draw_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/draw_abstract.h:              dlib/image_processing/generic_image.h
+./image_transforms/draw_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/draw_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/draw_abstract.h:              implements the interface defined in dlib/image_processing/generic_image.h 
+./image_transforms/random_color_transform_abstract.h:#include "../image_processing/generic_image.h"
+./image_transforms/random_color_transform_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/lbp.h:#include "../image_processing/generic_image.h"
+./image_transforms/spatial_filtering_abstract.h:#include "../image_processing/generic_image.h"
+./image_transforms/spatial_filtering_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/spatial_filtering_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/spatial_filtering_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/spatial_filtering_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/spatial_filtering_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/spatial_filtering_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/spatial_filtering_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/spatial_filtering_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/spatial_filtering_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/spatial_filtering_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/spatial_filtering_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/spatial_filtering_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/spatial_filtering_abstract.h:              dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+./image_transforms/spatial_filtering_abstract.h:              dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+./image_transforms/spatial_filtering_abstract.h:              dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+./image_transforms/spatial_filtering_abstract.h:              dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+./image_transforms/spatial_filtering_abstract.h:              dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+./image_transforms/spatial_filtering_abstract.h:              dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+./image_transforms/integral_image_abstract.h:#include "../image_processing/generic_image.h"
+./image_transforms/integral_image_abstract.h:                  dlib/image_processing/generic_image.h 
+./image_transforms/lbp_abstract.h:#include "../image_processing/generic_image.h"
+./image_transforms/lbp_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/lbp_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/lbp_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/random_color_transform.h:#include "../image_processing/generic_image.h"
+./image_transforms/thresholding_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/thresholding_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/thresholding_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/thresholding_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/thresholding_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/thresholding_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/thresholding_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/thresholding_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/random_cropper_abstract.h:#include "../image_processing/full_object_detection.h"
+./image_transforms/random_cropper_abstract.h:                  interface defined in dlib/image_processing/generic_image.h 
+./image_transforms/random_cropper_abstract.h:                  interface defined in dlib/image_processing/generic_image.h 
+./image_transforms/random_cropper_abstract.h:                  dlib/image_processing/generic_image.h 
+./image_transforms/random_cropper_abstract.h:                  interface defined in dlib/image_processing/generic_image.h 
+./image_transforms/random_cropper_abstract.h:                  dlib/image_processing/generic_image.h 
+./image_transforms/random_cropper_abstract.h:                  dlib/image_processing/generic_image.h 
+./image_transforms/random_cropper_abstract.h:                  dlib/image_processing/generic_image.h 
+./image_transforms/morphological_operations_abstract.h:#include "../image_processing/generic_image.h"
+./image_transforms/morphological_operations_abstract.h:              interface defined in dlib/image_processing/generic_image.h 
+./image_transforms/morphological_operations_abstract.h:              interface defined in dlib/image_processing/generic_image.h 
+./image_transforms/morphological_operations_abstract.h:              interface defined in dlib/image_processing/generic_image.h 
+./image_transforms/morphological_operations_abstract.h:              interface defined in dlib/image_processing/generic_image.h 
+./image_transforms/morphological_operations_abstract.h:              implement the interface defined in dlib/image_processing/generic_image.h 
+./image_transforms/morphological_operations_abstract.h:              implement the interface defined in dlib/image_processing/generic_image.h 
+./image_transforms/morphological_operations_abstract.h:              implement the interface defined in dlib/image_processing/generic_image.h 
+./image_transforms/morphological_operations_abstract.h:              interface defined in dlib/image_processing/generic_image.h 
+./image_transforms/morphological_operations_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/morphological_operations_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/morphological_operations_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/random_cropper.h:#include "../image_processing/full_object_detection.h"
+./image_transforms/edge_detector_abstract.h:#include "../image_processing/generic_image.h"
+./image_transforms/edge_detector_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/edge_detector_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/edge_detector_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/edge_detector_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/edge_detector_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/edge_detector_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/edge_detector_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/edge_detector_abstract.h:                  dlib/image_processing/generic_image.h 
+./image_transforms/edge_detector_abstract.h:                  dlib/image_processing/generic_image.h 
+./image_transforms/edge_detector_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/edge_detector_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/edge_detector_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/edge_detector_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/edge_detector_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/edge_detector_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/edge_detector_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/edge_detector_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:#include "../image_processing/full_object_detection_abstract.h"
+./image_transforms/interpolation_abstract.h:#include "../image_processing/generic_image.h"
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              implement the interface defined in dlib/image_processing/generic_image.h
+./image_transforms/interpolation_abstract.h:              implement the interface defined in dlib/image_processing/generic_image.h
+./image_transforms/interpolation_abstract.h:              implement the interface defined in dlib/image_processing/generic_image.h
+./image_transforms/interpolation_abstract.h:              implement the interface defined in dlib/image_processing/generic_image.h
+./image_transforms/interpolation_abstract.h:              implement the interface defined in dlib/image_processing/generic_image.h
+./image_transforms/interpolation_abstract.h:              implement the interface defined in dlib/image_processing/generic_image.h
+./image_transforms/interpolation_abstract.h:              implement the interface defined in dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              implement the interface defined in dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              implement the interface defined in dlib/image_processing/generic_image.h
+./image_transforms/interpolation_abstract.h:              implement the interface defined in dlib/image_processing/generic_image.h
+./image_transforms/interpolation_abstract.h:              implement the interface defined in dlib/image_processing/generic_image.h
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:                  dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:                  dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/equalize_histogram_abstract.h:#include "../image_processing/generic_image.h"
+./image_transforms/equalize_histogram_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/equalize_histogram_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/equalize_histogram_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/equalize_histogram_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/interpolation.h:#include "../image_processing/full_object_detection.h"
+./image_transforms/image_pyramid_abstract.h:#include "../image_processing/generic_image.h"
+./image_transforms/image_pyramid_abstract.h:                  dlib/image_processing/generic_image.h 
+./image_transforms/image_pyramid_abstract.h:                  dlib/image_processing/generic_image.h 
+./image_transforms/image_pyramid_abstract.h:                  dlib/image_processing/generic_image.h 
+./image_transforms/image_pyramid_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/image_pyramid_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/label_connected_blobs_abstract.h:#include "../image_processing/generic_image.h"
+./image_transforms/label_connected_blobs_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/label_connected_blobs_abstract.h:              dlib/image_processing/generic_image.h and it must contain integer pixels.
+./image_transforms/label_connected_blobs_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/label_connected_blobs_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/assign_image_abstract.h:#include "../image_processing/generic_image.h"
+./image_transforms/assign_image_abstract.h:              dlib/image_processing/generic_image.h or any object convertible to a matrix
+./image_transforms/assign_image_abstract.h:              dlib/image_processing/generic_image.h or an image_view.
+./image_transforms/assign_image_abstract.h:              dlib/image_processing/generic_image.h or any object convertible to a matrix
+./image_transforms/assign_image_abstract.h:              dlib/image_processing/generic_image.h or an image_view.
+./image_transforms/assign_image_abstract.h:              dlib/image_processing/generic_image.h or an image_view.
+./image_transforms/assign_image_abstract.h:              dlib/image_processing/generic_image.h or an image_view
+./image_transforms/assign_image_abstract.h:              dlib/image_processing/generic_image.h or an image_view
+./image_transforms/assign_image_abstract.h:              dlib/image_processing/generic_image.h or an image_view
+./image_transforms/hough_transform.h:#include "../image_processing/generic_image.h"
+./image_transforms/segment_image_abstract.h:#include "../image_processing/generic_image.h"
+./image_transforms/segment_image_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/segment_image_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/segment_image_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/segment_image_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/segment_image_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/hough_transform_abstract.h:#include "../image_processing/generic_image.h"
+./image_transforms/hough_transform_abstract.h:                  dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+./image_transforms/hough_transform_abstract.h:                  dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+./image_transforms/hough_transform_abstract.h:                  dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+./image_transforms/hough_transform_abstract.h:                  dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+./image_transforms/hough_transform_abstract.h:                  dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+./image_transforms/hough_transform_abstract.h:                  dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+./image_transforms/hough_transform_abstract.h:                  dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+./image_transforms/hough_transform_abstract.h:                  dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+./image_transforms/hough_transform_abstract.h:                  dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+./image_transforms/hough_transform_abstract.h:                  dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+./image_transforms/fhog_abstract.h:#include "../image_processing/generic_image.h"
+./image_transforms/fhog_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/fhog_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/fhog_abstract.h:              dlib/image_processing/generic_image.h 
+./image_transforms/fhog_abstract.h:              dlib/image_processing/generic_image.h 
+./image_keypoint/surf_abstract.h:#include "../image_processing/generic_image.h"
+./image_keypoint/surf_abstract.h:              dlib/image_processing/generic_image.h 
+./image_keypoint/poly_image_abstract.h:#include "../image_processing/generic_image.h"
+./image_keypoint/poly_image_abstract.h:                  dlib/image_processing/generic_image.h 

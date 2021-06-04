@@ -10,3 +10,6 @@ imglab/build
 run/imglab
 run/seal
 .vscode
+run/imglab
+run/seal
+run/sealFindr.py

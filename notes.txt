@@ -1,0 +1,34 @@
+/include/dlib/image_saver/*:
+headers and other shit for saving photos that is called at some point
+
+
+&>Zach's take: call stack
+call model:
+  get photos from xml ---document_handler + interface + xml_parser subclasses>---
+  for photo in photos:
+    stack<crops> = random_crop(photo) ---random_cropper.cpp---
+    while stack.size()>0:
+      croppedImg = stack.pop()
+      svm_classify(croppedImg) ? to_write.push(croppedImg) : discard(croppedImg) ---svm*.* + callstack[callstack.loc[svm_classify]-1]---
+  while to_write.size()>0:
+    image_save(to_write.pop()) ---image_saver---
+  return ---ip located in seal executable probably---
+
+can I ida this shit?
+  run w/o gui
+
+../include/dlib/data_io/load_image_dataset_abstract.h:              should be in the XML format used by the save_image_dataset_metadata() routine.
+../include/dlib/data_io/load_image_dataset_abstract.h:              should be in the XML format used by the save_image_dataset_metadata() routine.
+../include/dlib/data_io/libsvm_io.h:    typename disable_if<is_matrix<sample_type>,void>::type save_libsvm_formatted_data (
+../include/dlib/data_io/libsvm_io.h:            "\t void save_libsvm_formatted_data()"
+../include/dlib/data_io/libsvm_io.h:    typename enable_if<is_matrix<sample_type>,void>::type save_libsvm_formatted_data (
+../include/dlib/data_io/libsvm_io.h:            "\t void save_libsvm_formatted_data()"
+../include/dlib/data_io/image_dataset_metadata.cpp:        void save_image_dataset_metadata(
+../include/dlib/data_io/image_dataset_metadata.cpp:                // save all the boxes
+../include/dlib/data_io/image_dataset_metadata.cpp:                        // save all the parts
+../include/dlib/data_io/image_dataset_metadata.h:        void save_image_dataset_metadata(
+../include/dlib/data_io/image_dataset_metadata.h:                  as produced by the save_image_dataset_metadata() function.  Then
+../include/dlib/data_io/libsvm_io_abstract.h:    void save_libsvm_formatted_data (
+../include/dlib/data_io/libsvm_io_abstract.h:            - saves the data to the given file in libsvm format
+../include/dlib/data_io/libsvm_io_abstract.h:    void save_libsvm_formatted_data (
+../include/dlib/data_io/libsvm_io_abstract.h:            - saves the data to the given file in libsvm format

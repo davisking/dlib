@@ -1,0 +1,1300 @@
+#0  dlib::extract_image_chip<dlib::matrix<dlib::rgb_pixel, 0l, 0l, dlib::memory_manager_stateless_kernel_1<char>, dlib::row_major_layout>, dlib::matrix<dlib::rgb_pixel, 0l, 0l, dlib::memory_manager_stateless_kernel_1<char>, dlib::row_major_layout>, dlib::interpolate_bilinear> (img=..., location=..., chip=..., interp=...)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/../image_transforms/interpolation.h:1965
+#1  0x000055555559f895 in dlib::extract_image_chip<dlib::matrix<dlib::rgb_pixel, 0l, 0l, dlib::memory_manager_stateless_kernel_1<char>, dlib::row_major_layout>, dlib::matrix<dlib::rgb_pixel, 0l, 0l, dlib::memory_manager_stateless_kernel_1<char>, dlib::row_major_layout> > (chip=..., location=..., img=...)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/../image_transforms/interpolation.h:1995
+#2  main (argc=<optimized out>, argv=<optimized out>)
+    at /home/zach/development/research/dlibSealGUI/include/dnn/dnn_mmod_dog_hipsterizer.cpp:138
+$2 = (const dlib::chip_details &) @0x7fffffffc890: {rect = {l = 802, t = 481, r = 897, b = 565}, angle = 0, rows = 112, 
+  cols = 112}
+Undefined command: "".  Try "help".
+No symbol "image" in current context.
+$3 = (const dlib::matrix<dlib::rgb_pixel, 0, 0, dlib::memory_manager_stateless_kernel_1<char>, dlib::row_major_layout> &) @0x7fffffffc850: {<dlib::matrix_exp<dlib::matrix<dlib::rgb_pixel, 0, 0, dlib::memory_manager_stateless_kernel_1<char>, dlib::row_major_layout> >> = {static NR = 0, static NC = 0, static cost = <optimized out>}, static NR = 0, static NC = 0, 
+  static cost = <optimized out>, data = {<dlib::noncopyable> = {<No data fields>}, static NR = <optimized out>, 
+    static NC = <optimized out>, data = 0x555556c27e70, nr_ = 1535, nc_ = 4680, pool = {
+      _vptr.memory_manager_stateless_kernel_1 = 0x555555787488 <vtable for dlib::memory_manager_stateless_kernel_1<dlib::rgb_pixel>+16>, static is_stateless = <optimized out>}}}
+$4 = (dlib::matrix<dlib::rgb_pixel, 0, 0, dlib::memory_manager_stateless_kernel_1<char>, dlib::row_major_layout> &) @0x7fffffffc870: {<dlib::matrix_exp<dlib::matrix<dlib::rgb_pixel, 0, 0, dlib::memory_manager_stateless_kernel_1<char>, dlib::row_major_layout> >> = {static NR = 0, static NC = 0, static cost = <optimized out>}, static NR = 0, static NC = 0, 
+  static cost = <optimized out>, data = {<dlib::noncopyable> = {<No data fields>}, static NR = <optimized out>, 
+    static NC = <optimized out>, data = 0x0, nr_ = 0, nc_ = 0, pool = {
+      _vptr.memory_manager_stateless_kernel_1 = 0x555555787488 <vtable for dlib::memory_manager_stateless_kernel_1<dlib::rgb_pixel>+16>, static is_stateless = <optimized out>}}}
+No symbol "get_face_chip_details" in current context.
+Working directory /home/zach/development/research/dlibSealGUI/run.
+Undefined command: "chip_details".  Try "help".
+Attempt to use a type name as an expression
+$5 = void
+No symbol "res" in current context.
+Function "chip()" not defined.
+Please answer y or [n].
+Breakpoint 4 at 0x7ffefd5322e0 (545 locations)
+Program not restarted.
+Starting program: /home/zach/development/research/dlibSealGUI/run/sealdebug seal.dat data DSCN3217.JPG
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+[New Thread 0x7fffc9531000 (LWP 14465)]
+[New Thread 0x7fffc6d30000 (LWP 14466)]
+[New Thread 0x7fffc652f000 (LWP 14467)]
+[New Thread 0x7fffc1d2e000 (LWP 14468)]
+[New Thread 0x7fffbf52d000 (LWP 14469)]
+[New Thread 0x7fffbcd2c000 (LWP 14470)]
+[New Thread 0x7fffba52b000 (LWP 14471)]
+[New Thread 0x7fffb7d2a000 (LWP 14472)]
+[New Thread 0x7fffb5529000 (LWP 14473)]
+[New Thread 0x7fffb2d28000 (LWP 14474)]
+[New Thread 0x7fffb2527000 (LWP 14475)]
+[New Thread 0x7fffadd26000 (LWP 14476)]
+[New Thread 0x7fffab525000 (LWP 14477)]
+[New Thread 0x7fffa8d24000 (LWP 14478)]
+[New Thread 0x7fffa6523000 (LWP 14479)]
+[New Thread 0x7fffa5d22000 (LWP 14480)]
+[New Thread 0x7fffa1521000 (LWP 14481)]
+[New Thread 0x7fff9ed20000 (LWP 14482)]
+[New Thread 0x7fff9e51f000 (LWP 14483)]
+[New Thread 0x7fff99d1e000 (LWP 14484)]
+[New Thread 0x7fff9951d000 (LWP 14485)]
+[New Thread 0x7fff94d1c000 (LWP 14486)]
+[New Thread 0x7fff9251b000 (LWP 14487)]
+[New Thread 0x7fff89c4f000 (LWP 14490)]
+[New Thread 0x7fff8944e000 (LWP 14491)]
+[New Thread 0x7fff88a84000 (LWP 14492)]
+
+Thread 1 "sealdebug" hit Breakpoint 3, dlib::extract_image_chip<dlib::matrix<dlib::rgb_pixel, 0l, 0l, dlib::memory_manager_stateless_kernel_1<char>, dlib::row_major_layout>, dlib::matrix<dlib::rgb_pixel, 0l, 0l, dlib::memory_manager_stateless_kernel_1<char>, dlib::row_major_layout>, dlib::interpolate_bilinear> (img=..., location=..., chip=..., interp=...)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/../image_transforms/interpolation.h:1965
+1965	    void extract_image_chip (
+1975	            location.rows == location.rect.height() &&
+1982	            std::vector<chip_details> chip_locations(1,location);
+$6 = std::vector of length -5077753, capacity 10866440 = {{rect = {l = 2.0861575199901636e-314, t = 4.6355711830891514e-310, 
+      r = 4.6355711830891514e-310, b = 4.6355711830891514e-310}, angle = 4.6355711830891514e-310, rows = 93825005282368, 
+    cols = 93825005282368}, {rect = {l = 4.6355711830891514e-310, t = 4.6355711831397438e-310, r = 0, b = 0}, angle = 0, 
+    rows = 0, cols = 140736879819136}, {rect = {l = 2.7161546124404892e-312, t = -nan(0xfffffffffffff), r = 0, 
+      b = 6.953325742699362e-310}, angle = -nan(0xfffffffffffff), rows = 0, cols = 140736879818880}, {rect = {l = 0, t = 0, 
+      r = 0, b = 2.1219957904712067e-314}, angle = 0, rows = 0, cols = 140736879826080}, {rect = {
+      l = 6.9533257423072715e-310, t = 6.9533257423183386e-310, r = 6.9533257421523325e-310, b = 6.9533256506118496e-310}, 
+    angle = 6.9533257256797886e-310, rows = 140736879489760, cols = 140736879489808}, {rect = {l = 6.9533257258861104e-310, 
+      t = 6.9533257259153591e-310, r = 6.9533257259406553e-310, b = 6.9533257259525128e-310}, 
+    angle = 6.9533257259548844e-310, rows = 140736879491392, cols = 140736879491472}, {rect = {l = 6.9533256774566101e-310, 
+      t = 6.9533257259833425e-310, r = 6.9533257259872951e-310, b = 6.9533257259928286e-310}, 
+    angle = 6.9533257259991526e-310, rows = 140736878970832, cols = 140736879492208}, {rect = {l = 6.9533257260031052e-310, 
+      t = 6.9533257082570577e-310, r = 6.9533257260125912e-310, b = 6.9533257260189153e-310}, 
+    angle = 6.9533257260315634e-310, rows = 140736879492976, cols = 140736879206704}, {rect = {l = 6.9533257260394684e-310, 
+      t = 6.9533257260418399e-310, r = 6.9533257260442114e-310, b = 6.9533257260465829e-310}, 
+    angle = 6.9533257260489545e-310, rows = 140736879493376, cols = 0}, {rect = {l = 0, t = 0, r = 0, 
+      b = 6.9533256729483599e-310}, angle = 6.9533256667278758e-310, rows = 140736878416064, cols = 140736878416080}, {
+    rect = {l = 6.953325673125433e-310, t = 6.9533256728368986e-310, r = 6.9533256728629853e-310, 
+      b = 6.9533256729538934e-310}, angle = 6.9533256729167397e-310, rows = 140736878417504, cols = 140736878418416}, {
+    rect = {l = 6.9533256729222732e-310, t = 6.9533256731436146e-310, r = 6.9533256731444051e-310, 
+      b = 6.9533256731420336e-310}, angle = 6.9533256729475694e-310, rows = 140736878422368, cols = 0}, {rect = {l = 0, 
+      t = 0, r = 0, b = 0}, angle = 0, rows = 0, cols = 140736878371424}, {rect = {l = 6.953325668024304e-310, 
+      t = 6.9533256728313651e-310, r = 6.9533256728321556e-310, b = 6.9533256706037219e-310}, 
+    angle = 6.9533256706440377e-310, rows = 140736878373584, cols = 140736878418544}, {rect = {l = 6.9533256729167397e-310, 
+      t = 6.9533256729025106e-310, r = 6.9533256729475694e-310, b = 6.9533256706811914e-310}, 
+    angle = 6.9533256731436146e-310, rows = 140736878422400, cols = 140736878422352}, {rect = {l = 6.9533256729475694e-310, 
+      t = 6.9533256731428241e-310, r = 0, b = 0}, angle = 0, rows = 0, cols = 0}, {rect = {l = 0, t = 0, 
+      r = 6.953325672427417e-310, b = 6.9533256726068617e-310}, angle = 6.9533256725641744e-310, rows = 140736878416080, 
+    cols = 140736878422016}, {rect = {l = 6.9533256723072603e-310, t = 6.9533256728629853e-310, r = 6.953325669744443e-310, 
+      b = 6.9533256729167397e-310}, angle = 6.9533256720969859e-310, rows = 140736878400832, cols = 140736878349808}, {
+    rect = {l = 6.9533256697302139e-310, t = 6.9533256697325854e-310, r = 6.9533256697365379e-310, 
+      b = 6.9533256697412809e-310}, angle = 6.9533256731428241e-310, rows = 140736878422416, cols = 140736878422432}, {
+    rect = {l = 0, t = 0, r = 0, b = 0}, angle = 0, rows = 140736878407888, cols = 140736878411520}, {rect = {
+      l = 6.9533256725641744e-310, t = 6.9533256728321556e-310, r = 6.953325673125433e-310, b = 6.9533256723072603e-310}, 
+    angle = 6.9533256728629853e-310, rows = 140736878402016, cols = 140736878417792}, {rect = {l = 6.9533256720969859e-310, 
+      t = 6.9533256720788043e-310, r = 6.9533256695578838e-310, b = 6.9533256723048888e-310}, 
+    angle = 6.9533256722131902e-310, rows = 140736878401408, cols = 140736878358000}, {rect = {l = 6.9533256722116092e-310, 
+      t = 6.9533256731451956e-310, r = 6.9533256731459861e-310, b = 0}, angle = 0, rows = 0, cols = 0}, {rect = {l = 0, 
+      t = 6.953325673211598e-310, r = 6.9533256702132124e-310, b = 6.9533256731610057e-310}, 
+    angle = 6.9533256728321556e-310, rows = 140736878423728, cols = 140736878416176}, {rect = {l = 6.9533256728629853e-310, 
+      t = 6.9533256732289891e-310, r = 6.9533256729167397e-310, b = 6.9533256729025106e-310}, 
+    angle = 6.9533256729475694e-310, rows = 140736878417904, cols = 140736878422384}, {rect = {l = 6.9533256731444051e-310, 
+      t = 6.9533256731420336e-310, r = 6.9533256729475694e-310, b = 6.9533256731428241e-310}, 
+    angle = 6.9533256731451956e-310, rows = 140736878422432, cols = 0}, {rect = {l = 0, t = 0, r = 0, b = 0}, 
+    angle = 6.9533256708772367e-310, rows = 140736878369216, cols = 140736878375296}, {rect = {l = 6.9533256706321801e-310, 
+      t = 6.9533256708756557e-310, r = 6.9533256706440377e-310, b = 6.9533256707325742e-310}, 
+    angle = 6.9533256708930468e-310, rows = 140736878417792, cols = 140736878417504}, {rect = {l = 6.9533256729475694e-310, 
+      t = 6.9533256706811914e-310, r = 6.9533256731436146e-310, b = 6.9533256731444051e-310}, 
+    angle = 6.9533256731420336e-310, rows = 140736878418416, cols = 140736878422368}, {rect = {l = 6.9533256731451956e-310, 
+      t = 6.9533256731459861e-310, r = 0, b = 0}, angle = 0, rows = 0, cols = 0}, {rect = {l = 6.9533256708772367e-310, 
+      t = 6.9533256708226918e-310, r = 6.9533256708171583e-310, b = 6.9533256706321801e-310}, 
+    angle = 6.9533256708756557e-310, rows = 140736878371792, cols = 140736878373584}, {rect = {l = 6.9533256708930468e-310, 
+      t = 6.9533256729167397e-310, r = 6.9533256729025106e-310, b = 6.9533256729475694e-310}, 
+    angle = 6.9533256706811914e-310, rows = 140736878422384, cols = 140736878422400}, {rect = {l = 6.9533256731420336e-310, 
+      t = 6.9533256729475694e-310, r = 6.9533256731428241e-310, b = 6.9533256731451956e-310}, 
+    angle = 6.9533256731459861e-310, rows = 0, cols = 0}, {rect = {l = 0, t = 0, r = 0, b = 6.953325672427417e-310}, 
+    angle = 6.9533256711823716e-310, rows = 140736878381760, cols = 140736878371552}, {rect = {l = 6.9533256706037219e-310, 
+      t = 6.953325671239288e-310, r = 6.9533256722622015e-310, b = 6.9533256710274326e-310}, 
+Quit
+14	    class enumerable
+1985	            swap(chips[0], chip);
+1983	            dlib::array<image_type2> chips;
+1982	            std::vector<chip_details> chip_locations(1,location);
+89	      ~new_allocator() _GLIBCXX_USE_NOEXCEPT { }
+main (argc=<optimized out>, argv=<optimized out>)
+    at /home/zach/development/research/dlibSealGUI/include/dnn/dnn_mmod_dog_hipsterizer.cpp:141
+141	            int dotIdx = curImg.find(".");
+142	            if (dotIdx != std::string::npos) curImg = curImg.substr(0, dotIdx);
+148	            string location = "(" + to_string(left) + "," + to_string(top) + "),(" + to_string(right) + "," + to_string(bottom) + ")";
+365		return static_cast<char_type*>(__builtin_memcpy(__s1, __s2, __n));
+148	            string location = "(" + to_string(left) + "," + to_string(top) + "),(" + to_string(right) + "," + to_string(bottom) + ")";
+365		return static_cast<char_type*>(__builtin_memcpy(__s1, __s2, __n));
+148	            string location = "(" + to_string(left) + "," + to_string(top) + "),(" + to_string(right) + "," + to_string(bottom) + ")";
+365		return static_cast<char_type*>(__builtin_memcpy(__s1, __s2, __n));
+148	            string location = "(" + to_string(left) + "," + to_string(top) + "),(" + to_string(right) + "," + to_string(bottom) + ")";
+365		return static_cast<char_type*>(__builtin_memcpy(__s1, __s2, __n));
+148	            string location = "(" + to_string(left) + "," + to_string(top) + "),(" + to_string(right) + "," + to_string(bottom) + ")";
+365		return static_cast<char_type*>(__builtin_memcpy(__s1, __s2, __n));
+148	            string location = "(" + to_string(left) + "," + to_string(top) + "),(" + to_string(right) + "," + to_string(bottom) + ")";
+365		return static_cast<char_type*>(__builtin_memcpy(__s1, __s2, __n));
+148	            string location = "(" + to_string(left) + "," + to_string(top) + "),(" + to_string(right) + "," + to_string(bottom) + ")";
+657	      ~basic_string()
+149	            string filename = to_string(num_chips) + "_" + curImg + "_ChippedAt_" + location + ".jpeg";
+Continuing.
+
+Thread 1 "sealdebug" hit Breakpoint 2, dlib::save_jpeg (img=..., 
+    filename="dataChips/0_DSCN3217_ChippedAt_(802,481),(897,565).jpeg", quality=100)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/image_saver/save_jpeg.cpp:50
+50	    {
+52	        DLIB_CASSERT(img.size() != 0,
+56	        DLIB_CASSERT(0 <= quality && quality <= 100,
+2300	      c_str() const _GLIBCXX_NOEXCEPT
+63	        if (!outfile)
+69	        cinfo.err = jpeg_std_error(&jerr.pub);
+70	        jerr.pub.error_exit = jpeg_saver_error_exit;
+72	        if (setjmp(jerr.setjmp_buffer)) 
+82	        jpeg_create_compress(&cinfo);
+$7 = (const dlib::array2d<dlib::rgb_pixel, dlib::memory_manager_stateless_kernel_1<char> > &) @0x7fffffffc8d0: {<dlib::enumerable<dlib::rgb_pixel>> = {
+    _vptr.enumerable = 0x5555557874a8 <vtable for dlib::array2d<dlib::rgb_pixel, dlib::memory_manager_stateless_kernel_1<char> >+16>}, data = 0x55558f9c1b80, nc_ = 112, nr_ = 112, pool = {
+    _vptr.memory_manager_stateless_kernel_1 = 0x555555787488 <vtable for dlib::memory_manager_stateless_kernel_1<dlib::rgb_pixel>+16>, static is_stateless = <optimized out>}, cur = 0x0, last = 0x55558f9cae7d, at_start_ = true}
+Cannot take address of method nc.
+Cannot evaluate function -- may be inlined
+$8 = 112
+$9 = 112
+$10 = (dlib::rgb_pixel *) 0x55558f9c1b80
+cannot resolve overloaded method `element': no arguments supplied
+$11 = (const dlib::rgb_pixel &) <error reading variable>
+cannot resolve overloaded method `element': no arguments supplied
+cannot resolve overloaded method `begin': no arguments supplied
+Cannot evaluate function -- may be inlined
+No symbol "top" in current context.
+No symbol "top" in current context.
+No symbol "symbols" in current context.
+Undefined command: "symbols".  Try "help".
+List of classes of commands:
+
+aliases -- Aliases of other commands.
+breakpoints -- Making program stop at certain points.
+data -- Examining data.
+files -- Specifying and examining files.
+internals -- Maintenance commands.
+obscure -- Obscure features.
+running -- Running the program.
+stack -- Examining the stack.
+status -- Status inquiries.
+support -- Support facilities.
+tracepoints -- Tracing of program execution without stopping the program.
+user-defined -- User-defined commands.
+
+Type "help" followed by a class name for a list of commands in that class.
+Type "help all" for the list of all commands.
+Type "help" followed by command name for full documentation.
+Type "apropos word" to search for commands related to "word".
+Type "apropos -v word" for full documentation of commands related to "word".
+Command name abbreviations are allowed if unambiguous.
+Undefined command: "data".  Try "help".
+Examining data.
+
+List of commands:
+
+agent-printf -- Target agent only formatted printing, like the C "printf" function.
+append -- Append target code/data to a local file.
+append binary -- Append target code/data to a raw binary file.
+append binary memory -- Append contents of memory to a raw binary file.
+append binary value -- Append the value of an expression to a raw binary file.
+append memory -- Append contents of memory to a raw binary file.
+append value -- Append the value of an expression to a raw binary file.
+call -- Call a function in the program.
+disassemble -- Disassemble a specified section of memory.
+display -- Print value of expression EXP each time the program stops.
+dump -- Dump target code/data to a local file.
+dump binary -- Write target code/data to a raw binary file.
+dump binary memory -- Write contents of memory to a raw binary file.
+dump binary value -- Write the value of an expression to a raw binary file.
+dump ihex -- Write target code/data to an intel hex file.
+dump ihex memory -- Write contents of memory to an ihex file.
+dump ihex value -- Write the value of an expression to an ihex file.
+dump memory -- Write contents of memory to a raw binary file.
+dump srec -- Write target code/data to an srec file.
+dump srec memory -- Write contents of memory to an srec file.
+dump srec value -- Write the value of an expression to an srec file.
+dump tekhex -- Write target code/data to a tekhex file.
+dump tekhex memory -- Write contents of memory to a tekhex file.
+dump tekhex value -- Write the value of an expression to a tekhex file.
+dump value -- Write the value of an expression to a raw binary file.
+dump verilog -- Write target code/data to a verilog hex file.
+dump verilog memory -- Write contents of memory to a verilog hex file.
+dump verilog value -- Write the value of an expression to a verilog hex file.
+explore -- Explore a value or a type valid in the current context.
+explore type -- Explore a type or the type of an expression.
+explore value -- Explore value of an expression valid in the current context.
+find -- Search memory for a sequence of bytes.
+init-if-undefined -- Initialize a convenience variable if necessary.
+mem -- Define attributes for memory region or reset memory region handling to target-based.
+output -- Like "print" but don't put in value history and don't print newline.
+print -- Print value of expression EXP.
+print-object -- Ask an Objective-C object to print itself.
+printf -- Formatted printing, like the C "printf" function.
+ptype -- Print definition of type TYPE.
+restore -- Restore the contents of FILE to target memory.
+set -- Evaluate expression EXP and assign result to variable VAR.
+set ada -- Prefix command for changing Ada-specific settings.
+set ada print-signatures -- Enable or disable the output of formal and return types for functions in the overloads selection menu.
+set ada trust-PAD-over-XVS -- Enable or disable an optimization trusting PAD types over XVS types.
+set agent -- Set debugger's willingness to use agent as a helper.
+set annotate -- Set annotation_level.
+set architecture -- Set architecture of target.
+set args -- Set argument list to give program being debugged when it is started.
+set auto-connect-native-target -- Set whether GDB may automatically connect to the native target.
+set auto-load -- Auto-loading specific settings.
+set auto-load gdb-scripts -- Enable or disable auto-loading of canned sequences of commands scripts.
+set auto-load libthread-db -- Enable or disable auto-loading of inferior specific libthread_db.
+set auto-load local-gdbinit -- Enable or disable auto-loading of .gdbinit script in current directory.
+set auto-load python-scripts -- Set the debugger's behaviour regarding auto-loaded Python scripts.
+set auto-load safe-path -- Set the list of files and directories that are safe for auto-loading.
+set auto-load scripts-directory -- Set the list of directories from which to load auto-loaded scripts.
+set auto-solib-add -- Set autoloading of shared library symbols.
+set backtrace -- Set backtrace specific variables.
+set backtrace limit -- Set an upper bound on the number of backtrace levels.
+set backtrace past-entry -- Set whether backtraces should continue past the entry point of a program.
+set backtrace past-main -- Set whether backtraces should continue past "main".
+set basenames-may-differ -- Set whether a source file may have multiple base names.
+set breakpoint -- Breakpoint specific settings.
+set breakpoint always-inserted -- Set mode for inserting breakpoints.
+set breakpoint auto-hw -- Set automatic usage of hardware breakpoints.
+set breakpoint condition-evaluation -- Set mode of breakpoint condition evaluation.
+set breakpoint pending -- Set debugger's behavior regarding pending breakpoints.
+set can-use-hw-watchpoints -- Set debugger's willingness to use watchpoint hardware.
+set case-sensitive -- Set case sensitivity in name search (on/off/auto).
+set charset -- Set the host and target character sets.
+set check -- Set the status of the type/range checker.
+set check range -- Set range checking (on/warn/off/auto).
+set check type -- Set strict type checking.
+set circular-trace-buffer -- Set target's use of circular trace buffer.
+set code-cache -- Set cache use for code segment access.
+set coerce-float-to-double -- Set coercion of floats to doubles when calling functions.
+set compile-args -- Set compile command GCC command-line arguments.
+set compile-gcc -- Set compile command GCC driver filename.
+set complaints -- Set max number of complaints about incorrect symbols.
+set confirm -- Set whether to confirm potentially dangerous operations.
+set cp-abi -- Set the ABI used for inspecting C++ objects.
+set cwd -- Set the current working directory to be used when the inferior is started.
+set data-directory -- Set GDB's data directory.
+set dcache -- Use this command to set number of lines in dcache and line-size.
+set dcache line-size -- Set dcache line size in bytes (must be power of 2).
+set dcache size -- Set number of dcache lines.
+set debug -- Generic command for setting gdb debugging flags.
+set debug arch -- Set architecture debugging.
+set debug auto-load -- Set auto-load verifications debugging.
+set debug bfd-cache -- Set bfd cache debugging.
+set debug check-physname -- Set cross-checking of "physname" code against demangler.
+set debug coff-pe-read -- Set coff PE read debugging.
+set debug compile -- Set compile command debugging.
+set debug compile-cplus-scopes -- Set debugging of C++ compile scopes.
+set debug compile-cplus-types -- Set debugging of C++ compile type conversion.
+set debug displaced -- Set displaced stepping debugging.
+set debug dwarf-die -- Set debugging of the DWARF DIE reader.
+set debug dwarf-line -- Set debugging of the dwarf line reader.
+set debug dwarf-read -- Set debugging of the DWARF reader.
+set debug entry-values -- Set entry values and tail call frames debugging.
+set debug expression -- Set expression debugging.
+set debug frame -- Set frame debugging.
+set debug index-cache -- Set display of index-cache debug messages.
+set debug infrun -- Set inferior debugging.
+set debug jit -- Set JIT debugging.
+set debug libthread-db -- Set libthread-db debugging.
+set debug lin-lwp -- Set debugging of GNU/Linux lwp module.
+set debug linux-namespaces -- Set debugging of GNU/Linux namespaces module.
+set debug notification -- Set debugging of async remote notification.
+set debug observer -- Set observer debugging.
+set debug overload -- Set debugging of C++ overloading.
+set debug parser -- Set parser debugging.
+set debug py-unwind -- Set Python unwinder debugging.
+set debug record -- Set debugging of record/replay feature.
+set debug remote -- Set debugging of remote protocol.
+set debug remote-packet-max-chars -- Set the maximum number of characters to display for each remote packet.
+set debug separate-debug-file -- Set printing of separate debug info file search debug.
+set debug serial -- Set serial debugging.
+set debug skip -- Set whether to print the debug output about skipping files and functions.
+set debug stap-expression -- Set SystemTap expression debugging.
+set debug symbol-lookup -- Set debugging of symbol lookup.
+set debug symfile -- Set debugging of the symfile functions.
+set debug symtab-create -- Set debugging of symbol table creation.
+set debug target -- Set target debugging.
+set debug timestamp -- Set timestamping of debugging messages.
+set debug varobj -- Set varobj debugging.
+set debug xml -- Set XML parser debugging.
+set debug-file-directory -- Set the directories where separate debug symbols are searched for.
+set default-collect -- Set the list of expressions to collect by default.
+set demangle-style -- Set the current C++ demangling style.
+set detach-on-fork -- Set whether gdb will detach the child of a fork.
+set directories -- Set the search path for finding source files.
+set disable-randomization -- Set disabling of debuggee's virtual address space randomization.
+set disassemble-next-line -- Set whether to disassemble next source line or insn when execution stops.
+set disassembler-options -- Set the disassembler options.
+set disassembly-flavor -- Set the disassembly flavor.
+set disconnected-dprintf -- Set whether dprintf continues after GDB disconnects.
+set disconnected-tracing -- Set whether tracing continues after GDB disconnects.
+set displaced-stepping -- Set debugger's willingness to use displaced stepping.
+set dprintf-channel -- Set the channel to use for dynamic printf.
+set dprintf-function -- Set the function to use for dynamic printf.
+set dprintf-style -- Set the style of usage for dynamic printf.
+set dump-excluded-mappings -- Set whether gcore should dump mappings marked with the VM_DONTDUMP flag.
+set editing -- Set editing of command lines as they are typed.
+set endian -- Set endianness of target.
+set environment -- Set environment variable value to give the program.
+set exec-direction -- Set direction of execution.
+set exec-done-display -- Set notification of completion for asynchronous execution commands.
+set exec-wrapper -- Set a wrapper for running programs.
+set extended-prompt -- Set the extended prompt.
+set extension-language -- Set mapping between filename extension and source language.
+set filename-display -- Set how to display filenames.
+set follow-exec-mode -- Set debugger response to a program call of exec.
+set follow-fork-mode -- Set debugger response to a program call of fork or vfork.
+set frame-filter -- Prefix command for 'set' frame-filter related operations.
+set frame-filter priority -- GDB command to set the priority of the specified frame-filter.
+set gnutarget -- Set the current BFD target.
+set guile -- Prefix command for Guile preference settings.
+set guile print-stack -- Set mode for Guile exception printing on error.
+set height -- Set number of lines in a page for GDB output pagination.
+set history -- Generic command for setting command history parameters.
+set history expansion -- Set history expansion on command input.
+set history filename -- Set the filename in which to record the command history.
+set history remove-duplicates -- Set how far back in history to look for and remove duplicate entries.
+set history save -- Set saving of the history record on exit.
+set history size -- Set the size of the command history.
+set host-charset -- Set the host character set.
+set index-cache -- Set index-cache options.
+set index-cache directory -- Set the directory of the index cache.
+set index-cache off -- Disable the index cache.
+set index-cache on -- Enable the index cache.
+set inferior-tty -- Set terminal for future runs of program being debugged.
+set input-radix -- Set default input radix for entering numbers.
+set interactive-mode -- Set whether GDB's standard input is a terminal.
+set language -- Set the current source language.
+set libthread-db-search-path -- Set search path for libthread_db.
+set listsize -- Set number of source lines gdb will list by default.
+set logging -- Set logging options.
+set logging debugredirect -- Set the logging debug output mode.
+set logging file -- Set the current logfile.
+set logging off -- Disable logging.
+set logging on -- Enable logging.
+set logging overwrite -- Set whether logging overwrites or appends to the log file.
+set logging redirect -- Set the logging output mode.
+set max-completions -- Set maximum number of completion candidates.
+set max-user-call-depth -- Set the max call depth for non-python/scheme user-defined commands.
+set max-value-size -- Set maximum sized value gdb will load from the inferior.
+set may-call-functions -- Set permission to call functions in the program.
+set may-insert-breakpoints -- Set permission to insert breakpoints in the target.
+set may-insert-fast-tracepoints -- Set permission to insert fast tracepoints in the target.
+set may-insert-tracepoints -- Set permission to insert tracepoints in the target.
+set may-interrupt -- Set permission to interrupt or signal the target.
+set may-write-memory -- Set permission to write into target memory.
+set may-write-registers -- Set permission to write into registers.
+set mem -- Memory regions settings.
+set mem inaccessible-by-default -- Set handling of unknown memory regions.
+set mi-async -- Set whether MI asynchronous mode is enabled.
+set mpx -- Set Intel Memory Protection Extensions specific variables.
+set mpx bound -- Set the memory bounds for a given array/pointer storage in the bound table.
+set multiple-symbols -- Set how the debugger handles ambiguities in expressions.
+set non-stop -- Set whether gdb controls the inferior in non-stop mode.
+set observer -- Set whether gdb controls the inferior in observer mode.
+set opaque-type-resolution -- Set resolution of opaque struct/class/union types (if set before loading symbols).
+set osabi -- Set OS ABI of target.
+set output-radix -- Set default output radix for printing of values.
+set overload-resolution -- Set overload resolution in evaluating C++ functions.
+set pagination -- Set state of GDB output pagination.
+set print -- Generic command for setting how things print.
+set print address -- Set printing of addresses.
+set print array -- Set pretty formatting of arrays.
+set print array-indexes -- Set printing of array indexes.
+set print asm-demangle -- Set demangling of C++/ObjC names in disassembly listings.
+set print demangle -- Set demangling of encoded C++/ObjC names when displaying symbols.
+set print elements -- Set limit on string chars or array elements to print.
+set print entry-values -- Set printing of function arguments at function entry.
+set print finish -- Set whether `finish' prints the return value.
+set print frame-arguments -- Set printing of non-scalar frame arguments.
+set print frame-info -- Set printing of frame information.
+set print inferior-events -- Set printing of inferior events (such as inferior start and exit).
+set print max-depth -- Set maximum print depth for nested structures, unions and arrays.
+set print max-symbolic-offset -- Set the largest offset that will be printed in <SYMBOL+1234> form.
+set print null-stop -- Set printing of char arrays to stop at first null char.
+set print object -- Set printing of C++ virtual function tables.
+set print pascal_static-members -- Set printing of pascal static members.
+set print pretty -- Set pretty formatting of structures.
+set print raw-frame-arguments -- Set whether to print frame arguments in raw form.
+set print raw-values -- Set whether to print values in raw form.
+set print repeats -- Set threshold for repeated print elements.
+set print sevenbit-strings -- Set printing of 8-bit characters in strings as \nnn.
+set print static-members -- Set printing of C++ static members.
+set print symbol -- Set printing of symbol names when printing pointers.
+set print symbol-filename -- Set printing of source filename and line number with <SYMBOL>.
+set print symbol-loading -- Set printing of symbol loading messages.
+set print thread-events -- Set printing of thread events (such as thread start and exit).
+set print type -- Generic command for setting how types print.
+set print type methods -- Set printing of methods defined in classes.
+set print type nested-type-limit -- Set the number of recursive nested type definitions to print ("unlimited" or -1 to show all).
+set print type typedefs -- Set printing of typedefs defined in classes.
+set print union -- Set printing of unions interior to structures.
+set print vtbl -- Set printing of C++ virtual function tables.
+set prompt -- Set gdb's prompt.
+set python -- Prefix command for python preference settings.
+set python print-stack -- Set mode for Python stack dump on error.
+set radix -- Set default input and output number radices.
+set range-stepping -- Enable or disable range stepping.
+set record -- Set record options.
+set record btrace -- Set record options.
+set record btrace bts -- Set record btrace bts options.
+set record btrace bts buffer-size -- Set the record/replay bts buffer size.
+set record btrace cpu -- Set the cpu to be used for trace decode.
+set record btrace cpu auto -- Automatically determine the cpu to be used for trace decode.
+set record btrace cpu none -- Do not enable errata workarounds for trace decode.
+set record btrace pt -- Set record btrace pt options.
+set record btrace pt buffer-size -- Set the record/replay pt buffer size.
+set record btrace replay-memory-access -- Set what memory accesses are allowed during replay.
+set record full -- Set record options.
+set record full insn-number-max -- Set record/replay buffer limit.
+set record full memory-query -- Set whether query if PREC cannot record memory change of next instruction.
+set record full stop-at-limit -- Set whether record/replay stops when record/replay buffer becomes full.
+set record function-call-history-size -- Set number of function to print in "record function-call-history".
+set record instruction-history-size -- Set number of instructions to print in "record instruction-history".
+set remote -- Remote protocol specific variables.
+set remote P-packet -- Set use of remote protocol `P' (set-register) packet.
+set remote TracepointSource-packet -- Set use of remote protocol `TracepointSource' (TracepointSource) packet.
+set remote X-packet -- Set use of remote protocol `X' (binary-download) packet.
+set remote Z-packet -- Set use of remote protocol `Z' packets.
+set remote access-watchpoint-packet -- Set use of remote protocol `Z4' (access-watchpoint) packet.
+set remote agent-packet -- Set use of remote protocol `QAgent' (agent) packet.
+set remote allow-packet -- Set use of remote protocol `QAllow' (allow) packet.
+set remote attach-packet -- Set use of remote protocol `vAttach' (attach) packet.
+set remote binary-download-packet -- Set use of remote protocol `X' (binary-download) packet.
+set remote breakpoint-commands-packet -- Set use of remote protocol `BreakpointCommands' (breakpoint-commands) packet.
+set remote btrace-conf-bts-size-packet -- Set use of remote protocol `Qbtrace-conf:bts:size' (btrace-conf-bts-size) packet.
+set remote btrace-conf-pt-size-packet -- Set use of remote protocol `Qbtrace-conf:pt:size' (btrace-conf-pt-size) packet.
+set remote catch-syscalls-packet -- Set use of remote protocol `QCatchSyscalls' (catch-syscalls) packet.
+set remote conditional-breakpoints-packet -- Set use of remote protocol `ConditionalBreakpoints' (conditional-breakpoints) packet.
+set remote conditional-tracepoints-packet -- Set use of remote protocol `ConditionalTracepoints' (conditional-tracepoints) packet.
+set remote ctrl-c-packet -- Set use of remote protocol `vCtrlC' (ctrl-c) packet.
+set remote disable-btrace-packet -- Set use of remote protocol `Qbtrace:off' (disable-btrace) packet.
+set remote disable-randomization-packet -- Set use of remote protocol `QDisableRandomization' (disable-randomization) packet.
+set remote enable-btrace-bts-packet -- Set use of remote protocol `Qbtrace:bts' (enable-btrace-bts) packet.
+set remote enable-btrace-pt-packet -- Set use of remote protocol `Qbtrace:pt' (enable-btrace-pt) packet.
+set remote environment-hex-encoded-packet -- Set use of remote protocol `QEnvironmentHexEncoded' (environment-hex-encoded) packet.
+set remote environment-reset-packet -- Set use of remote protocol `QEnvironmentReset' (environment-reset) packet.
+set remote environment-unset-packet -- Set use of remote protocol `QEnvironmentUnset' (environment-unset) packet.
+set remote exec-event-feature-packet -- Set use of remote protocol `exec-event-feature' (exec-event-feature) packet.
+set remote exec-file -- Set the remote pathname for "run".
+set remote fast-tracepoints-packet -- Set use of remote protocol `FastTracepoints' (fast-tracepoints) packet.
+set remote fetch-register-packet -- Set use of remote protocol `p' (fetch-register) packet.
+set remote fork-event-feature-packet -- Set use of remote protocol `fork-event-feature' (fork-event-feature) packet.
+set remote get-thread-information-block-address-packet -- Set use of remote protocol `qGetTIBAddr' (get-thread-information-block-address) packet.
+set remote get-thread-local-storage-address-packet -- Set use of remote protocol `qGetTLSAddr' (get-thread-local-storage-address) packet.
+set remote hardware-breakpoint-limit -- Set the maximum number of target hardware breakpoints.
+set remote hardware-breakpoint-packet -- Set use of remote protocol `Z1' (hardware-breakpoint) packet.
+set remote hardware-watchpoint-length-limit -- Set the maximum length (in bytes) of a target hardware watchpoint.
+set remote hardware-watchpoint-limit -- Set the maximum number of target hardware watchpoints.
+set remote hostio-close-packet -- Set use of remote protocol `vFile:close' (hostio-close) packet.
+set remote hostio-fstat-packet -- Set use of remote protocol `vFile:fstat' (hostio-fstat) packet.
+set remote hostio-open-packet -- Set use of remote protocol `vFile:open' (hostio-open) packet.
+set remote hostio-pread-packet -- Set use of remote protocol `vFile:pread' (hostio-pread) packet.
+set remote hostio-pwrite-packet -- Set use of remote protocol `vFile:pwrite' (hostio-pwrite) packet.
+set remote hostio-readlink-packet -- Set use of remote protocol `vFile:readlink' (hostio-readlink) packet.
+set remote hostio-setfs-packet -- Set use of remote protocol `vFile:setfs' (hostio-setfs) packet.
+set remote hostio-unlink-packet -- Set use of remote protocol `vFile:unlink' (hostio-unlink) packet.
+set remote hwbreak-feature-packet -- Set use of remote protocol `hwbreak-feature' (hwbreak-feature) packet.
+set remote install-in-trace-packet -- Set use of remote protocol `InstallInTrace' (install-in-trace) packet.
+set remote interrupt-on-connect -- Set whether interrupt-sequence is sent to remote target when gdb connects to.
+set remote interrupt-sequence -- Set interrupt sequence to remote target.
+set remote kill-packet -- Set use of remote protocol `vKill' (kill) packet.
+set remote library-info-packet -- Set use of remote protocol `qXfer:libraries:read' (library-info) packet.
+set remote library-info-svr4-packet -- Set use of remote protocol `qXfer:libraries-svr4:read' (library-info-svr4) packet.
+set remote memory-map-packet -- Set use of remote protocol `qXfer:memory-map:read' (memory-map) packet.
+set remote memory-read-packet-size -- Set the maximum number of bytes per memory-read packet.
+set remote memory-write-packet-size -- Set the maximum number of bytes per memory-write packet.
+set remote multiprocess-feature-packet -- Set use of remote protocol `multiprocess-feature' (multiprocess-feature) packet.
+set remote no-resumed-stop-reply-packet -- Set use of remote protocol `N stop reply' (no-resumed-stop-reply) packet.
+set remote noack-packet -- Set use of remote protocol `QStartNoAckMode' (noack) packet.
+set remote osdata-packet -- Set use of remote protocol `qXfer:osdata:read' (osdata) packet.
+set remote p-packet -- Set use of remote protocol `p' (fetch-register) packet.
+set remote pass-signals-packet -- Set use of remote protocol `QPassSignals' (pass-signals) packet.
+set remote pid-to-exec-file-packet -- Set use of remote protocol `qXfer:exec-file:read' (pid-to-exec-file) packet.
+set remote program-signals-packet -- Set use of remote protocol `QProgramSignals' (program-signals) packet.
+set remote query-attached-packet -- Set use of remote protocol `qAttached' (query-attached) packet.
+set remote read-aux-vector-packet -- Set use of remote protocol `qXfer:auxv:read' (read-aux-vector) packet.
+set remote read-btrace-conf-packet -- Set use of remote protocol `qXfer:btrace-conf' (read-btrace-conf) packet.
+set remote read-btrace-packet -- Set use of remote protocol `qXfer:btrace' (read-btrace) packet.
+set remote read-fdpic-loadmap-packet -- Set use of remote protocol `qXfer:fdpic:read' (read-fdpic-loadmap) packet.
+set remote read-sdata-object-packet -- Set use of remote protocol `qXfer:statictrace:read' (read-sdata-object) packet.
+set remote read-siginfo-object-packet -- Set use of remote protocol `qXfer:siginfo:read' (read-siginfo-object) packet.
+set remote read-watchpoint-packet -- Set use of remote protocol `Z3' (read-watchpoint) packet.
+set remote reverse-continue-packet -- Set use of remote protocol `bc' (reverse-continue) packet.
+set remote reverse-step-packet -- Set use of remote protocol `bs' (reverse-step) packet.
+set remote run-packet -- Set use of remote protocol `vRun' (run) packet.
+set remote search-memory-packet -- Set use of remote protocol `qSearch:memory' (search-memory) packet.
+set remote set-register-packet -- Set use of remote protocol `P' (set-register) packet.
+set remote set-working-dir-packet -- Set use of remote protocol `QSetWorkingDir' (set-working-dir) packet.
+set remote software-breakpoint-packet -- Set use of remote protocol `Z0' (software-breakpoint) packet.
+set remote startup-with-shell-packet -- Set use of remote protocol `QStartupWithShell' (startup-with-shell) packet.
+set remote static-tracepoints-packet -- Set use of remote protocol `StaticTracepoints' (static-tracepoints) packet.
+set remote supported-packets-packet -- Set use of remote protocol `qSupported' (supported-packets) packet.
+set remote swbreak-feature-packet -- Set use of remote protocol `swbreak-feature' (swbreak-feature) packet.
+set remote symbol-lookup-packet -- Set use of remote protocol `qSymbol' (symbol-lookup) packet.
+set remote system-call-allowed -- Set if the host system(3) call is allowed for the target.
+set remote target-features-packet -- Set use of remote protocol `qXfer:features:read' (target-features) packet.
+set remote thread-events-packet -- Set use of remote protocol `QThreadEvents' (thread-events) packet.
+set remote threads-packet -- Set use of remote protocol `qXfer:threads:read' (threads) packet.
+set remote trace-buffer-size-packet -- Set use of remote protocol `QTBuffer:size' (trace-buffer-size) packet.
+set remote trace-status-packet -- Set use of remote protocol `qTStatus' (trace-status) packet.
+set remote traceframe-info-packet -- Set use of remote protocol `qXfer:traceframe-info:read' (traceframe-info) packet.
+set remote unwind-info-block-packet -- Set use of remote protocol `qXfer:uib:read' (unwind-info-block) packet.
+set remote verbose-resume-packet -- Set use of remote protocol `vCont' (verbose-resume) packet.
+set remote verbose-resume-supported-packet -- Set use of remote protocol `vContSupported' (verbose-resume-supported) packet.
+set remote vfork-event-feature-packet -- Set use of remote protocol `vfork-event-feature' (vfork-event-feature) packet.
+set remote write-siginfo-object-packet -- Set use of remote protocol `qXfer:siginfo:write' (write-siginfo-object) packet.
+set remote write-watchpoint-packet -- Set use of remote protocol `Z2' (write-watchpoint) packet.
+set remoteaddresssize -- Set the maximum size of the address (in bits) in a memory packet.
+set remotecache -- Set cache use for remote targets.
+set remoteflow -- Set use of hardware flow control for remote serial I/O.
+set remotelogbase -- Set numerical base for remote session logging.
+set remotelogfile -- Set filename for remote session recording.
+set remotetimeout -- Set timeout limit to wait for target to respond.
+set remotewritesize -- Set the maximum number of bytes per memory write packet (deprecated).
+set schedule-multiple -- Set mode for resuming threads of all processes.
+set scheduler-locking -- Set mode for locking scheduler during execution.
+set script-extension -- Set mode for script filename extension recognition.
+set serial -- Set default serial/parallel port configuration.
+set serial baud -- Set baud rate for remote serial I/O.
+set serial parity -- Set parity for remote serial I/O.
+set solib-absolute-prefix -- Set an alternate system root.
+set solib-search-path -- Set the search path for loading non-absolute shared library symbol files.
+set stack-cache -- Set cache use for stack access.
+set startup-with-shell -- Set use of shell to start subprocesses.  The default is on.
+set step-mode -- Set mode of the step operation.
+set stop-on-solib-events -- Set stopping for shared library events.
+set struct-convention -- Set the convention for returning small structs.
+set style -- Style-specific settings.
+set style address -- Address display styling.
+set style address background -- Set the background color for this property.
+set style address foreground -- Set the foreground color for this property.
+set style address intensity -- Set the display intensity for this property.
+set style enabled -- Set whether CLI styling is enabled.
+set style filename -- Filename display styling.
+set style filename background -- Set the background color for this property.
+set style filename foreground -- Set the foreground color for this property.
+set style filename intensity -- Set the display intensity for this property.
+set style function -- Function name display styling.
+set style function background -- Set the background color for this property.
+set style function foreground -- Set the foreground color for this property.
+set style function intensity -- Set the display intensity for this property.
+set style highlight -- Highlight display styling.
+set style highlight background -- Set the background color for this property.
+set style highlight foreground -- Set the foreground color for this property.
+set style highlight intensity -- Set the display intensity for this property.
+set style metadata -- Metadata display styling.
+set style metadata background -- Set the background color for this property.
+set style metadata foreground -- Set the foreground color for this property.
+set style metadata intensity -- Set the display intensity for this property.
+set style sources -- Set whether source code styling is enabled.
+set style title -- Title display styling.
+set style title background -- Set the background color for this property.
+set style title foreground -- Set the foreground color for this property.
+set style title intensity -- Set the display intensity for this property.
+set style tui-active-border -- TUI active border display styling.
+set style tui-active-border background -- Set the background color for this property.
+set style tui-active-border foreground -- Set the foreground color for this property.
+set style tui-border -- TUI border display styling.
+set style tui-border background -- Set the background color for this property.
+set style tui-border foreground -- Set the foreground color for this property.
+set style variable -- Variable name display styling.
+set style variable background -- Set the background color for this property.
+set style variable foreground -- Set the foreground color for this property.
+set style variable intensity -- Set the display intensity for this property.
+set substitute-path -- Add a substitution rule to rewrite the source directories.
+set sysroot -- Set an alternate system root.
+set target-charset -- Set the target character set.
+set target-file-system-kind -- Set assumed file system kind for target reported file names.
+set target-wide-charset -- Set the target wide character set.
+set tcp -- TCP protocol specific variables.
+set tcp auto-retry -- Set auto-retry on socket connect.
+set tcp connect-timeout -- Set timeout limit in seconds for socket connection.
+set tdesc -- Set target description specific variables.
+set tdesc filename -- Set the file to read for an XML target description.
+set trace-buffer-size -- Set requested size of trace buffer.
+set trace-commands -- Set tracing of GDB CLI commands.
+set trace-notes -- Set notes string to use for current and future trace runs.
+set trace-stop-notes -- Set notes string to use for future tstop commands.
+set trace-user -- Set the user name to use for current and future trace runs.
+set trust-readonly-sections -- Set mode for reading from readonly sections.
+set tui -- TUI configuration variables.
+set tui active-border-mode -- Set the attribute mode to use for the active TUI window border.
+set tui border-kind -- Set the kind of border for TUI windows.
+set tui border-mode -- Set the attribute mode to use for the TUI window borders.
+set tui compact-source -- Set whether the TUI source window is compact.
+set tui tab-width -- Set the tab width, in characters, for the TUI.
+set unwind-on-terminating-exception -- Set unwinding of stack if std::terminate is called while in call dummy.
+set unwindonsignal -- Set unwinding of stack if a signal is received while in a call dummy.
+set use-coredump-filter -- Set whether gcore should consider /proc/PID/coredump_filter.
+set use-deprecated-index-sections -- Set whether to use deprecated gdb_index sections.
+set var -- Evaluate expression EXP and assign result to variable VAR.
+set variable -- Evaluate expression EXP and assign result to variable VAR.
+set varsize-limit -- Set the maximum number of bytes allowed in a variable-size object.
+set verbose -- Set verbosity.
+set watchdog -- Set watchdog timer.
+set width -- Set number of characters where GDB should wrap lines of its output.
+set write -- Set writing into executable and core files.
+undisplay -- Cancel some expressions to be displayed when program stops.
+whatis -- Print data type of expression EXP.
+with -- Temporarily set SETTING to VALUE, run COMMAND, and restore SETTING.
+x -- Examine memory: x/FMT ADDRESS.
+
+Type "help" followed by command name for full documentation.
+Type "apropos word" to search for commands related to "word".
+Type "apropos -v word" for full documentation of commands related to "word".
+Command name abbreviations are allowed if unambiguous.
+List of classes of commands:
+
+aliases -- Aliases of other commands.
+breakpoints -- Making program stop at certain points.
+data -- Examining data.
+files -- Specifying and examining files.
+internals -- Maintenance commands.
+obscure -- Obscure features.
+running -- Running the program.
+stack -- Examining the stack.
+status -- Status inquiries.
+support -- Support facilities.
+tracepoints -- Tracing of program execution without stopping the program.
+user-defined -- User-defined commands.
+
+Type "help" followed by a class name for a list of commands in that class.
+Type "help all" for the list of all commands.
+Type "help" followed by command name for full documentation.
+Type "apropos word" to search for commands related to "word".
+Type "apropos -v word" for full documentation of commands related to "word".
+Command name abbreviations are allowed if unambiguous.
+Undefined command: "".  Try "help".
+Search for commands matching a REGEXP.
+Usage: apropos [-v] REGEXP
+Flag -v indicates to produce a verbose output, showing full documentation
+of the matching commands.
+Search for commands matching a REGEXP.
+Usage: apropos [-v] REGEXP
+Flag -v indicates to produce a verbose output, showing full documentation
+of the matching commands.
+Search for commands matching a REGEXP.
+Usage: apropos [-v] REGEXP
+Flag -v indicates to produce a verbose output, showing full documentation
+of the matching commands.
+Search for commands matching a REGEXP.
+Usage: apropos [-v] REGEXP
+Flag -v indicates to produce a verbose output, showing full documentation
+of the matching commands.
+Search for commands matching a REGEXP.
+Usage: apropos [-v] REGEXP
+Flag -v indicates to produce a verbose output, showing full documentation
+of the matching commands.
+Search for commands matching a REGEXP.
+Usage: apropos [-v] REGEXP
+Flag -v indicates to produce a verbose output, showing full documentation
+of the matching commands.
+Obscure features.
+
+List of commands:
+
+checkpoint -- Fork a duplicate process (experimental).
+compare-sections -- Compare section data on target to the exec file.
+compile -- Command to compile source code and inject it into the inferior.
+compile code -- Compile, inject, and execute code.
+compile file -- Evaluate a file containing source code.
+compile print -- Evaluate EXPR by using the compiler and print result.
+complete -- List the completions for the rest of the line as a command.
+expression -- Command to compile source code and inject it into the inferior.
+compile code -- Compile, inject, and execute code.
+compile file -- Evaluate a file containing source code.
+compile print -- Evaluate EXPR by using the compiler and print result.
+guile -- Evaluate a Guile expression.
+guile-repl -- Start a Guile interactive prompt.
+monitor -- Send a command to the remote monitor (remote targets only).
+python -- Evaluate a Python command.
+python-interactive -- Start an interactive Python prompt.
+record -- Start recording.
+record btrace -- Start branch trace recording.
+record btrace bts -- Start branch trace recording in Branch Trace Store (BTS) format.
+record btrace pt -- Start branch trace recording in Intel Processor Trace format.
+record delete -- Delete the rest of execution log and start recording it anew.
+record full -- Start full execution recording.
+record full restore -- Restore the execution log from a file.
+record function-call-history -- Prints the execution history at function granularity.
+record goto -- Restore the program to its state at instruction number N.
+record goto begin -- Go to the beginning of the execution log.
+record goto end -- Go to the end of the execution log.
+record instruction-history -- Print disassembled instructions stored in the execution log.
+record save -- Save the execution log to a file.
+record stop -- Stop the record/replay target.
+restart -- Restore program context from a checkpoint.
+stop -- There is no `stop' command, but you can set a hook on `stop'.
+
+Type "help" followed by command name for full documentation.
+Type "apropos word" to search for commands related to "word".
+Type "apropos -v word" for full documentation of commands related to "word".
+Command name abbreviations are allowed if unambiguous.
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+ModuleNotFoundError: No module named 'dlib'
+$2 = 767
+No symbol "output_components" in current context.
+$3 = 0
+152	        if (output_components_ != 1 && 
+163	        std::vector<unsigned char*> rows;
+164	        rows.resize(height_);
+167	        data.resize(height_*width_*output_components_);
+No symbol "width" in current context.
+$4 = 2339
+$5 = 3
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+$6 = std::vector of length 5382039, capacity 5382039 = {0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 
+  0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 
+  0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 
+  0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 
+  0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 
+  0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 
+  0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 
+  0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 
+  0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 
+  0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 
+  0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 
+  0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 
+  0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 
+  0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 
+  0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 
+  0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 
+  0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 0 '\000', 
+  0 '\000', 0 '\000'...}
+Python Exception <class 'gdb.error'> value has been optimized out: 
+Error while executing Python code.
+$7 = std::vector of length 767, capacity 767 = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
+  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
+  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
+  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
+  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
+  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
+  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
+  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
+  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0...}
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+$8 = std::vector of length 767, capacity 767 = {0x5555561e3f30 "", 0x5555561e5a99 "", 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
+  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
+  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
+  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
+  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
+  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
+  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
+  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
+  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0...}
+$9 = 93825005403952
+$10 = 5864075181872
+$11 = (unsigned char *) 0x5555561e5a99 ""
+$12 = 0x5555561e5a99
+$13 = 0x5555561e5a99
+$14 = 0x5555561e5a99
+171	            rows[i] = &data[i*width_*output_components_];
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+std::vector<unsigned char, std::allocator<unsigned char> >::operator[] (this=0x7fffffffb5a8, __n=<optimized out>)
+    at /usr/include/c++/9/bits/stl_vector.h:1040
+1040	      operator[](size_type __n) _GLIBCXX_NOEXCEPT
+dlib::jpeg_loader::read_image (this=0x7fffffffb590, file=0x555555905b90, imgbuffer=0x0, imgbuffersize=0)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/image_loader/jpeg_loader.cpp:170
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+Ambiguous command "a": actions, add-auto-load-safe-path, add-auto-load-scripts-directory, add-inferior...
+171	            rows[i] = &data[i*width_*output_components_];
+std::vector<unsigned char, std::allocator<unsigned char> >::operator[] (this=0x7fffffffb5a8, __n=<optimized out>)
+    at /usr/include/c++/9/bits/stl_vector.h:1040
+1040	      operator[](size_type __n) _GLIBCXX_NOEXCEPT
+dlib::jpeg_loader::read_image (this=0x7fffffffb590, file=0x555555905b90, imgbuffer=0x0, imgbuffersize=0)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/image_loader/jpeg_loader.cpp:170
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+std::vector<unsigned char, std::allocator<unsigned char> >::operator[] (this=0x7fffffffb5a8, __n=<optimized out>)
+    at /usr/include/c++/9/bits/stl_vector.h:1040
+1040	      operator[](size_type __n) _GLIBCXX_NOEXCEPT
+dlib::jpeg_loader::read_image (this=0x7fffffffb590, file=0x555555905b90, imgbuffer=0x0, imgbuffersize=0)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/image_loader/jpeg_loader.cpp:170
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+std::vector<unsigned char, std::allocator<unsigned char> >::operator[] (this=0x7fffffffb5a8, __n=<optimized out>)
+    at /usr/include/c++/9/bits/stl_vector.h:1040
+1040	      operator[](size_type __n) _GLIBCXX_NOEXCEPT
+dlib::jpeg_loader::read_image (this=0x7fffffffb590, file=0x555555905b90, imgbuffer=0x0, imgbuffersize=0)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/image_loader/jpeg_loader.cpp:170
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+std::vector<unsigned char, std::allocator<unsigned char> >::operator[] (this=0x7fffffffb5a8, __n=<optimized out>)
+    at /usr/include/c++/9/bits/stl_vector.h:1040
+1040	      operator[](size_type __n) _GLIBCXX_NOEXCEPT
+dlib::jpeg_loader::read_image (this=0x7fffffffb590, file=0x555555905b90, imgbuffer=0x0, imgbuffersize=0)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/image_loader/jpeg_loader.cpp:170
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+std::vector<unsigned char, std::allocator<unsigned char> >::operator[] (this=0x7fffffffb5a8, __n=<optimized out>)
+    at /usr/include/c++/9/bits/stl_vector.h:1040
+1040	      operator[](size_type __n) _GLIBCXX_NOEXCEPT
+dlib::jpeg_loader::read_image (this=0x7fffffffb590, file=0x555555905b90, imgbuffer=0x0, imgbuffersize=0)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/image_loader/jpeg_loader.cpp:170
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+std::vector<unsigned char, std::allocator<unsigned char> >::operator[] (this=0x7fffffffb5a8, __n=<optimized out>)
+    at /usr/include/c++/9/bits/stl_vector.h:1040
+1040	      operator[](size_type __n) _GLIBCXX_NOEXCEPT
+dlib::jpeg_loader::read_image (this=0x7fffffffb590, file=0x555555905b90, imgbuffer=0x0, imgbuffersize=0)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/image_loader/jpeg_loader.cpp:170
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+std::vector<unsigned char, std::allocator<unsigned char> >::operator[] (this=0x7fffffffb5a8, __n=<optimized out>)
+    at /usr/include/c++/9/bits/stl_vector.h:1040
+1040	      operator[](size_type __n) _GLIBCXX_NOEXCEPT
+dlib::jpeg_loader::read_image (this=0x7fffffffb590, file=0x555555905b90, imgbuffer=0x0, imgbuffersize=0)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/image_loader/jpeg_loader.cpp:170
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+std::vector<unsigned char, std::allocator<unsigned char> >::operator[] (this=0x7fffffffb5a8, __n=<optimized out>)
+    at /usr/include/c++/9/bits/stl_vector.h:1040
+1040	      operator[](size_type __n) _GLIBCXX_NOEXCEPT
+dlib::jpeg_loader::read_image (this=0x7fffffffb590, file=0x555555905b90, imgbuffer=0x0, imgbuffersize=0)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/image_loader/jpeg_loader.cpp:170
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+std::vector<unsigned char, std::allocator<unsigned char> >::operator[] (this=0x7fffffffb5a8, __n=<optimized out>)
+    at /usr/include/c++/9/bits/stl_vector.h:1040
+1040	      operator[](size_type __n) _GLIBCXX_NOEXCEPT
+dlib::jpeg_loader::read_image (this=0x7fffffffb590, file=0x555555905b90, imgbuffer=0x0, imgbuffersize=0)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/image_loader/jpeg_loader.cpp:170
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+std::vector<unsigned char, std::allocator<unsigned char> >::operator[] (this=0x7fffffffb5a8, __n=<optimized out>)
+    at /usr/include/c++/9/bits/stl_vector.h:1040
+1040	      operator[](size_type __n) _GLIBCXX_NOEXCEPT
+dlib::jpeg_loader::read_image (this=0x7fffffffb590, file=0x555555905b90, imgbuffer=0x0, imgbuffersize=0)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/image_loader/jpeg_loader.cpp:170
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+std::vector<unsigned char, std::allocator<unsigned char> >::operator[] (this=0x7fffffffb5a8, __n=<optimized out>)
+    at /usr/include/c++/9/bits/stl_vector.h:1040
+1040	      operator[](size_type __n) _GLIBCXX_NOEXCEPT
+dlib::jpeg_loader::read_image (this=0x7fffffffb590, file=0x555555905b90, imgbuffer=0x0, imgbuffersize=0)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/image_loader/jpeg_loader.cpp:170
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+std::vector<unsigned char, std::allocator<unsigned char> >::operator[] (this=0x7fffffffb5a8, __n=<optimized out>)
+    at /usr/include/c++/9/bits/stl_vector.h:1040
+1040	      operator[](size_type __n) _GLIBCXX_NOEXCEPT
+dlib::jpeg_loader::read_image (this=0x7fffffffb590, file=0x555555905b90, imgbuffer=0x0, imgbuffersize=0)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/image_loader/jpeg_loader.cpp:170
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+std::vector<unsigned char, std::allocator<unsigned char> >::operator[] (this=0x7fffffffb5a8, __n=<optimized out>)
+    at /usr/include/c++/9/bits/stl_vector.h:1040
+1040	      operator[](size_type __n) _GLIBCXX_NOEXCEPT
+dlib::jpeg_loader::read_image (this=0x7fffffffb590, file=0x555555905b90, imgbuffer=0x0, imgbuffersize=0)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/image_loader/jpeg_loader.cpp:170
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+171	            rows[i] = &data[i*width_*output_components_];
+std::vector<unsigned char, std::allocator<unsigned char> >::operator[] (this=0x7fffffffb5a8, __n=<optimized out>)
+    at /usr/include/c++/9/bits/stl_vector.h:1040
+1040	      operator[](size_type __n) _GLIBCXX_NOEXCEPT
+dlib::jpeg_loader::read_image (this=0x7fffffffb590, file=0x555555905b90, imgbuffer=0x0, imgbuffersize=0)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/image_loader/jpeg_loader.cpp:170
+170	        for (unsigned long i = 0; i < rows.size(); ++i)
+Continuing.
+[Thread 0x7fff9251a000 (LWP 27454) exited]
+[Thread 0x7fff94d1b000 (LWP 27453) exited]
+[Thread 0x7fff9751c000 (LWP 27452) exited]
+[Thread 0x7fff99d1d000 (LWP 27451) exited]
+[Thread 0x7fff9c51e000 (LWP 27450) exited]
+[Thread 0x7fff9ed1f000 (LWP 27449) exited]
+[Thread 0x7fffa1520000 (LWP 27448) exited]
+[Thread 0x7fffa3d21000 (LWP 27447) exited]
+[Thread 0x7fffa6522000 (LWP 27446) exited]
+[Thread 0x7fffa8d23000 (LWP 27445) exited]
+[Thread 0x7fffab524000 (LWP 27444) exited]
+[Thread 0x7fffadd25000 (LWP 27443) exited]
+[Thread 0x7fffb0526000 (LWP 27442) exited]
+[Thread 0x7fffb4d27000 (LWP 27441) exited]
+[Thread 0x7fffb5528000 (LWP 27440) exited]
+[Thread 0x7fffb7d29000 (LWP 27439) exited]
+[Thread 0x7fffbc52a000 (LWP 27438) exited]
+[Thread 0x7fffbcd2b000 (LWP 27437) exited]
+[Thread 0x7fffc152c000 (LWP 27436) exited]
+[Thread 0x7fffc1d2d000 (LWP 27435) exited]
+[Thread 0x7fffc652e000 (LWP 27434) exited]
+[Thread 0x7fffc8d2f000 (LWP 27433) exited]
+[Thread 0x7fffc9530000 (LWP 27432) exited]
+[Thread 0x7fff88a84000 (LWP 27459) exited]
+[Thread 0x7fff8944d000 (LWP 27458) exited]
+[Thread 0x7fff89c4e000 (LWP 27457) exited]
+[Inferior 1 (process 27431) exited normally]
+Breakpoint 3 at 0x5555555a9d18: full_object_detection.h:21. (7 locations)
+Starting program: /home/zach/development/research/dlibSealGUI/run/sealdebug seal.dat data DSCN3217.JPG
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+[New Thread 0x7fffc9530000 (LWP 27611)]
+[New Thread 0x7fffc8d2f000 (LWP 27612)]
+[New Thread 0x7fffc652e000 (LWP 27613)]
+[New Thread 0x7fffc3d2d000 (LWP 27614)]
+[New Thread 0x7fffbf52c000 (LWP 27615)]
+[New Thread 0x7fffbed2b000 (LWP 27616)]
+[New Thread 0x7fffba52a000 (LWP 27617)]
+[New Thread 0x7fffb7d29000 (LWP 27618)]
+[New Thread 0x7fffb5528000 (LWP 27619)]
+[New Thread 0x7fffb2d27000 (LWP 27620)]
+[New Thread 0x7fffb2526000 (LWP 27621)]
+[New Thread 0x7fffadd25000 (LWP 27622)]
+[New Thread 0x7fffab524000 (LWP 27623)]
+[New Thread 0x7fffa8d23000 (LWP 27624)]
+[New Thread 0x7fffa6522000 (LWP 27625)]
+[New Thread 0x7fffa3d21000 (LWP 27626)]
+[New Thread 0x7fffa3520000 (LWP 27627)]
+[New Thread 0x7fff9ed1f000 (LWP 27628)]
+[New Thread 0x7fff9c51e000 (LWP 27629)]
+[New Thread 0x7fff99d1d000 (LWP 27630)]
+[New Thread 0x7fff9951c000 (LWP 27631)]
+[New Thread 0x7fff94d1b000 (LWP 27632)]
+[New Thread 0x7fff9451a000 (LWP 27633)]
+[New Thread 0x7fff89c4e000 (LWP 27636)]
+[New Thread 0x7fff8944d000 (LWP 27637)]
+[New Thread 0x7fff88a84000 (LWP 27638)]
+
+Thread 1 "sealdebug" hit Breakpoint 1, init_source (cinfo=0x7fffffffb280)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/external/libjpeg/jdatasrc.c:46
+46	{
+Program not restarted.
+Starting program: /home/zach/development/research/dlibSealGUI/run/sealdebug seal.dat data DSCN3217.JPG
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+[New Thread 0x7fffc9530000 (LWP 27643)]
+[New Thread 0x7fffc8d2f000 (LWP 27644)]
+[New Thread 0x7fffc852e000 (LWP 27645)]
+[New Thread 0x7fffc5d2d000 (LWP 27646)]
+[New Thread 0x7fffc152c000 (LWP 27647)]
+[New Thread 0x7fffbcd2b000 (LWP 27648)]
+[New Thread 0x7fffba52a000 (LWP 27649)]
+[New Thread 0x7fffb9d29000 (LWP 27650)]
+[New Thread 0x7fffb5528000 (LWP 27651)]
+[New Thread 0x7fffb2d27000 (LWP 27652)]
+[New Thread 0x7fffb0526000 (LWP 27653)]
+[New Thread 0x7fffadd25000 (LWP 27654)]
+[New Thread 0x7fffab524000 (LWP 27655)]
+[New Thread 0x7fffa8d23000 (LWP 27656)]
+[New Thread 0x7fffa6522000 (LWP 27657)]
+[New Thread 0x7fffa3d21000 (LWP 27658)]
+[New Thread 0x7fffa1520000 (LWP 27659)]
+[New Thread 0x7fffa0d1f000 (LWP 27660)]
+[New Thread 0x7fff9c51e000 (LWP 27661)]
+[New Thread 0x7fff99d1d000 (LWP 27662)]
+[New Thread 0x7fff9751c000 (LWP 27663)]
+[New Thread 0x7fff94d1b000 (LWP 27664)]
+[New Thread 0x7fff9251a000 (LWP 27665)]
+[New Thread 0x7fff89c4e000 (LWP 27668)]
+[New Thread 0x7fff8944d000 (LWP 27669)]
+[New Thread 0x7fff88a84000 (LWP 27670)]
+
+Thread 1 "sealdebug" hit Breakpoint 1, init_source (cinfo=0x7fffffffb280)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/external/libjpeg/jdatasrc.c:46
+46	{
+Continuing.
+
+Thread 1 "sealdebug" hit Breakpoint 3, dlib::mmod_rect::mmod_rect (this=0x55558f9b69d0)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/full_object_detection.h:132
+132	    struct mmod_rect
+200	      _M_local_data() const
+dlib::loss_mmod_::to_label<dlib::dimpl::subnet_wrapper<dlib::add_layer<dlib::con_<1l, 9l, 9l, 1, 1, 4, 4>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<16l, 5l, 5l, 2, 2, 0, 0>, dlib::input_rgb_image_pyramid<dlib::pyramid_down<6u> >, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, true, void>, std::vector<dlib::mmod_rect, std::allocator<dlib::mmod_rect> >*> (this=0x7fffffffba20, input_tensor=..., sub=..., iter=0x7fffffffbf08, 
+    adjust_threshold=0) at /usr/include/c++/9/bits/char_traits.h:365
+365		return static_cast<char_type*>(__builtin_memcpy(__s1, __s2, __n));
+1351	                    final_dets.push_back(mmod_rect(dets_accum[i].rect_bbr,
+1346	                for (unsigned long i = 0; i < dets_accum.size(); ++i)
+1348	                    if (overlaps_any_box_nms(final_dets, dets_accum[i].rect_bbr))
+187	            return rectangle (
+1348	                    if (overlaps_any_box_nms(final_dets, dets_accum[i].rect_bbr))
+1346	                for (unsigned long i = 0; i < dets_accum.size(); ++i)
+1348	                    if (overlaps_any_box_nms(final_dets, dets_accum[i].rect_bbr))
+1353	                                                   options.detector_windows[dets_accum[i].tensor_channel].label));
+1351	                    final_dets.push_back(mmod_rect(dets_accum[i].rect_bbr,
+
+Thread 1 "sealdebug" hit Breakpoint 3, dlib::mmod_rect::mmod_rect (this=0x55558f01a190)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/full_object_detection.h:132
+132	    struct mmod_rect
+200	      _M_local_data() const
+dlib::loss_mmod_::to_label<dlib::dimpl::subnet_wrapper<dlib::add_layer<dlib::con_<1l, 9l, 9l, 1, 1, 4, 4>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<16l, 5l, 5l, 2, 2, 0, 0>, dlib::input_rgb_image_pyramid<dlib::pyramid_down<6u> >, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, true, void>, std::vector<dlib::mmod_rect, std::allocator<dlib::mmod_rect> >*> (this=0x7fffffffba20, input_tensor=..., sub=..., iter=0x7fffffffbf08, 
+    adjust_threshold=0) at /usr/include/c++/9/bits/char_traits.h:365
+365		return static_cast<char_type*>(__builtin_memcpy(__s1, __s2, __n));
+
+Thread 1 "sealdebug" hit Breakpoint 3, dlib::mmod_rect::mmod_rect (this=0x55558f01a140)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/full_object_detection.h:132
+132	    struct mmod_rect
+dlib::loss_mmod_::to_label<dlib::dimpl::subnet_wrapper<dlib::add_layer<dlib::con_<1l, 9l, 9l, 1, 1, 4, 4>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<16l, 5l, 5l, 2, 2, 0, 0>, dlib::input_rgb_image_pyramid<dlib::pyramid_down<6u> >, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, true, void>, std::vector<dlib::mmod_rect, std::allocator<dlib::mmod_rect> >*> (this=0x7fffffffba20, input_tensor=..., sub=..., iter=0x7fffffffbf08, 
+    adjust_threshold=0) at /usr/include/c++/9/bits/char_traits.h:365
+365		return static_cast<char_type*>(__builtin_memcpy(__s1, __s2, __n));
+1351	                    final_dets.push_back(mmod_rect(dets_accum[i].rect_bbr,
+1346	                for (unsigned long i = 0; i < dets_accum.size(); ++i)
+1348	                    if (overlaps_any_box_nms(final_dets, dets_accum[i].rect_bbr))
+187	            return rectangle (
+1348	                    if (overlaps_any_box_nms(final_dets, dets_accum[i].rect_bbr))
+1346	                for (unsigned long i = 0; i < dets_accum.size(); ++i)
+1348	                    if (overlaps_any_box_nms(final_dets, dets_accum[i].rect_bbr))
+187	            return rectangle (
+1348	                    if (overlaps_any_box_nms(final_dets, dets_accum[i].rect_bbr))
+1346	                for (unsigned long i = 0; i < dets_accum.size(); ++i)
+1348	                    if (overlaps_any_box_nms(final_dets, dets_accum[i].rect_bbr))
+1353	                                                   options.detector_windows[dets_accum[i].tensor_channel].label));
+1351	                    final_dets.push_back(mmod_rect(dets_accum[i].rect_bbr,
+
+Thread 1 "sealdebug" hit Breakpoint 3, dlib::mmod_rect::mmod_rect (this=0x55558f9b8300)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/full_object_detection.h:132
+132	    struct mmod_rect
+200	      _M_local_data() const
+dlib::loss_mmod_::to_label<dlib::dimpl::subnet_wrapper<dlib::add_layer<dlib::con_<1l, 9l, 9l, 1, 1, 4, 4>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<16l, 5l, 5l, 2, 2, 0, 0>, dlib::input_rgb_image_pyramid<dlib::pyramid_down<6u> >, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, true, void>, std::vector<dlib::mmod_rect, std::allocator<dlib::mmod_rect> >*> (this=0x7fffffffba20, input_tensor=..., sub=..., iter=0x7fffffffbf08, 
+    adjust_threshold=0) at /usr/include/c++/9/bits/char_traits.h:365
+365		return static_cast<char_type*>(__builtin_memcpy(__s1, __s2, __n));
+
+Thread 1 "sealdebug" hit Breakpoint 3, dlib::mmod_rect::mmod_rect (this=0x55558f9b8260)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/full_object_detection.h:132
+132	    struct mmod_rect
+dlib::loss_mmod_::to_label<dlib::dimpl::subnet_wrapper<dlib::add_layer<dlib::con_<1l, 9l, 9l, 1, 1, 4, 4>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<16l, 5l, 5l, 2, 2, 0, 0>, dlib::input_rgb_image_pyramid<dlib::pyramid_down<6u> >, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, true, void>, std::vector<dlib::mmod_rect, std::allocator<dlib::mmod_rect> >*> (this=0x7fffffffba20, input_tensor=..., sub=..., iter=0x7fffffffbf08, 
+    adjust_threshold=0) at /usr/include/c++/9/bits/char_traits.h:365
+365		return static_cast<char_type*>(__builtin_memcpy(__s1, __s2, __n));
+
+Thread 1 "sealdebug" hit Breakpoint 3, dlib::mmod_rect::mmod_rect (this=0x55558f9b82b0)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/full_object_detection.h:132
+132	    struct mmod_rect
+dlib::loss_mmod_::to_label<dlib::dimpl::subnet_wrapper<dlib::add_layer<dlib::con_<1l, 9l, 9l, 1, 1, 4, 4>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<16l, 5l, 5l, 2, 2, 0, 0>, dlib::input_rgb_image_pyramid<dlib::pyramid_down<6u> >, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, true, void>, std::vector<dlib::mmod_rect, std::allocator<dlib::mmod_rect> >*> (this=0x7fffffffba20, input_tensor=..., sub=..., iter=0x7fffffffbf08, 
+    adjust_threshold=0) at /usr/include/c++/9/bits/char_traits.h:365
+365		return static_cast<char_type*>(__builtin_memcpy(__s1, __s2, __n));
+1351	                    final_dets.push_back(mmod_rect(dets_accum[i].rect_bbr,
+1346	                for (unsigned long i = 0; i < dets_accum.size(); ++i)
+1348	                    if (overlaps_any_box_nms(final_dets, dets_accum[i].rect_bbr))
+187	            return rectangle (
+1348	                    if (overlaps_any_box_nms(final_dets, dets_accum[i].rect_bbr))
+1346	                for (unsigned long i = 0; i < dets_accum.size(); ++i)
+std::vector<dlib::loss_mmod_::intermediate_detection, std::allocator<dlib::loss_mmod_::intermediate_detection> >::size (
+    this=0x7fffffffb240, this=0x7fffffffb240)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/loss.h:1346
+1346	                for (unsigned long i = 0; i < dets_accum.size(); ++i)
+dlib::loss_mmod_::to_label<dlib::dimpl::subnet_wrapper<dlib::add_layer<dlib::con_<1l, 9l, 9l, 1, 1, 4, 4>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<16l, 5l, 5l, 2, 2, 0, 0>, dlib::input_rgb_image_pyramid<dlib::pyramid_down<6u> >, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, true, void>, std::vector<dlib::mmod_rect, std::allocator<dlib::mmod_rect> >*> (this=0x7fffffffba20, input_tensor=..., sub=..., iter=0x7fffffffbf08, 
+    adjust_threshold=0) at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/loss.h:1346
+1346	                for (unsigned long i = 0; i < dets_accum.size(); ++i)
+std::vector<dlib::loss_mmod_::intermediate_detection, std::allocator<dlib::loss_mmod_::intermediate_detection> >::size (
+    this=0x7fffffffb240, this=0x7fffffffb240) at /usr/include/c++/9/bits/stl_vector.h:915
+915	      size() const _GLIBCXX_NOEXCEPT
+dlib::loss_mmod_::to_label<dlib::dimpl::subnet_wrapper<dlib::add_layer<dlib::con_<1l, 9l, 9l, 1, 1, 4, 4>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<16l, 5l, 5l, 2, 2, 0, 0>, dlib::input_rgb_image_pyramid<dlib::pyramid_down<6u> >, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, true, void>, std::vector<dlib::mmod_rect, std::allocator<dlib::mmod_rect> >*> (this=0x7fffffffba20, input_tensor=..., sub=..., iter=0x7fffffffbf08, 
+    adjust_threshold=0) at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/loss.h:1348
+1348	                    if (overlaps_any_box_nms(final_dets, dets_accum[i].rect_bbr))
+std::vector<dlib::loss_mmod_::intermediate_detection, std::allocator<dlib::loss_mmod_::intermediate_detection> >::operator[]
+    (this=0x7fffffffb240, __n=7) at /usr/include/c++/9/bits/stl_vector.h:1040
+1040	      operator[](size_type __n) _GLIBCXX_NOEXCEPT
+dlib::loss_mmod_::to_label<dlib::dimpl::subnet_wrapper<dlib::add_layer<dlib::con_<1l, 9l, 9l, 1, 1, 4, 4>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<16l, 5l, 5l, 2, 2, 0, 0>, dlib::input_rgb_image_pyramid<dlib::pyramid_down<6u> >, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, true, void>, std::vector<dlib::mmod_rect, std::allocator<dlib::mmod_rect> >*> (this=0x7fffffffba20, input_tensor=..., sub=..., iter=0x7fffffffbf08, 
+    adjust_threshold=0) at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/loss.h:1348
+1348	                    if (overlaps_any_box_nms(final_dets, dets_accum[i].rect_bbr))
+dlib::drectangle::operator dlib::rectangle (this=0x55558f9b9c80)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/../image_transforms/../statistics/../optimization/../geometry/drectangle.h:67
+67	            return rectangle((long)std::floor(l+0.5), 
+__floor_sse41 () at ../sysdeps/x86_64/fpu/multiarch/s_floor-sse4_1.S:22
+22	../sysdeps/x86_64/fpu/multiarch/s_floor-sse4_1.S: No such file or directory.
+23	in ../sysdeps/x86_64/fpu/multiarch/s_floor-sse4_1.S
+__floor_sse41 () at ../sysdeps/x86_64/fpu/multiarch/s_floor-sse4_1.S:24
+24	in ../sysdeps/x86_64/fpu/multiarch/s_floor-sse4_1.S
+__floor_sse41 () at ../sysdeps/x86_64/fpu/multiarch/s_floor-sse4_1.S:22
+22	in ../sysdeps/x86_64/fpu/multiarch/s_floor-sse4_1.S
+23	in ../sysdeps/x86_64/fpu/multiarch/s_floor-sse4_1.S
+__floor_sse41 () at ../sysdeps/x86_64/fpu/multiarch/s_floor-sse4_1.S:24
+24	in ../sysdeps/x86_64/fpu/multiarch/s_floor-sse4_1.S
+__floor_sse41 () at ../sysdeps/x86_64/fpu/multiarch/s_floor-sse4_1.S:22
+22	in ../sysdeps/x86_64/fpu/multiarch/s_floor-sse4_1.S
+23	in ../sysdeps/x86_64/fpu/multiarch/s_floor-sse4_1.S
+__floor_sse41 () at ../sysdeps/x86_64/fpu/multiarch/s_floor-sse4_1.S:24
+24	in ../sysdeps/x86_64/fpu/multiarch/s_floor-sse4_1.S
+__floor_sse41 () at ../sysdeps/x86_64/fpu/multiarch/s_floor-sse4_1.S:22
+22	in ../sysdeps/x86_64/fpu/multiarch/s_floor-sse4_1.S
+23	in ../sysdeps/x86_64/fpu/multiarch/s_floor-sse4_1.S
+__floor_sse41 () at ../sysdeps/x86_64/fpu/multiarch/s_floor-sse4_1.S:24
+24	in ../sysdeps/x86_64/fpu/multiarch/s_floor-sse4_1.S
+dlib::loss_mmod_::to_label<dlib::dimpl::subnet_wrapper<dlib::add_layer<dlib::con_<1l, 9l, 9l, 1, 1, 4, 4>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<16l, 5l, 5l, 2, 2, 0, 0>, dlib::input_rgb_image_pyramid<dlib::pyramid_down<6u> >, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, true, void>, std::vector<dlib::mmod_rect, std::allocator<dlib::mmod_rect> >*> (this=0x7fffffffba20, input_tensor=..., sub=..., iter=0x7fffffffbf08, 
+    adjust_threshold=0) at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/loss.h:1348
+1348	                    if (overlaps_any_box_nms(final_dets, dets_accum[i].rect_bbr))
+dlib::loss_mmod_::overlaps_any_box_nms<dlib::mmod_rect> (rect=..., rects=std::vector of length 3, capacity 4 = {...}, 
+    this=0x7fffffffba20) at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/loss.h:1965
+1965	            for (auto&& r : rects)
+dlib::test_box_overlap::operator() (b=..., a=..., this=0x7fffffffba50)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/box_overlap_testing.h:91
+91	            const double inner = a.intersect(b).area();
+dlib::rectangle::intersect (rhs=..., this=0x55558f9b8260)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/box_overlap_testing.h:91
+91	            const double inner = a.intersect(b).area();
+std::min<long> (__b=<optimized out>, __a=@0x55558f9b8278: 565) at /usr/include/c++/9/bits/stl_algobase.h:198
+198	    min(const _Tp& __a, const _Tp& __b)
+std::max<long> (__b=<optimized out>, __a=@0x55558f9b8268: 481) at /usr/include/c++/9/bits/stl_algobase.h:222
+222	    max(const _Tp& __a, const _Tp& __b)
+dlib::test_box_overlap::operator() (b=..., a=..., this=0x7fffffffba50)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/box_overlap_testing.h:91
+91	            const double inner = a.intersect(b).area();
+dlib::rectangle::area (this=<optimized out>)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/box_overlap_testing.h:91
+91	            const double inner = a.intersect(b).area();
+dlib::rectangle::width (this=<optimized out>)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/box_overlap_testing.h:91
+91	            const double inner = a.intersect(b).area();
+dlib::rectangle::is_empty (this=<optimized out>)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/cuda/../matrix/../array2d/../geometry/rectangle.h:176
+176	        ) const { return (t > b || l > r); }
+dlib::loss_mmod_::overlaps_any_box_nms<dlib::mmod_rect> (rect=..., rects=std::vector of length 3, capacity 4 = {...}, 
+    this=0x7fffffffba20) at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/loss.h:1965
+1965	            for (auto&& r : rects)
+dlib::test_box_overlap::operator() (b=..., a=..., this=0x7fffffffba50)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/box_overlap_testing.h:91
+91	            const double inner = a.intersect(b).area();
+dlib::rectangle::intersect (rhs=..., this=0x55558f9b82b0)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/box_overlap_testing.h:91
+91	            const double inner = a.intersect(b).area();
+std::min<long> (__b=<optimized out>, __a=@0x55558f9b82c8: 627) at /usr/include/c++/9/bits/stl_algobase.h:198
+198	    min(const _Tp& __a, const _Tp& __b)
+std::max<long> (__b=<optimized out>, __a=@0x55558f9b82b8: 525) at /usr/include/c++/9/bits/stl_algobase.h:222
+222	    max(const _Tp& __a, const _Tp& __b)
+dlib::test_box_overlap::operator() (b=..., a=..., this=0x7fffffffba50)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/box_overlap_testing.h:91
+91	            const double inner = a.intersect(b).area();
+dlib::rectangle::area (this=<optimized out>)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/box_overlap_testing.h:91
+91	            const double inner = a.intersect(b).area();
+dlib::rectangle::width (this=<optimized out>)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/box_overlap_testing.h:91
+91	            const double inner = a.intersect(b).area();
+dlib::rectangle::is_empty (this=<optimized out>)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/cuda/../matrix/../array2d/../geometry/rectangle.h:176
+176	        ) const { return (t > b || l > r); }
+dlib::loss_mmod_::overlaps_any_box_nms<dlib::mmod_rect> (rect=..., rects=std::vector of length 3, capacity 4 = {...}, 
+    this=0x7fffffffba20) at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/loss.h:1965
+1965	            for (auto&& r : rects)
+dlib::test_box_overlap::operator() (b=..., a=..., this=0x7fffffffba50)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/box_overlap_testing.h:91
+91	            const double inner = a.intersect(b).area();
+dlib::rectangle::intersect (rhs=..., this=0x55558f9b8300)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/box_overlap_testing.h:91
+91	            const double inner = a.intersect(b).area();
+std::min<long> (__b=<optimized out>, __a=@0x55558f9b8318: 583) at /usr/include/c++/9/bits/stl_algobase.h:198
+198	    min(const _Tp& __a, const _Tp& __b)
+std::max<long> (__b=<optimized out>, __a=@0x55558f9b8308: 461) at /usr/include/c++/9/bits/stl_algobase.h:222
+222	    max(const _Tp& __a, const _Tp& __b)
+dlib::test_box_overlap::operator() (b=..., a=..., this=0x7fffffffba50)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/box_overlap_testing.h:91
+91	            const double inner = a.intersect(b).area();
+dlib::rectangle::area (this=<optimized out>)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/box_overlap_testing.h:91
+91	            const double inner = a.intersect(b).area();
+dlib::rectangle::width (this=<optimized out>)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/box_overlap_testing.h:91
+91	            const double inner = a.intersect(b).area();
+dlib::rectangle::is_empty (this=<optimized out>)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/cuda/../matrix/../array2d/../geometry/rectangle.h:176
+176	        ) const { return (t > b || l > r); }
+dlib::loss_mmod_::overlaps_any_box_nms<dlib::mmod_rect> (rect=..., rects=std::vector of length 3, capacity 4 = {...}, 
+    this=0x7fffffffba20) at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/loss.h:1965
+1965	            for (auto&& r : rects)
+dlib::loss_mmod_::to_label<dlib::dimpl::subnet_wrapper<dlib::add_layer<dlib::con_<1l, 9l, 9l, 1, 1, 4, 4>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<16l, 5l, 5l, 2, 2, 0, 0>, dlib::input_rgb_image_pyramid<dlib::pyramid_down<6u> >, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, true, void>, std::vector<dlib::mmod_rect, std::allocator<dlib::mmod_rect> >*> (this=0x7fffffffba20, input_tensor=..., sub=..., iter=0x7fffffffbf08, 
+    adjust_threshold=0) at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/loss.h:1353
+1353	                                                   options.detector_windows[dets_accum[i].tensor_channel].label));
+std::vector<dlib::mmod_options::detector_window_details, std::allocator<dlib::mmod_options::detector_window_details> >::operator[] (this=0x7fffffffba20, __n=0) at /usr/include/c++/9/bits/stl_vector.h:1058
+1058	      operator[](size_type __n) const _GLIBCXX_NOEXCEPT
+dlib::loss_mmod_::to_label<dlib::dimpl::subnet_wrapper<dlib::add_layer<dlib::con_<1l, 9l, 9l, 1, 1, 4, 4>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<16l, 5l, 5l, 2, 2, 0, 0>, dlib::input_rgb_image_pyramid<dlib::pyramid_down<6u> >, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, true, void>, std::vector<dlib::mmod_rect, std::allocator<dlib::mmod_rect> >*> (this=0x7fffffffba20, input_tensor=..., sub=..., iter=0x7fffffffbf08, 
+    adjust_threshold=0) at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/loss.h:1351
+1351	                    final_dets.push_back(mmod_rect(dets_accum[i].rect_bbr,
+dlib::mmod_rect::mmod_rect (label="", score=0.88167089223861694, r=..., this=0x7fffffffb2a0)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/full_object_detection.h:137
+137	        mmod_rect(const rectangle& r, double score, const std::string& label) : rect(r),detection_confidence(score), label(label) {}
+936	      length() const _GLIBCXX_NOEXCEPT
+std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char*> (this=0x7fffffffb2d0, 
+    __beg=0x555555a030b0 "", __end=0x555555a030b0 "") at /usr/include/c++/9/bits/basic_string.tcc:206
+206	      basic_string<_CharT, _Traits, _Alloc>::
+215		size_type __dnew = static_cast<size_type>(std::distance(__beg, __end));
+std::distance<char*> (__last=<optimized out>, __first=<optimized out>) at /usr/include/c++/9/bits/basic_string.tcc:215
+215		size_type __dnew = static_cast<size_type>(std::distance(__beg, __end));
+std::__distance<char*> (__last=<optimized out>, __first=<optimized out>)
+    at /usr/include/c++/9/bits/stl_iterator_base_funcs.h:138
+138	    distance(_InputIterator __first, _InputIterator __last)
+No symbol "__dnew" in current context.
+$15 = <optimized out>
+std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char*> (this=0x7fffffffb2d0, 
+    __beg=0x555555a030b0 "", __end=0x555555a030b0 "") at /usr/include/c++/9/bits/basic_string.tcc:225
+225		  { this->_S_copy_chars(_M_data(), __beg, __end); }
+cannot resolve overloaded method `_M_data': no arguments supplied
+Too few arguments in function call.
+Too few arguments in function call.
+232		_M_set_length(__dnew);
+dlib::loss_mmod_::to_label<dlib::dimpl::subnet_wrapper<dlib::add_layer<dlib::con_<1l, 9l, 9l, 1, 1, 4, 4>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<16l, 5l, 5l, 2, 2, 0, 0>, dlib::input_rgb_image_pyramid<dlib::pyramid_down<6u> >, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, true, void>, std::vector<dlib::mmod_rect, std::allocator<dlib::mmod_rect> >*> (this=0x7fffffffba20, input_tensor=..., sub=..., iter=0x7fffffffbf08, 
+    adjust_threshold=0) at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/loss.h:1351
+1351	                    final_dets.push_back(mmod_rect(dets_accum[i].rect_bbr,
+
+Thread 1 "sealdebug" hit Breakpoint 3, dlib::mmod_rect::mmod_rect (this=0x55558f9b8350)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/full_object_detection.h:132
+132	    struct mmod_rect
+No symbol "final_dets" in current context.
+200	      _M_local_data() const
+dlib::loss_mmod_::to_label<dlib::dimpl::subnet_wrapper<dlib::add_layer<dlib::con_<1l, 9l, 9l, 1, 1, 4, 4>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<45l, 5l, 5l, 1, 1, 2, 2>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<32l, 5l, 5l, 2, 2, 0, 0>, dlib::add_layer<dlib::relu_, dlib::add_layer<dlib::affine_, dlib::add_layer<dlib::con_<16l, 5l, 5l, 2, 2, 0, 0>, dlib::input_rgb_image_pyramid<dlib::pyramid_down<6u> >, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, void>, true, void>, std::vector<dlib::mmod_rect, std::allocator<dlib::mmod_rect> >*> (this=0x7fffffffba20, input_tensor=..., sub=..., iter=0x7fffffffbf08, 
+    adjust_threshold=0) at /usr/include/c++/9/bits/char_traits.h:365
+365		return static_cast<char_type*>(__builtin_memcpy(__s1, __s2, __n));
+1351	                    final_dets.push_back(mmod_rect(dets_accum[i].rect_bbr,
+1346	                for (unsigned long i = 0; i < dets_accum.size(); ++i)
+$16 = std::vector of length 4, capacity 4 = {{rect = {l = 802, t = 481, r = 897, b = 565}, 
+    detection_confidence = 1.0331809520721436, ignore = false, label = ""}, {rect = {l = 598, t = 525, r = 712, b = 627}, 
+    detection_confidence = 0.99427503347396851, ignore = false, label = ""}, {rect = {l = 2589, t = 461, r = 2726, b = 583}, 
+    detection_confidence = 0.92516624927520752, ignore = false, label = ""}, {rect = {l = 1156, t = 740, r = 1292, b = 862}, 
+    detection_confidence = 0.88167089223861694, ignore = false, label = ""}}

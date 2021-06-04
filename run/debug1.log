@@ -1,0 +1,341 @@
+#0  dlib::save_jpeg (img=..., filename="dataChips/0_DSCN3217_ChippedAt_(802,481),(897,565).jpeg", quality=100) at /home/zach/development/research/dlibSealGUI/include/dlib/image_saver/save_jpeg.cpp:50
+#1  0x00005555555a045a in dlib::save_jpeg<dlib::matrix<dlib::rgb_pixel, 0l, 0l, dlib::memory_manager_stateless_kernel_1<char>, dlib::row_major_layout> > (quality=100, file_name="dataChips/0_DSCN3217_ChippedAt_(802,481),(897,565).jpeg", img=...)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/../dlib/dnn/../image_processing/../image_transforms/assign_image.h:25
+#2  main (argc=<optimized out>, argv=<optimized out>) at /home/zach/development/research/dlibSealGUI/include/dnn/dnn_mmod_dog_hipsterizer.cpp:152
+52	        DLIB_CASSERT(img.size() != 0,
+56	        DLIB_CASSERT(0 <= quality && quality <= 100,
+2300	      c_str() const _GLIBCXX_NOEXCEPT
+63	        if (!outfile)
+64	            throw image_save_error("Can't open file " + filename + " for writing.");
+89	      ~new_allocator() _GLIBCXX_USE_NOEXCEPT { }
+[Thread 0x7fffa3521000 (LWP 12867) exited]
+[Thread 0x7fff9251b000 (LWP 12873) exited]
+[Thread 0x7fff96d1c000 (LWP 12872) exited]
+[Thread 0x7fff9951d000 (LWP 12871) exited]
+[Thread 0x7fff99d1e000 (LWP 12870) exited]
+[Thread 0x7fff9e51f000 (LWP 12869) exited]
+[Thread 0x7fff9ed20000 (LWP 12868) exited]
+[Thread 0x7fffa3d22000 (LWP 12866) exited]
+[Thread 0x7fffa6523000 (LWP 12865) exited]
+[Thread 0x7fffa8d24000 (LWP 12864) exited]
+[Thread 0x7fffab525000 (LWP 12863) exited]
+[Thread 0x7fffadd26000 (LWP 12862) exited]
+[Thread 0x7fffb2527000 (LWP 12861) exited]
+[Thread 0x7fffb2d28000 (LWP 12860) exited]
+[Thread 0x7fffb5529000 (LWP 12859) exited]
+[Thread 0x7fffb7d2a000 (LWP 12858) exited]
+[Thread 0x7fffba52b000 (LWP 12857) exited]
+[Thread 0x7fffbcd2c000 (LWP 12856) exited]
+[Thread 0x7fffbf52d000 (LWP 12855) exited]
+[Thread 0x7fffc1d2e000 (LWP 12854) exited]
+[Thread 0x7fffc652f000 (LWP 12853) exited]
+[Thread 0x7fffc8d30000 (LWP 12852) exited]
+[Thread 0x7fffc9531000 (LWP 12851) exited]
+[Thread 0x7fff88a84000 (LWP 12878) exited]
+[Thread 0x7fff8944e000 (LWP 12877) exited]
+[Thread 0x7fff89c4f000 (LWP 12876) exited]
+[Inferior 1 (process 12850) exited normally]
+Starting program: /home/zach/development/research/dlibSealGUI/run/sealdebug seal.dat data DSCN3217.JPG
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+[New Thread 0x7fffc9531000 (LWP 13170)]
+[New Thread 0x7fffc8d30000 (LWP 13171)]
+[New Thread 0x7fffc652f000 (LWP 13172)]
+[New Thread 0x7fffc1d2e000 (LWP 13173)]
+[New Thread 0x7fffbf52d000 (LWP 13174)]
+[New Thread 0x7fffbcd2c000 (LWP 13175)]
+[New Thread 0x7fffbc52b000 (LWP 13176)]
+[New Thread 0x7fffb9d2a000 (LWP 13177)]
+[New Thread 0x7fffb7529000 (LWP 13178)]
+[New Thread 0x7fffb2d28000 (LWP 13179)]
+[New Thread 0x7fffb0527000 (LWP 13180)]
+[New Thread 0x7fffadd26000 (LWP 13181)]
+[New Thread 0x7fffab525000 (LWP 13182)]
+[New Thread 0x7fffa8d24000 (LWP 13183)]
+[New Thread 0x7fffa6523000 (LWP 13184)]
+[New Thread 0x7fffa3d22000 (LWP 13185)]
+[New Thread 0x7fffa1521000 (LWP 13186)]
+[New Thread 0x7fff9ed20000 (LWP 13187)]
+[New Thread 0x7fff9c51f000 (LWP 13188)]
+[New Thread 0x7fff9bd1e000 (LWP 13189)]
+[New Thread 0x7fff9751d000 (LWP 13190)]
+[New Thread 0x7fff94d1c000 (LWP 13191)]
+[New Thread 0x7fff9251b000 (LWP 13192)]
+[New Thread 0x7fff89c4f000 (LWP 13195)]
+[New Thread 0x7fff8944e000 (LWP 13196)]
+[New Thread 0x7fff88a84000 (LWP 13197)]
+
+Thread 1 "sealdebug" hit Breakpoint 1, dlib::save_jpeg (img=..., 
+    filename="dataChips/0_DSCN3217_ChippedAt_(802,481),(897,565).jpeg", quality=100)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/image_saver/save_jpeg.cpp:50
+50	    {
+The history is empty.
+#0  dlib::save_jpeg (img=..., filename="dataChips/0_DSCN3217_ChippedAt_(802,481),(897,565).jpeg", quality=100)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/image_saver/save_jpeg.cpp:50
+50	    {
+52	        DLIB_CASSERT(img.size() != 0,
+$1 = "dataChips/0_DSCN3217_ChippedAt_(802,481),(897,565).jpeg"
+56	        DLIB_CASSERT(0 <= quality && quality <= 100,
+2300	      c_str() const _GLIBCXX_NOEXCEPT
+63	        if (!outfile)
+$2 = (FILE *) 0x0
+64	            throw image_save_error("Can't open file " + filename + " for writing.");
+89	      ~new_allocator() _GLIBCXX_USE_NOEXCEPT { }
+[Thread 0x7fff9251b000 (LWP 13192) exited]
+[Thread 0x7fff94d1c000 (LWP 13191) exited]
+[Thread 0x7fff9751d000 (LWP 13190) exited]
+[Thread 0x7fff9bd1e000 (LWP 13189) exited]
+[Thread 0x7fff9c51f000 (LWP 13188) exited]
+[Thread 0x7fff9ed20000 (LWP 13187) exited]
+[Thread 0x7fffa1521000 (LWP 13186) exited]
+[Thread 0x7fffa3d22000 (LWP 13185) exited]
+[Thread 0x7fffa6523000 (LWP 13184) exited]
+[Thread 0x7fffa8d24000 (LWP 13183) exited]
+[Thread 0x7fffab525000 (LWP 13182) exited]
+[Thread 0x7fffadd26000 (LWP 13181) exited]
+[Thread 0x7fffb0527000 (LWP 13180) exited]
+[Thread 0x7fffb2d28000 (LWP 13179) exited]
+[Thread 0x7fffb7529000 (LWP 13178) exited]
+[Thread 0x7fffb9d2a000 (LWP 13177) exited]
+[Thread 0x7fffbc52b000 (LWP 13176) exited]
+[Thread 0x7fffbcd2c000 (LWP 13175) exited]
+[Thread 0x7fffbf52d000 (LWP 13174) exited]
+[Thread 0x7fffc1d2e000 (LWP 13173) exited]
+[Thread 0x7fffc652f000 (LWP 13172) exited]
+[Thread 0x7fffc8d30000 (LWP 13171) exited]
+[Thread 0x7fffc9531000 (LWP 13170) exited]
+[Thread 0x7fff88a84000 (LWP 13197) exited]
+[Thread 0x7fff8944e000 (LWP 13196) exited]
+[Thread 0x7fff89c4f000 (LWP 13195) exited]
+[Inferior 1 (process 13169) exited normally]
+Starting program: /home/zach/development/research/dlibSealGUI/run/sealdebug seal.dat data DSCN3217.JPG --out dataChips
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+[New Thread 0x7fffc9531000 (LWP 13200)]
+[New Thread 0x7fffc8d30000 (LWP 13201)]
+[New Thread 0x7fffc652f000 (LWP 13202)]
+[New Thread 0x7fffc3d2e000 (LWP 13203)]
+[New Thread 0x7fffbf52d000 (LWP 13204)]
+[New Thread 0x7fffbed2c000 (LWP 13205)]
+[New Thread 0x7fffbc52b000 (LWP 13206)]
+[New Thread 0x7fffbbd2a000 (LWP 13207)]
+[New Thread 0x7fffb5529000 (LWP 13208)]
+[New Thread 0x7fffb4d28000 (LWP 13209)]
+[New Thread 0x7fffb2527000 (LWP 13210)]
+[New Thread 0x7fffadd26000 (LWP 13211)]
+[New Thread 0x7fffab525000 (LWP 13212)]
+[New Thread 0x7fffa8d24000 (LWP 13213)]
+[New Thread 0x7fffa6523000 (LWP 13214)]
+[New Thread 0x7fffa3d22000 (LWP 13215)]
+[New Thread 0x7fffa3521000 (LWP 13216)]
+[New Thread 0x7fff9ed20000 (LWP 13217)]
+[New Thread 0x7fff9c51f000 (LWP 13218)]
+[New Thread 0x7fff99d1e000 (LWP 13219)]
+[New Thread 0x7fff9951d000 (LWP 13220)]
+[New Thread 0x7fff94d1c000 (LWP 13221)]
+[New Thread 0x7fff9251b000 (LWP 13222)]
+[New Thread 0x7fff89c4f000 (LWP 13225)]
+[New Thread 0x7fff8944e000 (LWP 13226)]
+[New Thread 0x7fff88a84000 (LWP 13227)]
+
+Thread 1 "sealdebug" hit Breakpoint 1, dlib::save_jpeg (img=..., 
+    filename="dataChips/0_DSCN3217_ChippedAt_(802,481),(897,565).jpeg", quality=100)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/image_saver/save_jpeg.cpp:50
+50	    {
+52	        DLIB_CASSERT(img.size() != 0,
+56	        DLIB_CASSERT(0 <= quality && quality <= 100,
+2300	      c_str() const _GLIBCXX_NOEXCEPT
+63	        if (!outfile)
+64	            throw image_save_error("Can't open file " + filename + " for writing.");
+89	      ~new_allocator() _GLIBCXX_USE_NOEXCEPT { }
+[Thread 0x7fff9251b000 (LWP 13222) exited]
+[Thread 0x7fff94d1c000 (LWP 13221) exited]
+[Thread 0x7fff9951d000 (LWP 13220) exited]
+[Thread 0x7fff99d1e000 (LWP 13219) exited]
+[Thread 0x7fff9c51f000 (LWP 13218) exited]
+[Thread 0x7fff9ed20000 (LWP 13217) exited]
+[Thread 0x7fffa3521000 (LWP 13216) exited]
+[Thread 0x7fffa3d22000 (LWP 13215) exited]
+[Thread 0x7fffa6523000 (LWP 13214) exited]
+[Thread 0x7fffa8d24000 (LWP 13213) exited]
+[Thread 0x7fffab525000 (LWP 13212) exited]
+[Thread 0x7fffadd26000 (LWP 13211) exited]
+[Thread 0x7fffb2527000 (LWP 13210) exited]
+[Thread 0x7fffb4d28000 (LWP 13209) exited]
+[Thread 0x7fffb5529000 (LWP 13208) exited]
+[Thread 0x7fffbbd2a000 (LWP 13207) exited]
+[Thread 0x7fffbc52b000 (LWP 13206) exited]
+[Thread 0x7fffbed2c000 (LWP 13205) exited]
+[Thread 0x7fffbf52d000 (LWP 13204) exited]
+[Thread 0x7fffc3d2e000 (LWP 13203) exited]
+[Thread 0x7fffc652f000 (LWP 13202) exited]
+[Thread 0x7fffc8d30000 (LWP 13201) exited]
+[Thread 0x7fffc9531000 (LWP 13200) exited]
+[Thread 0x7fff88a84000 (LWP 13227) exited]
+[Thread 0x7fff8944e000 (LWP 13226) exited]
+[Thread 0x7fffcac7a000 (LWP 13199) exited]
+warning: Error removing breakpoint 0
+warning: Error removing breakpoint 0
+warning: Error removing breakpoint 0
+warning: Error removing breakpoint 0
+warning: Error removing breakpoint 0
+warning: Error removing breakpoint 0
+[Inferior 1 (process 13199) exited normally]
+Starting program: /home/zach/development/research/dlibSealGUI/run/sealdebug seal.dat data DSCN3217.JPG dataChips
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+[New Thread 0x7fffc9531000 (LWP 13232)]
+[New Thread 0x7fffc8d30000 (LWP 13233)]
+[New Thread 0x7fffc652f000 (LWP 13234)]
+[New Thread 0x7fffc3d2e000 (LWP 13235)]
+[New Thread 0x7fffc152d000 (LWP 13236)]
+[New Thread 0x7fffbcd2c000 (LWP 13237)]
+[New Thread 0x7fffbc52b000 (LWP 13238)]
+[New Thread 0x7fffb9d2a000 (LWP 13239)]
+[New Thread 0x7fffb5529000 (LWP 13240)]
+[New Thread 0x7fffb2d28000 (LWP 13241)]
+[New Thread 0x7fffb0527000 (LWP 13242)]
+[New Thread 0x7fffadd26000 (LWP 13243)]
+[New Thread 0x7fffab525000 (LWP 13244)]
+[New Thread 0x7fffa8d24000 (LWP 13245)]
+[New Thread 0x7fffa6523000 (LWP 13246)]
+[New Thread 0x7fffa3d22000 (LWP 13247)]
+[New Thread 0x7fffa1521000 (LWP 13248)]
+[New Thread 0x7fff9ed20000 (LWP 13249)]
+[New Thread 0x7fff9c51f000 (LWP 13250)]
+[New Thread 0x7fff99d1e000 (LWP 13251)]
+[New Thread 0x7fff9751d000 (LWP 13252)]
+[New Thread 0x7fff96d1c000 (LWP 13253)]
+[New Thread 0x7fff9251b000 (LWP 13254)]
+[New Thread 0x7fff89c4f000 (LWP 13257)]
+[New Thread 0x7fff8944e000 (LWP 13258)]
+[New Thread 0x7fff88a84000 (LWP 13259)]
+
+Thread 1 "sealdebug" hit Breakpoint 1, dlib::save_jpeg (img=..., 
+    filename="dataChips/0_DSCN3217_ChippedAt_(802,481),(897,565).jpeg", quality=100)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/image_saver/save_jpeg.cpp:50
+50	    {
+52	        DLIB_CASSERT(img.size() != 0,
+56	        DLIB_CASSERT(0 <= quality && quality <= 100,
+2300	      c_str() const _GLIBCXX_NOEXCEPT
+63	        if (!outfile)
+64	            throw image_save_error("Can't open file " + filename + " for writing.");
+$3 = (FILE *) 0x0
+89	      ~new_allocator() _GLIBCXX_USE_NOEXCEPT { }
+[Thread 0x7fff9251b000 (LWP 13254) exited]
+[Thread 0x7fff96d1c000 (LWP 13253) exited]
+[Thread 0x7fff9751d000 (LWP 13252) exited]
+[Thread 0x7fff99d1e000 (LWP 13251) exited]
+[Thread 0x7fff9c51f000 (LWP 13250) exited]
+[Thread 0x7fff9ed20000 (LWP 13249) exited]
+[Thread 0x7fffa1521000 (LWP 13248) exited]
+[Thread 0x7fffa3d22000 (LWP 13247) exited]
+[Thread 0x7fffa6523000 (LWP 13246) exited]
+[Thread 0x7fffa8d24000 (LWP 13245) exited]
+[Thread 0x7fffab525000 (LWP 13244) exited]
+[Thread 0x7fffadd26000 (LWP 13243) exited]
+[Thread 0x7fffb0527000 (LWP 13242) exited]
+[Thread 0x7fffb2d28000 (LWP 13241) exited]
+[Thread 0x7fffb5529000 (LWP 13240) exited]
+[Thread 0x7fffb9d2a000 (LWP 13239) exited]
+[Thread 0x7fffbc52b000 (LWP 13238) exited]
+[Thread 0x7fffbcd2c000 (LWP 13237) exited]
+[Thread 0x7fffc152d000 (LWP 13236) exited]
+[Thread 0x7fffc3d2e000 (LWP 13235) exited]
+[Thread 0x7fffc652f000 (LWP 13234) exited]
+[Thread 0x7fffc8d30000 (LWP 13233) exited]
+[Thread 0x7fffc9531000 (LWP 13232) exited]
+[Thread 0x7fff88a84000 (LWP 13259) exited]
+[Thread 0x7fff8944e000 (LWP 13258) exited]
+[Thread 0x7fff89c4f000 (LWP 13257) exited]
+[Inferior 1 (process 13231) exited normally]
+The program is not being run.
+Undefined command: "ls".  Try "help".
+Starting program: /home/zach/development/research/dlibSealGUI/run/sealdebug seal.dat data DSCN3217.JPG
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+[New Thread 0x7fffc9531000 (LWP 13322)]
+[New Thread 0x7fffc8d30000 (LWP 13323)]
+[New Thread 0x7fffc652f000 (LWP 13324)]
+[New Thread 0x7fffc3d2e000 (LWP 13325)]
+[New Thread 0x7fffbf52d000 (LWP 13326)]
+[New Thread 0x7fffbed2c000 (LWP 13327)]
+[New Thread 0x7fffbc52b000 (LWP 13328)]
+[New Thread 0x7fffb9d2a000 (LWP 13329)]
+[New Thread 0x7fffb5529000 (LWP 13330)]
+[New Thread 0x7fffb2d28000 (LWP 13331)]
+[New Thread 0x7fffb0527000 (LWP 13332)]
+[New Thread 0x7fffadd26000 (LWP 13333)]
+[New Thread 0x7fffab525000 (LWP 13334)]
+[New Thread 0x7fffa8d24000 (LWP 13335)]
+[New Thread 0x7fffa8523000 (LWP 13336)]
+[New Thread 0x7fffa5d22000 (LWP 13337)]
+[New Thread 0x7fffa1521000 (LWP 13338)]
+[New Thread 0x7fff9ed20000 (LWP 13339)]
+[New Thread 0x7fff9c51f000 (LWP 13340)]
+[New Thread 0x7fff99d1e000 (LWP 13341)]
+[New Thread 0x7fff9751d000 (LWP 13342)]
+[New Thread 0x7fff94d1c000 (LWP 13343)]
+[New Thread 0x7fff9251b000 (LWP 13344)]
+[New Thread 0x7fff89c4f000 (LWP 13347)]
+[New Thread 0x7fff8944e000 (LWP 13348)]
+[New Thread 0x7fff88a84000 (LWP 13349)]
+
+Thread 1 "sealdebug" hit Breakpoint 1, dlib::save_jpeg (img=..., 
+    filename="dataChips/0_DSCN3217_ChippedAt_(802,481),(897,565).jpeg", quality=100)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/image_saver/save_jpeg.cpp:50
+50	    {
+52	        DLIB_CASSERT(img.size() != 0,
+56	        DLIB_CASSERT(0 <= quality && quality <= 100,
+2300	      c_str() const _GLIBCXX_NOEXCEPT
+63	        if (!outfile)
+69	        cinfo.err = jpeg_std_error(&jerr.pub);
+70	        jerr.pub.error_exit = jpeg_saver_error_exit;
+72	        if (setjmp(jerr.setjmp_buffer)) 
+82	        jpeg_create_compress(&cinfo);
+83	        jpeg_stdio_dest(&cinfo, outfile);
+$4 = {err = 0x7fffffffc0a0, mem = 0x55558f01a140, progress = 0x0, client_data = 0x0, is_decompressor = 0 '\000', 
+  global_state = 100, dest = 0x0, image_width = 0, image_height = 0, input_components = 0, in_color_space = JCS_UNKNOWN, 
+  input_gamma = 1, scale_num = 0, scale_denom = 0, jpeg_width = 0, jpeg_height = 0, data_precision = 0, num_components = 0, 
+  jpeg_color_space = JCS_UNKNOWN, comp_info = 0x0, quant_tbl_ptrs = {0x0, 0x0, 0x0, 0x0}, q_scale_factor = {100, 100, 100, 
+    100}, dc_huff_tbl_ptrs = {0x0, 0x0, 0x0, 0x0}, ac_huff_tbl_ptrs = {0x0, 0x0, 0x0, 0x0}, 
+  arith_dc_L = '\000' <repeats 15 times>, arith_dc_U = '\000' <repeats 15 times>, arith_ac_K = '\000' <repeats 15 times>, 
+  num_scans = 0, scan_info = 0x0, raw_data_in = 0 '\000', arith_code = 0 '\000', optimize_coding = 0 '\000', 
+  CCIR601_sampling = 0 '\000', do_fancy_downsampling = 0 '\000', smoothing_factor = 0, dct_method = JDCT_ISLOW, 
+  restart_interval = 0, restart_in_rows = 0, write_JFIF_header = 0 '\000', JFIF_major_version = 0 '\000', 
+  JFIF_minor_version = 0 '\000', density_unit = 0 '\000', X_density = 0, Y_density = 0, write_Adobe_marker = 0 '\000', 
+  next_scanline = 0, progressive_mode = 0 '\000', max_h_samp_factor = 0, max_v_samp_factor = 0, min_DCT_h_scaled_size = 0, 
+  min_DCT_v_scaled_size = 0, total_iMCU_rows = 0, comps_in_scan = 0, cur_comp_info = {0x0, 0x0, 0x0, 0x0}, MCUs_per_row = 0, 
+  MCU_rows_in_scan = 0, blocks_in_MCU = 0, MCU_membership = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, Ss = 0, Se = 0, Ah = 0, Al = 0, 
+  block_size = 8, natural_order = 0x5555556f4940 <jpeg_natural_order>, lim_Se = 63, master = 0x0, main = 0x0, prep = 0x0, 
+  coef = 0x0, marker = 0x0, cconvert = 0x0, downsample = 0x0, fdct = 0x0, entropy = 0x0, script_space = 0x0, 
+  script_space_size = 0}
+85	        cinfo.image_width      = img.nc();
+86	        cinfo.image_height     = img.nr();
+88	        cinfo.in_color_space   = JCS_RGB;
+89	        jpeg_set_defaults(&cinfo);
+90	        jpeg_set_quality (&cinfo, quality, TRUE);
+91	        jpeg_start_compress(&cinfo, TRUE);
+94	        while (cinfo.next_scanline < cinfo.image_height) {
+95	            JSAMPROW row_pointer = (JSAMPROW) &img[cinfo.next_scanline][0];
+96	            jpeg_write_scanlines(&cinfo, &row_pointer, 1);
+94	        while (cinfo.next_scanline < cinfo.image_height) {
+95	            JSAMPROW row_pointer = (JSAMPROW) &img[cinfo.next_scanline][0];
+96	            jpeg_write_scanlines(&cinfo, &row_pointer, 1);
+94	        while (cinfo.next_scanline < cinfo.image_height) {
+Continuing.
+
+Thread 1 "sealdebug" hit Breakpoint 1, dlib::save_jpeg (img=..., 
+    filename="dataChips/1_DSCN3217_ChippedAt_(598,525),(712,627).jpeg", quality=100)
+    at /home/zach/development/research/dlibSealGUI/include/dlib/image_saver/save_jpeg.cpp:50
+50	    {
+52	        DLIB_CASSERT(img.size() != 0,
+56	        DLIB_CASSERT(0 <= quality && quality <= 100,
+2300	      c_str() const _GLIBCXX_NOEXCEPT
+63	        if (!outfile)
+69	        cinfo.err = jpeg_std_error(&jerr.pub);
+70	        jerr.pub.error_exit = jpeg_saver_error_exit;
+72	        if (setjmp(jerr.setjmp_buffer)) 
+82	        jpeg_create_compress(&cinfo);
+83	        jpeg_stdio_dest(&cinfo, outfile);
+$5 = (jpeg_compress_struct *) 0x7fffffffc510

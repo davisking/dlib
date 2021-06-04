@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<?xml-stylesheet type='text/xsl' href='image_metadata_stylesheet.xsl'?>
+<dataset>
+<name></name>
+<comment>Created by imglab tool.</comment>
+<folderList>./data</folderList>
+<images>
+  <image file='data/DSCN3217.JPG'>
+    <box top='255' left='298' width='57' height='56'/>
+    <box top='481' left='802' width='95' height='84'/>
+    <box top='230' left='407' width='45' height='55'/>
+  </image>
+  <image file='data/DSCN3218.JPG'>
+  </image>
+  <image file='data/DSCN3219.JPG'>
+  </image>
+  <image file='data/DSCN3220.JPG'>
+  </image>
+  <image file='data/DSCN3221.JPG'>
+  </image>
+  <image file='data/DSCN3222.JPG'>
+  </image>
+  <image file='data/DSCN3223.JPG'>
+  </image>
+  <image file='data/DSCN3224.JPG'>
+  </image>
+  <image file='data/DSCN3225.JPG'>
+  </image>
+  <image file='data/DSCN3227.JPG'>
+  </image>
+  <image file='data/DSCN3229.JPG'>
+  </image>
+</images>
+</dataset>

@@ -1,0 +1,8 @@
+../include/dlib/image_transforms/interpolation_abstract.h:    chip_details get_face_chip_details (
+../include/dlib/image_transforms/interpolation_abstract.h:    std::vector<chip_details> get_face_chip_details (
+../include/dlib/image_transforms/interpolation_abstract.h:            - This function is identical to the version of get_face_chip_details() defined
+../include/dlib/image_transforms/interpolation.h:    inline chip_details get_face_chip_details (
+../include/dlib/image_transforms/interpolation.h:            "\t chip_details get_face_chip_details()"
+../include/dlib/image_transforms/interpolation.h:            "\t chip_details get_face_chip_details()"
+../include/dlib/image_transforms/interpolation.h:    inline std::vector<chip_details> get_face_chip_details (
+../include/dlib/image_transforms/interpolation.h:            res.push_back(get_face_chip_details(dets[i], size, padding));
