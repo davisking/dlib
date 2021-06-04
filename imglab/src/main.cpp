@@ -48,7 +48,7 @@ void create_new_dataset (
 
     dataset meta;
     
-    //meta.name = "Data Set";
+    meta.name = "Data Set";
     meta.comment = "Created by imglab tool.";
     for (unsigned long i = 0; i < parser.number_of_arguments(); ++i)
     {

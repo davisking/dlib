@@ -61,58 +61,46 @@ using net_type = loss_mmod<con<1, 9, 9, 1, 1, rcon5<rcon5<rcon5<downsampler<inpu
 
 // ----------------------------------------------------------------------------------------
 
-const unsigned MAX_SIZE = 2000*1500; //Based on bearface 
 const unsigned CHIP_SIZE = 112;
-
-
-// ----------------------------------------------------------------------------------------
-// upscale image if it will remain under MAX_SIZE, return if scaled
-// ----------------------------------------------------------------------------------------
-bool upscale_image (matrix<rgb_pixel>& img) { //float& pxRatio
-	//long origImgSize = img.size();
-    if (img.size() < (MAX_SIZE/4)) //If expanding will remain under MAX_SIZE (*2 to both dims)
-	{
-	  cout << "upscaling..." << endl;
-	  pyramid_up(img);
-	  //pxRatio = sqrt (img.size () / origImgSize);
-	  cout << "Upscaled image size: " << img.size() << endl;
-	  return true;
-	}
-	return false;
-}
-
+const unsigned UPSCALE = 2;
 
 
 int main(int argc, char** argv) try
 {
-    if (argc < 3)
+    if (argc < 4)
     {
         cout << "Call this program like this:" << endl;
-        cout << "./seal.exe seal.dat PHOTO_DIR photo1 photo2 ..." << endl;
+        cout << "./seal.exe xmlfile seal.dat PHOTO_DIR photo1 photo2 ..." << endl;
         return 0;
     }
+    // load the xmlFile
+    char* xmlfile = argv[1]; 
+    dlib::image_dataset_metadata::dataset metadata; 
+    load_image_dataset_metadata(metadata, xmlfile); 
 
     // load the models
     net_type net;
-    deserialize(argv[1]) >> net;
+    deserialize(argv[2]) >> net;
 
     int num_chips = 0;
-    string curFolder = argv[2];
+    string curFolder = argv[3];
     string chipFolder = curFolder + "Chips";
 
     //go through and chip each image
-    for (int i = 3; i < argc; ++i)
+    for (int i = 4; i < argc; ++i)
     {
         string curImg = argv[i];
         string curImageFile = curFolder + "/" + curImg;
         matrix<rgb_pixel> img;
         load_image(img, curImageFile);
+        bool isPyramidUp;
 
         std::vector<dlib::mmod_rect> dets;
         try {
             cout << "try pyramid up " << curImageFile << endl;
-            pyramid_up(img);
+            pyramid_up(img, pyramid_down<UPSCALE>());
             dets = net(img);
+            isPyramidUp = true;
         }
         catch(std::bad_alloc& ba) { //Catches bad alllocation (too big)
             cout << "bad alloc pyramid up" << endl;
@@ -120,6 +108,7 @@ int main(int argc, char** argv) try
                 cout << "try pyramid down" << endl;
                 load_image(img, curImageFile); //Reload image, smaller
                 dets = net(img);
+                isPyramidUp = false;
             }
             catch(std::bad_alloc& ba) {
                 cout << "bad alloc pyramid down, skipping" << endl;
@@ -133,8 +122,8 @@ int main(int argc, char** argv) try
             matrix<rgb_pixel> face_chip;
             cout << "d.rect... " << endl;
             chip_details face_chip_details = chip_details(d.rect, chip_dims(CHIP_SIZE, CHIP_SIZE)); //Optionally add angle
-            int left = face_chip_details.rect.left(), top = face_chip_details.rect.top();
-            int right = face_chip_details.rect.right(), bottom = face_chip_details.rect.bottom();
+            int left = face_chip_details.rect.left() / UPSCALE, top = face_chip_details.rect.top() / UPSCALE;
+            int right = face_chip_details.rect.right() / UPSCALE, bottom = face_chip_details.rect.bottom() / UPSCALE;
             extract_image_chip(img, face_chip_details, face_chip); //Img, rectangle for each chip, chip destination
 
             //remove the .jpg part of the curImg
@@ -150,9 +139,22 @@ int main(int argc, char** argv) try
             string filedir = chipFolder + "/" + filename;
             num_chips++;
             save_jpeg(face_chip, filedir, 100); 
+            
+            //insert the box
+            const rectangle rect(left, top, right, bottom);
+            const dlib::image_dataset_metadata::box b(rect);
+            for (int i = 0; i < metadata.images.size(); i++){
+                if (metadata.images[i].filename.find(curImg) != std::string::npos){ //only add the box to the curImg
+                    metadata.images[i].boxes.push_back(b);
+                }
+            }
+
             cout << filename << " saved to " << chipFolder << endl;
         }
+        save_image_dataset_metadata(metadata, xmlfile);
     }
+    cout << "Done Chipping" << endl;
+
 }
 catch (std::exception& e)
 {

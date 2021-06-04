@@ -1,16 +1,14 @@
 import os
 import sys
-import pathlib
-import string
 
 
 def main(args):
-	if len(args) != 2:
-		print("Call as: python sealFace.py YOURFOLDERNAME")
+	if len(args) != 3:
+		print("Call as: python sealFindr.py YOURXMLFILE YOURFOLDERNAME")
 		return
 	
-	directory = SEALROOT#args[1] 
-	#fix this in arg call, even for testing. Should be $ROOT_PATH+/path/to/dir
+	directory = args[2]
+	xmlFile = args[1]
 	
 	arguments = ""
 	for filename in os.listdir(directory):
@@ -23,14 +21,9 @@ def main(args):
 		pass
 
 	if str(os.name) == "posix":
-		print("MacOS")
-		os.system("./seal seal.dat " + directory + " " + arguments)
+		os.system("./seal " + xmlFile + " seal.dat " + directory + " " + arguments)
 	if str(os.name) == 'nt':
-		print('Window')
-		os.system("seal.exe seal.dat " + directory + " " + arguments)
+		os.system("seal.exe " + xmlFile + " seal.dat " + directory + " " + arguments)
 
-if __name__ == "__main__":		
-	SEALROOT = str(pathlib.Path('data'))
-	print(SEALROOT)
-	main(sys.argv)
-	#main(SEALROOT)
+if __name__ == "__main__":	
+    main(sys.argv)

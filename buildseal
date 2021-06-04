@@ -5,13 +5,13 @@ build_img()
 {
   cd ${IMG_BUILD}
   cmake ..
-  cmake --build . --config Debug
+  cmake --build . --config Release
 }
 build_dnn()
 {
   cd ${DNN_BUILD}
   cmake ..
-  cmake --build . --config Debug
+  cmake --build . --config Release
 }
 
 export MAKEFLAGS=-j$(($(grep -c ^processor /proc/cpuinfo) - 1))

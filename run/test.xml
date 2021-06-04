@@ -1,32 +1,67 @@
 <?xml version='1.0' encoding='ISO-8859-1'?>
 <?xml-stylesheet type='text/xsl' href='image_metadata_stylesheet.xsl'?>
 <dataset>
-<name></name>
+<name>Data Set</name>
 <comment>Created by imglab tool.</comment>
 <folderList>./data</folderList>
 <images>
   <image file='data/DSCN3217.JPG'>
-    <box top='255' left='298' width='57' height='56'/>
+    <box top='240' left='401' width='48' height='43'/>
+    <box top='262' left='299' width='58' height='52'/>
+    <box top='230' left='1294' width='70' height='62'/>
+    <box top='370' left='578' width='69' height='62'/>
+    <box top='337' left='183' width='58' height='52'/>
+    <box top='212' left='1749' width='48' height='44'/>
+    <box top='237' left='597' width='58' height='52'/>
+    <box top='240' left='448' width='70' height='62'/>
   </image>
   <image file='data/DSCN3218.JPG'>
+    <box top='212' left='1427' width='70' height='62'/>
   </image>
   <image file='data/DSCN3219.JPG'>
+    <box top='92' left='540' width='70' height='62'/>
+    <box top='242' left='680' width='69' height='62'/>
+    <box top='121' left='1078' width='58' height='52'/>
+    <box top='109' left='1908' width='48' height='43'/>
   </image>
   <image file='data/DSCN3220.JPG'>
+    <box top='298' left='1074' width='119' height='106'/>
+    <box top='87' left='1106' width='100' height='89'/>
+    <box top='109' left='833' width='119' height='106'/>
   </image>
   <image file='data/DSCN3221.JPG'>
+    <box top='191' left='1112' width='99' height='88'/>
+    <box top='405' left='1113' width='119' height='107'/>
+    <box top='133' left='696' width='99' height='89'/>
+    <box top='182' left='2351' width='119' height='106'/>
+    <box top='205' left='653' width='99' height='89'/>
+    <box top='160' left='828' width='83' height='74'/>
   </image>
   <image file='data/DSCN3222.JPG'>
+    <box top='509' left='986' width='119' height='106'/>
+    <box top='271' left='1004' width='100' height='89'/>
+    <box top='400' left='302' width='99' height='89'/>
+    <box top='679' left='2177' width='49' height='43'/>
   </image>
   <image file='data/DSCN3223.JPG'>
+    <box top='424' left='653' width='99' height='88'/>
   </image>
   <image file='data/DSCN3224.JPG'>
+    <box top='225' left='504' width='100' height='89'/>
   </image>
   <image file='data/DSCN3225.JPG'>
+    <box top='239' left='1059' width='143' height='127'/>
+    <box top='227' left='420' width='100' height='88'/>
   </image>
   <image file='data/DSCN3227.JPG'>
+    <box top='657' left='380' width='49' height='44'/>
+    <box top='793' left='1916' width='28' height='26'/>
   </image>
   <image file='data/DSCN3229.JPG'>
+    <box top='668' left='1899' width='69' height='62'/>
+    <box top='670' left='929' width='58' height='52'/>
+    <box top='512' left='3027' width='59' height='52'/>
+    <box top='725' left='421' width='49' height='43'/>
   </image>
 </images>
 </dataset>
