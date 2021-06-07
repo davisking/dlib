@@ -4,6 +4,8 @@
 #
 set(CMAKE_BUILD_TYPE RelWithDebInfo) #debug symbols
 cmake_minimum_required(VERSION 2.8.12)
+#generates compiler commands json file for autocomplete and parsing
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # create a variable called target_name and set it to the string "imglab"
 set (target_name imglab)
