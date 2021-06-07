@@ -1,7 +1,0 @@
-[
-{
-  "directory": "/home/zach/development/research/dlibSealGUI/run/zachwxtest/build",
-  "command": "/usr/bin/c++  -DWXUSINGDLL -D_FILE_OFFSET_BITS=64 -D__WXGTK__ -isystem /usr/lib/x86_64-linux-gnu/wx/include/gtk3-unicode-3.1-unofficial -isystem /usr/include/wx-3.1-unofficial   -pthread -O2 -g -DNDEBUG   -o CMakeFiles/wxtest.dir/src/wxtest.cpp.o -c /home/zach/development/research/dlibSealGUI/run/zachwxtest/src/wxtest.cpp",
-  "file": "/home/zach/development/research/dlibSealGUI/run/zachwxtest/src/wxtest.cpp"
-}
-]

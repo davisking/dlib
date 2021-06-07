@@ -94,6 +94,7 @@ private:
     void executeChipping();
 
     std::string filename;
+    std::vector<std::string> folderList;
     dlib::image_dataset_metadata::dataset metadata;
 
     dlib::menu_bar mbar;
