@@ -7,32 +7,34 @@
 
 void configRead(std::string *);
 int main(int argc, char **argv){
-  std::string configargs[2];
-  std::string dirpath, xmlFile;
+  std::string configargs[3];
+  std::string dirpath, xmlFile, model;
 
-  if (argc == 2){
-    dirpath = std::string(argv[2]);
+  if (argc >= 3){
+    dirpath = std::string(argv[3]);
+    model = std::string(argv[2]);
     xmlFile = std::string(argv[1]);
   }
-  else{
-    std::cout << "reading from config";
+  else if (argc == 1){
+    std::cout << "Reading from config" << std::endl;
     configRead(configargs);
-    dirpath = configargs[1];
+    dirpath = configargs[2];
+    model = configargs[1];
     xmlFile = configargs[0];
+  } else {
+    std::cout << "Run ./program to read from config\nOr ./program YOURXMLFILE.xml YOURFOLDER1 YOURFOLDER2 ..." << std::endl;
   }
-  //std::vector<std::string> files;
 
-  std::string arguments;
-  arguments.append("./seal ");
-  arguments += xmlFile;
-  arguments += " ";
-  arguments += dirpath;
+  std::string arguments = "./seal " + xmlFile + " " + model + " " + dirpath;
+
   for (const auto & entry : std::filesystem::directory_iterator(dirpath)){
     std::cout << std::filesystem::proximate(entry, dirpath) << std::endl;
     arguments += " ";
     arguments += std::filesystem::proximate(entry, dirpath);
   }
   std::cout << arguments;
+
+  system(arguments.c_str());
 
   return 0;
 }
@@ -59,5 +61,5 @@ void configRead(std::string * config){
     configfile.close();
   }
 
-  else std::cout << "Unable to open file";
+  else std::cout << "Unable to open file" << std::endl;
 }

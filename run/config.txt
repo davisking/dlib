@@ -1,2 +1,3 @@
 xml=test.xml
+model=seal.dat
 picfolder=data

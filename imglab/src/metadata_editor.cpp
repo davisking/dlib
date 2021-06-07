@@ -676,7 +676,7 @@ void metadata_editor::
 {
     for (std::string folder : metadata.folderList)
     {
-        string str = "python ./sealFindr.py " + filename + " " + folder;
+        string str = "./program";
         const char *command = str.c_str();
         system(command);
     }
