@@ -2,8 +2,8 @@
 <?xml-stylesheet type='text/xsl' href='image_metadata_stylesheet.xsl'?>
 <dataset>
 <name>Data Set</name>
-<comment>Created by imglab tool.</comment>
-<folderList>./data</folderList>
+<comment>Created by imglab tools.</comment>
+<folderList>./data/</folderList>
 <images>
   <image file='data/DSCN3217.JPG'>
     <box top='240' left='401' width='48' height='43'/>

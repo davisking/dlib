@@ -9,6 +9,7 @@ build_img()
 }
 build_dnn()
 {
+  #builds both sealfindr and dnn_seal_chip execs
   cd ${DNN_BUILD}
   cmake ..
   cmake --build . --config Release
@@ -60,9 +61,9 @@ build_img
 build_dnn
 IMGLAB=$IMG_BUILD/imglab
 SEALEXEC=$DNN_BUILD/seal
-SEALPY=$IMG_ROOT/src/sealFindr.py
+SEALFINDR=$DNN_BUILD/program
 cp "$IMGLAB" "$PJ_ROOT/run"
 cp "$SEALEXEC" "$PJ_ROOT/run"
-cp "$SEALPY" "$PJ_ROOT/run"
+cp "$SEALFINDR" "$PJ_ROOT/run"
 
 

@@ -7,6 +7,10 @@ cmake_minimum_required(VERSION 2.8.12)
 #generates compiler commands json file for autocomplete and parsing
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
+# set c++17
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # create a variable called target_name and set it to the string "imglab"
 set (target_name imglab)
 

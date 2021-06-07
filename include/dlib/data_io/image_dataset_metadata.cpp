@@ -306,12 +306,10 @@ namespace dlib
             {
                 if (ts.size() == 2 && ts[1] == "name")
                 {
-                    std::cout << data << std::endl;
                     meta.name = trim(data);
                 }
                 else if (ts.size() == 2 && ts[1] == "comment")
                 {
-                    std::cout << data << std::endl;
                     meta.comment = trim(data);
                 }
                 else if (ts.size() == 2 && ts[1] == "folderList")
