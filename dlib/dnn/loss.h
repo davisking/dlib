@@ -3498,7 +3498,7 @@ namespace dlib
         test_box_overlap overlaps_ignore = test_box_overlap(0.5, 1.0);
         double lambda_obj = 1.0;
         double lambda_noobj = 1.0;
-        double lambda_bbr = 0.75;
+        double lambda_bbr = 1.0;
         double lambda_cls = 1.0;
 
     };
@@ -3766,14 +3766,15 @@ namespace dlib
                     const double dw = out_data[w_idx] - tw;
                     const double dh = out_data[h_idx] - th;
 
+                    const double scale = 2 - truth_box.rect.area() / static_cast<double>(input_tensor.nr() * input_tensor.nc());
                     // Compute MSE loss
-                    loss += scale_loss * options.lambda_bbr * (dx * dx + dy * dy + dw * dw + dh * dh);
+                    loss += scale_loss * options.lambda_bbr * scale *(dx * dx + dy * dy + dw * dw + dh * dh);
 
                     // Compute the gradient
-                    g[x_idx] = scale_grad * options.lambda_bbr * dx;
-                    g[y_idx] = scale_grad * options.lambda_bbr * dy;
-                    g[w_idx] = scale_grad * options.lambda_bbr * dw;
-                    g[h_idx] = scale_grad * options.lambda_bbr * dh;
+                    g[x_idx] = scale_grad * options.lambda_bbr * scale * dx;
+                    g[y_idx] = scale_grad * options.lambda_bbr * scale * dy;
+                    g[w_idx] = scale_grad * options.lambda_bbr * scale * dw;
+                    g[h_idx] = scale_grad * options.lambda_bbr * scale * dh;
 
                     // Compute binary cross-entropy loss
                     for (long k = 0; k < num_classes; ++k)

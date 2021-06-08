@@ -3,6 +3,7 @@
 #include <dlib/dnn.h>
 #include <dlib/gui_widgets.h>
 #include <dlib/image_io.h>
+#include <tools/imglab/src/metadata_editor.h>
 
 using namespace std;
 using namespace dlib;
@@ -87,8 +88,7 @@ namespace darknet
                 htag16<upsample<2, conblock<256, 1, 1,
                        nskip32<
                        yolo<1024, num_classes, ytag32, ntag32,
-                       backbone53<tag1<input_rgb_image>>
-                       >>>>>>>>>>>>>;
+                       backbone53<input_rgb_image>>>>>>>>>>>>>>;
 
     };
 
@@ -125,7 +125,7 @@ void postprocess_detections(const rectangle_transform& tform, std::vector<yolo_r
         d.rect = tform(d.rect);
 }
 
-using net_type = dlib::loss_yolo<darknet::ytag8, darknet::ytag16, darknet::ytag32, darknet::yolov3_train>;
+using net_type = loss_yolo<darknet::ytag8, darknet::ytag16, darknet::ytag32, darknet::yolov3_train>;
 
 int main(const int argc, const char** argv)
 try
@@ -138,7 +138,8 @@ try
     parser.add_option("steps", "number of training steps (defaule: 500000)", 1);
     parser.add_option("workers", "number of worker threads to load data (default: 4)", 1);
     parser.add_option("gpus", "number of GPUs to run the training on (default: 1)", 1);
-    parser.add_option("test", "test the detector with a custom threshold (default: 0.01)", 1);
+    parser.add_option("test", "test the detector with a threshold (default: 0.01)", 1);
+    parser.add_option("visualize", "visualize data augmentation instead of training");
     parser.set_group_name("Help Options");
     parser.add_option("h", "alias of --help");
     parser.add_option("help", "display this message and exit");
@@ -190,6 +191,7 @@ try
     options.overlaps_nms = test_box_overlap(0.45);
     net_type net(options);
     darknet::setup_detector(net, options, image_size);
+    cerr << net << endl;
 
     // Cosine scheduler with warm-up:
     // - learning_rate is the highest learning rate value, e.g. 0.01
@@ -206,6 +208,8 @@ try
     trainer.be_verbose();
     trainer.set_mini_batch_size(batch_size);
     trainer.set_learning_rate_schedule(learning_rate_schedule);
+    // trainer.set_learning_rate(learning_rate);
+    // trainer.set_iterations_without_progress_threshold(10000);
     trainer.set_synchronization_file(sync_file_name, chrono::minutes(15));
     cout << trainer;
     cout << "  burnin: " << warmup << endl;
@@ -229,6 +233,7 @@ try
         net.loss_details().adjust_threshold(threshold);
         image_window win;
         matrix<rgb_pixel> image, resized;
+        color_mapper string_to_color;
         for (const auto& im : dataset.images)
         {
             win.clear_overlay();
@@ -241,7 +246,7 @@ try
             cout << "# detections: " << detections.size() << endl;
             for (const auto& det : detections)
             {
-                win.add_overlay(det.rect, rgb_pixel(255, 0, 0), det.label);
+                win.add_overlay(det.rect, string_to_color(det.label), det.label);
                 cout << det.label << ": " << det.rect << " " << det.detection_confidence << endl;
             }
             cin.get();
@@ -252,23 +257,37 @@ try
     dlib::pipe<std::pair<matrix<rgb_pixel>, std::vector<yolo_rect>>> train_data(1000);
     auto loader = [&dataset, &data_directory, &train_data, &image_size](time_t seed) {
         dlib::rand rnd(time(nullptr) + seed);
-        matrix<rgb_pixel> image, letterbox;
+        matrix<rgb_pixel> image, rotated;
         std::pair<matrix<rgb_pixel>, std::vector<yolo_rect>> temp;
         while (train_data.is_enabled())
         {
-            std::vector<yolo_rect> boxes;
             auto idx = rnd.get_random_32bit_number() % dataset.images.size();
             load_image(image, data_directory + "/" + dataset.images[idx].filename);
 
-            const auto tform = rectangle_transform(letterbox_image(image, letterbox, image_size));
+            // Some data augmentation
+            rectangle_transform tform = rotate_image(
+                image,
+                rotated,
+                rnd.get_double_in_range(-5 * pi / 180, 5 * pi / 180),
+                interpolate_bilinear());
             for (const auto& box : dataset.images[idx].boxes)
             {
-                boxes.push_back(yolo_rect(tform(box.rect), 1, box.label));
+                temp.second.emplace_back(tform(box.rect), 1, box.label);
             }
-            // here you should do more data augmentation
-            disturb_colors(image, rnd);
-            temp.first = letterbox;
-            temp.second = boxes;
+
+            tform = letterbox_image(rotated, temp.first, image_size);
+            for (auto& box : temp.second)
+                box.rect = tform(box.rect);
+
+            if (rnd.get_random_double() > 0.5)
+            {
+                tform = flip_image_left_right(temp.first);
+                for (auto& box : temp.second)
+                    box.rect = tform(box.rect);
+            }
+
+            disturb_colors(temp.first, rnd);
+
             train_data.enqueue(temp);
         }
     };
@@ -276,6 +295,22 @@ try
     std::vector<thread> data_loaders;
     for (size_t i = 0; i < num_workers; ++i)
         data_loaders.emplace_back([loader, i]() { loader(i + 1); });
+
+    if (parser.option("visualize"))
+    {
+        image_window win;
+        color_mapper string_to_color;
+        while (true)
+        {
+            std::pair<matrix<rgb_pixel>, std::vector<yolo_rect>> temp;
+            train_data.dequeue(temp);
+            win.clear_overlay();
+            win.set_image(temp.first);
+            for (const auto& r : temp.second)
+                win.add_overlay(r.rect, string_to_color(r.label), r.label);
+            cin.get();
+        }
+    }
 
     std::vector<matrix<rgb_pixel>> images;
     std::vector<std::vector<yolo_rect>> bboxes;
