@@ -3447,10 +3447,52 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    using yolo_rect = mmod_rect;
-    inline bool operator<(const yolo_rect& lhs, const yolo_rect& rhs)
+    struct yolo_rect
     {
-        return lhs.detection_confidence < rhs.detection_confidence;
+        yolo_rect() = default;
+        yolo_rect(const drectangle& r) : rect(r) {}
+        yolo_rect(const drectangle& r, double score) : rect(r),detection_confidence(score) {}
+        yolo_rect(const drectangle& r, double score, const std::string& label) : rect(r),detection_confidence(score), label(label) {}
+        yolo_rect(const mmod_rect& r) : rect(r.rect), detection_confidence(r.detection_confidence), ignore(r.ignore), label(r.label) {}
+
+        drectangle rect;
+        double detection_confidence = 0;
+        bool ignore = false;
+        std::string label;
+
+        operator rectangle() const { return rect; }
+        bool operator == (const yolo_rect& rhs) const
+        {
+            return rect == rhs.rect
+                   && detection_confidence == rhs.detection_confidence
+                   && ignore == rhs.ignore
+                   && label == rhs.label;
+        }
+        bool operator<(const yolo_rect& rhs) const
+        {
+            return detection_confidence < rhs.detection_confidence;
+        }
+    };
+
+    inline void serialize(const yolo_rect& item, std::ostream& out)
+    {
+        int version = 1;
+        serialize(version, out);
+        serialize(item.rect, out);
+        serialize(item.detection_confidence, out);
+        serialize(item.ignore, out);
+        serialize(item.label, out);
+    }
+
+    inline void deserialize(yolo_rect& item, std::istream& in)
+    {
+        int version = 0;
+        deserialize(version, in);
+        if (version != 1)
+            throw serialization_error("Unexpected version found while deserializing dlib::yolo_rect");
+        deserialize(item.rect, in);
+        deserialize(item.detection_confidence, in);
+        deserialize(item.ignore, in);
     }
 
     struct yolo_options
@@ -3494,6 +3536,7 @@ namespace dlib
         std::vector<std::string> labels;
         double confidence_threshold = 0.25;
         double ignore_iou_threshold = 0.7;
+        bool classwise_nms = false;
         test_box_overlap overlaps_nms = test_box_overlap(0.45, 1.0);
         test_box_overlap overlaps_ignore = test_box_overlap(0.5, 1.0);
         double lambda_obj = 1.0;
@@ -3510,6 +3553,7 @@ namespace dlib
         serialize(item.anchors, out);
         serialize(item.confidence_threshold, out);
         serialize(item.ignore_iou_threshold, out);
+        serialize(item.classwise_nms, out);
         serialize(item.overlaps_nms, out);
         serialize(item.overlaps_ignore, out);
         serialize(item.lambda_obj, out);
@@ -3526,6 +3570,7 @@ namespace dlib
         deserialize(item.anchors, in);
         deserialize(item.confidence_threshold, in);
         deserialize(item.ignore_iou_threshold, in);
+        deserialize(item.classwise_nms, in);
         deserialize(item.overlaps_nms, in);
         deserialize(item.overlaps_ignore, in);
         deserialize(item.lambda_obj, in);
@@ -3759,8 +3804,8 @@ namespace dlib
 
                     const double tx = t_center.x() / stride_x - c;
                     const double ty = t_center.y() / stride_y - r;
-                    const double tw = truth_box.rect.width() / static_cast<double>(anchors[best_a].width + truth_box.rect.width());
-                    const double th = truth_box.rect.height() / static_cast<double>(anchors[best_a].height + truth_box.rect.height());
+                    const double tw = truth_box.rect.width() / (anchors[best_a].width + truth_box.rect.width());
+                    const double th = truth_box.rect.height() / (anchors[best_a].height + truth_box.rect.height());
                     const double dx = out_data[x_idx] - tx;
                     const double dy = out_data[y_idx] - ty;
                     const double dw = out_data[w_idx] - tw;
@@ -3794,8 +3839,7 @@ namespace dlib
                 }
             }
         };
-
-    }  // namespace impl
+    }
 
     template <template <typename> class... TAG_TYPES>
     class loss_yolo_
@@ -3905,15 +3949,14 @@ namespace dlib
 
         inline bool overlaps_any_box_nms (
             const std::vector<yolo_rect>& boxes,
-            const yolo_rect& box,
-            const bool classwise = false
+            const yolo_rect& box
         ) const
         {
             for (const auto& b : boxes)
             {
                 if (options.overlaps_nms(b.rect, box.rect))
                 {
-                    if (classwise)
+                    if (options.classwise_nms)
                     {
                         if (b.label == box.label)
                             return true;
