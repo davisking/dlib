@@ -3617,7 +3617,7 @@ namespace dlib
                 typename const_label_iterator,
                 typename SUBNET
             >
-            static void tensor_to_grad(
+            static void tensor_to_loss(
                 const tensor& input_tensor,
                 const_label_iterator truth,
                 SUBNET& sub,
@@ -3626,8 +3626,8 @@ namespace dlib
                 double& loss
             )
             {
-                yolo_helper_impl<TAG_TYPE>::tensor_to_grad(input_tensor, truth, sub, n, options, loss);
-                yolo_helper_impl<TAG_TYPES...>::tensor_to_grad(input_tensor, truth, sub, n, options, loss);
+                yolo_helper_impl<TAG_TYPE>::tensor_to_loss(input_tensor, truth, sub, n, options, loss);
+                yolo_helper_impl<TAG_TYPES...>::tensor_to_loss(input_tensor, truth, sub, n, options, loss);
             }
         };
 
@@ -3690,16 +3690,11 @@ namespace dlib
                 }
             }
 
-            static inline double compute_iou(const yolo_rect& a, const yolo_rect& b)
-            {
-                return a.rect.intersect(b.rect).area() / static_cast<double>((a.rect + b.rect).area());
-            }
-
             template <
                 typename const_label_iterator,
                 typename SUBNET
             >
-            static void tensor_to_grad(
+            static void tensor_to_loss(
                 const tensor& input_tensor,
                 const_label_iterator truth,
                 SUBNET& sub,
@@ -3718,8 +3713,7 @@ namespace dlib
                 const float* const out_data = output_tensor.host();
                 tensor& grad = layer<TAG_TYPE>(sub).get_gradient_input();
                 float* g = grad.host();
-                const double scale_loss = 1.0 / (output_tensor.num_samples() * output_tensor.nr() * output_tensor.nc());
-                const double scale_grad = 1.0 / output_tensor.num_samples();
+                const double scale = 1.0 / (output_tensor.num_samples() * output_tensor.nr() * output_tensor.nc());
 
                 // Compute the objectness loss for all grid cells
                 for (long r = 0; r < output_tensor.nr(); ++r)
@@ -3747,14 +3741,14 @@ namespace dlib
                             {
                                 if (truth_box.ignore)
                                     continue;
-                                best_iou = std::max(best_iou, compute_iou(truth_box, pred));
+                                best_iou = std::max(best_iou, box_intersection_over_union(truth_box.rect, pred.rect));
                             }
 
                             // Only incur loss for the boxes that are below a certain IoU threshold
                             if (best_iou < options.ignore_iou_threshold)
                             {
-                                loss += -scale_loss * options.lambda_noobj * safe_log(1 - out_data[o_idx]);
-                                g[o_idx] = scale_grad * options.lambda_noobj * out_data[o_idx];
+                                loss += -scale * options.lambda_noobj * safe_log(1 - out_data[o_idx]);
+                                g[o_idx] = scale * options.lambda_noobj * out_data[o_idx];
                             }
                         }
                     }
@@ -3776,7 +3770,7 @@ namespace dlib
                         for (size_t a = 0; a < details.size(); ++a)
                         {
                             const yolo_rect anchor(centered_drect(t_center, details[a].width, details[a].height));
-                            const double iou = compute_iou(truth_box, anchor);
+                            const double iou = box_intersection_over_union(truth_box.rect, anchor.rect);
                             if (iou > best_iou)
                             {
                                 best_iou = iou;
@@ -3799,8 +3793,8 @@ namespace dlib
                     const auto o_idx = tensor_index(output_tensor, n, best_a * num_feats + 4, r, c);
 
                     // This grid cell should detect an object
-                    loss += -scale_loss * options.lambda_obj * safe_log(out_data[o_idx]);
-                    g[o_idx] = scale_grad * options.lambda_obj * (out_data[o_idx] - 1);
+                    loss += -scale * options.lambda_obj * safe_log(out_data[o_idx]);
+                    g[o_idx] = scale * options.lambda_obj * (out_data[o_idx] - 1);
 
                     const double tx = t_center.x() / stride_x - c;
                     const double ty = t_center.y() / stride_y - r;
@@ -3811,15 +3805,15 @@ namespace dlib
                     const double dw = out_data[w_idx] - tw;
                     const double dh = out_data[h_idx] - th;
 
-                    const double scale = 2 - truth_box.rect.area() / static_cast<double>(input_tensor.nr() * input_tensor.nc());
+                    const double scale_bbr = 2 - truth_box.rect.area() / (input_tensor.nr() * input_tensor.nc());
                     // Compute MSE loss
-                    loss += scale_loss * options.lambda_bbr * scale *(dx * dx + dy * dy + dw * dw + dh * dh);
+                    loss += scale * options.lambda_bbr * scale_bbr * (dx * dx + dy * dy + dw * dw + dh * dh);
 
                     // Compute the gradient
-                    g[x_idx] = scale_grad * options.lambda_bbr * scale * dx;
-                    g[y_idx] = scale_grad * options.lambda_bbr * scale * dy;
-                    g[w_idx] = scale_grad * options.lambda_bbr * scale * dw;
-                    g[h_idx] = scale_grad * options.lambda_bbr * scale * dh;
+                    g[x_idx] = scale * options.lambda_bbr * scale_bbr * dx;
+                    g[y_idx] = scale * options.lambda_bbr * scale_bbr * dy;
+                    g[w_idx] = scale * options.lambda_bbr * scale_bbr * dw;
+                    g[h_idx] = scale * options.lambda_bbr * scale_bbr * dh;
 
                     // Compute binary cross-entropy loss
                     for (long k = 0; k < num_classes; ++k)
@@ -3827,13 +3821,13 @@ namespace dlib
                         const auto c_idx = tensor_index(output_tensor, n, best_a * num_feats + 5 + k, r, c);
                         if (truth_box.label == options.labels[k])
                         {
-                            loss += -scale_loss * options.lambda_cls * safe_log(out_data[c_idx]);
-                            g[c_idx] = scale_grad * options.lambda_cls * (out_data[c_idx] - 1);
+                            loss += -scale * options.lambda_cls * safe_log(out_data[c_idx]);
+                            g[c_idx] = scale * options.lambda_cls * (out_data[c_idx] - 1);
                         }
                         else
                         {
-                            loss += -scale_loss * options.lambda_cls * safe_log(1 - out_data[c_idx]);
-                            g[c_idx] = scale_grad * options.lambda_cls * out_data[c_idx];
+                            loss += -scale * options.lambda_cls * safe_log(1 - out_data[c_idx]);
+                            g[c_idx] = scale * options.lambda_cls * out_data[c_idx];
                         }
                     }
                 }
@@ -3905,7 +3899,7 @@ namespace dlib
             double loss = 0;
             for (long i = 0; i < input_tensor.num_samples(); ++i)
             {
-                impl::yolo_helper_impl<TAG_TYPES...>::tensor_to_grad(input_tensor, truth, sub, i, options, loss);
+                impl::yolo_helper_impl<TAG_TYPES...>::tensor_to_loss(input_tensor, truth, sub, i, options, loss);
             }
             return loss;
         }
