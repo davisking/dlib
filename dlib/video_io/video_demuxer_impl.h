@@ -166,6 +166,8 @@ namespace dlib
         float get_rotation_angle() const;
         
     private:
+        video_demuxer(const video_demuxer& ori)             = delete;
+        video_demuxer& operator=(const video_demuxer& ori)  = delete;
         
         bool connect();  
         bool interrupt_callback();

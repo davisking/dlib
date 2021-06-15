@@ -27,7 +27,13 @@ namespace dlib
     {
         std::vector<codec_details> details;
         const AVCodec* codec = NULL;
-        while ((codec = av_codec_next(codec)))
+        
+#if LIBAVCODEC_VERSION_MAJOR >= 58 && LIBAVCODEC_VERSION_MINOR >= 10 && LIBAVCODEC_VERSION_MICRO >= 100
+        void* opaque = nullptr;
+        while ((codec = av_codec_iterate(&opaque)))
+#else
+        while ((codec = av_codec_iterate(codec)))   
+#endif
         {
             codec_details detail;
             detail.codec_name = codec->name;
