@@ -3535,7 +3535,7 @@ namespace dlib
         std::unordered_map<int, std::vector<anchor_box_details>> anchors;
         std::vector<std::string> labels;
         double confidence_threshold = 0.25;
-        double ignore_iou_threshold = 0.7;
+        double truth_match_iou_threshold = 0.7;
         bool classwise_nms = false;
         test_box_overlap overlaps_nms = test_box_overlap(0.45, 1.0);
         test_box_overlap overlaps_ignore = test_box_overlap(0.5, 1.0);
@@ -3552,7 +3552,7 @@ namespace dlib
         serialize(version, out);
         serialize(item.anchors, out);
         serialize(item.confidence_threshold, out);
-        serialize(item.ignore_iou_threshold, out);
+        serialize(item.truth_match_iou_threshold, out);
         serialize(item.classwise_nms, out);
         serialize(item.overlaps_nms, out);
         serialize(item.overlaps_ignore, out);
@@ -3569,7 +3569,7 @@ namespace dlib
             throw serialization_error("Unexpected version found while deserializing dlib::yolo_options.");
         deserialize(item.anchors, in);
         deserialize(item.confidence_threshold, in);
-        deserialize(item.ignore_iou_threshold, in);
+        deserialize(item.truth_match_iou_threshold, in);
         deserialize(item.classwise_nms, in);
         deserialize(item.overlaps_nms, in);
         deserialize(item.overlaps_ignore, in);
@@ -3601,23 +3601,23 @@ namespace dlib
             }
 
             template <typename SUBNET>
-            static void tensor_to_dets(
-                const tensor& input,
+            static void tensor_to_dets (
+                const tensor& input_tensor,
                 const SUBNET& sub,
                 const long n,
                 const yolo_options& options,
                 std::vector<yolo_rect>& dets
             )
             {
-                yolo_helper_impl<TAG_TYPE>::tensor_to_dets(input, sub, n, options, dets);
-                yolo_helper_impl<TAG_TYPES...>::tensor_to_dets(input, sub, n, options, dets);
+                yolo_helper_impl<TAG_TYPE>::tensor_to_dets(input_tensor, sub, n, options, dets);
+                yolo_helper_impl<TAG_TYPES...>::tensor_to_dets(input_tensor, sub, n, options, dets);
             }
 
             template <
                 typename const_label_iterator,
                 typename SUBNET
             >
-            static void tensor_to_loss(
+            static void tensor_to_loss (
                 const tensor& input_tensor,
                 const_label_iterator truth,
                 SUBNET& sub,
@@ -3639,7 +3639,7 @@ namespace dlib
             static void list_tags(std::ostream& out) { out << tag_id<TAG_TYPE>::id; }
 
             template <typename SUBNET>
-            static void tensor_to_dets(
+            static void tensor_to_dets (
                 const tensor& input_tensor,
                 const SUBNET& sub,
                 const long n,
@@ -3694,7 +3694,7 @@ namespace dlib
                 typename const_label_iterator,
                 typename SUBNET
             >
-            static void tensor_to_loss(
+            static void tensor_to_loss (
                 const tensor& input_tensor,
                 const_label_iterator truth,
                 SUBNET& sub,
@@ -3713,7 +3713,7 @@ namespace dlib
                 const float* const out_data = output_tensor.host();
                 tensor& grad = layer<TAG_TYPE>(sub).get_gradient_input();
                 float* g = grad.host();
-                const double scale = 1.0 / (output_tensor.num_samples() * output_tensor.nr() * output_tensor.nc());
+                const double scale = 1.0; // (output_tensor.num_samples() * output_tensor.nr() * output_tensor.nc());
 
                 // Compute the objectness loss for all grid cells
                 for (long r = 0; r < output_tensor.nr(); ++r)
@@ -3745,7 +3745,7 @@ namespace dlib
                             }
 
                             // Only incur loss for the boxes that are below a certain IoU threshold
-                            if (best_iou < options.ignore_iou_threshold)
+                            if (best_iou < options.truth_match_iou_threshold)
                             {
                                 loss += -scale * options.lambda_noobj * safe_log(1 - out_data[o_idx]);
                                 g[o_idx] = scale * options.lambda_noobj * out_data[o_idx];
@@ -3805,6 +3805,7 @@ namespace dlib
                     const double dw = out_data[w_idx] - tw;
                     const double dh = out_data[h_idx] - th;
 
+                    // Penalize regression error according to the truth size
                     const double scale_bbr = 2 - truth_box.rect.area() / (input_tensor.nr() * input_tensor.nc());
                     // Compute MSE loss
                     loss += scale * options.lambda_bbr * scale_bbr * (dx * dx + dy * dy + dw * dw + dh * dh);
@@ -3900,8 +3901,9 @@ namespace dlib
             for (long i = 0; i < input_tensor.num_samples(); ++i)
             {
                 impl::yolo_helper_impl<TAG_TYPES...>::tensor_to_loss(input_tensor, truth, sub, i, options, loss);
+                ++truth;
             }
-            return loss;
+            return loss / input_tensor.num_samples();
         }
 
         void adjust_threshold(float conf_thresh) { options.confidence_threshold = conf_thresh; }
