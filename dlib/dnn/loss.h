@@ -3739,7 +3739,7 @@ namespace dlib
                             double best_iou = 0;
                             for (const yolo_rect& truth_box : *truth)
                             {
-                                if (truth_box.ignore)
+                                if (truth_box.ignore || options.overlaps_ignore(truth_box.rect, pred.rect))
                                     continue;
                                 best_iou = std::max(best_iou, box_intersection_over_union(truth_box.rect, pred.rect));
                             }
