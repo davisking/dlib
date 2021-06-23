@@ -188,8 +188,8 @@ try
     trainer.be_verbose();
     trainer.set_mini_batch_size(batch_size);
     trainer.set_learning_rate_schedule(learning_rate_schedule);
-    trainer.set_synchronization_file(sync_file_name, chrono::minutes(15));
     trainer.set_mini_batch_size(batch_size);
+    trainer.set_synchronization_file(sync_file_name, chrono::minutes(15));
     cout << trainer;
 
     if (parser.option("test"))
@@ -229,31 +229,49 @@ try
         dlib::rand rnd(time(nullptr) + seed);
         matrix<rgb_pixel> image, rotated;
         std::pair<matrix<rgb_pixel>, std::vector<yolo_rect>> temp;
+        random_cropper cropper;
+        cropper.set_seed(time_t(nullptr) + seed);
+        cropper.set_chip_dims(image_size, image_size);
+        cropper.set_max_object_size(0.9);
+        cropper.set_min_object_size(10, 10);
+        cropper.set_max_rotation_degrees(10);
+        cropper.set_translate_amount(0.1);
+        cropper.set_randomly_flip(true);
+        cropper.set_background_crops_fraction(0);
         while (train_data.is_enabled())
         {
-            auto idx = rnd.get_random_32bit_number() % dataset.images.size();
+            const auto idx = rnd.get_random_32bit_number() % dataset.images.size();
             load_image(image, data_directory + "/" + dataset.images[idx].filename);
-
-            // Some data augmentation
-            rectangle_transform tform = rotate_image(
-                image,
-                rotated,
-                rnd.get_double_in_range(-5 * pi / 180, 5 * pi / 180),
-                interpolate_bilinear());
             for (const auto& box : dataset.images[idx].boxes)
-                temp.second.emplace_back(tform(box.rect), 1, box.label);
-
-            tform = letterbox_image(rotated, temp.first, image_size);
-            for (auto& box : temp.second)
-                box.rect = tform(box.rect);
+                temp.second.emplace_back(box.rect, 1, box.label);
 
             if (rnd.get_random_double() > 0.5)
             {
-                tform = flip_image_left_right(temp.first);
+                // Some data augmentation
+                rectangle_transform tform = rotate_image(
+                    image,
+                    rotated,
+                    rnd.get_double_in_range(-5 * pi / 180, 5 * pi / 180),
+                    interpolate_bilinear());
                 for (auto& box : temp.second)
                     box.rect = tform(box.rect);
-            }
 
+                tform = letterbox_image(rotated, temp.first, image_size);
+                for (auto& box : temp.second)
+                    box.rect = tform(box.rect);
+
+                if (rnd.get_random_double() > 0.5)
+                {
+                    tform = flip_image_left_right(temp.first);
+                    for (auto& box : temp.second)
+                        box.rect = tform(box.rect);
+                }
+            }
+            else
+            {
+                std::vector<yolo_rect> boxes = temp.second;
+                cropper(image, boxes, temp.first, temp.second);
+            }
             disturb_colors(temp.first, rnd);
             train_data.enqueue(temp);
         }
@@ -274,7 +292,17 @@ try
             win.clear_overlay();
             win.set_image(temp.first);
             for (const auto& r : temp.second)
-                win.add_overlay(r.rect, string_to_color(r.label), r.label);
+            {
+                auto color = string_to_color(r.label);
+                if (r.ignore)
+                {
+                    color.alpha = 128;
+                    win.add_overlay(r.rect.tl_corner(), r.rect.br_corner(), color);
+                    win.add_overlay(r.rect.tr_corner(), r.rect.bl_corner(), color);
+                }
+                win.add_overlay(r.rect, color, r.label);
+            }
+            cout << "Press enter to visualize the next training sample.";
             cin.get();
         }
     }
