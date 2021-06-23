@@ -3538,7 +3538,6 @@ namespace dlib
         double truth_match_iou_threshold = 0.7;
         bool classwise_nms = false;
         test_box_overlap overlaps_nms = test_box_overlap(0.45, 1.0);
-        test_box_overlap overlaps_ignore = test_box_overlap(0.5, 1.0);
         double lambda_obj = 1.0;
         double lambda_box = 1.0;
         double lambda_cls = 1.0;
@@ -3555,7 +3554,6 @@ namespace dlib
         serialize(item.truth_match_iou_threshold, out);
         serialize(item.classwise_nms, out);
         serialize(item.overlaps_nms, out);
-        serialize(item.overlaps_ignore, out);
         serialize(item.lambda_obj, out);
         serialize(item.lambda_box, out);
         serialize(item.lambda_cls, out);
@@ -3573,7 +3571,6 @@ namespace dlib
         deserialize(item.truth_match_iou_threshold, in);
         deserialize(item.classwise_nms, in);
         deserialize(item.overlaps_nms, in);
-        deserialize(item.overlaps_ignore, in);
         deserialize(item.lambda_obj, in);
         deserialize(item.lambda_box, in);
         deserialize(item.lambda_cls, in);
@@ -3739,7 +3736,7 @@ namespace dlib
                             double best_iou = 0;
                             for (const yolo_rect& truth_box : *truth)
                             {
-                                if (truth_box.ignore || options.overlaps_ignore(truth_box.rect, pred.rect))
+                                if (truth_box.ignore)
                                     continue;
                                 best_iou = std::max(best_iou, box_intersection_over_union(truth_box.rect, pred.rect));
                             }
