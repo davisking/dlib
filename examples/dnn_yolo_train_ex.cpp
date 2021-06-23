@@ -37,13 +37,10 @@ namespace darknet
     struct def
     {
         template <long nf, long ks, int s, typename SUBNET>
-        using conblock = ACT<BN<add_layer<con_<nf, ks, ks, s, s, ks/2, ks/2>, SUBNET>>>;
+        using conblock = ACT<BN<add_layer<con_<nf, ks, ks, s, s, ks / 2, ks / 2>, SUBNET>>>;
 
-        template <long nf1, long nf2, typename SUBNET>
-        using residual = add_prev1<
-                         conblock<nf1, 3, 1,
-                         conblock<nf2, 1, 1,
-                    tag1<SUBNET>>>>;
+        template <long nf, typename SUBNET>
+        using residual = add_prev1<conblock<nf, 3, 1, conblock<nf / 2, 1, 1, tag1<SUBNET>>>>;
 
         template <long nf, long factor, typename SUBNET>
         using conblock5 = conblock<nf, 1, 1,
@@ -52,65 +49,59 @@ namespace darknet
                           conblock<nf * factor, 3, 1,
                           conblock<nf, 1, 1, SUBNET>>>>>;
 
-        // the residual block introduced in YOLOv3 (with bottleneck)
-        template <long nf, typename SUBNET> using resv3 = residual<nf, nf / 2, SUBNET>;
-        // the residual block introduced in YOLOv4 (without bottleneck)
-        template <long nf, typename SUBNET> using resv4 = residual<nf, nf, SUBNET>;
-
-        template <typename SUBNET> using resv3_64= resv3<64, SUBNET>;
-        template <typename SUBNET> using resv3_128 = resv3<128, SUBNET>;
-        template <typename SUBNET> using resv3_256 = resv3<256, SUBNET>;
-        template <typename SUBNET> using resv3_512 = resv3<512, SUBNET>;
-        template <typename SUBNET> using resv3_1024 = resv3<1024, SUBNET>;
+        template <typename SUBNET> using res_64 = residual<64, SUBNET>;
+        template <typename SUBNET> using res_128 = residual<128, SUBNET>;
+        template <typename SUBNET> using res_256 = residual<256, SUBNET>;
+        template <typename SUBNET> using res_512 = residual<512, SUBNET>;
+        template <typename SUBNET> using res_1024 = residual<1024, SUBNET>;
 
         template <typename INPUT>
-        using backbone53 = repeat<4, resv3_1024, conblock<1024, 3, 2,
-                    btag16<repeat<8, resv3_512,  conblock<512, 3, 2,
-                     btag8<repeat<8, resv3_256,  conblock<256, 3, 2,
-                           repeat<2, resv3_128,  conblock<128, 3, 2,
-                                     resv3_64<   conblock<64, 3, 2,
-                                                 conblock<32, 3, 1,
-                                                 INPUT>>>>>>>>>>>>>;
+        using backbone53 = repeat<4, res_1024, conblock<1024, 3, 2,
+                    btag16<repeat<8, res_512,  conblock<512, 3, 2,
+                     btag8<repeat<8, res_256,  conblock<256, 3, 2,
+                           repeat<2, res_128,  conblock<128, 3, 2,
+                                     res_64<   conblock<64, 3, 2,
+                                               conblock<32, 3, 1,
+                                               INPUT>>>>>>>>>>>>>;
 
-        template <long nf, int classes, template <typename> class YTAG, template <typename> class NTAG, typename SUBNET>
-        using yolo = YTAG<sig<con<3 * (classes + 5), 1, 1, 1, 1,
+        template <long num_classes, long nf, template <typename> class YTAG, template <typename> class NTAG, typename SUBNET>
+        using yolo = YTAG<sig<con<3 * (num_classes + 5), 1, 1, 1, 1,
                      conblock<nf, 3, 1,
                 NTAG<conblock5<nf / 2, 2,
                      SUBNET>>>>>>;
 
         template <long num_classes>
-        using yolov3 = yolo<256, num_classes, ytag8, ntag8,
+        using yolov3 = yolo<num_classes, 256, ytag8, ntag8,
                        concat2<htag8, btag8,
                  htag8<upsample<2, conblock<128, 1, 1,
                        nskip16<
-                       yolo<512, num_classes, ytag16, ntag16,
+                       yolo<num_classes, 512, ytag16, ntag16,
                        concat2<htag16, btag16,
                 htag16<upsample<2, conblock<256, 1, 1,
                        nskip32<
-                       yolo<1024, num_classes, ytag32, ntag32,
+                       yolo<num_classes, 1024, ytag32, ntag32,
                        backbone53<input_rgb_image>>>>>>>>>>>>>>;
 
     };
 
-    using yolov3_train = def<leaky_relu, bn_con>::yolov3<80>;
-    using yolov3_infer = def<leaky_relu, affine>::yolov3<80>;
+    using yolov3_train_type = loss_yolo<ytag8, ytag16, ytag32, def<leaky_relu, bn_con>::yolov3<80>>;
+    using yolov3_infer_type = loss_yolo<ytag8, ytag16, ytag32, def<leaky_relu, affine>::yolov3<80>>;
 
-    template <typename net_type>
-    void setup_detector(net_type& net, const yolo_options& options, long image_size)
+    void setup_detector(yolov3_train_type& net, const yolo_options& options)
     {
-        // remove bias
+        // remove bias from bn inputs
         disable_duplicative_biases(net);
-        // do not remove the mean from the input image
-        input_layer(net) = input_rgb_image(0, 0, 0);
         // setup leaky relus
         visit_computational_layers(net, [](leaky_relu_& l) { l = leaky_relu_(0.1); });
-        // set the number of filters (they are located after the tag and sig layers)
-        layer<ytag8, 2>(net).layer_details().set_num_filters(3 * (options.labels.size() + 5));
-        layer<ytag16, 2>(net).layer_details().set_num_filters(3 * (options.labels.size() + 5));
-        layer<ytag32, 2>(net).layer_details().set_num_filters(3 * (options.labels.size() + 5));
-        // allocate the network
-        matrix<rgb_pixel> image(image_size, image_size);
-        net(image);
+        // enlarge the batch normalization stats window
+        set_all_bn_running_stats_window_sizes(net, 1000);
+        // set the number of filters for detection layers (they are located after the tag and sig layers)
+        const long nfo1 = options.anchors.at(tag_id<ytag8>::id).size() * (options.labels.size() + 5);
+        const long nfo2 = options.anchors.at(tag_id<ytag16>::id).size() * (options.labels.size() + 5);
+        const long nfo3 = options.anchors.at(tag_id<ytag32>::id).size() * (options.labels.size() + 5);
+        layer<ytag8, 2>(net).layer_details().set_num_filters(nfo1);
+        layer<ytag16, 2>(net).layer_details().set_num_filters(nfo2);
+        layer<ytag32, 2>(net).layer_details().set_num_filters(nfo3);
     }
 }
 
@@ -125,8 +116,6 @@ void postprocess_detections(const rectangle_transform& tform, std::vector<yolo_r
         d.rect = tform(d.rect);
 }
 
-using net_type = loss_yolo<darknet::ytag8, darknet::ytag16, darknet::ytag32, darknet::yolov3_train>;
-
 int main(const int argc, const char** argv)
 try
 {
@@ -134,8 +123,8 @@ try
     parser.add_option("size", "image size for training (default: 416)", 1);
     parser.add_option("learning-rate", "initial learning rate (default: 0.001)", 1);
     parser.add_option("batch-size", "mini batch size (default: 8)", 1);
-    parser.add_option("warmup", "number of warmup steps (default: 5000)", 1);
-    parser.add_option("steps", "number of training steps (defaule: 500000)", 1);
+    parser.add_option("burnin", "learning rate burnin steps (default: 1000)", 1);
+    parser.add_option("patience", "number of steps without progress (default: 10000)", 1);
     parser.add_option("workers", "number of worker threads to load data (default: 4)", 1);
     parser.add_option("gpus", "number of GPUs to run the training on (default: 1)", 1);
     parser.add_option("test", "test the detector with a threshold (default: 0.01)", 1);
@@ -151,9 +140,9 @@ try
         return 0;
     }
     const double learning_rate = get_option(parser, "learning-rate", 0.001);
+    const size_t patience = get_option(parser, "patience", 10000);
     const size_t batch_size = get_option(parser, "batch-size", 8);
-    const size_t warmup = get_option(parser, "warmup", 5000);
-    const size_t num_steps = get_option(parser, "steps", 100000);
+    const size_t burnin = get_option(parser, "burnin", 1000);
     const size_t image_size = get_option(parser, "size", 416);
     const size_t num_workers = get_option(parser, "workers", 4);
     const size_t num_gpus = get_option(parser, "gpus", 1);
@@ -183,37 +172,25 @@ try
         cout << " (" << (100.0*label.second)/num_objects << "%)\n";
         options.labels.push_back(label.first);
     }
-    options.confidence_threshold = 0.25;
-    options.ignore_iou_threshold = 0.5;
+    options.truth_match_iou_threshold = 0.7;
     options.add_anchors<darknet::ytag8>({{10, 13}, {16, 30}, {33, 23}});
     options.add_anchors<darknet::ytag16>({{30, 61}, {62, 45}, {59, 119}});
     options.add_anchors<darknet::ytag32>({{116, 90}, {156, 198}, {373, 326}});
-    options.overlaps_nms = test_box_overlap(0.45);
-    net_type net(options);
-    darknet::setup_detector(net, options, image_size);
+    darknet::yolov3_train_type net(options);
+    darknet::setup_detector(net, options);
     cerr << net << endl;
 
-    // Cosine scheduler with warm-up:
-    // - learning_rate is the highest learning rate value, e.g. 0.01
-    // - warmup: number of steps to linearly increase the learning rate
-    // - steps: maximum number of steps of the training session
-    const matrix<double> learning_rate_schedule = learning_rate * join_rows(
-        linspace(0, 1, warmup),
-        ((1 + cos(pi / (num_steps - warmup) * linspace(0, num_steps - warmup, num_steps - warmup))) / 2)
-    ) + numeric_limits<double>::epsilon();  // this prevents the learning rates from being 0
+    const matrix<double> learning_rate_schedule = learning_rate * pow(linspace(1e-12, 1, burnin), 4);
 
     std::vector<int> gpus(num_gpus);
     iota(gpus.begin(), gpus.end(), 0);
-    dnn_trainer<net_type> trainer(net, sgd(0.0005, 0.9), gpus);
+    dnn_trainer<darknet::yolov3_train_type> trainer(net, sgd(0.0005, 0.9), gpus);
     trainer.be_verbose();
     trainer.set_mini_batch_size(batch_size);
     trainer.set_learning_rate_schedule(learning_rate_schedule);
-    // trainer.set_learning_rate(learning_rate);
-    // trainer.set_iterations_without_progress_threshold(10000);
     trainer.set_synchronization_file(sync_file_name, chrono::minutes(15));
+    trainer.set_mini_batch_size(batch_size);
     cout << trainer;
-    cout << "  burnin: " << warmup << endl;
-    cout << "  #steps: " << num_steps << endl;
 
     if (parser.option("test"))
     {
@@ -223,13 +200,6 @@ try
             return EXIT_FAILURE;
         }
         const double threshold = get_option(parser, "test", 0.01);
-        {
-            net_type temp;
-            dnn_trainer<net_type> trainer(temp);
-            trainer.set_synchronization_file(sync_file_name);
-            trainer.get_net();
-            net.subnet() = temp.subnet();
-        }
         net.loss_details().adjust_threshold(threshold);
         image_window win;
         matrix<rgb_pixel> image, resized;
@@ -271,9 +241,7 @@ try
                 rnd.get_double_in_range(-5 * pi / 180, 5 * pi / 180),
                 interpolate_bilinear());
             for (const auto& box : dataset.images[idx].boxes)
-            {
                 temp.second.emplace_back(tform(box.rect), 1, box.label);
-            }
 
             tform = letterbox_image(rotated, temp.first, image_size);
             for (auto& box : temp.second)
@@ -287,7 +255,6 @@ try
             }
 
             disturb_colors(temp.first, rnd);
-
             train_data.enqueue(temp);
         }
     };
@@ -314,7 +281,8 @@ try
 
     std::vector<matrix<rgb_pixel>> images;
     std::vector<std::vector<yolo_rect>> bboxes;
-    while (trainer.get_train_one_step_calls() < num_steps)
+
+    const auto train = [&images, &bboxes, &train_data, &trainer]()
     {
         images.clear();
         bboxes.clear();
@@ -326,7 +294,24 @@ try
             bboxes.push_back(move(temp.second));
         }
         trainer.train_one_step(images, bboxes);
-    }
+    };
+
+    std::cerr << "training started with " << burnin << " burn-in steps" << std::endl;
+    while (trainer.get_train_one_step_calls() < burnin)
+        train();
+
+    std::cerr << "burn-in finished" << std::endl;
+    trainer.get_net();
+    trainer.set_learning_rate(learning_rate);
+    trainer.set_min_learning_rate(learning_rate * 1e-3);
+    trainer.set_learning_rate_shrink_factor(0.1);
+    trainer.set_iterations_without_progress_threshold(patience);
+    std::cerr << trainer << std::endl;
+
+    while (trainer.get_learning_rate() >= trainer.get_min_learning_rate())
+        train();
+
+    std::cerr << "training done" << std::endl;
 
     trainer.get_net();
     train_data.disable();
@@ -334,6 +319,7 @@ try
         worker.join();
 
     serialize("yolov3.dnn") << net;
+    return EXIT_SUCCESS;
 }
 catch (const std::exception& e)
 {
