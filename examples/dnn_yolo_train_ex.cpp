@@ -172,7 +172,13 @@ try
         cout << " (" << (100.0*label.second)/num_objects << "%)\n";
         options.labels.push_back(label.first);
     }
+    // When computing the objectness loss in YOLO, predictions that do not have an IoU
+    // with any ground truth box of at least options.truth_match_iou_threshold, will be
+    // treated as not capable of detecting an object, an therefore incur loss.
+    // Predictions about this threshold will be ignored, i.e. will not affect the loss.
     options.truth_match_iou_threshold = 0.7;
+    // These are the anchors computed on COCO dataset by the official DarkNet code
+    // using K-Means clustering.
     options.add_anchors<darknet::ytag8>({{10, 13}, {16, 30}, {33, 23}});
     options.add_anchors<darknet::ytag16>({{30, 61}, {62, 45}, {59, 119}});
     options.add_anchors<darknet::ytag32>({{116, 90}, {156, 198}, {373, 326}});
@@ -180,18 +186,23 @@ try
     darknet::setup_detector(net, options);
     cerr << net << endl;
 
+    // The training process can be unstable at the beginning.  For this reason, we exponentially
+    // increase the learning rate during the first burnin steps.
     const matrix<double> learning_rate_schedule = learning_rate * pow(linspace(1e-12, 1, burnin), 4);
 
+    // In case we have several GPUs, we can tell the dnn_trainer to make use of them.
     std::vector<int> gpus(num_gpus);
     iota(gpus.begin(), gpus.end(), 0);
     dnn_trainer<darknet::yolov3_train_type> trainer(net, sgd(0.0005, 0.9), gpus);
     trainer.be_verbose();
     trainer.set_mini_batch_size(batch_size);
     trainer.set_learning_rate_schedule(learning_rate_schedule);
-    trainer.set_mini_batch_size(batch_size);
     trainer.set_synchronization_file(sync_file_name, chrono::minutes(15));
     cout << trainer;
 
+    // If the training has started and a synchronization file has already been saved to disk,
+    // we can re-run this program with the --test option and a confidence threshold to see
+    // how the training is going.
     if (parser.option("test"))
     {
         if (!file_exists(sync_file_name))
@@ -224,6 +235,7 @@ try
         return EXIT_SUCCESS;
     }
 
+    // Create some data loaders which will load the data, and perform som data augmentation.
     dlib::pipe<std::pair<matrix<rgb_pixel>, std::vector<yolo_rect>>> train_data(1000);
     auto loader = [&dataset, &data_directory, &train_data, &image_size](time_t seed) {
         dlib::rand rnd(time(nullptr) + seed);
@@ -247,7 +259,6 @@ try
 
             if (rnd.get_random_double() > 0.5)
             {
-                // Some data augmentation
                 rectangle_transform tform = rotate_image(
                     image,
                     rotated,
@@ -281,6 +292,8 @@ try
     for (size_t i = 0; i < num_workers; ++i)
         data_loaders.emplace_back([loader, i]() { loader(i + 1); });
 
+    // It is always a good idea to visualize the training samples.  By passing the --visualize
+    // flag, we can see the training samples that will be fed to the dnn_trainer.
     if (parser.option("visualize"))
     {
         image_window win;
@@ -310,6 +323,7 @@ try
     std::vector<matrix<rgb_pixel>> images;
     std::vector<std::vector<yolo_rect>> bboxes;
 
+    // The main training loop, that we will reuse for the warmup and the rest of the training.
     const auto train = [&images, &bboxes, &train_data, &trainer]()
     {
         images.clear();
