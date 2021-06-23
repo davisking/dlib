@@ -3540,8 +3540,7 @@ namespace dlib
         test_box_overlap overlaps_nms = test_box_overlap(0.45, 1.0);
         test_box_overlap overlaps_ignore = test_box_overlap(0.5, 1.0);
         double lambda_obj = 1.0;
-        double lambda_noobj = 1.0;
-        double lambda_bbr = 1.0;
+        double lambda_box = 1.0;
         double lambda_cls = 1.0;
 
     };
@@ -3551,13 +3550,14 @@ namespace dlib
         int version = 1;
         serialize(version, out);
         serialize(item.anchors, out);
+        serialize(item.labels, out);
         serialize(item.confidence_threshold, out);
         serialize(item.truth_match_iou_threshold, out);
         serialize(item.classwise_nms, out);
         serialize(item.overlaps_nms, out);
         serialize(item.overlaps_ignore, out);
         serialize(item.lambda_obj, out);
-        serialize(item.lambda_bbr, out);
+        serialize(item.lambda_box, out);
         serialize(item.lambda_cls, out);
     }
 
@@ -3568,13 +3568,14 @@ namespace dlib
         if (version != 1)
             throw serialization_error("Unexpected version found while deserializing dlib::yolo_options.");
         deserialize(item.anchors, in);
+        deserialize(item.labels, in);
         deserialize(item.confidence_threshold, in);
         deserialize(item.truth_match_iou_threshold, in);
         deserialize(item.classwise_nms, in);
         deserialize(item.overlaps_nms, in);
         deserialize(item.overlaps_ignore, in);
         deserialize(item.lambda_obj, in);
-        deserialize(item.lambda_bbr, in);
+        deserialize(item.lambda_box, in);
         deserialize(item.lambda_cls, in);
     }
 
@@ -3713,7 +3714,6 @@ namespace dlib
                 const float* const out_data = output_tensor.host();
                 tensor& grad = layer<TAG_TYPE>(sub).get_gradient_input();
                 float* g = grad.host();
-                const double scale = 1.0; // (output_tensor.num_samples() * output_tensor.nr() * output_tensor.nc());
 
                 // Compute the objectness loss for all grid cells
                 for (long r = 0; r < output_tensor.nr(); ++r)
@@ -3744,12 +3744,9 @@ namespace dlib
                                 best_iou = std::max(best_iou, box_intersection_over_union(truth_box.rect, pred.rect));
                             }
 
-                            // Only incur loss for the boxes that are below a certain IoU threshold
+                            // Incur loss for the boxes that are below a certain IoU threshold with any truth box
                             if (best_iou < options.truth_match_iou_threshold)
-                            {
-                                loss += -scale * options.lambda_noobj * safe_log(1 - out_data[o_idx]);
-                                g[o_idx] = scale * options.lambda_noobj * out_data[o_idx];
-                            }
+                                g[o_idx] = out_data[o_idx];
                         }
                     }
                 }
@@ -3793,45 +3790,34 @@ namespace dlib
                     const auto o_idx = tensor_index(output_tensor, n, best_a * num_feats + 4, r, c);
 
                     // This grid cell should detect an object
-                    loss += -scale * options.lambda_obj * safe_log(out_data[o_idx]);
-                    g[o_idx] = scale * options.lambda_obj * (out_data[o_idx] - 1);
+                    g[o_idx] = options.lambda_obj * (out_data[o_idx] - 1);
 
+                    // Get the truth box target values
                     const double tx = t_center.x() / stride_x - c;
                     const double ty = t_center.y() / stride_y - r;
                     const double tw = truth_box.rect.width() / (anchors[best_a].width + truth_box.rect.width());
                     const double th = truth_box.rect.height() / (anchors[best_a].height + truth_box.rect.height());
-                    const double dx = out_data[x_idx] - tx;
-                    const double dy = out_data[y_idx] - ty;
-                    const double dw = out_data[w_idx] - tw;
-                    const double dh = out_data[h_idx] - th;
 
-                    // Penalize regression error according to the truth size
-                    const double scale_bbr = 2 - truth_box.rect.area() / (input_tensor.nr() * input_tensor.nc());
-                    // Compute MSE loss
-                    loss += scale * options.lambda_bbr * scale_bbr * (dx * dx + dy * dy + dw * dw + dh * dh);
+                    // Scale regression error according to the truth size
+                    const double scale_box = 2 - truth_box.rect.area() / (input_tensor.nr() * input_tensor.nc());
 
-                    // Compute the gradient
-                    g[x_idx] = scale * options.lambda_bbr * scale_bbr * dx;
-                    g[y_idx] = scale * options.lambda_bbr * scale_bbr * dy;
-                    g[w_idx] = scale * options.lambda_bbr * scale_bbr * dw;
-                    g[h_idx] = scale * options.lambda_bbr * scale_bbr * dh;
+                    // Compute the gradient for the box coordinates
+                    g[x_idx] = options.lambda_box * scale_box * (out_data[x_idx] - tx);
+                    g[y_idx] = options.lambda_box * scale_box * (out_data[y_idx] - ty);
+                    g[w_idx] = options.lambda_box * scale_box * (out_data[w_idx] - tw);
+                    g[h_idx] = options.lambda_box * scale_box * (out_data[h_idx] - th);
 
-                    // Compute binary cross-entropy loss
+                    // Compute the classification error
                     for (long k = 0; k < num_classes; ++k)
                     {
                         const auto c_idx = tensor_index(output_tensor, n, best_a * num_feats + 5 + k, r, c);
                         if (truth_box.label == options.labels[k])
-                        {
-                            loss += -scale * options.lambda_cls * safe_log(out_data[c_idx]);
-                            g[c_idx] = scale * options.lambda_cls * (out_data[c_idx] - 1);
-                        }
+                            g[c_idx] = options.lambda_cls * (out_data[c_idx] - 1);
                         else
-                        {
-                            loss += -scale * options.lambda_cls * safe_log(1 - out_data[c_idx]);
-                            g[c_idx] = scale * options.lambda_cls * out_data[c_idx];
-                        }
+                            g[c_idx] = options.lambda_cls * out_data[c_idx];
                     }
                 }
+                loss += length_squared(rowm(mat(grad), n));
             }
         };
     }
