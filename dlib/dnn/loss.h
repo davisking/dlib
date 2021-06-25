@@ -3889,7 +3889,11 @@ namespace dlib
             return loss / input_tensor.num_samples();
         }
 
-        void adjust_threshold(float conf_thresh) { options.confidence_threshold = conf_thresh; }
+        void adjust_threshold(double conf_thresh) { options.confidence_threshold = conf_thresh; }
+        void adjust_nms(double iou_thresh, double percent_covered_thresh = 1)
+        {
+            options.overlaps_nms = test_box_overlap(iou_thresh, percent_covered_thresh);
+        }
 
         friend void serialize(const loss_yolo_& item, std::ostream& out)
         {

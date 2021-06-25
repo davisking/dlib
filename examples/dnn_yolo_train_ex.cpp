@@ -129,6 +129,7 @@ try
     parser.add_option("gpus", "number of GPUs to run the training on (default: 1)", 1);
     parser.add_option("test", "test the detector with a threshold (default: 0.01)", 1);
     parser.add_option("visualize", "visualize data augmentation instead of training");
+    parser.add_option("map", "compute the mean average precision");
     parser.set_group_name("Help Options");
     parser.add_option("h", "alias of --help");
     parser.add_option("help", "display this message and exit");
@@ -152,7 +153,7 @@ try
 
     image_dataset_metadata::dataset dataset;
     image_dataset_metadata::load_image_dataset_metadata(dataset, data_directory + "/training.xml");
-    std::cout << "# images: " << dataset.images.size() << std::endl;
+    cout << "# images: " << dataset.images.size() << endl;
     std::map<string, size_t> labels;
     size_t num_objects = 0;
     for (const auto& im : dataset.images)
@@ -184,7 +185,6 @@ try
     options.add_anchors<darknet::ytag32>({{116, 90}, {156, 198}, {373, 326}});
     darknet::yolov3_train_type net(options);
     darknet::setup_detector(net, options);
-    cerr << net << endl;
 
     // The training process can be unstable at the beginning.  For this reason, we exponentially
     // increase the learning rate during the first burnin steps.
@@ -234,6 +234,67 @@ try
         }
         return EXIT_SUCCESS;
     }
+
+    if (parser.option("map"))
+    {
+        image_dataset_metadata::dataset dataset;
+        image_dataset_metadata::load_image_dataset_metadata(dataset, data_directory + "/testing.xml");
+        if (!file_exists(sync_file_name))
+        {
+            cout << "Could not find file " << sync_file_name << endl;
+            return EXIT_FAILURE;
+        }
+        matrix<rgb_pixel> image, resized;
+        std::map<std::string, std::vector<std::pair<double, bool>>> hits;
+        std::map<std::string, unsigned long> missing;
+        net.loss_details().adjust_threshold(0.005);
+        for (auto& im : dataset.images)
+        {
+            load_image(image, data_directory + "/" + im.filename);
+            const auto tform = preprocess_image(image, resized, image_size);
+            auto dets = net(resized);
+            postprocess_detections(tform, dets);
+            std::vector<bool> used(dets.size(), false);
+            // true positives: truths matched by detections
+            for (size_t i = 0; i < im.boxes.size(); ++i)
+            {
+                bool found_match = false;
+                for (size_t j = 0; j < dets.size(); ++j)
+                {
+                    if (used[j])
+                        continue;
+                    if (im.boxes[i].label == dets[j].label &&
+                        box_intersection_over_union(drectangle(im.boxes[i].rect), dets[j].rect) > 0.5)
+                    {
+                        used[j] = true;
+                        found_match = true;
+                        hits[dets[j].label].emplace_back(dets[j].detection_confidence, true);
+                        break;
+                    }
+                }
+                // false negatives: truths not matched
+                if (!found_match)
+                    missing[im.boxes[i].label]++;
+            }
+            // false positives: detections not matched
+            for (size_t i = 0; i < dets.size(); ++i)
+            {
+                if (!used[i])
+                    hits[dets[i].label].emplace_back(dets[i].detection_confidence, false);
+            }
+        }
+        double map = 0;
+        for (auto& item : hits)
+        {
+            std::sort(item.second.rbegin(), item.second.rend());
+            const double ap = average_precision(item.second, missing[item.first]);
+            cout << rpad(item.first + ": ", 16, " ") << ap * 100 << '%' << endl;
+            map += ap;
+        }
+        cout << rpad(string("mAP: "), 16, " ") << map / hits.size() * 100 << '%' << endl;
+        return EXIT_SUCCESS;
+    }
+
 
     // Create some data loaders which will load the data, and perform som data augmentation.
     dlib::pipe<std::pair<matrix<rgb_pixel>, std::vector<yolo_rect>>> train_data(1000);
@@ -338,22 +399,22 @@ try
         trainer.train_one_step(images, bboxes);
     };
 
-    std::cerr << "training started with " << burnin << " burn-in steps" << std::endl;
+    cout << "training started with " << burnin << " burn-in steps" << endl;
     while (trainer.get_train_one_step_calls() < burnin)
         train();
 
-    std::cerr << "burn-in finished" << std::endl;
+    cout << "burn-in finished" << endl;
     trainer.get_net();
     trainer.set_learning_rate(learning_rate);
     trainer.set_min_learning_rate(learning_rate * 1e-3);
     trainer.set_learning_rate_shrink_factor(0.1);
     trainer.set_iterations_without_progress_threshold(patience);
-    std::cerr << trainer << std::endl;
+    cout << trainer << endl;
 
     while (trainer.get_learning_rate() >= trainer.get_min_learning_rate())
         train();
 
-    std::cerr << "training done" << std::endl;
+    cout << "training done" << endl;
 
     trainer.get_net();
     train_data.disable();
