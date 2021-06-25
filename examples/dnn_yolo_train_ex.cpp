@@ -248,40 +248,43 @@ try
         std::map<std::string, std::vector<std::pair<double, bool>>> hits;
         std::map<std::string, unsigned long> missing;
         net.loss_details().adjust_threshold(0.005);
-        for (auto& im : dataset.images)
+        cout << "computing mean average precision for " << dataset.images.size() << " images..." << endl;
+        for (size_t i = 0; i < dataset.images.size(); ++i)
         {
+            const auto& im = dataset.images[i];
             load_image(image, data_directory + "/" + im.filename);
             const auto tform = preprocess_image(image, resized, image_size);
             auto dets = net(resized);
             postprocess_detections(tform, dets);
             std::vector<bool> used(dets.size(), false);
             // true positives: truths matched by detections
-            for (size_t i = 0; i < im.boxes.size(); ++i)
+            for (size_t t = 0; t < im.boxes.size(); ++t)
             {
                 bool found_match = false;
-                for (size_t j = 0; j < dets.size(); ++j)
+                for (size_t d = 0; d < dets.size(); ++d)
                 {
-                    if (used[j])
+                    if (used[d])
                         continue;
-                    if (im.boxes[i].label == dets[j].label &&
-                        box_intersection_over_union(drectangle(im.boxes[i].rect), dets[j].rect) > 0.5)
+                    if (im.boxes[t].label == dets[d].label &&
+                        box_intersection_over_union(drectangle(im.boxes[t].rect), dets[d].rect) > 0.5)
                     {
-                        used[j] = true;
+                        used[d] = true;
                         found_match = true;
-                        hits[dets[j].label].emplace_back(dets[j].detection_confidence, true);
+                        hits[dets[d].label].emplace_back(dets[d].detection_confidence, true);
                         break;
                     }
                 }
                 // false negatives: truths not matched
                 if (!found_match)
-                    missing[im.boxes[i].label]++;
+                    missing[im.boxes[t].label]++;
             }
             // false positives: detections not matched
-            for (size_t i = 0; i < dets.size(); ++i)
+            for (size_t d = 0; d < dets.size(); ++d)
             {
-                if (!used[i])
-                    hits[dets[i].label].emplace_back(dets[i].detection_confidence, false);
+                if (!used[d])
+                    hits[dets[d].label].emplace_back(dets[d].detection_confidence, false);
             }
+            cout << "progress: " << i << '/' << dataset.images.size() << "\t\t\t\r" << flush;
         }
         double map = 0;
         for (auto& item : hits)
