@@ -3847,7 +3847,7 @@ namespace dlib
         {
             DLIB_CASSERT(sub.sample_expansion_factor() == 1, sub.sample_expansion_factor());
             std::vector<yolo_rect> dets_accum;
-            output_label_type final_dets;
+            std::vector<yolo_rect> final_dets;
             for (long i = 0; i < input_tensor.num_samples(); ++i)
             {
                 dets_accum.clear();
