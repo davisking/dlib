@@ -3459,6 +3459,7 @@ namespace dlib
         double detection_confidence = 0;
         bool ignore = false;
         std::string label;
+        std::vector<std::pair<double, std::string>> labels;
 
         operator rectangle() const { return rect; }
         bool operator == (const yolo_rect& rhs) const
@@ -3482,6 +3483,7 @@ namespace dlib
         serialize(item.detection_confidence, out);
         serialize(item.ignore, out);
         serialize(item.label, out);
+        serialize(item.labels, out);
     }
 
     inline void deserialize(yolo_rect& item, std::istream& in)
@@ -3493,6 +3495,8 @@ namespace dlib
         deserialize(item.rect, in);
         deserialize(item.detection_confidence, in);
         deserialize(item.ignore, in);
+        deserialize(item.label, in);
+        deserialize(item.labels, in);
     }
 
     struct yolo_options
@@ -3672,16 +3676,20 @@ namespace dlib
                                                              h / (1 - h) * anchors[a].height));
                                 for (long k = 0; k < num_classes; ++k)
                                 {
-                                    const float conf = out_data[tensor_index(output_tensor, n, a * num_feats + 5 + k, r, c)];
+                                    const float conf = out_data[tensor_index(output_tensor, n, a * num_feats + 5 + k, r, c)] * obj;
                                     if (conf > det.detection_confidence)
                                     {
                                         det.detection_confidence = conf;
                                         det.label = options.labels[k];
                                     }
+                                    if (conf > options.confidence_threshold)
+                                        det.labels.emplace_back(conf, options.labels[k]);
                                 }
-                                det.detection_confidence *= obj;
                                 if (det.detection_confidence > options.confidence_threshold)
+                                {
+                                    std::sort(det.labels.rbegin(), det.labels.rend());
                                     dets.push_back(std::move(det));
+                                }
                             }
                         }
                     }
