@@ -3677,17 +3677,14 @@ namespace dlib
                                 for (long k = 0; k < num_classes; ++k)
                                 {
                                     const float conf = out_data[tensor_index(output_tensor, n, a * num_feats + 5 + k, r, c)] * obj;
-                                    if (conf > det.detection_confidence)
-                                    {
-                                        det.detection_confidence = conf;
-                                        det.label = options.labels[k];
-                                    }
                                     if (conf > options.confidence_threshold)
                                         det.labels.emplace_back(conf, options.labels[k]);
                                 }
-                                if (det.detection_confidence > options.confidence_threshold)
+                                if (!det.labels.empty() && det.labels[0].first > options.confidence_threshold)
                                 {
                                     std::sort(det.labels.rbegin(), det.labels.rend());
+                                    det.detection_confidence = det.labels[0].first;
+                                    det.label = det.labels[0].second;
                                     dets.push_back(std::move(det));
                                 }
                             }
