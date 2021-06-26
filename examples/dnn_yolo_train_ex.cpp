@@ -1,3 +1,19 @@
+// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+/*
+    This is an example illustrating the use of the deep learning tools from the dlib C++
+    Library.  I'm assuming you have already read the dnn_introduction_ex.cpp, the
+    dnn_introduction2_ex.cpp and the dnn_introduction3_ex.cpp examples.  In this example
+    program we are going to show how one can train a YOLO detector.  In particular, we will train
+    the YOLOv3 model like the one introduced in this paper:
+    "YOLOv3: An Incremental Improvement" by Joseph Redmon and  Ali Farhadi.
+
+    This example program will work with any imglab dataset, such as:
+        - faces: http://dlib.net/files/data/dlib_face_detection_dataset-2016-09-30.tar.gz
+        - vehicles: http://dlib.net/files/data/dlib_rear_end_vehicles_v1.tar
+    Just uncompress the dataset and give the directory containing the training.xml and testing.xml
+    files as an argument to this program.
+*/
+
 #include <dlib/cmd_line_parser.h>
 #include <dlib/data_io.h>
 #include <dlib/dnn.h>
@@ -8,6 +24,9 @@
 using namespace std;
 using namespace dlib;
 
+// In the darknet namespace we define:
+// - the network architecture: DarkNet53 backbone and detection head for YOLO.
+// - a helper function to setup the detector: change the number of classes, etc.
 namespace darknet
 {
     // backbone tags
@@ -64,6 +83,12 @@ namespace darknet
                                                conblock<32, 3, 1,
                                                INPUT>>>>>>>>>>>>>;
 
+        // This is the layer that will be passed to the loss layer to get the detections from the network.
+        // The main thing to pay attention to when defining the YOLO output layer is that it should be
+        // a tag layer, followed by a sigmoid layer and a 1x1 convolution.  The tag layer should be unique
+        // in the whole network definition, as the loss layer will use it to get the outputs.  The number of
+        // filters in the convolutional layer should be (1 + 4 + num_classes) * num_anchors at that output.
+        // The 1 corresponds to the objectness in the loss layer and the 4 to the bounding box coordinates.
         template <long num_classes, long nf, template <typename> class YTAG, template <typename> class NTAG, typename SUBNET>
         using yolo = YTAG<sig<con<3 * (num_classes + 5), 1, 1, 1, 1,
                      conblock<nf, 3, 1,
@@ -105,11 +130,14 @@ namespace darknet
     }
 }
 
+// In this example, YOLO expects square images, and we choose to transform them by letterboxing them.
 rectangle_transform preprocess_image(const matrix<rgb_pixel>& image, matrix<rgb_pixel>& output, const long image_size)
 {
     return rectangle_transform(inv(letterbox_image(image, output, image_size)));
 }
 
+// YOLO outputs the bounding boxes in the coordinate system of the input (letterboxed) image, so we need to convert them
+// back to the original image.
 void postprocess_detections(const rectangle_transform& tform, std::vector<yolo_rect>& detections)
 {
     for (auto& d : detections)
@@ -176,12 +204,12 @@ try
         string_to_color(label.first);
     }
     // When computing the objectness loss in YOLO, predictions that do not have an IoU
-    // with any ground truth box of at least options.truth_match_iou_threshold, will be
+    // with any ground truth box of at least options.iou_ignore_threshold, will be
     // treated as not capable of detecting an object, an therefore incur loss.
-    // Predictions about this threshold will be ignored, i.e. will not affect the loss.
-    options.truth_match_iou_threshold = 0.7;
-    // These are the anchors computed on COCO dataset by the official DarkNet code
-    // using K-Means clustering.
+    // Predictions above this threshold will be ignored, i.e. will not contribute to the
+    // loss. Good values are 0.7 or 0.5.
+    options.iou_ignore_threshold = 0.7;
+    // These are the anchors computed on COCO dataset, presented in the YOLOv3 paper.
     options.add_anchors<darknet::ytag8>({{10, 13}, {16, 30}, {33, 23}});
     options.add_anchors<darknet::ytag16>({{30, 61}, {62, 45}, {59, 119}});
     options.add_anchors<darknet::ytag32>({{116, 90}, {156, 198}, {373, 326}});
@@ -195,6 +223,8 @@ try
     // In case we have several GPUs, we can tell the dnn_trainer to make use of them.
     std::vector<int> gpus(num_gpus);
     iota(gpus.begin(), gpus.end(), 0);
+    // We initialize the trainer here, as it will be used in several contexts, depending on the
+    // arguments passed the the program.
     dnn_trainer<darknet::yolov3_train_type> trainer(net, sgd(0.0005, 0.9), gpus);
     trainer.be_verbose();
     trainer.set_mini_batch_size(batch_size);
@@ -213,7 +243,6 @@ try
             return EXIT_FAILURE;
         }
         const double threshold = get_option(parser, "test", 0.01);
-        net.loss_details().adjust_threshold(threshold);
         image_window win;
         matrix<rgb_pixel> image, resized;
         for (const auto& im : dataset.images)
@@ -223,7 +252,7 @@ try
             win.set_title(im.filename);
             win.set_image(image);
             const auto tform = preprocess_image(image, resized, image_size);
-            auto detections = net(resized);
+            auto detections = net.process(resized, threshold);
             postprocess_detections(tform, detections);
             cout << "# detections: " << detections.size() << endl;
             for (const auto& det : detections)
@@ -236,6 +265,9 @@ try
         return EXIT_SUCCESS;
     }
 
+    // If the training has started and a synchronization file has already been saved to disk,
+    // we can re-run this program with the --map option to compute the mean average precision
+    // on the test set.
     if (parser.option("map"))
     {
         image_dataset_metadata::dataset dataset;
@@ -253,14 +285,13 @@ try
             hits[label] = std::vector<std::pair<double, bool>>();
             missing[label] = 0;
         }
-        net.loss_details().adjust_threshold(0.005);
         cout << "computing mean average precision for " << dataset.images.size() << " images..." << endl;
         for (size_t i = 0; i < dataset.images.size(); ++i)
         {
             const auto& im = dataset.images[i];
             load_image(image, data_directory + "/" + im.filename);
             const auto tform = preprocess_image(image, resized, image_size);
-            auto dets = net(resized);
+            auto dets = net.process(resized, 0.005);
             postprocess_detections(tform, dets);
             std::vector<bool> used(dets.size(), false);
             // true positives: truths matched by detections
@@ -307,7 +338,8 @@ try
 
     // Create some data loaders which will load the data, and perform som data augmentation.
     dlib::pipe<std::pair<matrix<rgb_pixel>, std::vector<yolo_rect>>> train_data(1000);
-    auto loader = [&dataset, &data_directory, &train_data, &image_size](time_t seed) {
+    const auto loader = [&dataset, &data_directory, &train_data, &image_size](time_t seed)
+    {
         dlib::rand rnd(time(nullptr) + seed);
         matrix<rgb_pixel> image, rotated;
         std::pair<matrix<rgb_pixel>, std::vector<yolo_rect>> temp;
@@ -327,6 +359,7 @@ try
             for (const auto& box : dataset.images[idx].boxes)
                 temp.second.emplace_back(box.rect, 1, box.label);
 
+            // We alternate between augmenting the full image and random cropping
             if (rnd.get_random_double() > 0.5)
             {
                 rectangle_transform tform = rotate_image(
@@ -376,6 +409,7 @@ try
             for (const auto& r : temp.second)
             {
                 auto color = string_to_color(r.label);
+                // make semi-transparent and cross-out the ignored boxes
                 if (r.ignore)
                 {
                     color.alpha = 128;

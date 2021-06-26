@@ -3447,58 +3447,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    struct yolo_rect
-    {
-        yolo_rect() = default;
-        yolo_rect(const drectangle& r) : rect(r) {}
-        yolo_rect(const drectangle& r, double score) : rect(r),detection_confidence(score) {}
-        yolo_rect(const drectangle& r, double score, const std::string& label) : rect(r),detection_confidence(score), label(label) {}
-        yolo_rect(const mmod_rect& r) : rect(r.rect), detection_confidence(r.detection_confidence), ignore(r.ignore), label(r.label) {}
-
-        drectangle rect;
-        double detection_confidence = 0;
-        bool ignore = false;
-        std::string label;
-        std::vector<std::pair<double, std::string>> labels;
-
-        operator rectangle() const { return rect; }
-        bool operator == (const yolo_rect& rhs) const
-        {
-            return rect == rhs.rect
-                   && detection_confidence == rhs.detection_confidence
-                   && ignore == rhs.ignore
-                   && label == rhs.label;
-        }
-        bool operator<(const yolo_rect& rhs) const
-        {
-            return detection_confidence < rhs.detection_confidence;
-        }
-    };
-
-    inline void serialize(const yolo_rect& item, std::ostream& out)
-    {
-        int version = 1;
-        serialize(version, out);
-        serialize(item.rect, out);
-        serialize(item.detection_confidence, out);
-        serialize(item.ignore, out);
-        serialize(item.label, out);
-        serialize(item.labels, out);
-    }
-
-    inline void deserialize(yolo_rect& item, std::istream& in)
-    {
-        int version = 0;
-        deserialize(version, in);
-        if (version != 1)
-            throw serialization_error("Unexpected version found while deserializing dlib::yolo_rect");
-        deserialize(item.rect, in);
-        deserialize(item.detection_confidence, in);
-        deserialize(item.ignore, in);
-        deserialize(item.label, in);
-        deserialize(item.labels, in);
-    }
-
     struct yolo_options
     {
     public:
@@ -3536,10 +3484,10 @@ namespace dlib
         }
 
         // map between the stride and the anchor boxes
-        std::unordered_map<int, std::vector<anchor_box_details>> anchors;
+        std::map<int, std::vector<anchor_box_details>> anchors;
         std::vector<std::string> labels;
         double confidence_threshold = 0.25;
-        double truth_match_iou_threshold = 0.7;
+        double iou_ignore_threshold = 0.7;
         bool classwise_nms = false;
         test_box_overlap overlaps_nms = test_box_overlap(0.45, 1.0);
         double lambda_obj = 1.0;
@@ -3555,7 +3503,7 @@ namespace dlib
         serialize(item.anchors, out);
         serialize(item.labels, out);
         serialize(item.confidence_threshold, out);
-        serialize(item.truth_match_iou_threshold, out);
+        serialize(item.iou_ignore_threshold, out);
         serialize(item.classwise_nms, out);
         serialize(item.overlaps_nms, out);
         serialize(item.lambda_obj, out);
@@ -3572,7 +3520,7 @@ namespace dlib
         deserialize(item.anchors, in);
         deserialize(item.labels, in);
         deserialize(item.confidence_threshold, in);
-        deserialize(item.truth_match_iou_threshold, in);
+        deserialize(item.iou_ignore_threshold, in);
         deserialize(item.classwise_nms, in);
         deserialize(item.overlaps_nms, in);
         deserialize(item.lambda_obj, in);
@@ -3580,9 +3528,25 @@ namespace dlib
         deserialize(item.lambda_cls, in);
     }
 
-    inline std::ostream& operator<<(std::ostream& out, const std::unordered_map<int, std::vector<yolo_options::anchor_box_details>>& anchors)
+    inline std::ostream& operator<<(std::ostream& out, const std::map<int, std::vector<yolo_options::anchor_box_details>>& anchors)
     {
-        out << "anchors: " << anchors.size();
+        // write anchor boxes grouped by tag id
+        size_t tag_count = 0;
+        for (const auto& i : anchors)
+        {
+            const auto& tag_id = i.first;
+            const auto& details = i.second;
+            if (tag_count++ > 0)
+                out << ";";
+            out << "tag" << tag_id << ":";
+            size_t anchor_count = 0;
+            for (size_t a = 0; a < details.size(); ++a)
+            {
+                out << details[a].width << "x" << details[a].height;
+                if (a + 1 < details.size())
+                    out << ",";
+            }
+        }
         return out;
     }
 
@@ -3608,11 +3572,12 @@ namespace dlib
                 const SUBNET& sub,
                 const long n,
                 const yolo_options& options,
+                const double adjust_threshold,
                 std::vector<yolo_rect>& dets
             )
             {
-                yolo_helper_impl<TAG_TYPE>::tensor_to_dets(input_tensor, sub, n, options, dets);
-                yolo_helper_impl<TAG_TYPES...>::tensor_to_dets(input_tensor, sub, n, options, dets);
+                yolo_helper_impl<TAG_TYPE>::tensor_to_dets(input_tensor, sub, n, options, adjust_threshold, dets);
+                yolo_helper_impl<TAG_TYPES...>::tensor_to_dets(input_tensor, sub, n, options, adjust_threshold, dets);
             }
 
             template <
@@ -3646,14 +3611,16 @@ namespace dlib
                 const SUBNET& sub,
                 const long n,
                 const yolo_options& options,
+                const double adjust_threshold,
                 std::vector<yolo_rect>& dets
             )
             {
                 DLIB_CASSERT(sub.sample_expansion_factor() == 1, sub.sample_expansion_factor());
+                const auto& anchors = options.anchors.at(tag_id<TAG_TYPE>::id);
                 const tensor& output_tensor = layer<TAG_TYPE>(sub).get_output();
+                DLIB_CASSERT(output_tensor.k() == anchors.size() * (options.labels.size() + 5));
                 const auto stride_x = static_cast<double>(input_tensor.nc()) / output_tensor.nc();
                 const auto stride_y = static_cast<double>(input_tensor.nr()) / output_tensor.nr();
-                const auto& anchors = options.anchors.at(tag_id<TAG_TYPE>::id);
                 const long num_feats = output_tensor.k() / anchors.size();
                 const long num_classes = num_feats - 5;
                 const float* const out_data = output_tensor.host();
@@ -3665,7 +3632,7 @@ namespace dlib
                         for (long c = 0; c < output_tensor.nc(); ++c)
                         {
                             const float obj = out_data[tensor_index(output_tensor, n, a * num_feats + 4, r, c)];
-                            if (obj > options.confidence_threshold)
+                            if (obj > adjust_threshold)
                             {
                                 const auto x = out_data[tensor_index(output_tensor, n, a * num_feats + 0, r, c)];
                                 const auto y = out_data[tensor_index(output_tensor, n, a * num_feats + 1, r, c)];
@@ -3677,10 +3644,10 @@ namespace dlib
                                 for (long k = 0; k < num_classes; ++k)
                                 {
                                     const float conf = out_data[tensor_index(output_tensor, n, a * num_feats + 5 + k, r, c)] * obj;
-                                    if (conf > options.confidence_threshold)
+                                    if (conf > adjust_threshold)
                                         det.labels.emplace_back(conf, options.labels[k]);
                                 }
-                                if (!det.labels.empty() && det.labels[0].first > options.confidence_threshold)
+                                if (!det.labels.empty() && det.labels[0].first > adjust_threshold)
                                 {
                                     std::sort(det.labels.rbegin(), det.labels.rend());
                                     det.detection_confidence = det.labels[0].first;
@@ -3708,13 +3675,16 @@ namespace dlib
             {
                 DLIB_CASSERT(sub.sample_expansion_factor() == 1, sub.sample_expansion_factor());
                 const tensor& output_tensor = layer<TAG_TYPE>(sub).get_output();
+                const auto& anchors = options.anchors.at(tag_id<TAG_TYPE>::id);
+                DLIB_CASSERT(output_tensor.k() == anchors.size() * (options.labels.size() + 5));
                 const auto stride_x = static_cast<double>(input_tensor.nc()) / output_tensor.nc();
                 const auto stride_y = static_cast<double>(input_tensor.nr()) / output_tensor.nr();
-                const auto& anchors = options.anchors.at(tag_id<TAG_TYPE>::id);
                 const long num_feats = output_tensor.k() / anchors.size();
                 const long num_classes = num_feats - 5;
                 const float* const out_data = output_tensor.host();
                 tensor& grad = layer<TAG_TYPE>(sub).get_gradient_input();
+                DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
+                DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
                 float* g = grad.host();
 
                 // Compute the objectness loss for all grid cells
@@ -3747,7 +3717,7 @@ namespace dlib
                             }
 
                             // Incur loss for the boxes that are below a certain IoU threshold with any truth box
-                            if (best_iou < options.truth_match_iou_threshold)
+                            if (best_iou < options.iou_ignore_threshold)
                                 g[o_idx] = out_data[o_idx];
                         }
                     }
@@ -3847,16 +3817,16 @@ namespace dlib
         void to_label (
             const tensor& input_tensor,
             const SUB_TYPE& sub,
-            label_iterator iter
+            label_iterator iter,
+            double adjust_threshold = 0.25
         ) const
         {
-            DLIB_CASSERT(sub.sample_expansion_factor() == 1, sub.sample_expansion_factor());
             std::vector<yolo_rect> dets_accum;
             std::vector<yolo_rect> final_dets;
             for (long i = 0; i < input_tensor.num_samples(); ++i)
             {
                 dets_accum.clear();
-                impl::yolo_helper_impl<TAG_TYPES...>::tensor_to_dets(input_tensor, sub, i, options, dets_accum);
+                impl::yolo_helper_impl<TAG_TYPES...>::tensor_to_dets(input_tensor, sub, i, options, adjust_threshold, dets_accum);
 
                 // Do non-max suppression
                 std::sort(dets_accum.rbegin(), dets_accum.rend());
@@ -3884,7 +3854,6 @@ namespace dlib
         ) const
         {
             DLIB_CASSERT(input_tensor.num_samples() != 0);
-            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
             double loss = 0;
             for (long i = 0; i < input_tensor.num_samples(); ++i)
             {
@@ -3894,7 +3863,6 @@ namespace dlib
             return loss / input_tensor.num_samples();
         }
 
-        void adjust_threshold(double conf_thresh) { options.confidence_threshold = conf_thresh; }
         void adjust_nms(double iou_thresh, double percent_covered_thresh = 1)
         {
             options.overlaps_nms = test_box_overlap(iou_thresh, percent_covered_thresh);
@@ -3923,12 +3891,32 @@ namespace dlib
             deserialize(item.options, in);
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const loss_yolo_& )
+        friend std::ostream& operator<<(std::ostream& out, const loss_yolo_& item)
         {
-            out << "loss_yolo\t (" << tag_count() << " output tags: ";
-            list_tags(out);
+            out << "loss_yolo\t (";
+            const auto& opts = item.options;
+            out << "num outputs:" << tag_count();
+            out << ", anchor boxes:(" << opts.anchors << ")";
+            out << ", labels:(";
+            for (size_t i = 0; i < opts.labels.size(); ++i)
+            {
+                out << opts.labels[i];
+                if (i + 1 < opts.labels.size())
+                    out << ",";
+            }
+            out << ")";
+            out << ", lambda_obj:" << opts.lambda_obj;
+            out << ", lambda_box:" << opts.lambda_box;
+            out << ", lambda_cls:" << opts.lambda_cls;
+            out << ", overlaps_nms:(" << opts.overlaps_nms.get_iou_thresh() << "," << opts.overlaps_nms.get_percent_covered_thresh() << ")";
+            out << ", classwise_nms:" << std::boolalpha << opts.classwise_nms;
             out << ")";
             return out;
+        }
+
+        friend void to_xml(const loss_yolo_& /*item*/, std::ostream& out)
+        {
+            out << "<loss_yolo/>";
         }
 
     private:

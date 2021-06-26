@@ -1854,6 +1854,168 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct yolo_options
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object contains all the parameters that control the behavior of loss_yolo_.
+        !*/
+    public:
+        struct anchor_box_details
+        {
+            anchor_box_details() = default;
+            anchor_box_details(unsigned long w, unsigned long h) : width(w), height(h) {}
+
+            unsigned long width = 0;
+            unsigned long height = 0;
+
+            friend inline void serialize(const anchor_box_details& item, std::ostream& out);
+            friend inline void deserialize(anchor_box_details& item, std::istream& in);
+        };
+
+        yolo_options() = default;
+
+        // This kind of object detector is a multi-scale object detector with bounding box regression
+        // for anchor boxes.  The anchors field determinase which anchors will be used at the output
+        // pointed by the tag layer whose id is the key of the map.
+        std::unordered_map<int, std::vector<anchor_box_details>> anchors;
+
+        template <template <typename> class TAG_TYPE>
+        void add_anchors(
+            const std::vector<anchor_box_details>& boxes
+        );
+        /*!
+            ensures
+                - acnhors.at(tag_id<TAG_TYPE>::id) == boxes
+        !*/
+
+        // This field contains the labels of all the possible object this detector can find.
+        std::vector<std::string> labels;
+        // When computing the objectness loss, any detection that has an IoU above iou_ignore_threshold
+        // will be ignored and not incur any loss
+        double iou_ignore_threshold = 0.7;
+        // Tell the non-max Supression whether to take classes into account
+        bool classwise_nms = false;
+        // When doing non-max suppression, we use overlaps_nms to decide if a box overlaps
+        // an already output detection and should therefore be thrown out.
+        test_box_overlap overlaps_nms = test_box_overlap(0.45, 1.0);
+        // These parameters control how we penalize different kinds of mistakes: notably the objectness loss,
+        // the box (bounding box regression) loss, and the class loss.
+        double lambda_obj = 1.0;
+        double lambda_box = 1.0;
+        double lambda_cls = 1.0;
+
+    };
+
+    void serialize(const yolo_options& item, std::ostream& out)
+    void deserialize(yolo_options& item, std::istream& in)
+
+// ----------------------------------------------------------------------------------------
+
+    template <template <typename> class... TAG_TYPES>
+    class loss_yolo_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object implements the loss layer interface defined above by
+                EXAMPLE_LOSS_LAYER_.  In particular, it implements the YOLO detection
+                loss defined in the paper:
+                    YOLOv3: An Incremental Improvement by Joseph Redmon and Ali Farhadi.
+
+                This means you use this loss if you want to detect the locations of objects
+                in images.
+
+                It should also be noted that this loss layer requires tag layers as template
+                parameters, which in turn require a subnetwork to be of type:
+                layer<TAG_TYPE>(net).subnet(): sig<con<(num_classes + 5) * num_anchors), SUBNET>>
+
+                Where num_classes is the number of categories that the detector is trained on,
+                and num_anchors is the number of priors or anchor boxes at the output pointed
+                by the tag layer. The number 5 corresponds to the objectness and the 4 coordinates
+                for performing bounding box regression.
+        !*/
+
+    public:
+
+        typedef std::vector<mmod_rect> training_label_type;
+        typedef std::vector<mmod_rect> output_label_type;
+
+        loss_mmod_(
+        );
+        /*!
+            ensures
+                - #get_options() == yolo_options()
+        !*/
+
+        loss_yolo_(
+            mmod_options options_
+        );
+        /*!
+            ensures
+                - #get_options() == options_
+        !*/
+
+        const yolo_options& get_options (
+        ) const;
+        /*!
+            ensures
+                - returns the options object that defines the general behavior of this loss layer.
+        !*/
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter,
+            double adjust_threshold = 0
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
+            it has the additional calling requirements that: 
+                - sub.get_output().k() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+            Also, the output labels are std::vectors of mmod_rects where, for each mmod_rect R,
+            we have the following interpretations:
+                - R.rect == the location of an object in the image.
+                - R.detection_confidence the score for the object, the bigger the score the
+                  more confident the detector is that an object is really there.  Only
+                  objects with a detection_confidence > adjust_threshold are output.  So if
+                  you want to output more objects (that are also of less confidence) you
+                  can call to_label() with a smaller value of adjust_threshold.
+                - R.ignore == false (this value is unused by to_label()).
+        !*/
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            const_label_iterator truth, 
+            SUBNET& sub
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient() 
+            except it has the additional calling requirements that: 
+                - sub.get_output().k() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+            Also, the loss value returned is roughly equal to the average number of
+            mistakes made per image.  This is the sum of false alarms and missed
+            detections, weighted by the loss weights for these types of mistakes specified
+            in the mmod_options.
+        !*/
+    };
+
+    template <typename SUBNET>
+    using loss_mmod = add_loss_layer<loss_mmod_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_LOSS_ABSTRACT_H_
