@@ -167,11 +167,13 @@ try
     cout << "# labels: " << labels.size() << endl;
 
     yolo_options options;
+    color_mapper string_to_color;
     for (const auto& label : labels)
     {
         cout <<  " - " << label.first << ": " << label.second;
         cout << " (" << (100.0*label.second)/num_objects << "%)\n";
         options.labels.push_back(label.first);
+        string_to_color(label.first);
     }
     // When computing the objectness loss in YOLO, predictions that do not have an IoU
     // with any ground truth box of at least options.truth_match_iou_threshold, will be
@@ -214,7 +216,6 @@ try
         net.loss_details().adjust_threshold(threshold);
         image_window win;
         matrix<rgb_pixel> image, resized;
-        color_mapper string_to_color;
         for (const auto& im : dataset.images)
         {
             win.clear_overlay();
@@ -247,6 +248,11 @@ try
         matrix<rgb_pixel> image, resized;
         std::map<std::string, std::vector<std::pair<double, bool>>> hits;
         std::map<std::string, unsigned long> missing;
+        for (const auto& label : options.labels)
+        {
+            hits[label] = std::vector<std::pair<double, bool>>();
+            missing[label] = 0;
+        }
         net.loss_details().adjust_threshold(0.005);
         cout << "computing mean average precision for " << dataset.images.size() << " images..." << endl;
         for (size_t i = 0; i < dataset.images.size(); ++i)
@@ -270,19 +276,19 @@ try
                     {
                         used[d] = true;
                         found_match = true;
-                        hits[dets[d].label].emplace_back(dets[d].detection_confidence, true);
+                        hits.at(dets[d].label).emplace_back(dets[d].detection_confidence, true);
                         break;
                     }
                 }
                 // false negatives: truths not matched
                 if (!found_match)
-                    missing[im.boxes[t].label]++;
+                    missing.at(im.boxes[t].label)++;
             }
             // false positives: detections not matched
             for (size_t d = 0; d < dets.size(); ++d)
             {
                 if (!used[d])
-                    hits[dets[d].label].emplace_back(dets[d].detection_confidence, false);
+                    hits.at(dets[d].label).emplace_back(dets[d].detection_confidence, false);
             }
             cout << "progress: " << i << '/' << dataset.images.size() << "\t\t\t\r" << flush;
         }
@@ -311,7 +317,7 @@ try
         cropper.set_max_object_size(0.9);
         cropper.set_min_object_size(10, 10);
         cropper.set_max_rotation_degrees(10);
-        cropper.set_translate_amount(0.1);
+        cropper.set_translate_amount(0.5);
         cropper.set_randomly_flip(true);
         cropper.set_background_crops_fraction(0);
         while (train_data.is_enabled())
@@ -361,7 +367,6 @@ try
     if (parser.option("visualize"))
     {
         image_window win;
-        color_mapper string_to_color;
         while (true)
         {
             std::pair<matrix<rgb_pixel>, std::vector<yolo_rect>> temp;
