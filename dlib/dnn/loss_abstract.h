@@ -1937,10 +1937,10 @@ namespace dlib
 
     public:
 
-        typedef std::vector<mmod_rect> training_label_type;
-        typedef std::vector<mmod_rect> output_label_type;
+        typedef std::vector<yolo_rect> training_label_type;
+        typedef std::vector<yolo_rect> output_label_type;
 
-        loss_mmod_(
+        loss_yolo_(
         );
         /*!
             ensures
@@ -1948,7 +1948,7 @@ namespace dlib
         !*/
 
         loss_yolo_(
-            mmod_options options_
+            yolo_options options_
         );
         /*!
             ensures
@@ -1970,7 +1970,7 @@ namespace dlib
             const tensor& input_tensor,
             const SUB_TYPE& sub,
             label_iterator iter,
-            double adjust_threshold = 0
+            double adjust_threshold = 0.25
         ) const;
         /*!
             This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
@@ -1978,14 +1978,19 @@ namespace dlib
                 - sub.get_output().k() == 1
                 - sub.get_output().num_samples() == input_tensor.num_samples()
                 - sub.sample_expansion_factor() == 1
-            Also, the output labels are std::vectors of mmod_rects where, for each mmod_rect R,
+            Also, the output labels are std::vectors of yolo_rects where, for each yolo_rect R,
             we have the following interpretations:
                 - R.rect == the location of an object in the image.
-                - R.detection_confidence the score for the object, the bigger the score the
-                  more confident the detector is that an object is really there.  Only
+                - R.detection_confidence == the score for the object, between 0 and 1.  Only
                   objects with a detection_confidence > adjust_threshold are output.  So if
                   you want to output more objects (that are also of less confidence) you
                   can call to_label() with a smaller value of adjust_threshold.
+                - R.label == the label of the detected object.
+                - R.labels == a std::vector<double, std::string> containing all the confidence values
+                  and labels that have a detection score > adjust_threshold, since this loss allows
+                  for multi-label outputs.  Note that the followin is true:
+                      - R.labels[0].first == R.detection_confidence
+                      - R.labels[0].second == R.label
                 - R.ignore == false (this value is unused by to_label()).
         !*/
 
@@ -2004,15 +2009,23 @@ namespace dlib
                 - sub.get_output().k() == 1
                 - sub.get_output().num_samples() == input_tensor.num_samples()
                 - sub.sample_expansion_factor() == 1
-            Also, the loss value returned is roughly equal to the average number of
-            mistakes made per image.  This is the sum of false alarms and missed
-            detections, weighted by the loss weights for these types of mistakes specified
-            in the mmod_options.
+            Also, the loss value returned corresponts to the L2 loss.
         !*/
+
+        void adjust_nms
+        (
+            double iou_thresh,
+            double percent_covered_thresh = 1
+        );
+        /*!
+            ensures
+                - #get_options().overlaps_nms == test_box_overlap(iou_thresh, percent_covered_thresh)
+        !*/
+
     };
 
     template <typename SUBNET>
-    using loss_mmod = add_loss_layer<loss_mmod_, SUBNET>;
+    using loss_yolo = add_loss_layer<loss_yolo_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

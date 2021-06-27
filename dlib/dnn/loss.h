@@ -3895,9 +3895,11 @@ namespace dlib
         {
             out << "loss_yolo\t (";
             const auto& opts = item.options;
-            out << "num outputs:" << tag_count();
+            out << tag_count() << " output" << (tag_count() > 1 ? "s" : "") << ":(";
+            list_tags(out);
+            out << ")";
             out << ", anchor boxes:(" << opts.anchors << ")";
-            out << ", labels:(";
+            out << ", " << opts.labels.size() << " label" << (opts.labels.size() > 1 ? "s" : "") << ":(";
             for (size_t i = 0; i < opts.labels.size(); ++i)
             {
                 out << opts.labels[i];

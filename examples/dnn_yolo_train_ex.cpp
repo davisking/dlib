@@ -344,7 +344,7 @@ try
         matrix<rgb_pixel> image, rotated;
         std::pair<matrix<rgb_pixel>, std::vector<yolo_rect>> temp;
         random_cropper cropper;
-        cropper.set_seed(time_t(nullptr) + seed);
+        cropper.set_seed(time(nullptr) + seed);
         cropper.set_chip_dims(image_size, image_size);
         cropper.set_max_object_size(0.9);
         cropper.set_min_object_size(10, 10);
