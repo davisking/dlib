@@ -205,12 +205,13 @@ try
         string_to_color(label.first);
     }
 
-    // If default anchor boxes don't fit well your data, you should recompute them.
+    // If the default anchor boxes don't fit well your data, you should recompute them.
     // Here's an simple way to do it using K-Means clustering.  Note that the approach
-    //  shown below is suboptimal, since it doesn't group the bounding boxes by size.
-    //  Grouping the bounding boxes by size and computing the K-Means on each group
-    //  would make more sense, since each stride of the network is meant to output a
-    //  boxes at a particular size.
+    // shown below is suboptimal, since it doesn't group the bounding boxes by size.
+    // Grouping the bounding boxes by size and computing the K-Means on each group
+    // would make more sense, since each stride of the network is meant to output a
+    // boxes at a particular size, but that is very specific to the network architecture
+    // and the dataset itself.
     if (parser.option("anchors"))
     {
         const auto num_clusers = std::stoul(parser.option("anchors").argument());
