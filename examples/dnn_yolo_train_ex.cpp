@@ -238,7 +238,7 @@ try
         for (const auto& c : anchors)
             cout << round(c(0)) << 'x' << round(c(1)) << endl;
         // And check the average IoU of the newly computed anchor boxes and the training samples.
-        double average_iou;
+        double average_iou = 0;
         for (const auto& s : samples)
         {
             drectangle sample = centered_drect(dpoint(0, 0), s(0), s(1));
