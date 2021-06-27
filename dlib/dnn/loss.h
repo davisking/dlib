@@ -3539,7 +3539,6 @@ namespace dlib
             if (tag_count++ > 0)
                 out << ";";
             out << "tag" << tag_id << ":";
-            size_t anchor_count = 0;
             for (size_t a = 0; a < details.size(); ++a)
             {
                 out << details[a].width << "x" << details[a].height;
@@ -3862,6 +3861,8 @@ namespace dlib
             }
             return loss / input_tensor.num_samples();
         }
+
+        const yolo_options& get_options() const { return options; }
 
         void adjust_nms(double iou_thresh, double percent_covered_thresh = 1)
         {
