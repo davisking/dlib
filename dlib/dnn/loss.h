@@ -3617,7 +3617,7 @@ namespace dlib
                 DLIB_CASSERT(sub.sample_expansion_factor() == 1, sub.sample_expansion_factor());
                 const auto& anchors = options.anchors.at(tag_id<TAG_TYPE>::id);
                 const tensor& output_tensor = layer<TAG_TYPE>(sub).get_output();
-                DLIB_CASSERT(output_tensor.k() == anchors.size() * (options.labels.size() + 5));
+                DLIB_CASSERT(static_cast<size_t>(output_tensor.k()) == anchors.size() * (options.labels.size() + 5));
                 const auto stride_x = static_cast<double>(input_tensor.nc()) / output_tensor.nc();
                 const auto stride_y = static_cast<double>(input_tensor.nr()) / output_tensor.nr();
                 const long num_feats = output_tensor.k() / anchors.size();
@@ -3675,7 +3675,7 @@ namespace dlib
                 DLIB_CASSERT(sub.sample_expansion_factor() == 1, sub.sample_expansion_factor());
                 const tensor& output_tensor = layer<TAG_TYPE>(sub).get_output();
                 const auto& anchors = options.anchors.at(tag_id<TAG_TYPE>::id);
-                DLIB_CASSERT(output_tensor.k() == anchors.size() * (options.labels.size() + 5));
+                DLIB_CASSERT(static_cast<size_t>(output_tensor.k()) == anchors.size() * (options.labels.size() + 5));
                 const auto stride_x = static_cast<double>(input_tensor.nc()) / output_tensor.nc();
                 const auto stride_y = static_cast<double>(input_tensor.nr()) / output_tensor.nr();
                 const long num_feats = output_tensor.k() / anchors.size();
