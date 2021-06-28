@@ -3908,6 +3908,7 @@ namespace dlib
                     out << ",";
             }
             out << ")";
+            out << ", iou_ignore_threshold: " << opts.iou_ignore_threshold;
             out << ", lambda_obj:" << opts.lambda_obj;
             out << ", lambda_box:" << opts.lambda_box;
             out << ", lambda_cls:" << opts.lambda_cls;
