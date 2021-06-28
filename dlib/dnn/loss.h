@@ -3486,7 +3486,6 @@ namespace dlib
         // map between the stride and the anchor boxes
         std::map<int, std::vector<anchor_box_details>> anchors;
         std::vector<std::string> labels;
-        double confidence_threshold = 0.25;
         double iou_ignore_threshold = 0.7;
         bool classwise_nms = false;
         test_box_overlap overlaps_nms = test_box_overlap(0.45, 1.0);
@@ -3502,7 +3501,6 @@ namespace dlib
         serialize(version, out);
         serialize(item.anchors, out);
         serialize(item.labels, out);
-        serialize(item.confidence_threshold, out);
         serialize(item.iou_ignore_threshold, out);
         serialize(item.classwise_nms, out);
         serialize(item.overlaps_nms, out);
@@ -3519,7 +3517,6 @@ namespace dlib
             throw serialization_error("Unexpected version found while deserializing dlib::yolo_options.");
         deserialize(item.anchors, in);
         deserialize(item.labels, in);
-        deserialize(item.confidence_threshold, in);
         deserialize(item.iou_ignore_threshold, in);
         deserialize(item.classwise_nms, in);
         deserialize(item.overlaps_nms, in);
