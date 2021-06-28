@@ -3558,7 +3558,7 @@ namespace dlib
 
             static void list_tags(std::ostream& out)
             {
-                out << tag_id<TAG_TYPE>::id << (tag_count() > 1 ? "," : "");
+                out << "tag" << tag_id<TAG_TYPE>::id << (tag_count() > 1 ? "," : "");
                 yolo_helper_impl<TAG_TYPES...>::list_tags(out);
             }
 
