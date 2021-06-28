@@ -3599,7 +3599,7 @@ namespace dlib
         {
             constexpr static size_t tag_count() { return 1; }
 
-            static void list_tags(std::ostream& out) { out << tag_id<TAG_TYPE>::id; }
+            static void list_tags(std::ostream& out) { out << "tag" << tag_id<TAG_TYPE>::id; }
 
             template <typename SUBNET>
             static void tensor_to_dets (
@@ -3893,11 +3893,11 @@ namespace dlib
         {
             out << "loss_yolo\t (";
             const auto& opts = item.options;
-            out << tag_count() << " output" << (tag_count() > 1 ? "s" : "") << ":(";
+            out << tag_count() << " output" << (tag_count() != 1 ? "s" : "") << ":(";
             list_tags(out);
             out << ")";
             out << ", anchor boxes:(" << opts.anchors << ")";
-            out << ", " << opts.labels.size() << " label" << (opts.labels.size() > 1 ? "s" : "") << ":(";
+            out << ", " << opts.labels.size() << " label" << (opts.labels.size() != 1 ? "s" : "") << ":(";
             for (size_t i = 0; i < opts.labels.size(); ++i)
             {
                 out << opts.labels[i];
