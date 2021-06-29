@@ -261,7 +261,7 @@ if (NOT TARGET dlib)
    toggle_preprocessor_switch(DLIB_USE_MKL_FFT)
 
 
-   set(source_files 
+   set(source_files
       base64/base64_kernel_1.cpp
       bigint/bigint_kernel_1.cpp
       bigint/bigint_kernel_2.cpp
@@ -270,7 +270,6 @@ if (NOT TARGET dlib)
       entropy_decoder/entropy_decoder_kernel_2.cpp
       entropy_encoder/entropy_encoder_kernel_1.cpp
       entropy_encoder/entropy_encoder_kernel_2.cpp
-      gui_widgets/fonts.cpp
       md5/md5_kernel_1.cpp
       tokenizer/tokenizer_kernel_1.cpp
       unicode/unicode.cpp
@@ -412,6 +411,7 @@ if (NOT TARGET dlib)
             gui_widgets/drawable.cpp
             gui_widgets/canvas_drawing.cpp
             gui_widgets/style.cpp
+            gui_widgets/fonts.cpp
             gui_widgets/base_widgets.cpp
             gui_core/gui_core_kernel_1.cpp
             gui_core/gui_core_kernel_2.cpp
