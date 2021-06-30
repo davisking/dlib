@@ -261,7 +261,7 @@ if (NOT TARGET dlib)
    toggle_preprocessor_switch(DLIB_USE_MKL_FFT)
 
 
-   set(source_files 
+   set(source_files
       base64/base64_kernel_1.cpp
       bigint/bigint_kernel_1.cpp
       bigint/bigint_kernel_2.cpp
@@ -270,7 +270,6 @@ if (NOT TARGET dlib)
       entropy_decoder/entropy_decoder_kernel_2.cpp
       entropy_encoder/entropy_encoder_kernel_1.cpp
       entropy_encoder/entropy_encoder_kernel_2.cpp
-      gui_widgets/fonts.cpp
       md5/md5_kernel_1.cpp
       tokenizer/tokenizer_kernel_1.cpp
       unicode/unicode.cpp
@@ -291,6 +290,7 @@ if (NOT TARGET dlib)
          dir_nav/dir_nav_kernel_1.cpp
          dir_nav/dir_nav_kernel_2.cpp
          dir_nav/dir_nav_extensions.cpp
+         gui_widgets/fonts.cpp
          linker/linker_kernel_1.cpp
          logger/extra_logger_headers.cpp
          logger/logger_kernel_1.cpp
