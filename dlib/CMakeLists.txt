@@ -290,6 +290,7 @@ if (NOT TARGET dlib)
          dir_nav/dir_nav_kernel_1.cpp
          dir_nav/dir_nav_kernel_2.cpp
          dir_nav/dir_nav_extensions.cpp
+         gui_widgets/fonts.cpp
          linker/linker_kernel_1.cpp
          logger/extra_logger_headers.cpp
          logger/logger_kernel_1.cpp
@@ -411,7 +412,6 @@ if (NOT TARGET dlib)
             gui_widgets/drawable.cpp
             gui_widgets/canvas_drawing.cpp
             gui_widgets/style.cpp
-            gui_widgets/fonts.cpp
             gui_widgets/base_widgets.cpp
             gui_core/gui_core_kernel_1.cpp
             gui_core/gui_core_kernel_2.cpp
