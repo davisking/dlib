@@ -3897,7 +3897,7 @@ namespace dlib
             out << tag_count() << " output" << (tag_count() != 1 ? "s" : "") << ":(";
             list_tags(out);
             out << ")";
-            out << ", anchor boxes:(" << opts.anchors << ")";
+            out << ", anchor_boxes:(" << opts.anchors << ")";
             out << ", " << opts.labels.size() << " label" << (opts.labels.size() != 1 ? "s" : "") << ":(";
             for (size_t i = 0; i < opts.labels.size(); ++i)
             {
