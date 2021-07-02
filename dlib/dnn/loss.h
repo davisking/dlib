@@ -3861,9 +3861,10 @@ namespace dlib
 
         const yolo_options& get_options() const { return options; }
 
-        void adjust_nms(double iou_thresh, double percent_covered_thresh = 1)
+        void adjust_nms(double iou_thresh, double percent_covered_thresh = 1, bool classwise = false)
         {
             options.overlaps_nms = test_box_overlap(iou_thresh, percent_covered_thresh);
+            options.classwise_nms = classwise;
         }
 
         friend void serialize(const loss_yolo_& item, std::ostream& out)

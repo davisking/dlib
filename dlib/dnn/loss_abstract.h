@@ -1876,7 +1876,7 @@ namespace dlib
         yolo_options() = default;
 
         // This kind of object detector is a multi-scale object detector with bounding box regression
-        // for anchor boxes.  The anchors field determinase which anchors will be used at the output
+        // for anchor boxes.  The anchors field determines which anchors will be used at the output
         // pointed by the tag layer whose id is the key of the map.
         std::unordered_map<int, std::vector<anchor_box_details>> anchors;
 
@@ -1886,19 +1886,19 @@ namespace dlib
         );
         /*!
             ensures
-                - acnhors.at(tag_id<TAG_TYPE>::id) == boxes
+                - anchors.at(tag_id<TAG_TYPE>::id) == boxes
         !*/
 
         // This field contains the labels of all the possible object this detector can find.
         std::vector<std::string> labels;
         // When computing the objectness loss, any detection that has an IoU above iou_ignore_threshold
-        // will be ignored and not incur any loss
+        // with a ground truth box will not incur any loss.
         double iou_ignore_threshold = 0.7;
-        // Tell the non-max Supression whether to take classes into account
-        bool classwise_nms = false;
         // When doing non-max suppression, we use overlaps_nms to decide if a box overlaps
         // an already output detection and should therefore be thrown out.
         test_box_overlap overlaps_nms = test_box_overlap(0.45, 1.0);
+        // Tell the non-max Suppression whether to take classes into account
+        bool classwise_nms = false;
         // These parameters control how we penalize different kinds of mistakes: notably the objectness loss,
         // the box (bounding box regression) loss, and the class loss.
         double lambda_obj = 1.0;
@@ -1931,7 +1931,7 @@ namespace dlib
 
                 Where num_classes is the number of categories that the detector is trained on,
                 and num_anchors is the number of priors or anchor boxes at the output pointed
-                by the tag layer. The number 5 corresponds to the objectness and the 4 coordinates
+                by the tag layer. The number 5 corresponds to the objectness plus the 4 coordinates
                 for performing bounding box regression.
         !*/
 
@@ -1974,8 +1974,8 @@ namespace dlib
         ) const;
         /*!
             This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
-            it has the additional calling requirements that: 
-                - sub.get_output().k() == 1
+            it has the additional calling requirements that:
+                - layer<TAG_TYPE>(sub).get_output().k() == options.anchors.at(tag_id<TAG_TYPE>::id).size() * (5 + options.labels.size());
                 - sub.get_output().num_samples() == input_tensor.num_samples()
                 - sub.sample_expansion_factor() == 1
             Also, the output labels are std::vectors of yolo_rects where, for each yolo_rect R,
@@ -1988,7 +1988,7 @@ namespace dlib
                 - R.label == the label of the detected object.
                 - R.labels == a std::vector<double, std::string> containing all the confidence values
                   and labels that have a detection score > adjust_threshold, since this loss allows
-                  for multi-label outputs.  Note that the followin is true:
+                  for multi-label outputs.  Note that the following is true:
                       - R.labels[0].first == R.detection_confidence
                       - R.labels[0].second == R.label
                 - R.ignore == false (this value is unused by to_label()).
@@ -2006,20 +2006,22 @@ namespace dlib
         /*!
             This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient() 
             except it has the additional calling requirements that: 
-                - sub.get_output().k() == 1
+                - layer<TAG_TYPE>(sub).get_output().k() == options.anchors.at(tag_id<TAG_TYPE>::id).size() * (5 + options.labels.size());
                 - sub.get_output().num_samples() == input_tensor.num_samples()
                 - sub.sample_expansion_factor() == 1
-            Also, the loss value returned corresponts to the L2 loss.
+            Also, the loss value returned corresponds to the L2 loss.
         !*/
 
         void adjust_nms
         (
             double iou_thresh,
-            double percent_covered_thresh = 1
+            double percent_covered_thresh = 1,
+            bool classwise = false
         );
         /*!
             ensures
                 - #get_options().overlaps_nms == test_box_overlap(iou_thresh, percent_covered_thresh)
+                - #get_options().classwise_nms == classwise
         !*/
 
     };
