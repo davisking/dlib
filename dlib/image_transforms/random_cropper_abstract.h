@@ -199,6 +199,24 @@ namespace dlib
                 - #get_max_object_size() == value
         !*/
 
+        double get_min_object_coverage (
+        ) const;
+        /*!
+            ensures
+                - When a chip is extracted, any object whose area covered is smaller than
+                  get_min_object_coverage() will have its ignore field set to true.
+        !*/
+
+        void set_min_object_coverage (
+            double value
+        );
+        /*!
+            requires
+                - 0 < value <= 1
+            ensures
+                - #get_min_object_coverage() == value
+        !*/
+
         template <
             typename array_type,
             typename rectangle_type

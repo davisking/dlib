@@ -23,6 +23,7 @@ namespace dlib
         double max_object_size = 0.7; // cropped object will be at most this fraction of the size of the image.
         double background_crops_fraction = 0.5;
         double translate_amount = 0.10;
+        double min_object_coverage = 1.0;
 
         std::mutex rnd_mutex;
         dlib::rand rnd;
@@ -102,6 +103,16 @@ namespace dlib
         { 
             DLIB_CASSERT(0 < value);
             max_object_size = value; 
+        }
+
+        double get_min_object_coverage (
+        ) const { return min_object_coverage; }
+        void set_min_object_coverage (
+            double value
+        )
+        {
+            DLIB_CASSERT(0 < value && value <= 1);
+            min_object_coverage = value;
         }
 
         template <
@@ -207,12 +218,14 @@ namespace dlib
                 // map to crop
                 rect.rect = tform(rect.rect);
 
+                const double intersection = get_rect(crop).intersect(rect.rect).area();
+
                 // if the rect is at least partly in the crop
-                if (get_rect(crop).intersect(rect.rect).area() != 0)
+                if (intersection != 0)
                 {
                     // set to ignore if not totally in the crop or if too small.
-                    if (!get_rect(crop).contains(rect.rect) || 
-                        ((long)rect.rect.height() < min_object_length_long_dim  && (long)rect.rect.width() < min_object_length_long_dim) || 
+                    if (intersection / rect.rect.area() < min_object_coverage ||
+                        ((long)rect.rect.height() < min_object_length_long_dim  && (long)rect.rect.width() < min_object_length_long_dim) ||
                         ((long)rect.rect.height() < min_object_length_short_dim || (long)rect.rect.width() < min_object_length_short_dim))
                     {
                         rect.ignore = true;

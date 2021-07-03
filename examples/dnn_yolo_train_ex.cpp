@@ -403,6 +403,7 @@ try
         cropper.set_translate_amount(0.5);
         cropper.set_randomly_flip(true);
         cropper.set_background_crops_fraction(0);
+        cropper.set_min_object_coverage(0.8);
         while (train_data.is_enabled())
         {
             const auto idx = rnd.get_random_32bit_number() % dataset.images.size();
