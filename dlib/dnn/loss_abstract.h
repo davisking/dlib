@@ -1906,7 +1906,7 @@ namespace dlib
         // an already output detection and should therefore be thrown out.
         test_box_overlap overlaps_nms = test_box_overlap(0.45, 1.0);
         // Tell the non-max Suppression whether to take classes into account
-        bool classwise_nms = false;
+        bool classwise_nms = true;
         // These parameters control how we penalize different kinds of mistakes: notably the objectness loss,
         // the box (bounding box regression) loss, and the classification loss.
         double lambda_obj = 1.0;
@@ -2024,7 +2024,7 @@ namespace dlib
         (
             double iou_thresh,
             double percent_covered_thresh = 1,
-            bool classwise = false
+            bool classwise = true
         );
         /*!
             ensures

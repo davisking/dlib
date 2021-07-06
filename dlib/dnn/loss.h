@@ -3489,7 +3489,7 @@ namespace dlib
         double iou_ignore_threshold = 0.7;
         double iou_anchor_threshold = 1.0;
         test_box_overlap overlaps_nms = test_box_overlap(0.45, 1.0);
-        bool classwise_nms = false;
+        bool classwise_nms = true;
         double lambda_obj = 1.0;
         double lambda_box = 1.0;
         double lambda_cls = 1.0;
@@ -3879,7 +3879,7 @@ namespace dlib
 
         const yolo_options& get_options() const { return options; }
 
-        void adjust_nms(double iou_thresh, double percent_covered_thresh = 1, bool classwise = false)
+        void adjust_nms(double iou_thresh, double percent_covered_thresh = 1, bool classwise = true)
         {
             options.overlaps_nms = test_box_overlap(iou_thresh, percent_covered_thresh);
             options.classwise_nms = classwise;
