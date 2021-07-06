@@ -3487,8 +3487,9 @@ namespace dlib
         std::map<int, std::vector<anchor_box_details>> anchors;
         std::vector<std::string> labels;
         double iou_ignore_threshold = 0.7;
-        bool classwise_nms = false;
+        double iou_anchor_threshold = 1.0;
         test_box_overlap overlaps_nms = test_box_overlap(0.45, 1.0);
+        bool classwise_nms = false;
         double lambda_obj = 1.0;
         double lambda_box = 1.0;
         double lambda_cls = 1.0;
@@ -3502,6 +3503,7 @@ namespace dlib
         serialize(item.anchors, out);
         serialize(item.labels, out);
         serialize(item.iou_ignore_threshold, out);
+        serialize(item.iou_anchor_threshold, out);
         serialize(item.classwise_nms, out);
         serialize(item.overlaps_nms, out);
         serialize(item.lambda_obj, out);
@@ -3518,6 +3520,7 @@ namespace dlib
         deserialize(item.anchors, in);
         deserialize(item.labels, in);
         deserialize(item.iou_ignore_threshold, in);
+        deserialize(item.iou_anchor_threshold, in);
         deserialize(item.classwise_nms, in);
         deserialize(item.overlaps_nms, in);
         deserialize(item.lambda_obj, in);
@@ -3745,46 +3748,70 @@ namespace dlib
                         }
                     }
 
-                    // Skip if the best anchor is not from the current stride
-                    if (best_tag_id != tag_id<TAG_TYPE>::id)
-                        continue;
-
-                    const long c = t_center.x() / stride_x;
-                    const long r = t_center.y() / stride_y;
-                    const auto x_idx = tensor_index(output_tensor, n, best_a * num_feats + 0, r, c);
-                    const auto y_idx = tensor_index(output_tensor, n, best_a * num_feats + 1, r, c);
-                    const auto w_idx = tensor_index(output_tensor, n, best_a * num_feats + 2, r, c);
-                    const auto h_idx = tensor_index(output_tensor, n, best_a * num_feats + 3, r, c);
-                    const auto o_idx = tensor_index(output_tensor, n, best_a * num_feats + 4, r, c);
-
-                    // This grid cell should detect an object
-                    g[o_idx] = options.lambda_obj * (out_data[o_idx] - 1);
-
-                    // Get the truth box target values
-                    const double tx = t_center.x() / stride_x - c;
-                    const double ty = t_center.y() / stride_y - r;
-                    const double tw = truth_box.rect.width() / (anchors[best_a].width + truth_box.rect.width());
-                    const double th = truth_box.rect.height() / (anchors[best_a].height + truth_box.rect.height());
-
-                    // Scale regression error according to the truth size
-                    const double scale_box = 2 - truth_box.rect.area() / (input_tensor.nr() * input_tensor.nc());
-
-                    // Compute the gradient for the box coordinates
-                    g[x_idx] = options.lambda_box * scale_box * (out_data[x_idx] - tx);
-                    g[y_idx] = options.lambda_box * scale_box * (out_data[y_idx] - ty);
-                    g[w_idx] = options.lambda_box * scale_box * (out_data[w_idx] - tw);
-                    g[h_idx] = options.lambda_box * scale_box * (out_data[h_idx] - th);
-
-                    // Compute the classification error
-                    for (long k = 0; k < num_classes; ++k)
+                    // Helper function to compute objectness, bounding box regression and classification gradients
+                    const auto compute_grads = [&] (const size_t anchor_idx)
                     {
-                        const auto c_idx = tensor_index(output_tensor, n, best_a * num_feats + 5 + k, r, c);
-                        if (truth_box.label == options.labels[k])
-                            g[c_idx] = options.lambda_cls * (out_data[c_idx] - 1);
-                        else
-                            g[c_idx] = options.lambda_cls * out_data[c_idx];
+                        const long c = t_center.x() / stride_x;
+                        const long r = t_center.y() / stride_y;
+                        const auto x_idx = tensor_index(output_tensor, n, anchor_idx * num_feats + 0, r, c);
+                        const auto y_idx = tensor_index(output_tensor, n, anchor_idx * num_feats + 1, r, c);
+                        const auto w_idx = tensor_index(output_tensor, n, anchor_idx * num_feats + 2, r, c);
+                        const auto h_idx = tensor_index(output_tensor, n, anchor_idx * num_feats + 3, r, c);
+                        const auto o_idx = tensor_index(output_tensor, n, anchor_idx * num_feats + 4, r, c);
+
+                        // This grid cell should detect an object
+                        g[o_idx] = options.lambda_obj * (out_data[o_idx] - 1);
+
+                        // Get the truth box target values
+                        const double tx = t_center.x() / stride_x - c;
+                        const double ty = t_center.y() / stride_y - r;
+                        const double tw = truth_box.rect.width() / (anchors[anchor_idx].width + truth_box.rect.width());
+                        const double th = truth_box.rect.height() / (anchors[anchor_idx].height + truth_box.rect.height());
+
+                        // Scale regression error according to the truth size
+                        const double scale_box = 2 - truth_box.rect.area() / (input_tensor.nr() * input_tensor.nc());
+
+                        // Compute the gradient for the box coordinates
+                        g[x_idx] = options.lambda_box * scale_box * (out_data[x_idx] - tx);
+                        g[y_idx] = options.lambda_box * scale_box * (out_data[y_idx] - ty);
+                        g[w_idx] = options.lambda_box * scale_box * (out_data[w_idx] - tw);
+                        g[h_idx] = options.lambda_box * scale_box * (out_data[h_idx] - th);
+
+                        // Compute the classification error
+                        for (long k = 0; k < num_classes; ++k)
+                        {
+                            const auto c_idx = tensor_index(output_tensor, n, anchor_idx * num_feats + 5 + k, r, c);
+                            if (truth_box.label == options.labels[k])
+                                g[c_idx] = options.lambda_cls * (out_data[c_idx] - 1);
+                            else
+                                g[c_idx] = options.lambda_cls * out_data[c_idx];
+                        }
+                    };
+
+                    // Update the best anchor if it's from the current stride
+                    if (best_tag_id == tag_id<TAG_TYPE>::id)
+                    {
+                        compute_grads(best_a);
+                    }
+
+                    // Update other anchors according to IoU threshold option
+                    if (options.iou_anchor_threshold < 1.0)
+                    {
+                        for (size_t a = 0; a < anchors.size(); ++a)
+                        {
+                            // Skip if we already updated this anchor
+                            if (best_tag_id == tag_id<TAG_TYPE>::id && a == best_a)
+                                continue;
+
+                            const yolo_rect anchor(centered_drect(t_center, anchors[a].width, anchors[a].height));
+                            const double iou = box_intersection_over_union(truth_box.rect, anchor.rect);
+                            if (iou > options.iou_anchor_threshold)
+                                compute_grads(a);
+                        }
                     }
                 }
+
+                // Compute the L2 loss
                 loss += length_squared(rowm(mat(grad), n));
             }
         };
@@ -3907,6 +3934,7 @@ namespace dlib
             }
             out << ")";
             out << ", iou_ignore_threshold: " << opts.iou_ignore_threshold;
+            out << ", iou_anchor_threshold: " << opts.iou_anchor_threshold;
             out << ", lambda_obj:" << opts.lambda_obj;
             out << ", lambda_box:" << opts.lambda_box;
             out << ", lambda_cls:" << opts.lambda_cls;

@@ -260,6 +260,9 @@ try
     // Predictions above this threshold will be ignored, i.e. will not contribute to the
     // loss. Good values are 0.7 or 0.5.
     options.iou_ignore_threshold = 0.7;
+    // By setting this to a value < 1, we are telling the model to update all the predictions
+    // as long as the anchor box has an IoU > 0.2 with a ground truth.
+    options.iou_anchor_threshold = 0.2;
     // These are the anchors computed on COCO dataset, presented in the YOLOv3 paper.
     options.add_anchors<darknet::ytag8>({{10, 13}, {16, 30}, {33, 23}});
     options.add_anchors<darknet::ytag16>({{30, 61}, {62, 45}, {59, 119}});
