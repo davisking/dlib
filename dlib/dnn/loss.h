@@ -3753,6 +3753,16 @@ namespace dlib
                         // Update best anchor if it's from the current stride, and optionally other anchors
                         if ((best_tag_id == tag_id<TAG_TYPE>::id && best_a == a) || options.iou_anchor_threshold < 1)
                         {
+
+                            // do not update other anchors if they have low IoU
+                            if (!(best_tag_id == tag_id<TAG_TYPE>::id && best_a == a))
+                            {
+                                const yolo_rect anchor(centered_drect(t_center, anchors[a].width, anchors[a].height));
+                                const double iou = box_intersection_over_union(truth_box.rect, anchor.rect);
+                                if (iou < options.iou_anchor_threshold)
+                                    continue;
+                            }
+
                             const long c = t_center.x() / stride_x;
                             const long r = t_center.y() / stride_y;
                             const auto x_idx = tensor_index(output_tensor, n, a * num_feats + 0, r, c);
