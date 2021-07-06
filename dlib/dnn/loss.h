@@ -3751,7 +3751,7 @@ namespace dlib
                     for (size_t a = 0; a < anchors.size(); ++a)
                     {
                         // Update best anchor if it's from the current stride, and optionally other anchors
-                        if ((best_tag_id == tag_id<TAG_TYPE>::id && best_a = a) || options.iou_anchor_threshold < 1)
+                        if ((best_tag_id == tag_id<TAG_TYPE>::id && best_a == a) || options.iou_anchor_threshold < 1)
                         {
                             const long c = t_center.x() / stride_x;
                             const long r = t_center.y() / stride_y;
