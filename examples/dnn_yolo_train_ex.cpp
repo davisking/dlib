@@ -158,7 +158,7 @@ try
     parser.add_option("test", "test the detector with a threshold (default: 0.01)", 1);
     parser.add_option("visualize", "visualize data augmentation instead of training");
     parser.add_option("map", "compute the mean average precision");
-    parser.add_option("anchors", "compute <arg1> anchor boxes using K-Means", 1);
+    parser.add_option("anchors", "Do nothing but compute <arg1> anchor boxes using K-Means and print their shapes.", 1);
     parser.set_group_name("Help Options");
     parser.add_option("h", "alias of --help");
     parser.add_option("help", "display this message and exit");
@@ -205,47 +205,45 @@ try
         string_to_color(label.first);
     }
 
-    // If the default anchor boxes don't fit well your data, you should recompute them.
+    // If the default anchor boxes don't fit your data well you should recompute them.
     // Here's an simple way to do it using K-Means clustering.  Note that the approach
     // shown below is suboptimal, since it doesn't group the bounding boxes by size.
     // Grouping the bounding boxes by size and computing the K-Means on each group
-    // would make more sense, since each stride of the network is meant to output a
+    // would make more sense, since each stride of the network is meant to output
     // boxes at a particular size, but that is very specific to the network architecture
     // and the dataset itself.
     if (parser.option("anchors"))
     {
         const auto num_clusers = std::stoul(parser.option("anchors").argument());
-        std::vector<matrix<double, 2, 1>> samples;
+        std::vector<dpoint> samples;
         // First we need to rescale the bounding boxes to match the image size at training time.
         for (const auto& image_info : dataset.images)
         {
             const auto scale = image_size / std::max<double>(image_info.width, image_info.height);
             for (const auto& box : image_info.boxes)
             {
-                matrix<double, 2, 1> sample;
-                sample(0) = box.rect.width() * scale;
-                sample(1) = box.rect.height() * scale;
-                samples.push_back(move(sample));
+                dpoint sample(box.rect.width(), box.rect.height());
+                samples.push_back(sample*scale);
             }
         }
         // Now we can compute K-Means clustering
         randomize_samples(samples);
         cout << "Computing anchors for " << samples.size() << " samples" << endl;
-        std::vector<matrix<double, 2, 1>> anchors;
+        std::vector<dpoint> anchors;
         pick_initial_centers(num_clusers, anchors, samples);
         find_clusters_using_kmeans(samples, anchors);
-        std::sort(anchors.begin(), anchors.end(), [](const auto& a, const auto& b){ return a(0)*a(1) < b(0)*b(1); });
-        for (const auto& c : anchors)
+        std::sort(anchors.begin(), anchors.end(), [](const dpoint& a, const dpoint& b){ return prod(a) < prod(b); });
+        for (const dpoint& c : anchors)
             cout << round(c(0)) << 'x' << round(c(1)) << endl;
         // And check the average IoU of the newly computed anchor boxes and the training samples.
         double average_iou = 0;
-        for (const auto& s : samples)
+        for (const dpoint& s : samples)
         {
-            drectangle sample = centered_drect(dpoint(0, 0), s(0), s(1));
+            drectangle sample = centered_drect(dpoint(0, 0), s.x(), s.y());
             double best_iou = 0;
-            for (const auto& a : anchors)
+            for (const dpoint& a : anchors)
             {
-                drectangle anchor = centered_drect(dpoint(0, 0), a(0), a(1));
+                drectangle anchor = centered_drect(dpoint(0, 0), a.x(), a.y());
                 best_iou = std::max(best_iou, box_intersection_over_union(sample, anchor));
             }
             average_iou += best_iou;
