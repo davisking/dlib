@@ -361,6 +361,32 @@ void rotate_dataset(const command_line_parser& parser)
 
 // ----------------------------------------------------------------------------------------
 
+void add_width_and_height_metadata(const command_line_parser& parser)
+{
+    for (unsigned long i = 0; i < parser.number_of_arguments(); ++i) {
+        image_dataset_metadata::dataset metadata;
+        const string datasource = parser[i];
+        load_image_dataset_metadata(metadata,datasource);
+
+        // Set the current directory to be the one that contains the
+        // metadata file. We do this because the file might contain
+        // file paths which are relative to this folder.
+        set_current_dir(get_parent_directory(file(datasource)));
+
+        parallel_for(0, metadata.images.size(), [&](long i) 
+        {
+            array2d<rgb_pixel> img;
+            load_image(img, metadata.images[i].filename);
+            metadata.images[i].width = img.nc();
+            metadata.images[i].height = img.nr();
+        });
+
+        save_image_dataset_metadata(metadata, datasource);
+    }
+}
+
+// ----------------------------------------------------------------------------------------
+
 int resample_dataset(const command_line_parser& parser)
 {
     if (parser.number_of_arguments() != 1)
@@ -592,6 +618,8 @@ int main(int argc, char** argv)
                                         "The parts are instead simply mirrored to the flipped dataset.", 1);
         parser.add_option("rotate", "Read an XML image dataset and output a copy that is rotated counter clockwise by <arg> degrees. "
                                   "The output is saved to an XML file prefixed with rotated_<arg>.",1);
+        parser.add_option("add-width-height-metadata", "Open the given xml files and set the width and height image metadata fields "
+                            "for every image. This involves loading each image to find these values.");
         parser.add_option("cluster", "Cluster all the objects in an XML file into <arg> different clusters (pass 0 to find automatically) and save "
                                      "the results as cluster_###.xml and cluster_###.jpg files.",1);
         parser.add_option("ignore", "Mark boxes labeled as <arg> as ignored.  The resulting XML file is output as a separate file and the original is not modified.",1);
@@ -616,7 +644,7 @@ int main(int argc, char** argv)
         const char* singles[] = {"h","c","r","l","files","convert","parts","rmdiff", "rmtrunc", "rmdupes", "seed", "shuffle", "split", "add", 
                                  "flip-basic", "flip", "rotate", "tile", "size", "cluster", "resample", "min-object-size", "rmempty",
                                  "crop-size", "cropped-object-size", "rmlabel", "rm-other-labels", "rm-if-overlaps", "sort-num-objects", 
-                                 "one-object-per-image", "jpg", "rmignore", "sort", "split-train-test", "box-images"};
+                                 "one-object-per-image", "jpg", "rmignore", "sort", "split-train-test", "box-images", "add-width-height-metadata"};
         parser.check_one_time_options(singles);
         const char* c_sub_ops[] = {"r", "convert"};
         parser.check_sub_options("c", c_sub_ops);
@@ -641,6 +669,7 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("c", "flip-basic");
         parser.check_incompatible_options("flip", "flip-basic");
         parser.check_incompatible_options("c", "rotate");
+        parser.check_incompatible_options("c", "add-width-height-metadata");
         parser.check_incompatible_options("c", "rename");
         parser.check_incompatible_options("c", "ignore");
         parser.check_incompatible_options("c", "parts");
@@ -654,6 +683,7 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("l", "flip");
         parser.check_incompatible_options("l", "flip-basic");
         parser.check_incompatible_options("l", "rotate");
+        parser.check_incompatible_options("l", "add-width-height-metadata");
         parser.check_incompatible_options("files", "rename");
         parser.check_incompatible_options("files", "ignore");
         parser.check_incompatible_options("files", "add");
@@ -661,22 +691,27 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("files", "flip");
         parser.check_incompatible_options("files", "flip-basic");
         parser.check_incompatible_options("files", "rotate");
+        parser.check_incompatible_options("files", "add-width-height-metadata");
         parser.check_incompatible_options("add", "flip");
         parser.check_incompatible_options("add", "flip-basic");
         parser.check_incompatible_options("add", "rotate");
+        parser.check_incompatible_options("add", "add-width-height-metadata");
         parser.check_incompatible_options("add", "tile");
         parser.check_incompatible_options("flip", "tile");
         parser.check_incompatible_options("flip-basic", "tile");
         parser.check_incompatible_options("rotate", "tile");
+        parser.check_incompatible_options("add-width-height-metadata", "tile");
         parser.check_incompatible_options("cluster", "tile");
         parser.check_incompatible_options("resample", "tile");
         parser.check_incompatible_options("flip", "cluster");
         parser.check_incompatible_options("flip-basic", "cluster");
         parser.check_incompatible_options("rotate", "cluster");
+        parser.check_incompatible_options("add-width-height-metadata", "cluster");
         parser.check_incompatible_options("add", "cluster");
         parser.check_incompatible_options("flip", "resample");
         parser.check_incompatible_options("flip-basic", "resample");
         parser.check_incompatible_options("rotate", "resample");
+        parser.check_incompatible_options("add-width-height-metadata", "resample");
         parser.check_incompatible_options("add", "resample");
         parser.check_incompatible_options("shuffle", "tile");
         parser.check_incompatible_options("sort-num-objects", "tile");
@@ -739,6 +774,12 @@ int main(int argc, char** argv)
         if (parser.option("rotate"))
         {
             rotate_dataset(parser);
+            return EXIT_SUCCESS;
+        }
+
+        if (parser.option("add-width-height-metadata"))
+        {
+            add_width_and_height_metadata(parser);
             return EXIT_SUCCESS;
         }
 
