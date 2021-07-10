@@ -21,7 +21,7 @@
 #include <dlib/dir_nav.h>
 
 
-const char* VERSION = "1.17";
+const char* VERSION = "1.18";
 
 
 
@@ -332,6 +332,8 @@ void rotate_dataset(const command_line_parser& parser)
 
         load_image(img, metadata.images[i].filename);
         const point_transform_affine tran = rotate_image(img, temp, angle*pi/180);
+        metadata.images[i].width = temp.nc();
+        metadata.images[i].height = temp.nr();
         if (parser.option("jpg"))
         {
             filename = to_jpg_name(filename);
@@ -447,6 +449,8 @@ int resample_dataset(const command_line_parser& parser)
             std::ostringstream sout;
             sout << hex << murmur_hash3_128bit(&chip[0][0], chip.size()*sizeof(chip[0][0])).second;
             dimg.filename = data.images[i].filename + "_RESAMPLED_"+sout.str()+".png";
+            dimg.width = chip.nc();
+            dimg.height = chip.nr();
 
             if (parser.option("jpg"))
             {
