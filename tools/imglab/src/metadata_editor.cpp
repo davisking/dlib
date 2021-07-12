@@ -224,7 +224,12 @@ void propagate_boxes(
 
     array2d<rgb_pixel> img1, img2;
     dlib::load_image(img1, data.images[prev].filename);
+    data.images[prev].width = img1.nc();
+    data.images[prev].height = img1.nr();
+
     dlib::load_image(img2, data.images[next].filename);
+    data.images[next].width = img2.nc();
+    data.images[next].height = img2.nr();
     for (unsigned long i = 0; i < data.images[prev].boxes.size(); ++i)
     {
         correlation_tracker tracker;
@@ -513,6 +518,8 @@ load_image(
     try
     {
         dlib::load_image(img, metadata.images[idx].filename);
+        metadata.images[idx].width = img.nc();
+        metadata.images[idx].height = img.nr();
         set_title(metadata.name + " #"+cast_to_string(idx)+": " +metadata.images[idx].filename);
     }
     catch (exception& e)
@@ -543,6 +550,8 @@ load_image_and_set_size(
     try
     {
         dlib::load_image(img, metadata.images[idx].filename);
+        metadata.images[idx].width = img.nc();
+        metadata.images[idx].height = img.nr();
         set_title(metadata.name + " #"+cast_to_string(idx)+": " +metadata.images[idx].filename);
     }
     catch (exception& e)
