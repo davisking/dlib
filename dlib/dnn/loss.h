@@ -3646,7 +3646,7 @@ namespace dlib
                                     if (conf > adjust_threshold)
                                         det.labels.emplace_back(conf, options.labels[k]);
                                 }
-                                if (!det.labels.empty() && det.labels[0].first > adjust_threshold)
+                                if (!det.labels.empty())
                                 {
                                     std::sort(det.labels.rbegin(), det.labels.rend());
                                     det.detection_confidence = det.labels[0].first;
