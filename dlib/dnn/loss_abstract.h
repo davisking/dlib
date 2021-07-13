@@ -1895,12 +1895,12 @@ namespace dlib
         // iou_ignore_threshold with a ground truth box will not incur any loss.
         double iou_ignore_threshold = 0.7;
         // When computing the YOLO loss (objectness + bounding box regression + classification),
-        // only the best match between a truth and an anchor are used.  Setting iou_anchor_threshold
-        // to 1 will make the model use only the best anchor for each ground truth, so
-        // other anchors can be used for other ground truths in the same cell (useful for
-        // detecting objects in crowds).  However, if the other anchors have an IoU with a
-        // truth above iou_anchor_threshold, they will also be updated.  This will match
-        // all anchors whose iou with a ground truth is above iou_anchor_threshold.
+        // the best match between a truth and an anchor is always used, regardless of their IoU.
+        // However, if other anchors have an IoU with a truth above iou_anchor_threshold, they
+        // will also be updated.  This will update all those anchors to match the same truth.
+        // Setting iou_anchor_threshold to 1 will make the model use only the best anchor for
+        // each ground truth, so other anchors can be used for other ground truths in the same
+        // cell (useful for detecting objects in crowds).
         double iou_anchor_threshold = 1.0;
         // When doing non-max suppression, we use overlaps_nms to decide if a box overlaps
         // an already output detection and should therefore be thrown out.
