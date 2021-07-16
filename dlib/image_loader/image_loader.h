@@ -46,17 +46,11 @@ namespace dlib
             int32 biHeight;
             unsigned short biBitCount;
             unsigned long biCompression;
-            /*
-            unsigned long biSizeImage;
-            unsigned long biClrUsed;
-            unsigned long biClrImportant;
-            */
             unsigned long a, b, c, d, i;
 
             using namespace std;
 
             streambuf& in = *in_.rdbuf();
-    //        streamsize num;
             unsigned char buf[100];
 
 
@@ -114,33 +108,9 @@ namespace dlib
             a = buf[i]; b = buf[i+1]; c = buf[i+2]; d = buf[i+3];
             biCompression = a | (b<<8) | (c<<16) | (d<<24);
 
-            /*
-            i += 4;
-            a = buf[i]; b = buf[i+1]; c = buf[i+2]; d = buf[i+3];
-            biSizeImage = a | (b<<8) | (c<<16) | (d<<24);
-
-            i += 4+4+4;
-            a = buf[i]; b = buf[i+1]; c = buf[i+2]; d = buf[i+3];
-            biClrUsed = a | (b<<8) | (c<<16) | (d<<24);
-
-            i += 4;
-            a = buf[i]; b = buf[i+1]; c = buf[i+2]; d = buf[i+3];
-            biClrImportant = a | (b<<8) | (c<<16) | (d<<24);
-            */
-
 
             if (biSize != 40)
                 throw image_load_error("bmp load error 6: header too small");
-
-            // read and discard any extra bytes that are part of the header
-            if (biSize > 40)
-            {
-                if (in.sgetn(reinterpret_cast<char*>(buf),biSize-40) != static_cast<long>(biSize - 40))
-                {
-                    throw image_load_error("bmp load error 7: header too small");
-                }
-                bytes_read_so_far += biSize-40;
-            }
 
             image.set_size(biHeight, biWidth);
 
