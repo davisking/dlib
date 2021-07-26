@@ -1564,8 +1564,8 @@ namespace dlib
               left corner, upper right corner to upper right corner, etc.).
             - #out.nr() == out.nr() && #out.nc() == out.nc().  
               I.e. out should already be sized to whatever size you want it to be.
-            - Returns a transformation object that maps points in in_img into their
-              corresponding location in #out_img.
+            - Returns a transformation object that maps points in img into their
+              corresponding location in #out.
     !*/
 
     template <
@@ -1586,8 +1586,8 @@ namespace dlib
               convex quadrilateral and uses them in a call to the version of
               extract_image_4points() defined above.  i.e. extract_image_4points(img, out,
               intersections_between_lines)
-            - Returns a transformation object that maps points in in_img into their
-              corresponding location in #out_img.
+            - Returns a transformation object that maps points in img into their
+              corresponding location in #out.
         throws 
             - no_convex_quadrilateral: this is thrown if you can't make a convex
               quadrilateral out of the given lines.
