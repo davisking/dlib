@@ -1542,7 +1542,7 @@ namespace dlib
     template <
         typename image_type
         >
-    void extract_image_4points (
+    point_transform_projective extract_image_4points (
         const image_type& img,
         image_type& out,
         const std::array<dpoint,4>& pts
@@ -1564,12 +1564,14 @@ namespace dlib
               left corner, upper right corner to upper right corner, etc.).
             - #out.nr() == out.nr() && #out.nc() == out.nc().  
               I.e. out should already be sized to whatever size you want it to be.
+            - Returns a transformation object that maps points in in_img into their
+              corresponding location in #out_img.
     !*/
 
     template <
         typename image_type
         >
-    void extract_image_4points (
+    point_transform_projective extract_image_4points (
         const image_type& img,
         image_type& out,
         const std::array<line,4>& lines 
@@ -1584,6 +1586,8 @@ namespace dlib
               convex quadrilateral and uses them in a call to the version of
               extract_image_4points() defined above.  i.e. extract_image_4points(img, out,
               intersections_between_lines)
+            - Returns a transformation object that maps points in in_img into their
+              corresponding location in #out_img.
         throws 
             - no_convex_quadrilateral: this is thrown if you can't make a convex
               quadrilateral out of the given lines.

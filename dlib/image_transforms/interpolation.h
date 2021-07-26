@@ -2118,7 +2118,7 @@ namespace dlib
     template <
         typename image_type
         >
-    void extract_image_4points (
+    point_transform_projective extract_image_4points (
         const image_type& img_,
         image_type& out_,
         const std::array<dpoint,4>& pts
@@ -2127,7 +2127,7 @@ namespace dlib
         const_image_view<image_type> img(img_);
         image_view<image_type> out(out_);
         if (out.size() == 0)
-            return;
+            return point_transform_projective();
 
         drectangle bounding_box;
         for (auto& p : pts)
@@ -2160,18 +2160,19 @@ namespace dlib
 
         auto tform = find_projective_transform(from_points, to_points);
         transform_image(img_, out_, interpolate_bilinear(), tform);
+        return inv(tform);
     }
 
     template <
         typename image_type
         >
-    void extract_image_4points (
+    point_transform_projective extract_image_4points (
         const image_type& img,
         image_type& out,
         const std::array<line,4>& lines 
     )
     {
-        extract_image_4points(img, out, find_convex_quadrilateral(lines));
+        return extract_image_4points(img, out, find_convex_quadrilateral(lines));
     }
 
 // ----------------------------------------------------------------------------------------
