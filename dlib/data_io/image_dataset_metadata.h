@@ -109,8 +109,8 @@ namespace dlib
 
             std::string filename;
             std::vector<box> boxes;
-            unsigned long width = 0;
-            unsigned long height = 0;
+            long width = 0;
+            long height = 0;
         };
 
     // ------------------------------------------------------------------------------------
