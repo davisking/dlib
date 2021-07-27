@@ -89,6 +89,8 @@
         - std::complex
         - std::unique_ptr
         - std::shared_ptr
+        - std::variant (if C++17 is used)
+        - std::optional (if C++17 is used) 
         - dlib::uint64
         - dlib::int64
         - float_details
@@ -119,6 +121,8 @@
         - std::complex
         - std::unique_ptr
         - std::shared_ptr
+        - std::variant (if C++17 is used)
+        - std::optional (if C++17 is used)
         - dlib::uint64
         - dlib::int64
         - float_details
@@ -233,6 +237,10 @@
 #include <limits>
 #include <type_traits>
 #include <utility>
+#if __cplusplus >= 201703L
+#include <variant>
+#include <optional>
+#endif
 #include "uintn.h"
 #include "interfaces/enumerable.h"
 #include "interfaces/map_pair.h"
@@ -1215,6 +1223,82 @@ namespace dlib
         catch (serialization_error& e)
         { throw serialization_error(e.info + "\n   while deserializing object of type std::tuple"); }
     }
+    
+// ----------------------------------------------------------------------------------------
+    
+#if __cplusplus >= 201703L
+    
+    namespace detail
+    {
+        template<typename Variant, std::size_t I = 0>
+        void deserialize_variant_helper(Variant& item, std::istream& in, std::size_t index)
+        {
+            if constexpr (I < std::variant_size_v<Variant>)
+            {
+                if (I == index)
+                {
+                    auto& x = item.template emplace<std::variant_alternative_t<I,Variant>>();
+                    deserialize(x, in);
+                }
+                else
+                {
+                    deserialize_variant_helper<Variant, I+1>(item, in, index);
+                }
+            }
+            else
+            {
+                throw serialization_error("deserialize_variant_helper() index is out of range of variant size");
+            }
+        }
+    }
+    
+    template<typename... Types>
+    void serialize(
+        const std::variant<Types...>& item,
+        std::ostream& out
+    )
+    {
+        serialize(item.index(),  out);
+        std::visit([&out](const auto& x) {
+            serialize(x, out);
+        }, item);
+    }
+    
+    template <typename... Types>
+    void deserialize(
+        std::variant<Types...>& item,
+        std::istream& in
+    )
+    {
+        std::size_t index = 0;
+        deserialize(index, in);
+        detail::deserialize_variant_helper(item, in, index);
+    }
+    
+    template<typename T>
+    void serialize(const std::optional<T>& item, std::ostream& out)
+    {
+        serialize(item.has_value(), out);
+        if (item)
+            serialize(item.value(), out);
+    }
+    
+    template <typename T>
+    void deserialize(std::optional<T>& item, std::istream& in)
+    {
+        bool has_value = false;
+        deserialize(has_value, in);
+        if (has_value)
+        {
+            deserialize(item.has_value() ? item.value() : item.emplace(), in);
+        }
+        else
+        {
+            item.reset();
+        }
+    }
+    
+#endif
     
 // ----------------------------------------------------------------------------------------
     
@@ -2270,6 +2354,20 @@ namespace dlib
         }
         
         explicit proxy_serialize (
+            std::vector<int8_t>& buf
+        ) : fout_optional_owning_ptr(new vectorstream(buf)),
+            fout(*fout_optional_owning_ptr)
+        {
+        }
+        
+        explicit proxy_serialize (
+            std::vector<uint8_t>& buf
+        ) : fout_optional_owning_ptr(new vectorstream(buf)),
+            fout(*fout_optional_owning_ptr)
+        {
+        }
+        
+        explicit proxy_serialize (
             std::ostream& ss
         ) : fout_optional_owning_ptr(nullptr),
             fout(ss)
@@ -2303,6 +2401,22 @@ namespace dlib
         
         explicit proxy_deserialize (
             std::vector<char>& buf
+        ) : fin_optional_owning_ptr(new vectorstream(buf)),
+            fin(*fin_optional_owning_ptr)   
+        {
+            init();
+        }
+        
+        explicit proxy_deserialize (
+            std::vector<int8_t>& buf
+        ) : fin_optional_owning_ptr(new vectorstream(buf)),
+            fin(*fin_optional_owning_ptr)   
+        {
+            init();
+        }
+         
+        explicit proxy_deserialize (
+            std::vector<uint8_t>& buf
         ) : fin_optional_owning_ptr(new vectorstream(buf)),
             fin(*fin_optional_owning_ptr)   
         {
@@ -2417,11 +2531,19 @@ namespace dlib
     { return proxy_serialize(ss); }
     inline proxy_serialize serialize(std::vector<char>& buf)
     { return proxy_serialize(buf); }
+    inline proxy_serialize serialize(std::vector<int8_t>& buf)
+    { return proxy_serialize(buf); }
+    inline proxy_serialize serialize(std::vector<uint8_t>& buf)
+    { return proxy_serialize(buf); }
     inline proxy_deserialize deserialize(const std::string& filename)
     { return proxy_deserialize(filename); }
     inline proxy_deserialize deserialize(std::istream& ss)
     { return proxy_deserialize(ss); }
     inline proxy_deserialize deserialize(std::vector<char>& buf)
+    { return proxy_deserialize(buf); }
+    inline proxy_deserialize deserialize(std::vector<int8_t>& buf)
+    { return proxy_deserialize(buf); }
+    inline proxy_deserialize deserialize(std::vector<uint8_t>& buf)
     { return proxy_deserialize(buf); }
 
 // ----------------------------------------------------------------------------------------

@@ -131,11 +131,11 @@ namespace dlib
             cudnn_activation_descriptor(
                 cudnnActivationMode_t mode,
                 cudnnNanPropagation_t reluNanOpt,
-                double reluCeiling
+                double coef
             )
             {
                 CHECK_CUDNN(cudnnCreateActivationDescriptor(&handle));
-                CHECK_CUDNN(cudnnSetActivationDescriptor(handle, mode, reluNanOpt, reluCeiling));
+                CHECK_CUDNN(cudnnSetActivationDescriptor(handle, mode, reluNanOpt, coef));
             }
 
             ~cudnn_activation_descriptor()
@@ -1756,6 +1756,7 @@ namespace dlib
         }
 
     // ------------------------------------------------------------------------------------
+
     }
 }
 

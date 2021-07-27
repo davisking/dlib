@@ -376,6 +376,36 @@ namespace dlib
             const tensor& gradient_input
         );
 
+    // ------------------------------------------------------------------------------------
+
+        void clipped_relu (
+            tensor& dest,
+            const tensor& src,
+            const float ceiling
+        );
+
+        void clipped_relu_gradient (
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input,
+            const float ceiling
+        );
+
+    // ------------------------------------------------------------------------------------
+
+        void elu (
+            tensor& dest,
+            const tensor& src,
+            const float alpha
+        );
+
+        void elu_gradient (
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input,
+            const float alpha
+        );
+
     // ----------------------------------------------------------------------------------------
 
         void gelu (

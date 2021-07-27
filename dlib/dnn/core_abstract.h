@@ -308,6 +308,7 @@ namespace dlib
         typedef LAYER_DETAILS layer_details_type;
         typedef SUBNET subnet_type;
         typedef typename subnet_type::input_type input_type;
+        typedef typename subnet_type::input_layer_type input_layer_type;
         // num_computational_layers will always give the number of layers in the network
         // that transform tensors (i.e. layers defined by something that implements the
         // EXAMPLE_COMPUTATIONAL_LAYER_ interface).  This is all the layers except for
@@ -444,6 +445,26 @@ namespace dlib
         /*!
             ensures
                 - returns the immediate subnetwork of *this network.  
+        !*/
+
+        const input_layer_type& input_layer(
+        ) const;  
+        /*!
+            ensures
+                - returns the very first layer in *this network.  It's equivalent to calling
+                  subnet() recursively until you get to the first layer.  This means it will return
+                  the object that is an implementation of the EXAMPLE_INPUT_LAYER interface defined
+                  in input_abstract.h
+        !*/
+
+        input_layer_type& input_layer(
+        ); 
+        /*!
+            ensures
+                - returns the very first layer in *this network.  It's equivalent to calling
+                  subnet() recursively until you get to the first layer.  This means it will return
+                  the object that is an implementation of the EXAMPLE_INPUT_LAYER interface defined
+                  in input_abstract.h
         !*/
 
         const layer_details_type& layer_details(
@@ -730,6 +751,7 @@ namespace dlib
         typedef LOSS_DETAILS loss_details_type;
         typedef SUBNET subnet_type;
         typedef typename subnet_type::input_type input_type;
+        typedef typename subnet_type::input_layer_type input_layer_type;
         const static size_t num_computational_layers = subnet_type::num_computational_layers;
         const static size_t num_layers = subnet_type::num_layers + 1;
         // If LOSS_DETAILS is an unsupervised loss then training_label_type==no_label_type.
@@ -816,6 +838,26 @@ namespace dlib
         /*!
             ensures
                 - returns the immediate subnetwork of *this network.  
+        !*/
+
+        const input_layer_type& input_layer(
+        ) const;  
+        /*!
+            ensures
+                - returns the very first layer in *this network.  It's equivalent to calling
+                  subnet() recursively until you get to the first layer.  This means it will return
+                  the object that is an implementation of the EXAMPLE_INPUT_LAYER interface defined
+                  in input_abstract.h
+        !*/
+
+        input_layer_type& input_layer(
+        ); 
+        /*!
+            ensures
+                - returns the very first layer in *this network.  It's equivalent to calling
+                  subnet() recursively until you get to the first layer.  This means it will return
+                  the object that is an implementation of the EXAMPLE_INPUT_LAYER interface defined
+                  in input_abstract.h
         !*/
 
         const loss_details_type& loss_details(
@@ -1357,6 +1399,7 @@ namespace dlib
 
         typedef SUBNET subnet_type;
         typedef typename SUBNET::input_type input_type;
+        typedef typename subnet_type::input_layer_type input_layer_type;
         const static size_t num_computational_layers = (REPEATED_LAYER<SUBNET>::num_computational_layers-SUBNET::num_computational_layers)*num + SUBNET::num_computational_layers;
         const static size_t num_layers = (REPEATED_LAYER<SUBNET>::num_layers-SUBNET::num_layers)*num + SUBNET::num_layers;
         typedef REPEATED_LAYER<an_unspecified_input_type> repeated_layer_type;
@@ -1437,6 +1480,27 @@ namespace dlib
                 - returns the SUBNET base network that repeat sits on top of.  If you want
                   to access the REPEATED_LAYER components then you must use get_repeated_layer(). 
         !*/
+
+        const input_layer_type& input_layer(
+        ) const;  
+        /*!
+            ensures
+                - returns the very first layer in *this network.  It's equivalent to calling
+                  subnet() recursively until you get to the first layer.  This means it will return
+                  the object that is an implementation of the EXAMPLE_INPUT_LAYER interface defined
+                  in input_abstract.h
+        !*/
+
+        input_layer_type& input_layer(
+        ); 
+        /*!
+            ensures
+                - returns the very first layer in *this network.  It's equivalent to calling
+                  subnet() recursively until you get to the first layer.  This means it will return
+                  the object that is an implementation of the EXAMPLE_INPUT_LAYER interface defined
+                  in input_abstract.h
+        !*/
+
     };
 
     template < size_t num, template<typename> class T, typename U >
@@ -1651,13 +1715,11 @@ namespace dlib
     );
     /*!
         requires
-            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, repeat, or
               add_tag_layer.
         ensures
-            - returns the input later of the given network object.  Specifically, this
-              function is equivalent to calling:
-                layer<net_type::num_layers-1>(net);
-              That is, you get the input layer details object for the network.
+            - returns the input later of the given network object.  This is the same as just calling
+              net.input_layer().
     !*/
 
 // ----------------------------------------------------------------------------------------
