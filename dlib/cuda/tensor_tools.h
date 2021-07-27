@@ -660,7 +660,7 @@ namespace dlib { namespace tt
             - means.nr() == invstds.nr() == src.nr()
             - means.nc() == invstds.nc() == src.nc()
             - means.k()  == invstds.k()  == src.k()
-            - #src == the batch normalized version of src.
+            - #dest == the batch normalized version of src.
             - #means == the mean values of the contents of src.
             - #invstds == 1/(the standard deviation values of the contents of src).
             - #running_means = (1-averaging_factor)*mat(#running_means) + averaging_factor*mat(#means);
@@ -760,7 +760,7 @@ namespace dlib { namespace tt
             - #means.num_samples()==means.nr()==means.nc() == 1
             - #invstds.num_samples() ==invstds.nr() ==invstds.nc() == 1
             - means.k()  == invstds.k()  == src.k()
-            - #src == the batch normalized version of src.
+            - #dest == the batch normalized version of src.
             - #means == the mean values of the contents of src.
             - #invstds == 1/(the standard deviation values of the contents of src).
             - #running_means = (1-averaging_factor)*mat(#running_means) + averaging_factor*mat(#means);
@@ -811,6 +811,19 @@ namespace dlib { namespace tt
         const tensor& gamma,
         const tensor& beta
     );
+    /*!
+        requires
+            - eps > 0
+            - src.num_samples() == gamma.size() == beta.size()
+            - have_same_dimensions(gamma, beta) == true
+            - beta.num_samples() ==beta.nr() ==gamma.nc() == 1
+        ensures
+            - have_same_dimensions(#dest, src) == true
+            - #means.size() == invstds.size() == src.num_samples()
+            - #dest == the normalized version of src.
+            - #means == the mean values of the contents of src.
+            - #invstds == 1/(the standard deviation values of the contents of src).
+    !*/
 
     void layer_normalize_gradient (
         const double eps,
@@ -823,6 +836,26 @@ namespace dlib { namespace tt
             tensor& gamma_grad,
             tensor& beta_grad
     );
+    /*!
+        requires
+            - eps > 0
+            - invstds and means should be the output of a call to
+              layer_normalize(eps,dest,means,invstds,src,gamma,beta)
+            - have_same_dimensions(gradient_input, src) == true
+            - have_same_dimensions(src, src_grad) == true
+            - have_same_dimensions(gamma, gamma_grad) == true
+            - have_same_dimensions(gamma, beta_grad) == true
+            - means.size() == src.num_samples()
+            - invstds.size() == src.num_samples()
+            - have_same_dimensions(means, gamma) == true
+            - have_same_dimensions(invstds, gamma) == true
+        ensures
+            - Let f(src,gamma,beta) == dot(gradient_input, dest output of
+              layer_normalize(eps,dest,means,invstds,src,gamma,beta))
+            - Adds the gradient of f() with respect to src to #src_grad.
+            - Assigns the gradient of f() with respect to gamma to #gamma_grad.
+            - Assigns the gradient of f() with respect to beta to #beta_grad.
+    !*/
 
     // -----------------------------------------------------------------------------------
 
