@@ -270,6 +270,9 @@ namespace dlib
         double quantile_discard = 0.10
     )
     {
+        if (container.size() == 0)
+            return 0;
+
         const auto quantile_thresh = find_upper_quantile(container, quantile_discard); 
         running_gradient g;
         for (auto x : container)
