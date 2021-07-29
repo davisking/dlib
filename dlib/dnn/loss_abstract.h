@@ -1994,7 +1994,7 @@ namespace dlib
                   you want to output more objects (that are also of less confidence) you
                   can call to_label() with a smaller value of adjust_threshold.
                 - R.label == the label of the detected object.
-                - R.labels == a std::vector<double, std::string> containing all the confidence values
+                - R.labels == a std::vector<std::pair<double, std::string>> containing all the confidence values
                   and labels that have a detection score > adjust_threshold, since this loss allows
                   for multi-label outputs.  Note that the following is true:
                       - R.labels[0].first == R.detection_confidence
