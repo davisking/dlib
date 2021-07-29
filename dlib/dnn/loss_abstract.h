@@ -1899,7 +1899,7 @@ namespace dlib
         // However, if other anchors have an IoU with a truth box above iou_anchor_threshold, they
         // will also experience loss against that truth box as well.  Setting iou_anchor_threshold to 1 will
         // make the model use only the best anchor for each ground truth, so other anchors can be
-        // used for other ground truths in the same cell (useful for detecting objects in crowds).
+        // used for other ground truth boxes in the same cell (useful for detecting objects in crowds).
         // This setting is meant to be used with "high capacity" models, not small ones.
         double iou_anchor_threshold = 1.0;
         // When doing non-max suppression, we use overlaps_nms to decide if a box overlaps
