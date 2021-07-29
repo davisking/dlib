@@ -255,8 +255,7 @@ try
     // When computing the objectness loss in YOLO, predictions that do not have an IoU
     // with any ground truth box of at least options.iou_ignore_threshold, will be
     // treated as not capable of detecting an object, an therefore incur loss.
-    // Predictions above this threshold will be ignored, i.e. will not contribute to the
-    // loss. Good values are 0.7 or 0.5.
+    // Similarly, predictions above this threshold are considered correct predictions by the loss. Typical settings for this threshold are in the range 0.5 to 0.7.
     options.iou_ignore_threshold = 0.7;
     // By setting this to a value < 1, we are telling the model to update all the predictions
     // as long as the anchor box has an IoU > 0.2 with a ground truth.
