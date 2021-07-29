@@ -2020,8 +2020,7 @@ namespace dlib
             Also, the loss value returned corresponds to the L2 loss.
         !*/
 
-        void adjust_nms
-        (
+        void adjust_nms (
             double iou_thresh,
             double percent_covered_thresh = 1,
             bool classwise = true
