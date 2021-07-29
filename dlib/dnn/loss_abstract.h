@@ -2027,8 +2027,8 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_options().overlaps_nms = test_box_overlap(iou_thresh, percent_covered_thresh)
-                - #get_options().classwise_nms = classwise
+                - #get_options().overlaps_nms == test_box_overlap(iou_thresh, percent_covered_thresh)
+                - #get_options().classwise_nms == classwise
         !*/
 
     };
