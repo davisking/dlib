@@ -1905,7 +1905,7 @@ namespace dlib
         // When doing non-max suppression, we use overlaps_nms to decide if a box overlaps
         // an already output detection and should therefore be thrown out.
         test_box_overlap overlaps_nms = test_box_overlap(0.45, 1.0);
-        // Tell the non-max Suppression whether to take classes into account
+        // When set to true, NMS will only be applied between objects with the same class label.
         bool classwise_nms = true;
         // These parameters control how we penalize different kinds of mistakes: notably the objectness loss,
         // the box (bounding box regression) loss, and the classification loss.
