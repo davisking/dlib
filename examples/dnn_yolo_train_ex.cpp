@@ -206,7 +206,7 @@ try
     }
 
     // If the default anchor boxes don't fit your data well you should recompute them.
-    // Here's an simple way to do it using K-Means clustering.  Note that the approach
+    // Here's a simple way to do it using K-Means clustering.  Note that the approach
     // shown below is suboptimal, since it doesn't group the bounding boxes by size.
     // Grouping the bounding boxes by size and computing the K-Means on each group
     // would make more sense, since each stride of the network is meant to output
