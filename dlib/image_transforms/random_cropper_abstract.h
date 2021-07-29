@@ -203,8 +203,8 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - When a chip is extracted, any object whose area covered is smaller than
-                  get_min_object_coverage() will have its ignore field set to true.
+                - When a chip is extracted, any object that has less than get_min_object_coverage() fraction of its 
+                   total area contained within the crop will have its ignore field set to true.
         !*/
 
         void set_min_object_coverage (
@@ -372,5 +372,4 @@ namespace dlib
 }
 
 #endif // DLIB_RaNDOM_CROPPER_ABSTRACT_H_
-
 
