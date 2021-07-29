@@ -1889,7 +1889,7 @@ namespace dlib
                 - anchors.at(tag_id<TAG_TYPE>::id) == boxes
         !*/
 
-        // This field contains the labels of all the possible object this detector can find.
+        // This field contains the labels of all the possible objects this detector can find.
         std::vector<std::string> labels;
         // When computing the objectness loss, any detection that has an IoU above
         // iou_ignore_threshold with a ground truth box will not incur any loss.
@@ -2042,4 +2042,3 @@ namespace dlib
 }
 
 #endif // DLIB_DNn_LOSS_ABSTRACT_H_
-
