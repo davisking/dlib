@@ -1896,8 +1896,8 @@ namespace dlib
         double iou_ignore_threshold = 0.7;
         // When computing the YOLO loss (objectness + bounding box regression + classification),
         // the best match between a truth and an anchor is always used, regardless of the IoU.
-        // However, if other anchors have an IoU with a truth above iou_anchor_threshold, they
-        // will also be updated to match the same truth.  Setting iou_anchor_threshold to 1 will
+        // However, if other anchors have an IoU with a truth box above iou_anchor_threshold, they
+        // will also experience loss against that truth box as well.  Setting iou_anchor_threshold to 1 will
         // make the model use only the best anchor for each ground truth, so other anchors can be
         // used for other ground truths in the same cell (useful for detecting objects in crowds).
         // This setting is meant to be used with "high capacity" models, not small ones.
