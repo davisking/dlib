@@ -40,6 +40,7 @@ namespace dlib
                 - #get_max_object_size() == 0.7
                 - #get_background_crops_fraction() == 0.5
                 - #get_translate_amount() == 0.1
+                - #get_min_object_coverage == 1.0
         !*/
 
         void set_seed (
