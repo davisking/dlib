@@ -218,7 +218,7 @@ namespace dlib
         std::vector<std::pair<double, std::string>> labels;
 
         operator rectangle() const { return rect; }
-        bool operator == (const yolo_rect& rhs) const;
+        bool operator== (const yolo_rect& rhs) const;
         /*!
             ensures
                 - returns true if and only if rect == rhs.rect && detection_confidence == rhs.detection_confidence && label == rhs.label.
@@ -243,5 +243,4 @@ namespace dlib
 }
 
 #endif // DLIB_FULL_OBJECT_DeTECTION_ABSTRACT_Hh_
-
 
