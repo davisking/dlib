@@ -2017,7 +2017,7 @@ namespace dlib
                 - layer<TAG_TYPE>(sub).get_output().k() == options.anchors.at(tag_id<TAG_TYPE>::id).size() * (5 + options.labels.size());
                 - sub.get_output().num_samples() == input_tensor.num_samples()
                 - sub.sample_expansion_factor() == 1
-            Also, the loss value returned corresponds to the L2 loss.
+            Also, the loss value returned corresponds to the squared norm of the error gradient.
         !*/
 
         void adjust_nms (
