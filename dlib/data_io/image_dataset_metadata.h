@@ -101,7 +101,7 @@ namespace dlib
         {
             /*!
                 WHAT THIS OBJECT REPRESENTS
-                    This object represents an annotated image.   
+                    This object represents an annotated image.
             !*/
 
             image() {}
@@ -109,6 +109,8 @@ namespace dlib
 
             std::string filename;
             std::vector<box> boxes;
+            long width = 0;
+            long height = 0;
         };
 
     // ------------------------------------------------------------------------------------

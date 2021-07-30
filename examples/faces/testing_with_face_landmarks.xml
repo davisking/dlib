@@ -5,10 +5,9 @@
 <comment>These are images from the PASCAL VOC 2011 dataset.
    The face landmarks are from dlib's shape_predictor_68_face_landmarks.dat
    landmarking model.  The model uses the 68 landmark scheme used by the iBUG
-   300-W dataset.
-</comment>
+   300-W dataset.</comment>
 <images>
-  <image file='2008_002470.jpg'>
+  <image file='2008_002470.jpg' width='500' height='332'>
     <box top='181' left='274' width='52' height='53'>
       <part name='00' x='277' y='194'/>
       <part name='01' x='278' y='200'/>
@@ -430,7 +429,7 @@
       <part name='67' x='196' y='112'/>
     </box>
   </image>
-  <image file='2008_002506.jpg'>
+  <image file='2008_002506.jpg' width='500' height='375'>
     <box top='78' left='329' width='109' height='109'>
       <part name='00' x='342' y='134'/>
       <part name='01' x='345' y='145'/>
@@ -642,7 +641,7 @@
       <part name='67' x='163' y='133'/>
     </box>
   </image>
-  <image file='2008_004176.jpg'>
+  <image file='2008_004176.jpg' width='480' height='438'>
     <box top='230' left='206' width='37' height='37'>
       <part name='00' x='206' y='241'/>
       <part name='01' x='206' y='245'/>
@@ -1134,7 +1133,7 @@
       <part name='67' x='294' y='126'/>
     </box>
   </image>
-  <image file='2008_007676.jpg'>
+  <image file='2008_007676.jpg' width='500' height='334'>
     <box top='62' left='226' width='37' height='37'>
       <part name='00' x='223' y='72'/>
       <part name='01' x='224' y='77'/>
@@ -1626,7 +1625,7 @@
       <part name='67' x='160' y='115'/>
     </box>
   </image>
-  <image file='2009_004587.jpg'>
+  <image file='2009_004587.jpg' width='400' height='500'>
     <box top='46' left='154' width='75' height='76'>
       <part name='00' x='147' y='74'/>
       <part name='01' x='147' y='84'/>

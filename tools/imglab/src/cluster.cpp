@@ -247,6 +247,8 @@ int cluster_dataset(
         {
             idata[i].first = std::numeric_limits<double>::infinity();
             idata[i].second.filename = data.images[i].filename;
+            idata[i].second.width = data.images[i].width;
+            idata[i].second.height = data.images[i].height;
             if (!has_non_ignored_boxes(data.images[i]))
                 continue;
 
