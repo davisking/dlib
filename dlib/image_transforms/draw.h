@@ -228,6 +228,61 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename T, typename traits,
+        typename alloc
+    >
+    std::pair<long, long> compute_string_dimensions (
+        const std::basic_string<T, traits, alloc>& str,
+        const std::shared_ptr<font>& f_ptr = default_font::get_font(),
+        typename std::basic_string<T,traits,alloc>::size_type first = 0,
+        typename std::basic_string<T,traits,alloc>::size_type last = (std::basic_string<T,traits,alloc>::npos)
+    )
+    {
+        using string = std::basic_string<T, traits, alloc>;
+        DLIB_ASSERT((last == string::npos) || (first <= last && last < str.size()),
+                    "\tvoid dlib::compute_string_dimensions()"
+                    << "\n\tlast == string::npos: " << ((last == string::npos)?"true":"false")
+                    << "\n\tfirst: " << (unsigned long)first
+                    << "\n\tlast:  " << (unsigned long)last
+                    << "\n\tstr.size():  " << (unsigned long)str.size());
+
+        if (last == string::npos)
+            last = str.size();
+
+        const font& f = *f_ptr;
+
+        long height = f.height();
+        long width = 0;
+        for (typename string::size_type i = first; i <= last; ++i)
+        {
+            // ignore the '\r' character
+            if (str[i] == '\r')
+                continue;
+
+            // A combining character should be applied to the previous character, and we
+            // therefore make one step back. If a combining comes right after a newline,
+            // then there must be some kind of error in the string, and we don't combine.
+            if (is_combining_char(str[i]))
+            {
+                width -= f[str[i]].width();
+            }
+
+            if (str[i] == '\n')
+            {
+                height += f.height();
+                width = f.left_overflow();
+                continue;
+            }
+
+            const letter& l = f[str[i]];
+            width += l.width();
+        }
+        return std::make_pair(width, height);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename T,
         typename traits,
         typename alloc,

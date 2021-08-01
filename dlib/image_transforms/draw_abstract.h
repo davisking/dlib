@@ -82,6 +82,27 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename T, typename traits,
+        typename alloc
+    >
+    std::pair<long, long> compute_string_dimensions (
+        const std::basic_string<T, traits, alloc>& str,
+        const std::shared_ptr<font>& f_ptr = default_font::get_font(),
+        typename std::basic_string<T,traits,alloc>::size_type first = 0,
+        typename std::basic_string<T,traits,alloc>::size_type last = (std::basic_string<T,traits,alloc>::npos)
+    )
+
+    /*!
+        ensures
+            - computes the size of the given string with the specified font in pixels.  To be very specific,
+              if dims is the returned object by this function, then:
+              - dims.first == width of the string
+              - dims.second == height of the string
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename T,
         typename traits,
         typename alloc,
