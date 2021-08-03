@@ -227,33 +227,33 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct string_dims
+    {
+        string_dims() = default;
+        string_dims (
+            unsigned long width,
+            unsigned long height
+        ) : width(width), height(height) {}
+        unsigned long width = 0;
+        unsigned long height = 0;
+    };
+
     template <
         typename T, typename traits,
         typename alloc
     >
-    std::pair<long, long> compute_string_dimensions (
+    string_dims compute_string_dims (
         const std::basic_string<T, traits, alloc>& str,
-        const std::shared_ptr<font>& f_ptr = default_font::get_font(),
-        typename std::basic_string<T,traits,alloc>::size_type first = 0,
-        typename std::basic_string<T,traits,alloc>::size_type last = (std::basic_string<T,traits,alloc>::npos)
+        const std::shared_ptr<font>& f_ptr = default_font::get_font()
     )
     {
         using string = std::basic_string<T, traits, alloc>;
-        DLIB_ASSERT((last == string::npos) || (first <= last && last < str.size()),
-                    "\tvoid dlib::compute_string_dimensions()"
-                    << "\n\tlast == string::npos: " << ((last == string::npos)?"true":"false")
-                    << "\n\tfirst: " << (unsigned long)first
-                    << "\n\tlast:  " << (unsigned long)last
-                    << "\n\tstr.size():  " << (unsigned long)str.size());
-
-        if (last == string::npos)
-            last = str.size();
 
         const font& f = *f_ptr;
 
         long height = f.height();
         long width = 0;
-        for (typename string::size_type i = first; i <= last; ++i)
+        for (typename string::size_type i = 0; i < str.size(); ++i)
         {
             // ignore the '\r' character
             if (str[i] == '\r')
@@ -277,7 +277,7 @@ namespace dlib
             const letter& l = f[str[i]];
             width += l.width();
         }
-        return std::make_pair(width, height);
+        return string_dims(width, height);
     }
 
 // ----------------------------------------------------------------------------------------
