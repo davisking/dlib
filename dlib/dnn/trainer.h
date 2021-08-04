@@ -1121,7 +1121,7 @@ namespace dlib
             }
 
             // if we haven't seen much data yet then just say false.
-            if (gradient_updates_since_last_sync < 30)
+            if (previous_loss_values_to_keep_until_disk_sync.size() < 30)
                 return false;
 
             // if the loss is very likely to be increasing then return true
