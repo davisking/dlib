@@ -1,10 +1,10 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * Last changed in libpng 1.6.2 [April 25, 2013]
- * Copyright (c) 1998-2013 Glenn Randers-Pehrson
- * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
- * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
+ * Copyright (c) 2018 Cosmin Truta
+ * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
+ * Copyright (c) 1996-1997 Andreas Dilger
+ * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -30,7 +30,7 @@ png_set_bgr(png_structrp png_ptr)
 #endif
 
 #if defined(PNG_READ_SWAP_SUPPORTED) || defined(PNG_WRITE_SWAP_SUPPORTED)
-/* Turn on 16 bit byte swapping */
+/* Turn on 16-bit byte swapping */
 void PNGAPI
 png_set_swap(png_structrp png_ptr)
 {
@@ -57,7 +57,9 @@ png_set_packing(png_structrp png_ptr)
    if (png_ptr->bit_depth < 8)
    {
       png_ptr->transformations |= PNG_PACK;
-      png_ptr->usr_bit_depth = 8;
+#     ifdef PNG_WRITE_SUPPORTED
+         png_ptr->usr_bit_depth = 8;
+#     endif
    }
 }
 #endif
@@ -98,7 +100,7 @@ png_set_interlace_handling(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_interlace handling");
 
-   if (png_ptr && png_ptr->interlaced)
+   if (png_ptr != 0 && png_ptr->interlaced != 0)
    {
       png_ptr->transformations |= PNG_INTERLACE;
       return (7);
@@ -125,7 +127,7 @@ png_set_filler(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
    /* In libpng 1.6 it is possible to determine whether this is a read or write
     * operation and therefore to do more checking here for a valid call.
     */
-   if (png_ptr->mode & PNG_IS_READ_STRUCT)
+   if ((png_ptr->mode & PNG_IS_READ_STRUCT) != 0)
    {
 #     ifdef PNG_READ_FILLER_SUPPORTED
          /* On read png_set_filler is always valid, regardless of the base PNG
@@ -170,13 +172,14 @@ png_set_filler(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
                    * size!
                    */
                   png_app_error(png_ptr,
-                     "png_set_filler is invalid for low bit depth gray output");
+                      "png_set_filler is invalid for"
+                      " low bit depth gray output");
                   return;
                }
 
             default:
                png_app_error(png_ptr,
-                  "png_set_filler: inappropriate color type");
+                   "png_set_filler: inappropriate color type");
                return;
          }
 #     else
@@ -208,7 +211,7 @@ png_set_add_alpha(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
 
    png_set_filler(png_ptr, filler, filler_loc);
    /* The above may fail to do anything. */
-   if (png_ptr->transformations & PNG_FILLER)
+   if ((png_ptr->transformations & PNG_FILLER) != 0)
       png_ptr->transformations |= PNG_ADD_ALPHA;
 }
 
@@ -266,8 +269,8 @@ png_do_invert(png_row_infop row_info, png_bytep row)
    if (row_info->color_type == PNG_COLOR_TYPE_GRAY)
    {
       png_bytep rp = row;
-      png_size_t i;
-      png_size_t istop = row_info->rowbytes;
+      size_t i;
+      size_t istop = row_info->rowbytes;
 
       for (i = 0; i < istop; i++)
       {
@@ -280,8 +283,8 @@ png_do_invert(png_row_infop row_info, png_bytep row)
       row_info->bit_depth == 8)
    {
       png_bytep rp = row;
-      png_size_t i;
-      png_size_t istop = row_info->rowbytes;
+      size_t i;
+      size_t istop = row_info->rowbytes;
 
       for (i = 0; i < istop; i += 2)
       {
@@ -295,8 +298,8 @@ png_do_invert(png_row_infop row_info, png_bytep row)
       row_info->bit_depth == 16)
    {
       png_bytep rp = row;
-      png_size_t i;
-      png_size_t istop = row_info->rowbytes;
+      size_t i;
+      size_t istop = row_info->rowbytes;
 
       for (i = 0; i < istop; i += 4)
       {
@@ -311,7 +314,7 @@ png_do_invert(png_row_infop row_info, png_bytep row)
 
 #ifdef PNG_16BIT_SUPPORTED
 #if defined(PNG_READ_SWAP_SUPPORTED) || defined(PNG_WRITE_SWAP_SUPPORTED)
-/* Swaps byte order on 16 bit depth images */
+/* Swaps byte order on 16-bit depth images */
 void /* PRIVATE */
 png_do_swap(png_row_infop row_info, png_bytep row)
 {
@@ -325,9 +328,16 @@ png_do_swap(png_row_infop row_info, png_bytep row)
 
       for (i = 0; i < istop; i++, rp += 2)
       {
+#ifdef PNG_BUILTIN_BSWAP16_SUPPORTED
+         /* Feature added to libpng-1.6.11 for testing purposes, not
+          * enabled by default.
+          */
+         *(png_uint_16*)rp = __builtin_bswap16(*(png_uint_16*)rp);
+#else
          png_byte t = *rp;
          *rp = *(rp + 1);
          *(rp + 1) = t;
+#endif
       }
    }
 }
@@ -335,7 +345,7 @@ png_do_swap(png_row_infop row_info, png_bytep row)
 #endif
 
 #if defined(PNG_READ_PACKSWAP_SUPPORTED)||defined(PNG_WRITE_PACKSWAP_SUPPORTED)
-static PNG_CONST png_byte onebppswaptable[256] = {
+static const png_byte onebppswaptable[256] = {
    0x00, 0x80, 0x40, 0xC0, 0x20, 0xA0, 0x60, 0xE0,
    0x10, 0x90, 0x50, 0xD0, 0x30, 0xB0, 0x70, 0xF0,
    0x08, 0x88, 0x48, 0xC8, 0x28, 0xA8, 0x68, 0xE8,
@@ -370,7 +380,7 @@ static PNG_CONST png_byte onebppswaptable[256] = {
    0x1F, 0x9F, 0x5F, 0xDF, 0x3F, 0xBF, 0x7F, 0xFF
 };
 
-static PNG_CONST png_byte twobppswaptable[256] = {
+static const png_byte twobppswaptable[256] = {
    0x00, 0x40, 0x80, 0xC0, 0x10, 0x50, 0x90, 0xD0,
    0x20, 0x60, 0xA0, 0xE0, 0x30, 0x70, 0xB0, 0xF0,
    0x04, 0x44, 0x84, 0xC4, 0x14, 0x54, 0x94, 0xD4,
@@ -405,7 +415,7 @@ static PNG_CONST png_byte twobppswaptable[256] = {
    0x2F, 0x6F, 0xAF, 0xEF, 0x3F, 0x7F, 0xBF, 0xFF
 };
 
-static PNG_CONST png_byte fourbppswaptable[256] = {
+static const png_byte fourbppswaptable[256] = {
    0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70,
    0x80, 0x90, 0xA0, 0xB0, 0xC0, 0xD0, 0xE0, 0xF0,
    0x01, 0x11, 0x21, 0x31, 0x41, 0x51, 0x61, 0x71,
@@ -469,7 +479,7 @@ png_do_packswap(png_row_infop row_info, png_bytep row)
          *rp = table[*rp];
    }
 }
-#endif /* PNG_READ_PACKSWAP_SUPPORTED or PNG_WRITE_PACKSWAP_SUPPORTED */
+#endif /* PACKSWAP || WRITE_PACKSWAP */
 
 #if defined(PNG_WRITE_FILLER_SUPPORTED) || \
     defined(PNG_READ_STRIP_ALPHA_SUPPORTED)
@@ -501,27 +511,35 @@ png_do_strip_channel(png_row_infop row_info, png_bytep row, int at_start)
    {
       if (row_info->bit_depth == 8)
       {
-         if (at_start) /* Skip initial filler */
+         if (at_start != 0) /* Skip initial filler */
             ++sp;
          else          /* Skip initial channel and, for sp, the filler */
-            sp += 2, ++dp;
+         {
+            sp += 2; ++dp;
+         }
 
          /* For a 1 pixel wide image there is nothing to do */
          while (sp < ep)
-            *dp++ = *sp, sp += 2;
+         {
+            *dp++ = *sp; sp += 2;
+         }
 
          row_info->pixel_depth = 8;
       }
 
       else if (row_info->bit_depth == 16)
       {
-         if (at_start) /* Skip initial filler */
+         if (at_start != 0) /* Skip initial filler */
             sp += 2;
          else          /* Skip initial channel and, for sp, the filler */
-            sp += 4, dp += 2;
+         {
+            sp += 4; dp += 2;
+         }
 
          while (sp < ep)
-            *dp++ = *sp++, *dp++ = *sp, sp += 3;
+         {
+            *dp++ = *sp++; *dp++ = *sp; sp += 3;
+         }
 
          row_info->pixel_depth = 16;
       }
@@ -541,31 +559,37 @@ png_do_strip_channel(png_row_infop row_info, png_bytep row, int at_start)
    {
       if (row_info->bit_depth == 8)
       {
-         if (at_start) /* Skip initial filler */
+         if (at_start != 0) /* Skip initial filler */
             ++sp;
          else          /* Skip initial channels and, for sp, the filler */
-            sp += 4, dp += 3;
+         {
+            sp += 4; dp += 3;
+         }
 
          /* Note that the loop adds 3 to dp and 4 to sp each time. */
          while (sp < ep)
-            *dp++ = *sp++, *dp++ = *sp++, *dp++ = *sp, sp += 2;
+         {
+            *dp++ = *sp++; *dp++ = *sp++; *dp++ = *sp; sp += 2;
+         }
 
          row_info->pixel_depth = 24;
       }
 
       else if (row_info->bit_depth == 16)
       {
-         if (at_start) /* Skip initial filler */
+         if (at_start != 0) /* Skip initial filler */
             sp += 2;
          else          /* Skip initial channels and, for sp, the filler */
-            sp += 8, dp += 6;
+         {
+            sp += 8; dp += 6;
+         }
 
          while (sp < ep)
          {
             /* Copy 6 bytes, skip 2 */
-            *dp++ = *sp++, *dp++ = *sp++;
-            *dp++ = *sp++, *dp++ = *sp++;
-            *dp++ = *sp++, *dp++ = *sp, sp += 3;
+            *dp++ = *sp++; *dp++ = *sp++;
+            *dp++ = *sp++; *dp++ = *sp++;
+            *dp++ = *sp++; *dp++ = *sp; sp += 3;
          }
 
          row_info->pixel_depth = 48;
@@ -585,7 +609,7 @@ png_do_strip_channel(png_row_infop row_info, png_bytep row, int at_start)
       return; /* The filler channel has gone already */
 
    /* Fix the rowbytes value. */
-   row_info->rowbytes = dp-row;
+   row_info->rowbytes = (size_t)(dp-row);
 }
 #endif
 
@@ -596,7 +620,7 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_bgr");
 
-   if ((row_info->color_type & PNG_COLOR_MASK_COLOR))
+   if ((row_info->color_type & PNG_COLOR_MASK_COLOR) != 0)
    {
       png_uint_32 row_width = row_info->width;
       if (row_info->bit_depth == 8)
@@ -666,7 +690,7 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
 #endif
    }
 }
-#endif /* PNG_READ_BGR_SUPPORTED or PNG_WRITE_BGR_SUPPORTED */
+#endif /* READ_BGR || WRITE_BGR */
 
 #if defined(PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED) || \
     defined(PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED)
@@ -683,8 +707,8 @@ png_do_check_palette_indexes(png_structrp png_ptr, png_row_infop row_info)
        * and this calculation is used because it avoids warnings that other
        * forms produced on either GCC or MSVC.
        */
-      int padding = (-row_info->pixel_depth * row_info->width) & 7;
-      png_bytep rp = png_ptr->row_buf + row_info->rowbytes;
+      int padding = PNG_PADBITS(row_info->pixel_depth, row_info->width);
+      png_bytep rp = png_ptr->row_buf + row_info->rowbytes - 1;
 
       switch (row_info->bit_depth)
       {
@@ -695,7 +719,7 @@ png_do_check_palette_indexes(png_structrp png_ptr, png_row_infop row_info)
              */
             for (; rp > png_ptr->row_buf; rp--)
             {
-              if (*rp >> padding != 0)
+              if ((*rp >> padding) != 0)
                  png_ptr->num_palette_max = 1;
               padding = 0;
             }
@@ -769,7 +793,7 @@ png_do_check_palette_indexes(png_structrp png_ptr, png_row_infop row_info)
       }
    }
 }
-#endif /* PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED */
+#endif /* CHECK_FOR_INVALID_INDEX */
 
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
     defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
@@ -788,7 +812,7 @@ png_set_user_transform_info(png_structrp png_ptr, png_voidp
       (png_ptr->flags & PNG_FLAG_ROW_INIT) != 0)
    {
       png_app_error(png_ptr,
-            "info change after png_start_read_image or png_read_update_info");
+          "info change after png_start_read_image or png_read_update_info");
       return;
    }
 #endif
@@ -819,7 +843,7 @@ png_get_user_transform_ptr(png_const_structrp png_ptr)
 png_uint_32 PNGAPI
 png_get_current_row_number(png_const_structrp png_ptr)
 {
-   /* See the comments in png.h - this is the sub-image row when reading and
+   /* See the comments in png.h - this is the sub-image row when reading an
     * interlaced image.
     */
    if (png_ptr != NULL)
@@ -835,7 +859,6 @@ png_get_current_pass_number(png_const_structrp png_ptr)
       return png_ptr->pass;
    return 8; /* invalid */
 }
-#endif /* PNG_USER_TRANSFORM_INFO_SUPPORTED */
-#endif /* PNG_READ_USER_TRANSFORM_SUPPORTED ||
-          PNG_WRITE_USER_TRANSFORM_SUPPORTED */
-#endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */
+#endif /* USER_TRANSFORM_INFO */
+#endif /* READ_USER_TRANSFORM || WRITE_USER_TRANSFORM */
+#endif /* READ || WRITE */
