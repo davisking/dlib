@@ -81,6 +81,44 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct string_dims
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple struct that represents the size (width and height) of a
+                string in pixels.
+        !*/
+
+        string_dims() = default;
+        string_dims (
+            unsigned long width,
+            unsigned long height
+        ) : width(width), height(height) {}
+        unsigned long width = 0;
+        unsigned long height = 0;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T, typename traits,
+        typename alloc
+    >
+    string_dims compute_string_dims (
+        const std::basic_string<T, traits, alloc>& str,
+        const std::shared_ptr<font>& f_ptr = default_font::get_font()
+    )
+
+    /*!
+        ensures
+            - computes the size of the given string with the specified font in pixels.  To be very specific,
+              if dims is the returned object by this function, then:
+              - dims.width == width of the string
+              - dims.height == height of the string
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename T,
         typename traits,
@@ -175,6 +213,5 @@ namespace dlib
 }
 
 #endif // DLIB_DRAW_IMAGe_ABSTRACT
-
 
 
