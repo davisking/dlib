@@ -85,7 +85,7 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is a simple structs that represents the size (width and height) of a
+                This is a simple struct that represents the size (width and height) of a
                 string in pixels.
         !*/
 
@@ -213,6 +213,5 @@ namespace dlib
 }
 
 #endif // DLIB_DRAW_IMAGe_ABSTRACT
-
 
 
