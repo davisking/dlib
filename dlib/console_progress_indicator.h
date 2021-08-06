@@ -30,7 +30,8 @@ namespace dlib
                     }
 
                 The above code will print a message to the console each iteration
-                which shows how much time is remaining until the loop terminates.
+                which shows the current progress and how much time is remaining until
+                the loop terminates.
         !*/
 
     public:
@@ -72,8 +73,8 @@ namespace dlib
         /*!
             ensures
                 - print_status() assumes it is called with values which are linearly
-                  approaching target().  It will attempt to predict how much time is
-                  remaining until cur becomes equal to target().
+                  approaching target().  It will display the current progress and attempt
+                  to predict how much time is remaining until cur becomes equal to target().
                 - prints a status message to out which indicates how much more time is
                   left until cur is equal to target()
                 - if (always_print) then
@@ -155,6 +156,15 @@ namespace dlib
 
             out.setf(std::ios::fixed,std::ios::floatfield);
             std::streamsize ss;
+
+            if (std::trunc(target_val) == target_val)
+                ss = out.precision(0);
+            else
+                ss = out.precision(2);
+
+            out << "Progress: " << cur << "/" << target_val;
+            ss = out.precision(2);
+            out << " (" << cur / target_val * 100. << "%). ";
 
             if (seconds < 60)
             {
