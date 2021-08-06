@@ -157,7 +157,7 @@ namespace dlib
             out.setf(std::ios::fixed,std::ios::floatfield);
             std::streamsize ss;
 
-            if (std::fmod(target_val, 1.0) == 0)
+            if (std::trunc(target_val) == target_val)
                 ss = out.precision(0);
             else
                 ss = out.precision(2);
