@@ -185,6 +185,60 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct yolo_rect
+    {
+        yolo_rect() = default;
+        yolo_rect(const drectangle& r) : rect(r) {}
+        yolo_rect(const drectangle& r, double score) : rect(r),detection_confidence(score) {}
+        yolo_rect(const drectangle& r, double score, const std::string& label) : rect(r),detection_confidence(score), label(label) {}
+        yolo_rect(const mmod_rect& r) : rect(r.rect), detection_confidence(r.detection_confidence), ignore(r.ignore), label(r.label) {}
+
+        drectangle rect;
+        double detection_confidence = 0;
+        bool ignore = false;
+        std::string label;
+        std::vector<std::pair<double, std::string>> labels;
+
+        operator rectangle() const { return rect; }
+        bool operator == (const yolo_rect& rhs) const
+        {
+            return rect == rhs.rect
+                   && detection_confidence == rhs.detection_confidence
+                   && ignore == rhs.ignore
+                   && label == rhs.label;
+        }
+        bool operator<(const yolo_rect& rhs) const
+        {
+            return detection_confidence < rhs.detection_confidence;
+        }
+    };
+
+    inline void serialize(const yolo_rect& item, std::ostream& out)
+    {
+        int version = 1;
+        serialize(version, out);
+        serialize(item.rect, out);
+        serialize(item.detection_confidence, out);
+        serialize(item.ignore, out);
+        serialize(item.label, out);
+        serialize(item.labels, out);
+    }
+
+    inline void deserialize(yolo_rect& item, std::istream& in)
+    {
+        int version = 0;
+        deserialize(version, in);
+        if (version != 1)
+            throw serialization_error("Unexpected version found while deserializing dlib::yolo_rect");
+        deserialize(item.rect, in);
+        deserialize(item.detection_confidence, in);
+        deserialize(item.ignore, in);
+        deserialize(item.label, in);
+        deserialize(item.labels, in);
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_FULL_OBJECT_DeTECTION_H_

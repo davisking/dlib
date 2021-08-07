@@ -60,7 +60,13 @@ namespace dlib
             fout << "<images>\n";
             for (unsigned long i = 0; i < images.size(); ++i)
             {
-                fout << "  <image file='" << images[i].filename << "'>\n";
+                fout << "  <image file='" << images[i].filename << "'";
+                if (images[i].width != 0 && images[i].height != 0)
+                {
+                    fout << " width='" << images[i].width << "'";
+                    fout << " height='" << images[i].height << "'";
+                }
+                fout << ">\n";
 
                 // save all the boxes
                 for (unsigned long j = 0; j < images[i].boxes.size(); ++j)
@@ -251,6 +257,9 @@ namespace dlib
 
                         if (atts.is_in_list("file")) temp_image.filename = atts["file"];
                         else throw dlib::error("<image> missing required attribute 'file'");
+
+                        if (atts.is_in_list("width")) temp_image.width = sa = atts["width"];
+                        if (atts.is_in_list("height")) temp_image.height = sa = atts["height"];
                     }
 
                     ts.push_back(name);

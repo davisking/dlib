@@ -1854,7 +1854,190 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct yolo_options
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object contains all the parameters that control the behavior of loss_yolo_.
+        !*/
+    public:
+        struct anchor_box_details
+        {
+            anchor_box_details() = default;
+            anchor_box_details(unsigned long w, unsigned long h) : width(w), height(h) {}
+
+            unsigned long width = 0;
+            unsigned long height = 0;
+
+            friend inline void serialize(const anchor_box_details& item, std::ostream& out);
+            friend inline void deserialize(anchor_box_details& item, std::istream& in);
+        };
+
+        yolo_options() = default;
+
+        // This kind of object detector is a multi-scale object detector with bounding box
+        // regression for anchor boxes.  The anchors field determines which anchors will be
+        // used at the output pointed by the tag layer whose id is the key of the map.
+        std::unordered_map<int, std::vector<anchor_box_details>> anchors;
+
+        template <template <typename> class TAG_TYPE>
+        void add_anchors(
+            const std::vector<anchor_box_details>& boxes
+        );
+        /*!
+            ensures
+                - anchors.at(tag_id<TAG_TYPE>::id) == boxes
+        !*/
+
+        // This field contains the labels of all the possible objects this detector can find.
+        std::vector<std::string> labels;
+        // When computing the objectness loss, any detection that has an IoU above
+        // iou_ignore_threshold with a ground truth box will not incur any loss.
+        double iou_ignore_threshold = 0.7;
+        // When computing the YOLO loss (objectness + bounding box regression + classification),
+        // the best match between a truth and an anchor is always used, regardless of the IoU.
+        // However, if other anchors have an IoU with a truth box above iou_anchor_threshold, they
+        // will also experience loss against that truth box as well.  Setting iou_anchor_threshold to 1 will
+        // make the model use only the best anchor for each ground truth, so other anchors can be
+        // used for other ground truth boxes in the same cell (useful for detecting objects in crowds).
+        // This setting is meant to be used with "high capacity" models, not small ones.
+        double iou_anchor_threshold = 1.0;
+        // When doing non-max suppression, we use overlaps_nms to decide if a box overlaps
+        // an already output detection and should therefore be thrown out.
+        test_box_overlap overlaps_nms = test_box_overlap(0.45, 1.0);
+        // When set to true, NMS will only be applied between objects with the same class label.
+        bool classwise_nms = true;
+        // These parameters control how we penalize different kinds of mistakes: notably the objectness loss,
+        // the box (bounding box regression) loss, and the classification loss.
+        double lambda_obj = 1.0;
+        double lambda_box = 1.0;
+        double lambda_cls = 1.0;
+
+    };
+
+    void serialize(const yolo_options& item, std::ostream& out)
+    void deserialize(yolo_options& item, std::istream& in)
+
+// ----------------------------------------------------------------------------------------
+
+    template <template <typename> class... TAG_TYPES>
+    class loss_yolo_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object implements the loss layer interface defined above by
+                EXAMPLE_LOSS_LAYER_.  In particular, it implements the YOLO detection
+                loss defined in the paper:
+                    YOLOv3: An Incremental Improvement by Joseph Redmon and Ali Farhadi.
+
+                This means you use this loss if you want to detect the locations of objects
+                in images.
+
+                It should also be noted that this loss layer requires tag layers as template
+                parameters, which in turn require a subnetwork to be of type:
+                layer<TAG_TYPE>(net).subnet(): sig<con<(num_classes + 5) * num_anchors), SUBNET>>
+
+                Where num_classes is the number of categories that the detector is trained on,
+                and num_anchors is the number of priors or anchor boxes at the output pointed
+                by the tag layer. The number 5 corresponds to the objectness plus the 4 coordinates
+                for performing bounding box regression.
+        !*/
+
+    public:
+
+        typedef std::vector<yolo_rect> training_label_type;
+        typedef std::vector<yolo_rect> output_label_type;
+
+        loss_yolo_(
+        );
+        /*!
+            ensures
+                - #get_options() == yolo_options()
+        !*/
+
+        loss_yolo_(
+            yolo_options options_
+        );
+        /*!
+            ensures
+                - #get_options() == options_
+        !*/
+
+        const yolo_options& get_options (
+        ) const;
+        /*!
+            ensures
+                - returns the options object that defines the general behavior of this loss layer.
+        !*/
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter,
+            double adjust_threshold = 0.25
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
+            it has the additional calling requirements that:
+                - layer<TAG_TYPE>(sub).get_output().k() == options.anchors.at(tag_id<TAG_TYPE>::id).size() * (5 + options.labels.size());
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+            Also, the output labels are std::vectors of yolo_rects where, for each yolo_rect R,
+            we have the following interpretations:
+                - R.rect == the location of an object in the image.
+                - R.detection_confidence == the score for the object, between 0 and 1.  Only
+                  objects with a detection_confidence > adjust_threshold are output.  So if
+                  you want to output more objects (that are also of less confidence) you
+                  can call to_label() with a smaller value of adjust_threshold.
+                - R.label == the label of the detected object.
+                - R.labels == a std::vector<std::pair<double, std::string>> containing all the confidence values
+                  and labels that have a detection score > adjust_threshold, since this loss allows
+                  for multi-label outputs.  Note that the following is true:
+                      - R.labels[0].first == R.detection_confidence
+                      - R.labels[0].second == R.label
+                - R.ignore == false (this value is unused by to_label()).
+        !*/
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            const_label_iterator truth, 
+            SUBNET& sub
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient() 
+            except it has the additional calling requirements that: 
+                - layer<TAG_TYPE>(sub).get_output().k() == options.anchors.at(tag_id<TAG_TYPE>::id).size() * (5 + options.labels.size());
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+            Also, the loss value returned corresponds to the squared norm of the error gradient.
+        !*/
+
+        void adjust_nms (
+            double iou_thresh,
+            double percent_covered_thresh = 1,
+            bool classwise = true
+        );
+        /*!
+            ensures
+                - #get_options().overlaps_nms == test_box_overlap(iou_thresh, percent_covered_thresh)
+                - #get_options().classwise_nms == classwise
+        !*/
+
+    };
+
+    template <typename SUBNET>
+    using loss_yolo = add_loss_layer<loss_yolo_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_LOSS_ABSTRACT_H_
-

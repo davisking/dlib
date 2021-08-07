@@ -19,8 +19,8 @@ namespace dlib
                 This object is a tool for extracting random crops of objects from a set of
                 images.  The crops are randomly jittered in scale, translation, and
                 rotation but more or less centered on objects specified by mmod_rect
-                objects.
-                
+                objects (or other rectangle types with a compatible interface).
+
             THREAD SAFETY
                 It is safe for multiple threads to make concurrent calls to this object's
                 operator() methods.
@@ -40,6 +40,7 @@ namespace dlib
                 - #get_max_object_size() == 0.7
                 - #get_background_crops_fraction() == 0.5
                 - #get_translate_amount() == 0.1
+                - #get_min_object_coverage == 1.0
         !*/
 
         void set_seed (
@@ -152,7 +153,7 @@ namespace dlib
                   the longest edge of the object (i.e. either its height or width,
                   whichever is longer) is at least #get_min_object_length_long_dim() pixels
                   in length.  When we say "object" here we are referring specifically to
-                  the rectangle in the mmod_rect output by the cropper.
+                  the rectangle in the rectangle_type output by the cropper.
         !*/
 
         long get_min_object_length_short_dim (
@@ -163,7 +164,7 @@ namespace dlib
                   the shortest edge of the object (i.e. either its height or width,
                   whichever is shorter) is at least #get_min_object_length_short_dim()
                   pixels in length.  When we say "object" here we are referring
-                  specifically to the rectangle in the mmod_rect output by the cropper.
+                  specifically to the rectangle in the rectangle_type output by the cropper.
         !*/
 
         void set_min_object_size (
@@ -199,15 +200,34 @@ namespace dlib
                 - #get_max_object_size() == value
         !*/
 
+        double get_min_object_coverage (
+        ) const;
+        /*!
+            ensures
+                - When a chip is extracted, any object that has less than get_min_object_coverage() fraction of its 
+                   total area contained within the crop will have its ignore field set to true.
+        !*/
+
+        void set_min_object_coverage (
+            double value
+        );
+        /*!
+            requires
+                - 0 < value <= 1
+            ensures
+                - #get_min_object_coverage() == value
+        !*/
+
         template <
-            typename array_type
+            typename array_type,
+            typename rectangle_type
             >
         void append (
             size_t num_crops,
             const array_type& images,
-            const std::vector<std::vector<mmod_rect>>& rects,
+            const std::vector<std::vector<rectangle_type>>& rects,
             array_type& crops,
-            std::vector<std::vector<mmod_rect>>& crop_rects
+            std::vector<std::vector<rectangle_type>>& crop_rects
         );
         /*!
             requires
@@ -218,6 +238,8 @@ namespace dlib
                 - array_type is a type with an interface compatible with dlib::array or
                   std::vector and it must in turn contain image objects that implement the
                   interface defined in dlib/image_processing/generic_image.h 
+                - rectangle_type is a type with an interface compatible with mmod_rect, such
+                  as yolo_rect.
             ensures
                 - Randomly extracts num_crops chips from images and appends them to the end
                   of crops.  We also copy the object metadata for each extracted crop and
@@ -230,14 +252,15 @@ namespace dlib
         !*/
 
         template <
-            typename array_type
+            typename array_type,
+            typename rectangle_type
             >
         void operator() (
             size_t num_crops,
             const array_type& images,
-            const std::vector<std::vector<mmod_rect>>& rects,
+            const std::vector<std::vector<rectangle_type>>& rects,
             array_type& crops,
-            std::vector<std::vector<mmod_rect>>& crop_rects
+            std::vector<std::vector<rectangle_type>>& crop_rects
         );
         /*!
             requires
@@ -247,6 +270,8 @@ namespace dlib
                 - array_type is a type with an interface compatible with dlib::array or
                   std::vector and it must in turn contain image objects that implement the
                   interface defined in dlib/image_processing/generic_image.h 
+                - rectangle_type is a type with an interface compatible with mmod_rect, such
+                  as yolo_rect.
             ensures
                 - Randomly extracts num_crops chips from images.  We also copy the object
                   metadata for each extracted crop and store it into #crop_rects.  In
@@ -259,13 +284,14 @@ namespace dlib
 
         template <
             typename array_type,
-            typename image_type
+            typename image_type,
+            typename rectangle_type
             >
         void operator() (
             const array_type& images,
-            const std::vector<std::vector<mmod_rect>>& rects,
+            const std::vector<std::vector<rectangle_type>>& rects,
             image_type& crop,
-            std::vector<mmod_rect>& crop_rects
+            std::vector<rectangle_type>& crop_rects
         );
         /*!
             requires
@@ -277,6 +303,8 @@ namespace dlib
                 - array_type is a type with an interface compatible with dlib::array or
                   std::vector and it must in turn contain image objects that implement the
                   interface defined in dlib/image_processing/generic_image.h 
+                - rectangle_type is a type with an interface compatible with mmod_rect, such
+                  as yolo_rect.
             ensures
                 - Selects a random image and creates a random crop from it.  Specifically,
                   we pick a random index IDX < images.size() and then execute 
@@ -285,13 +313,14 @@ namespace dlib
 
         template <
             typename image_type1,
-            typename image_type2
+            typename image_type2,
+            typename rectangle_type
             >
         void operator() (
             const image_type1& img,
-            const std::vector<mmod_rect>& rects,
+            const std::vector<rectangle_type>& rects,
             image_type2& crop,
-            std::vector<mmod_rect>& crop_rects
+            std::vector<rectangle_type>& crop_rects
         );
         /*!
             requires
@@ -300,9 +329,11 @@ namespace dlib
                   dlib/image_processing/generic_image.h 
                 - image_type2 == an image object that implements the interface defined in
                   dlib/image_processing/generic_image.h 
+                - rectangle_type is a type with an interface compatible with mmod_rect, such
+                  as yolo_rect.
             ensures
-                - Extracts a random crop from img and copies over the mmod_rect objects in
-                  rects to #crop_rects if they are contained inside the crop.  Moreover,
+                - Extracts a random crop from img and copies over the rectangle_type objects
+                  in rects to #crop_rects if they are contained inside the crop.  Moreover,
                   rectangles are marked as ignore if they aren't completely contained
                   inside the crop.
                 - #crop_rects.size() <= rects.size()
@@ -342,5 +373,4 @@ namespace dlib
 }
 
 #endif // DLIB_RaNDOM_CROPPER_ABSTRACT_H_
-
 
