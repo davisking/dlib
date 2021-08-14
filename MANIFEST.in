@@ -14,4 +14,7 @@ recursive-include python_examples *.txt *.py
 recursive-include tools/python **
 
 prune tools/python/build*
+prune dlib/cmake_utils/*/build*
 prune dlib/test
+
+global-exclude *.pyc
