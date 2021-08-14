@@ -54,7 +54,7 @@ cp -r ../../docs/cache/* . || report_failure
 
 echo Version: $RELEASE >> README.md
 echo "Date:    `date`" >> README.md
-echo Mercurial Revision ID: $CHANGESET_ID >> README.md
+echo Git commit ID: $CHANGESET_ID >> README.md
 
 
 
