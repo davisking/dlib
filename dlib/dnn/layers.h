@@ -2563,6 +2563,9 @@ namespace dlib
         bool disabled = false;
     };
 
+    template <typename SUBNET>
+    using affine = add_layer<affine_, SUBNET>;
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -4337,8 +4340,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename SUBNET>
-    using affine = add_layer<affine_, SUBNET>;
     namespace impl
     {
         class visitor_fuse_layers
