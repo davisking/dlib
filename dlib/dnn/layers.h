@@ -3127,8 +3127,6 @@ namespace dlib
 
         void forward_inplace(const tensor& input, tensor& output)
         {
-            if (disabled)
-                return;
             tt::relu(output, input);
         } 
 
@@ -3139,14 +3137,8 @@ namespace dlib
             tensor& 
         )
         {
-            if (disabled)
-                return;
             tt::relu_gradient(data_grad, computed_output, gradient_input);
         }
-
-        void disable() { disabled = true; }
-        void enable() { disabled = false; }
-        bool is_disabled() const { return disabled; }
 
         inline dpoint map_input_to_output (const dpoint& p) const { return p; }
         inline dpoint map_output_to_input (const dpoint& p) const { return p; }
@@ -3167,11 +3159,9 @@ namespace dlib
                 throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::relu_.");
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const relu_& item)
+        friend std::ostream& operator<<(std::ostream& out, const relu_& /*item*/)
         {
             out << "relu";
-            if (item.disabled)
-                out << "\t (disabled)";
             return out;
         }
 
@@ -4349,28 +4339,14 @@ namespace dlib
 
     template <typename SUBNET>
     using affine = add_layer<affine_, SUBNET>;
-    class relu_;
     namespace impl
     {
-        class visitor_fuse_convolutions
+        class visitor_fuse_layers
         {
             public:
             template <typename T> void fuse_convolutions(T&) const
             {
                 // disable other layer types
-            }
-
-            // TODO: implement other activations and activation + convolution combinations
-
-            template <long nf, long nr, long nc, int sy, int sx, int py, int px, typename U, typename E1, typename E2>
-            void fuse_convolutions(
-                add_layer<relu_,
-                add_layer<affine_,
-                add_layer<con_<nf, nr, nc, sy, sx, py, px>, U>, E2>, E1>& l)
-            {
-                l.layer_details().disable();
-                l.subnet().subnet().layer_details().fuse();
-                fuse_convolutions(l.subnet());
             }
 
             // handle the standard case (convolutional layer followed by affine;
@@ -4430,12 +4406,12 @@ namespace dlib
     }
 
     template <typename net_type>
-    void fuse_convolutions(
+    void fuse_layers (
         net_type& net
     )
     {
-        DLIB_CASSERT(count_parameters(net) > 0, "The network has to be allocated before fusing the convolutions.");
-        visit_layers(net, impl::visitor_fuse_convolutions());
+        DLIB_CASSERT(count_parameters(net) > 0, "The network has to be allocated before fusing the layers.");
+        visit_layers(net, impl::visitor_fuse_layers());
     }
 
 // ----------------------------------------------------------------------------------------

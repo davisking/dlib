@@ -1213,7 +1213,7 @@ namespace dlib
                     out,
                     descriptor(biases),
                     biases.device(),
-                    relu_activation_descriptor(),
+                    identity_activation_descriptor(),
                     out_desc,
                     out));
         }

@@ -3301,7 +3301,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename net_type>
-    void fuse_convolutions (
+    void fuse_layers (
         net_type& net
     );
     /*!
@@ -3311,8 +3311,8 @@ namespace dlib
             - net has been properly allocated, that is: count_parameters(net) > 0.
         ensures
             - Disables all the affine_ layers that have a convolution as an input.
-            - Updates the convolutions beneath the affine_ layers to produce the same output
-              as with the affine_ layers enabled.
+            - Updates the convolution weights beneath the affine_ layers to produce the same
+              output as with the affine_ layers enabled.
     !*/
 
 // ----------------------------------------------------------------------------------------

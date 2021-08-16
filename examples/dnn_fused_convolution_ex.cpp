@@ -53,7 +53,7 @@ try
     }
 
     // fuse the convolutions in the network
-    fuse_convolutions(net2);
+    fuse_layers(net2);
     resizable_tensor out2 = net2.forward(x);
     const auto& label2 = labels[index_of_max(mat(out2))];
     tt::softmax(probs, out2);
