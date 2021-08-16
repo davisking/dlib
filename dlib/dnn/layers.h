@@ -111,6 +111,7 @@ namespace dlib
         void disable_bias() { use_bias = false; }
         bool bias_is_disabled() const { return !use_bias; }
         void fuse() { is_fused = true; }
+        bool fused() { return is_fused; }
         void enable_bias()
         {
             if (use_bias == true)
@@ -248,13 +249,6 @@ namespace dlib
             }
             else
             {
-                conv.setup(sub.get_output(),
-                           filters(params,0),
-                           _stride_y,
-                           _stride_x,
-                           padding_y_,
-                           padding_x_);
-
                 conv(false, output,
                     sub.get_output(),
                     filters(params,0));
@@ -4345,25 +4339,27 @@ namespace dlib
         class visitor_fuse_layers
         {
             public:
-            template <typename T> void fuse_convolutions(T&) const
+            template <typename T>
+            void fuse_convolution(T&) const
             {
                 // disable other layer types
             }
 
             // handle the standard case (convolutional layer followed by affine;
             template <long nf, long nr, long nc, int sy, int sx, int py, int px, typename U, typename E>
-            void fuse_convolutions(add_layer<affine_, add_layer<con_<nf, nr, nc, sy, sx, py, px>, U>, E>& l)
+            void fuse_convolution(add_layer<affine_, add_layer<con_<nf, nr, nc, sy, sx, py, px>, U>, E>& l)
             {
                 if (l.layer_details().is_disabled())
-                {
                     return;
-                }
-                // get the parameters from the affine layer as alias_tensor_instance
-                auto gamma = l.layer_details().get_gamma();
-                auto beta = l.layer_details().get_beta();
 
                 // get the convolution below the affine layer
                 auto& conv = l.subnet().layer_details();
+                if (conv.fused())
+                    return;
+
+                // get the parameters from the affine layer as alias_tensor_instance
+                auto gamma = l.layer_details().get_gamma();
+                auto beta = l.layer_details().get_beta();
 
                 if (conv.bias_is_disabled())
                 {
@@ -4388,6 +4384,8 @@ namespace dlib
                     filter(params, n * filter.size()) *= g[n];
                 }
 
+		// mark the convolution layer as fused
+		conv.fuse();
                 // disable the affine layer
                 l.layer_details().disable();
             }
@@ -4401,7 +4399,7 @@ namespace dlib
             template <typename T, typename U, typename E>
             void operator()(size_t , add_layer<T, U, E>& l)
             {
-                fuse_convolutions(l);
+                fuse_convolution(l);
             }
         };
     }

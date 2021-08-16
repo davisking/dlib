@@ -1205,7 +1205,7 @@ namespace dlib
                     (const cudnnFilterDescriptor_t)filter_handle,
                     filters.device(),
                     (const cudnnConvolutionDescriptor_t)conv_handle,
-                    CUDNN_CONVOLUTION_FWD_ALGO_IMPLICIT_PRECOMP_GEMM,
+                    (cudnnConvolutionFwdAlgo_t)forward_algo,
                     forward_workspace,
                     forward_workspace_size_in_bytes,
                     &alpha2,
