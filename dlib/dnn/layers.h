@@ -3168,7 +3168,6 @@ namespace dlib
         }
 
     private:
-        bool disabled = false;
         resizable_tensor params;
     };
 
@@ -4355,7 +4354,9 @@ namespace dlib
                 // get the convolution below the affine layer
                 auto& conv = l.subnet().layer_details();
                 if (conv.fused())
+                {
                     return;
+                }
 
                 // get the parameters from the affine layer as alias_tensor_instance
                 auto gamma = l.layer_details().get_gamma();
