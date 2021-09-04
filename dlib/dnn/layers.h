@@ -1807,13 +1807,24 @@ namespace dlib
             }
 
             // handle input repeat layer with tag case
-            template <layer_mode mode, unsigned long ID, typename E, typename F>
-            void disable_input_bias(add_layer<bn_<mode>, add_tag_layer<ID, impl::repeat_input_layer, E>, F>& )
+            template <layer_mode mode, unsigned long ID, typename E>
+            void disable_input_bias(add_layer<bn_<mode>, add_tag_layer<ID, impl::repeat_input_layer>, E>& )
             {
             }
 
-            template <unsigned long ID, typename E, typename F>
-            void disable_input_bias(add_layer<layer_norm_, add_tag_layer<ID, impl::repeat_input_layer, E>, F>& )
+            template <unsigned long ID, typename E>
+            void disable_input_bias(add_layer<layer_norm_, add_tag_layer<ID, impl::repeat_input_layer>, E>& )
+            {
+            }
+
+            // handle tag layer case
+            template <layer_mode mode, unsigned long ID, typename U, typename E>
+            void disable_input_bias(add_layer<bn_<mode>, add_tag_layer<ID, U>, E>& )
+            {
+            }
+
+            template <unsigned long ID, typename U, typename E>
+            void disable_input_bias(add_layer<layer_norm_, add_tag_layer<ID, U>, E>& )
             {
             }
 
