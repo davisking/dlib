@@ -944,6 +944,8 @@ namespace dlib
         /*!
             ensures
                 - bias_is_disabled() returns true
+                - if biwas was enabled and allocated, it resizes the layer parameters
+                  to free accommodate the filter parameters only, and free the bias parameters.
         !*/
 
         void enable_bias(
@@ -953,7 +955,6 @@ namespace dlib
                 - bias_is_disabled() returns false
                 - if bias was disabled and not allocated, it resizes the layer parameters
                   to accommodate the new zero-inizialized biases
-                - if called after disable_bias, the previous biases will be used
         !*/
 
         bool bias_is_disabled(
