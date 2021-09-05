@@ -113,16 +113,23 @@ namespace dlib
             if (use_bias == false)
                 return;
 
+            use_bias = false;
+            if (params.size() == 0)
+                return;
+
             DLIB_CASSERT(params.size() == filters.size() + num_filters_);
             auto temp = params;
             params.set_size(params.size() - num_filters_);
             std::copy(temp.begin(), temp.end() - num_filters_, params.begin());
             biases = alias_tensor();
-            use_bias = false;
         }
         void enable_bias()
         {
             if (use_bias == true)
+                return;
+
+            use_bias = true;
+            if (params.size() == 0)
                 return;
 
             DLIB_CASSERT(params.size() == filters.size());
@@ -131,7 +138,6 @@ namespace dlib
             std::copy(temp.begin(), temp.end(), params.begin());
             biases = alias_tensor(1, num_filters_);
             biases(params, filters.size()) = 0;
-            use_bias = true;
         }
 
         inline dpoint map_input_to_output (
