@@ -127,7 +127,7 @@ namespace dlib
 
             DLIB_CASSERT(params.size() == filters.size());
             auto temp = params;
-            params.set_size(params.size() + biases.size());
+            params.set_size(params.size() + num_filters_);
             std::copy(temp.begin(), temp.end(), params.begin());
             biases = alias_tensor(1, num_filters_);
             biases(params, filters.size()) = 0;
