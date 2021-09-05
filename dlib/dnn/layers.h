@@ -60,8 +60,7 @@ namespace dlib
             num_filters_(o.num_outputs),
             padding_y_(_padding_y),
             padding_x_(_padding_x),
-            use_bias(true),
-            is_fused(false)
+            use_bias(true)
         {
             DLIB_CASSERT(num_filters_ > 0);
         }
@@ -108,25 +107,31 @@ namespace dlib
         double get_bias_weight_decay_multiplier () const   { return bias_weight_decay_multiplier; }
         void set_bias_learning_rate_multiplier(double val) { bias_learning_rate_multiplier = val; }
         void set_bias_weight_decay_multiplier(double val)  { bias_weight_decay_multiplier  = val; }
-        void disable_bias() { use_bias = false; }
         bool bias_is_disabled() const { return !use_bias; }
-        void fuse() { is_fused = true; }
-        bool fused() { return is_fused; }
+        void disable_bias()
+        {
+            if (use_bias == false)
+                return;
+
+            DLIB_CASSERT(params.size() == filters.size() + num_filters_);
+            auto temp = params;
+            params.set_size(params.size() - num_filters_);
+            std::copy(temp.begin(), temp.end() - num_filters_, params.begin());
+            biases = alias_tensor();
+            use_bias = false;
+        }
         void enable_bias()
         {
             if (use_bias == true)
                 return;
-            else
-                use_bias = true;
-            // setup biases if network has been allocated and it doesn't have bias
-            if (params.size() == filters.size())
-            {
-                auto temp = params;
-                params.set_size(params.size() + num_filters_);
-                std::copy(temp.begin(), temp.end(), params.begin());
-                biases = alias_tensor(1, num_filters_);
-                biases(params, filters.size()) = 0;
-            }
+
+            DLIB_CASSERT(params.size() == filters.size());
+            auto temp = params;
+            params.set_size(params.size() + biases.size());
+            std::copy(temp.begin(), temp.end(), params.begin());
+            biases = alias_tensor(1, num_filters_);
+            biases(params, filters.size()) = 0;
+            use_bias = true;
         }
 
         inline dpoint map_input_to_output (
@@ -186,7 +191,6 @@ namespace dlib
             bias_weight_decay_multiplier = item.bias_weight_decay_multiplier;
             num_filters_ = item.num_filters_;
             use_bias = item.use_bias;
-            is_fused = item.is_fused;
             return *this;
         }
 
@@ -225,21 +229,10 @@ namespace dlib
             if (use_bias)
             {
 #ifdef DLIB_USE_CUDA
-                // this convolution has been fused with the batch norm and the activation
-                if (is_fused)
-                {
-                    conv(false, output,
-                        sub.get_output(),
-                        filters(params,0),
-                        biases(params, filters.size()));
-                }
-                else
-                {
-                    conv(false, output,
-                        sub.get_output(),
-                        filters(params,0));
-                    tt::add(1,output,1,biases(params,filters.size()));
-                }
+                conv(false, output,
+                    sub.get_output(),
+                    filters(params,0),
+                    biases(params, filters.size()));
 #else
                 conv(false, output,
                     sub.get_output(),
@@ -277,7 +270,7 @@ namespace dlib
 
         friend void serialize(const con_& item, std::ostream& out)
         {
-            serialize("con_6", out);
+            serialize("con_5", out);
             serialize(item.params, out);
             serialize(item.num_filters_, out);
             serialize(_nr, out);
@@ -293,7 +286,6 @@ namespace dlib
             serialize(item.bias_learning_rate_multiplier, out);
             serialize(item.bias_weight_decay_multiplier, out);
             serialize(item.use_bias, out);
-            serialize(item.is_fused, out);
         }
 
         friend void deserialize(con_& item, std::istream& in)
@@ -304,7 +296,7 @@ namespace dlib
             long nc;
             int stride_y;
             int stride_x;
-            if (version == "con_4" || version == "con_5" || version == "con_6")
+            if (version == "con_4" || version == "con_5")
             {
                 deserialize(item.params, in);
                 deserialize(item.num_filters_, in);
@@ -329,10 +321,6 @@ namespace dlib
                 if (version == "con_5")
                 {
                     deserialize(item.use_bias, in);
-                }
-                if (version == "con_6")
-                {
-                    deserialize(item.is_fused, in);
                 }
             }
             else
@@ -403,8 +391,6 @@ namespace dlib
         int padding_y_;
         int padding_x_;
         bool use_bias;
-        bool is_fused;
-
     };
 
     template <
@@ -4364,14 +4350,10 @@ namespace dlib
 
                 // get the convolution below the affine layer
                 auto& conv = l.subnet().layer_details();
-                if (conv.fused())
-                {
-                    return;
-                }
 
                 // get the parameters from the affine layer as alias_tensor_instance
-                auto gamma = l.layer_details().get_gamma();
-                auto beta = l.layer_details().get_beta();
+                alias_tensor_instance gamma = l.layer_details().get_gamma();
+                alias_tensor_instance beta = l.layer_details().get_beta();
 
                 if (conv.bias_is_disabled())
                 {
@@ -4396,8 +4378,6 @@ namespace dlib
                     filter(params, n * filter.size()) *= g[n];
                 }
 
-		// mark the convolution layer as fused
-		conv.fuse();
                 // disable the affine layer
                 l.layer_details().disable();
             }
