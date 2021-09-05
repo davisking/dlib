@@ -36,20 +36,6 @@ cmake_minimum_required(VERSION 2.8.12)
 # Every project needs a name.  We call this the "examples" project.
 project(examples)
 
-find_program(CCACHE_FOUND ccache)
-if(CCACHE_FOUND)
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
-endif (CCACHE_FOUND)
-
-include(CheckCXXCompilerFlag)
-if (CMAKE_BUILD_TYPE STREQUAL "Release")
-    CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)
-    if(COMPILER_SUPPORTS_MARCH_NATIVE)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
-    endif()
-endif()
-
 # Tell cmake we will need dlib.  This command will pull in dlib and compile it
 # into your project.  Note that you don't need to compile or install dlib.  All
 # cmake needs is the dlib source code folder and it will take care of everything.
