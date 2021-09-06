@@ -1187,11 +1187,11 @@ namespace dlib
             const float alpha1 = 1;
             const float alpha2 = add_to_output ? 1 : 0;
 
-            // Since cudnnConvolutionForward() is an asynchronous call, we need to hold a
-            // reference to the workspace buffer so we can be sure it isn't reallocated
-            // while the function is still executing on the device.  But each time we come
-            // here, we make sure to grab the latest workspace buffer so that, globally, we
-            // minimize the number of such buffers.
+            // Since cudnnConvolutionBiasActivationForward() is an asynchronous call,
+            // we need to hold a reference to the workspace buffer so we can be sure it
+            // isn't reallocated while the function is still executing on the device.
+            // But each time we come here, we make sure to grab the latest workspace
+            // buffer so that, globally, we minimize the number of such buffers.
             forward_workspace = device_global_buffer(forward_workspace_size_in_bytes);
 
             float* out = output.device();
