@@ -645,7 +645,9 @@ if (NOT TARGET dlib)
             # Note that we add __STRICT_ANSI__ to avoid freaking out nvcc with gcc specific
             # magic in the standard C++ header files (since nvcc uses gcc headers on
             # linux).
-            list(APPEND CUDA_NVCC_FLAGS "-arch=sm_50;-D__STRICT_ANSI__;-D_MWAITXINTRIN_H_INCLUDED;-D_FORCE_INLINES;${FLAGS_FOR_NVCC}")
+            list(APPEND CUDA_NVCC_FLAGS "-gencode arch=compute_50,code=[sm_50,compute_50]")
+            list(APPEND CUDA_NVCC_FLAGS "-gencode arch=compute_75,code=[sm_75,compute_75]")
+            list(APPEND CUDA_NVCC_FLAGS "-D__STRICT_ANSI__;-D_MWAITXINTRIN_H_INCLUDED;-D_FORCE_INLINES;${FLAGS_FOR_NVCC}")
             list(APPEND CUDA_NVCC_FLAGS ${active_preprocessor_switches})
             if (NOT DLIB_IN_PROJECT_BUILD)
                LIST(APPEND CUDA_NVCC_FLAGS -DDLIB__CMAKE_GENERATED_A_CONFIG_H_FILE)
