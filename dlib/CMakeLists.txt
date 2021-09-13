@@ -172,6 +172,8 @@ if (NOT TARGET dlib)
       "Disable this if you don't want to use a LAPACK library" )
    set (DLIB_USE_CUDA_STR
       "Disable this if you don't want to use NVIDIA CUDA" )
+   set (DLIB_USE_CUDA_COMPUTE_CAPABILITIES_STR
+      "Set this to a comma-separated list of CUDA compute capabilities" )
    set (DLIB_USE_MKL_SEQUENTIAL_STR
       "Enable this if you have MKL installed and want to use the sequential version instead of the multi-core version." )
    set (DLIB_USE_MKL_WITH_TBB_STR
@@ -246,6 +248,7 @@ if (NOT TARGET dlib)
       option(DLIB_USE_BLAS ${DLIB_USE_BLAS_STR} ON)
       option(DLIB_USE_LAPACK ${DLIB_USE_LAPACK_STR} ON)
       option(DLIB_USE_CUDA ${DLIB_USE_CUDA_STR} ON)
+      set(DLIB_USE_CUDA_COMPUTE_CAPABILITIES 50 CACHE STRING ${DLIB_USE_CUDA_COMPUTE_CAPABILITIES_STR})
       option(DLIB_PNG_SUPPORT ${DLIB_PNG_SUPPORT_STR} ON)
       option(DLIB_GIF_SUPPORT ${DLIB_GIF_SUPPORT_STR} ON)
       #option(DLIB_USE_FFTW ${DLIB_USE_FFTW_STR} ON)
@@ -642,10 +645,13 @@ if (NOT TARGET dlib)
             endif()
 
             set(CUDA_HOST_COMPILATION_CPP ON)
+            string(REPLACE "," ";" DLIB_CUDA_COMPUTE_CAPABILITIES ${DLIB_USE_CUDA_COMPUTE_CAPABILITIES})
+            foreach(CAP ${DLIB_CUDA_COMPUTE_CAPABILITIES})
+                list(APPEND CUDA_NVCC_FLAGS "-gencode arch=compute_${CAP},code=[sm_${CAP},compute_${CAP}]")
+            endforeach()
             # Note that we add __STRICT_ANSI__ to avoid freaking out nvcc with gcc specific
-            # magic in the standard C++ header files (since nvcc uses gcc headers on
-            # linux).
-            list(APPEND CUDA_NVCC_FLAGS "-arch=sm_50;-D__STRICT_ANSI__;-D_MWAITXINTRIN_H_INCLUDED;-D_FORCE_INLINES;${FLAGS_FOR_NVCC}")
+            # magic in the standard C++ header files (since nvcc uses gcc headers on linux).
+            list(APPEND CUDA_NVCC_FLAGS "-D__STRICT_ANSI__;-D_MWAITXINTRIN_H_INCLUDED;-D_FORCE_INLINES;${FLAGS_FOR_NVCC}")
             list(APPEND CUDA_NVCC_FLAGS ${active_preprocessor_switches})
             if (NOT DLIB_IN_PROJECT_BUILD)
                LIST(APPEND CUDA_NVCC_FLAGS -DDLIB__CMAKE_GENERATED_A_CONFIG_H_FILE)
@@ -773,7 +779,7 @@ if (NOT TARGET dlib)
             endif()
 
             include_directories(${cudnn_include})
-            message(STATUS "Enabling CUDA support for dlib.  DLIB WILL USE CUDA")
+            message(STATUS "Enabling CUDA support for dlib.  DLIB WILL USE CUDA, compute capabilities: ${DLIB_CUDA_COMPUTE_CAPABILITIES}")
          else()
             set(DLIB_USE_CUDA OFF CACHE STRING ${DLIB_USE_BLAS_STR} FORCE )
             toggle_preprocessor_switch(DLIB_USE_CUDA)
