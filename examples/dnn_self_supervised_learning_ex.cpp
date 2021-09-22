@@ -318,7 +318,7 @@ namespace dlib
             }
 
             double diagonal_loss = sum(squared(diag(C) - 1));
-            double off_diag_loss = sum(squared(C - D));
+            double off_diag_loss = sum(squared(C - diagm(diag(C))));
 
             return diagonal_loss + lambda * off_diag_loss;
         }
