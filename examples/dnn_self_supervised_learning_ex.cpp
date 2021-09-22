@@ -281,7 +281,7 @@ namespace dlib
             const matrix<float> A = mat(za_norm);
             const matrix<float> B = mat(zb_norm);
             const matrix<float> C = mat(temp);  // trans(A) * B
-            const matrix<float> D = diagm(diag(C));
+            const matrix<float> D = ones_matrix<float>(sample_size, sample_size) - identity_matrix<float>(sample_size);
             // std::cout << diag(C) << std::endl;
             // std::cout << D << std::endl;
             // std::cout << C - D << std::endl;
@@ -291,15 +291,15 @@ namespace dlib
             // ----------------------------------------
             // 	=> d/dA = 2 * B * diag(diag(A' * B) - vector(1))
             // 	=> d/dB = 2 * A * diag(diag(A' * B) - vector(1))
-            const matrix<float> GDA = B * diagm(diag(C) - 1) * 2;
-            const matrix<float> GDB = A * diagm(diag(C) - 1) * 2;
+            const matrix<float> GDA = 2 * (B * diagm(diag(C) - 1));
+            const matrix<float> GDB = 2 * (A * diagm(diag(C) - 1));
 
-            // off-diag: sum((A'* B - D).^2)
+            // off-diag: sum(((A'* B) .* D).^2)
             // -----------------------------
-            //  => d/dA = 2 *  B * (B' * A - D')
-            //  => d/dB = 2 *  A * (A' * B - D)
-            const matrix<float> GOA = 2 * B * (trans(C) - D);
-            const matrix<float> GOB = 2 * A * (C - D);
+            //  => d/dA = 2 * B * ((B' * A) .* (D .* D)') = 2 * B * (C' .* (D .* D)')
+            //  => d/dB = 2 * A * ((A' * B) .* (D .* D)) = 2 * A * (C .* (D .* D))
+            const matrix<float> GOA = 2 * B * pointwise_multiply(trans(C), trans(squared(D)));
+            const matrix<float> GOB = 2 * A * pointwise_multiply(C, squared(D));
             // std::cout << GDA.nr() << 'x' << GDB.nc() << std::endl;
             // std::cout << GDB.nr() << 'x' << GDB.nc() << std::endl;
             // std::cout << GOA.nr() << 'x' << GDB.nc() << std::endl;
