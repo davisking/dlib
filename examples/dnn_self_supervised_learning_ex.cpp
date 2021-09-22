@@ -272,11 +272,8 @@ namespace dlib
             tt::batch_normalize(eps, za_norm, means, invstds, 1, running_means, running_variances, za, gamma, beta);
             // std::cout << "batch_normalize b" << std::endl;
             tt::batch_normalize(eps, zb_norm, means, invstds, 1, running_means, running_variances, zb, gamma, beta);
-            // std::cout << output_tensor.size() << std::endl;
-            // std::cout << za_norm.size() << std::endl;
 
             // compute the empirical cross-correlation matrix
-            // std::cout << "cross-correlation matrix" << std::endl;
             temp.set_size(sample_size, sample_size);
             tt::gemm(0, temp, 1, za_norm, true, zb_norm, false);
             temp /= batch_size;
@@ -323,41 +320,7 @@ namespace dlib
             double diagonal_loss = sum(squared(diag(C) - 1));
             double off_diag_loss = sum(squared(C - D));
 
-            // return sum(squared(diag(C) - 1)) + lambda *
-            //        sum(pointwise_multiply(
-            //            ones_matrix<float>(sample_size, sample_size) - identity_matrix<float>(sample_size),
-            //            squared(C)));
             return diagonal_loss + lambda * off_diag_loss;
-
-            // for (size_t i = 0; i < batch_size; ++i)
-            // {
-            //     auto s1 = sample(za_norm, i * sample_size);
-            //     auto s2 = sample(zb_norm, i * sample_size);
-            //     tt::gemm(0, temp, 1, s1, true, s1, false);
-            //     for (
-            // }
-            // double loss = sum(squared(diag(temp) - 1)) + sum(pointwise_multiply(lambda, squared(temp)));
-
-            // double loss = 0;
-            // auto g = grad.host();
-            // // TODO: figure out how to compute the gradients
-            // for (long r = 0; r < temp.nr(); ++r)
-            // {
-            //     for (long c = 0; c < temp.nc(); ++c)
-            //     {
-            //         const auto val = mat(temp)(r, c);
-            //         if (r == c)
-            //         {
-            //             loss += (val - 1) * (val - 1);
-            //         }
-            //         else
-            //         {
-            //             loss += lambda * val * val;
-            //         }
-            //     }
-            // }
-            // cout << loss << endl;
-            // return loss;
         }
 
         friend void serialize(const loss_barlow_twins_& item, std::ostream& out)
@@ -404,26 +367,6 @@ try
 {
     std::vector<std::pair<matrix<rgb_pixel>, matrix<rgb_pixel>>> batch;
 
-
-    // using net_type = loss_barlow_twins<fc<2, input_rgb_image_pair>>;
-    // net_type net; //(input_rgb_image_pair(0, 0, 0));
-    // matrix<rgb_pixel> white(1, 1);
-    // matrix<rgb_pixel> black(1, 1);
-    // assign_all_pixels(white, rgb_pixel(255, 128, 1));
-    // assign_all_pixels(black, rgb_pixel(64, 32, 128));
-    // batch.emplace_back(white, black);
-    // batch.emplace_back(black, white);
-    // batch.emplace_back(white, black);
-    // resizable_tensor x;
-    // net.to_tensor(batch.begin(), batch.end(), x);
-    // net.forward(x);
-    // cout << net << endl;
-    // while (true)
-    // {
-    //     const auto loss = net.compute_loss(x);
-    //     cout << "loss: " << loss << endl;
-    // }
-
     using net_type = loss_barlow_twins<
                      fc_no_bias<512, relu<bn_fc<fc_no_bias<512, relu<bn_fc<fc_no_bias<512,
                      avg_pool_everything<
@@ -450,7 +393,6 @@ try
             const auto idx = rnd.get_random_64bit_number() % training_images.size();
             auto image = training_images[idx];
             batch.emplace_back(image, fliplr(image));
-            // cout << idx << ", " << batch.size() << endl;
         }
         resizable_tensor x;
         // cout << trainer.get_train_one_step_calls() << ": " << trainer.get_average_loss() << endl;
@@ -461,7 +403,7 @@ try
         // cout << "back propagating error" << endl;
         net.back_propagate_error(x);
         // cout << "updating network parameters" << endl;
-        net.update_parameters(solvers, 0.000001);
+        net.update_parameters(solvers, 1e-5);
         // cout << net << endl;
         cin.get();
     }
