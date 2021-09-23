@@ -75,6 +75,7 @@ namespace dlib
                 - The A,B,C,Q,R,lower, and upper parameter matrices are filled with zeros.
                   Therefore, to use this object you must initialize it via the constructor
                   that supplies these parameters.
+                - #get_target_error_threshold() == -1
         !*/
 
         mpc (
@@ -108,6 +109,7 @@ namespace dlib
                     - get_target(i).size() == A.nr()
                 - #get_max_iterations() == 10000 
                 - #get_epsilon() == 0.01
+                - #get_target_error_threshold() == -1
         !*/
 
         const matrix<double,S,S>& get_A (
@@ -205,6 +207,29 @@ namespace dlib
                 - performs: set_target(val, horizon-1)
         !*/
 
+        double get_target_error_threshold (
+        ) const;
+        /*!
+            ensures
+                - The target error terms in the objective function with values less than
+                  get_target_error_threshold() are ignored.  That is, the
+                  trans(x_i-target_i)*Q*(x_i-target_i) terms with values less than this are dropped
+                  from the objective function.  Therefore, setting get_target_error_threshold() to a
+                  value >= 0 allows you to encode a control law that says "find me the controls that
+                  make the target error less than or equal to this at some point, but I don't care
+                  what happens at times after that."
+        !*/
+
+        void set_target_error_threshold (
+            const double thresh 
+        );
+        /*!
+            ensures
+                - #target_error_threshold() == thresh
+        !*/
+
+
+
         unsigned long get_max_iterations (
         ) const; 
         /*!
@@ -256,7 +281,7 @@ namespace dlib
                 - A.nr() == current_state.size()
             ensures
                 - Solves the model predictive control problem defined by the arguments to
-                  this objects constructor, assuming that the starting state is given by
+                  this object's constructor, assuming that the starting state is given by
                   current_state.  Then we return the control that should be taken in the
                   current state that best optimizes the quadratic objective function
                   defined above.
