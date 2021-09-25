@@ -1934,8 +1934,9 @@ namespace dlib
         );
         /*!
             ensures
-                - sets the params.size() of this layer to 0.
-                - when forward_inplace and backward_inplace are called, they return immediately.
+                - #get_layer_params().size() == 0.
+                - when forward_inplace and backward_inplace are called, they return immediately doing nothing.
+                  Causing this layer to trivially perform the an identity transform.
         !*/
 
         alias_tensor_instance get_gamma();
