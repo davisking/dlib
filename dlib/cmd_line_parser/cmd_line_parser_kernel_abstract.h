@@ -30,7 +30,7 @@ namespace dlib
 
             ENUMERATION ORDER   
                 The enumerator will enumerate over all the options defined in *this 
-                in alphebetical order according to the name of the option.
+                in alphabetical order according to the name of the option.
 
             POINTERS AND REFERENCES TO INTERNAL DATA
                 parsed_line(), option_is_defined(), option(), number_of_arguments(),
