@@ -1211,7 +1211,8 @@ namespace dlib
                 if (start < stop)
                 {
                     devices[i]->net.to_tensor(dbegin+start, dbegin+stop, job.t[i]);
-                    job.labels[i].assign(lbegin+start, lbegin+stop);
+                    if (job.labels[i].size() != 0)
+                        job.labels[i].assign(lbegin+start, lbegin+stop);
                     job.have_data[i] = true;
                 }
                 else
