@@ -125,6 +125,7 @@ namespace dlib
             data.set_size(2 * std::distance(ibegin, iend), 3, nr, nc);
 
             const size_t offset = nr * nc;
+            const size_t offset2 = data.size() / 2;
             auto ptr = data.host();
             for (auto i = ibegin; i != iend; ++i)
             {
@@ -136,21 +137,16 @@ namespace dlib
                         rgb_pixel temp_second = i->second(r, c);
                         auto p = ptr++;
                         *p = (temp_first.red - avg_red_first) / 256.0;
+                        *(p + offset2) = (temp_second.red - avg_red_second) / 256.0;
                         p += offset;
                         *p = (temp_first.green - avg_green_first) / 256.0;
+                        *(p + offset2) = (temp_second.green - avg_green_second) / 256.0;
                         p += offset;
                         *p = (temp_first.blue - avg_blue_first) / 256.0;
-                        // go to the second half of the tensor
-                        p += offset + data.size() / 2;
-                        *p = (temp_second.red - avg_red_second) / 256.0;
-                        p += offset;
-                        *p = (temp_second.green - avg_green_second) / 256.0;
-                        p += offset;
-                        *p = (temp_second.blue - avg_blue_second) / 256.0;
+                        *(p + offset2) = (temp_second.blue - avg_blue_second) / 256.0;
                         p += offset;
                     }
                 }
-                // ptr += offset * (2 * data.k() - 1);
                 ptr += offset * (data.k() - 1);
             }
         }
