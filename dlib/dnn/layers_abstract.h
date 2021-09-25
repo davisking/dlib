@@ -944,7 +944,7 @@ namespace dlib
         /*!
             ensures
                 - bias_is_disabled() returns true
-                - if biwas was enabled and allocated, it resizes the layer parameters
+                - if bias was enabled and allocated, it resizes the layer parameters
                   to accommodate the filter parameters only, and free the bias parameters.
         !*/
 
