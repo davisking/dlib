@@ -49,7 +49,7 @@ fi
 if [ "$VARIANT" = "old-cmake" ]; then
   mkdir build
   cd build
-  CMAKEDIR=../cmake -DCMAKE_CXX_FLAGS="${CXX_FLAGS}"
+  CMAKEDIR=../cmake
 
   $CMAKEDIR/2.8/bin/cmake ../dlib/test/tools
   $CMAKEDIR/2.8/bin/cmake --build .  -- -j 2
