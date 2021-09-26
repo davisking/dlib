@@ -234,17 +234,10 @@ namespace dlib
                        padding_x_);
             if (use_bias)
             {
-#ifdef DLIB_USE_CUDA
                 conv(false, output,
                     sub.get_output(),
                     filters(params,0),
                     biases(params, filters.size()));
-#else
-                conv(false, output,
-                    sub.get_output(),
-                    filters(params,0));
-                tt::add(1,output,1,biases(params,filters.size()));
-#endif
             }
             else
             {

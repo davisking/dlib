@@ -554,6 +554,22 @@ namespace dlib
                 const tensor& filters
             );
 
+            void operator() (
+                const bool add_to_output,
+                resizable_tensor& output,
+                const tensor& data,
+                const tensor& filters,
+                const tensor& biases
+            );
+
+            void operator() (
+                const bool add_to_output,
+                tensor& output,
+                const tensor& data,
+                const tensor& filters,
+                const tensor& biases
+            );
+
             void get_gradient_for_data (
                 const bool add_to_output,
                 const tensor& gradient_input, 

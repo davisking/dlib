@@ -1181,6 +1181,7 @@ namespace dlib
             DLIB_CASSERT(output.k() == filters.num_samples());
             DLIB_CASSERT(output.nr() == 1+(data.nr()+2*padding_y-filters.nr())/stride_y);
             DLIB_CASSERT(output.nc() == 1+(data.nc()+2*padding_x-filters.nc())/stride_x);
+            DLIB_CASSERT(filters.num_samples() == biases.k());
 
 
 

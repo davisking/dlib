@@ -173,13 +173,6 @@ namespace dlib
 
             void operator() (
                 const bool add_to_output,
-                tensor& output,
-                const tensor& data,
-                const tensor& filters
-            );
-
-            void operator() (
-                const bool add_to_output,
                 resizable_tensor& output,
                 const tensor& data,
                 const tensor& filters
@@ -188,6 +181,13 @@ namespace dlib
             void operator() (
                 const bool add_to_output,
                 tensor& output,
+                const tensor& data,
+                const tensor& filters
+            );
+
+            void operator() (
+                const bool add_to_output,
+                resizable_tensor& output,
                 const tensor& data,
                 const tensor& filters,
                 const tensor& biases
@@ -195,7 +195,7 @@ namespace dlib
 
             void operator() (
                 const bool add_to_output,
-                resizable_tensor& output,
+                tensor& output,
                 const tensor& data,
                 const tensor& filters,
                 const tensor& biases
