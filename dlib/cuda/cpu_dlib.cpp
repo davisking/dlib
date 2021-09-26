@@ -2473,7 +2473,9 @@ namespace dlib
             const tensor& biases
         )
         {
-            (*this)(add_to_output, static_cast<tensor&>(output),data,filters, biases);
+            DLIB_CASSERT(filters.num_samples() == biases.k());
+            (*this)(add_to_output, output,data,filters);
+            tt::add(1, output, 1, biases);
         }
 
         void tensor_conv::operator() (
