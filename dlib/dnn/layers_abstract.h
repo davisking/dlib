@@ -1863,24 +1863,24 @@ namespace dlib
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
                 defined above.  In particular, it applies a simple pointwise linear
                 transformation to an input tensor.  You can think of it as having two
-                parameter tensors, A and B.  If the input tensor is called INPUT then the
-                output of this layer is:
-                    A*INPUT+B
+                parameter tensors, gamma and beta.  If the input tensor is called INPUT
+                then the output of this layer is:
+                    gamma*INPUT+beta
                 where all operations are performed element wise and each sample in the
                 INPUT tensor is processed separately.
 
-                Moreover, this object has two modes that affect the dimensionalities of A
-                and B and how they are applied to compute A*INPUT+B.  If
-                get_mode()==FC_MODE then A and B each have the same dimensionality as the
-                input tensor, except their num_samples() dimensions are 1.  If
-                get_mode()==CONV_MODE then A and B have all their dimensions set to 1
-                except for k(), which is equal to INPUT.k().
+                Moreover, this object has two modes that affect the dimensionalities of
+                gamma and beta and how they are applied to compute gamma*INPUT+beta.  If
+                get_mode()==FC_MODE then gamma and beta each have the same dimensionality
+                as the input tensor, except their num_samples() dimensions are 1.  If
+                get_mode()==CONV_MODE then gamma and beta have all their dimensions set
+                to 1 except for k(), which is equal to INPUT.k().
 
-                In either case, the computation of A*INPUT+B is performed pointwise over all
-                the elements of INPUT using either:
-                    OUTPUT(n,k,r,c) == A(1,k,r,c)*INPUT(n,k,r,c)+B(1,k,r,c)
+                In either case, the computation of gamma*INPUT+beta is performed pointwise
+                over all the elements of INPUT using either:
+                    OUTPUT(n,k,r,c) == gamma(1,k,r,c)*INPUT(n,k,r,c)+beta(1,k,r,c)
                 or
-                    OUTPUT(n,k,r,c) == A(1,k,1,1)*INPUT(n,k,r,c)+B(1,k,1,1)
+                    OUTPUT(n,k,r,c) == gamma(1,k,1,1)*INPUT(n,k,r,c)+beta(1,k,1,1)
                 as appropriate.
 
 
