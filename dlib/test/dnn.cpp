@@ -4159,6 +4159,36 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_fuse_layers()
+    {
+        print_spinner();
+        using net_type = fc<10, avg_pool_everything<relu<bn_con<con<16, 3, 3, 1, 1, input_rgb_image>>>>>;
+        using net_type_fused = fc<10, avg_pool_everything<relu<affine<con<16, 3, 3, 1, 1, input_rgb_image>>>>>;
+        net_type net_bias, net_nobias;
+        disable_duplicative_biases(net_nobias);
+        resizable_tensor x;
+        matrix<rgb_pixel> image(8, 8);
+        net_bias.to_tensor(&image, &image+1, x);
+        net_nobias.to_tensor(&image, &image+1, x);
+        net_bias.forward(x);
+        net_nobias.forward(x);
+        net_type_fused net_fused_bias(net_bias);
+        net_type_fused net_fused_nobias(net_nobias);
+        const resizable_tensor out_bias = net_bias.get_output();
+        const resizable_tensor out_nobias = net_nobias.get_output();
+        fuse_layers(net_fused_bias);
+        fuse_layers(net_fused_nobias);
+        net_fused_bias.forward(x);
+        net_fused_nobias.forward(x);
+        const resizable_tensor out_bias_fused = net_fused_bias.get_output();
+        const resizable_tensor out_nobias_fused = net_fused_nobias.get_output();
+
+        DLIB_TEST(max(squared(mat(out_bias) - mat(out_bias_fused))) < 1e-10);
+        DLIB_TEST(max(squared(mat(out_nobias) - mat(out_nobias_fused))) < 1e-10);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class dnn_tester : public tester
     {
     public:
@@ -4263,6 +4293,7 @@ namespace
             test_disable_duplicative_biases();
             test_set_learning_rate_multipliers();
             test_input_ouput_mappers();
+            test_fuse_layers();
         }
 
         void perform_test()
