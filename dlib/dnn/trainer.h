@@ -1194,9 +1194,6 @@ namespace dlib
             job.have_data.resize(devs);
             job.test_only = test_only;
 
-            // check if the iterator points to anything
-            const bool have_labels = sizeof(*lbegin) != 1;
-
             // chop the data into devs blocks, each of about block_size elements.
             const double block_size = num / static_cast<double>(devs);
 
@@ -1214,8 +1211,7 @@ namespace dlib
                 if (start < stop)
                 {
                     devices[i]->net.to_tensor(dbegin+start, dbegin+stop, job.t[i]);
-                    if (have_labels)
-                        job.labels[i].assign(lbegin+start, lbegin+stop);
+                    job.labels[i].assign(lbegin+start, lbegin+stop);
                     job.have_data[i] = true;
                 }
                 else
@@ -1241,8 +1237,44 @@ namespace dlib
             data_iterator dend
         )
         {
-            typename std::vector<training_label_type>::iterator nothing;
-            send_job(test_only, dbegin, dend, nothing);
+            propagate_exception();
+            size_t num = std::distance(dbegin, dend);
+            size_t devs = devices.size();
+            job.t.resize(devs);
+            job.have_data.resize(devs);
+            job.test_only = test_only;
+
+            // chop the data into devs blocks, each of about block_size elements.
+            const double block_size = num / static_cast<double>(devs);
+
+            const auto prev_dev = dlib::cuda::get_device();
+
+            double j = 0;
+
+            for (size_t i = 0; i < devs; ++i)
+            {
+                dlib::cuda::set_device(devices[i]->device_id);
+
+                const size_t start = static_cast<size_t>(std::round(j));
+                const size_t stop  = static_cast<size_t>(std::round(j + block_size));
+
+                if (start < stop)
+                {
+                    devices[i]->net.to_tensor(dbegin+start, dbegin+stop, job.t[i]);
+                    job.have_data[i] = true;
+                }
+                else
+                {
+                    job.have_data[i] = false;
+                }
+
+                j += block_size;
+            }
+
+            DLIB_ASSERT(std::fabs(j - num) < 1e-10);
+
+            dlib::cuda::set_device(prev_dev);
+            job_pipe.enqueue(job);
         }
 
         void print_progress()
