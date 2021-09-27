@@ -1199,6 +1199,8 @@ namespace dlib
 
             const auto prev_dev = dlib::cuda::get_device();
 
+            const bool has_unsupervised_loss = std::is_same<no_label_type, training_label_type>::value;
+
             double j = 0;
 
             for (size_t i = 0; i < devs; ++i)
@@ -1211,7 +1213,8 @@ namespace dlib
                 if (start < stop)
                 {
                     devices[i]->net.to_tensor(dbegin+start, dbegin+stop, job.t[i]);
-                    job.labels[i].assign(lbegin+start, lbegin+stop);
+                    if (!has_unsupervised_loss)
+                        job.labels[i].assign(lbegin+start, lbegin+stop);
                     job.have_data[i] = true;
                 }
                 else
