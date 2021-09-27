@@ -255,7 +255,7 @@ namespace dlib
             alias_tensor split(batch_size, sample_size);
             alias_tensor sample(1, sample_size);
             auto za = split(output_tensor);
-            auto zb = split(output_tensor, batch_size);
+            auto zb = split(output_tensor, split.size());
 
             // normalize both batches independently across the batch dimension
             const double eps = DEFAULT_BATCH_NORM_EPS;
