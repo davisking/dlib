@@ -4,11 +4,7 @@
     Library.  I'm assuming you have already read the dnn_introduction_ex.cpp, the
     dnn_introduction2_ex.cpp and the dnn_introduction3_ex.cpp examples.  In this example
     program we are going to show how one can train a neural network using an unsupervised
-    loss function.  In particular, we will train a DenseNet with 100 layers and growth
-    rate k = 12 on the CIFAR-10 dataset.  This network was introduced in this paper:
-    "Densely Connected Convolutional Networks" by Gao Huang, Zhuang Liu,
-    Laurens van der Maaten, Kilian Q. Weinberger.
-    According to the paper, this model is able to achive around 95% accuracy on CIFAR-10.
+    loss function.  In particular, we will train a ResNet50.
 
     To train the unsupervised loss, we will use the self-supervised learning (SSL) method
     called Barlow Twins, introduced in this paper:
@@ -60,9 +56,24 @@ void augment(
     const matrix<rgb_pixel>& image,
     matrix<rgb_pixel>& crop,
     const unsigned long size,
+    const bool prime,
     dlib::rand& rnd
 )
 {
+    // blur
+    matrix<rgb_pixel> blurred;
+    const double sigma = rnd.get_double_in_range(0.1, 1.1);
+    if ((prime && rnd.get_random_double() < 0.1) || !prime)
+    {
+        const auto rect = gaussian_blur(image, blurred, sigma);
+        extract_image_chip(blurred, rect, crop);
+        blurred = crop;
+    }
+    else
+    {
+        blurred = image;
+    }
+
     // randomly crop
     const auto rect = make_random_cropping_rect(image, rnd);
     extract_image_chip(image, chip_details(rect, chip_dims(size, size)), crop);
@@ -81,6 +92,20 @@ void augment(
         matrix<unsigned char> gray;
         assign_image(gray, crop);
         assign_image(crop, gray);
+    }
+
+    // solarize
+    if (prime && rnd.get_random_double() < 0.2)
+    {
+        for (auto& p : crop)
+        {
+            if (p.red > 128)
+                p.red = 255 - p.red;
+            if (p.green > 128)
+                p.green = 255 - p.green;
+            if (p.blue > 128)
+                p.blue = 255 - p.blue;
+        }
     }
 }
 
@@ -114,11 +139,12 @@ try
 {
     // The default settings are fine for the example already.
     command_line_parser parser;
-    parser.add_option("batch", "set the mini batch size (default: 64)", 1);
+    parser.add_option("batch", "set the mini batch size (default: 128)", 1);
     parser.add_option("dims", "set the projector dimensions (default: 128)", 1);
     parser.add_option("lambda", "penalize off-diagonal terms (default: 1/dims)", 1);
     parser.add_option("learning-rate", "set the initial learning rate (default: 1e-3)", 1);
-    parser.add_option("min-learning-rate", "set the min learning rate (default: 1e-6)", 1);
+    parser.add_option("min-learning-rate", "set the min learning rate (default: 1e-5)", 1);
+    parser.add_option("size", "set the image size (default: 66)", 1);
     parser.set_group_name("Help Options");
     parser.add_option("h", "alias for --help");
     parser.add_option("help", "display this message and exit");
@@ -138,7 +164,11 @@ try
     const long dims = get_option(parser, "dims", 128);
     const double lambda = get_option(parser, "lambda", 1.0 / dims);
     const double learning_rate = get_option(parser, "learning-rate", 1e-3);
-    const double min_learning_rate = get_option(parser, "min-learning-rate", 1e-6);
+    const double min_learning_rate = get_option(parser, "min-learning-rate", 1e-5);
+    // The ResNet50 model used in this example has 5 downsampling layers without extra
+    // padding. This means that the downsampling factor of the network is over than 32,
+    // but CIFAR-10 images are 32x32. We address that by increasing the input image size.
+    const long image_size = get_option(parser, "size", 66);
 
     // Load the CIFAR-10 dataset into memory.
     std::vector<matrix<rgb_pixel>> training_images, testing_images;
@@ -147,7 +177,7 @@ try
     dlib::rand rnd;
 
     // Initialize the model with the specified projector dimensions and lambda.  According to the
-    // third paper, lambda = 1/dims works well on CIFAR-10.
+    // second paper, lambda = 1/dims works well on CIFAR-10.
     model::train net((loss_barlow_twins_(lambda)));
     layer<1>(net).layer_details().set_num_outputs(dims);
     disable_duplicative_biases(net);
@@ -163,7 +193,6 @@ try
         trainer.be_verbose();
         cout << trainer << endl;
 
-        image_window win;
         // During the training, we will compute the empirical cross-correlation matrix
         // between the features of both versions of the augmented images.  This matrix
         // should be getting close to the identity matrix as the training progresses.
@@ -179,6 +208,7 @@ try
         const double eps = DEFAULT_BATCH_NORM_EPS;
         gamma.set_size(1, dims);
         beta.set_size(1, dims);
+        image_window win;
 
         std::vector<std::pair<matrix<rgb_pixel>, matrix<rgb_pixel>>> batch;
         while (trainer.get_learning_rate() >= trainer.get_min_learning_rate())
@@ -189,17 +219,17 @@ try
                 const auto idx = rnd.get_random_64bit_number() % training_images.size();
                 auto image = training_images[idx];
                 matrix<rgb_pixel> aug_a, aug_b;
-                augment(image, aug_a, 64, rnd);
-                augment(image, aug_b, 64, rnd);
+                augment(image, aug_a, image_size, false, rnd);
+                augment(image, aug_b, image_size, true, rnd);
                 batch.emplace_back(aug_a, aug_b);
                 // win.set_image(join_rows(crop_a, crop_b));
                 // cin.get();
             }
             trainer.train_one_step(batch);
 
-            // Compute the empirical cross-correlation matrix every 100 steps. Again,
+            // Compute the empirical cross-correlation matrix every 1000 steps. Again,
             // this is not needed for the training to work, but it's nice to visualize.
-            if (trainer.get_train_one_step_calls() % 100 == 0)
+            if (trainer.get_train_one_step_calls() % 1000 == 0)
             {
                 // Wait for threaded processing to stop in the trainer.
                 trainer.get_net(force_flush_to_disk::no);
@@ -224,7 +254,7 @@ try
                 tt::gemm(0, eccm, 1, za_norm, true, zb_norm, false);
                 eccm /= batch_size;
                 matrix<unsigned char> c_img;
-                assign_image(c_img, mat(eccm) * 255);
+                assign_image(c_img, abs(mat(eccm)) * 255);
                 win.set_image(c_img);
                 win.set_title("Barlow Twins step#: " + to_string(trainer.get_train_one_step_calls()));
             }
@@ -241,14 +271,13 @@ try
     // Assign the network, without the projector, which is only used for the self-supervised
     // training.
     layer<2>(inet).subnet() = layer<5>(net).subnet();
+    // Freeze the backbone
     set_all_learning_rate_multipliers(layer<2>(inet), 0);
-    cout << inet << endl;
-    layer<1>(inet).layer_details().set_num_outputs(10);
     // Train the network
     {
-        dnn_trainer<model::infer> trainer(inet);
-        trainer.set_learning_rate(0.1);
-        trainer.set_min_learning_rate(1e-4);
+        dnn_trainer<model::infer, adam> trainer(inet, adam(1e-6, 0.9, 0.999));
+        trainer.set_learning_rate(learning_rate);
+        trainer.set_min_learning_rate(min_learning_rate);
         // Since this model doesn't train with pairs, just single images, we can increase the
         // batch-size by a factor of 2.
         trainer.set_mini_batch_size(2 * batch_size);
@@ -268,7 +297,7 @@ try
                 const auto idx = rnd.get_random_64bit_number() % training_images.size();
                 auto image = training_images[idx];
                 matrix<rgb_pixel> crop;
-                augment(image, crop, 64, rnd);
+                augment(image, crop, image_size, false, rnd);
                 images.push_back(std::move(crop));
                 labels.push_back(training_labels[idx]);
             }
@@ -280,15 +309,16 @@ try
     }
 
     // Finally, we can compute the accuracy of the model on the CIFAR-10 train and test images.
-    // The model used in this example (DenseNet-100, k=12) can achieve an accuracy of over 90%
-    // on CIFAR-10, so we should expect something similar.
-    auto compute_accuracy = [&inet](const std::vector<matrix<rgb_pixel>>& images, const std::vector<unsigned long>& labels)
+    auto compute_accuracy = [&inet, image_size](
+        const std::vector<matrix<rgb_pixel>>& images,
+        const std::vector<unsigned long>& labels
+    )
     {
         size_t num_right = 0;
         size_t num_wrong = 0;
         for (size_t i = 0; i < images.size(); ++i)
         {
-            matrix<rgb_pixel> image(64, 64);
+            matrix<rgb_pixel> image(image_size, image_size);
             resize_image(images[i], image);
             const auto pred = inet(image);
             if (labels[i] == pred)
@@ -302,6 +332,7 @@ try
         cout << "error rate: " << num_wrong / static_cast<double>(num_right + num_wrong) << endl;
     };
 
+    // If everything works as expected, we should get accuracies that are between 85% - 90%.
     cout << "training accuracy" << endl;
     compute_accuracy(training_images, training_labels);
     cout << "\ntesting accuracy" << endl;
