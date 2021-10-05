@@ -277,7 +277,7 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This input layer works with RGB std::pair of images of type matrix<rgb_pixel>.
+                This input layer works with std::pair of RGB images of type matrix<rgb_pixel>.
                 It is useful when you want to input image pairs that are related to each other,
                 for instance, they are different distorted views of the same original image.
                 It is mainly supposed to be used with unsupervised loss functions such as
@@ -371,6 +371,8 @@ namespace dlib
                   Moreover, each color channel is normalized by having its average value
                   subtracted (according to get_avg_red(), get_avg_green(), or
                   get_avg_blue()) and then is divided by 256.0.
+                  Additionally, the first elements in each pair are placed in the first half
+                  of the batch, and the second elements in the second half.
         !*/
 
         // Provided for compatibility with input_rgb_image_pyramid's interface

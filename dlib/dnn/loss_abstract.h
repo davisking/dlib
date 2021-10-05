@@ -2052,19 +2052,19 @@ namespace dlib
                     (https://arxiv.org/abs/2103.03230)
 
                 This means you use this loss to learn useful representations from data that
-                has no label information.  Useful representations mean that can be used on
-                another downstream task, such as classification.
-                In particular this loss function applies the redundancy reduction principle
-                to the representation dimensions.
+                has no label information.  Useful representations mean that can be used to
+                train another downstream task, such as classification.
+                In particular, this loss function applies the redundancy reduction principle
+                to the representations learned by the network it sits on top of.
 
                 To be specific, this layer requires the sample_expansion_factor to be 2, and
                 in each batch, the second half contains distorted versions of the first half.
                 Let Z_A and Z_B be the first and second half of the batch that goes into this
-                loss layer.  Z_A and Z_B have dimensions N rows and D columns, where N is
-                half the batch size and D is the dimensionality of the output tensor.  Each
-                row in Z_B should contain a distorted version of the corresponding row in Z_A.
-                Then, this loss computes the empirical cross-correlation matrix between the
-                batch-normalized versions of Z_A and Z_B:
+                loss layer, respectively.  Z_A and Z_B have dimensions N rows and D columns,
+                where N is half the batch size and D is the dimensionality of the output tensor.
+                Each row in Z_B should contain a distorted version of the corresponding row
+                in Z_A.  Then, this loss computes the empirical cross-correlation matrix between
+                the batch-normalized versions of Z_A and Z_B:
 
                     C = trans(bn(Z_A)) * bn(Z_B)
 
@@ -2075,7 +2075,7 @@ namespace dlib
 
                 where off_diag grabs all the elements that are not on the diagonal of C and
                 lambda provides a trade-off between both terms in the loss function.  The C
-                matrix has dimensions DxD, there are only D diagonal terms, but D * (D - 1)
+                matrix has dimensions D x D: there are only D diagonal terms, but D * (D - 1)
                 off-diagonal elements.  A reasonable value for lambda is 1 / D.
 
         loss_barlow_twins_(
