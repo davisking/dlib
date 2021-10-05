@@ -4083,6 +4083,8 @@ namespace dlib
             return diagonal_loss + lambda * off_diag_loss;
         }
 
+        float get_lambda() const  { return lambda; }
+
         friend void serialize(const loss_barlow_twins_& item, std::ostream& out)
         {
             serialize("loss_barlow_twins_", out);
