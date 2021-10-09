@@ -4014,16 +4014,15 @@ namespace dlib
 
             // Normalize both batches independently across the batch dimension
             const double eps = 1e-4;
-            resizable_tensor za_norm, means_a, invstds_a, rms_a, rvs_a, ga, ba;
-            resizable_tensor zb_norm, means_b, invstds_b, rms_b, rvs_b, gb, bb;
-            ga.set_size(1, sample_size);
-            ga = 1;
-            gb = ga;
-            ba.set_size(1, sample_size);
-            ba = 0;
-            bb = ba;
-            tt::batch_normalize(eps, za_norm, means_a, invstds_a, 1, rms_a, rvs_a, za, ga, ba);
-            tt::batch_normalize(eps, zb_norm, means_b, invstds_b, 1, rms_b, rvs_a, zb, gb, bb);
+            resizable_tensor za_norm, means_a, invstds_a;
+            resizable_tensor zb_norm, means_b, invstds_b;
+            resizable_tensor rms, rvs, g, b;
+            g.set_size(1, sample_size);
+            g = 1;
+            b.set_size(1, sample_size);
+            b = 0;
+            tt::batch_normalize(eps, za_norm, means_a, invstds_a, 1, rms, rvs, za, g, b);
+            tt::batch_normalize(eps, zb_norm, means_b, invstds_b, 1, rms, rvs, zb, g, b);
 
             // Compute the empirical cross-correlation matrix
             resizable_tensor eccm;
@@ -4031,49 +4030,53 @@ namespace dlib
             tt::gemm(0, eccm, 1, za_norm, true, zb_norm, false);
             eccm /= batch_size;
 
-            const matrix<float> A = mat(za_norm);
-            const matrix<float> B = mat(zb_norm);
-            const matrix<float> C = mat(eccm);  // trans(A) * B
-            const matrix<float> D = ones_matrix<float>(sample_size, sample_size) - identity_matrix<float>(sample_size);
+            // Compute the loss: MSE between eccm and the identity matrix.
+            // Off-diagonal terms are weighed by lambda.
+            const matrix<float> C = mat(eccm);
+            const double diagonal_loss = sum(squared(diag(C) - 1));
+            const double off_diag_loss = sum(squared(C - diagm(diag(C))));
+            double loss = diagonal_loss + lambda * off_diag_loss;
 
-            // Compute the loss: notation from http://www.matrixcalculus.org/
-            // diagonal: sum((diag(A' * B) - vector(1)).^2)
-            // ----------------------------------------
-            // 	=> d/dA = 2 * B * diag(diag(A' * B) - vector(1))
-            // 	=> d/dB = 2 * A * diag(diag(A' * B) - vector(1))
-            const matrix<float> GDA = 2 * (B * diagm(diag(C) - 1));
-            const matrix<float> GDB = 2 * (A * diagm(diag(C) - 1));
-
-            // off-diag: sum(((A'* B) .* D).^2)
-            // -----------------------------
-            //  => d/dA = 2 * B * ((B' * A) .* (D .* D)') = 2 * B * (C .* (D .* D))
-            //  => d/dB = 2 * A * ((A' * B) .* (D .* D))  = 2 * A * (C .* (D .* D))
-            const matrix<float> CD2 = pointwise_multiply(C, squared(D));
-            const matrix<float> GOA = 2 * B * CD2;
-            const matrix<float> GOB = 2 * A * CD2;
-
+            // Loss gradient, which will be used as the input of the batch normalization gradient
             resizable_tensor grad_input;
             grad_input.copy_size(grad);
             auto grad_input_a = split(grad_input);
             auto grad_input_b = split(grad_input, offset);
-            grad_input_a = GDA + lambda * GOA;
-            grad_input_b = GDB + lambda * GOB;
 
-            // Compute the batch norm gradients
-            resizable_tensor ga_grad, ba_grad, gb_grad, bb_grad;
-            ga_grad.copy_size(ga);
-            gb_grad.copy_size(gb);
-            ba_grad.copy_size(ba);
-            bb_grad.copy_size(bb);
+            // Compute the loss: notation from http://www.matrixcalculus.org/
+            // A = za_norm
+            // B = zb_norm
+            // C = eccm
+            // D = off_mask: a mask that keeps only the elements outside the diagonal
+
+            // diagonal term: sum((diag(A' * B) - vector(1)).^2)
+            // --------------------------------------------
+            // 	=> d/dA = 2 * B * diag(diag(A' * B) - vector(1)) = 2 * B * diag(diag(C) - vector(1))
+            // 	=> d/dB = 2 * A * diag(diag(A' * B) - vector(1)) = 2 * A * diag(diag(C) - vector(1))
+            resizable_tensor cdiag_1(diagm(diag(mat(eccm) - 1)));
+            tt::gemm(0, grad_input_a, 2, zb_norm, false, cdiag_1, false);
+            tt::gemm(0, grad_input_b, 2, za_norm, false, cdiag_1, false);
+
+            // off-diag term: sum(((A'* B) .* D).^2)
+            // --------------------------------
+            //  => d/dA = 2 * B * ((B' * A) .* (D .* D)') = 2 * B * (C .* (D .* D)) = 2 * B * (C .* D)
+            //  => d/dB = 2 * A * ((A' * B) .* (D .* D))  = 2 * A * (C .* (D .* D)) = 2 * A * (C .* D)
+            resizable_tensor off_mask(ones_matrix<float>(sample_size, sample_size) - identity_matrix<float>(sample_size));
+            resizable_tensor off_diag(sample_size, sample_size);
+            tt::multiply(false, off_diag, eccm, off_mask);
+            tt::gemm(1, grad_input_a, lambda, zb_norm, false, off_diag, false);
+            tt::gemm(1, grad_input_b, lambda, za_norm, false, off_diag, false);
+
+            // Compute the batch norm gradients, g and b grads are not used
+            resizable_tensor g_grad, b_grad;
+            g_grad.copy_size(g);
+            b_grad.copy_size(b);
             auto gza = split(grad);
             auto gzb = split(grad, offset);
-            tt::batch_normalize_gradient(eps, grad_input_a, means_a, invstds_a, za, ga, gza, ga_grad, ba_grad);
-            tt::batch_normalize_gradient(eps, grad_input_b, means_b, invstds_b, zb, gb, gzb, gb_grad, bb_grad);
+            tt::batch_normalize_gradient(eps, grad_input_a, means_a, invstds_a, za, g, gza, g_grad, b_grad);
+            tt::batch_normalize_gradient(eps, grad_input_b, means_b, invstds_b, zb, g, gzb, g_grad, b_grad);
 
-            const double diagonal_loss = sum(squared(diag(C) - 1));
-            const double off_diag_loss = sum(squared(C - diagm(diag(C))));
-
-            return diagonal_loss + lambda * off_diag_loss;
+            return loss;
         }
 
         float get_lambda() const  { return lambda; }
