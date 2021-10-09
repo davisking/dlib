@@ -2077,6 +2077,7 @@ namespace dlib
                 lambda provides a trade-off between both terms in the loss function.  The C
                 matrix has dimensions D x D: there are only D diagonal terms, but D * (D - 1)
                 off-diagonal elements.  A reasonable value for lambda is 1 / D.
+        !*/
 
         loss_barlow_twins_(
         );
