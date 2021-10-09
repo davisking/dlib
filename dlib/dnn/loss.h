@@ -4048,23 +4048,16 @@ namespace dlib
             // -----------------------------
             //  => d/dA = 2 * B * ((B' * A) .* (D .* D)') = 2 * B * (C .* (D .* D))
             //  => d/dB = 2 * A * ((A' * B) .* (D .* D))  = 2 * A * (C .* (D .* D))
-            const matrix<float> GOA = 2 * B * pointwise_multiply(C, squared(D));
-            const matrix<float> GOB = 2 * A * pointwise_multiply(C, squared(D));
+            const matrix<float> CD2 = pointwise_multiply(C, squared(D));
+            const matrix<float> GOA = 2 * B * CD2;
+            const matrix<float> GOB = 2 * A * CD2;
 
             resizable_tensor grad_input;
             grad_input.copy_size(grad);
-            auto gi = grad_input.host_write_only();
-            const auto istdsa = invstds_a.host();
-            const auto istdsb = invstds_b.host();
-            for (long r = 0; r < batch_size; ++r)
-            {
-                for (long c = 0; c < sample_size; ++c)
-                {
-                    const size_t idx = tensor_index(za_norm, r, c, 0, 0);
-                    gi[idx] = istdsa[c] * (GDA(r, c) + lambda * GOA(r, c));
-                    gi[idx + offset] = istdsb[c] * (GDB(r, c) + lambda * GOB(r, c));
-                }
-            }
+            auto grad_input_a = split(grad_input);
+            auto grad_input_b = split(grad_input, offset);
+            grad_input_a = GDA + lambda * GOA;
+            grad_input_b = GDB + lambda * GOB;
 
             // Compute the batch norm gradients
             resizable_tensor ga_grad, ba_grad, gb_grad, bb_grad;
@@ -4074,11 +4067,11 @@ namespace dlib
             bb_grad.copy_size(bb);
             auto gza = split(grad);
             auto gzb = split(grad, offset);
-            tt::batch_normalize_gradient(eps, split(grad_input), means_a, invstds_a, za, ga, gza, ga_grad, ba_grad);
-            tt::batch_normalize_gradient(eps, split(grad_input, offset), means_b, invstds_b, zb, gb, gzb, gb_grad, bb_grad);
+            tt::batch_normalize_gradient(eps, grad_input_a, means_a, invstds_a, za, ga, gza, ga_grad, ba_grad);
+            tt::batch_normalize_gradient(eps, grad_input_b, means_b, invstds_b, zb, gb, gzb, gb_grad, bb_grad);
 
-            double diagonal_loss = sum(squared(diag(C) - 1));
-            double off_diag_loss = sum(squared(C - diagm(diag(C))));
+            const double diagonal_loss = sum(squared(diag(C) - 1));
+            const double off_diag_loss = sum(squared(C - diagm(diag(C))));
 
             return diagonal_loss + lambda * off_diag_loss;
         }
