@@ -388,7 +388,7 @@ try
     }
 
 
-    // Create some data loaders which will load the data, and perform som data augmentation.
+    // Create some data loaders which will load the data, and perform some data augmentation.
     dlib::pipe<std::pair<matrix<rgb_pixel>, std::vector<yolo_rect>>> train_data(1000);
     const auto loader = [&dataset, &data_directory, &train_data, &image_size](time_t seed)
     {
