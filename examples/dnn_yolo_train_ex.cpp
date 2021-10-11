@@ -388,7 +388,7 @@ try
     }
 
 
-    // Create some data loaders which will load the data, and perform som data augmentation.
+    // Create some data loaders which will load the data, and perform some data augmentation.
     dlib::pipe<std::pair<matrix<rgb_pixel>, std::vector<yolo_rect>>> train_data(1000);
     const auto loader = [&dataset, &data_directory, &train_data, &image_size](time_t seed)
     {
@@ -516,7 +516,16 @@ try
     for (auto& worker : data_loaders)
         worker.join();
 
-    serialize("yolov3.dnn") << net;
+    // Before saving the network, we can assign it to the "infer" version, so that it won't
+    // perform batch normalization with batch sizes larger than one, as usual.  Moreover,
+    // we can also fuse the batch normalization (affine) layers into the convolutional
+    // layers, so that the network can run a bit faster.  Notice that, after fusing the
+    // layers, the network can no longer be used for training, so you should save the
+    // yolov3_train_type network if you plan to further train or finetune the network.
+    darknet::yolov3_infer_type inet(net);
+    fuse_layers(inet);
+
+    serialize("yolov3.dnn") << inet;
     return EXIT_SUCCESS;
 }
 catch (const std::exception& e)
