@@ -4,7 +4,9 @@
     Library.  I'm assuming you have already read the dnn_introduction_ex.cpp, the
     dnn_introduction2_ex.cpp and the dnn_introduction3_ex.cpp examples.  In this example
     program we are going to show how one can train a neural network using an unsupervised
-    loss function.  In particular, we will train a ResNet50.
+    loss function.  In particular, we will train the ResNet50 model from the paper
+    "Deep Residual Learning for Image Recognition" by Kaiming He, Xiangyu Zhang, Shaoqing
+    Ren, Jian Sun.
 
     To train the unsupervised loss, we will use the self-supervised learning (SSL) method
     called Barlow Twins, introduced in this paper:
@@ -22,25 +24,78 @@
 
     This removes the redundancy of the feature representations, by maximizing the
     encoded information about the images themselves, while minimizing the information
-    about the transforms and data augmentations used.
+    about the transforms and data augmentations used to obtain the representations.
 
     The original Barlow Twins paper uses the ImageNet dataset, but in this example we
     are using CIFAR-10, so we will follow the recommendations of this paper, instead:
     "A Note on Connecting Barlow Twins with Negative-Sample-Free Contrastive Learning"
     by Yao-Hung Hubert Tsai, Shaojie Bai, Louis-Philippe Morency, Ruslan Salakhutdinov,
-    in which they experiment with Barlow Twins on CIFAR-10 and Tiny ImageNet.
+    in which they experiment with Barlow Twins on CIFAR-10 and Tiny ImageNet.  Since
+    the CIFAR-10 contains relatively small images, we will define a ResNet50 architecture
+    that doesn't downsample the input in the first convolutional layer, and doesn't  have
+    a max pooling layer afterwards, like the paper does.
 */
+
 #include <dlib/dnn.h>
 #include <dlib/data_io.h>
 #include <dlib/cmd_line_parser.h>
 #include <dlib/gui_widgets.h>
 
-#include "resnet.h"
-
 using namespace std;
 using namespace dlib;
 
-rectangle make_random_cropping_rect(const matrix<rgb_pixel>& image, dlib::rand& rnd)
+// A custom definition of ResNet50 with a downsampling factor of 8 instead of 32.
+// It is essentically the original ResNet50, but without the max pooling and a
+// convolutional layer with a stride of 1 instead of 2 at the input.
+namespace resnet50
+{
+    using namespace dlib;
+    template <template <typename> class BN>
+    struct def
+    {
+        template <long N, int K, int S, typename SUBNET>
+        using conv = add_layer<con_<N, K, K, S, S, K / 2, K / 2>, SUBNET>;
+
+        template<long N, int S, typename SUBNET>
+        using bottleneck = BN<conv<4 * N, 1, 1, relu<BN<conv<N, 3, S, relu<BN<conv<N, 1, 1, SUBNET>>>>>>>>;
+
+        template <long N,  typename SUBNET>
+        using residual = add_prev1<bottleneck<N, 1, tag1<SUBNET>>>;
+
+        template <typename SUBNET> using res_512 = relu<residual<512, SUBNET>>;
+        template <typename SUBNET> using res_256 = relu<residual<256, SUBNET>>;
+        template <typename SUBNET> using res_128 = relu<residual<128, SUBNET>>;
+        template <typename SUBNET> using res_64  = relu<residual<64, SUBNET>>;
+
+        template <long N, int S, typename SUBNET>
+        using transition = add_prev2<BN<conv<4 * N, 1, S, skip1<tag2<bottleneck<N, S, tag1<SUBNET>>>>>>>;
+
+        template <typename INPUT>
+        using backbone = avg_pool_everything<
+            repeat<2, res_512, transition<512, 2,
+            repeat<5, res_256, transition<256, 2,
+            repeat<3, res_128, transition<128, 2,
+            repeat<2, res_64,  transition<64, 1,
+            relu<BN<conv<64, 3, 1,INPUT>>>>>>>>>>>>;
+    };
+};
+
+// This model namespace contains the definitions for:
+// - SSL model using the Barlow Twins loss, a projector head and an input_rgb_image_pair.
+// - Classifier model using the loss_multiclass_log, a fc layer and an input_rgb_image.
+namespace model
+{
+    template <typename SUBNET> using projector = fc<128, relu<bn_fc<fc<512, SUBNET>>>>;
+    template <typename SUBNET> using classifier = fc<10, SUBNET>;
+
+    using train = loss_barlow_twins<projector<resnet50::def<bn_con>::backbone<input_rgb_image_pair>>>;
+    using infer = loss_multiclass_log<classifier<resnet50::def<affine>::backbone<input_rgb_image>>>;
+}
+
+rectangle make_random_cropping_rect(
+    const matrix<rgb_pixel>& image,
+    dlib::rand& rnd
+)
 {
     const double mins = 7. / 15.;
     const double maxs = 7. / 8.;
@@ -52,18 +107,17 @@ rectangle make_random_cropping_rect(const matrix<rgb_pixel>& image, dlib::rand& 
     return move_rect(rect, offset);
 }
 
-void augment(
+matrix<rgb_pixel> augment(
     const matrix<rgb_pixel>& image,
-    matrix<rgb_pixel>& crop,
-    const unsigned long size,
     const bool prime,
     dlib::rand& rnd
 )
 {
+    matrix<rgb_pixel> crop;
     // blur
     matrix<rgb_pixel> blurred;
     const double sigma = rnd.get_double_in_range(0.1, 1.1);
-    if ((prime && rnd.get_random_double() < 0.1) || !prime)
+    if (!prime || (prime && rnd.get_random_double() < 0.1))
     {
         const auto rect = gaussian_blur(image, blurred, sigma);
         extract_image_chip(blurred, rect, crop);
@@ -76,7 +130,7 @@ void augment(
 
     // randomly crop
     const auto rect = make_random_cropping_rect(image, rnd);
-    extract_image_chip(image, chip_details(rect, chip_dims(size, size)), crop);
+    extract_image_chip(blurred, chip_details(rect, chip_dims(32, 32)), crop);
 
     // image left-right flip
     if (rnd.get_random_double() < 0.5)
@@ -84,7 +138,7 @@ void augment(
 
     // color augmentation
     if (rnd.get_random_double() < 0.8)
-        disturb_colors(crop, rnd);
+        disturb_colors(crop, rnd, 0.5, 0.5);
 
     // grayscale
     if (rnd.get_random_double() < 0.2)
@@ -107,44 +161,19 @@ void augment(
                 p.blue = 255 - p.blue;
         }
     }
+    return crop;
 }
-
-// This model definition contains the definitions for:
-// - SSL model using the Barlow Twins loss, a projector head and an input_rgb_image_pair.
-// - Classifier model using the loss_multiclass_log, a fc layer and an input_rgb_image.
-namespace model
-{
-    template <typename SUBNET>
-    using projector = fc<128, relu<bn_fc<fc<512, SUBNET>>>>;
-
-    template <typename SUBNET>
-    using classifier = fc<10, SUBNET>;
-
-    template <
-        template <typename> class LOSS,
-        template <typename> class MLP,
-        template <typename> class BN,
-        typename INPUT>
-    using net_type = LOSS<MLP<avg_pool_everything<
-        typename resnet::def<BN>::template backbone_50<
-        INPUT>>>>;
-
-    using train = net_type<loss_barlow_twins, projector, bn_con, input_rgb_image_pair>;
-    using infer = net_type<loss_multiclass_log, classifier, affine, input_rgb_image>;
-}
-
 
 int main(const int argc, const char** argv)
 try
 {
     // The default settings are fine for the example already.
     command_line_parser parser;
-    parser.add_option("batch", "set the mini batch size (default: 128)", 1);
+    parser.add_option("batch", "set the mini batch size (default: 64)", 1);
     parser.add_option("dims", "set the projector dimensions (default: 128)", 1);
     parser.add_option("lambda", "penalize off-diagonal terms (default: 1/dims)", 1);
     parser.add_option("learning-rate", "set the initial learning rate (default: 1e-3)", 1);
     parser.add_option("min-learning-rate", "set the min learning rate (default: 1e-5)", 1);
-    parser.add_option("size", "set the image size (default: 66)", 1);
     parser.set_group_name("Help Options");
     parser.add_option("h", "alias for --help");
     parser.add_option("help", "display this message and exit");
@@ -165,22 +194,18 @@ try
     const double lambda = get_option(parser, "lambda", 1.0 / dims);
     const double learning_rate = get_option(parser, "learning-rate", 1e-3);
     const double min_learning_rate = get_option(parser, "min-learning-rate", 1e-5);
-    // The ResNet50 model used in this example has 5 downsampling layers without extra
-    // padding. This means that the downsampling factor of the network is over than 32,
-    // but CIFAR-10 images are 32x32. We address that by increasing the input image size.
-    const long image_size = get_option(parser, "size", 66);
 
     // Load the CIFAR-10 dataset into memory.
     std::vector<matrix<rgb_pixel>> training_images, testing_images;
     std::vector<unsigned long> training_labels, testing_labels;
     load_cifar_10_dataset(parser[0], training_images, training_labels, testing_images, testing_labels);
-    dlib::rand rnd;
 
     // Initialize the model with the specified projector dimensions and lambda.  According to the
     // second paper, lambda = 1/dims works well on CIFAR-10.
     model::train net((loss_barlow_twins_(lambda)));
     layer<1>(net).layer_details().set_num_outputs(dims);
     disable_duplicative_biases(net);
+    dlib::rand rnd;
 
     // Train the feature extractor using the Barlow Twins method
     {
@@ -218,24 +243,19 @@ try
             {
                 const auto idx = rnd.get_random_64bit_number() % training_images.size();
                 auto image = training_images[idx];
-                matrix<rgb_pixel> aug_a, aug_b;
-                augment(image, aug_a, image_size, false, rnd);
-                augment(image, aug_b, image_size, true, rnd);
-                batch.emplace_back(aug_a, aug_b);
-                // win.set_image(join_rows(crop_a, crop_b));
-                // cin.get();
+                batch.emplace_back(augment(image, false, rnd), augment(image, true, rnd));
             }
             trainer.train_one_step(batch);
 
-            // Compute the empirical cross-correlation matrix every 1000 steps. Again,
+            // Compute the empirical cross-correlation matrix every 100 steps. Again,
             // this is not needed for the training to work, but it's nice to visualize.
-            if (trainer.get_train_one_step_calls() % 1000 == 0)
+            if (trainer.get_train_one_step_calls() % 100 == 0)
             {
                 // Wait for threaded processing to stop in the trainer.
                 trainer.get_net(force_flush_to_disk::no);
                 // Get the output from the last fc layer
                 const auto& out = net.subnet().get_output();
-                // The trainer might have syncronized its state to the disk and cleaned
+                // The trainer might have synchronized its state to the disk and cleaned
                 // the network state. If that happens, the output will be empty, in
                 // which case, we just skip the empirical cross-correlation matrix
                 // computation.
@@ -261,26 +281,27 @@ try
         }
         trainer.get_net();
         net.clean();
-        serialize("barlow_twins.net") << net;
+        // After training, we can discard the projector head and just keep the backone
+        // to train it or finetune it on other downstream tasks.
+        serialize("resnet50_self_supervised_cifar_10.net") << layer<5>(net);
     }
 
-    // Hopefully, the model has now learned some useful representations, which we can
-    // use to learn a classifier on top of them.  We will now build the classifier model
-    // and freeze the weights, so that we only train the top-most fc layer.
+    // To check the quality of the learned feature representations, we will train a linear
+    // classififer on top of the frozen backbone.
     model::infer inet;
     // Assign the network, without the projector, which is only used for the self-supervised
     // training.
-    layer<2>(inet).subnet() = layer<5>(net).subnet();
+    layer<2>(inet) = layer<5>(net);
     // Freeze the backbone
     set_all_learning_rate_multipliers(layer<2>(inet), 0);
     // Train the network
     {
         dnn_trainer<model::infer, adam> trainer(inet, adam(1e-6, 0.9, 0.999));
+        // Since this model doesn't train with pairs, just single images, we can increase
+        // the batch size.
+        trainer.set_mini_batch_size(2 * batch_size);
         trainer.set_learning_rate(learning_rate);
         trainer.set_min_learning_rate(min_learning_rate);
-        // Since this model doesn't train with pairs, just single images, we can increase the
-        // batch-size by a factor of 2.
-        trainer.set_mini_batch_size(2 * batch_size);
         trainer.set_iterations_without_progress_threshold(5000);
         trainer.set_synchronization_file("cifar_10_sync");
         trainer.be_verbose();
@@ -294,34 +315,29 @@ try
             labels.clear();
             while (images.size() < trainer.get_mini_batch_size())
             {
-                const auto idx = rnd.get_random_64bit_number() % training_images.size();
-                auto image = training_images[idx];
-                matrix<rgb_pixel> crop;
-                augment(image, crop, image_size, false, rnd);
-                images.push_back(std::move(crop));
+                const auto idx = rnd.get_random_32bit_number() % training_images.size();
+                images.push_back(augment(training_images[idx], false, rnd));
                 labels.push_back(training_labels[idx]);
             }
             trainer.train_one_step(images, labels);
         }
         trainer.get_net();
         inet.clean();
-        serialize("resnet50.dnn") << inet;
+        serialize("resnet50_cifar_10.dnn") << inet;
     }
 
     // Finally, we can compute the accuracy of the model on the CIFAR-10 train and test images.
-    auto compute_accuracy = [&inet, image_size](
+    auto compute_accuracy = [&inet, batch_size](
         const std::vector<matrix<rgb_pixel>>& images,
         const std::vector<unsigned long>& labels
     )
     {
         size_t num_right = 0;
         size_t num_wrong = 0;
-        for (size_t i = 0; i < images.size(); ++i)
+        const auto preds = inet(images, batch_size * 2);
+        for (size_t i = 0; i < labels.size(); ++i)
         {
-            matrix<rgb_pixel> image(image_size, image_size);
-            resize_image(images[i], image);
-            const auto pred = inet(image);
-            if (labels[i] == pred)
+            if (labels[i] == preds[i])
                 ++num_right;
             else
                 ++num_wrong;
@@ -332,7 +348,7 @@ try
         cout << "error rate: " << num_wrong / static_cast<double>(num_right + num_wrong) << endl;
     };
 
-    // If everything works as expected, we should get accuracies that are between 85% - 90%.
+    // If everything works as expected, we should get accuracies that are between 87% and 90%.
     cout << "training accuracy" << endl;
     compute_accuracy(training_images, training_labels);
     cout << "\ntesting accuracy" << endl;
