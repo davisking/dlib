@@ -2465,6 +2465,33 @@ namespace dlib
             }
         }
 
+        void tensor_conv::operator() (
+            const bool add_to_output,
+            resizable_tensor& output,
+            const tensor& data,
+            const tensor& filters,
+            const tensor& biases
+        )
+        {
+            DLIB_CASSERT(filters.num_samples() == biases.k());
+            (*this)(add_to_output, output,data,filters);
+            tt::add(1, output, 1, biases);
+        }
+
+        void tensor_conv::operator() (
+            const bool add_to_output,
+            tensor& output,
+            const tensor& data,
+            const tensor& filters,
+            const tensor& biases
+        )
+        {
+            DLIB_CASSERT(filters.num_samples() == biases.k());
+            (*this)(add_to_output, output, data, filters);
+            tt::add(1, output, 1, biases);
+        }
+
+
     // ------------------------------------------------------------------------------------
 
         void tensor_conv::

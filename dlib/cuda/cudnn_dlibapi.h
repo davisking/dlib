@@ -173,6 +173,13 @@ namespace dlib
 
             void operator() (
                 const bool add_to_output,
+                resizable_tensor& output,
+                const tensor& data,
+                const tensor& filters
+            );
+
+            void operator() (
+                const bool add_to_output,
                 tensor& output,
                 const tensor& data,
                 const tensor& filters
@@ -182,7 +189,16 @@ namespace dlib
                 const bool add_to_output,
                 resizable_tensor& output,
                 const tensor& data,
-                const tensor& filters
+                const tensor& filters,
+                const tensor& biases
+            );
+
+            void operator() (
+                const bool add_to_output,
+                tensor& output,
+                const tensor& data,
+                const tensor& filters,
+                const tensor& biases
             );
 
             void get_gradient_for_data (
@@ -202,6 +218,16 @@ namespace dlib
            void setup(
                 const tensor& data,
                 const tensor& filters,
+                int stride_y,
+                int stride_x,
+                int padding_y,
+                int padding_x
+            );
+
+           void setup(
+                const tensor& data,
+                const tensor& filters,
+                const tensor& biases,
                 int stride_y,
                 int stride_x,
                 int padding_y,

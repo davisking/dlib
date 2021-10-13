@@ -1042,6 +1042,64 @@ namespace dlib { namespace tt
                 - #output.nc() == 1+(data.nc() + 2*padding_x - filters.nc())/stride_x
         !*/
 
+        void operator() (
+            const bool add_to_output,
+            tensor& output,
+            const tensor& data,
+            const tensor& filters,
+            const tensor& biases
+        ) { impl(add_to_output,output,data,filters,biases); }
+        /*!
+            requires
+                - setup() has been called.  Specifically, setup() has been called like this:
+                    this->setup(data, filters, stride_y, stride_x, padding_y, padding_x);
+                - is_same_object(output,data) == false
+                - is_same_object(output,filters) == false
+                - filters.k() == data.k()
+                - filters.nr() <= src.nr() + 2*padding_y
+                - filters.nc() <= src.nc() + 2*padding_x
+                - filters.num_samples() == biases.k()
+                - #output.num_samples() == data.num_samples()
+                - #output.k() == filters.num_samples()
+                - #output.nr() == 1+(data.nr() + 2*padding_y - filters.nr())/stride_y
+                - #output.nc() == 1+(data.nc() + 2*padding_x - filters.nc())/stride_x
+            ensures
+                - Convolves filters over data.  If add_to_output==true then we add the
+                  results to output, otherwise we assign to output, overwriting the
+                  previous values in output.
+                - Adds biases to the result of the convolved data
+                - filters contains filters.num_samples() filters.
+        !*/
+
+        void operator() (
+            const bool add_to_output,
+            resizable_tensor& output,
+            const tensor& data,
+            const tensor& filters,
+            const tensor& biases
+        ) { impl(add_to_output,output,data,filters, biases); }
+        /*!
+            requires
+                - setup() has been called.  Specifically, setup() has been called like this:
+                    this->setup(data, filters, stride_y, stride_x, padding_y, padding_x);
+                - is_same_object(output,data) == false
+                - is_same_object(output,filters) == false
+                - filters.k() == data.k()
+                - filters.nr() <= src.nr() + 2*padding_y
+                - filters.nc() <= src.nc() + 2*padding_x
+                - filters.num_samples() == biases.k()
+            ensures
+                - Convolves filters over data.  If add_to_output==true then we add the
+                  results to output, otherwise we assign to output, overwriting the
+                  previous values in output.
+                - Adds biases to the result of the convolved data
+                - filters contains filters.num_samples() filters.
+                - #output.num_samples() == data.num_samples()
+                - #output.k() == filters.num_samples()
+                - #output.nr() == 1+(data.nr() + 2*padding_y - filters.nr())/stride_y
+                - #output.nc() == 1+(data.nc() + 2*padding_x - filters.nc())/stride_x
+        !*/
+
         void get_gradient_for_data (
             const bool add_to_output,
             const tensor& gradient_input, 
@@ -1141,7 +1199,7 @@ namespace dlib { namespace tt
                   the tensors, or store any kind of references to the data or filter
                   tensors. 
         !*/
-       
+
     private:
 #ifdef DLIB_USE_CUDA
         cuda::tensor_conv impl;
