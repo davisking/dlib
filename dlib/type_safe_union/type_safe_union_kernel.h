@@ -191,7 +191,7 @@ namespace dlib
         auto visit_impl(
             F&&
         ) -> typename std::enable_if<
-                (I == sizeof...(Types)) and
+                (I == sizeof...(Types)) &&
                 std::is_same<void, typename internal::result_of<F(T0&)>::type>::value
         >::type
         {
@@ -204,7 +204,7 @@ namespace dlib
         auto visit_impl(
             F&& f
         ) -> typename std::enable_if<
-                (I == sizeof...(Types)) and
+                (I == sizeof...(Types)) &&
                 ! std::is_same<void, typename internal::result_of<F(T0&)>::type>::value,
                 typename internal::result_of<F(T0&)>::type
         >::type
@@ -241,7 +241,7 @@ namespace dlib
         auto visit_impl(
             F&&
         ) const -> typename std::enable_if<
-                (I == sizeof...(Types)) and
+                (I == sizeof...(Types)) &&
                 std::is_same<void, typename internal::result_of<F(const T0&)>::type>::value
         >::type
         {
@@ -254,7 +254,7 @@ namespace dlib
         auto visit_impl(
             F&& f
         ) const -> typename std::enable_if<
-                (I == sizeof...(Types)) and
+                (I == sizeof...(Types)) &&
                 ! std::is_same<void, typename internal::result_of<F(const T0&)>::type>::value,
                 typename internal::result_of<F(const T0&)>::type
         >::type
