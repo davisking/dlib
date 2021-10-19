@@ -205,7 +205,7 @@ namespace dlib
             F&& f
         ) -> typename std::enable_if<
                 (I == sizeof...(Types)) and
-                not std::is_same<void, typename internal::result_of<F(T0&)>::type>::value,
+                ! std::is_same<void, typename internal::result_of<F(T0&)>::type>::value,
                 typename internal::result_of<F(T0&)>::type
         >::type
         {
@@ -255,7 +255,7 @@ namespace dlib
             F&& f
         ) const -> typename std::enable_if<
                 (I == sizeof...(Types)) and
-                not std::is_same<void, typename internal::result_of<F(const T0&)>::type>::value,
+                ! std::is_same<void, typename internal::result_of<F(const T0&)>::type>::value,
                 typename internal::result_of<F(const T0&)>::type
         >::type
         {
