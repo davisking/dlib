@@ -27,7 +27,7 @@ namespace
     class test
     {
 
-    private:
+    public:
 
         enum kind
         {
@@ -429,7 +429,6 @@ namespace
                 b = 3;
                 b = std::move(a);
 
-                DLIB_TEST(a.get<int>() == 3);
                 DLIB_TEST(b.get<std::string>() == "asdf");
             }
 
