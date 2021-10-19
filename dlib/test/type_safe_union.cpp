@@ -457,6 +457,45 @@ namespace
                 DLIB_TEST(!a.contains<ptr_t>());
                 DLIB_TEST(*b.get<ptr_t>() == "asdf");
             }
+
+            {
+                //testing emplace(), copy semantics, move semantics, swap, overloaded, and new visitor
+                type_safe_union<int, float, std::string> a, b;
+                a.emplace<std::string>("hello world");
+
+                DLIB_TEST(a.contains<std::string>());
+                b = a; //copy
+                DLIB_TEST(a.contains<std::string>());
+                DLIB_TEST(b.contains<std::string>());
+                DLIB_TEST(a.cast_to<std::string>() == "hello world");
+                DLIB_TEST(b.cast_to<std::string>() == "hello world");
+                a = 1;
+                DLIB_TEST(a.contains<int>());
+                DLIB_TEST(a.cast_to<int>() == 1);
+                b = std::move(a);
+                DLIB_TEST(b.contains<int>());
+                DLIB_TEST(b.cast_to<int>() == 1);
+                DLIB_TEST(a.is_empty());
+                DLIB_TEST(a.index() == 0);
+                swap(a, b);
+                DLIB_TEST(a.contains<int>());
+                DLIB_TEST(a.cast_to<int>() == 1);
+                DLIB_TEST(b.is_empty());
+                DLIB_TEST(b.index() == 0);
+                auto ret = a.apply_to_contents(overloaded(
+                    [](int) {
+                        return std::string("int");
+                    },
+                    [](float) {
+                        return std::string("float");
+                    },
+                    [](const std::string&) {
+                        return std::string("std::string");
+                    }
+                ));
+                static_assert(std::is_same<std::string, decltype(ret)>::value, "bad return type");
+                DLIB_TEST(ret == "int");
+            }
         }
 
     };

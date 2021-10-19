@@ -202,7 +202,7 @@ namespace dlib
             typename F
         >
         auto visit_impl(
-            F&& f
+            F&&
         ) -> typename std::enable_if<
                 (I == sizeof...(Types)) &&
                 ! std::is_same<void, typename internal::result_of<F(T0&)>::type>::value,
@@ -252,7 +252,7 @@ namespace dlib
             typename F
         >
         auto visit_impl(
-            F&& f
+            F&&
         ) const -> typename std::enable_if<
                 (I == sizeof...(Types)) &&
                 ! std::is_same<void, typename internal::result_of<F(const T0&)>::type>::value,
