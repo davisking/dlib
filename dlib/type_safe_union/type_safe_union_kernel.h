@@ -38,6 +38,9 @@ namespace dlib
         struct result_of<F(Args...)> : std::result_of<F&&(Args&&...)> {};
 #endif
 
+        template< class T >
+        using result_of_t = typename result_of<T>::type;
+
         // ---------------------------------------------------------------------
         template <typename T, typename... Rest>
         struct is_any : std::false_type {};
@@ -47,18 +50,6 @@ namespace dlib
 
         template <typename T, typename First, typename... Rest>
         struct is_any<T,First,Rest...> : std::integral_constant<bool, std::is_same<T,First>::value || is_any<T,Rest...>::value> {};
-
-        // ---------------------------------------------------------------------
-        template<typename T>
-        struct is_void : std::false_type {};
-
-        template<>
-        struct is_void<void> : std::true_type {};
-
-        template<>
-        struct is_void<const void> : std::true_type {};
-
-        // ---------------------------------------------------------------------
 
         // ---------------------------------------------------------------------
         namespace detail
@@ -128,32 +119,6 @@ namespace dlib
         template <typename T, typename... VariantTypes>
         struct variant_type_id : detail::variant_type_id_impl<sizeof...(VariantTypes), 0, T, VariantTypes...> {};
         // ---------------------------------------------------------------------
-
-        struct ostream_helper
-        {
-            ostream_helper(std::ostream& os) : _os(os) {}
-
-            template <typename T>
-            void operator() (const T& item) const
-            {
-                _os << item;
-            }
-
-            std::ostream& _os;
-        };
-
-        struct istream_helper
-        {
-            istream_helper(std::istream& is) : _is(is) {}
-
-            template <typename T>
-            void operator() (T& item) const
-            {
-                _is >> item;
-            }
-
-            std::istream& _is;
-        };   
     }
 
     template <typename... Types>
@@ -173,7 +138,7 @@ namespace dlib
         typename std::aligned_union<0, Types...>::type mem;
         int type_identity = 0;
 
-        using T0 = typename internal::variant_get_type<0, Types...>::type;
+        using T0 = typename get_type<0>::type;
 
         template<typename T>
         struct is_valid : internal::is_any<T,Types...> {};
@@ -188,11 +153,71 @@ namespace dlib
             size_t I,
             typename F
         >
+        typename std::enable_if<
+            (I == sizeof...(Types))
+        >::type apply_to_contents_impl(
+            F&&
+        )
+        {
+        }
+
+        template<
+            size_t I,
+            typename F
+        >
+        typename std::enable_if<
+            (I < sizeof...(Types))
+        >::type apply_to_contents_impl(
+            F&& f
+        )
+        {
+            using T = typename get_type<I>::type;
+
+            if (type_identity == (I+1))
+                std::forward<F>(f)(unchecked_get<T>());
+            else
+                apply_to_contents_impl<I+1>(std::forward<F>(f));
+        }
+
+        template<
+            size_t I,
+            typename F
+        >
+        typename std::enable_if<
+            (I == sizeof...(Types))
+        >::type apply_to_contents_impl(
+            F&&
+        ) const
+        {
+        }
+
+        template<
+            size_t I,
+            typename F
+        >
+        typename std::enable_if<
+            (I < sizeof...(Types))
+        >::type apply_to_contents_impl(
+            F&& f
+        ) const
+        {
+            using T = typename get_type<I>::type;
+
+            if (type_identity == (I+1))
+                std::forward<F>(f)(unchecked_get<T>());
+            else
+                apply_to_contents_impl<I+1>(std::forward<F>(f));
+        }
+
+        template<
+            size_t I,
+            typename F
+        >
         auto visit_impl(
             F&&
         ) -> typename std::enable_if<
                 (I == sizeof...(Types)) &&
-                std::is_same<void, typename internal::result_of<F(T0&)>::type>::value
+                std::is_same<void, internal::result_of_t<F(T0&)>>::value
         >::type
         {
         }
@@ -205,11 +230,11 @@ namespace dlib
             F&&
         ) -> typename std::enable_if<
                 (I == sizeof...(Types)) &&
-                ! std::is_same<void, typename internal::result_of<F(T0&)>::type>::value,
-                typename internal::result_of<F(T0&)>::type
+                ! std::is_same<void, internal::result_of_t<F(T0&)>>::value,
+                internal::result_of_t<F(T0&)>
         >::type
         {
-            return typename internal::result_of<F(T0&)>::type{};
+            return internal::result_of_t<F(T0&)>{};
         }
 
         template<
@@ -220,16 +245,13 @@ namespace dlib
             F&& f
         )  -> typename std::enable_if<
                 (I < sizeof...(Types)),
-                typename internal::result_of<F(T0&)>::type
+                internal::result_of_t<F(T0&)>
         >::type
         {
-            constexpr size_t Ilast = sizeof...(Types);
-            using T = typename internal::variant_get_type<I, Types...>::type;
+            using T = typename get_type<I>::type;
 
             if (type_identity == (I+1))
                 return std::forward<F>(f)(unchecked_get<T>());
-            else if (type_identity == 0)
-                return visit_impl<Ilast>(std::forward<F>(f));
             else
                 return visit_impl<I+1>(std::forward<F>(f));
         }
@@ -242,7 +264,7 @@ namespace dlib
             F&&
         ) const -> typename std::enable_if<
                 (I == sizeof...(Types)) &&
-                std::is_same<void, typename internal::result_of<F(const T0&)>::type>::value
+                std::is_same<void, internal::result_of_t<F(const T0&)>>::value
         >::type
         {
         }
@@ -255,11 +277,11 @@ namespace dlib
             F&&
         ) const -> typename std::enable_if<
                 (I == sizeof...(Types)) &&
-                ! std::is_same<void, typename internal::result_of<F(const T0&)>::type>::value,
-                typename internal::result_of<F(const T0&)>::type
+                ! std::is_same<void, internal::result_of_t<F(const T0&)>>::value,
+                internal::result_of_t<F(const T0&)>
         >::type
         {
-            return typename internal::result_of<F(const T0&)>::type{};
+            return internal::result_of_t<F(const T0&)>{};
         }
 
         template<
@@ -270,16 +292,13 @@ namespace dlib
             F&& f
         ) const -> typename std::enable_if<
                 (I < sizeof...(Types)),
-                typename internal::result_of<F(const T0&)>::type
+                internal::result_of_t<F(const T0&)>
         >::type
         {
-            constexpr size_t Ilast = sizeof...(Types);
-            using T = typename internal::variant_get_type<I, Types...>::type;
+            using T = typename get_type<I>::type;
 
             if (type_identity == (I+1))
                 return std::forward<F>(f)(unchecked_get<T>());
-            else if (type_identity == 0)
-                return visit_impl<Ilast>(std::forward<F>(f));
             else
                 return visit_impl<I+1>(std::forward<F>(f));
         }
@@ -307,7 +326,7 @@ namespace dlib
 
         void destruct ()
         {
-            apply_to_contents(destruct_helper{});
+            visit(destruct_helper{});
             type_identity = 0;
         }
 
@@ -377,8 +396,6 @@ namespace dlib
             type_safe_union& _me;
         };
 
-        
-
         template<
             size_t I
         >
@@ -399,7 +416,7 @@ namespace dlib
             type_safe_union& x
         )
         {
-            using T = typename internal::variant_get_type<I, Types...>::type;
+            using T = typename get_type<I>::type;
             
             if (index == I)
             {
@@ -419,7 +436,7 @@ namespace dlib
             const type_safe_union& item
         ) : type_safe_union()
         {
-            item.apply_to_contents(helper_copy{*this});
+            item.visit(helper_copy{*this});
         }
 
         template <
@@ -440,7 +457,7 @@ namespace dlib
             if (item.is_empty())
                 destruct();
             else
-                item.apply_to_contents(helper_copy(*this));
+                item.visit(helper_copy(*this));
             return *this;
         }
 
@@ -460,7 +477,7 @@ namespace dlib
             type_safe_union&& item
         ) : type_safe_union()
         {
-            item.apply_to_contents(helper_move{*this});
+            item.visit(helper_move{*this});
             item.destruct();
         }
 
@@ -474,7 +491,7 @@ namespace dlib
             }
             else
             {
-                item.apply_to_contents(helper_move{*this});
+                item.visit(helper_move{*this});
                 item.destruct();
             }
             return *this;
@@ -537,7 +554,23 @@ namespace dlib
         }
 
         template <typename F>
-        auto apply_to_contents(
+        void apply_to_contents(
+            F&& f
+        )
+        {
+            apply_to_contents_impl<0>(std::forward<F>(f));
+        }
+
+        template <typename F>
+        void apply_to_contents(
+            F&& f
+        ) const
+        {
+            return apply_to_contents_impl<0>(std::forward<F>(f));
+        }
+
+        template <typename F>
+        auto visit(
             F&& f
         ) -> decltype(visit_impl<0>(std::forward<F>(f)))
         {
@@ -545,7 +578,7 @@ namespace dlib
         }
 
         template <typename F>
-        auto apply_to_contents(
+        auto visit(
             F&& f
         ) const -> decltype(visit_impl<0>(std::forward<F>(f)))
         {
@@ -576,16 +609,16 @@ namespace dlib
         {
             if (type_identity == item.type_identity)
             {
-                item.apply_to_contents(swap_helper{*this});
+                item.visit(swap_helper{*this});
             }
             else if (is_empty())
             {
-                item.apply_to_contents(helper_move{*this});
+                item.visit(helper_move{*this});
                 item.destruct();
             }
             else if (item.is_empty())
             {
-                apply_to_contents(helper_move{item});
+                visit(helper_move{item});
                 destruct();
             }
             else
@@ -629,18 +662,6 @@ namespace dlib
                 return *reinterpret_cast<T*>(&mem);
             else
                 throw bad_type_safe_union_cast();
-        }
-
-        friend std::ostream& operator<<(std::ostream& os, const type_safe_union& item)
-        {
-            item.apply_to_contents(internal::ostream_helper(os));
-            return os;
-        }
-
-        friend std::istream& operator>>(std::istream& is, type_safe_union& item)
-        {
-            item.apply_to_contents(internal::istream_helper(is));
-            return is;
         }
     };
 
@@ -709,7 +730,7 @@ namespace dlib
         try
         {
             serialize(item.index(), out);
-            item.apply_to_contents(detail::serialize_helper(out));
+            item.visit(detail::serialize_helper(out));
         }
         catch (serialization_error& e)
         {

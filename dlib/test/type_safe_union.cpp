@@ -27,7 +27,7 @@ namespace
     class test
     {
 
-    public:
+    private:
 
         enum kind
         {
@@ -482,7 +482,8 @@ namespace
                 DLIB_TEST(a.cast_to<int>() == 1);
                 DLIB_TEST(b.is_empty());
                 DLIB_TEST(b.index() == 0);
-                auto ret = a.apply_to_contents(overloaded(
+                //visit can return non-void types
+                auto ret = a.visit(overloaded(
                     [](int) {
                         return std::string("int");
                     },
@@ -495,9 +496,23 @@ namespace
                 ));
                 static_assert(std::is_same<std::string, decltype(ret)>::value, "bad return type");
                 DLIB_TEST(ret == "int");
+                //apply_to_contents can only return void
+                a = std::string("hello there!");
+                std::string str;
+                a.apply_to_contents(overloaded(
+                    [&str](int) {
+                        str = std::string("int");
+                    },
+                    [&str](float) {
+                        str = std::string("float");
+                    },
+                    [&str](const std::string&) {
+                        str = std::string("std::string");
+                    }
+                ));
+                DLIB_TEST(str == "std::string");
             }
         }
-
     };
 
 
