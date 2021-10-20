@@ -169,11 +169,12 @@ try
 {
     // The default settings are fine for the example already.
     command_line_parser parser;
-    parser.add_option("batch", "set the mini batch size (default: 64)", 1);
+    parser.add_option("batch", "set the mini batch size per GPU (default: 64)", 1);
     parser.add_option("dims", "set the projector dimensions (default: 128)", 1);
     parser.add_option("lambda", "penalize off-diagonal terms (default: 1/dims)", 1);
     parser.add_option("learning-rate", "set the initial learning rate (default: 1e-3)", 1);
     parser.add_option("min-learning-rate", "set the min learning rate (default: 1e-5)", 1);
+    parser.add_option("num-gpus", "number of GPUs (default: 1)", 1);
     parser.set_group_name("Help Options");
     parser.add_option("h", "alias for --help");
     parser.add_option("help", "display this message and exit");
@@ -189,7 +190,8 @@ try
         return EXIT_SUCCESS;
     }
 
-    const size_t batch_size = get_option(parser, "batch", 64);
+    const size_t num_gpus = get_option(parser, "num-gpus", 1);
+    const size_t batch_size = get_option(parser, "batch", 64) * num_gpus;
     const long dims = get_option(parser, "dims", 128);
     const double lambda = get_option(parser, "lambda", 1.0 / dims);
     const double learning_rate = get_option(parser, "learning-rate", 1e-3);
@@ -206,10 +208,12 @@ try
     layer<1>(net).layer_details().set_num_outputs(dims);
     disable_duplicative_biases(net);
     dlib::rand rnd;
+    std::vector<int> gpus(num_gpus);
+    std::iota(gpus.begin(), gpus.end(), 0);
 
     // Train the feature extractor using the Barlow Twins method
     {
-        dnn_trainer<model::train, adam> trainer(net, adam(1e-6, 0.9, 0.999));
+        dnn_trainer<model::train, adam> trainer(net, adam(1e-6, 0.9, 0.999), gpus);
         trainer.set_mini_batch_size(batch_size);
         trainer.set_learning_rate(learning_rate);
         trainer.set_min_learning_rate(min_learning_rate);
@@ -229,7 +233,6 @@ try
         eccm.set_size(dims, dims);
         // Some tensors needed to perform batch normalization
         resizable_tensor za_norm, zb_norm, means, invstds, rms, rvs, gamma, beta;
-        alias_tensor split(batch_size, dims);
         const double eps = DEFAULT_BATCH_NORM_EPS;
         gamma.set_size(1, dims);
         beta.set_size(1, dims);
@@ -241,7 +244,7 @@ try
             batch.clear();
             while (batch.size() < trainer.get_mini_batch_size())
             {
-                const auto idx = rnd.get_random_64bit_number() % training_images.size();
+                const auto idx = rnd.get_random_32bit_number() % training_images.size();
                 auto image = training_images[idx];
                 batch.emplace_back(augment(image, false, rnd), augment(image, true, rnd));
             }
@@ -262,6 +265,7 @@ try
                 if (out.size() == 0)
                     continue;
                 // Separate both augmented versions of the images
+                alias_tensor split(out.num_samples() / 2, dims);
                 auto za = split(out);
                 auto zb = split(out, split.size());
                 gamma = 1;
@@ -296,7 +300,7 @@ try
     set_all_learning_rate_multipliers(layer<2>(inet), 0);
     // Train the network
     {
-        dnn_trainer<model::infer, adam> trainer(inet, adam(1e-6, 0.9, 0.999));
+        dnn_trainer<model::infer, adam> trainer(inet, adam(1e-6, 0.9, 0.999), gpus);
         // Since this model doesn't train with pairs, just single images, we can increase
         // the batch size.
         trainer.set_mini_batch_size(2 * batch_size);
