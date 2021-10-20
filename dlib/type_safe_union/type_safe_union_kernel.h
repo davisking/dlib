@@ -3,7 +3,7 @@
 #ifndef DLIB_TYPE_SAFE_UNIOn_h_ 
 #define DLIB_TYPE_SAFE_UNIOn_h_
 
-// #include "type_safe_union_kernel_abstract.h"
+#include "type_safe_union_kernel_abstract.h"
 #include <new>
 #include <iostream>
 #include <type_traits>

@@ -3,9 +3,6 @@
 #undef DLIB_TYPE_SAFE_UNION_KERNEl_ABSTRACT_
 #ifdef DLIB_TYPE_SAFE_UNION_KERNEl_ABSTRACT_
 
-#include "../algs.h"
-#include "../noncopyable.h"
-
 namespace dlib
 {
 
@@ -21,29 +18,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename T1,
-        typename T2 = _void,  // _void indicates parameter not used.
-        typename T3 = _void,
-        typename T4 = _void,
-        typename T5 = _void, 
-        typename T6 = _void,
-        typename T7 = _void,
-        typename T8 = _void,
-        typename T9 = _void,
-        typename T10 = _void,
-        typename T11 = _void,
-        typename T12 = _void,
-        typename T13 = _void,
-        typename T14 = _void,
-        typename T15 = _void,
-        typename T16 = _void,
-        typename T17 = _void,
-        typename T18 = _void,
-        typename T19 = _void,
-        typename T20 = _void
-        >
-    class type_safe_union : noncopyable
+    template <typename... Types>
+    class type_safe_union
     {
         /*!
             REQUIREMENTS ON ALL TEMPLATE ARGUMENTS
@@ -71,53 +47,113 @@ namespace dlib
 
     public:
 
-        typedef T1 type1;
-        typedef T2 type2;
-        typedef T3 type3;
-        typedef T4 type4;
-        typedef T5 type5;
-        typedef T6 type6;
-        typedef T7 type7;
-        typedef T8 type8;
-        typedef T9 type9;
-        typedef T10 type10;
-        typedef T11 type11;
-        typedef T12 type12;
-        typedef T13 type13;
-        typedef T14 type14;
-        typedef T15 type15;
-        typedef T16 type16;
-        typedef T17 type17;
-        typedef T18 type18;
-        typedef T19 type19;
-        typedef T20 type20;
-
         type_safe_union(
-        );
+        ) = default;
         /*!
             ensures
                 - this object is properly initialized
         !*/
 
-        template <typename T>
         type_safe_union (
-            T&& item
+            const type_safe_union& item
+        )
+        /*!
+            ensures
+                - copy constructs *this from item
+        !*/
+
+        template <
+            typename T,
+            typename = typename std::enable_if<is_valid<T>::value>::type
+        >
+        type_safe_union (
+            const T& item
         );
         /*!
-            requires
-                - T must be one of the types given to this object's template arguments
             ensures
-                - this object is properly initialized
+                - constructs *this from item
                 - #get<T>() == item
-                  (i.e. this object will contain a copy of item, or we move item if it's an rvalue)
+                  (i.e. this object will contain a copy of item)
+        !*/
+
+        type_safe_union& operator=(
+            const type_safe_union& item
+        );
+        /*!
+            ensures
+                - copy assigns *this from item
+        !*/
+
+        template <
+            typename T,
+            typename = typename std::enable_if<is_valid<T>::value>::type
+        >
+        type_safe_union& operator= (
+            const T& item
+        );
+        /*!
+            ensures
+                - copy assigns *this from item
+                - #get<T> == item
+                  (i.e. this object will contain a copy of item)
         !*/
 
         type_safe_union (
             type_safe_union&& item
-        ); 
+        );
         /*!
             ensures
                 - move constructs *this from item.
+        !*/
+
+        type_safe_union& operator= (
+            type_safe_union&& item
+        );
+        /*!
+            ensures
+                - move assigns *this from item.
+        !*/
+
+        template <
+            typename T,
+            typename = typename std::enable_if<is_valid<T>::value>::type
+        >
+        type_safe_union (
+            T&& item
+        );
+        /*!
+            ensures
+                - move constructs *this from item
+                - #get<T> == item
+                  (i.e. this object will have moved item into *this)
+        !*/
+
+         template <
+            typename T,
+            typename = typename std::enable_if<is_valid<T>::value>::type
+        >
+        type_safe_union& operator= (
+            T&& item
+        );
+        /*!
+            ensures
+                - move assigns *this from item
+                - #get<T> == item
+                  (i.e. this object will have moved item into *this)
+        !*/
+
+        template <
+            typename T,
+            typename... Args
+        >
+        type_safe_union (
+            in_place_tag<T>,
+            Args&&... args
+        );
+        /*!
+            ensures
+                - constructs *this with type T using constructor-arguments args...
+                  (i.e. this object will have moved item into *this)
         !*/
 
         ~type_safe_union(
@@ -125,6 +161,25 @@ namespace dlib
         /*!
             ensures
                 - all resources associated with this object have been freed
+        !*/
+
+        void reset();
+        /*!
+            ensures
+                - all resources associated with this object have been freed
+        !*/
+
+        template <
+            typename T,
+            typename... Args
+        >
+        void emplace(
+            Args&&... args
+        );
+        /*!
+            ensures
+                - re-assigns *this with type T using constructor-arguments args...
+                  (i.e. this object will have moved item into *this)
         !*/
 
         template <typename T>
@@ -160,68 +215,68 @@ namespace dlib
                     - returns false
         !*/
 
-        template <typename T>
-        void apply_to_contents (
-            T& obj
+        template <typename F>
+        void apply_to_contents(
+            F&& f
         );
         /*!
             requires
-                - obj is a function object capable of operating on all the types contained
-                  in this type_safe_union.  I.e.  obj(this->get<U>()) must be a valid
+                - f is a callable object capable of operating on all the types contained
+                  in this type_safe_union.  I.e.  std::forward<F>(f)(this->get<U>()) must be a valid
                   expression for all the possible U types.
             ensures
                 - if (is_empty() == false) then
                     - Let U denote the type of object currently contained in this type_safe_union
-                    - calls obj(this->get<U>())
+                    - calls std::forward<F>(f)(this->get<U>())
                     - The object returned by this->get<U>() will be non-const
         !*/
 
-        template <typename T>
-        void apply_to_contents (
-            const T& obj
+        template <typename F>
+        void apply_to_contents(
+            F&& f
+        ) const;
+        /*!
+            requires
+                - f is a callable object capable of operating on all the types contained
+                  in this type_safe_union.  I.e.  std::forward<F>(f)(this->get<U>()) must be a valid
+                  expression for all the possible U types.
+            ensures
+                - if (is_empty() == false) then
+                    - Let U denote the type of object currently contained in this type_safe_union
+                    - calls std::forward<F>(f)(this->get<U>())
+                    - The object returned by this->get<U>() will be non-const
+        !*/
+
+        template <typename F>
+        auto visit(
+            F&& f
         );
         /*!
             requires
-                - obj is a function object capable of operating on all the types contained
-                  in this type_safe_union.  I.e.  obj(this->get<U>()) must be a valid
+                - f is a callable object capable of operating on all the types contained
+                  in this type_safe_union.  I.e.  std::forward<F>(f)(this->get<U>()) must be a valid
                   expression for all the possible U types.
             ensures
                 - if (is_empty() == false) then
                     - Let U denote the type of object currently contained in this type_safe_union
-                    - calls obj(this->get<U>())
+                    - calls std::forward<F>(f)(this->get<U>())
                     - The object returned by this->get<U>() will be non-const
         !*/
 
-        template <typename T>
-        void apply_to_contents (
-            T& obj
-        ) const;
+        template <typename F>
+        auto visit(
+            F&& f
+        );
         /*!
             requires
-                - obj is a function object capable of operating on all the types contained
-                  in this type_safe_union.  I.e.  obj(this->get<U>()) must be a valid
+                - f is a callable object capable of operating on all the types contained
+                  in this type_safe_union.  I.e.  std::forward<F>(f)(this->get<U>()) must be a valid
                   expression for all the possible U types.
             ensures
                 - if (is_empty() == false) then
                     - Let U denote the type of object currently contained in this type_safe_union
-                    - calls obj(this->get<U>())
-                    - The object returned by this->get<U>() will be const
-        !*/
-
-        template <typename T>
-        void apply_to_contents (
-            const T& obj
-        ) const;
-        /*!
-            requires
-                - obj is a function object capable of operating on all the types contained
-                  in this type_safe_union.  I.e.  obj(this->get<U>()) must be a valid
-                  expression for all the possible U types.
-            ensures
-                - if (is_empty() == false) then
-                    - Let U denote the type of object currently contained in this type_safe_union
-                    - calls obj(this->get<U>())
-                    - The object returned by this->get<U>() will be const
+                    - calls std::forward<F>(f)(this->get<U>())
+                    - The object returned by this->get<U>() will be non-const
         !*/
 
         template <typename T> 
@@ -266,28 +321,6 @@ namespace dlib
                     - returns a non-const reference to the object contained in this type_safe_union.
                 - else
                     - throws bad_type_safe_union_cast
-        !*/
-
-        template <typename T>
-        type_safe_union& operator= (
-            T&& item
-        );
-        /*!
-            requires
-                - T must be one of the types given to this object's template arguments
-            ensures
-                - #get<T>() == item
-                  (i.e. this object will contain a copy of item, or we move item if it's an rvalue)
-                - returns *this
-        !*/
-
-        type_safe_union& operator= (
-            type_safe_union&& item
-        ); 
-        /*!
-            ensures
-                - Allows moving item into *this.  In fact, this is done by this->swap(item).
-                - returns *this
         !*/
 
         void swap (
