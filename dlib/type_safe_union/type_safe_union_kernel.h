@@ -134,11 +134,14 @@ namespace dlib
         template <size_t I>
         struct get_type : internal::variant_get_type<I,Types...> {};
 
+        template <size_t I>
+        using get_type_t = typename get_type<I>::type;
+
     private:
         typename std::aligned_union<0, Types...>::type mem;
         int type_identity = 0;
 
-        using T0 = typename get_type<0>::type;
+        using T0 = get_type_t<0>;
 
         template<typename T>
         struct is_valid : internal::is_any<T,Types...> {};
@@ -171,10 +174,8 @@ namespace dlib
             F&& f
         )
         {
-            using T = typename get_type<I>::type;
-
             if (type_identity == (I+1))
-                std::forward<F>(f)(unchecked_get<T>());
+                std::forward<F>(f)(unchecked_get<get_type_t<I>>());
             else
                 apply_to_contents_impl<I+1>(std::forward<F>(f));
         }
@@ -201,10 +202,8 @@ namespace dlib
             F&& f
         ) const
         {
-            using T = typename get_type<I>::type;
-
             if (type_identity == (I+1))
-                std::forward<F>(f)(unchecked_get<T>());
+                std::forward<F>(f)(unchecked_get<get_type_t<I>>());
             else
                 apply_to_contents_impl<I+1>(std::forward<F>(f));
         }
@@ -248,10 +247,8 @@ namespace dlib
                 internal::result_of_t<F(T0&)>
         >::type
         {
-            using T = typename get_type<I>::type;
-
             if (type_identity == (I+1))
-                return std::forward<F>(f)(unchecked_get<T>());
+                return std::forward<F>(f)(unchecked_get<get_type_t<I>>());
             else
                 return visit_impl<I+1>(std::forward<F>(f));
         }
@@ -295,10 +292,8 @@ namespace dlib
                 internal::result_of_t<F(const T0&)>
         >::type
         {
-            using T = typename get_type<I>::type;
-
             if (type_identity == (I+1))
-                return std::forward<F>(f)(unchecked_get<T>());
+                return std::forward<F>(f)(unchecked_get<get_type_t<I>>());
             else
                 return visit_impl<I+1>(std::forward<F>(f));
         }
@@ -395,38 +390,6 @@ namespace dlib
 
             type_safe_union& _me;
         };
-
-        template<
-            size_t I
-        >
-        inline typename std::enable_if<(I == sizeof...(Types))>::type deserialize_helper(
-            std::istream&, 
-            int, 
-            type_safe_union&
-        )
-        {
-        }
-        
-        template<
-            size_t I
-        >
-        inline typename std::enable_if<(I < sizeof...(Types))>::type deserialize_helper(
-            std::istream& in, 
-            int index, 
-            type_safe_union& x
-        )
-        {
-            using T = typename get_type<I>::type;
-            
-            if (index == I)
-            {
-                deserialize(x.template get<T>(), in);
-            }
-            else
-            {
-                deserialize_helper<I+1>(in, index, x);
-            }
-        }   
 
     public:
 
@@ -796,9 +759,9 @@ namespace dlib
     #endif //__cplusplus >= 201703L
 
     template<typename... T>
-    overloaded_helper<std::decay_t<T>...> overloaded(T&&... t)
+    overloaded_helper<typename std::decay<T>::type...> overloaded(T&&... t)
     {
-        return overloaded_helper<std::decay_t<T>...>{std::forward<T>(t)...};
+        return overloaded_helper<typename std::decay<T>::type...>{std::forward<T>(t)...};
     }
 }
 
