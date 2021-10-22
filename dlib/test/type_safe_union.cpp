@@ -523,6 +523,12 @@ namespace
                 static_assert(type_safe_union_size<tsu_b>::value == 2, "bad size");
                 static_assert(type_safe_union_size<tsu_c>::value == 3, "bad size");
                 static_assert(type_safe_union_size<tsu_d>::value == 4, "bad size");
+#if __cplusplus >= 201402L
+                static_assert(type_safe_union_size_v<tsu_a> == 1, "bad size");
+                static_assert(type_safe_union_size_v<tsu_b> == 2, "bad size");
+                static_assert(type_safe_union_size_v<tsu_c> == 3, "bad size");
+                static_assert(type_safe_union_size_v<tsu_d> == 4, "bad size");
+#endif
             }
         }
     };
