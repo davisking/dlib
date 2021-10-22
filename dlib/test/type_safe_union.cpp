@@ -530,10 +530,44 @@ namespace
                 static_assert(type_safe_union_size_v<tsu_d> == 4, "bad size");
 #endif
             }
+
+            {
+                //nested unions
+                using tsu_a = type_safe_union<int,float,std::string>;
+                using tsu_b = type_safe_union<int,float,std::string,tsu_a>;
+
+                tsu_b object(dlib::in_place_tag<tsu_a>{}, std::string("hello from bottom node"));
+                DLIB_TEST(object.contains<tsu_a>());
+                DLIB_TEST(object.get<tsu_a>().get<std::string>() == "hello from bottom node");
+                auto ret = object.visit(overloaded(
+                    [](int) {
+                        return std::string("int");
+                    },
+                    [](float) {
+                        return std::string("float");
+                    },
+                    [](std::string) {
+                        return std::string("std::string");
+                    },
+                    [](const tsu_a& item) {
+                        return item.visit(overloaded(
+                            [](int) {
+                                return std::string("nested int");
+                            },
+                            [](float) {
+                                return std::string("nested float");
+                            },
+                            [](std::string str) {
+                                return str;
+                            }
+                        ));
+                    }
+                ));
+                static_assert(std::is_same<std::string, decltype(ret)>::value, "bad type");
+                DLIB_TEST(ret == "hello from bottom node");
+            }
         }
     };
-
-
 
     class type_safe_union_tester : public tester
     {
