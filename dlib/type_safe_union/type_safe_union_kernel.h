@@ -32,7 +32,7 @@ namespace dlib
 
 #if __cplusplus >= 201703L
         template <typename F, typename... Args>
-            struct result_of<F(Args...)> : std::invoke_result<F, Args...> {};
+        struct result_of<F(Args...)> : std::invoke_result<F, Args...> {};
 #else
         template <typename F, typename... Args>
         struct result_of<F(Args...)> : std::result_of<F&&(Args&&...)> {};
@@ -529,7 +529,7 @@ namespace dlib
             F&& f
         ) const
         {
-            return apply_to_contents_impl<0>(std::forward<F>(f));
+            apply_to_contents_impl<0>(std::forward<F>(f));
         }
 
         template <typename F>
@@ -599,10 +599,8 @@ namespace dlib
         {
             validate_type<T>();
             if (type_identity != get_type_id<T>())
-            {
                 construct<T>();
-            }
-            return *reinterpret_cast<T*>(&mem);
+            return unchecked_get<T>();
         }
 
         template <typename T>
@@ -611,7 +609,7 @@ namespace dlib
         {
             validate_type<T>();
             if (contains<T>())
-                return *reinterpret_cast<const T*>(&mem);
+                return unchecked_get<T>();
             else
                 throw bad_type_safe_union_cast();
         }
@@ -622,7 +620,7 @@ namespace dlib
         {
             validate_type<T>();
             if (contains<T>())
-                return *reinterpret_cast<T*>(&mem);
+                return unchecked_get<T>();
             else
                 throw bad_type_safe_union_cast();
         }
