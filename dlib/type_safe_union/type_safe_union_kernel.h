@@ -632,6 +632,17 @@ namespace dlib
         type_safe_union<Types...>& b
     ) { a.swap(b); }
 
+    template<typename T>
+    struct type_safe_union_size {};
+
+    template<typename ...Types>
+    struct type_safe_union_size<type_safe_union<Types...>> : std::integral_constant<std::size_t, sizeof...(Types)> {};
+
+#if __cplusplus >= 201402L
+    template <class T>
+    constexpr std::size_t type_safe_union_size_v = type_safe_union_size<T>::value;
+#endif
+
     namespace detail
     {
         struct serialize_helper

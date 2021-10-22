@@ -506,11 +506,23 @@ namespace
                     [&str](float) {
                         str = std::string("float");
                     },
-                    [&str](const std::string&) {
-                        str = std::string("std::string");
+                    [&str](const std::string& item) {
+                        str = item;
                     }
                 ));
-                DLIB_TEST(str == "std::string");
+                DLIB_TEST(str == "hello there!");
+            }
+
+            {
+                //test compile time sizes
+                using tsu_a = type_safe_union<int>;
+                using tsu_b = type_safe_union<int,float>;
+                using tsu_c = type_safe_union<int,float,double>;
+                using tsu_d = type_safe_union<int,float,double,long>;
+                static_assert(type_safe_union_size<tsu_a>::value == 1, "bad size");
+                static_assert(type_safe_union_size<tsu_b>::value == 2, "bad size");
+                static_assert(type_safe_union_size<tsu_c>::value == 3, "bad size");
+                static_assert(type_safe_union_size<tsu_d>::value == 4, "bad size");
             }
         }
     };
