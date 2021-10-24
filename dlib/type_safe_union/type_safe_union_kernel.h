@@ -12,7 +12,6 @@
 
 namespace dlib
 {
-    /*exceptions*/
     class bad_type_safe_union_cast : public std::bad_cast 
     {
     public:
@@ -86,7 +85,6 @@ namespace dlib
 
         template <size_t I, typename... VariantTypes>
         struct variant_get_type : detail::variant_get_type_impl<sizeof...(VariantTypes), 0, I, VariantTypes...> {};
-        // ---------------------------------------------------------------------
 
         // ---------------------------------------------------------------------
         namespace detail
@@ -138,26 +136,26 @@ namespace dlib
             return internal::variant_type_id<T,Types...>::value;
         }
 
+    private:
+        template<typename T>
+        struct is_valid : internal::is_any<T,Types...> {};
+
         template <size_t I>
         struct get_type : internal::variant_get_type<I,Types...> {};
 
         template <size_t I>
         using get_type_t = typename get_type<I>::type;
 
-    private:
-        typename std::aligned_union<0, Types...>::type mem;
-        int type_identity = 0;
-
         using T0 = get_type_t<0>;
-
-        template<typename T>
-        struct is_valid : internal::is_any<T,Types...> {};
 
         template <typename T>
         void validate_type() const
         {
             static_assert(is_valid<T>::value, "Type T isn't one of the ones given to this object's template arguments.");
         }
+
+        typename std::aligned_union<0, Types...>::type mem;
+        int type_identity = 0;
 
         template<
             size_t I,
@@ -524,22 +522,6 @@ namespace dlib
         }
 
         template <typename F>
-        void apply_to_contents(
-            F&& f
-        )
-        {
-            apply_to_contents_impl<0>(std::forward<F>(f));
-        }
-
-        template <typename F>
-        void apply_to_contents(
-            F&& f
-        ) const
-        {
-            apply_to_contents_impl<0>(std::forward<F>(f));
-        }
-
-        template <typename F>
         auto visit(
             F&& f
         ) -> decltype(visit_impl<0>(std::forward<F>(f)))
@@ -553,6 +535,22 @@ namespace dlib
         ) const -> decltype(visit_impl<0>(std::forward<F>(f)))
         {
             return visit_impl<0>(std::forward<F>(f));
+        }
+
+        template <typename F>
+        void apply_to_contents(
+            F&& f
+        )
+        {
+            apply_to_contents_impl<0>(std::forward<F>(f));
+        }
+
+        template <typename F>
+        void apply_to_contents(
+            F&& f
+        ) const
+        {
+            apply_to_contents_impl<0>(std::forward<F>(f));
         }
 
         template <typename T>
@@ -639,17 +637,6 @@ namespace dlib
         type_safe_union<Types...>& b
     ) { a.swap(b); }
 
-    template<typename T>
-    struct type_safe_union_size {};
-
-    template<typename ...Types>
-    struct type_safe_union_size<type_safe_union<Types...>> : std::integral_constant<std::size_t, sizeof...(Types)> {};
-
-#if __cplusplus >= 201402L
-    template <class T>
-    constexpr std::size_t type_safe_union_size_v = type_safe_union_size<T>::value;
-#endif
-
     namespace detail
     {
         struct serialize_helper
@@ -729,8 +716,8 @@ namespace dlib
             deserialize(index, in);
 
             if (index == 0)
-                item.reset();
-            else if (index > 0 && index < sizeof...(Types))
+                item.clear();
+            else if (index > 0 && index <= (int)sizeof...(Types))
                 detail::deserialize_helper<0>(in, index, item);
             else
                 throw serialization_error("bad index value. Should be in range [0,sizeof...(Types))");

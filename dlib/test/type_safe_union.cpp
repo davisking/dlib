@@ -514,24 +514,6 @@ namespace
             }
 
             {
-                //test compile time sizes
-                using tsu_a = type_safe_union<int>;
-                using tsu_b = type_safe_union<int,float>;
-                using tsu_c = type_safe_union<int,float,double>;
-                using tsu_d = type_safe_union<int,float,double,long>;
-                static_assert(type_safe_union_size<tsu_a>::value == 1, "bad size");
-                static_assert(type_safe_union_size<tsu_b>::value == 2, "bad size");
-                static_assert(type_safe_union_size<tsu_c>::value == 3, "bad size");
-                static_assert(type_safe_union_size<tsu_d>::value == 4, "bad size");
-#if __cplusplus >= 201402L
-                static_assert(type_safe_union_size_v<tsu_a> == 1, "bad size");
-                static_assert(type_safe_union_size_v<tsu_b> == 2, "bad size");
-                static_assert(type_safe_union_size_v<tsu_c> == 3, "bad size");
-                static_assert(type_safe_union_size_v<tsu_d> == 4, "bad size");
-#endif
-            }
-
-            {
                 //nested unions
                 using tsu_a = type_safe_union<int,float,std::string>;
                 using tsu_b = type_safe_union<int,float,std::string,tsu_a>;
