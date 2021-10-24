@@ -239,7 +239,7 @@ template <typename... Types>
                     - returns false
         !*/
 
-        int index(
+        int get_current_type_id(
         ) const;
         /*!
             ensures

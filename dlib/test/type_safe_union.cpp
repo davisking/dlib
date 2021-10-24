@@ -476,12 +476,12 @@ namespace
                 DLIB_TEST(b.contains<int>());
                 DLIB_TEST(b.cast_to<int>() == 1);
                 DLIB_TEST(a.is_empty());
-                DLIB_TEST(a.index() == 0);
+                DLIB_TEST(a.get_current_type_id() == 0);
                 swap(a, b);
                 DLIB_TEST(a.contains<int>());
                 DLIB_TEST(a.cast_to<int>() == 1);
                 DLIB_TEST(b.is_empty());
-                DLIB_TEST(b.index() == 0);
+                DLIB_TEST(b.get_current_type_id() == 0);
                 //visit can return non-void types
                 auto ret = a.visit(overloaded(
                     [](int) {

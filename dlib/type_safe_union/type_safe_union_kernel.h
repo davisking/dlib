@@ -566,7 +566,7 @@ namespace dlib
             return type_identity == 0;
         }
 
-        int index() const
+        int get_current_type_id() const
         {
             return type_identity;
         }
@@ -695,7 +695,7 @@ namespace dlib
     {
         try
         {
-            serialize(item.index(), out);
+            serialize(item.get_current_type_id(), out);
             item.visit(detail::serialize_helper(out));
         }
         catch (serialization_error& e)
