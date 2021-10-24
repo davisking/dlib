@@ -507,7 +507,7 @@ namespace dlib
             destruct();
         }
 
-        void reset()
+        void clear()
         {
             destruct();
         }
@@ -725,10 +725,15 @@ namespace dlib
     {
         try
         {
-            item.reset();
             int index = -1;
             deserialize(index, in);
-            detail::deserialize_helper<0>(in, index, item);
+
+            if (index == 0)
+                item.reset();
+            else if (index > 0 && index < sizeof...(Types))
+                detail::deserialize_helper<0>(in, index, item);
+            else
+                throw serialization_error("bad index value. Should be in range [0,sizeof...(Types))");
         }
         catch(serialization_error& e)
         {

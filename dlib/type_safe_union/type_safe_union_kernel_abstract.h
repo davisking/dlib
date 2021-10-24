@@ -163,10 +163,11 @@ namespace dlib
                 - all resources associated with this object have been freed
         !*/
 
-        void reset();
+        void clear();
         /*!
             ensures
                 - all resources associated with this object have been freed
+                - #is_empty() == true
         !*/
 
         template <
