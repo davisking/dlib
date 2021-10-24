@@ -124,6 +124,13 @@ namespace dlib
     template <typename... Types>
     class type_safe_union
     {
+        /*!
+            CONVENTION
+                - is_empty() ==  (type_identity == 0)
+                - contains<T>() == (type_identity == get_type_id<T>())
+                - mem == the aligned block of memory on the stack which is
+                  where objects in the union are stored
+        !*/
     public:
         template <typename T>
         static constexpr int get_type_id ()
