@@ -215,6 +215,20 @@ namespace dlib
                     - returns false
         !*/
 
+        int index(
+        ) const;
+        /*!
+            ensures
+                - returns type_identity, i.e, the index of the currently held type.
+                  For example if the current type is the first type defined in the template parameters then
+                    - returns 1
+                  If the current type is the second type in the template parameters then
+                    - returns 2
+                  etc.
+                  If the current object is empty, i.e. is_empty() == true, then
+                    - returns 0
+        !*/
+
         template <typename F>
         void apply_to_contents(
             F&& f
