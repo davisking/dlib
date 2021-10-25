@@ -548,6 +548,38 @@ namespace
                 static_assert(std::is_same<std::string, decltype(ret)>::value, "bad type");
                 DLIB_TEST(ret == "hello from bottom node");
             }
+
+            {
+                //"private" visitor
+                using tsu = type_safe_union<int,float,std::string>;
+
+                class visitor_private
+                {
+                private:
+                    std::string operator()(int)
+                    {
+                        return std::string("int");
+                    }
+
+                    std::string operator()(float)
+                    {
+                        return std::string("float");
+                    }
+
+                    std::string operator()(const std::string& str)
+                    {
+                        return str;
+                    }
+
+                    friend tsu;
+                };
+
+                visitor_private visitor;
+                tsu a = std::string("hello from private visitor");
+                auto ret = a.visit(visitor);
+                static_assert(std::is_same<std::string, decltype(ret)>::value, "bad type");
+                DLIB_TEST(ret == "hello from private visitor");
+            }
         }
     };
 
