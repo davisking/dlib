@@ -306,17 +306,15 @@ namespace dlib
             helper_move(type_safe_union& me) : _me(me) {}
 
             template<typename T>
-            void operator()(T&& x)
+            void operator()(T& x)
             {
-                using U = typename std::decay<T>::type;
-
-                if (_me.type_identity != get_type_id<U>())
+                if (_me.type_identity != get_type_id<T>())
                 {
-                    _me.construct<U>(std::move(x));
+                    _me.construct<T>(std::move(x));
                 }
                 else
                 {
-                    _me.template unchecked_get<U>() = std::move(x);
+                    _me.template unchecked_get<T>() = std::move(x);
                 }
             }
 
@@ -518,32 +516,38 @@ namespace dlib
             }
         }
 
-        template <typename T>
+        template <
+            typename T,
+            typename = typename std::enable_if<is_valid<T>::value>::type
+        >
         T& get(
         )
         {
-            validate_type<T>();
             if (type_identity != get_type_id<T>())
                 construct<T>();
             return unchecked_get<T>();
         }
 
-        template <typename T>
+        template <
+            typename T,
+            typename = typename std::enable_if<is_valid<T>::value>::type
+        >
         const T& cast_to (
         ) const
         {
-            validate_type<T>();
             if (contains<T>())
                 return unchecked_get<T>();
             else
                 throw bad_type_safe_union_cast();
         }
 
-        template <typename T>
+        template <
+            typename T,
+            typename = typename std::enable_if<is_valid<T>::value>::type
+        >
         T& cast_to (
         )
         {
-            validate_type<T>();
             if (contains<T>())
                 return unchecked_get<T>();
             else
