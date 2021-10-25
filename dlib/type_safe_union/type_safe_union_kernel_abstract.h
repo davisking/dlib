@@ -92,8 +92,9 @@ template <typename... Types>
             const T& item
         );
         /*!
+            requires
+                - T must be one of the types given to this object's template arguments
             ensures
-                - T is one of the template parameters, i.e is a valid type.
                 - constructs *this from item
                 - #get<T>() == item
                   (i.e. this object will contain a copy of item)
@@ -114,8 +115,9 @@ template <typename... Types>
             const T& item
         );
         /*!
+            requires
+                - T must be one of the types given to this object's template arguments
             ensures
-                - T is one of the template parameters, i.e is a valid type.
                 - copy assigns *this from item
                 - #get<T> == item
                   (i.e. this object will contain a copy of item)
@@ -144,8 +146,9 @@ template <typename... Types>
             T&& item
         );
         /*!
+            requires
+                - T must be one of the types given to this object's template arguments
             ensures
-                - T is one of the template parameters, i.e is a valid type.
                 - move constructs *this from item
                 - #get<T> == item
                   (i.e. this object will have moved item into *this)
@@ -158,8 +161,9 @@ template <typename... Types>
             T&& item
         );
         /*!
+            requires
+                - T must be one of the types given to this object's template arguments
             ensures
-                - T is one of the template parameters, i.e is a valid type.
                 - move assigns *this from item
                 - #get<T> == item
                   (i.e. this object will have moved item into *this)
@@ -174,6 +178,8 @@ template <typename... Types>
             Args&&... args
         );
         /*!
+            requires
+                - T must be one of the types given to this object's template arguments
             ensures
                 - constructs *this with type T using constructor-arguments args...
                   (i.e. efficiently performs *this = T(args...))
@@ -201,6 +207,8 @@ template <typename... Types>
             Args&&... args
         );
         /*!
+            requires
+                - T must be one of the types given to this object's template arguments
             ensures
                 - re-assigns *this with type T using constructor-arguments args...
                   (i.e. efficiently performs *this = T(args...))
