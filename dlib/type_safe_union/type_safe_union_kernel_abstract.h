@@ -244,11 +244,7 @@ template <typename... Types>
         /*!
             ensures
                 - returns type_identity, i.e, the index of the currently held type.
-                  For example if the current type is the first type defined in the template parameters then
-                    - returns 1
-                  If the current type is the second type in the template parameters then
-                    - returns 2
-                  etc.
+                  For example if the current type is the first template argument it returns 1, if it's the second then 2, and so on.
                   If the current object is empty, i.e. is_empty() == true, then
                     - returns 0
         !*/
@@ -291,7 +287,7 @@ template <typename... Types>
         );
         /*!
             ensures:
-                equivalent to calling visit(std::forward<F>(f))
+                equivalent to calling visit(std::forward<F>(f)) with void return type
         !*/
 
         template <typename F>
@@ -300,7 +296,7 @@ template <typename... Types>
         ) const;
         /*!
             ensures:
-                equivalent to calling visit(std::forward<F>(f))
+                equivalent to calling visit(std::forward<F>(f)) with void return type
         !*/
 
         template <typename T> 
