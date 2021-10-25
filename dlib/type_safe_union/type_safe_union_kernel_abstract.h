@@ -85,42 +85,12 @@ namespace dlib
                 - copy constructs *this from item
         !*/
 
-        template <
-            typename T
-        >
-        type_safe_union (
-            const T& item
-        );
-        /*!
-            requires
-                - T must be one of the types given to this object's template arguments
-            ensures
-                - constructs *this from item
-                - #get<T>() == item
-                  (i.e. this object will contain a copy of item)
-        !*/
-
         type_safe_union& operator=(
             const type_safe_union& item
         );
         /*!
             ensures
                 - copy assigns *this from item
-        !*/
-
-        template <
-            typename T
-        >
-        type_safe_union& operator= (
-            const T& item
-        );
-        /*!
-            requires
-                - T must be one of the types given to this object's template arguments
-            ensures
-                - copy assigns *this from item
-                - #get<T> == item
-                  (i.e. this object will contain a copy of item)
         !*/
 
         type_safe_union (
@@ -147,14 +117,15 @@ namespace dlib
         );
         /*!
             requires
-                - T must be one of the types given to this object's template arguments
+                - std::decay_t<T> must be one of the types given to this object's template arguments
             ensures
-                - move constructs *this from item
-                - #get<T> == item
-                  (i.e. this object will have moved item into *this)
+                - constructs *this from item using perfect forwarding (converting constructor)
+                - #get<T>() == std::forward<T>(item)
+                  (i.e. this object will either contain a copy of item or will have moved item into *this
+                   depending on the reference type)
         !*/
 
-         template <
+        template <
             typename T
         >
         type_safe_union& operator= (
@@ -162,11 +133,12 @@ namespace dlib
         );
         /*!
             requires
-                - T must be one of the types given to this object's template arguments
+                - std::decay_t<T> must be one of the types given to this object's template arguments
             ensures
-                - move assigns *this from item
-                - #get<T> == item
-                  (i.e. this object will have moved item into *this)
+                - assigns *this from item using perfect forwarding (converting assignment)
+                - #get<T> == std::forward<T>(item)
+                  (i.e. this object will either contain a copy of item or will have moved item into *this
+                   depending on the reference type)
         !*/
 
         template <

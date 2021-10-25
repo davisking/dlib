@@ -459,6 +459,89 @@ namespace
             }
 
             {
+                //testing copy semantics and move semantics
+
+                struct mytype
+                {
+                    mytype(int i_ = 0) : i(i_) {}
+
+                    mytype(const mytype& other) : i(other.i) {}
+                    mytype& operator=(const mytype& other) {i = other.i; return *this;}
+
+                    mytype(mytype&& other) : i(other.i) {other.i = 0;}
+                    mytype& operator=(mytype&& other) {i = other.i ; other.i = 0; return *this;}
+
+                    int i = 0;
+                };
+
+                using tsu = type_safe_union<int,mytype>;
+
+                {
+                    mytype a(10);
+                    tsu ta(a); //copy constructor
+                    DLIB_TEST(a.i == 10);
+                    DLIB_TEST(ta.cast_to<mytype>().i == 10);
+                }
+
+                {
+                    mytype a(10);
+                    tsu ta;
+                    ta = a; //copy assign
+                    DLIB_TEST(a.i == 10);
+                    DLIB_TEST(ta.cast_to<mytype>().i == 10);
+                }
+
+                {
+                    mytype a(10);
+                    tsu ta(std::move(a)); //move constructor
+                    DLIB_TEST(a.i == 0);
+                    DLIB_TEST(ta.cast_to<mytype>().i == 10);
+                }
+
+                {
+                    mytype a(10);
+                    tsu ta;
+                    ta = std::move(a); //move assign
+                    DLIB_TEST(a.i == 0);
+                    DLIB_TEST(ta.cast_to<mytype>().i == 10);
+                }
+
+                {
+                    tsu ta(mytype(10));
+                    DLIB_TEST(ta.cast_to<mytype>().i == 10);
+                    tsu tb(ta); //copy constructor
+                    DLIB_TEST(ta.cast_to<mytype>().i == 10);
+                    DLIB_TEST(tb.cast_to<mytype>().i == 10);
+                }
+
+                {
+                    tsu ta(mytype(10));
+                    DLIB_TEST(ta.cast_to<mytype>().i == 10);
+                    tsu tb;
+                    tb = ta; //copy assign
+                    DLIB_TEST(ta.cast_to<mytype>().i == 10);
+                    DLIB_TEST(tb.cast_to<mytype>().i == 10);
+                }
+
+                {
+                    tsu ta(mytype(10));
+                    DLIB_TEST(ta.cast_to<mytype>().i == 10);
+                    tsu tb(std::move(ta)); //move constructor
+                    DLIB_TEST(ta.is_empty());
+                    DLIB_TEST(tb.cast_to<mytype>().i == 10);
+                }
+
+                {
+                    tsu ta(mytype(10));
+                    DLIB_TEST(ta.cast_to<mytype>().i == 10);
+                    tsu tb;
+                    tb = std::move(ta); //move assign
+                    DLIB_TEST(ta.is_empty());
+                    DLIB_TEST(tb.cast_to<mytype>().i == 10);
+                }
+            }
+
+            {
                 //testing emplace(), copy semantics, move semantics, swap, overloaded, and new visitor
                 type_safe_union<int, float, std::string> a, b;
                 a.emplace<std::string>("hello world");

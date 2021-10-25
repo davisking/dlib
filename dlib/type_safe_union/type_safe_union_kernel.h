@@ -279,20 +279,22 @@ namespace dlib
             type_identity = get_type_id<T>();
         }
 
-        struct helper_copy
+        struct helper_forward
         {
-            helper_copy(type_safe_union& me) : _me(me) {}
+            helper_forward(type_safe_union& me) : _me(me) {}
 
-            template <typename T>
-            void operator() (const T& item) const
+            template<typename T>
+            void operator()(T&& x)
             {
-                if (_me.type_identity != get_type_id<T>())
+                using U = typename std::decay<T>::type;
+
+                if (_me.type_identity != get_type_id<U>())
                 {
-                    _me.construct<T>(item);
+                    _me.construct<U>(std::forward<T>(x));
                 }
                 else
                 {
-                    _me.template unchecked_get<T>() = item;
+                    _me.template unchecked_get<U>() = std::forward<T>(x);
                 }
             }
 
@@ -343,18 +345,7 @@ namespace dlib
             const type_safe_union& item
         ) : type_safe_union()
         {
-            item.visit(helper_copy{*this});
-        }
-
-        template <
-            typename T,
-            typename = typename std::enable_if<is_valid<T>::value>::type
-        >
-        type_safe_union (
-            const T& item
-        ) : type_safe_union()
-        {
-            helper_copy{*this}(item);
+            item.visit(helper_forward{*this});
         }
 
         type_safe_union& operator=(
@@ -364,19 +355,7 @@ namespace dlib
             if (item.is_empty())
                 destruct();
             else
-                item.visit(helper_copy(*this));
-            return *this;
-        }
-
-        template <
-            typename T,
-            typename = typename std::enable_if<is_valid<T>::value>::type
-        >
-        type_safe_union& operator= (
-            const T& item
-        )
-        {
-            helper_copy{*this}(item);
+                item.visit(helper_forward{*this});
             return *this;
         }
 
@@ -406,24 +385,24 @@ namespace dlib
 
         template <
             typename T,
-            typename = typename std::enable_if<is_valid<T>::value>::type
+            typename = typename std::enable_if<is_valid<typename std::decay<T>::type>::value>::type
         >
         type_safe_union (
             T&& item
         ) : type_safe_union()
         {
-            helper_move{*this}(std::move(item));
+            helper_forward{*this}(std::forward<T>(item));
         }
 
         template <
             typename T,
-            typename = typename std::enable_if<is_valid<T>::value>::type
+            typename = typename std::enable_if<is_valid<typename std::decay<T>::type>::value>::type
         >
         type_safe_union& operator= (
             T&& item
         )
         {
-            helper_move{*this}(std::move(item));
+            helper_forward{*this}(std::forward<T>(item));
             return *this;
         }
 
@@ -436,6 +415,7 @@ namespace dlib
             Args&&... args
         )
         {
+            validate_type<T>();
             construct<T,Args...>(std::forward<Args>(args)...);
         }
 
@@ -457,6 +437,7 @@ namespace dlib
             Args&&... args
         )
         {
+            validate_type<T>();
             construct<T,Args...>(std::forward<Args>(args)...);
         }
 
