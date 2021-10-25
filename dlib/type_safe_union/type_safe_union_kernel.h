@@ -27,20 +27,6 @@ namespace dlib
     namespace internal
     {
         // ---------------------------------------------------------------------
-        template <typename> struct result_of;
-
-#if __cplusplus >= 201703L
-        template <typename F, typename... Args>
-        struct result_of<F(Args...)> : std::invoke_result<F, Args...> {};
-#else
-        template <typename F, typename... Args>
-        struct result_of<F(Args...)> : std::result_of<F&&(Args&&...)> {};
-#endif
-
-        template< class T >
-        using result_of_t = typename result_of<T>::type;
-
-        // ---------------------------------------------------------------------
         template <typename T, typename... Rest>
         struct is_any : std::false_type {};
 
@@ -154,6 +140,15 @@ namespace dlib
             static_assert(is_valid<T>::value, "Type T isn't one of the ones given to this object's template arguments.");
         }
 
+        template<typename F, typename T>
+        struct return_type
+        {
+            using type = decltype(std::declval<F>()(std::declval<T>()));
+        };
+
+        template<typename F, typename T>
+        using return_type_t = typename return_type<F,T>::type;
+
         typename std::aligned_union<0, Types...>::type mem;
         int type_identity = 0;
 
@@ -161,67 +156,11 @@ namespace dlib
             size_t I,
             typename F
         >
-        typename std::enable_if<
-            (I == sizeof...(Types))
-        >::type apply_to_contents_impl(
-            F&&
-        )
-        {
-        }
-
-        template<
-            size_t I,
-            typename F
-        >
-        typename std::enable_if<
-            (I < sizeof...(Types))
-        >::type apply_to_contents_impl(
-            F&& f
-        )
-        {
-            if (type_identity == (I+1))
-                std::forward<F>(f)(unchecked_get<get_type_t<I>>());
-            else
-                apply_to_contents_impl<I+1>(std::forward<F>(f));
-        }
-
-        template<
-            size_t I,
-            typename F
-        >
-        typename std::enable_if<
-            (I == sizeof...(Types))
-        >::type apply_to_contents_impl(
-            F&&
-        ) const
-        {
-        }
-
-        template<
-            size_t I,
-            typename F
-        >
-        typename std::enable_if<
-            (I < sizeof...(Types))
-        >::type apply_to_contents_impl(
-            F&& f
-        ) const
-        {
-            if (type_identity == (I+1))
-                std::forward<F>(f)(unchecked_get<get_type_t<I>>());
-            else
-                apply_to_contents_impl<I+1>(std::forward<F>(f));
-        }
-
-        template<
-            size_t I,
-            typename F
-        >
         auto visit_impl(
             F&&
         ) -> typename std::enable_if<
                 (I == sizeof...(Types)) &&
-                std::is_same<void, internal::result_of_t<F(T0&)>>::value
+                std::is_same<void, return_type_t<F, T0&>>::value
         >::type
         {
         }
@@ -234,11 +173,11 @@ namespace dlib
             F&&
         ) -> typename std::enable_if<
                 (I == sizeof...(Types)) &&
-                ! std::is_same<void, internal::result_of_t<F(T0&)>>::value,
-                internal::result_of_t<F(T0&)>
+                ! std::is_same<void, return_type_t<F, T0&>>::value,
+                return_type_t<F, T0&>
         >::type
         {
-            return internal::result_of_t<F(T0&)>{};
+            return return_type_t<F, T0&>{};
         }
 
         template<
@@ -249,7 +188,7 @@ namespace dlib
             F&& f
         )  -> typename std::enable_if<
                 (I < sizeof...(Types)),
-                internal::result_of_t<F(T0&)>
+                return_type_t<F, T0&>
         >::type
         {
             if (type_identity == (I+1))
@@ -266,7 +205,7 @@ namespace dlib
             F&&
         ) const -> typename std::enable_if<
                 (I == sizeof...(Types)) &&
-                std::is_same<void, internal::result_of_t<F(const T0&)>>::value
+                std::is_same<void, return_type_t<F, const T0&>>::value
         >::type
         {
         }
@@ -279,11 +218,11 @@ namespace dlib
             F&&
         ) const -> typename std::enable_if<
                 (I == sizeof...(Types)) &&
-                ! std::is_same<void, internal::result_of_t<F(const T0&)>>::value,
-                internal::result_of_t<F(const T0&)>
+                ! std::is_same<void, return_type_t<F, const T0&>>::value,
+                return_type_t<F, const T0&>
         >::type
         {
-            return internal::result_of_t<F(const T0&)>{};
+            return return_type_t<F, const T0&>{};
         }
 
         template<
@@ -294,7 +233,7 @@ namespace dlib
             F&& f
         ) const -> typename std::enable_if<
                 (I < sizeof...(Types)),
-                internal::result_of_t<F(const T0&)>
+                return_type_t<F, const T0&>
         >::type
         {
             if (type_identity == (I+1))
@@ -542,7 +481,7 @@ namespace dlib
             F&& f
         )
         {
-            apply_to_contents_impl<0>(std::forward<F>(f));
+            visit(std::forward<F>(f));
         }
 
         template <typename F>
@@ -550,7 +489,7 @@ namespace dlib
             F&& f
         ) const
         {
-            apply_to_contents_impl<0>(std::forward<F>(f));
+            visit(std::forward<F>(f));
         }
 
         template <typename T>
