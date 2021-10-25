@@ -21,7 +21,7 @@ namespace dlib
     template<typename T>
     struct in_place_tag {};
     /*!
-        This is an empty class type used as a special disambiguous tag to be
+        This is an empty class type used as a special disambiguation tag to be
         passed as first argument to the constructor of type_safe_union that performs
         in-place construction of an object.
 
