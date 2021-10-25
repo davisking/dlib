@@ -41,7 +41,7 @@ namespace dlib
     !*/
 // ----------------------------------------------------------------------------------------
 
-template <typename... Types>
+    template <typename... Types>
     class type_safe_union
     {
         /*!
