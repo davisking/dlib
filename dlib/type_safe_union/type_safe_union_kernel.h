@@ -134,12 +134,6 @@ namespace dlib
 
         using T0 = get_type_t<0>;
 
-        template <typename T>
-        void validate_type() const
-        {
-            static_assert(is_valid<T>::value, "Type T isn't one of the ones given to this object's template arguments.");
-        }
-
         template<typename F, typename T>
         struct return_type
         {
@@ -406,6 +400,7 @@ namespace dlib
 
         template <
             typename T,
+            typename = typename std::enable_if<is_valid<T>::value>::type,
             typename... Args
         >
         type_safe_union (
@@ -413,7 +408,6 @@ namespace dlib
             Args&&... args
         )
         {
-            validate_type<T>();
             construct<T,Args...>(std::forward<Args>(args)...);
         }
 
@@ -431,11 +425,10 @@ namespace dlib
             typename T,
             typename... Args
         >
-        void emplace(
+        typename std::enable_if<is_valid<T>::value>::type emplace(
             Args&&... args
         )
         {
-            validate_type<T>();
             construct<T,Args...>(std::forward<Args>(args)...);
         }
 
