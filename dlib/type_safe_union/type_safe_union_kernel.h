@@ -126,6 +126,9 @@ namespace dlib
         template<typename T>
         struct is_valid : internal::is_any<T,Types...> {};
 
+        template<typename T>
+        using is_valid_check = typename std::enable_if<is_valid<T>::value, bool>::type;
+
         template <size_t I>
         struct get_type : internal::variant_get_type<I,Types...> {};
 
@@ -377,7 +380,7 @@ namespace dlib
 
         template <
             typename T,
-            typename = typename std::enable_if<is_valid<typename std::decay<T>::type>::value>::type
+            is_valid_check<typename std::decay<T>::type> = true
         >
         type_safe_union (
             T&& item
@@ -388,7 +391,7 @@ namespace dlib
 
         template <
             typename T,
-            typename = typename std::enable_if<is_valid<typename std::decay<T>::type>::value>::type
+            is_valid_check<typename std::decay<T>::type> = true
         >
         type_safe_union& operator= (
             T&& item
@@ -400,8 +403,8 @@ namespace dlib
 
         template <
             typename T,
-            typename = typename std::enable_if<is_valid<T>::value>::type,
-            typename... Args
+            typename... Args,
+            is_valid_check<T> = true
         >
         type_safe_union (
             in_place_tag<T>,
@@ -423,9 +426,10 @@ namespace dlib
 
         template <
             typename T,
-            typename... Args
+            typename... Args,
+            is_valid_check<T> = true
         >
-        typename std::enable_if<is_valid<T>::value>::type emplace(
+        void emplace(
             Args&&... args
         )
         {
@@ -511,7 +515,7 @@ namespace dlib
 
         template <
             typename T,
-            typename = typename std::enable_if<is_valid<T>::value>::type
+            is_valid_check<T> = true
         >
         T& get(
         )
@@ -523,7 +527,7 @@ namespace dlib
 
         template <
             typename T,
-            typename = typename std::enable_if<is_valid<T>::value>::type
+            is_valid_check<T> = true
         >
         const T& cast_to (
         ) const
@@ -536,7 +540,7 @@ namespace dlib
 
         template <
             typename T,
-            typename = typename std::enable_if<is_valid<T>::value>::type
+            is_valid_check<T> = true
         >
         T& cast_to (
         )
