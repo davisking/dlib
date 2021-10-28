@@ -429,7 +429,6 @@ namespace
                 b = 3;
                 b = std::move(a);
 
-                DLIB_TEST(a.get<int>() == 3);
                 DLIB_TEST(b.get<std::string>() == "asdf");
             }
 
@@ -458,11 +457,214 @@ namespace
                 DLIB_TEST(!a.contains<ptr_t>());
                 DLIB_TEST(*b.get<ptr_t>() == "asdf");
             }
+
+            {
+                //testing copy semantics and move semantics
+
+                struct mytype
+                {
+                    mytype(int i_ = 0) : i(i_) {}
+
+                    mytype(const mytype& other) : i(other.i) {}
+                    mytype& operator=(const mytype& other) {i = other.i; return *this;}
+
+                    mytype(mytype&& other) : i(other.i) {other.i = 0;}
+                    mytype& operator=(mytype&& other) {i = other.i ; other.i = 0; return *this;}
+
+                    int i = 0;
+                };
+
+                using tsu = type_safe_union<int,mytype>;
+
+                {
+                    mytype a(10);
+                    tsu ta(a); //copy constructor
+                    DLIB_TEST(a.i == 10);
+                    DLIB_TEST(ta.cast_to<mytype>().i == 10);
+                }
+
+                {
+                    mytype a(10);
+                    tsu ta;
+                    ta = a; //copy assign
+                    DLIB_TEST(a.i == 10);
+                    DLIB_TEST(ta.cast_to<mytype>().i == 10);
+                }
+
+                {
+                    mytype a(10);
+                    tsu ta(std::move(a)); //move constructor
+                    DLIB_TEST(a.i == 0);
+                    DLIB_TEST(ta.cast_to<mytype>().i == 10);
+                }
+
+                {
+                    mytype a(10);
+                    tsu ta;
+                    ta = std::move(a); //move assign
+                    DLIB_TEST(a.i == 0);
+                    DLIB_TEST(ta.cast_to<mytype>().i == 10);
+                }
+
+                {
+                    tsu ta(mytype(10));
+                    DLIB_TEST(ta.cast_to<mytype>().i == 10);
+                    tsu tb(ta); //copy constructor
+                    DLIB_TEST(ta.cast_to<mytype>().i == 10);
+                    DLIB_TEST(tb.cast_to<mytype>().i == 10);
+                }
+
+                {
+                    tsu ta(mytype(10));
+                    DLIB_TEST(ta.cast_to<mytype>().i == 10);
+                    tsu tb;
+                    tb = ta; //copy assign
+                    DLIB_TEST(ta.cast_to<mytype>().i == 10);
+                    DLIB_TEST(tb.cast_to<mytype>().i == 10);
+                }
+
+                {
+                    tsu ta(mytype(10));
+                    DLIB_TEST(ta.cast_to<mytype>().i == 10);
+                    tsu tb(std::move(ta)); //move constructor
+                    DLIB_TEST(ta.is_empty());
+                    DLIB_TEST(tb.cast_to<mytype>().i == 10);
+                }
+
+                {
+                    tsu ta(mytype(10));
+                    DLIB_TEST(ta.cast_to<mytype>().i == 10);
+                    tsu tb;
+                    tb = std::move(ta); //move assign
+                    DLIB_TEST(ta.is_empty());
+                    DLIB_TEST(tb.cast_to<mytype>().i == 10);
+                }
+            }
+
+            {
+                //testing emplace(), copy semantics, move semantics, swap, overloaded, and new visitor
+                type_safe_union<int, float, std::string> a, b;
+                a.emplace<std::string>("hello world");
+
+                DLIB_TEST(a.contains<std::string>());
+                b = a; //copy
+                DLIB_TEST(a.contains<std::string>());
+                DLIB_TEST(b.contains<std::string>());
+                DLIB_TEST(a.cast_to<std::string>() == "hello world");
+                DLIB_TEST(b.cast_to<std::string>() == "hello world");
+                a = 1;
+                DLIB_TEST(a.contains<int>());
+                DLIB_TEST(a.cast_to<int>() == 1);
+                b = std::move(a);
+                DLIB_TEST(b.contains<int>());
+                DLIB_TEST(b.cast_to<int>() == 1);
+                DLIB_TEST(a.is_empty());
+                DLIB_TEST(a.get_current_type_id() == 0);
+                swap(a, b);
+                DLIB_TEST(a.contains<int>());
+                DLIB_TEST(a.cast_to<int>() == 1);
+                DLIB_TEST(b.is_empty());
+                DLIB_TEST(b.get_current_type_id() == 0);
+                //visit can return non-void types
+                auto ret = a.visit(overloaded(
+                    [](int) {
+                        return std::string("int");
+                    },
+                    [](float) {
+                        return std::string("float");
+                    },
+                    [](const std::string&) {
+                        return std::string("std::string");
+                    }
+                ));
+                static_assert(std::is_same<std::string, decltype(ret)>::value, "bad return type");
+                DLIB_TEST(ret == "int");
+                //apply_to_contents can only return void
+                a = std::string("hello there!");
+                std::string str;
+                a.apply_to_contents(overloaded(
+                    [&str](int) {
+                        str = std::string("int");
+                    },
+                    [&str](float) {
+                        str = std::string("float");
+                    },
+                    [&str](const std::string& item) {
+                        str = item;
+                    }
+                ));
+                DLIB_TEST(str == "hello there!");
+            }
+
+            {
+                //nested unions
+                using tsu_a = type_safe_union<int,float,std::string>;
+                using tsu_b = type_safe_union<int,float,std::string,tsu_a>;
+
+                tsu_b object(dlib::in_place_tag<tsu_a>{}, std::string("hello from bottom node"));
+                DLIB_TEST(object.contains<tsu_a>());
+                DLIB_TEST(object.get<tsu_a>().get<std::string>() == "hello from bottom node");
+                auto ret = object.visit(overloaded(
+                    [](int) {
+                        return std::string("int");
+                    },
+                    [](float) {
+                        return std::string("float");
+                    },
+                    [](std::string) {
+                        return std::string("std::string");
+                    },
+                    [](const tsu_a& item) {
+                        return item.visit(overloaded(
+                            [](int) {
+                                return std::string("nested int");
+                            },
+                            [](float) {
+                                return std::string("nested float");
+                            },
+                            [](std::string str) {
+                                return str;
+                            }
+                        ));
+                    }
+                ));
+                static_assert(std::is_same<std::string, decltype(ret)>::value, "bad type");
+                DLIB_TEST(ret == "hello from bottom node");
+            }
+
+            {
+                //"private" visitor
+                using tsu = type_safe_union<int,float,std::string>;
+
+                class visitor_private
+                {
+                private:
+                    std::string operator()(int)
+                    {
+                        return std::string("int");
+                    }
+
+                    std::string operator()(float)
+                    {
+                        return std::string("float");
+                    }
+
+                    std::string operator()(const std::string& str)
+                    {
+                        return str;
+                    }
+
+                    friend tsu;
+                };
+
+                visitor_private visitor;
+                tsu a = std::string("hello from private visitor");
+                auto ret = a.visit(visitor);
+                static_assert(std::is_same<std::string, decltype(ret)>::value, "bad type");
+                DLIB_TEST(ret == "hello from private visitor");
+            }
         }
-
     };
-
-
 
     class type_safe_union_tester : public tester
     {

@@ -4,18 +4,14 @@
 #define DLIB_TYPE_SAFE_UNIOn_h_
 
 #include "type_safe_union_kernel_abstract.h"
-#include "../algs.h"
-#include "../noncopyable.h"
-#include "../serialize.h"
 #include <new>
 #include <iostream>
 #include <type_traits>
+#include <functional>
+#include "../serialize.h"
 
 namespace dlib
 {
-
-// ----------------------------------------------------------------------------------------
-
     class bad_type_safe_union_cast : public std::bad_cast 
     {
     public:
@@ -25,38 +21,92 @@ namespace dlib
           }
     };
 
-// ----------------------------------------------------------------------------------------
+    template<typename T>
+    struct in_place_tag {};
 
-    struct _void{};
-    inline void serialize( const _void&, std::ostream&){}
-    inline void deserialize(  _void&, std::istream&){}
+    namespace internal
+    {
+        // ---------------------------------------------------------------------
+        template <typename T, typename... Rest>
+        struct is_any : std::false_type {};
 
-// ----------------------------------------------------------------------------------------
+        template <typename T, typename First>
+        struct is_any<T,First> : std::is_same<T,First> {};
 
-    template <
-        typename T1,
-        typename T2 = _void,
-        typename T3 = _void,
-        typename T4 = _void,
-        typename T5 = _void, 
-        typename T6 = _void,
-        typename T7 = _void,
-        typename T8 = _void,
-        typename T9 = _void,
-        typename T10 = _void,
+        template <typename T, typename First, typename... Rest>
+        struct is_any<T,First,Rest...> : std::integral_constant<bool, std::is_same<T,First>::value || is_any<T,Rest...>::value> {};
 
-        typename T11 = _void,
-        typename T12 = _void,
-        typename T13 = _void,
-        typename T14 = _void,
-        typename T15 = _void,
-        typename T16 = _void,
-        typename T17 = _void,
-        typename T18 = _void,
-        typename T19 = _void,
-        typename T20 = _void
-        >
-    class type_safe_union : noncopyable
+        // ---------------------------------------------------------------------
+        namespace detail
+        {
+            struct empty {};
+
+            template<typename T>
+            struct variant_type_placeholder {using type = T;};
+
+            template <
+                    size_t nVariantTypes,
+                    size_t Counter,
+                    size_t I,
+                    typename... VariantTypes
+            >
+            struct variant_get_type_impl {};
+
+            template <
+                    size_t nVariantTypes,
+                    size_t Counter,
+                    size_t I,
+                    typename VariantTypeFirst,
+                    typename... VariantTypeRest
+            >
+            struct variant_get_type_impl<nVariantTypes, Counter, I, VariantTypeFirst, VariantTypeRest...>
+                    :   std::conditional<(Counter < nVariantTypes),
+                            typename std::conditional<(I == Counter),
+                                    variant_type_placeholder<VariantTypeFirst>,
+                                    variant_get_type_impl<nVariantTypes, Counter+1, I, VariantTypeRest...>
+                            >::type,
+                            empty
+                    >::type {};
+        }
+
+        template <size_t I, typename... VariantTypes>
+        struct variant_get_type : detail::variant_get_type_impl<sizeof...(VariantTypes), 0, I, VariantTypes...> {};
+
+        // ---------------------------------------------------------------------
+        namespace detail
+        {
+            template <
+                    size_t nVariantTypes,
+                    size_t Counter,
+                    typename T,
+                    typename... VariantTypes
+            >
+            struct variant_type_id_impl : std::integral_constant<int,-1> {};
+
+            template <
+                    size_t nVariantTypes,
+                    size_t Counter,
+                    typename T,
+                    typename VariantTypeFirst,
+                    typename... VariantTypesRest
+            >
+            struct variant_type_id_impl<nVariantTypes,Counter,T,VariantTypeFirst,VariantTypesRest...>
+                    :   std::conditional<(Counter < nVariantTypes),
+                            typename std::conditional<std::is_same<T,VariantTypeFirst>::value,
+                                    std::integral_constant<int,Counter+1>,
+                                    variant_type_id_impl<nVariantTypes,Counter + 1, T, VariantTypesRest...>
+                            >::type,
+                            std::integral_constant<int,-1>
+                    >::type {};
+        }
+
+        template <typename T, typename... VariantTypes>
+        struct variant_type_id : detail::variant_type_id_impl<sizeof...(VariantTypes), 0, T, VariantTypes...> {};
+        // ---------------------------------------------------------------------
+    }
+
+    template <typename... Types>
+    class type_safe_union
     {
         /*!
             CONVENTION
@@ -65,46 +115,141 @@ namespace dlib
                 - mem == the aligned block of memory on the stack which is
                   where objects in the union are stored
         !*/
+    public:
+        template <typename T>
+        static constexpr int get_type_id ()
+        {
+            return internal::variant_type_id<T,Types...>::value;
+        }
 
     private:
+        template<typename T>
+        struct is_valid : internal::is_any<T,Types...> {};
 
-        template <typename T, typename U>
-        void invoke_on (
-            T& obj,
-            U& item
-        ) const
+        template<typename T>
+        using is_valid_check = typename std::enable_if<is_valid<T>::value, bool>::type;
+
+        template <size_t I>
+        struct get_type : internal::variant_get_type<I,Types...> {};
+
+        template <size_t I>
+        using get_type_t = typename get_type<I>::type;
+
+        using T0 = get_type_t<0>;
+
+        template<typename F, typename T>
+        struct return_type
         {
-            obj(item);
+            using type = decltype(std::declval<F>()(std::declval<T>()));
+        };
+
+        template<typename F, typename T>
+        using return_type_t = typename return_type<F,T>::type;
+
+        typename std::aligned_union<0, Types...>::type mem;
+        int type_identity = 0;
+
+        template<
+            size_t I,
+            typename F
+        >
+        auto visit_impl(
+            F&&
+        ) -> typename std::enable_if<
+                (I == sizeof...(Types)) &&
+                std::is_same<void, return_type_t<F, T0&>>::value
+        >::type
+        {
+        }
+
+        template<
+            size_t I,
+            typename F
+        >
+        auto visit_impl(
+            F&&
+        ) -> typename std::enable_if<
+                (I == sizeof...(Types)) &&
+                ! std::is_same<void, return_type_t<F, T0&>>::value,
+                return_type_t<F, T0&>
+        >::type
+        {
+            return return_type_t<F, T0&>{};
+        }
+
+        template<
+            size_t I,
+            typename F
+        >
+        auto visit_impl(
+            F&& f
+        )  -> typename std::enable_if<
+                (I < sizeof...(Types)),
+                return_type_t<F, T0&>
+        >::type
+        {
+            if (type_identity == (I+1))
+                return std::forward<F>(f)(unchecked_get<get_type_t<I>>());
+            else
+                return visit_impl<I+1>(std::forward<F>(f));
+        }
+
+        template<
+            size_t I,
+            typename F
+        >
+        auto visit_impl(
+            F&&
+        ) const -> typename std::enable_if<
+                (I == sizeof...(Types)) &&
+                std::is_same<void, return_type_t<F, const T0&>>::value
+        >::type
+        {
+        }
+
+        template<
+            size_t I,
+            typename F
+        >
+        auto visit_impl(
+            F&&
+        ) const -> typename std::enable_if<
+                (I == sizeof...(Types)) &&
+                ! std::is_same<void, return_type_t<F, const T0&>>::value,
+                return_type_t<F, const T0&>
+        >::type
+        {
+            return return_type_t<F, const T0&>{};
+        }
+
+        template<
+            size_t I,
+            typename F
+        >
+        auto visit_impl(
+            F&& f
+        ) const -> typename std::enable_if<
+                (I < sizeof...(Types)),
+                return_type_t<F, const T0&>
+        >::type
+        {
+            if (type_identity == (I+1))
+                return std::forward<F>(f)(unchecked_get<get_type_t<I>>());
+            else
+                return visit_impl<I+1>(std::forward<F>(f));
         }
 
         template <typename T>
-        void invoke_on (
-            T& ,
-            _void 
-        ) const
+        const T& unchecked_get() const
         {
+            return *reinterpret_cast<const T*>(&mem);
         }
-
-        // member data
-        typename std::aligned_union<0, T1,T2,T3,T4,T5, 
-                                       T6,T7,T8,T9,T10,
-                                       T11,T12,T13,T14,T15,
-                                       T16,T17,T18,T19,T20>::type mem;
-        int type_identity;
-
-        // --------------------------------------------
 
         template <typename T>
-        void validate_type() const
+        T& unchecked_get()
         {
-            // ERROR: You are trying to get a type of object that isn't
-            // representable by this type_safe_union.
-            static_assert(is_any<T,T1,T2,T3,T4,T5,
-                                   T6,T7,T8,T9,T10,
-                                   T11,T12,T13,T14,T15,
-                                   T16,T17,T18,T19,T20>::value, "Type T isn't one of the ones given to this object's template arguments.");
+            return *reinterpret_cast<T*>(&mem);
         }
-
 
         struct destruct_helper
         {
@@ -115,124 +260,158 @@ namespace dlib
             }
         };
 
-        void destruct (
-        ) 
-        /*!
-            ensures
-                - #is_empty() == true
-        !*/
+        void destruct ()
         {
-            // destruct whatever is in this object
-            apply_to_contents(destruct_helper());
-
-            // mark this object as being empty
+            visit(destruct_helper{});
             type_identity = 0;
         }
 
-        template <typename T>
+        template <typename T, typename... Args>
         void construct (
-        )  
-        { 
-            if (type_identity != get_type_id<T>())
-            {
-                destruct(); 
-                new(&mem) T(); 
-                type_identity = get_type_id<T>();
-            }
-        }
-
-        template <typename T>
-        void construct (
-            T&& item
-        )  
-        { 
-            using U = typename std::decay<T>::type;
-            if (type_identity != get_type_id<U>())
-            {
-                destruct(); 
-                new(&mem) U(std::forward<T>(item)); 
-                type_identity = get_type_id<U>();
-            }
-        }
-
-        template <typename T> 
-        T& unchecked_get(
-        ) 
-        /*!
-            requires
-                - contains<T>() == true
-            ensures
-                - returns a non-const reference to the T object
-        !*/
-        { 
-            return *reinterpret_cast<T*>(&mem); 
-        }
-
-        template <typename T> 
-        const T& unchecked_get(
-        ) const
-        /*!
-            requires
-                - contains<T>() == true
-            ensures
-                - returns a const reference to the T object
-        !*/
-        { 
-            return *reinterpret_cast<const T*>(&mem); 
-        }
-
-        template <typename T>
-        void operator() (T& item) 
-        /*
-            This function is used by the swap function of this class.  See that
-            function to see how this works.
-        */
+            Args&&... args
+        )
         {
-            exchange(get<T>(), item);
+            destruct();
+            new(&mem) T(std::forward<Args>(args)...);
+            type_identity = get_type_id<T>();
         }
+
+        struct helper_forward
+        {
+            helper_forward(type_safe_union& me) : _me(me) {}
+
+            template<typename T>
+            void operator()(T&& x)
+            {
+                using U = typename std::decay<T>::type;
+
+                if (_me.type_identity != get_type_id<U>())
+                {
+                    _me.construct<U>(std::forward<T>(x));
+                }
+                else
+                {
+                    _me.template unchecked_get<U>() = std::forward<T>(x);
+                }
+            }
+
+            type_safe_union& _me;
+        };
+
+        struct helper_move
+        {
+            helper_move(type_safe_union& me) : _me(me) {}
+
+            template<typename T>
+            void operator()(T& x)
+            {
+                if (_me.type_identity != get_type_id<T>())
+                {
+                    _me.construct<T>(std::move(x));
+                }
+                else
+                {
+                    _me.template unchecked_get<T>() = std::move(x);
+                }
+            }
+
+            type_safe_union& _me;
+        };
+
+        struct swap_helper
+        {
+            swap_helper(type_safe_union& me) : _me(me) {}
+
+            template<typename T>
+            void operator()(T& x)
+            {
+                using std::swap;
+                swap(_me.unchecked_get<T>(), x); //really you want to use cast_to<T>(), BUT, swap is supposed to be nothrow
+            }
+
+            type_safe_union& _me;
+        };
 
     public:
 
-        typedef T1 type1;
-        typedef T2 type2;
-        typedef T3 type3;
-        typedef T4 type4;
-        typedef T5 type5;
-        typedef T6 type6;
-        typedef T7 type7;
-        typedef T8 type8;
-        typedef T9 type9;
-        typedef T10 type10;
-        typedef T11 type11;
-        typedef T12 type12;
-        typedef T13 type13;
-        typedef T14 type14;
-        typedef T15 type15;
-        typedef T16 type16;
-        typedef T17 type17;
-        typedef T18 type18;
-        typedef T19 type19;
-        typedef T20 type20;
+        type_safe_union() = default;
 
-
-        type_safe_union() : type_identity(0) 
-        { 
+        type_safe_union (
+            const type_safe_union& item
+        ) : type_safe_union()
+        {
+            item.visit(helper_forward{*this});
         }
 
-        template <typename T>
-        type_safe_union (
-            T&& item
-        ) : type_identity(0)
+        type_safe_union& operator=(
+            const type_safe_union& item
+        )
         {
-            validate_type<typename std::decay<T>::type>();
-            construct(std::forward<T>(item));
+            if (item.is_empty())
+                destruct();
+            else
+                item.visit(helper_forward{*this});
+            return *this;
         }
 
         type_safe_union (
             type_safe_union&& item
-        ) : type_safe_union() 
+        ) : type_safe_union()
         {
-            swap(item);
+            item.visit(helper_move{*this});
+            item.destruct();
+        }
+
+        type_safe_union& operator= (
+            type_safe_union&& item
+        )
+        {
+            if (item.is_empty())
+            {
+                destruct();
+            }
+            else
+            {
+                item.visit(helper_move{*this});
+                item.destruct();
+            }
+            return *this;
+        }
+
+        template <
+            typename T,
+            is_valid_check<typename std::decay<T>::type> = true
+        >
+        type_safe_union (
+            T&& item
+        ) : type_safe_union()
+        {
+            helper_forward{*this}(std::forward<T>(item));
+        }
+
+        template <
+            typename T,
+            is_valid_check<typename std::decay<T>::type> = true
+        >
+        type_safe_union& operator= (
+            T&& item
+        )
+        {
+            helper_forward{*this}(std::forward<T>(item));
+            return *this;
+        }
+
+        template <
+            typename T,
+            typename... Args,
+            is_valid_check<T> = true
+        >
+        type_safe_union (
+            in_place_tag<T>,
+            Args&&... args
+        )
+        {
+            construct<T,Args...>(std::forward<Args>(args)...);
         }
 
         ~type_safe_union()
@@ -240,37 +419,53 @@ namespace dlib
             destruct();
         }
 
-        template <typename T>
-        static int get_type_id (
-        ) 
+        void clear()
         {
-            if (std::is_same<T,T1>::value) return 1;
-            if (std::is_same<T,T2>::value) return 2;
-            if (std::is_same<T,T3>::value) return 3;
-            if (std::is_same<T,T4>::value) return 4;
-            if (std::is_same<T,T5>::value) return 5;
+            destruct();
+        }
 
-            if (std::is_same<T,T6>::value) return 6;
-            if (std::is_same<T,T7>::value) return 7;
-            if (std::is_same<T,T8>::value) return 8;
-            if (std::is_same<T,T9>::value) return 9;
-            if (std::is_same<T,T10>::value) return 10;
+        template <
+            typename T,
+            typename... Args,
+            is_valid_check<T> = true
+        >
+        void emplace(
+            Args&&... args
+        )
+        {
+            construct<T,Args...>(std::forward<Args>(args)...);
+        }
 
-            if (std::is_same<T,T11>::value) return 11;
-            if (std::is_same<T,T12>::value) return 12;
-            if (std::is_same<T,T13>::value) return 13;
-            if (std::is_same<T,T14>::value) return 14;
-            if (std::is_same<T,T15>::value) return 15;
+        template <typename F>
+        auto visit(
+            F&& f
+        ) -> decltype(visit_impl<0>(std::forward<F>(f)))
+        {
+            return visit_impl<0>(std::forward<F>(f));
+        }
 
-            if (std::is_same<T,T16>::value) return 16;
-            if (std::is_same<T,T17>::value) return 17;
-            if (std::is_same<T,T18>::value) return 18;
-            if (std::is_same<T,T19>::value) return 19;
-            if (std::is_same<T,T20>::value) return 20;
+        template <typename F>
+        auto visit(
+            F&& f
+        ) const -> decltype(visit_impl<0>(std::forward<F>(f)))
+        {
+            return visit_impl<0>(std::forward<F>(f));
+        }
 
-            // return a number that doesn't match any of the
-            // valid states of type_identity
-            return -1;
+        template <typename F>
+        void apply_to_contents(
+            F&& f
+        )
+        {
+            visit(std::forward<F>(f));
+        }
+
+        template <typename F>
+        void apply_to_contents(
+            F&& f
+        ) const
+        {
+            visit(std::forward<F>(f));
         }
 
         template <typename T>
@@ -286,327 +481,143 @@ namespace dlib
             return type_identity == 0;
         }
 
-
-    public:
-
-        template <
-            typename t1, typename t2, typename t3, typename t4, typename t5,
-            typename t6, typename t7, typename t8, typename t9, typename t10,
-            typename t11, typename t12, typename t13, typename t14, typename t15,
-            typename t16, typename t17, typename t18, typename t19, typename t20
-            >
-        friend void serialize (
-            const type_safe_union<t1,t2,t3,t4,t5,t6,t7,t8,t9,t10, t11,t12,t13,t14,t15,t16,t17,t18,t19,t20>& item,
-            std::ostream& out
-        );
-
-
-        template <
-            typename T
-            >
-        void apply_to_contents (
-            T& obj
-        ) 
+        int get_current_type_id() const
         {
-            switch (type_identity)
-            {
-                // do nothing because we are empty
-                case 0: break;
-
-                case 1: invoke_on(obj,unchecked_get<T1>());  break;
-                case 2: invoke_on(obj,unchecked_get<T2>());  break;
-                case 3: invoke_on(obj,unchecked_get<T3>());  break;
-                case 4: invoke_on(obj,unchecked_get<T4>());  break;
-                case 5: invoke_on(obj,unchecked_get<T5>());  break;
-
-                case 6: invoke_on(obj,unchecked_get<T6>());  break;
-                case 7: invoke_on(obj,unchecked_get<T7>());  break;
-                case 8: invoke_on(obj,unchecked_get<T8>());  break;
-                case 9: invoke_on(obj,unchecked_get<T9>());  break;
-                case 10: invoke_on(obj,unchecked_get<T10>());  break;
-
-                case 11: invoke_on(obj,unchecked_get<T11>());  break;
-                case 12: invoke_on(obj,unchecked_get<T12>());  break;
-                case 13: invoke_on(obj,unchecked_get<T13>());  break;
-                case 14: invoke_on(obj,unchecked_get<T14>());  break;
-                case 15: invoke_on(obj,unchecked_get<T15>());  break;
-
-                case 16: invoke_on(obj,unchecked_get<T16>());  break;
-                case 17: invoke_on(obj,unchecked_get<T17>());  break;
-                case 18: invoke_on(obj,unchecked_get<T18>());  break;
-                case 19: invoke_on(obj,unchecked_get<T19>());  break;
-                case 20: invoke_on(obj,unchecked_get<T20>());  break;
-            }
-        }
-
-        template <
-            typename T
-            >
-        void apply_to_contents (
-            const T& obj
-        ) 
-        {
-            switch (type_identity)
-            {
-                // do nothing because we are empty
-                case 0: break;
-
-                case 1: invoke_on(obj,unchecked_get<T1>());  break;
-                case 2: invoke_on(obj,unchecked_get<T2>());  break;
-                case 3: invoke_on(obj,unchecked_get<T3>());  break;
-                case 4: invoke_on(obj,unchecked_get<T4>());  break;
-                case 5: invoke_on(obj,unchecked_get<T5>());  break;
-
-                case 6: invoke_on(obj,unchecked_get<T6>());  break;
-                case 7: invoke_on(obj,unchecked_get<T7>());  break;
-                case 8: invoke_on(obj,unchecked_get<T8>());  break;
-                case 9: invoke_on(obj,unchecked_get<T9>());  break;
-                case 10: invoke_on(obj,unchecked_get<T10>());  break;
-
-                case 11: invoke_on(obj,unchecked_get<T11>());  break;
-                case 12: invoke_on(obj,unchecked_get<T12>());  break;
-                case 13: invoke_on(obj,unchecked_get<T13>());  break;
-                case 14: invoke_on(obj,unchecked_get<T14>());  break;
-                case 15: invoke_on(obj,unchecked_get<T15>());  break;
-
-                case 16: invoke_on(obj,unchecked_get<T16>());  break;
-                case 17: invoke_on(obj,unchecked_get<T17>());  break;
-                case 18: invoke_on(obj,unchecked_get<T18>());  break;
-                case 19: invoke_on(obj,unchecked_get<T19>());  break;
-                case 20: invoke_on(obj,unchecked_get<T20>());  break;
-            }
-        }
-
-        template <
-            typename T
-            >
-        void apply_to_contents (
-            T& obj
-        ) const
-        {
-            switch (type_identity)
-            {
-                // do nothing because we are empty
-                case 0: break;
-
-                case 1: invoke_on(obj,unchecked_get<T1>());  break;
-                case 2: invoke_on(obj,unchecked_get<T2>());  break;
-                case 3: invoke_on(obj,unchecked_get<T3>());  break;
-                case 4: invoke_on(obj,unchecked_get<T4>());  break;
-                case 5: invoke_on(obj,unchecked_get<T5>());  break;
-
-                case 6: invoke_on(obj,unchecked_get<T6>());  break;
-                case 7: invoke_on(obj,unchecked_get<T7>());  break;
-                case 8: invoke_on(obj,unchecked_get<T8>());  break;
-                case 9: invoke_on(obj,unchecked_get<T9>());  break;
-                case 10: invoke_on(obj,unchecked_get<T10>());  break;
-
-                case 11: invoke_on(obj,unchecked_get<T11>());  break;
-                case 12: invoke_on(obj,unchecked_get<T12>());  break;
-                case 13: invoke_on(obj,unchecked_get<T13>());  break;
-                case 14: invoke_on(obj,unchecked_get<T14>());  break;
-                case 15: invoke_on(obj,unchecked_get<T15>());  break;
-
-                case 16: invoke_on(obj,unchecked_get<T16>());  break;
-                case 17: invoke_on(obj,unchecked_get<T17>());  break;
-                case 18: invoke_on(obj,unchecked_get<T18>());  break;
-                case 19: invoke_on(obj,unchecked_get<T19>());  break;
-                case 20: invoke_on(obj,unchecked_get<T20>());  break;
-            }
-        }
-
-        template <
-            typename T
-            >
-        void apply_to_contents (
-            const T& obj
-        ) const
-        {
-            switch (type_identity)
-            {
-                // do nothing because we are empty
-                case 0: break;
-
-                case 1: invoke_on(obj,unchecked_get<T1>());  break;
-                case 2: invoke_on(obj,unchecked_get<T2>());  break;
-                case 3: invoke_on(obj,unchecked_get<T3>());  break;
-                case 4: invoke_on(obj,unchecked_get<T4>());  break;
-                case 5: invoke_on(obj,unchecked_get<T5>());  break;
-
-                case 6: invoke_on(obj,unchecked_get<T6>());  break;
-                case 7: invoke_on(obj,unchecked_get<T7>());  break;
-                case 8: invoke_on(obj,unchecked_get<T8>());  break;
-                case 9: invoke_on(obj,unchecked_get<T9>());  break;
-                case 10: invoke_on(obj,unchecked_get<T10>());  break;
-
-                case 11: invoke_on(obj,unchecked_get<T11>());  break;
-                case 12: invoke_on(obj,unchecked_get<T12>());  break;
-                case 13: invoke_on(obj,unchecked_get<T13>());  break;
-                case 14: invoke_on(obj,unchecked_get<T14>());  break;
-                case 15: invoke_on(obj,unchecked_get<T15>());  break;
-
-                case 16: invoke_on(obj,unchecked_get<T16>());  break;
-                case 17: invoke_on(obj,unchecked_get<T17>());  break;
-                case 18: invoke_on(obj,unchecked_get<T18>());  break;
-                case 19: invoke_on(obj,unchecked_get<T19>());  break;
-                case 20: invoke_on(obj,unchecked_get<T20>());  break;
-            }
+            return type_identity;
         }
 
         void swap (
             type_safe_union& item
         )
         {
-            // if both *this and item contain the same type of thing
             if (type_identity == item.type_identity)
             {
-                // swap the things in this and item.  
-                item.apply_to_contents(*this);
+                item.visit(swap_helper{*this});
             }
-            else if (type_identity == 0)
+            else if (is_empty())
             {
-                // *this doesn't contain anything.  So swap this and item and
-                // then destruct item.
-                item.apply_to_contents(*this);
+                item.visit(helper_move{*this});
                 item.destruct();
             }
-            else if (item.type_identity == 0)
+            else if (item.is_empty())
             {
-                // *this doesn't contain anything.  So swap this and item and
-                // then destruct this.
-                apply_to_contents(item);
+                visit(helper_move{item});
                 destruct();
             }
             else
             {
-                type_safe_union temp;
-                // swap *this into temp
-                apply_to_contents(temp);
-                // swap item into *this
-                item.apply_to_contents(*this);
-                // swap temp into item
-                temp.apply_to_contents(item);
+                type_safe_union tmp;
+                swap(tmp);      // this -> tmp
+                swap(item);     // item -> this
+                tmp.swap(item); // tmp (this) -> item
             }
         }
 
-        template <typename T> 
+        template <
+            typename T,
+            is_valid_check<T> = true
+        >
         T& get(
-        ) 
-        { 
-            validate_type<T>();
-            construct<T>();  
-            return *reinterpret_cast<T*>(&mem); 
+        )
+        {
+            if (type_identity != get_type_id<T>())
+                construct<T>();
+            return unchecked_get<T>();
         }
 
-        template <typename T>
+        template <
+            typename T,
+            is_valid_check<T> = true
+        >
         const T& cast_to (
         ) const
         {
-            validate_type<T>();
             if (contains<T>())
-                return *reinterpret_cast<const T*>(&mem);
+                return unchecked_get<T>();
             else
                 throw bad_type_safe_union_cast();
         }
 
-        template <typename T>
+        template <
+            typename T,
+            is_valid_check<T> = true
+        >
         T& cast_to (
-        ) 
+        )
         {
-            validate_type<T>();
             if (contains<T>())
-                return *reinterpret_cast<T*>(&mem);
+                return unchecked_get<T>();
             else
                 throw bad_type_safe_union_cast();
         }
-
-        template <typename T>
-        type_safe_union& operator= (T&& item) { get<typename std::decay<T>::type>() = std::forward<T>(item); return *this; }
-
-        type_safe_union& operator= (type_safe_union&& item) { swap(item); return *this; }
-
     };
 
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename T1, typename T2, typename T3, typename T4, typename T5,
-        typename T6, typename T7, typename T8, typename T9, typename T10,
-        typename T11, typename T12, typename T13, typename T14, typename T15,
-        typename T16, typename T17, typename T18, typename T19, typename T20
-        >
+    template <typename ...Types>
     inline void swap (
-        type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>& a, 
-        type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>& b 
-    ) { a.swap(b); }   
+        type_safe_union<Types...>& a,
+        type_safe_union<Types...>& b
+    ) { a.swap(b); }
 
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename from, 
-        typename T1, typename T2, typename T3, typename T4, typename T5,
-        typename T6, typename T7, typename T8, typename T9, typename T10,
-        typename T11, typename T12, typename T13, typename T14, typename T15,
-        typename T16, typename T17, typename T18, typename T19, typename T20
-        >
-    struct is_convertible<from,
-        type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20> >
-    {
-        const static bool value = is_convertible<from,T1>::value ||
-                                  is_convertible<from,T2>::value ||
-                                  is_convertible<from,T3>::value ||
-                                  is_convertible<from,T4>::value ||
-                                  is_convertible<from,T5>::value ||
-                                  is_convertible<from,T6>::value ||
-                                  is_convertible<from,T7>::value ||
-                                  is_convertible<from,T8>::value ||
-                                  is_convertible<from,T9>::value ||
-                                  is_convertible<from,T10>::value ||
-                                  is_convertible<from,T11>::value ||
-                                  is_convertible<from,T12>::value ||
-                                  is_convertible<from,T13>::value ||
-                                  is_convertible<from,T14>::value ||
-                                  is_convertible<from,T15>::value ||
-                                  is_convertible<from,T16>::value ||
-                                  is_convertible<from,T17>::value ||
-                                  is_convertible<from,T18>::value ||
-                                  is_convertible<from,T19>::value ||
-                                  is_convertible<from,T20>::value;
-    };
-
-// ----------------------------------------------------------------------------------------
-
-    namespace impl_tsu
+    namespace detail
     {
         struct serialize_helper
         {
-            /*
-                This is a function object to help us serialize type_safe_unions
-            */
+            serialize_helper(std::ostream& out_) : out(out_) {}
+
+            template <typename T>
+            void operator() (const T& item) const 
+            { 
+                serialize(item, out); 
+            } 
 
             std::ostream& out;
-            serialize_helper(std::ostream& out_): out(out_) {}
-            template <typename T>
-            void operator() (const T& item) const { serialize(item, out); } 
-        };
+        };  
+
+        template<
+            size_t I,
+            typename... Types
+        >
+        inline typename std::enable_if<(I == sizeof...(Types))>::type deserialize_helper(
+            std::istream&, 
+            int, 
+            type_safe_union<Types...>&
+        )
+        {
+        }
+        
+        template<
+            size_t I,
+            typename... Types
+        >
+        inline typename std::enable_if<(I < sizeof...(Types))>::type deserialize_helper(
+            std::istream& in, 
+            int index, 
+            type_safe_union<Types...>& x
+        )
+        {
+            using T = typename internal::variant_get_type<I, Types...>::type;
+            
+            if (index == (I+1))
+            {
+                deserialize(x.template get<T>(), in);
+            }
+            else
+            {
+                deserialize_helper<I+1>(in, index, x);
+            }
+        }        
     }
 
-    template <
-        typename T1, typename T2, typename T3, typename T4, typename T5,
-        typename T6, typename T7, typename T8, typename T9, typename T10,
-        typename T11, typename T12, typename T13, typename T14, typename T15,
-        typename T16, typename T17, typename T18, typename T19, typename T20
-        >
-    void serialize (
-        const type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>& item,
+    template<typename... Types>
+    inline void serialize (
+        const type_safe_union<Types...>& item,
         std::ostream& out
     )
     {
         try
         {
-            // save the type_identity
-            serialize(item.type_identity, out);
-            item.apply_to_contents(dlib::impl_tsu::serialize_helper(out));
+            serialize(item.get_current_type_id(), out);
+            item.visit(detail::serialize_helper(out));
         }
         catch (serialization_error& e)
         {
@@ -614,66 +625,73 @@ namespace dlib
         }
     }
 
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename T1, typename T2, typename T3, typename T4, typename T5,
-        typename T6, typename T7, typename T8, typename T9, typename T10,
-        typename T11, typename T12, typename T13, typename T14, typename T15,
-        typename T16, typename T17, typename T18, typename T19, typename T20
-        >
-    void deserialize (
-        type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>&  item,
+    template<typename... Types>
+    inline void deserialize (
+        type_safe_union<Types...>& item,
         std::istream& in
     )
     {
         try
         {
-            typedef type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20> tsu_type;
+            int index = -1;
+            deserialize(index, in);
 
-            int type_identity;
-            deserialize(type_identity, in);
-            switch (type_identity)
-            {
-                // swap an empty type_safe_union into item since it should be in the empty state
-                case 0: tsu_type().swap(item); break;
-
-                case 1: deserialize(item.template get<T1>(), in);  break;
-                case 2: deserialize(item.template get<T2>(), in);  break;
-                case 3: deserialize(item.template get<T3>(), in);  break;
-                case 4: deserialize(item.template get<T4>(), in);  break;
-                case 5: deserialize(item.template get<T5>(), in);  break;
-
-                case 6: deserialize(item.template get<T6>(), in);  break;
-                case 7: deserialize(item.template get<T7>(), in);  break;
-                case 8: deserialize(item.template get<T8>(), in);  break;
-                case 9: deserialize(item.template get<T9>(), in);  break;
-                case 10: deserialize(item.template get<T10>(), in);  break;
-
-                case 11: deserialize(item.template get<T11>(), in);  break;
-                case 12: deserialize(item.template get<T12>(), in);  break;
-                case 13: deserialize(item.template get<T13>(), in);  break;
-                case 14: deserialize(item.template get<T14>(), in);  break;
-                case 15: deserialize(item.template get<T15>(), in);  break;
-
-                case 16: deserialize(item.template get<T16>(), in);  break;
-                case 17: deserialize(item.template get<T17>(), in);  break;
-                case 18: deserialize(item.template get<T18>(), in);  break;
-                case 19: deserialize(item.template get<T19>(), in);  break;
-                case 20: deserialize(item.template get<T20>(), in);  break;
-
-                default: throw serialization_error("Corrupt data detected while deserializing type_safe_union");
-            }
+            if (index == 0)
+                item.clear();
+            else if (index > 0 && index <= (int)sizeof...(Types))
+                detail::deserialize_helper<0>(in, index, item);
+            else
+                throw serialization_error("bad index value. Should be in range [0,sizeof...(Types))");
         }
-        catch (serialization_error& e)
+        catch(serialization_error& e)
         {
             throw serialization_error(e.info + "\n   while deserializing an object of type type_safe_union");
         }
     }
 
-// ----------------------------------------------------------------------------------------
+    #if __cplusplus >= 201703L
 
+    template<typename ...Base>
+    struct overloaded_helper : Base...
+    {
+        template<typename... T>
+        overloaded_helper(T&& ... t) : Base{std::forward<T>(t)}... {}
+
+        using Base::operator()...;
+    };
+
+    #else
+
+    template<typename Base, typename ... BaseRest>
+    struct overloaded_helper: Base, overloaded_helper<BaseRest...>
+    {
+        template<typename T, typename ... TRest>
+        overloaded_helper(T&& t, TRest&& ...trest) :
+            Base{std::forward<T>(t)},
+            overloaded_helper<BaseRest...>{std::forward<TRest>(trest)...}
+        {}
+
+        using Base::operator();
+        using overloaded_helper<BaseRest...>::operator();
+    };
+
+    template<typename Base>
+    struct overloaded_helper<Base> : Base
+    {
+        template<typename T>
+        overloaded_helper<Base>(T&& t) : Base{std::forward<T>(t)}
+        {}
+
+        using Base::operator();
+    };
+
+    #endif //__cplusplus >= 201703L
+
+    template<typename... T>
+    overloaded_helper<typename std::decay<T>::type...> overloaded(T&&... t)
+    {
+        return overloaded_helper<typename std::decay<T>::type...>{std::forward<T>(t)...};
+    }
 }
 
 #endif // DLIB_TYPE_SAFE_UNIOn_h_
-
