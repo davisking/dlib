@@ -39,6 +39,7 @@ namespace dlib
 
         tsu a(in_place_tag<A>{}, 0, 1);
     !*/
+
 // ----------------------------------------------------------------------------------------
 
     template <typename... Types>
@@ -74,7 +75,7 @@ namespace dlib
         ) = default;
         /*!
             ensures
-                - this object is properly initialized
+                - #is_empty() == true
         !*/
 
         type_safe_union (
@@ -335,10 +336,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template < ...  >
+    template<typename... Types>
     inline void swap (
-        type_safe_union<...>& a, 
-        type_safe_union<...>& b 
+        type_safe_union<Types...>& a, 
+        type_safe_union<Types...>& b 
     ) { a.swap(b); }   
     /*!
         provides a global swap function
@@ -346,9 +347,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template < ... >
+    template<typename... Types>
     void serialize (
-        const type_safe_union<...>& item, 
+        const type_safe_union<Types...>& item, 
         std::ostream& out 
     );   
     /*!
@@ -362,9 +363,9 @@ namespace dlib
                        serialize(item.get<type_of_object_in_item>(), out);
     !*/
 
-    template < ...  >
+    template<typename... Types>
     void deserialize (
-        type_safe_union<...>& item, 
+        type_safe_union<Types...>& item, 
         std::istream& in
     );   
     /*!
