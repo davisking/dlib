@@ -7,6 +7,7 @@
 #include "../string.h"
 #include "png_loader.h"
 #include "jpeg_loader.h"
+#include "webp_loader.h"
 #include "image_loader.h"
 #include <fstream>
 #include <sstream>
@@ -25,6 +26,7 @@ namespace dlib
             PNG,
             DNG,
             GIF,
+            WEBP,
             UNKNOWN
         };
 
@@ -34,14 +36,15 @@ namespace dlib
             if (!file)
                 throw image_load_error("Unable to open file: " + file_name);
 
-            char buffer[9];
-            file.read((char*)buffer, 8);
-            buffer[8] = 0;
+            char buffer[13];
+            file.read((char*)buffer, 12);
+            buffer[12] = 0;
 
             // Determine the true image type using link:
             // http://en.wikipedia.org/wiki/List_of_file_signatures
+            static const char *pngHeader = "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A";
 
-            if (strcmp(buffer, "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A") == 0) 
+            if (memcmp(buffer, pngHeader, strlen(pngHeader)) == 0)
                 return PNG;
             else if(buffer[0]=='\xff' && buffer[1]=='\xd8' && buffer[2]=='\xff') 
                 return JPG;
@@ -51,6 +54,9 @@ namespace dlib
                 return DNG;
             else if(buffer[0]=='G' && buffer[1]=='I' && buffer[2] == 'F') 
                 return GIF;
+            else if(buffer[0]=='R' && buffer[1]=='I' && buffer[2] == 'F' && buffer[3] == 'F' &&
+                    buffer[8]=='W' && buffer[9]=='E' && buffer[10] == 'B' && buffer[11] == 'P')
+                return WEBP;
 
             return UNKNOWN;
         }
@@ -81,6 +87,9 @@ namespace dlib
 #endif
 #ifdef DLIB_JPEG_SUPPORT
             case image_file_type::JPG: load_jpeg(image, file_name); return;
+#endif
+#ifdef DLIB_WEBP_SUPPORT
+            case image_file_type::WEBP: load_webp(image, file_name); return;
 #endif
 #ifdef DLIB_GIF_SUPPORT
             case image_file_type::GIF: 
