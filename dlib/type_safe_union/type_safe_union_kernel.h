@@ -276,9 +276,12 @@ namespace dlib
             type_identity = get_type_id<T>();
         }
 
-        struct helper_forward
+        struct assign_to
         {
-            helper_forward(type_safe_union& me) : _me(me) {}
+            /*!
+                This class assigns an object to `me` using std::forward.
+            !*/
+            assign_to(type_safe_union& me) : _me(me) {}
 
             template<typename T>
             void operator()(T&& x)
@@ -298,9 +301,12 @@ namespace dlib
             type_safe_union& _me;
         };
 
-        struct helper_move
+        struct move_to
         {
-            helper_move(type_safe_union& me) : _me(me) {}
+            /*!
+                This class move assigns an object to `me`.
+            !*/
+            move_to(type_safe_union& me) : _me(me) {}
 
             template<typename T>
             void operator()(T& x)
@@ -318,15 +324,21 @@ namespace dlib
             type_safe_union& _me;
         };
 
-        struct swap_helper
+        struct swap_to
         {
-            swap_helper(type_safe_union& me) : _me(me) {}
-
+            /*!
+                This class swaps an object with `me`.
+            !*/
+            swap_to(type_safe_union& me) : _me(me) {}
             template<typename T>
             void operator()(T& x)
+            /*!
+                requires
+                    - _me.contains<T>() == true
+            !*/
             {
                 using std::swap;
-                swap(_me.unchecked_get<T>(), x); //really you want to use cast_to<T>(), BUT, swap is supposed to be nothrow
+                swap(_me.unchecked_get<T>(), x);
             }
 
             type_safe_union& _me;
@@ -340,7 +352,7 @@ namespace dlib
             const type_safe_union& item
         ) : type_safe_union()
         {
-            item.visit(helper_forward{*this});
+            item.visit(assign_to{*this});
         }
 
         type_safe_union& operator=(
@@ -350,7 +362,7 @@ namespace dlib
             if (item.is_empty())
                 destruct();
             else
-                item.visit(helper_forward{*this});
+                item.visit(assign_to{*this});
             return *this;
         }
 
@@ -358,7 +370,7 @@ namespace dlib
             type_safe_union&& item
         ) : type_safe_union()
         {
-            item.visit(helper_move{*this});
+            item.visit(move_to{*this});
             item.destruct();
         }
 
@@ -372,7 +384,7 @@ namespace dlib
             }
             else
             {
-                item.visit(helper_move{*this});
+                item.visit(move_to{*this});
                 item.destruct();
             }
             return *this;
@@ -386,7 +398,7 @@ namespace dlib
             T&& item
         ) : type_safe_union()
         {
-            helper_forward{*this}(std::forward<T>(item));
+            assign_to{*this}(std::forward<T>(item));
         }
 
         template <
@@ -397,7 +409,7 @@ namespace dlib
             T&& item
         )
         {
-            helper_forward{*this}(std::forward<T>(item));
+            assign_to{*this}(std::forward<T>(item));
             return *this;
         }
 
@@ -492,16 +504,16 @@ namespace dlib
         {
             if (type_identity == item.type_identity)
             {
-                item.visit(swap_helper{*this});
+                item.visit(swap_to{*this});
             }
             else if (is_empty())
             {
-                item.visit(helper_move{*this});
+                item.visit(move_to{*this});
                 item.destruct();
             }
             else if (item.is_empty())
             {
-                visit(helper_move{item});
+                visit(move_to{item});
                 destruct();
             }
             else
@@ -606,7 +618,7 @@ namespace dlib
                 deserialize_helper<I+1>(in, index, x);
             }
         }        
-    }
+    } // namespace detail
 
     template<typename... Types>
     inline void serialize (
@@ -649,7 +661,7 @@ namespace dlib
         }
     }
 
-    #if __cplusplus >= 201703L
+#if __cplusplus >= 201703L
 
     template<typename ...Base>
     struct overloaded_helper : Base...
@@ -660,7 +672,7 @@ namespace dlib
         using Base::operator()...;
     };
 
-    #else
+#else
 
     template<typename Base, typename ... BaseRest>
     struct overloaded_helper: Base, overloaded_helper<BaseRest...>
@@ -685,7 +697,7 @@ namespace dlib
         using Base::operator();
     };
 
-    #endif //__cplusplus >= 201703L
+#endif //__cplusplus >= 201703L
 
     template<typename... T>
     overloaded_helper<typename std::decay<T>::type...> overloaded(T&&... t)
