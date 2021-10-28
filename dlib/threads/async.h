@@ -18,29 +18,6 @@ namespace dlib
 
     namespace impl
     {
-        template <typename T> struct selector {};
-
-        template <typename T, typename U, typename V>
-        void call_prom_set_value(
-            T& prom,
-            U& fun,
-            selector<V> 
-        )
-        {
-            prom.set_value(fun());
-        }
-
-        template <typename T, typename U>
-        void call_prom_set_value(
-            T& prom,
-            U& fun,
-            selector<void>
-        )
-        {
-            fun();
-            prom.set_value();
-        }
-
         template <typename> struct result_of;
 
 #if (__cplusplus >= 201703L ||                          \
@@ -71,21 +48,11 @@ namespace dlib
         Args&&... args 
     )
     {
-        auto prom = std::make_shared<std::promise<typename impl::result_of<Function(Args...)>::type>>();
-        std::future<typename impl::result_of<Function(Args...)>::type> ret = prom->get_future();
-        using bind_t = decltype(std::bind(std::forward<Function>(f), std::forward<Args>(args)...));
-        auto fun = std::make_shared<bind_t>(std::bind(std::forward<Function>(f), std::forward<Args>(args)...));
-        tp.add_task_by_value([fun, prom]()
-        { 
-            try
-            {
-                impl::call_prom_set_value(*prom, *fun, impl::selector<typename impl::result_of<Function(Args...)>::type>());
-            }
-            catch(...)
-            {
-                prom->set_exception(std::current_exception());
-            }
-        });
+        using return_type   = typename impl::result_of<Function(Args...)>::type;
+        using task_type     = std::packaged_task<return_type()>;
+        auto task = std::make_shared<task_type>(std::bind(std::forward<Function>(f), std::forward<Args>(args)...));
+        auto ret  = task->get_future();
+        tp.add_task_by_value([task]() {(*task)();});
         return ret;
     }
 
