@@ -2086,7 +2086,7 @@ namespace dlib
                 - #get_lambda() == 0.0051
         !*/
 
-        loss_barlow_twins_(float lambda) : lambda(lambda)
+        loss_barlow_twins_(float lambda);
         /*!
             ensures
                 - #get_lambda() == lambda
