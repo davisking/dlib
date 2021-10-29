@@ -15,7 +15,7 @@
 
     The paper contains a good explanation on how and why this works, but the main idea
     behind the Barlow Twins method is:
-        - generate two distorted view of a batch of images: YA, YB
+        - generate two distorted views of a batch of images: YA, YB
         - feed them to a deep neural network and obtain their representations and
           and batch normalize them: ZA, ZB
         - compute the empirical cross-correlation matrix between both feature
