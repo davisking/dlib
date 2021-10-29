@@ -71,6 +71,7 @@ set (tests
    hash_table.cpp
    hog_image.cpp
    image.cpp
+   invoke.cpp
    iosockstream.cpp
    is_same_object.cpp
    isotonic_regression.cpp
