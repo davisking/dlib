@@ -7,11 +7,34 @@
 #include <type_traits>
 #include "utility.h"
 
+#if defined(_MSC_VER)
+    #if _MSC_VER >= 1900
+        #define DLIB_HAVE_INVOKE 1
+    #endif
+#else
+    #if __cplusplus >= 201703L
+        #define DLIB_HAVE_INVOKE 1
+    #endif
+#endif
+
+#if defined(_MSC_VER)
+    #if _MSC_VER >= 1920
+        #define DLIB_HAVE_INVOKE_RESULT 1
+    #endif
+#else
+    #if __cplusplus >= 201703L
+        #define DLIB_HAVE_INVOKE_RESULT 1
+    #endif
+#endif
+
+
 namespace dlib
 {
     // ----------------------------------------------------------------------------------------
 
-#if __cplusplus < 201703L
+#if DLIB_HAVE_INVOKE_RESULT
+    using std::invoke;
+#else
     namespace detail {
         template< typename F, typename ... Args >
         auto INVOKE(F&& fn, Args&& ... args)
@@ -30,15 +53,6 @@ namespace dlib
         {
             return std::forward<F>(fn)(std::forward<Args>(args)...);
         }
-
-        template< typename AlwaysVoid, typename, typename...>
-        struct invoke_result {};
-
-        template< typename F, typename... Args >
-        struct invoke_result< decltype( void(INVOKE(std::declval<F>(), std::declval<Args>()...)) ), F, Args...>
-        {
-            using type = decltype( INVOKE(std::declval<F>(), std::declval<Args>()...) );
-        };
     }
 
     template< typename F, typename... Args>
@@ -47,19 +61,27 @@ namespace dlib
     {
         return detail::INVOKE(std::forward<F>( f ), std::forward<Args>( args )...);
     }
+#endif
+
+    // ----------------------------------------------------------------------------------------
+
+#if DLIB_HAVE_INVOKE_RESULT
+    using std::invoke_result;
+#else
+    namespace detail
+    {
+        template< typename AlwaysVoid, typename, typename...>
+        struct invoke_result {};
+
+        template< typename F, typename... Args >
+        struct invoke_result< decltype( void(invoke(std::declval<F>(), std::declval<Args>()...)) ), F, Args...>
+        {
+            using type = decltype( invoke(std::declval<F>(), std::declval<Args>()...) );
+        };
+    }
 
     template< typename F, typename... Args >
     struct invoke_result : detail::invoke_result< void, F, Args...> {};
-
-    template< typename > struct result_of;
-
-    template< typename F, typename... Args >
-    struct result_of< F(Args...) > : detail::invoke_result< void, F, Args...> {};
-
-#else
-    using std::invoke;
-    using std::invoke_result;
-    using std::result_of;
 #endif
 
     // ----------------------------------------------------------------------------------------
