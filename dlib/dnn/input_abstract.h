@@ -324,9 +324,9 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_avg_red() == item.avg_red
-                - #get_avg_green() == item.avg_green
-                - #get_avg_blue() == item.avg_blue
+                - #get_avg_red() == item.get_avg_red()
+                - #get_avg_green() == item.get_avg_green()
+                - #get_avg_blue() == item.get_avg_blue()
         !*/
 
         float get_avg_red(
