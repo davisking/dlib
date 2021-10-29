@@ -25,7 +25,7 @@ namespace dlib
         template< typename F, typename ... Args >
         auto INVOKE(F&& fn, Args&& ... args)
         -> typename std::enable_if<
-                not std::is_member_pointer<typename std::decay<F>::type>::value,
+                !std::is_member_pointer<typename std::decay<F>::type>::value,
                 decltype(std::forward<F>(fn)(std::forward<Args>(args)...))>::type
         {
             return std::forward<F>(fn)(std::forward<Args>(args)...);
