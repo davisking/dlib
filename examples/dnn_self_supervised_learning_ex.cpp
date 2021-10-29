@@ -32,7 +32,7 @@
     by Yao-Hung Hubert Tsai, Shaojie Bai, Louis-Philippe Morency, Ruslan Salakhutdinov,
     in which they experiment with Barlow Twins on CIFAR-10 and Tiny ImageNet.  Since
     the CIFAR-10 contains relatively small images, we will define a ResNet50 architecture
-    that doesn't downsample the input in the first convolutional layer, and doesn't  have
+    that doesn't downsample the input in the first convolutional layer, and doesn't have
     a max pooling layer afterwards, like the paper does.
 */
 
