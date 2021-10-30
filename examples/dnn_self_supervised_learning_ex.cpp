@@ -204,7 +204,7 @@ try
 
     // Initialize the model with the specified projector dimensions and lambda.  According to the
     // second paper, lambda = 1/dims works well on CIFAR-10.
-    model::train net(loss_barlow_twins_(lambda));
+    model::train net((loss_barlow_twins_(lambda)));
     layer<1>(net).layer_details().set_num_outputs(dims);
     disable_duplicative_biases(net);
     dlib::rand rnd;
