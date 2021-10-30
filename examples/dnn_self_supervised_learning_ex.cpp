@@ -45,7 +45,7 @@ using namespace std;
 using namespace dlib;
 
 // A custom definition of ResNet50 with a downsampling factor of 8 instead of 32.
-// It is essentically the original ResNet50, but without the max pooling and a
+// It is essentially the original ResNet50, but without the max pooling and a
 // convolutional layer with a stride of 1 instead of 2 at the input.
 namespace resnet50
 {
