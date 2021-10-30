@@ -3970,6 +3970,155 @@ namespace dlib
 
     template <template <typename> class TAG_1, template <typename> class TAG_2, template <typename> class TAG_3, typename SUBNET>
     using loss_yolo = add_loss_layer<loss_yolo_<TAG_1, TAG_2, TAG_3>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class loss_barlow_twins_
+    {
+    public:
+
+        loss_barlow_twins_() = default;
+
+        loss_barlow_twins_(float lambda) : lambda(lambda)
+        {
+            DLIB_CASSERT(lambda > 0);
+        }
+
+        template <
+            typename SUBNET
+        >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            SUBNET& sub
+        ) const
+        {
+            const tensor& output_tensor = sub.get_output();
+            tensor& grad = sub.get_gradient_input();
+
+            DLIB_CASSERT(sub.sample_expansion_factor() == 2);
+            DLIB_CASSERT(input_tensor.num_samples() != 0);
+            DLIB_CASSERT(input_tensor.num_samples() % sub.sample_expansion_factor() == 0);
+            DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+            DLIB_CASSERT(output_tensor.nr() == 1 && output_tensor.nc() == 1);
+            DLIB_CASSERT(grad.nr() == 1 && grad.nc() == 1);
+
+            const auto batch_size = output_tensor.num_samples() / 2;
+            const auto sample_size = output_tensor.k();
+            const auto offset = batch_size * sample_size;
+
+            // Alias helpers to access the samples in the batch
+            alias_tensor split(batch_size, sample_size);
+            auto za = split(output_tensor);
+            auto zb = split(output_tensor, offset);
+
+            // Normalize both batches independently across the batch dimension
+            const double eps = 1e-4;
+            resizable_tensor za_norm, means_a, invstds_a;
+            resizable_tensor zb_norm, means_b, invstds_b;
+            resizable_tensor rms, rvs, g, b;
+            g.set_size(1, sample_size);
+            g = 1;
+            b.set_size(1, sample_size);
+            b = 0;
+            tt::batch_normalize(eps, za_norm, means_a, invstds_a, 1, rms, rvs, za, g, b);
+            tt::batch_normalize(eps, zb_norm, means_b, invstds_b, 1, rms, rvs, zb, g, b);
+
+            // Compute the empirical cross-correlation matrix
+            resizable_tensor eccm;
+            eccm.set_size(sample_size, sample_size);
+            tt::gemm(0, eccm, 1, za_norm, true, zb_norm, false);
+            eccm /= batch_size;
+
+            // Compute the loss: MSE between eccm and the identity matrix.
+            // Off-diagonal terms are weighed by lambda.
+            const matrix<float> C = mat(eccm);
+            const double diagonal_loss = sum(squared(diag(C) - 1));
+            const double off_diag_loss = sum(squared(C - diagm(diag(C))));
+            double loss = diagonal_loss + lambda * off_diag_loss;
+
+            // Loss gradient, which will be used as the input of the batch normalization gradient
+            resizable_tensor grad_input;
+            grad_input.copy_size(grad);
+            auto grad_input_a = split(grad_input);
+            auto grad_input_b = split(grad_input, offset);
+
+            // Compute the loss: notation from http://www.matrixcalculus.org/
+            // A = za_norm
+            // B = zb_norm
+            // C = eccm
+            // D = off_mask: a mask that keeps only the elements outside the diagonal
+
+            // diagonal term: sum((diag(A' * B) - vector(1)).^2)
+            // --------------------------------------------
+            // 	=> d/dA = 2 * B * diag(diag(A' * B) - vector(1)) = 2 * B * diag(diag(C) - vector(1))
+            // 	=> d/dB = 2 * A * diag(diag(A' * B) - vector(1)) = 2 * A * diag(diag(C) - vector(1))
+            resizable_tensor cdiag_1(diagm(diag(mat(eccm) - 1)));
+            tt::gemm(0, grad_input_a, 2, zb_norm, false, cdiag_1, false);
+            tt::gemm(0, grad_input_b, 2, za_norm, false, cdiag_1, false);
+
+            // off-diag term: sum(((A'* B) .* D).^2)
+            // --------------------------------
+            //  => d/dA = 2 * B * ((B' * A) .* (D .* D)') = 2 * B * (C .* (D .* D)) = 2 * B * (C .* D)
+            //  => d/dB = 2 * A * ((A' * B) .* (D .* D))  = 2 * A * (C .* (D .* D)) = 2 * A * (C .* D)
+            resizable_tensor off_mask(ones_matrix<float>(sample_size, sample_size) - identity_matrix<float>(sample_size));
+            resizable_tensor off_diag(sample_size, sample_size);
+            tt::multiply(false, off_diag, eccm, off_mask);
+            tt::gemm(1, grad_input_a, lambda, zb_norm, false, off_diag, false);
+            tt::gemm(1, grad_input_b, lambda, za_norm, false, off_diag, false);
+
+            // Compute the batch norm gradients, g and b grads are not used
+            resizable_tensor g_grad, b_grad;
+            g_grad.copy_size(g);
+            b_grad.copy_size(b);
+            auto gza = split(grad);
+            auto gzb = split(grad, offset);
+            tt::batch_normalize_gradient(eps, grad_input_a, means_a, invstds_a, za, g, gza, g_grad, b_grad);
+            tt::batch_normalize_gradient(eps, grad_input_b, means_b, invstds_b, zb, g, gzb, g_grad, b_grad);
+
+            return loss;
+        }
+
+        float get_lambda() const  { return lambda; }
+
+        friend void serialize(const loss_barlow_twins_& item, std::ostream& out)
+        {
+            serialize("loss_barlow_twins_", out);
+            serialize(item.lambda, out);
+        }
+
+        friend void deserialize(loss_barlow_twins_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version == "loss_barlow_twins_")
+            {
+                deserialize(item.lambda, in);
+            }
+            else
+            {
+                throw serialization_error("Unexpected version found while deserializing dlib::loss_barlow_twins_.  Instead found " + version);
+            }
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const loss_barlow_twins_& item)
+        {
+            out << "loss_barlow_twins (lambda=" << item.lambda << ")";
+            return out;
+        }
+
+        friend void to_xml(const loss_barlow_twins_& item, std::ostream& out)
+        {
+            out << "<loss_barlow_twins lambda='" << item.lambda << "'/>";
+        }
+
+    private:
+        float lambda = 0.0051;
+    };
+
+    template <typename SUBNET>
+    using loss_barlow_twins = add_loss_layer<loss_barlow_twins_, SUBNET>;
+
 }
 
 #endif // DLIB_DNn_LOSS_H_

@@ -2038,6 +2038,88 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class loss_barlow_twins_
+    {
+    public:
+
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object implements the loss layer interface defined above by
+                EXAMPLE_LOSS_LAYER_.  In particular, it implements the Barlow Twins loss
+                layer presented in the paper:
+                    Barlow Twins: Self-Supervised Learning via Redundancy Reduction
+                    by Jure Zbontar, Li Jing, Ishan Misra, Yann LeCun, Stéphane Deny
+                    (https://arxiv.org/abs/2103.03230)
+
+                This means you use this loss to learn useful representations from data that
+                has no label information.  Useful representations mean that can be used to
+                train another downstream task, such as classification.
+                In particular, this loss function applies the redundancy reduction principle
+                to the representations learned by the network it sits on top of.
+
+                To be specific, this layer requires the sample_expansion_factor to be 2, and
+                in each batch, the second half contains distorted versions of the first half.
+                Let Z_A and Z_B be the first and second half of the batch that goes into this
+                loss layer, respectively.  Z_A and Z_B have dimensions N rows and D columns,
+                where N is half the batch size and D is the dimensionality of the output tensor.
+                Each row in Z_B should contain a distorted version of the corresponding row
+                in Z_A.  Then, this loss computes the empirical cross-correlation matrix between
+                the batch-normalized versions of Z_A and Z_B:
+
+                    C = trans(bn(Z_A)) * bn(Z_B)
+
+                It then applies the redundancy reduction principle by trying to make C as
+                close to the identity matrix as possible:
+
+                    L = squared(diag(C) - 1) + lambda * squared(off_diag(C))
+
+                where off_diag grabs all the elements that are not on the diagonal of C and
+                lambda provides a trade-off between both terms in the loss function.  The C
+                matrix has dimensions D x D: there are only D diagonal terms, but D * (D - 1)
+                off-diagonal elements.  A reasonable value for lambda is 1 / D.
+        !*/
+
+        loss_barlow_twins_(
+        );
+        /*!
+            ensures
+                - #get_lambda() == 0.0051
+        !*/
+
+        loss_barlow_twins_(float lambda);
+        /*!
+            ensures
+                - #get_lambda() == lambda
+        !*/
+
+        float get_lambda() const;
+        /*!
+            ensures
+                - returns the lambda value used by the loss function.  See the discussion
+                  in WHAT THIS OBJECT REPRESENTS for details.
+        !*/
+
+        template <
+            typename SUBNET
+        >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            SUBNET& sub
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient()
+            except it has the additional calling requirements that:
+                - sub.get_output().nr() == 1
+                - sub.get_output().nc() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 2
+        !*/
+
+    };
+
+    template <typename SUBNET>
+    using loss_barlow_twins = add_loss_layer<loss_barlow_twins_, SUBNET>;
+
 }
 
 #endif // DLIB_DNn_LOSS_ABSTRACT_H_
