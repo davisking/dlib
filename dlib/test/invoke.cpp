@@ -2,6 +2,9 @@
 // License: Boost Software License   See LICENSE.txt for the full license.
 #include <string>
 #include <memory>
+#include <array>
+#include <tuple>
+#include <utility>
 #include <dlib/invoke.h>
 #include "tester.h"
 
@@ -192,6 +195,40 @@ namespace
 
     // ----------------------------------------------------------------------------------------
 
+    void test_make_from_tuple()
+    {
+        struct multi_args_object
+        {
+            multi_args_object(int i_, int j_) : i(i_), j(j_) {}
+            int i = 0;
+            int j = 0;
+        };
+
+        {
+            auto obj = dlib::make_from_tuple<multi_args_object>(std::make_tuple(1, 2));
+            static_assert(std::is_same<decltype(obj), multi_args_object>::value, "bad type");
+            DLIB_TEST(obj.i == 1);
+            DLIB_TEST(obj.j == 2);
+        }
+
+        {
+            std::array<int,2> a = {3, 4};
+            auto obj = dlib::make_from_tuple<multi_args_object>(a);
+            static_assert(std::is_same<decltype(obj), multi_args_object>::value, "bad type");
+            DLIB_TEST(obj.i == 3);
+            DLIB_TEST(obj.j == 4);
+        }
+
+        {
+            auto obj = dlib::make_from_tuple<multi_args_object>(std::make_pair(5, 6));
+            static_assert(std::is_same<decltype(obj), multi_args_object>::value, "bad type");
+            DLIB_TEST(obj.i == 5);
+            DLIB_TEST(obj.j == 6);
+        }
+    }
+
+    // ----------------------------------------------------------------------------------------
+
 
     class invoke_tester : public tester
     {
@@ -208,6 +245,7 @@ namespace
             test_lambdas();
             test_member_functions_and_data();
             test_return_types();
+            test_make_from_tuple();
         }
     } a;
 }

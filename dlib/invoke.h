@@ -103,6 +103,29 @@ namespace dlib
     }
 
     // ----------------------------------------------------------------------------------------
+
+    namespace detail
+    {
+        template <class T, class Tuple, std::size_t... I>
+        constexpr T make_from_tuple_impl( Tuple&& t, index_sequence<I...> )
+        {
+            return T(std::get<I>(std::forward<Tuple>(t))...);
+        }
+    }
+
+    template <class T, class Tuple>
+    constexpr T make_from_tuple( Tuple&& t )
+    /*!
+        ensures
+            - identical to std::make_from_tuple<T>(std::forward<Tuple>(t))
+            - works with C++11 onwards
+    !*/
+    {
+        return detail::make_from_tuple_impl<T>(std::forward<Tuple>(t),
+                                               make_index_sequence<std::tuple_size<typename std::decay<Tuple>::type >::value>{});
+    }
+
+    // ----------------------------------------------------------------------------------------
 }
 
 #endif //DLIB_INVOKE_Hh_
