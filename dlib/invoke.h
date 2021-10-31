@@ -32,6 +32,11 @@ namespace dlib
 
     template< typename F, typename... Args>
     auto invoke(F && f, Args &&... args)
+    /*!
+        ensures
+            - identical to std::invoke(std::forward<F>(f), std::forward<Args>(args)...)
+            - works with C++11 onwards
+    !*/
     -> decltype(detail::INVOKE(std::forward<F>( f ), std::forward<Args>( args )...))
     {
         return detail::INVOKE(std::forward<F>( f ), std::forward<Args>( args )...);
@@ -53,9 +58,19 @@ namespace dlib
 
     template< typename F, typename... Args >
     struct invoke_result : detail::invoke_result< void, F, Args...> {};
+    /*!
+        ensures
+            - identical to std::invoke_result<F, Args..>
+            - works with C++11 onwards
+    !*/
 
     template< typename F, typename... Args >
     using invoke_result_t = typename invoke_result<F, Args...>::type;
+    /*!
+        ensures
+            - identical to std::invoke_result_t<F, Args..>
+            - works with C++11 onwards
+    !*/
 
     // ----------------------------------------------------------------------------------------
 
@@ -73,6 +88,11 @@ namespace dlib
 
     template<typename F, typename Tuple>
     auto apply(F&& fn, Tuple&& tpl)
+    /*!
+        ensures
+            - identical to std::apply(std::forward<F>(f), std::forward<Tuple>(tpl))
+            - works with C++11 onwards
+    !*/
     -> decltype(detail::apply_impl(std::forward<F>(fn),
                                    std::forward<Tuple>(tpl),
                                    make_index_sequence<std::tuple_size<typename std::decay<Tuple>::type >::value>{}))
