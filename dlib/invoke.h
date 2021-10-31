@@ -50,9 +50,9 @@ namespace dlib
         struct invoke_result {};
 
         template< typename F, typename... Args >
-        struct invoke_result< decltype( void(invoke(std::declval<F>(), std::declval<Args>()...)) ), F, Args...>
+        struct invoke_result< decltype( void(dlib::invoke(std::declval<F>(), std::declval<Args>()...)) ), F, Args...>
         {
-            using type = decltype( invoke(std::declval<F>(), std::declval<Args>()...) );
+            using type = decltype( dlib::invoke(std::declval<F>(), std::declval<Args>()...) );
         };
     }
 
@@ -78,11 +78,11 @@ namespace dlib
     {
         template<typename F, typename Tuple, std::size_t... I>
         auto apply_impl(F&& fn, Tuple&& tpl, index_sequence<I...>)
-        -> decltype(invoke(std::forward<F>(fn),
-                           std::get<I>(std::forward<Tuple>(tpl))...))
+        -> decltype(dlib::invoke(std::forward<F>(fn),
+                                 std::get<I>(std::forward<Tuple>(tpl))...))
         {
-            return invoke(std::forward<F>(fn),
-                          std::get<I>(std::forward<Tuple>(tpl))...);
+            return dlib::invoke(std::forward<F>(fn),
+                                std::get<I>(std::forward<Tuple>(tpl))...);
         }
     }
 
@@ -95,11 +95,11 @@ namespace dlib
     !*/
     -> decltype(detail::apply_impl(std::forward<F>(fn),
                                    std::forward<Tuple>(tpl),
-                                   make_index_sequence<std::tuple_size<typename std::decay<Tuple>::type >::value>{}))
+                                   make_index_sequence<std::tuple_size<typename std::remove_reference<Tuple>::type >::value>{}))
     {
         return detail::apply_impl(std::forward<F>(fn),
                                   std::forward<Tuple>(tpl),
-                                  make_index_sequence<std::tuple_size<typename std::decay<Tuple>::type >::value>{});
+                                  make_index_sequence<std::tuple_size<typename std::remove_reference<Tuple>::type >::value>{});
     }
 
     // ----------------------------------------------------------------------------------------
@@ -122,7 +122,7 @@ namespace dlib
     !*/
     {
         return detail::make_from_tuple_impl<T>(std::forward<Tuple>(t),
-                                               make_index_sequence<std::tuple_size<typename std::decay<Tuple>::type >::value>{});
+                                               make_index_sequence<std::tuple_size<typename std::remove_reference<Tuple>::type >::value>{});
     }
 
     // ----------------------------------------------------------------------------------------
