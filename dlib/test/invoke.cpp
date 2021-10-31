@@ -9,7 +9,6 @@ namespace
 {
     using namespace test;
     using namespace dlib;
-    using namespace std;
 
     logger dlog("test.invoke");
 
@@ -40,13 +39,13 @@ namespace
     {
         {
             std::string str = run1_str4;
-            invoke(func_testargs, 1, run1_str1, run1_str2, std::cref(run1_str3), std::ref(str));
+            dlib::invoke(func_testargs, 1, run1_str1, run1_str2, std::cref(run1_str3), std::ref(str));
             DLIB_TEST(str == run1_str5);
         }
 
         {
             std::string str = run1_str4;
-            apply(func_testargs, std::make_tuple(1, run1_str1, run1_str2, std::cref(run1_str3), std::ref(str)));
+            dlib::apply(func_testargs, std::make_tuple(1, run1_str1, run1_str2, std::cref(run1_str3), std::ref(str)));
             DLIB_TEST(str == run1_str5);
         }
 
@@ -55,8 +54,8 @@ namespace
             {
                 for (int j = -10 ; j <= 10 ; j++)
                 {
-                    DLIB_TEST(invoke(func_return_addition, i, j) == (i+j));
-                    DLIB_TEST(apply(func_return_addition, std::make_tuple(i, j)) == (i+j));
+                    DLIB_TEST(dlib::invoke(func_return_addition, i, j) == (i+j));
+                    DLIB_TEST(dlib::apply(func_return_addition, std::make_tuple(i, j)) == (i+j));
                 }
             }
         }
@@ -68,7 +67,7 @@ namespace
     {
         {
             std::string str = run1_str4;
-            invoke([](int i, std::string ref1, const std::string& ref2, const std::string& ref3, std::string& ref4) {
+            dlib::invoke([](int i, std::string ref1, const std::string& ref2, const std::string& ref3, std::string& ref4) {
                 DLIB_TEST(i > 0);
                 DLIB_TEST(ref1 == run1_str1);
                 DLIB_TEST(ref2 == run1_str2);
@@ -81,7 +80,7 @@ namespace
 
         {
             std::string str = run1_str4;
-            apply([](int i, std::string ref1, const std::string& ref2, const std::string& ref3, std::string& ref4) {
+            dlib::apply([](int i, std::string ref1, const std::string& ref2, const std::string& ref3, std::string& ref4) {
                 DLIB_TEST(i > 0);
                 DLIB_TEST(ref1 == run1_str1);
                 DLIB_TEST(ref2 == run1_str2);
@@ -97,8 +96,8 @@ namespace
             {
                 for (int j = -10 ; j <= 10 ; j++)
                 {
-                    DLIB_TEST(invoke([](int i, int j) {return i + j;}, i, j) == (i+j));
-                    DLIB_TEST(apply([](int i, int j) {return i + j;}, std::make_tuple(i,j)) == (i+j));
+                    DLIB_TEST(dlib::invoke([](int i, int j) {return i + j;}, i, j) == (i+j));
+                    DLIB_TEST(dlib::apply([](int i, int j) {return i + j;}, std::make_tuple(i,j)) == (i+j));
                 }
             }
         }
@@ -106,35 +105,89 @@ namespace
 
     // ----------------------------------------------------------------------------------------
 
+    struct example_struct
+    {
+        example_struct(int i_ = 0) : i(i_) {}
+        example_struct(const example_struct&) = delete;
+        example_struct& operator=(const example_struct&) = delete;
+        example_struct(example_struct&& other) : i(other.i) {other.i = 0;}
+        example_struct& operator=(example_struct&& other) {i = other.i; other.i = 0; return *this;}
+
+        int get_i() const {return i;}
+
+        int i = 0;
+    };
+
     void test_member_functions_and_data()
     {
-        struct example_struct
-        {
-            example_struct(int i_ = 0) : i(i_) {}
-            example_struct(const example_struct&) = delete;
-            example_struct& operator=(const example_struct&) = delete;
-            example_struct(example_struct&& other) : i(other.i) {other.i = 0;}
-            example_struct& operator=(example_struct&& other) {i = other.i; other.i = 0; return *this;}
+        example_struct obj1(10);
+        std::unique_ptr<example_struct> obj2(new example_struct(11));
+        std::shared_ptr<example_struct> obj3(new example_struct(12));
 
-            int get_i() const {return i;}
+        DLIB_TEST(dlib::invoke(&example_struct::get_i,    obj1) == 10);
+        DLIB_TEST(dlib::invoke(&example_struct::i,        obj1) == 10);
+        DLIB_TEST(dlib::invoke(&example_struct::get_i,    &obj1) == 10);
+        DLIB_TEST(dlib::invoke(&example_struct::i,        &obj1) == 10);
+        DLIB_TEST(dlib::invoke(&example_struct::get_i,    obj2) == 11);
+        DLIB_TEST(dlib::invoke(&example_struct::i,        obj2) == 11);
+        DLIB_TEST(dlib::invoke(&example_struct::get_i,    obj3) == 12);
+        DLIB_TEST(dlib::invoke(&example_struct::i,        obj3) == 12);
+    }
 
-            int i = 0;
-        };
+    // ----------------------------------------------------------------------------------------
+    int return_int()
+    {
+        return 0;
+    }
 
-        {
-            example_struct obj1(10);
-            std::unique_ptr<example_struct> obj2(new example_struct(11));
-            std::shared_ptr<example_struct> obj3(new example_struct(12));
+    int& return_int_ref()
+    {
+        static int i = 0;
+        return i;
+    }
 
-            DLIB_TEST(invoke(&example_struct::get_i,    obj1) == 10);
-            DLIB_TEST(invoke(&example_struct::i,        obj1) == 10);
-            DLIB_TEST(invoke(&example_struct::get_i,    &obj1) == 10);
-            DLIB_TEST(invoke(&example_struct::i,        &obj1) == 10);
-            DLIB_TEST(invoke(&example_struct::get_i,    obj2) == 11);
-            DLIB_TEST(invoke(&example_struct::i,        obj2) == 11);
-            DLIB_TEST(invoke(&example_struct::get_i,    obj3) == 12);
-            DLIB_TEST(invoke(&example_struct::i,        obj3) == 12);
-        }
+    const int& return_int_const_ref()
+    {
+        static const int i = 0;
+        return i;
+    }
+
+    int* return_int_pointer()
+    {
+        static int i = 0;
+        return &i;
+    }
+
+    const int* return_int_const_pointer()
+    {
+        static const int i = 0;
+        return &i;
+    }
+
+    void test_return_types()
+    {
+        static_assert(std::is_same<int,         dlib::invoke_result_t<decltype(return_int)>>::value, "bad type");
+        static_assert(std::is_same<int&,        dlib::invoke_result_t<decltype(return_int_ref)>>::value, "bad type");
+        static_assert(std::is_same<const int&,  dlib::invoke_result_t<decltype(return_int_const_ref)>>::value, "bad type");
+        static_assert(std::is_same<int*,        dlib::invoke_result_t<decltype(return_int_pointer)>>::value, "bad type");
+        static_assert(std::is_same<const int*,  dlib::invoke_result_t<decltype(return_int_const_pointer)>>::value, "bad type");
+
+        static_assert(std::is_same<int, dlib::invoke_result_t<decltype(&example_struct::get_i), const example_struct&>>::value, "bad type");
+        static_assert(std::is_same<int, dlib::invoke_result_t<decltype(&example_struct::get_i), example_struct&>>::value, "bad type");
+        static_assert(std::is_same<int, dlib::invoke_result_t<decltype(&example_struct::get_i), const example_struct*>>::value, "bad type");
+        static_assert(std::is_same<int, dlib::invoke_result_t<decltype(&example_struct::get_i), example_struct*>>::value, "bad type");
+        static_assert(std::is_same<int, dlib::invoke_result_t<decltype(&example_struct::get_i), std::unique_ptr<example_struct>>>::value, "bad type");
+        static_assert(std::is_same<int, dlib::invoke_result_t<decltype(&example_struct::get_i), std::shared_ptr<example_struct>>>::value, "bad type");
+
+        static_assert(std::is_same<const int&,  dlib::invoke_result_t<decltype(&example_struct::i), const example_struct&>>::value, "bad type");
+        static_assert(std::is_same<int&,        dlib::invoke_result_t<decltype(&example_struct::i), example_struct&>>::value, "bad type");
+        static_assert(std::is_same<const int&,  dlib::invoke_result_t<decltype(&example_struct::i), const example_struct*>>::value, "bad type");
+        static_assert(std::is_same<int&,        dlib::invoke_result_t<decltype(&example_struct::i), example_struct*>>::value, "bad type");
+        static_assert(std::is_same<int&,        dlib::invoke_result_t<decltype(&example_struct::i), std::unique_ptr<example_struct>>>::value, "bad type");
+        static_assert(std::is_same<int&,        dlib::invoke_result_t<decltype(&example_struct::i), std::shared_ptr<example_struct>>>::value, "bad type");
+
+        auto lambda_func_return_int = []() -> int {return 0;};
+        static_assert(std::is_same<int, dlib::invoke_result_t<decltype(lambda_func_return_int)>>::value, "bad type");
     }
 
     // ----------------------------------------------------------------------------------------
@@ -154,6 +207,7 @@ namespace
             test_functions();
             test_lambdas();
             test_member_functions_and_data();
+            test_return_types();
         }
     } a;
 }

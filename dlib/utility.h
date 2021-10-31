@@ -3,19 +3,7 @@
 #ifndef DLIB_UTILITY_Hh_
 #define DLIB_UTILITY_Hh_
 
-#ifndef DLIB_CPLUSPLUS
-    #if defined(_MSVC_LANG ) && !defined(__clang__)
-        #define DLIB_CPLUSPLUS  (_MSC_VER == 1900 ? 201103L : _MSVC_LANG )
-    #else
-        #define DLIB_CPLUSPLUS  __cplusplus
-    #endif
-#endif
-
-#if DLIB_CPLUSPLUS >= 201402L
-    #define HAVE_INDEX_SEQUENCE 1
-#endif
-
-#include <utility>
+#include <cstddef>
 
 /*
     This header contains back-ports of C++14/17 functions and type traits
@@ -24,11 +12,6 @@
 
 namespace dlib
 {
-#if HAVE_INDEX_SEQUENCE
-    using std::index_sequence;
-    using std::make_index_sequence;
-    using std::index_sequence_for;
-#else
     template<std::size_t... Ints>
     struct index_sequence
     {
@@ -54,7 +37,6 @@ namespace dlib
 
     template<typename... Ts>
     using index_sequence_for = make_index_sequence<sizeof...(Ts)>;
-#endif
 }
 
 #endif //DLIB_UTILITY_Hh_
