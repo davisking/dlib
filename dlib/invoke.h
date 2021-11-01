@@ -76,6 +76,25 @@ namespace dlib
 
     namespace detail
     {
+        template< typename ReturnType, typename F, typename... Args>
+        struct is_invocable : std::false_type {};
+
+        template< typename F, typename... Args >
+        struct is_invocable<decltype(dlib::invoke(std::declval<F>(), std::declval<Args>()...)), F, Args...> : std::true_type {};
+    }
+
+    template< typename F, typename... Args >
+    struct is_invocable : detail::is_invocable<void, F, Args...> {};
+    /*!
+        ensures
+            - identical to std::is_invocable<F, Args..>
+            - works with C++11 onwards
+    !*/
+
+    // ----------------------------------------------------------------------------------------
+
+    namespace detail
+    {
         template<typename F, typename Tuple, std::size_t... I>
         auto apply_impl(F&& fn, Tuple&& tpl, index_sequence<I...>)
         -> decltype(dlib::invoke(std::forward<F>(fn),

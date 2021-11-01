@@ -40,6 +40,11 @@ namespace
 
     void test_functions()
     {
+        static_assert(dlib::is_invocable<decltype(func_testargs), int, std::string, const std::string&, const std::string&, std::string&>::value, "should be invocable!");
+        static_assert(dlib::is_invocable<decltype(func_testargs), int, std::string, std::string, const std::string&, std::string&>::value, "should be invocable!");
+        static_assert(dlib::is_invocable<decltype(func_testargs), int, std::string, std::string, std::string, std::string&>::value, "should be invocable!");
+        static_assert(! dlib::is_invocable<decltype(func_testargs), int, std::string, std::string, std::string, std::string>::value, "shouldn't be invocable!");
+
         {
             std::string str = run1_str4;
             dlib::invoke(func_testargs, 1, run1_str1, run1_str2, std::cref(run1_str3), std::ref(str));
