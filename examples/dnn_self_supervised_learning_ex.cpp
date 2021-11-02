@@ -292,10 +292,14 @@ try
     // Now, we initialize the feature extractor model with the backbone we have just learned.
     model::feats fnet(layer<5>(net));
     // And we will generate all the features for the training set to train a multiclass SVM
-    // classifier.
+    // classifier.  It's always a good idea to use double instead of float to improve the
+    // convergence speed and the precision of the optimizer.
     std::vector<matrix<double, 0, 1>> features;
     cout << "Extracting features for linear classifier..." << endl;
-    features = fnet(training_images, 4 * batch_size);
+    auto temp = fnet(training_images, 4 * batch_size);
+    for (auto&& f : temp)
+        features.push_back(matrix_cast<double>(f));
+    temp.clear();
     svm_multiclass_linear_trainer<linear_kernel<matrix<double,0,1>>, unsigned long> trainer;
     trainer.set_num_threads(std::thread::hardware_concurrency());
     // The most appropriate C setting could be found automatically by using find_max_global().  See the docs for
@@ -307,7 +311,7 @@ try
 
     // Finally, we can compute the accuracy of the model on the CIFAR-10 train and test images.
     auto compute_accuracy = [&fnet, &df, batch_size](
-        const std::vector<matrix<float, 0, 1>>& samples,
+        const std::vector<matrix<double, 0, 1>>& samples,
         const std::vector<unsigned long>& labels
     )
     {
@@ -330,7 +334,10 @@ try
     cout << "\ntraining accuracy" << endl;
     compute_accuracy(features, training_labels);
     cout << "\ntesting accuracy" << endl;
-    features = fnet(testing_images, 4 * batch_size);
+    features.clear();
+    temp = fnet(testing_images, 4 * batch_size);
+    for (auto&& f : temp)
+        features.push_back(matrix_cast<double>(f));
     compute_accuracy(features, testing_labels);
     return EXIT_SUCCESS;
 }
