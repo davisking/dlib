@@ -298,6 +298,8 @@ try
     features = fnet(training_images, 4 * batch_size);
     svm_multiclass_linear_trainer<linear_kernel<matrix<float,0,1>>, unsigned long> trainer;
     trainer.set_num_threads(std::thread::hardware_concurrency());
+    // The most appropriate C setting could be found automatically by using find_max_global().  See the docs for
+    // find_max_global() for further information and take particular note of model_selection_ex.cpp.
     trainer.set_c(svm_c);
     cout << "Training Multiclass SVM..." << endl;
     const auto df = trainer.train(features, training_labels);
