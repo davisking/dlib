@@ -3614,7 +3614,6 @@ namespace dlib
                 std::vector<yolo_rect>& dets
             )
             {
-                DLIB_CASSERT(sub.sample_expansion_factor() == 1, sub.sample_expansion_factor());
                 const auto& anchors = options.anchors.at(tag_id<TAG_TYPE>::id);
                 const tensor& output_tensor = layer<TAG_TYPE>(sub).get_output();
                 DLIB_CASSERT(static_cast<size_t>(output_tensor.k()) == anchors.size() * (options.labels.size() + 5));
@@ -3672,7 +3671,6 @@ namespace dlib
                 double& loss
             )
             {
-                DLIB_CASSERT(sub.sample_expansion_factor() == 1, sub.sample_expansion_factor());
                 const tensor& output_tensor = layer<TAG_TYPE>(sub).get_output();
                 const auto& anchors = options.anchors.at(tag_id<TAG_TYPE>::id);
                 DLIB_CASSERT(static_cast<size_t>(output_tensor.k()) == anchors.size() * (options.labels.size() + 5));
@@ -3684,6 +3682,7 @@ namespace dlib
                 tensor& grad = layer<TAG_TYPE>(sub).get_gradient_input();
                 DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
                 DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+                const double input_area = input_tensor.nr() * input_tensor.nc();
                 float* g = grad.host();
 
                 // Compute the objectness loss for all grid cells
@@ -3781,7 +3780,7 @@ namespace dlib
                             const double th = truth_box.rect.height() / (anchors[a].height + truth_box.rect.height());
 
                             // Scale regression error according to the truth size
-                            const double scale_box = 2 - truth_box.rect.area() / (input_tensor.nr() * input_tensor.nc());
+                            const double scale_box = 2 - truth_box.rect.area() / input_area;
 
                             // Compute the gradient for the box coordinates
                             g[x_idx] = options.lambda_box * scale_box * (out_data[x_idx] - tx);
@@ -3835,6 +3834,7 @@ namespace dlib
             double adjust_threshold = 0.25
         ) const
         {
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1, sub.sample_expansion_factor());
             std::vector<yolo_rect> dets_accum;
             std::vector<yolo_rect> final_dets;
             for (long i = 0; i < input_tensor.num_samples(); ++i)
@@ -3868,6 +3868,7 @@ namespace dlib
         ) const
         {
             DLIB_CASSERT(input_tensor.num_samples() != 0);
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1, sub.sample_expansion_factor());
             double loss = 0;
             for (long i = 0; i < input_tensor.num_samples(); ++i)
             {
