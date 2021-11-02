@@ -22,7 +22,11 @@
     // Disable the "statement is unreachable" message since it will go off on code that is
     // actually reachable but just happens to not be reachable sometimes during certain
     // template instantiations.
+    #ifdef __NVCC_DIAG_PRAGMA_SUPPORT__
+    #pragma nv_diag_suppress code_is_unreachable
+    #else
     #pragma diag_suppress code_is_unreachable
+    #endif
 #endif
 
 
