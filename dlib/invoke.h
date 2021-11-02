@@ -47,17 +47,21 @@ namespace dlib
     namespace detail
     {
         template< typename AlwaysVoid, typename, typename...>
-        struct invoke_result {};
+        struct invoke_traits
+        {
+            static constexpr bool value = false;
+        };
 
         template< typename F, typename... Args >
-        struct invoke_result< decltype( void(dlib::invoke(std::declval<F>(), std::declval<Args>()...)) ), F, Args...>
+        struct invoke_traits< decltype( void(dlib::invoke(std::declval<F>(), std::declval<Args>()...)) ), F, Args...>
         {
+            static constexpr bool value = true;
             using type = decltype( dlib::invoke(std::declval<F>(), std::declval<Args>()...) );
         };
     }
 
     template< typename F, typename... Args >
-    struct invoke_result : detail::invoke_result< void, F, Args...> {};
+    struct invoke_result : detail::invoke_traits< void, F, Args...> {};
     /*!
         ensures
             - identical to std::invoke_result<F, Args..>
@@ -74,17 +78,8 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-    namespace detail
-    {
-        template< typename ReturnType, typename F, typename... Args>
-        struct is_invocable : std::false_type {};
-
-        template< typename F, typename... Args >
-        struct is_invocable<decltype(dlib::invoke(std::declval<F>(), std::declval<Args>()...)), F, Args...> : std::true_type {};
-    }
-
     template< typename F, typename... Args >
-    struct is_invocable : detail::is_invocable<void, F, Args...> {};
+    struct is_invocable : std::integral_constant<bool, detail::invoke_traits< void, F, Args...>::value> {};
     /*!
         ensures
             - identical to std::is_invocable<F, Args..>
