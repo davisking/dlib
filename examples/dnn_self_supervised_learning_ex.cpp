@@ -36,9 +36,10 @@
     a max pooling layer afterwards, like the paper does.
 */
 
-#include <dlib/dnn.h>
-#include <dlib/data_io.h>
 #include <dlib/cmd_line_parser.h>
+#include <dlib/data_io.h>
+#include <dlib/dnn.h>
+#include <dlib/global_optimization.h>
 #include <dlib/gui_widgets.h>
 #include <dlib/svm_threaded.h>
 
@@ -169,7 +170,6 @@ try
     // The default settings are fine for the example already.
     command_line_parser parser;
     parser.add_option("batch", "set the mini batch size per GPU (default: 64)", 1);
-    parser.add_option("c", "SVM C parameter for the linear classifier (default: 5000)", 1);
     parser.add_option("dims", "set the projector dimensions (default: 128)", 1);
     parser.add_option("lambda", "penalize off-diagonal terms (default: 1/dims)", 1);
     parser.add_option("learning-rate", "set the initial learning rate (default: 1e-3)", 1);
@@ -196,7 +196,6 @@ try
     const double lambda = get_option(parser, "lambda", 1.0 / dims);
     const double learning_rate = get_option(parser, "learning-rate", 1e-3);
     const double min_learning_rate = get_option(parser, "min-learning-rate", 1e-5);
-    const double svm_c = get_option(parser, "c", 5000);
 
     // Load the CIFAR-10 dataset into memory.
     std::vector<matrix<rgb_pixel>> training_images, testing_images;
@@ -296,11 +295,27 @@ try
     std::vector<matrix<float, 0, 1>> features;
     cout << "Extracting features for linear classifier..." << endl;
     features = fnet(training_images, 4 * batch_size);
-    svm_multiclass_linear_trainer<linear_kernel<matrix<float,0,1>>, unsigned long> trainer;
+
+    // Find the most appropriate C setting using find_max_global.
+    auto cross_validation_score = [&](const double c)
+    {
+        svm_multiclass_linear_trainer<linear_kernel<matrix<float, 0, 1>>, unsigned long> trainer;
+        trainer.set_num_threads(std::thread::hardware_concurrency());
+        trainer.set_c(c);
+        cout << "C: " << c << endl;
+        const auto cm = cross_validate_multiclass_trainer(trainer, features, training_labels, 3);
+        const double accuracy = sum(diag(cm)) / sum(cm);
+        cout << "cross validation accuracy: " << accuracy << endl;;
+        cout << "confusion matrix:\n " << cm << endl;
+        return accuracy;
+    };
+    const auto result = find_max_global(cross_validation_score, 1e-4, 10000, max_function_calls(50));
+    cout << "Best C: " << result.x(0) << endl;
+
+    // Proceed to train the SVM classifier with the best C.
+    svm_multiclass_linear_trainer<linear_kernel<matrix<float, 0, 1>>, unsigned long> trainer;
     trainer.set_num_threads(std::thread::hardware_concurrency());
-    // The most appropriate C setting could be found automatically by using find_max_global().  See the docs for
-    // find_max_global() for further information and take particular note of model_selection_ex.cpp.
-    trainer.set_c(svm_c);
+    trainer.set_c(result.x(0));
     cout << "Training Multiclass SVM..." << endl;
     const auto df = trainer.train(features, training_labels);
     serialize("multiclass_svm_cifar_10.dat") << df;
