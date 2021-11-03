@@ -43,7 +43,7 @@ namespace
         static_assert(dlib::is_invocable<decltype(func_testargs), int, std::string, const std::string&, const std::string&, std::string&>::value, "should be invocable!");
         static_assert(dlib::is_invocable<decltype(func_testargs), int, std::string, std::string, const std::string&, std::string&>::value, "should be invocable!");
         static_assert(dlib::is_invocable<decltype(func_testargs), int, std::string, std::string, std::string, std::string&>::value, "should be invocable!");
-        static_assert(! dlib::is_invocable<decltype(func_testargs), int, std::string, std::string, std::string, std::string>::value, "shouldn't be invocable!");
+        static_assert(dlib::is_invocable<decltype(func_testargs), int, std::string, std::string, std::string, std::reference_wrapper<std::string>>::value, "should be invocable!");
 
         {
             std::string str = run1_str4;
