@@ -8,6 +8,7 @@
 #include <dlib/sparse_vector.h>
 #include <dlib/optimization.h>
 #include <dlib/statistics/running_gradient.h>
+#include <dlib/filtering.h>
 
 using namespace dlib;
 using namespace std;
@@ -115,6 +116,19 @@ void hit_enter_to_continue()
 {
     std::cout << "Hit enter to continue";
     std::cin.get();
+}
+
+// ----------------------------------------------------------------------------------------
+
+string print_momentum_filter(const momentum_filter& r)
+{
+    std::ostringstream sout;
+    sout << "momentum_filter(";
+    sout << "measurement_noise="<<r.get_measurement_noise();
+    sout << ", typical_acceleration="<<r.get_typical_acceleration();
+    sout << ", max_measurement_deviation="<<r.get_max_measurement_deviation();
+    sout << ")";
+    return sout.str();
 }
 
 // ----------------------------------------------------------------------------------------
@@ -264,5 +278,69 @@ ensures \n\
 
     m.def("probability_that_sequence_is_increasing",probability_that_sequence_is_increasing, py::arg("time_series"),
         "returns the probability that the given sequence of real numbers is increasing in value over time.");
+
+    {
+        typedef momentum_filter type;
+        py::class_<type>(m, "momentum_filter",
+            R"asdf( 
+                This object is a simple tool for filtering a single scalar value that
+                measures the location of a moving object that has some non-trivial
+                momentum.  Importantly, the measurements are noisy and the object can
+                experience sudden unpredictable accelerations.  To accomplish this
+                filtering we use a simple Kalman filter with a state transition model of:
+
+                    position_{i+1} = position_{i} + velocity_{i} 
+                    velocity_{i+1} = velocity_{i} + some_unpredictable_acceleration
+
+                and a measurement model of:
+                    
+                    measured_position_{i} = position_{i} + measurement_noise
+
+                Where some_unpredictable_acceleration and measurement_noise are 0 mean Gaussian 
+                noise sources with standard deviations of get_typical_acceleration() and
+                get_measurement_noise() respectively.
+
+                To allow for really sudden and large but infrequent accelerations, at each
+                step we check if the current measured position deviates from the predicted
+                filtered position by more than get_max_measurement_deviation()*get_measurement_noise() 
+                and if so we adjust the filter's state to keep it within these bounds.
+                This allows the moving object to undergo large unmodeled accelerations, far
+                in excess of what would be suggested by get_typical_acceleration(), without
+                then experiencing a long lag time where the Kalman filter has to "catch
+                up" to the new position.  )asdf"
+        )
+        .def(py::init<double,double,double>(), py::arg("measurement_noise"), py::arg("typical_acceleration"), py::arg("max_measurement_deviation"))
+        .def("measurement_noise",   [](const momentum_filter& a){return a.get_measurement_noise();})
+        .def("typical_acceleration",   [](const momentum_filter& a){return a.get_typical_acceleration();})
+        .def("max_measurement_deviation",   [](const momentum_filter& a){return a.get_max_measurement_deviation();})
+        .def("__call__", [](momentum_filter& f, const double r){return f(r); })
+        .def("__repr__", print_momentum_filter)
+        .def(py::pickle(&getstate<type>, &setstate<type>));
+    }
+
+    m.def("find_optimal_momentum_filter",
+        [](const py::object sequence, const double smoothness ) {
+            return find_optimal_momentum_filter(python_list_to_vector<double>(sequence), smoothness);
+        },
+        py::arg("sequence"),
+        py::arg("smoothness")=1,
+        R"asdf(requires
+            - sequences.size() != 0
+            - for all valid i: sequences[i].size() > 4
+            - smoothness >= 0
+        ensures
+            - This function finds the "optimal" settings of a momentum_filter based on
+              recorded measurement data stored in sequences.  Here we assume that each
+              vector in sequences is a complete track history of some object's measured
+              positions.  What we do is find the momentum_filter that minimizes the
+              following objective function:
+                 sum of abs(predicted_location[i] - measured_location[i]) + smoothness*abs(filtered_location[i]-filtered_location[i-1])
+                 Where i is a time index.
+              The sum runs over all the data in sequences.  So what we do is find the
+              filter settings that produce smooth filtered trajectories but also produce
+              filtered outputs that are as close to the measured positions as possible.
+              The larger the value of smoothness the less jittery the filter outputs will
+              be, but they might become biased or laggy if smoothness is set really high.)asdf"
+    );
 }
 
