@@ -11,32 +11,124 @@ namespace dlib
 {
     // ----------------------------------------------------------------------------------------
     namespace detail {
-        template< typename F, typename ... Args >
-        auto INVOKE(F&& fn, Args&& ... args)
+        template< typename T >
+        struct is_reference_wrapper : std::false_type {};
+        template< typename U >
+        struct is_reference_wrapper<std::reference_wrapper<U>> : std::true_type {};
+
+        template <
+            typename Base,
+            typename T,
+            typename Derived,
+            typename... Args
+        >
+        constexpr auto INVOKE( T Base::*pmf, Derived && ref, Args &&... args )
+        noexcept(noexcept((std::forward<Derived>(ref).*pmf)(std::forward<Args>(args)...)))
         -> typename std::enable_if<
-                std::is_member_pointer<typename std::decay<F>::type>::value,
-                decltype(std::mem_fn(fn)(std::forward<Args>(args)...))>::type
+                std::is_function<T>::value &&
+                std::is_base_of<Base, typename std::decay<Derived>::type>::value,
+                decltype((std::forward<Derived>(ref).*pmf)(std::forward<Args>(args)...))
+           >::type
         {
-            return std::mem_fn(fn)(std::forward<Args>(args)...) ;
+            return (std::forward<Derived>(ref).*pmf)(std::forward<Args>(args)...);
         }
 
-        template< typename F, typename ... Args >
-        auto INVOKE(F&& fn, Args&& ... args)
+        template<
+            typename Base,
+            typename T,
+            typename RefWrap,
+            typename... Args
+        >
+        constexpr auto INVOKE( T Base::*pmf, RefWrap && ref, Args &&... args )
+        noexcept(noexcept((ref.get().*pmf)(std::forward<Args>(args)...)))
+        -> typename std::enable_if<
+                std::is_function<T>::value &&
+                is_reference_wrapper<typename std::decay<RefWrap>::type>::value,
+                decltype((ref.get().*pmf)(std::forward<Args>(args)...))>::type
+        {
+            return (ref.get().*pmf)(std::forward<Args>(args)...);
+        }
+
+        template< typename Base, typename T, typename Ptr, typename... Args>
+        constexpr auto INVOKE( T Base::*pmf, Ptr && ptr, Args &&... args )
+        noexcept(noexcept(((*std::forward<Ptr>(ptr)).*pmf)( std::forward<Args>( args )...)))
+        -> typename std::enable_if<
+                std::is_function<T>::value &&
+                !is_reference_wrapper<typename std::decay<Ptr>::type>::value &&
+                !std::is_base_of<Base, typename std::decay<Ptr>::type>::value,
+                decltype(((*std::forward<Ptr>(ptr)).*pmf)(std::forward<Args>(args)...))>::type
+        {
+            return ((*std::forward<Ptr>(ptr)).*pmf)( std::forward<Args>( args )...);
+        }
+
+        template<
+            typename Base,
+            typename T,
+            typename Derived
+        >
+        constexpr auto INVOKE( T Base::*pmd, Derived && ref )
+        noexcept(noexcept(std::forward<Derived>(ref).*pmd))
+        -> typename std::enable_if<
+                !std::is_function<T>::value &&
+                std::is_base_of<Base, typename std::decay<Derived>::type>::value,
+                decltype(std::forward<Derived>(ref).*pmd)>::type
+        {
+            return std::forward<Derived>(ref).*pmd;
+        }
+
+        template<
+            typename Base,
+            typename T,
+            typename RefWrap
+        >
+        constexpr auto INVOKE( T Base::*pmd, RefWrap && ref )
+        noexcept(noexcept(std::forward<RefWrap>(ref.get()).*pmd))
+        -> typename std::enable_if<
+                !std::is_function<T>::value &&
+                is_reference_wrapper<typename std::decay<RefWrap>::type>::value,
+                decltype(ref.get().*pmd)>::type
+        {
+            return std::forward<RefWrap>(ref.get()).*pmd;
+        }
+
+        template<
+            typename Base,
+            typename T,
+            typename Ptr
+        >
+        constexpr auto INVOKE( T Base::*pmd, Ptr && ptr )
+        noexcept(noexcept((*std::forward<Ptr>(ptr)).*pmd))
+        -> typename std::enable_if<
+                !std::is_function<T>::value &&
+                !is_reference_wrapper<typename std::decay<Ptr>::type>::value &&
+                !std::is_base_of<Base, typename std::decay<Ptr>::type>::value,
+                decltype((*std::forward<Ptr>(ptr)).*pmd)>::type
+        {
+            return (*std::forward<Ptr>(ptr)).*pmd;
+        }
+
+        template<
+            typename F,
+            typename... Args
+        >
+        constexpr auto INVOKE( F && f, Args &&... args )
+        noexcept(noexcept(std::forward<F>( f )( std::forward<Args>( args )...)))
         -> typename std::enable_if<
                 !std::is_member_pointer<typename std::decay<F>::type>::value,
-                decltype(std::forward<F>(fn)(std::forward<Args>(args)...))>::type
+                decltype(std::forward<F>(f)(std::forward<Args>(args)...))>::type
         {
-            return std::forward<F>(fn)(std::forward<Args>(args)...);
+            return std::forward<F>( f )( std::forward<Args>( args )...);
         }
     }
 
     template< typename F, typename... Args>
-    auto invoke(F && f, Args &&... args)
+    constexpr auto invoke(F && f, Args &&... args)
     /*!
         ensures
             - identical to std::invoke(std::forward<F>(f), std::forward<Args>(args)...)
             - works with C++11 onwards
     !*/
+    noexcept(noexcept(detail::INVOKE(std::forward<F>( f ), std::forward<Args>( args )...)))
     -> decltype(detail::INVOKE(std::forward<F>( f ), std::forward<Args>( args )...))
     {
         return detail::INVOKE(std::forward<F>( f ), std::forward<Args>( args )...);
@@ -85,6 +177,32 @@ namespace dlib
             - identical to std::is_invocable<F, Args..>
             - works with C++11 onwards
     !*/
+
+    // ----------------------------------------------------------------------------------------
+
+    template <typename R, typename F, typename... Args>
+    struct is_invocable_r : std::integral_constant<bool, dlib::is_invocable<F, Args...>::value &&
+                                                         std::is_convertible<invoke_result_t<F, Args...>, R>::value> {};
+    /*!
+        ensures
+            - identical to std::is_invocable_r<R, F, Args..>
+            - works with C++11 onwards
+    !*/
+
+    // ----------------------------------------------------------------------------------------
+
+    template< typename R, typename F, typename... Args>
+    constexpr typename std::enable_if<dlib::is_invocable_r<R, F, Args...>::value, R>::type
+    invoke_r(F && f, Args &&... args)
+    /*!
+        ensures
+            - identical to std::invoke_r<R>(std::forward<F>(f), std::forward<Args>(args)...)
+            - works with C++11 onwards
+    !*/
+    noexcept(noexcept(dlib::invoke(std::forward<F>( f ), std::forward<Args>( args )...)))
+    {
+        return dlib::invoke(std::forward<F>( f ), std::forward<Args>( args )...);
+    }
 
     // ----------------------------------------------------------------------------------------
 
