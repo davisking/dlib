@@ -238,7 +238,9 @@ namespace dlib
     namespace detail
     {
         template<typename F, typename Tuple, std::size_t... I>
-        auto apply_impl(F&& fn, Tuple&& tpl, index_sequence<I...>)
+        constexpr auto apply_impl(F&& fn, Tuple&& tpl, index_sequence<I...>)
+        noexcept(noexcept(dlib::invoke(std::forward<F>(fn),
+                                       std::get<I>(std::forward<Tuple>(tpl))...)))
         -> decltype(dlib::invoke(std::forward<F>(fn),
                                  std::get<I>(std::forward<Tuple>(tpl))...))
         {
@@ -248,12 +250,15 @@ namespace dlib
     }
 
     template<typename F, typename Tuple>
-    auto apply(F&& fn, Tuple&& tpl)
+    constexpr auto apply(F&& fn, Tuple&& tpl)
     /*!
         ensures
             - identical to std::apply(std::forward<F>(f), std::forward<Tuple>(tpl))
             - works with C++11 onwards
     !*/
+    noexcept(noexcept(detail::apply_impl(std::forward<F>(fn),
+                                         std::forward<Tuple>(tpl),
+                                         make_index_sequence<std::tuple_size<typename std::remove_reference<Tuple>::type >::value>{})))
     -> decltype(detail::apply_impl(std::forward<F>(fn),
                                    std::forward<Tuple>(tpl),
                                    make_index_sequence<std::tuple_size<typename std::remove_reference<Tuple>::type >::value>{}))
