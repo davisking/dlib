@@ -22,7 +22,11 @@ namespace dlib
             typename Derived,
             typename... Args
         >
-        constexpr auto INVOKE( T Base::*pmf, Derived && ref, Args &&... args )
+        constexpr auto INVOKE(
+            T Base::*pmf, //pointer to member function
+            Derived&& ref,
+            Args&&... args
+        )
         noexcept(noexcept((std::forward<Derived>(ref).*pmf)(std::forward<Args>(args)...)))
         -> typename std::enable_if<
                 std::is_function<T>::value &&
@@ -39,7 +43,11 @@ namespace dlib
             typename RefWrap,
             typename... Args
         >
-        constexpr auto INVOKE( T Base::*pmf, RefWrap && ref, Args &&... args )
+        constexpr auto INVOKE(
+            T Base::*pmf, //pointer to member function
+            RefWrap&& ref,
+            Args&&... args
+        )
         noexcept(noexcept((ref.get().*pmf)(std::forward<Args>(args)...)))
         -> typename std::enable_if<
                 std::is_function<T>::value &&
@@ -49,8 +57,17 @@ namespace dlib
             return (ref.get().*pmf)(std::forward<Args>(args)...);
         }
 
-        template< typename Base, typename T, typename Ptr, typename... Args>
-        constexpr auto INVOKE( T Base::*pmf, Ptr && ptr, Args &&... args )
+        template<
+            typename Base,
+            typename T,
+            typename Ptr,
+            typename... Args
+        >
+        constexpr auto INVOKE(
+            T Base::*pmf, //pointer to member function
+            Ptr&& ptr,
+            Args&&... args
+        )
         noexcept(noexcept(((*std::forward<Ptr>(ptr)).*pmf)( std::forward<Args>( args )...)))
         -> typename std::enable_if<
                 std::is_function<T>::value &&
@@ -66,10 +83,13 @@ namespace dlib
             typename T,
             typename Derived
         >
-        constexpr auto INVOKE( T Base::*pmd, Derived && ref )
+        constexpr auto INVOKE(
+            T Base::*pmd, //pointer to member data
+            Derived&& ref
+        )
         noexcept(noexcept(std::forward<Derived>(ref).*pmd))
         -> typename std::enable_if<
-                !std::is_function<T>::value &&
+                std::is_object<T>::value &&
                 std::is_base_of<Base, typename std::decay<Derived>::type>::value,
                 decltype(std::forward<Derived>(ref).*pmd)>::type
         {
@@ -81,14 +101,17 @@ namespace dlib
             typename T,
             typename RefWrap
         >
-        constexpr auto INVOKE( T Base::*pmd, RefWrap && ref )
-        noexcept(noexcept(std::forward<RefWrap>(ref.get()).*pmd))
+        constexpr auto INVOKE(
+            T Base::*pmd, //pointer to member data
+            RefWrap&& ref
+        )
+        noexcept(noexcept(ref.get().*pmd))
         -> typename std::enable_if<
-                !std::is_function<T>::value &&
+                std::is_object<T>::value &&
                 is_reference_wrapper<typename std::decay<RefWrap>::type>::value,
                 decltype(ref.get().*pmd)>::type
         {
-            return std::forward<RefWrap>(ref.get()).*pmd;
+            return ref.get().*pmd;
         }
 
         template<
@@ -96,10 +119,13 @@ namespace dlib
             typename T,
             typename Ptr
         >
-        constexpr auto INVOKE( T Base::*pmd, Ptr && ptr )
+        constexpr auto INVOKE(
+            T Base::*pmd, //pointer to member data
+            Ptr&& ptr
+        )
         noexcept(noexcept((*std::forward<Ptr>(ptr)).*pmd))
         -> typename std::enable_if<
-                !std::is_function<T>::value &&
+                std::is_object<T>::value &&
                 !is_reference_wrapper<typename std::decay<Ptr>::type>::value &&
                 !std::is_base_of<Base, typename std::decay<Ptr>::type>::value,
                 decltype((*std::forward<Ptr>(ptr)).*pmd)>::type
@@ -111,7 +137,10 @@ namespace dlib
             typename F,
             typename... Args
         >
-        constexpr auto INVOKE( F && f, Args &&... args )
+        constexpr auto INVOKE(
+            F && f,
+            Args&&... args
+        )
         noexcept(noexcept(std::forward<F>( f )( std::forward<Args>( args )...)))
         -> typename std::enable_if<
                 !std::is_member_pointer<typename std::decay<F>::type>::value,
