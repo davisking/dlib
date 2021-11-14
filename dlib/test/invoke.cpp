@@ -234,6 +234,100 @@ namespace
 
     // ----------------------------------------------------------------------------------------
 
+    const char* func_return_c_string()
+    {
+        return "hello darkness my old friend";
+    }
+
+    struct obj_return_c_string
+    {
+        obj_return_c_string() = default;
+        obj_return_c_string(const obj_return_c_string& rhs) = delete;
+        obj_return_c_string(obj_return_c_string&& rhs)      = delete;
+
+        const char* run()
+        {
+            return "i've come to talk with you again";
+        }
+    };
+
+    void test_invoke_r()
+    {
+        {
+            static_assert(dlib::is_invocable_r<std::string, decltype(func_return_c_string)>::value, "should be invocable");
+            auto str = dlib::invoke_r<std::string>(func_return_c_string);
+            static_assert(std::is_same<decltype(str), std::string>::value, "bad return type");
+            DLIB_TEST(str == "hello darkness my old friend");
+        }
+
+        {
+            obj_return_c_string obj;
+            static_assert(dlib::is_invocable_r<std::string, decltype(&obj_return_c_string::run), decltype(obj)>::value, "should be invocable");
+            auto str = dlib::invoke_r<std::string>(&obj_return_c_string::run, obj);
+            static_assert(std::is_same<decltype(str), std::string>::value, "bad return type");
+            DLIB_TEST(str == "i've come to talk with you again");
+        }
+
+        {
+            obj_return_c_string obj;
+            static_assert(dlib::is_invocable_r<std::string, decltype(&obj_return_c_string::run), decltype(&obj)>::value, "should be invocable");
+            auto str = dlib::invoke_r<std::string>(&obj_return_c_string::run, &obj);
+            static_assert(std::is_same<decltype(str), std::string>::value, "bad return type");
+            DLIB_TEST(str == "i've come to talk with you again");
+        }
+
+        {
+            auto obj = std::make_shared<obj_return_c_string>();
+            static_assert(dlib::is_invocable_r<std::string, decltype(&obj_return_c_string::run), decltype(obj)>::value, "should be invocable");
+            auto str = dlib::invoke_r<std::string>(&obj_return_c_string::run, obj);
+            static_assert(std::is_same<decltype(str), std::string>::value, "bad return type");
+            DLIB_TEST(str == "i've come to talk with you again");
+        }
+
+        {
+            std::unique_ptr<obj_return_c_string> obj(new obj_return_c_string());
+            static_assert(dlib::is_invocable_r<std::string, decltype(&obj_return_c_string::run), decltype(obj)>::value, "should be invocable");
+            auto str = dlib::invoke_r<std::string>(&obj_return_c_string::run, obj);
+            static_assert(std::is_same<decltype(str), std::string>::value, "bad return type");
+            DLIB_TEST(str == "i've come to talk with you again");
+        }
+
+        {
+            auto lambda_return_c_string = [] {
+                return "because a vision softly creeping";
+            };
+            static_assert(dlib::is_invocable_r<std::string, decltype(lambda_return_c_string)>::value, "should be invocable");
+            auto str = dlib::invoke_r<std::string>(lambda_return_c_string);
+            static_assert(std::is_same<decltype(str), std::string>::value, "bad return type");
+            DLIB_TEST(str == "because a vision softly creeping");
+        }
+    }
+
+    // ----------------------------------------------------------------------------------------
+
+    constexpr int multiply_ints(int i, int j)
+    {
+        return i*j;
+    }
+
+    struct constexpr_object
+    {
+        constexpr int multiply_ints(int i, int j) const
+        {
+            return i*j;
+        }
+    };
+
+    void test_constexpr()
+    {
+        static_assert(dlib::invoke(multiply_ints, 2, 5) == 10, "this should be constexpr");
+        static_assert(dlib::invoke_r<long>(multiply_ints, 2, 5) == 10, "this should be constexpr");
+        constexpr constexpr_object constexpr_obj;
+        static_assert(dlib::invoke(&constexpr_object::multiply_ints, constexpr_obj, 2, 5) == 10);
+        static_assert(dlib::invoke_r<long>(&constexpr_object::multiply_ints, constexpr_obj, 2, 5) == 10);
+    }
+
+    // ----------------------------------------------------------------------------------------
 
     class invoke_tester : public tester
     {
@@ -251,6 +345,8 @@ namespace
             test_member_functions_and_data();
             test_return_types();
             test_make_from_tuple();
+            test_invoke_r();
+            test_constexpr();
         }
     } a;
 }
