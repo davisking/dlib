@@ -310,16 +310,16 @@ ensures \n\
                 up" to the new position.  )asdf"
         )
         .def(py::init<double,double,double>(), py::arg("measurement_noise"), py::arg("typical_acceleration"), py::arg("max_measurement_deviation"))
-        .def("measurement_noise",   [](const momentum_filter& a){return a.get_measurement_noise();})
-        .def("typical_acceleration",   [](const momentum_filter& a){return a.get_typical_acceleration();})
-        .def("max_measurement_deviation",   [](const momentum_filter& a){return a.get_max_measurement_deviation();})
-        .def("__call__", [](momentum_filter& f, const double r){return f(r); })
+        .def("measurement_noise",   &type::get_measurement_noise)
+        .def("typical_acceleration", &type::get_typical_acceleration)
+        .def("max_measurement_deviation", &type::get_max_measurement_deviation)
+        .def("__call__", &type::operator())
         .def("__repr__", print_momentum_filter)
         .def(py::pickle(&getstate<type>, &setstate<type>));
     }
 
     m.def("find_optimal_momentum_filter",
-        [](const py::object sequence, const double smoothness ) {
+        [](const py::object sequence, const double smoothness) {
             return find_optimal_momentum_filter(python_list_to_vector<double>(sequence), smoothness);
         },
         py::arg("sequence"),
