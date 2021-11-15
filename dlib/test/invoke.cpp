@@ -323,8 +323,8 @@ namespace
         static_assert(dlib::invoke(multiply_ints, 2, 5) == 10, "this should be constexpr");
         static_assert(dlib::invoke_r<long>(multiply_ints, 2, 5) == 10, "this should be constexpr");
         constexpr constexpr_object constexpr_obj;
-        static_assert(dlib::invoke(&constexpr_object::multiply_ints, constexpr_obj, 2, 5) == 10);
-        static_assert(dlib::invoke_r<long>(&constexpr_object::multiply_ints, constexpr_obj, 2, 5) == 10);
+        static_assert(dlib::invoke(&constexpr_object::multiply_ints, constexpr_obj, 2, 5) == 10, "this should be constexpr");
+        static_assert(dlib::invoke_r<long>(&constexpr_object::multiply_ints, constexpr_obj, 2, 5) == 10, "this should be constexpr");
     }
 
     // ----------------------------------------------------------------------------------------
