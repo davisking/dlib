@@ -295,6 +295,10 @@ try
     std::vector<matrix<float, 0, 1>> features;
     cout << "Extracting features for linear classifier..." << endl;
     features = fnet(training_images, 4 * batch_size);
+    vector_normalizer<matrix<float, 0, 1>> normalizer;
+    normalizer.train(features);
+    for (auto& feature : features)
+        feature = normalizer(feature);
 
     // Find the most appropriate C setting using find_max_global.
     auto cross_validation_score = [&](const double c)
@@ -309,7 +313,7 @@ try
         cout << "confusion matrix:\n " << cm << endl;
         return accuracy;
     };
-    const auto result = find_max_global(cross_validation_score, 1e-4, 10000, max_function_calls(50));
+    const auto result = find_max_global(cross_validation_score, 1e-3, 1000, max_function_calls(50));
     cout << "Best C: " << result.x(0) << endl;
 
     // Proceed to train the SVM classifier with the best C.
@@ -346,6 +350,8 @@ try
     compute_accuracy(features, training_labels);
     cout << "\ntesting accuracy" << endl;
     features = fnet(testing_images, 4 * batch_size);
+    for (auto& feature : features)
+        feature = normalizer(feature);
     compute_accuracy(features, testing_labels);
     return EXIT_SUCCESS;
 }
