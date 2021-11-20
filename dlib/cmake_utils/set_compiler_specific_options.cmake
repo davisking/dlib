@@ -22,6 +22,10 @@ if (COMMAND pybind11_add_module)
    if (ARM_NEON_IS_AVAILABLE)
       set(USE_NEON_INSTRUCTIONS ON CACHE BOOL "Compile your program with ARM-NEON instructions")
    endif()
+   include(${CMAKE_CURRENT_LIST_DIR}/check_if_rdrnd_instructions_executable_on_host.cmake)
+   if (RDRND_IS_AVAILABLE_ON_HOST)
+      set(USE_RDRND_INSTRUCTIONS ON CACHE BOOL "Compile your program with RDRND instructions")
+   endif()
 endif()
 
 
@@ -121,6 +125,15 @@ elseif((";${gcc_like_compilers};" MATCHES ";${CMAKE_CXX_COMPILER_ID};")  AND
    endif()
 endif()
 
+# Setup an option to allow a user to disable RDRND instruction use.  
+if ((";${gcc_like_compilers};" MATCHES ";${CMAKE_CXX_COMPILER_ID};")  AND
+   (";${intel_archs};"        MATCHES ";${CMAKE_SYSTEM_PROCESSOR};"))
+   option(USE_RDRND_INSTRUCTIONS  "Compile your program with RDRND instructions"  ON)
+   if(USE_RDRND_INSTRUCTIONS)
+      list(APPEND active_compile_opts -mrdrnd)
+      message(STATUS "Enabling RDRND instructions")
+   endif()
+endif()
 
 
 
