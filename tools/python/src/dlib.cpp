@@ -72,6 +72,11 @@ PYBIND11_MODULE(_dlib_pybind11, m)
 #else
     m.attr("USE_NEON_INSTRUCTIONS") = false;
 #endif
+#ifdef DLIB_HAVE_RDRND
+    m.attr("USE_RDRND_INSTRUCTIONS") = true;
+#else
+    m.attr("USE_RDRND_INSTRUCTIONS") = false;
+#endif
 
 
 

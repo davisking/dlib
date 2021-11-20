@@ -74,6 +74,11 @@
                 #define DLIB_HAVE_NEON
             #endif
         #endif
+        #ifdef __RDRND__
+            #ifndef DLIB_HAVE_RDRND
+                #define DLIB_HAVE_RDRND
+            #endif
+        #endif
     #endif
 #endif
 
@@ -106,6 +111,9 @@
 #endif
 #ifdef DLIB_HAVE_NEON
     #include <arm_neon.h> // ARM NEON
+#endif
+#ifdef DLIB_HAVE_RDRND
+    #include <immintrin.h> // RDRND
 #endif
 
 // ----------------------------------------------------------------------------------------
@@ -147,6 +155,7 @@
     inline bool cpu_has_sse41_instructions()  { return 0!=(cpuid(1)[2]&(1<<19)); }
     inline bool cpu_has_sse42_instructions()  { return 0!=(cpuid(1)[2]&(1<<20)); }
     inline bool cpu_has_avx_instructions()    { return 0!=(cpuid(1)[2]&(1<<28)); }
+    inline bool cpu_has_rdrnd_instructions()  { return 0!=(cpuid(1)[2]&(1<<30)); }
     inline bool cpu_has_avx2_instructions()   { return 0!=(cpuid(7)[1]&(1<<5));  }
     inline bool cpu_has_avx512_instructions() { return 0!=(cpuid(7)[1]&(1<<16)); }
 
@@ -167,6 +176,10 @@
 #elif defined(DLIB_HAVE_SSE2)
         if (!cpu_has_sse2_instructions())
             std::cerr << "Dlib was compiled to use SSE2 instructions, but these aren't available on your machine." << std::endl;
+#endif
+#if defined(DLIB_HAVE_RDRND)
+        if (!cpu_has_rdrnd_instructions())
+            std::cerr << "Dlib was compiled to use RDRND instructions, but these aren't available on your machine." << std::endl;
 #endif
     }
 
