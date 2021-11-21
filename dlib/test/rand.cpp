@@ -205,6 +205,119 @@ namespace
 
     }
 
+    template <
+        typename rdrand
+        >
+    void rdrand_test (
+    )
+    /*!
+        requires
+            - rdrand is an implementation of rand/rdrand_kernel_abstract.h 
+              is instantiated with int
+        ensures
+            - runs tests on rand for compliance with the specs
+    !*/
+    {        
+        uint16 max_retries = 15;
+
+        ostringstream sout;
+
+        rdrand r, r2;
+        DLIB_TEST(r.get_max_retries() == 10);
+        r.set_max_retries(max_retries);
+
+        DLIB_TEST(r.get_max_retries() == max_retries);
+        r.clear();
+        DLIB_TEST(r.get_max_retries() == 10);
+        swap(r,r2);
+        DLIB_TEST(r.get_max_retries() == 10);
+        r.set_max_retries(max_retries);
+        DLIB_TEST(r.get_max_retries() == max_retries);
+        swap(r,r2);
+        DLIB_TEST(r2.get_max_retries() == max_retries);
+        DLIB_TEST(r.get_max_retries() == 10);
+        swap(r,r2);
+        DLIB_TEST(r.get_max_retries() == max_retries);
+        DLIB_TEST(r2.get_max_retries() == 10);
+
+        print_spinner();
+        unsigned long size = 100000;
+        for (unsigned long i = 0; i < size; ++i) 
+        {
+            uint64 ch = r.get_random_64bit_number();
+            sout.write((char*)&ch,8);
+        }
+
+        check_bpp(sout.str());
+        sout.clear();
+        sout.str("");
+
+        print_spinner();
+        for (unsigned long i = 0; i < size; ++i) 
+        {
+            uint32 ch = r.get_random_32bit_number();
+            sout.write((char*)&ch,4);
+        }
+
+        check_bpp(sout.str());
+        sout.clear();
+        sout.str("");
+
+        print_spinner();
+        for (unsigned long i = 0; i < size; ++i) 
+        {
+            uint16 ch = r.get_random_16bit_number();
+            sout.write((char*)&ch,2);
+        }
+
+        check_bpp(sout.str());
+        sout.clear();
+        sout.str("");
+
+        print_spinner();
+        for (unsigned long i = 0; i < size; ++i) 
+        {
+            unsigned char ch = r.get_random_8bit_number();
+            sout.write((char*)&ch,1);
+        }
+
+        check_bpp(sout.str());
+        sout.clear();
+        sout.str("");
+
+        // make sure the things can serialize right
+        {
+            r.clear();
+            r2.clear();
+
+
+            for (int i = 0; i < 1000; ++i)
+            {
+                r.get_random_32bit_number();
+            }
+
+            ostringstream sout;
+            serialize(r, sout);
+
+            istringstream sin(sout.str());
+            deserialize(r2, sin);
+
+            for (int i = 0; i < 1000; ++i)
+            {
+                r2.get_random_32bit_number();
+            }
+        }
+
+        // make sure calling clear() and set_max_retries(10) do the same thing
+        {
+            r.clear();
+            r2.set_max_retries(10);
+            rdrand r3;
+
+            DLIB_TEST(r.get_max_retries() == r2.get_max_retries());
+            DLIB_TEST(r.get_max_retries() == r3.get_max_retries());
+        }
+    }
 
     template <typename rand_type>
     void test_normal_numbers(
@@ -469,6 +582,10 @@ namespace
             test_get_integer();
             test_weibull_distribution();
             test_exponential_distribution();
+#ifdef DLIB_HAVE_RDRND
+            dlog << LINFO << "testing rdrand_kernel_1";
+            rdrand_test<dlib::rdrand>();
+#endif
         }
     } a;
 
