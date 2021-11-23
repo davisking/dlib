@@ -90,6 +90,7 @@ elseif (MSVC OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC") # else if using Visu
    option(USE_SSE2_INSTRUCTIONS "Compile your program with SSE2 instructions" ON)
    option(USE_SSE4_INSTRUCTIONS "Compile your program with SSE4 instructions" OFF)
    option(USE_AVX_INSTRUCTIONS  "Compile your program with AVX instructions"  OFF)
+   option(USE_RDRND_INSTRUCTIONS "Compile your program with RDRND instructions" ON)
 
    include(CheckTypeSize)
    check_type_size( "void*" SIZE_OF_VOID_PTR)
@@ -114,6 +115,10 @@ elseif (MSVC OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC") # else if using Visu
       endif()
       message(STATUS "Enabling SSE2 instructions")
       list(APPEND active_preprocessor_switches "-DDLIB_HAVE_SSE2")
+   endif()
+   if(USE_RDRND_INSTRUCTIONS)
+      message(STATUS "Enabling RDRND instructions")
+      list(APPEND active_preprocessor_switches "-DDLIB_HAVE_RDRND")
    endif()
 
 elseif((";${gcc_like_compilers};" MATCHES ";${CMAKE_CXX_COMPILER_ID};")  AND
