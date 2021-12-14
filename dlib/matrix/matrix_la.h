@@ -160,9 +160,10 @@ namespace dlib
 
         /* Householder's reduction to bidiagonal form. */
         g = x = 0.0;    
-        for (i=0; i<n; i++) 
+        auto ei = e.begin();
+        for (i=0; i<n; i++, ei++)
         {
-            e(i) = g;
+            *ei = g;
             s = 0.0;
             l = i + 1;
 
@@ -222,7 +223,7 @@ namespace dlib
                 } /* end j */
             } /* end s */
 
-            y = abs(q(i)) + abs(e(i));                         
+            y = abs(q(i)) + abs(*ei);
             if (y > x)
                 x = y;
         } /* end i */
