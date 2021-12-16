@@ -160,6 +160,8 @@ namespace dlib
 
         /* Householder's reduction to bidiagonal form. */
         g = x = 0.0;    
+        // We use *ei instead of e(i) because some versions of gcc emit a bogus warning message
+        // otherwise.
         auto ei = e.begin();
         for (i=0; i<n; i++, ei++)
         {
