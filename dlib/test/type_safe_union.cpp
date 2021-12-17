@@ -688,7 +688,7 @@ namespace
         private:
 
             template<typename T>
-            void operator()(const dlib::in_place_tag<T>&, tsu& item)
+            void operator()(dlib::in_place_tag<T>, tsu& item)
             {
                 type_indices.push_back(item.get_type_id<T>());
             }
@@ -725,7 +725,7 @@ namespace
             for_each_visitor(int target_index_) : target_index(target_index_) {}
 
             template<typename TagType>
-            void operator()(const TagType& tag, tsu& item)
+            void operator()(TagType tag, tsu& item)
             {
                 if (item.get_type_id<TagType>() == target_index)
                     item = tsu{tag};
@@ -781,7 +781,7 @@ namespace
             }
 
             template<typename T, typename Variant>
-            void operator()(const in_place_tag<T>&, Variant&& me)
+            void operator()(in_place_tag<T>, Variant&& me)
             {
                 if (typeid(T).hash_code() == hash_code)
                     dlib::deserialize(me.template get<T>(), in);

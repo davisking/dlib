@@ -628,11 +628,9 @@ namespace dlib
             {}
 
             template<typename T, typename Variant>
-            void operator()(const in_place_tag<T>&, Variant&& x)
+            void operator()(in_place_tag<T>, Variant&& x)
             {
-                using VariantDecayed = typename std::decay<Variant>::type;
-                constexpr int type_id = VariantDecayed::template get_type_id<T>();
-                if (index == type_id)
+                if (index == x.template get_type_id<T>())
                     deserialize(x.template get<T>(), in);
             }
 
