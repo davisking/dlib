@@ -719,7 +719,6 @@ namespace
         //Instead of something simple like a target index, you might want to set the variant
         //based on some specific state that is unique to one of the alternative types.
         //For example, you might want to conditionally set the variant based on hashes.
-        //Specifically, you might to serialize and deserialize types using hashes, not type indices.
 
         struct for_each_visitor
         {
@@ -755,6 +754,60 @@ namespace
         }
     }
 
+    namespace test_for_each_3
+    {
+        using tsu1 = type_safe_union<int,float,std::string>;
+        using tsu2 = type_safe_union<std::string,long,char>;
+
+        struct serializer_typeid
+        {
+            serializer_typeid(std::ostream& out_) : out(out_) {}
+
+            template<typename T>
+            void operator()(const T& x)
+            {
+                dlib::serialize(typeid(T).hash_code(), out);
+                dlib::serialize(x, out);
+            }
+
+            std::ostream& out;
+        };
+
+        struct deserializer_typeid
+        {
+            deserializer_typeid(std::istream& in_) : in(in_) 
+            {
+                dlib::deserialize(hash_code, in);
+            }
+
+            template<typename T, typename Variant>
+            void operator()(const in_place_tag<T>&, Variant&& me)
+            {
+                if (typeid(T).hash_code() == hash_code)
+                    dlib::deserialize(me.template get<T>(), in);
+            }
+
+            std::size_t hash_code = 0;
+            std::istream& in;
+        };
+
+        void test()
+        {
+            tsu1 a;
+            a.get<std::string>() = "hello from tsu1";
+
+            std::stringstream out;
+            a.visit(serializer_typeid(out));
+
+            tsu2 b;
+            b.for_each(deserializer_typeid(out));
+
+            DLIB_TEST(b.contains<std::string>());
+            DLIB_TEST(b.get<std::string>() == "hello from tsu1");
+        }
+    }
+
+
     class type_safe_union_tester : public tester
     {
     public:
@@ -773,6 +826,7 @@ namespace
                 a.test_stuff();
                 test_for_each_1::test();
                 test_for_each_2::test();
+                test_for_each_3::test();
             }
         }
     } a;
