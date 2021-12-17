@@ -80,6 +80,13 @@ namespace
     public:
         void test_stuff()
         {
+            static_assert(tsu::get_type_id<float>() == 1,       "bad type id");
+            static_assert(tsu::get_type_id<double>() == 2,      "bad type id");
+            static_assert(tsu::get_type_id<char>() == 3,        "bad type id");
+            static_assert(tsu::get_type_id<std::string>() == 4, "bad type id");
+            static_assert(tsu::get_type_id<long>() == -1,       "This should be -1");
+
+
             DLIB_TEST(a.is_empty() == true);
             DLIB_TEST(a.contains<char>() == false);
             DLIB_TEST(a.contains<float>() == false);
@@ -666,6 +673,88 @@ namespace
         }
     };
 
+    namespace test_for_each_1
+    {
+        /*! Local classes aren't allowed to have template member functions... !*/
+
+        using tsu = type_safe_union<int,float,std::string>;
+
+        //for_each() using private visitor
+        class for_each_visitor
+        {
+        public: 
+            std::vector<int> type_indices;
+
+        private:
+
+            template<typename T>
+            void operator()(const dlib::in_place_tag<T>&, tsu& item)
+            {
+                type_indices.push_back(item.get_type_id<T>());
+            }
+
+            friend tsu;
+        };
+
+        void test()
+        {
+            tsu a;
+            for_each_visitor visitor;
+            a.for_each(visitor);
+            
+            DLIB_TEST(visitor.type_indices.size() == 3);
+            DLIB_TEST(visitor.type_indices[0] == 1);
+            DLIB_TEST(visitor.type_indices[1] == 2);
+            DLIB_TEST(visitor.type_indices[2] == 3);
+        }
+    }
+
+    namespace test_for_each_2
+    {
+        /*! Local classes aren't allowed to have template member functions... !*/
+        
+        using tsu = type_safe_union<int,float,std::string>;
+
+        //for_each() that demonstrates an actual use-case. 
+        //Instead of something simple like a target index, you might want to set the variant
+        //based on some specific state that is unique to one of the alternative types.
+        //For example, you might want to conditionally set the variant based on hashes.
+        //Specifically, you might to serialize and deserialize types using hashes, not type indices.
+
+        struct for_each_visitor
+        {
+            for_each_visitor(int target_index_) : target_index(target_index_) {}
+
+            template<typename TagType>
+            void operator()(const TagType& tag, tsu& item)
+            {
+                if (item.get_type_id<TagType>() == target_index)
+                    item = tsu{tag};
+            }
+
+            const int target_index = 0;
+        };
+
+        void test()
+        {
+            tsu a;
+            a.for_each(for_each_visitor{1});
+            DLIB_TEST(a.contains<int>());
+            a.clear();
+            a.for_each(for_each_visitor{2});
+            DLIB_TEST(a.contains<float>());
+            a.clear();
+            a.for_each(for_each_visitor{3});
+            DLIB_TEST(a.contains<std::string>());
+            a.clear();
+            a.for_each(for_each_visitor{-1});
+            DLIB_TEST(a.is_empty());
+            a.clear();
+            a.for_each(for_each_visitor{215465});
+            DLIB_TEST(a.is_empty());
+        }
+    }
+
     class type_safe_union_tester : public tester
     {
     public:
@@ -682,6 +771,8 @@ namespace
             {
                 test a;
                 a.test_stuff();
+                test_for_each_1::test();
+                test_for_each_2::test();
             }
         }
     } a;

@@ -27,17 +27,18 @@ namespace dlib
 
         Here is an example of its usage:
 
-        struct A
-        {
-            int i = 0;
-            int j = 0;
+            struct A
+            {
+                int i = 0;
+                int j = 0;
 
-            A(int i_, int j_) : i(i_), j(j_) {}
-        };
+                A(int i_, int j_) : i(i_), j(j_) {}
+            };
 
-        using tsu = type_safe_union<A,std::string>;
-
-        tsu a(in_place_tag<A>{}, 0, 1);
+            using tsu = type_safe_union<A,std::string>;
+            tsu a(in_place_tag<A>{}, 0, 1); // a now contains an object of type A
+        
+        It is also used with type_safe_union::for_each() to disambiguate types.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -192,11 +193,13 @@ namespace dlib
         );
         /*!
            ensures
-              - if (T is the same type as one of the template arguments) then
-                 - returns a number indicating which template argument it is. In particular,
-                   if it's the first template argument it returns 1, if the second then 2, and so on.
-               - else
-                  - returns -1
+                - if (T is the same type as one of the template arguments) then
+                    returns a number indicating which template argument it is. In particular,
+                    if it's the first template argument it returns 1, if the second then 2, and so on.
+                - else if (T is in_place_tag<U>) then 
+                    equivalent to returning get_type_id<U>())
+                - else
+                    returns -1
         !*/
 
         template <typename T>
@@ -280,6 +283,33 @@ namespace dlib
                 equivalent to calling visit(std::forward<F>(f)) with void return type
         !*/
 
+        template <typename F>
+        void for_each(
+            F&& f
+        );
+        /*!
+            requires
+                - f is a callable object such that the following expression is valid for
+                  all types U in Types...:
+
+                    std::forward<F>(f)(const in_place_tag<U>& tag, type_safe_union<Types...>& x)
+            ensures
+                - the state of x is unchanged
+        !*/
+
+        template <typename F>
+        void for_each(
+            F&& f
+        ) const;
+        /*!
+            requires
+                - f is a callable object such that the following expression is valid for
+                  all types U in Types...:
+
+                    std::forward<F>(f)(const in_place_tag<U>& tag, const type_safe_union<Types...>& x)
+
+        !*/
+
         template <typename T> 
         T& get(
         );
@@ -296,6 +326,17 @@ namespace dlib
                     - Any previous object stored in this type_safe_union is destructed and its
                       state is lost.
                     - returns a non-const reference to the newly created T object.
+        !*/
+
+        template <
+            typename T
+        >
+        T& get(
+            const in_place_tag<T>& tag
+        );
+        /*!
+            ensures
+                equivalent to calling get<T>()
         !*/
 
         template <typename T>
@@ -381,7 +422,7 @@ namespace dlib
     }
     /*!
         This is a helper function for passing many callable objects (usually lambdas)
-        to either apply_to_contents() or visit(), that combine to make a complete
+        to either apply_to_contents(), visit() or for_each(), that combine to make a complete
         visitor. A picture paints a thousand words:
 
         using tsu = type_safe_union<int,float,std::string>;
@@ -418,6 +459,22 @@ namespace dlib
         ));
 
         assert(result == "hello there");
+
+        std::vector<int> type_ids;
+
+        a.for_each(overloaded(
+            [&type_ids](in_place_tag<int>, tsu& me) {
+                type_ids.push_back(me.get_type_id<int>());
+            },
+            [&type_ids](in_place_tag<float>, tsu& me) {
+                type_ids.push_back(me.get_type_id<float>());
+            },
+            [&type_ids](in_place_tag<std::string>, tsu& me) {
+                type_ids.push_back(me.get_type_id<std::string>());
+            }
+        ));
+
+        assert(type_ids == vector<int>({0,1,2}));
     !*/
 }
 

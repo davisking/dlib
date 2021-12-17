@@ -22,86 +22,45 @@ namespace dlib
     };
 
     template<typename T>
-    struct in_place_tag {};
+    struct in_place_tag { using type = T;};
 
     namespace internal
     {
         // ---------------------------------------------------------------------
-        template <typename T, typename... Rest>
-        struct is_any : std::false_type {};
+
+        template <typename T, typename First, typename... Rest>
+        struct is_any : std::integral_constant<bool, is_any<T,First>::value || is_any<T,Rest...>::value> {};
 
         template <typename T, typename First>
         struct is_any<T,First> : std::is_same<T,First> {};
 
-        template <typename T, typename First, typename... Rest>
-        struct is_any<T,First,Rest...> : std::integral_constant<bool, std::is_same<T,First>::value || is_any<T,Rest...>::value> {};
+        // ---------------------------------------------------------------------
+
+        template <size_t I, typename... Ts>
+        struct variant_get_type;
+
+        template <size_t I, typename T0, typename... Ts>
+        struct variant_get_type<I, T0, Ts...> : variant_get_type<I-1, Ts...> {};
+
+        template <typename T0, typename... Ts>
+        struct variant_get_type<0, T0, Ts...> { using type = T0;};
 
         // ---------------------------------------------------------------------
-        namespace detail
-        {
-            struct empty {};
 
-            template<typename T>
-            struct variant_type_placeholder {using type = T;};
+        template <int nTs, typename T, typename... Ts>
+        struct variant_type_id_impl
+                : std::integral_constant<int, -1 - nTs> {};
 
-            template <
-                    size_t nVariantTypes,
-                    size_t Counter,
-                    size_t I,
-                    typename... VariantTypes
-            >
-            struct variant_get_type_impl {};
+        template <int nTs, typename T, typename T0, typename... Ts>
+        struct variant_type_id_impl<nTs, T, T0, Ts...>
+                : std::integral_constant<int, std::is_same<T,T0>::value ? 1 : variant_type_id_impl<nTs, T,Ts...>::value + 1> {};
 
-            template <
-                    size_t nVariantTypes,
-                    size_t Counter,
-                    size_t I,
-                    typename VariantTypeFirst,
-                    typename... VariantTypeRest
-            >
-            struct variant_get_type_impl<nVariantTypes, Counter, I, VariantTypeFirst, VariantTypeRest...>
-                    :   std::conditional<(Counter < nVariantTypes),
-                            typename std::conditional<(I == Counter),
-                                    variant_type_placeholder<VariantTypeFirst>,
-                                    variant_get_type_impl<nVariantTypes, Counter+1, I, VariantTypeRest...>
-                            >::type,
-                            empty
-                    >::type {};
-        }
+        template <typename T, typename... Ts>
+        struct variant_type_id : variant_type_id_impl<sizeof...(Ts),T,Ts...>{};
 
-        template <size_t I, typename... VariantTypes>
-        struct variant_get_type : detail::variant_get_type_impl<sizeof...(VariantTypes), 0, I, VariantTypes...> {};
+        template <typename T, typename... Ts>
+        struct variant_type_id<in_place_tag<T>, Ts...> : variant_type_id<T,Ts...>{};
 
-        // ---------------------------------------------------------------------
-        namespace detail
-        {
-            template <
-                    size_t nVariantTypes,
-                    size_t Counter,
-                    typename T,
-                    typename... VariantTypes
-            >
-            struct variant_type_id_impl : std::integral_constant<int,-1> {};
-
-            template <
-                    size_t nVariantTypes,
-                    size_t Counter,
-                    typename T,
-                    typename VariantTypeFirst,
-                    typename... VariantTypesRest
-            >
-            struct variant_type_id_impl<nVariantTypes,Counter,T,VariantTypeFirst,VariantTypesRest...>
-                    :   std::conditional<(Counter < nVariantTypes),
-                            typename std::conditional<std::is_same<T,VariantTypeFirst>::value,
-                                    std::integral_constant<int,Counter+1>,
-                                    variant_type_id_impl<nVariantTypes,Counter + 1, T, VariantTypesRest...>
-                            >::type,
-                            std::integral_constant<int,-1>
-                    >::type {};
-        }
-
-        template <typename T, typename... VariantTypes>
-        struct variant_type_id : detail::variant_type_id_impl<sizeof...(VariantTypes), 0, T, VariantTypes...> {};
         // ---------------------------------------------------------------------
     }
 
@@ -237,6 +196,54 @@ namespace dlib
                 return std::forward<F>(f)(unchecked_get<get_type_t<I>>());
             else
                 return visit_impl<I+1>(std::forward<F>(f));
+        }
+
+        template<
+            size_t I,
+            typename F
+        >
+        typename std::enable_if<(I == sizeof...(Types))>::type
+        for_each_impl(
+            F&&
+        ) const
+        {
+        }
+
+        template<
+            size_t I,
+            typename F
+        >
+        typename std::enable_if<(I < sizeof...(Types))>::type
+        for_each_impl(
+            F&& f
+        ) const
+        {
+            std::forward<F>(f)(in_place_tag<get_type_t<I>>{}, *this);
+            for_each_impl<I+1>(std::forward<F>(f));
+        }
+
+        template<
+            size_t I,
+            typename F
+        >
+        typename std::enable_if<(I == sizeof...(Types))>::type
+        for_each_impl(
+            F&&
+        )
+        {
+        }
+
+        template<
+            size_t I,
+            typename F
+        >
+        typename std::enable_if<(I < sizeof...(Types))>::type
+        for_each_impl(
+            F&& f
+        )
+        {
+            std::forward<F>(f)(in_place_tag<get_type_t<I>>{}, *this);
+            for_each_impl<I+1>(std::forward<F>(f));
         }
 
         template <typename T>
@@ -480,6 +487,22 @@ namespace dlib
             visit(std::forward<F>(f));
         }
 
+        template <typename F>
+        void for_each(
+            F&& f
+        )
+        {
+            for_each_impl<0>(std::forward<F>(f));
+        }
+
+        template <typename F>
+        void for_each(
+            F&& f
+        ) const
+        {
+            for_each_impl<0>(std::forward<F>(f));
+        }
+
         template <typename T>
         bool contains (
         ) const
@@ -538,6 +561,16 @@ namespace dlib
         }
 
         template <
+            typename T
+        >
+        T& get(
+            const in_place_tag<T>& tag
+        )
+        {
+            return get<T>();
+        }
+
+        template <
             typename T,
             is_valid_check<T> = true
         >
@@ -585,39 +618,27 @@ namespace dlib
             std::ostream& out;
         };  
 
-        template<
-            size_t I,
-            typename... Types
-        >
-        inline typename std::enable_if<(I == sizeof...(Types))>::type deserialize_helper(
-            std::istream&, 
-            int, 
-            type_safe_union<Types...>&
-        )
+        struct deserialize_helper
         {
-        }
-        
-        template<
-            size_t I,
-            typename... Types
-        >
-        inline typename std::enable_if<(I < sizeof...(Types))>::type deserialize_helper(
-            std::istream& in, 
-            int index, 
-            type_safe_union<Types...>& x
-        )
-        {
-            using T = typename internal::variant_get_type<I, Types...>::type;
-            
-            if (index == (I+1))
+            deserialize_helper(
+                std::istream& in_,
+                int index_
+            ) : index(index_),
+                in(in_)
+            {}
+
+            template<typename T, typename Variant>
+            void operator()(const in_place_tag<T>&, Variant&& x)
             {
-                deserialize(x.template get<T>(), in);
+                using VariantDecayed = typename std::decay<Variant>::type;
+                constexpr int type_id = VariantDecayed::template get_type_id<T>();
+                if (index == type_id)
+                    deserialize(x.template get<T>(), in);
             }
-            else
-            {
-                deserialize_helper<I+1>(in, index, x);
-            }
-        }        
+
+            const int index = -1;
+            std::istream& in;
+        };
     } // namespace detail
 
     template<typename... Types>
@@ -651,7 +672,7 @@ namespace dlib
             if (index == 0)
                 item.clear();
             else if (index > 0 && index <= (int)sizeof...(Types))
-                detail::deserialize_helper<0>(in, index, item);
+                item.for_each(detail::deserialize_helper(in, index));
             else
                 throw serialization_error("bad index value. Should be in range [0,sizeof...(Types))");
         }
