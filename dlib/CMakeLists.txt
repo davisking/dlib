@@ -612,10 +612,15 @@ if (NOT TARGET dlib)
       include(cmake_utils/find_ffmpeg.cmake)
       if (DLIB_USE_FFMPEG)
          if (FFMPEG_FOUND)
-            set (dlib_needed_libraries ${dlib_needed_libraries} ${FFMPEG_LIBRARIES})
+            set (dlib_needed_libraries ${dlib_needed_libraries} ${FFMPEG_LINK_LIBRARIES})
             set (dlib_needed_includes ${dlib_needed_includes} ${FFMPEG_INCLUDE_DIRS})
+            set(source_files ${source_files}
+                    video_io/ffmpeg_info.cpp
+                    video_io/ffmpeg_helpers.cpp
+                    video_io/video_demuxer.cpp)
+            enable_preprocessor_switch(DLIB_USE_FFMPEG)
          else()
-            toggle_preprocessor_switch(DLIB_USE_FFMPEG)
+            disable_preprocessor_switch(DLIB_USE_FFMPEG)
          endif()
       endif()
 

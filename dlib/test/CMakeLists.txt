@@ -167,6 +167,9 @@ set (tests
 # cmake that they are part of our target (which is the executable named dtest)
 ADD_EXECUTABLE(${target_name} main.cpp tester.cpp ${tests})
 
+file(REAL_PATH ${CMAKE_SOURCE_DIR}/videos DLIB_VIDEOS_FILEPATH)
+add_compile_definitions(DLIB_VIDEOS_FILEPATH="${DLIB_VIDEOS_FILEPATH}")
+
 # Turn on all warnings when using gcc.
 if (CMAKE_COMPILER_IS_GNUCXX)
    add_definitions("-W -Wall")

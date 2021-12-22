@@ -22,7 +22,7 @@ if (UNIX OR MINGW)
             libavutil
         )
         if (FFMPEG_FOUND)
-            message(STATUS "Found FFMPEG/LIBAV via pkg-config")
+            message(STATUS "Found FFMPEG/LIBAV via pkg-config `${FFMPEG_LIBRARY_DIRS}`")
         endif()
     else()
         message(STATUS "PkgConfig could not be found, FFMPEG won't be available")

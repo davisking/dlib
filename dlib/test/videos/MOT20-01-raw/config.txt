@@ -1,0 +1,4 @@
+name 	= MOT20-01-raw.webm
+width	= 960
+height	= 540
+nframes = 429

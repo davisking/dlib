@@ -3,15 +3,14 @@
 
 #ifdef DLIB_USE_FFMPEG
 
-#include <sstream>
-#include <string>
-#include <cstdlib>
-#include <sstream>
-#include <dlib/compress_stream.h>
-#include <dlib/base64.h>
+#include <dlib/dir_nav.h>
+#include <dlib/config_reader.h>
 #include <dlib/video_io.h>
-
 #include "tester.h"
+
+#ifndef DLIB_VIDEOS_FILEPATH
+static_assert(false, "Build is faulty. DLIB_VIDEOS_FILEPATH should be defined by cmake");
+#endif
 
 namespace  
 {
@@ -21,16 +20,30 @@ namespace
 
     logger dlog("test.video");
         
-    void test_decode_vid1()
+    void test_decode_video(
+        const std::string& videopath,
+        const std::string& configpath
+    )
     {
-//        const std::string filepath = "vid1.mp4";
-//        save_vid1_to_file(filepath);
-//        
-//        dlib::video_demuxer_args args;
-//        args.filepath = filepath;
-//        dlib::video_demuxer cap(args);
-//        
-//        DLIB_TEST(cap.is_open());
+        dlib::config_reader cfg(configpath);
+        const int nframes = dlib::get_option(cfg, "nframes", 0);
+        const int height  = dlib::get_option(cfg, "height", 0);
+        const int width   = dlib::get_option(cfg, "width", 0);
+
+        dlib::demuxer_ffmpeg::args args;
+        args.filepath = videopath;
+        dlib::demuxer_ffmpeg cap(args);
+
+        DLIB_TEST(cap.is_open());
+        DLIB_TEST(cap.height() == height);
+        DLIB_TEST(cap.width() == width);
+
+        int frame_counter = 0;
+        sw_frame f;
+        while (cap.read(f))
+            frame_counter++;
+
+        DLIB_TEST(frame_counter == nframes);
     }
 
     class video_tester : public tester
@@ -45,7 +58,14 @@ namespace
         void perform_test (
         )
         {
-            test_decode_vid1();
+            dlib::directory dir(DLIB_VIDEOS_FILEPATH);
+            auto dirs = dir.get_dirs();
+            for (auto& dir : dirs)
+            {
+                const std::string videopath     = dir.full_name() + "/vid.webm";
+                const std::string configpath    = dir.full_name() + "/config.txt";
+                test_decode_video(videopath, configpath);
+            }
         }
     } a;
 }
