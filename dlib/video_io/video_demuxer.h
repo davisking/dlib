@@ -63,7 +63,14 @@ namespace dlib
         int             nchannels()         const;
 
         bool push_encoded(const uint8_t *encoded, int nencoded);
-        suc_t read(sw_frame &dst_frame);
+
+        suc_t read(
+            type_safe_union<array2d<rgb_pixel>, audio_frame>& frame,
+            uint64_t& timestamp_us
+        );
+
+        /*expert use*/
+        suc_t read(sw_frame& dst_frame);
 
     private:
         bool open();

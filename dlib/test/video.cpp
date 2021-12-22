@@ -38,12 +38,28 @@ namespace
         DLIB_TEST(cap.height() == height);
         DLIB_TEST(cap.width() == width);
 
-        int frame_counter = 0;
-        sw_frame f;
-        while (cap.read(f))
-            frame_counter++;
+        int counter_image = 0;
+        int counter_audio = 0;
 
-        DLIB_TEST(frame_counter == nframes);
+        type_safe_union<array2d<rgb_pixel>, audio_frame> frame;
+        uint64_t timestamp_us = 0;
+
+        while (cap.read(frame, timestamp_us))
+        {
+            frame.visit(overloaded(
+                    [&](const array2d<rgb_pixel>&) {
+                        counter_image++;
+                    },
+                    [&](const audio_frame&) {
+                        counter_audio++;
+                    }
+            ));
+
+            frame.clear();
+        }
+
+        DLIB_TEST(counter_image == nframes);
+        DLIB_TEST(counter_audio == 0);
     }
 
     class video_tester : public tester

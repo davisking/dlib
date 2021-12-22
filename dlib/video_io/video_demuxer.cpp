@@ -64,7 +64,13 @@ namespace dlib
 
     bool decoder_ffmpeg::is_open() const
     {
-        return connected && parser != nullptr && pCodecCtx != nullptr;
+        if (!src_frame_buffer.empty())
+            return true;
+
+        return FFMPEG_INITIALIZED &&
+               connected &&
+               parser != nullptr &&
+               pCodecCtx != nullptr;
     }
 
     int decoder_ffmpeg::height() const
@@ -224,7 +230,7 @@ namespace dlib
                 suc1 = send_packet(pkt);
                 ok   = suc1 >= 0;
 
-                if (suc1 >= 0)
+                if (ok)
                 {
                     suc2 = 1;
 
@@ -245,9 +251,7 @@ namespace dlib
             ok = recv_packet();
 
             if (ok && packet->size > 0)
-            {
                 ok = decode(packet.get());
-            }
         }
 
         if (!ok)
@@ -266,13 +270,60 @@ namespace dlib
         {
             dst_frame = std::move(src_frame_buffer.front());
             src_frame_buffer.pop();
-            return decoder_ffmpeg::FRAME_AVAILABLE;
+            return FRAME_AVAILABLE;
         }
 
         if (!is_open())
-            return decoder_ffmpeg::CLOSED;
+            return CLOSED;
 
-        return decoder_ffmpeg::MORE_INPUT;
+        return MORE_INPUT;
+    }
+
+    decoder_ffmpeg::suc_t decoder_ffmpeg::read(
+        type_safe_union<array2d<rgb_pixel>, audio_frame> &frame,
+        uint64_t &timestamp_us
+    )
+    {
+        sw_frame f;
+        const auto suc = read(f);
+
+        if (suc == FRAME_AVAILABLE)
+        {
+            if (f.is_video())
+            {
+                if (f.st.pixfmt != AV_PIX_FMT_RGB24)
+                {
+                    resizer_image.resize_inplace(
+                        resizer_image.get_dst_h(),
+                        resizer_image.get_dst_w(),
+                        AV_PIX_FMT_RGB24,
+                        f);
+                }
+
+                array2d<rgb_pixel> frame_image(f.st.h, f.st.w);
+                for (int row = 0 ; row < f.st.h ; row++)
+                {
+                    memcpy(frame_image.begin() + row * f.st.w,
+                           f.st.data[0] + row * f.st.linesize[0],
+                           f.st.w*3);
+                }
+
+                frame = std::move(frame_image);
+            }
+            else if (f.is_audio())
+            {
+                audio_frame frame_audio;
+                frame_audio.sample_rate = f.st.sample_rate;
+                frame_audio.samples.resize(f.st.nb_samples);
+                memcpy(frame_audio.samples.data(), f.st.data[0], frame_audio.samples.size()*sizeof(audio_frame::sample));
+
+                frame = std::move(frame_audio);
+            }
+
+            timestamp_us = f.st.timestamp_us;
+        }
+
+        return suc;
     }
 
     demuxer_ffmpeg::demuxer_ffmpeg(const args& a)
@@ -600,7 +651,7 @@ namespace dlib
                 suc1 = send_packet(ch, pkt);
                 ok   = suc1 >= 0;
 
-                if (suc1 >= 0)
+                if (ok)
                 {
                     suc2 = 1;
 
