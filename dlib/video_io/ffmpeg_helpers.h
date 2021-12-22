@@ -1,8 +1,8 @@
 // Copyright (C) 2021  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
-#ifndef DLIB_SW_FRAME
-#define DLIB_SW_FRAME
+#ifndef DLIB_FFMPEG_HELPERS
+#define DLIB_FFMPEG_HELPERS
 
 #include <stdint.h>
 #include <cstdio>
@@ -27,6 +27,12 @@ extern "C" {
 #include <libavformat/avformat.h>
 #include <libavdevice/avdevice.h>
 }
+
+#include "../test_for_odr_violations.h"
+
+#ifndef DLIB_USE_FFMPEG
+static_assert(false, "This version of dlib isn't built with the FFMPEG wrappers");
+#endif
 
 namespace dlib
 {
@@ -276,6 +282,18 @@ namespace dlib
         uint64_t sample_count   = 0;
         av_ptr<AVAudioFifo> fifo;
     };
+
+    struct audio_frame
+    {
+        struct sample
+        {
+            int16_t ch1 = 0;
+            int16_t ch2 = 0;
+        };
+
+        std::vector<sample> samples;
+        float sample_rate = 0;
+    };
 }
 
-#endif //DLIB_SW_FRAME
+#endif //DLIB_FFMPEG_HELPERS
