@@ -82,20 +82,6 @@ namespace dlib
     av_ptr<AVFrame>  make_avframe();
     av_ptr<AVPacket> make_avpacket();
 
-    struct AVPacketRefLock
-    {
-        AVPacketRefLock(av_ptr<AVPacket>& packet);
-        ~AVPacketRefLock();
-        av_ptr<AVPacket>& _packet;
-    };
-
-    struct AVFrameRefLock
-    {
-        AVFrameRefLock(av_ptr<AVFrame>& frame);
-        ~AVFrameRefLock();
-        av_ptr<AVFrame>& _frame;
-    };
-
     struct sw_frame
     {
         sw_frame() = default;
@@ -105,6 +91,8 @@ namespace dlib
         sw_frame(sw_frame &&ori) noexcept;
         sw_frame &operator=(sw_frame &&ori) noexcept;
         ~sw_frame();
+
+        void reset();
 
         void copy(
             const uint8_t **data,
@@ -142,7 +130,7 @@ namespace dlib
 
         std::string description() const;
 
-        struct {
+        struct state {
             uint8_t*    data[8]         = {nullptr};
             int         linesize[8]     = {0};
             uint64_t    timestamp_us    = 0;
@@ -176,6 +164,19 @@ namespace dlib
 
         void resize(
             const sw_frame &src,
+            sw_frame &dst
+        );
+
+        void resize(
+            const av_ptr<AVFrame>& src,
+            uint64_t src_timestamp,
+            int dst_h, int dst_w, AVPixelFormat dst_fmt,
+            sw_frame &dst
+        );
+
+        void resize(
+            const av_ptr<AVFrame>& src,
+            uint64_t src_timestamp,
             sw_frame &dst
         );
 
@@ -225,6 +226,19 @@ namespace dlib
             sw_frame &dst
         );
 
+        void resize(
+            const av_ptr<AVFrame> &src,
+            uint64_t src_timestamp,
+            int dst_sample_rate, uint64_t dst_channel_layout, AVSampleFormat dst_fmt,
+            sw_frame &dst
+        );
+
+        void resize(
+            const av_ptr<AVFrame> &src,
+            uint64_t src_timestamp,
+            sw_frame &dst
+        );
+
         void resize_inplace(
             int dst_sample_rate, uint64_t dst_channel_layout, AVSampleFormat dst_fmt,
             sw_frame &f
@@ -244,7 +258,9 @@ namespace dlib
     private:
 
         void unchecked_resize(
-            const sw_frame &src,
+            const uint8_t** src_data,
+            int src_nb_samples,
+            uint64_t src_timestamp,
             sw_frame &dst
         );
 

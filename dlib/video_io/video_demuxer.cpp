@@ -167,7 +167,6 @@ namespace dlib
 
         auto recv_frame = [&]
         {
-            AVFrameRefLock lock(frame);
             int ret = avcodec_receive_frame(pCodecCtx.get(), frame.get());
             int suc = -1; //default to not-ok
 
@@ -191,12 +190,13 @@ namespace dlib
                 const uint64_t timestamp_us = av_rescale_q(pts, tb, {1,1000000});
                 next_pts                    += is_video ? 1 : frame->nb_samples;
 
-                sw_frame decoded(frame, timestamp_us);
+                sw_frame decoded;
 
                 if (is_video)
                 {
                     auto& opts = _args.options.cast_to<args::image_args>();
-                    resizer_image.resize_inplace(
+                    resizer_image.resize(
+                            frame, timestamp_us,
                             opts.h > 0 ? opts.h : decoded.st.h,
                             opts.w > 0 ? opts.w : decoded.st.w,
                             opts.fmt != AV_PIX_FMT_NONE ? opts.fmt : decoded.st.pixfmt,
@@ -205,7 +205,8 @@ namespace dlib
                 else
                 {
                     auto& opts = _args.options.cast_to<args::audio_args>();
-                    resizer_audio.resize_inplace(
+                    resizer_audio.resize(
+                            frame, timestamp_us,
                             opts.sample_rate > 0            ? opts.sample_rate      : decoded.st.sample_rate,
                             opts.channel_layout > 0         ? opts.channel_layout   : decoded.st.channel_layout,
                             opts.fmt != AV_SAMPLE_FMT_NONE  ? opts.fmt              : decoded.st.samplefmt,
@@ -436,7 +437,6 @@ namespace dlib
 
             if (ch.stream_id == AVERROR_STREAM_NOT_FOUND)
             {
-                printf("av_find_best_stream() : stream not found for stream type `%s`\n", av_get_media_type_string(media_type));
                 ch = channel{}; //reset
                 return true; //You might be asking for both video and audio but only video is available. That's OK. Just provide video.
             }
@@ -568,7 +568,7 @@ namespace dlib
         if (!st.src_frame_buffer.empty())
             return;
 
-        if (!st.connected)
+        if (!is_open())
             return;
 
         auto recv_packet = [&]()
@@ -602,7 +602,6 @@ namespace dlib
 
         auto recv_frame = [&](channel &ch)
         {
-            AVFrameRefLock lock(st.frame);
             int ret = avcodec_receive_frame(ch.pCodecCtx.get(), st.frame.get());
             int suc = -1; //default to not-ok
 
@@ -625,14 +624,13 @@ namespace dlib
                 const uint64_t timestamp_us = av_rescale_q(pts, tb, {1,1000000});
                 ch.next_pts                 += is_video ? 1 : st.frame->nb_samples;
 
-                sw_frame decoded(st.frame, timestamp_us);
-
+                sw_frame f;
                 if (is_video)
-                    st.channel_video.resizer_image.resize_inplace(decoded);
+                    st.channel_video.resizer_image.resize(st.frame, timestamp_us, f);
                 else
-                    st.channel_audio.resizer_audio.resize_inplace(decoded);
+                    st.channel_audio.resizer_audio.resize(st.frame, timestamp_us, f);
 
-                st.src_frame_buffer.push(std::move(decoded));
+                st.src_frame_buffer.push(std::move(f));
                 st.last_read_time_ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
                 suc = 1; //ok, keep receiving
             }
@@ -674,8 +672,6 @@ namespace dlib
 
             if (ok)
             {
-                AVPacketRefLock lock(st.packet);
-
                 if (st.packet->stream_index == st.channel_video.stream_id ||
                     st.packet->stream_index == st.channel_audio.stream_id)
                 {
@@ -683,6 +679,8 @@ namespace dlib
 
                     ok = decode(ch, st.packet.get());
                 }
+
+                av_packet_unref(st.packet.get());
             }
         }
 
@@ -736,9 +734,10 @@ namespace dlib
             array2d<rgb_pixel> frame_image(f.st.h, f.st.w);
             for (int row = 0 ; row < f.st.h ; row++)
             {
+                //linesize[0] == 3*width
                 memcpy(frame_image.begin() + row * f.st.w,
                        f.st.data[0] + row * f.st.linesize[0],
-                       f.st.w*3);
+                       f.st.linesize[0]);
             }
 
             frame = std::move(frame_image);
@@ -780,12 +779,12 @@ namespace dlib
 
     int demuxer_ffmpeg::height() const
     {
-        return st.channel_video.is_enabled() ? st.channel_video.resizer_image.get_dst_h() : -1;
+        return st.channel_video.is_enabled() ? st.channel_video.resizer_image.get_dst_h() : 0;
     }
 
     int demuxer_ffmpeg::width() const
     {
-        return st.channel_video.is_enabled() ? st.channel_video.resizer_image.get_dst_w() : -1;
+        return st.channel_video.is_enabled() ? st.channel_video.resizer_image.get_dst_w() : 0;
     }
 
     AVPixelFormat demuxer_ffmpeg::fmt() const
@@ -811,7 +810,7 @@ namespace dlib
 
     int demuxer_ffmpeg::sample_rate() const
     {
-        return st.channel_audio.is_enabled() ? st.channel_audio.resizer_audio.get_dst_rate() : -1;
+        return st.channel_audio.is_enabled() ? st.channel_audio.resizer_audio.get_dst_rate() : 0;
     }
 
     uint64_t demuxer_ffmpeg::channel_layout() const
@@ -827,6 +826,17 @@ namespace dlib
     int demuxer_ffmpeg::nchannels() const
     {
         return st.channel_audio.is_enabled() ? av_get_channel_layout_nb_channels(channel_layout()) : 0;
+    }
+
+    int demuxer_ffmpeg::nsamples() const
+    {
+        int64_t tmp = st.channel_audio.is_enabled() ? av_rescale_q_rnd(st.pFormatCtx->duration, {1, AV_TIME_BASE}, {1, st.channel_audio.resizer_audio.get_dst_rate()}, AV_ROUND_UP) : 0;
+        return tmp;
+    }
+
+    float demuxer_ffmpeg::duration() const
+    {
+        return (float)av_rescale_q(st.pFormatCtx->duration, {1, AV_TIME_BASE}, {1, 1000000}) * 1e-6;
     }
 
     bool demuxer_ffmpeg::interrupt_callback()

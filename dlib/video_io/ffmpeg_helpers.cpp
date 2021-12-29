@@ -158,30 +158,6 @@ namespace dlib
         return obj;
     }
 
-    AVPacketRefLock::AVPacketRefLock(
-        av_ptr<AVPacket> &packet
-    ) : _packet(packet)
-    {
-    }
-
-    AVPacketRefLock::~AVPacketRefLock()
-    {
-        if (_packet)
-            av_packet_unref(_packet.get());
-    }
-
-    AVFrameRefLock::AVFrameRefLock(
-        av_ptr<AVFrame>& frame
-    ) : _frame(frame)
-    {
-    }
-
-    AVFrameRefLock::~AVFrameRefLock()
-    {
-        if (_frame)
-            av_frame_unref(_frame.get());
-    }
-
     sw_frame::sw_frame(
         const av_ptr<AVFrame>& frame,
         uint64_t timestamp_us_
@@ -238,6 +214,12 @@ namespace dlib
     {
         if (st.data[0])
             av_freep(&st.data[0]);
+    }
+
+    void sw_frame::reset()
+    {
+        sw_frame empty;
+        std::swap(empty, *this);
     }
 
     void sw_frame::copy(
@@ -347,8 +329,7 @@ namespace dlib
 
         if (params_this != params_new)
         {
-            sw_frame empty;
-            std::swap(st, empty.st);
+            reset();
             params_this = params_new;
 
             if (params_new != params_zero)
@@ -521,6 +502,41 @@ namespace dlib
         resize(src, _dst_h, _dst_w, _dst_fmt, dst);
     }
 
+    void sw_image_resizer::resize(
+        const av_ptr<AVFrame> &src,
+        uint64_t src_timestamp,
+        int dst_h,
+        int dst_w,
+        AVPixelFormat dst_pixfmt,
+        sw_frame &dst
+    )
+    {
+        reset(src->height, src->width, (AVPixelFormat)src->format,
+              dst_h, dst_w, dst_pixfmt);
+
+        if (_imgConvertCtx)
+        {
+            dst.resize_image(_dst_h, _dst_w, _dst_fmt, src_timestamp);
+
+            sws_scale(_imgConvertCtx.get(),
+                      src->data, src->linesize, 0, src->height,
+                      dst.st.data, dst.st.linesize);
+        }
+        else
+        {
+            dst = sw_frame(src, src_timestamp);
+        }
+    }
+
+    void sw_image_resizer::resize(
+        const av_ptr<AVFrame> &src,
+        uint64_t src_timestamp,
+        sw_frame &dst
+    )
+    {
+        resize(src, src_timestamp, _dst_h, _dst_w, _dst_fmt, dst);
+    }
+
     void sw_image_resizer::resize_inplace(
         int dst_h, int dst_w, AVPixelFormat dst_pixfmt,
         sw_frame& src
@@ -596,15 +612,17 @@ namespace dlib
     }
 
     void sw_audio_resampler::unchecked_resize(
-        const sw_frame &src,
+        const uint8_t** src_data,
+        int src_nb_samples,
+        uint64_t src_timestamp,
         sw_frame &dst
     )
     {
         const int64_t delay       = swr_get_delay(_audioResamplerCtx.get(), src_sample_rate_);
-        const auto dst_nb_samples = av_rescale_rnd(delay + src.st.nb_samples, dst_sample_rate_, src_sample_rate_, AV_ROUND_UP);
-        dst.resize_audio(dst_sample_rate_, dst_nb_samples, dst_channel_layout_, dst_fmt_, src.st.timestamp_us); //could put 0 as timestamp, wouldn't matter, we use tracked samples instead
+        const auto dst_nb_samples = av_rescale_rnd(delay + src_nb_samples, dst_sample_rate_, src_sample_rate_, AV_ROUND_UP);
+        dst.resize_audio(dst_sample_rate_, dst_nb_samples, dst_channel_layout_, dst_fmt_, src_timestamp); //could put 0 as timestamp, wouldn't matter, we use tracked samples instead
 
-        int ret = swr_convert(_audioResamplerCtx.get(), dst.st.data, dst.st.nb_samples, (const uint8_t**)src.st.data, src.st.nb_samples);
+        int ret = swr_convert(_audioResamplerCtx.get(), dst.st.data, dst.st.nb_samples, src_data, src_nb_samples);
         if (ret < 0)
             throw std::runtime_error("swr_convert() failed : " + get_av_error(ret));
 
@@ -626,11 +644,33 @@ namespace dlib
 
         if (_audioResamplerCtx)
         {
-            unchecked_resize(src, dst);
+            unchecked_resize((const uint8_t**)src.st.data, src.st.nb_samples, src.st.timestamp_us, dst);
         }
         else
         {
             dst = src;
+        }
+    }
+
+    void sw_audio_resampler::resize(
+        const av_ptr<AVFrame>&  src,
+        uint64_t                src_timestamp,
+        int                     dst_sample_rate,
+        uint64_t                dst_channel_layout,
+        AVSampleFormat          dst_samplefmt,
+        sw_frame&               dst
+    )
+    {
+        reset(src->sample_rate, src->channel_layout, (AVSampleFormat)src->format,
+              dst_sample_rate, dst_channel_layout, dst_samplefmt);
+
+        if (_audioResamplerCtx)
+        {
+            unchecked_resize((const uint8_t**)src->data, src->nb_samples, src_timestamp, dst);
+        }
+        else
+        {
+            dst = sw_frame(src, src_timestamp);
         }
     }
 
@@ -647,7 +687,7 @@ namespace dlib
         if (_audioResamplerCtx)
         {
             sw_frame dst;
-            unchecked_resize(src,dst);
+            unchecked_resize((const uint8_t**)src.st.data, src.st.nb_samples, src.st.timestamp_us,dst);
             src = std::move(dst);
         }
     }
@@ -658,6 +698,15 @@ namespace dlib
     )
     {
         resize(src, dst_sample_rate_, dst_channel_layout_, dst_fmt_, dst);
+    }
+
+    void sw_audio_resampler::resize(
+        const av_ptr<AVFrame> &src,
+        uint64_t src_timestamp,
+        sw_frame &dst
+    )
+    {
+        resize(src, src_timestamp, dst_sample_rate_, dst_channel_layout_, dst_fmt_, dst);
     }
 
     void sw_audio_resampler::resize_inplace(

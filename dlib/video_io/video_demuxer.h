@@ -133,7 +133,7 @@ namespace dlib
 
             bool        enable_image = true;
             image_args  image_options;
-            bool        enable_audio = false;
+            bool        enable_audio = true;
             audio_args  audio_options;
 
             std::map<std::string, std::string> format_options;
@@ -162,6 +162,9 @@ namespace dlib
         uint64_t        channel_layout() const;
         AVSampleFormat  sample_fmt() const;
         int             nchannels() const;
+        int             nsamples() const;
+
+        float duration() const;
 
         bool read(
             type_safe_union<array2d<rgb_pixel>, audio_frame>& frame,
