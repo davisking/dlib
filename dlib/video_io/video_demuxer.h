@@ -18,7 +18,7 @@ namespace dlib
         {
             struct channel_args
             {
-                AVCodecID                           codec;
+                AVCodecID                           codec = AV_CODEC_ID_NONE;
                 std::string                         codec_name;     //only used if codec==AV_CODEC_ID_NONE
                 std::map<std::string, std::string>  codec_options;  //It's rare you should have to set this
                 int                                 nthreads = -1;  //-1 means std::thread::hardware_concurrency()
@@ -63,6 +63,7 @@ namespace dlib
         int             nchannels()         const;
 
         bool push_encoded(const uint8_t *encoded, int nencoded);
+        void flush();
 
         suc_t read(
             type_safe_union<array2d<rgb_pixel>, audio_frame>& frame,
@@ -162,7 +163,7 @@ namespace dlib
         uint64_t        channel_layout() const;
         AVSampleFormat  sample_fmt() const;
         int             nchannels() const;
-        int             nsamples() const;
+        int             estimated_total_samples() const;
 
         float duration() const;
 

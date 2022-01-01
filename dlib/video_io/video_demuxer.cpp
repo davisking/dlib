@@ -53,9 +53,10 @@ namespace dlib
         pCodecCtx->thread_count = _args.base.nthreads > 0 ? _args.base.nthreads : std::thread::hardware_concurrency();
 
         av_dict opt = _args.base.codec_options;
-        if (avcodec_open2(pCodecCtx.get(), pCodec, opt.avdic ? &opt.avdic : nullptr) < 0)
+        int ret = avcodec_open2(pCodecCtx.get(), pCodec, opt.avdic ? &opt.avdic : nullptr);
+        if (ret < 0)
         {
-            printf("AV : failed to open video encoder\n");
+            printf("avcodec_open2() failed : `%s`\n", get_av_error(ret).c_str());
             return false;
         }
 
@@ -113,10 +114,15 @@ namespace dlib
         if (!is_open())
             return false;
 
-        /*need this stupid padding*/
-        encoded_buffer.resize(nencoded + AV_INPUT_BUFFER_PADDING_SIZE, 0);
-        memcpy(&encoded_buffer[0], encoded, nencoded);
-        encoded = &encoded_buffer[0];
+        if (encoded && nencoded > 0)
+        {
+            /*need this stupid padding*/
+            encoded_buffer.resize(nencoded + AV_INPUT_BUFFER_PADDING_SIZE, 0);
+            memcpy(&encoded_buffer[0], encoded, nencoded);
+            encoded = &encoded_buffer[0];
+        }
+
+        const bool is_flushing = encoded == nullptr || nencoded == 0;
 
         auto recv_packet = [&]
         {
@@ -260,14 +266,20 @@ namespace dlib
                 ok = decode(packet.get());
         }
 
-        if (!ok)
+        if (!ok || is_flushing)
         {
             /*! FLUSH !*/
             decode(nullptr);
+            ok = false;
         }
 
         connected = ok;
         return connected;
+    }
+
+    void decoder_ffmpeg::flush()
+    {
+        push_encoded(nullptr, 0);
     }
 
     decoder_ffmpeg::suc_t decoder_ffmpeg::read(Frame& dst_frame)
@@ -871,10 +883,9 @@ namespace dlib
         return st.channel_audio.is_enabled() ? av_get_channel_layout_nb_channels(channel_layout()) : 0;
     }
 
-    int demuxer_ffmpeg::nsamples() const
+    int demuxer_ffmpeg::estimated_total_samples() const
     {
-        int64_t tmp = st.channel_audio.is_enabled() ? av_rescale_q_rnd(st.pFormatCtx->duration, {1, AV_TIME_BASE}, {1, st.channel_audio.resizer_audio.get_dst_rate()}, AV_ROUND_UP) : 0;
-        return tmp;
+        return st.channel_audio.is_enabled() ? st.pFormatCtx->streams[st.channel_audio.stream_id]->duration : 0;
     }
 
     float demuxer_ffmpeg::duration() const
