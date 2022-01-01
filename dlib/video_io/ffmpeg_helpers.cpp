@@ -158,265 +158,141 @@ namespace dlib
         return obj;
     }
 
-    sw_frame::sw_frame(
-        const av_ptr<AVFrame>& frame,
-        uint64_t timestamp_us_
-    ) : sw_frame()
+    Frame Frame::make(
+        int             h,
+        int             w,
+        AVPixelFormat   pixfmt,
+        int             sample_rate,
+        int             nb_samples,
+        uint64_t        channel_layout,
+        AVSampleFormat  samplefmt,
+        uint64_t        timestamp_us
+    )
     {
-        copy(
-            (const uint8_t**)frame->data,
-            frame->linesize,
-            frame->format,
-            frame->height,
-            frame->width,
-            frame->sample_rate,
-            frame->nb_samples,
-            frame->channel_layout,
-            timestamp_us_
-        );
+        Frame obj;
+        obj.frame = make_avframe();
+        obj.frame->height           = h;
+        obj.frame->width            = w;
+        obj.frame->sample_rate      = sample_rate;
+        obj.frame->channel_layout   = channel_layout;
+        obj.frame->nb_samples       = nb_samples;
+        obj.frame->format           = h > 0 && w > 0 ? (int)pixfmt : (int)samplefmt;
+        obj.timestamp_us            = timestamp_us;
+
+        int ret = av_frame_get_buffer(obj.frame.get(), 0); //use default alignment, which is likely 32
+        if (ret < 0)
+        {
+            obj.frame.reset(nullptr);
+            throw std::runtime_error("av_frame_get_buffer() failed : " + get_av_error(ret));
+        }
+
+//        ret = av_frame_make_writable(obj.frame.get());
+//        if (ret < 0)
+//        {
+//            obj.frame.reset(nullptr);
+//            throw std::runtime_error("av_frame_make_writable() failed : " + get_av_error(ret));
+//        }
+
+        if (obj.is_audio())
+            obj.frame->pts = av_rescale_q(obj.timestamp_us, {1,1000000}, {1, obj.frame->sample_rate});
+
+        return obj;
     }
 
-    sw_frame::sw_frame(const sw_frame& other) : sw_frame()
+    Frame Frame::make_image(
+        int h,
+        int w,
+        AVPixelFormat fmt,
+        uint64_t timestamp_us
+    )
     {
-        copy(
-            (const uint8_t**)other.st.data,
-            other.st.linesize,
-            other.is_video() ? (int) other.st.pixfmt : (int) other.st.samplefmt,
-            other.st.h,
-            other.st.w,
-            other.st.sample_rate,
-            other.st.nb_samples,
-            other.st.channel_layout,
-            other.st.timestamp_us
-        );
+        return make(h, w, fmt, 0, 0, 0, AV_SAMPLE_FMT_NONE, timestamp_us);
     }
 
-    sw_frame& sw_frame::operator=(const sw_frame& other)
+    Frame Frame::make_audio(
+        int             sample_rate,
+        int             nb_samples,
+        uint64_t        channel_layout,
+        AVSampleFormat  fmt,
+        uint64_t        timestamp_us
+    )
     {
-        sw_frame tmp(other);
-        std::swap(st, tmp.st);
-        return *this;
+        return make(0,0,AV_PIX_FMT_NONE, sample_rate, nb_samples, channel_layout, fmt, timestamp_us);
     }
 
-    sw_frame::sw_frame(sw_frame&& ori) noexcept
-    : sw_frame()
+    Frame::Frame(const Frame &ori)
     {
-        std::swap(st, ori.st);
-    }
-
-    sw_frame& sw_frame::operator=(sw_frame&& ori) noexcept
-    {
-        std::swap(st, ori.st);
-        return *this;
-    }
-
-    sw_frame::~sw_frame()
-    {
-        if (st.data[0])
-            av_freep(&st.data[0]);
-    }
-
-    void sw_frame::reset()
-    {
-        sw_frame empty;
+        Frame empty = ori;
         std::swap(empty, *this);
     }
 
-    void sw_frame::copy(
-        const uint8_t** data_,
-        const int* linesize_,
-        int format_,
-        int h_,
-        int w_,
-        int sample_rate_,
-        int nb_samples_,
-        int channel_layout_,
-        uint64_t timestamp_us_
-    )
+    Frame &Frame::operator=(const Frame &ori)
     {
-        if (h_ > 0 && w_ > 0)
+        if (ori.is_empty())
         {
-            resize_image(
-                h_,
-                w_,
-                (AVPixelFormat)format_,
-                timestamp_us_
-            );
-
-            av_image_copy(st.data,  st.linesize,
-                          data_, linesize_,
-                          st.pixfmt, st.w, st.h);
-        }
-        else if (sample_rate_ > 0 && nb_samples_ > 0 && channel_layout_ > 0)
-        {
-            resize_audio(
-                    sample_rate_,
-                    nb_samples_,
-                    channel_layout_,
-                    (AVSampleFormat)format_,
-                    timestamp_us_
-            );
-
-            av_samples_copy(st.data, (uint8_t* const*)data_,
-                            0, 0,
-                            st.nb_samples, nchannels(), st.samplefmt);
-        }
-    }
-
-    av_ptr<AVFrame> sw_frame::copy_to_avframe() const
-    {
-        av_ptr<AVFrame> frame;
-
-        if (is_video() || is_audio())
-        {
-            frame = make_avframe();
-
-            if (frame)
-            {
-                if (is_video())
-                {
-                    frame->height = st.h;
-                    frame->width  = st.w;
-                    frame->format = (int)st.pixfmt;
-                }
-                else if (is_audio())
-                {
-                    frame->sample_rate      = st.sample_rate;
-                    frame->nb_samples       = st.nb_samples;
-                    frame->channel_layout   = st.channel_layout;
-                    frame->format           = (int)st.samplefmt;
-                }
-
-                int ret = av_frame_get_buffer(frame.get(), 1);
-                if (ret < 0)
-                {
-                    frame.reset(nullptr);
-                    throw std::runtime_error("sw_frame::copy_to_avframe() : av_frame_get_buffer() failed");
-                }
-                else
-                {
-                    if (is_video())
-                    {
-                        av_image_copy(frame->data, frame->linesize,
-                                      (const uint8_t**)st.data, st.linesize,
-                                      st.pixfmt, st.w, st.h);
-                    }
-                    else if (is_audio())
-                    {
-                        frame->pts = av_rescale_q(st.timestamp_us, {1,1000000}, {1, frame->sample_rate});
-                        av_samples_copy(frame->data, st.data, 0, 0, st.nb_samples, nchannels(), st.samplefmt);
-                    }
-                }
-            }
+            Frame empty;
+            std::swap(*this, empty);
         }
         else
         {
-        }
+            const bool same_image =
+                    is_image() && ori.is_image() &&
+                    std::tie(    frame->height,     frame->width,     frame->format) ==
+                    std::tie(ori.frame->height, ori.frame->width, ori.frame->format);
 
-        return frame;
-    }
+            const bool same_audio =
+                    is_audio() && ori.is_audio() &&
+                    std::tie(    frame->sample_rate,     frame->nb_samples,     frame->channel_layout,     frame->format) ==
+                    std::tie(ori.frame->sample_rate, ori.frame->nb_samples, ori.frame->channel_layout, ori.frame->format);
 
-    void sw_frame::resize_image(
-        int srch,
-        int srcw,
-        AVPixelFormat srcfmt,
-        uint64_t timestamp_us_
-    )
-    {
-        constexpr auto params_zero = std::make_tuple(0,0,AV_PIX_FMT_NONE);
-        auto params_this = std::tie(st.h, st.w, st.pixfmt);
-        auto params_new  = std::tie(srch, srcw, srcfmt);
-
-        if (params_this != params_new)
-        {
-            reset();
-            params_this = params_new;
-
-            if (params_new != params_zero)
+            if (!same_image && !same_audio)
             {
-                int ret = av_image_alloc(st.data, st.linesize, st.w, st.h, st.pixfmt, 1);
-                if (ret < 0)
-                    throw std::runtime_error("av_image_alloc() failed : " + get_av_error(ret));
+                Frame tmp = make(ori.frame->height,
+                                 ori.frame->width,
+                                 (AVPixelFormat)ori.frame->format,
+                                 ori.frame->sample_rate,
+                                 ori.frame->nb_samples,
+                                 ori.frame->channel_layout,
+                                 (AVSampleFormat)ori.frame->format,
+                                 ori.timestamp_us);
+                std::swap(*this, tmp);
             }
+
+            av_frame_copy(frame.get(), ori.frame.get());
+            av_frame_copy_props(frame.get(), ori.frame.get());
         }
 
-        st.timestamp_us = timestamp_us_;
+        return *this;
     }
 
-    void sw_frame::resize_audio(
-        int             sample_rate_,
-        int             nb_samples_,
-        uint64_t        channel_layout_,
-        AVSampleFormat  samplefmt_,
-        uint64_t        timestamp_us_
-    )
+    bool Frame::is_empty() const
     {
-        constexpr auto params_zero = std::make_tuple(0,0,0,AV_SAMPLE_FMT_NONE);
-        auto params_this = std::tie(st.sample_rate,st.nb_samples, st.channel_layout , st.samplefmt);
-        auto params_new  = std::tie(sample_rate_, nb_samples_, channel_layout_, samplefmt_);
-
-        if (params_this != params_new)
-        {
-            sw_frame empty;
-            std::swap(st, empty.st);
-            params_this = params_new;
-
-            if (params_new != params_zero)
-            {
-                int ret = av_samples_alloc(st.data, st.linesize, nchannels(), st.nb_samples, st.samplefmt, 1);
-                if (ret < 0)
-                    throw std::runtime_error("av_samples_alloc() failed : " + get_av_error(ret));
-            }
-        }
-
-        st.timestamp_us = timestamp_us_;
+        return !is_image() && !is_audio();
     }
 
-    bool sw_frame::is_video() const
+    bool Frame::is_image() const
     {
-        return st.h > 0 && st.w > 0 && st.pixfmt != AV_PIX_FMT_NONE;
+        return frame && frame->width > 0 && frame->height > 0 && frame->format >= 0;
     }
 
-    bool sw_frame::is_audio() const
+    bool Frame::is_audio() const
     {
-        return st.sample_rate > 0 && st.nb_samples > 0 && st.channel_layout > 0 && st.samplefmt != AV_SAMPLE_FMT_NONE;
+        return frame && frame->nb_samples > 0 && frame->channel_layout > 0 && frame->sample_rate > 0;
     }
 
-    int sw_frame::nchannels() const
+    AVPixelFormat Frame::pixfmt() const
     {
-        return av_get_channel_layout_nb_channels(st.channel_layout);
+        return is_image() ? (AVPixelFormat)frame->format : AV_PIX_FMT_NONE;
     }
 
-    int sw_frame::size() const
+    AVSampleFormat Frame::samplefmt() const
     {
-        if (is_video())
-            return av_image_get_buffer_size(st.pixfmt, st.w, st.h, 1);
-        else if (is_audio())
-            return av_samples_get_buffer_size(nullptr, nchannels(), st.nb_samples, st.samplefmt, 1);
-        return 0;
+        return is_audio() ? (AVSampleFormat)frame->format : AV_SAMPLE_FMT_NONE;
     }
 
-    std::string sw_frame::description() const
+    int Frame::nchannels() const
     {
-        std::string str(256, '\0');
-        if (is_video())
-        {
-            int ret = snprintf(&str[0], str.size(), "video (h,w,fmt) : (%i,%i,%s) - size : %i - timestamp_us %lu",
-                               st.h, st.w, get_pixel_fmt_str(st.pixfmt).c_str(), size(), st.timestamp_us);
-            str.resize(ret);
-        }
-        else if (is_audio())
-        {
-            int ret = snprintf(&str[0], str.size(), "audio (sr, nsamples, layout, fmt) : (%i,%i,%lu,%s) - size : %i - timestamp_us %lu",
-                               st.sample_rate, st.nb_samples, st.channel_layout, get_audio_fmt_str(st.samplefmt).c_str(), size(), st.timestamp_us);
-            str.resize(ret);
-        }
-        else
-        {
-            str = "empty frame";
-        }
-
-        return str;
+        return is_audio() ? av_get_channel_layout_nb_channels(frame->channel_layout) : 0;
     }
 
     int sw_image_resizer::get_src_h() const {
@@ -471,22 +347,29 @@ namespace dlib
         }
     }
 
-    void sw_image_resizer::resize(
-        const sw_frame& src,
+    void sw_image_resizer::resize (
+        const Frame& src,
         int dst_h, int dst_w, AVPixelFormat dst_pixfmt,
-        sw_frame& dst
+        Frame& dst
     )
     {
-        reset(src.st.h, src.st.w, src.st.pixfmt,
+        DLIB_ASSERT(src.is_image());
+
+        reset(src.frame->height, src.frame->width, src.pixfmt(),
               dst_h, dst_w, dst_pixfmt);
 
         if (_imgConvertCtx)
         {
-            dst.resize_image(_dst_h, _dst_w, _dst_fmt, src.st.timestamp_us);
+            if (!dst.is_image() ||
+                std::tie(dst.frame->height, dst.frame->width, dst.frame->format) !=
+                std::tie(_dst_h, _dst_w, _dst_fmt))
+            {
+                dst = Frame::make_image(_dst_h, _dst_w, _dst_fmt, src.timestamp_us);
+            }
 
             sws_scale(_imgConvertCtx.get(),
-                      src.st.data, src.st.linesize, 0, src.st.h,
-                      dst.st.data, dst.st.linesize);
+                      src.frame->data, src.frame->linesize, 0, src.frame->height,
+                      dst.frame->data, dst.frame->linesize);
         }
         else
         {
@@ -495,74 +378,11 @@ namespace dlib
     }
 
     void sw_image_resizer::resize(
-        const sw_frame& src,
-        sw_frame& dst
+        const Frame& src,
+        Frame& dst
     )
     {
         resize(src, _dst_h, _dst_w, _dst_fmt, dst);
-    }
-
-    void sw_image_resizer::resize(
-        const av_ptr<AVFrame> &src,
-        uint64_t src_timestamp,
-        int dst_h,
-        int dst_w,
-        AVPixelFormat dst_pixfmt,
-        sw_frame &dst
-    )
-    {
-        reset(src->height, src->width, (AVPixelFormat)src->format,
-              dst_h, dst_w, dst_pixfmt);
-
-        if (_imgConvertCtx)
-        {
-            dst.resize_image(_dst_h, _dst_w, _dst_fmt, src_timestamp);
-
-            sws_scale(_imgConvertCtx.get(),
-                      src->data, src->linesize, 0, src->height,
-                      dst.st.data, dst.st.linesize);
-        }
-        else
-        {
-            dst = sw_frame(src, src_timestamp);
-        }
-    }
-
-    void sw_image_resizer::resize(
-        const av_ptr<AVFrame> &src,
-        uint64_t src_timestamp,
-        sw_frame &dst
-    )
-    {
-        resize(src, src_timestamp, _dst_h, _dst_w, _dst_fmt, dst);
-    }
-
-    void sw_image_resizer::resize_inplace(
-        int dst_h, int dst_w, AVPixelFormat dst_pixfmt,
-        sw_frame& src
-    )
-    {
-        reset(src.st.h, src.st.w, src.st.pixfmt,
-              dst_h, dst_w, dst_pixfmt);
-
-        if (_imgConvertCtx)
-        {
-            sw_frame dst;
-            dst.resize_image(_dst_h, _dst_w, _dst_fmt, src.st.timestamp_us);
-
-            sws_scale(_imgConvertCtx.get(),
-                      src.st.data, src.st.linesize, 0, src.st.h,
-                      dst.st.data, dst.st.linesize);
-
-            src = std::move(dst);
-        }
-    }
-
-    void sw_image_resizer::resize_inplace(
-        sw_frame& f
-    )
-    {
-        resize_inplace(_dst_h, _dst_w, _dst_fmt, f);
     }
 
     void sw_audio_resampler::reset(
@@ -611,40 +431,41 @@ namespace dlib
         }
     }
 
-    void sw_audio_resampler::unchecked_resize(
-        const uint8_t** src_data,
-        int src_nb_samples,
-        uint64_t src_timestamp,
-        sw_frame &dst
-    )
-    {
-        const int64_t delay       = swr_get_delay(_audioResamplerCtx.get(), src_sample_rate_);
-        const auto dst_nb_samples = av_rescale_rnd(delay + src_nb_samples, dst_sample_rate_, src_sample_rate_, AV_ROUND_UP);
-        dst.resize_audio(dst_sample_rate_, dst_nb_samples, dst_channel_layout_, dst_fmt_, src_timestamp); //could put 0 as timestamp, wouldn't matter, we use tracked samples instead
-
-        int ret = swr_convert(_audioResamplerCtx.get(), dst.st.data, dst.st.nb_samples, src_data, src_nb_samples);
-        if (ret < 0)
-            throw std::runtime_error("swr_convert() failed : " + get_av_error(ret));
-
-        dst.st.nb_samples   = ret;
-        dst.st.timestamp_us = av_rescale_q(_tracked_samples, {1, dst_sample_rate_}, {1,1000000});
-        _tracked_samples    += dst.st.nb_samples;
-    }
-
     void sw_audio_resampler::resize(
-        const sw_frame& src,
+        const Frame&    src,
         int             dst_sample_rate,
         uint64_t        dst_channel_layout,
         AVSampleFormat  dst_samplefmt,
-        sw_frame&       dst
+        Frame&          dst
     )
     {
-        reset(src.st.sample_rate, src.st.channel_layout, src.st.samplefmt,
+        DLIB_ASSERT(src.is_audio());
+
+        reset(src.frame->sample_rate, src.frame->channel_layout, (AVSampleFormat)src.frame->format,
               dst_sample_rate, dst_channel_layout, dst_samplefmt);
 
         if (_audioResamplerCtx)
         {
-            unchecked_resize((const uint8_t**)src.st.data, src.st.nb_samples, src.st.timestamp_us, dst);
+            const int64_t delay       = swr_get_delay(_audioResamplerCtx.get(), src_sample_rate_);
+            const auto dst_nb_samples = av_rescale_rnd(delay + src.frame->nb_samples, dst_sample_rate_, src_sample_rate_, AV_ROUND_UP);
+
+            if (!dst.is_audio() ||
+                std::tie(dst.frame->sample_rate, dst.frame->channel_layout, dst.frame->format, dst.frame->nb_samples) !=
+                std::tie(dst_sample_rate_, dst_channel_layout_, dst_fmt_, dst_nb_samples))
+            {
+                dst = Frame::make_audio(dst_sample_rate_, dst_nb_samples, dst_channel_layout_, dst_fmt_, 0);
+            }
+
+            int ret = swr_convert(_audioResamplerCtx.get(),
+                                  dst.frame->data, dst.frame->nb_samples,
+                                  (const uint8_t**)src.frame->data, src.frame->nb_samples);
+            if (ret < 0)
+                throw std::runtime_error("swr_convert() failed : " + get_av_error(ret));
+
+            dst.frame->nb_samples = ret;
+            dst.frame->pts   = _tracked_samples;
+            dst.timestamp_us = av_rescale_q(_tracked_samples, {1, dst_sample_rate_}, {1,1000000});
+            _tracked_samples += dst.frame->nb_samples;
         }
         else
         {
@@ -653,67 +474,11 @@ namespace dlib
     }
 
     void sw_audio_resampler::resize(
-        const av_ptr<AVFrame>&  src,
-        uint64_t                src_timestamp,
-        int                     dst_sample_rate,
-        uint64_t                dst_channel_layout,
-        AVSampleFormat          dst_samplefmt,
-        sw_frame&               dst
-    )
-    {
-        reset(src->sample_rate, src->channel_layout, (AVSampleFormat)src->format,
-              dst_sample_rate, dst_channel_layout, dst_samplefmt);
-
-        if (_audioResamplerCtx)
-        {
-            unchecked_resize((const uint8_t**)src->data, src->nb_samples, src_timestamp, dst);
-        }
-        else
-        {
-            dst = sw_frame(src, src_timestamp);
-        }
-    }
-
-    void sw_audio_resampler::resize_inplace(
-            int             dst_sample_rate,
-            uint64_t        dst_channel_layout,
-            AVSampleFormat  dst_samplefmt,
-            sw_frame&       src
-    )
-    {
-        reset(src.st.sample_rate, src.st.channel_layout, src.st.samplefmt,
-              dst_sample_rate, dst_channel_layout, dst_samplefmt);
-
-        if (_audioResamplerCtx)
-        {
-            sw_frame dst;
-            unchecked_resize((const uint8_t**)src.st.data, src.st.nb_samples, src.st.timestamp_us,dst);
-            src = std::move(dst);
-        }
-    }
-
-    void sw_audio_resampler::resize(
-        const sw_frame& src,
-        sw_frame& dst
+        const Frame& src,
+        Frame& dst
     )
     {
         resize(src, dst_sample_rate_, dst_channel_layout_, dst_fmt_, dst);
-    }
-
-    void sw_audio_resampler::resize(
-        const av_ptr<AVFrame> &src,
-        uint64_t src_timestamp,
-        sw_frame &dst
-    )
-    {
-        resize(src, src_timestamp, dst_sample_rate_, dst_channel_layout_, dst_fmt_, dst);
-    }
-
-    void sw_audio_resampler::resize_inplace(
-        sw_frame& f
-    )
-    {
-        resize_inplace(dst_sample_rate_, dst_channel_layout_, dst_fmt_, f);
     }
 
     int sw_audio_resampler::get_src_rate() const
@@ -762,16 +527,18 @@ namespace dlib
         }
     }
 
-    std::vector<sw_frame> sw_audio_fifo::push_pull(
-        sw_frame&& in
+    std::vector<Frame> sw_audio_fifo::push_pull(
+        Frame&& in
     )
     {
-        std::vector<sw_frame> outs;
+        DLIB_ASSERT(in.is_audio());
+
+        std::vector<Frame> outs;
 
         //check that the configuration hasn't suddenly changed this would be exceptional
         const int nchannels = in.nchannels();
-        auto current_params = std::tie(         fmt,  channels);
-        auto new_params     = std::tie(in.st.samplefmt, nchannels);
+        auto current_params = std::tie(fmt, channels);
+        auto new_params = std::tie(in.frame->format, nchannels);
 
         if (current_params != new_params)
             throw std::runtime_error("new audio frame params differ from first ");
@@ -782,21 +549,20 @@ namespace dlib
         }
         else
         {
-            if (av_audio_fifo_write(fifo.get(), (void**)in.st.data, in.st.nb_samples) != in.st.nb_samples)
+            if (av_audio_fifo_write(fifo.get(), (void**)in.frame->data, in.frame->nb_samples) != in.frame->nb_samples)
                 throw std::runtime_error("av_audio_fifo_write() failed to write all samples");
 
             while (av_audio_fifo_size(fifo.get()) >= frame_size)
             {
-                const AVRational tb1 = {1, in.st.sample_rate};
+                const AVRational tb1 = {1, in.frame->sample_rate};
                 const AVRational tb2 = {1, 1000000};
                 const uint64_t timestamp_us = av_rescale_q(sample_count, tb1, tb2);
-                sw_frame out;
-                out.resize_audio(in.st.sample_rate, frame_size, in.st.channel_layout, in.st.samplefmt, timestamp_us);
+                Frame out = Frame::make_audio(in.frame->sample_rate, frame_size, in.frame->channel_layout, in.samplefmt(), timestamp_us);
 
-                if (av_audio_fifo_read(fifo.get(), (void**)out.st.data, out.st.nb_samples) != out.st.nb_samples)
+                if (av_audio_fifo_read(fifo.get(), (void**)out.frame->data, out.frame->nb_samples) != out.frame->nb_samples)
                     throw std::runtime_error("av_audio_fifo_read() failed to read all requested samples");
 
-                sample_count += out.st.nb_samples;
+                sample_count += out.frame->nb_samples;
                 outs.push_back(std::move(out));
             }
         }

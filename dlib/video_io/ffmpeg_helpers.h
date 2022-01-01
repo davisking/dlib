@@ -82,70 +82,53 @@ namespace dlib
     av_ptr<AVFrame>  make_avframe();
     av_ptr<AVPacket> make_avpacket();
 
-    struct sw_frame
+    struct Frame
     {
-        sw_frame() = default;
-        sw_frame(const av_ptr<AVFrame>& frame, uint64_t timestamp_us_);
-        sw_frame(const sw_frame &ori);
-        sw_frame &operator=(const sw_frame &ori);
-        sw_frame(sw_frame &&ori) noexcept;
-        sw_frame &operator=(sw_frame &&ori) noexcept;
-        ~sw_frame();
+        Frame()                         = default;
+        Frame(Frame&& ori)              = default;
+        Frame& operator=(Frame&& ori)   = default;
+        Frame(const Frame& ori);
+        Frame& operator=(const Frame& ori);
 
-        void reset();
-
-        void copy(
-            const uint8_t **data,
-            const int *linesize,
-            int format,
+        static Frame make(
             int h,
             int w,
-            int sample_rate,
-            int nb_samples,
-            int channel_layout,
-            uint64_t timestamp_us
-        );
-
-        void resize_image(
-            int srch,
-            int srcw,
-            AVPixelFormat srcfmt,
-            uint64_t timestamp_us_
-        );
-
-        void resize_audio(
+            AVPixelFormat pixfmt,
             int sample_rate,
             int nb_samples,
             uint64_t channel_layout,
-            AVSampleFormat srcfmt,
-            uint64_t timestamp_us_
+            AVSampleFormat samplefmt,
+            uint64_t timestamp_us
         );
 
-        bool is_video() const;
+        static Frame make_image(
+            int h,
+            int w,
+            AVPixelFormat pixfmt,
+            uint64_t timestamp_us
+        );
+
+        static Frame make_audio(
+            int sample_rate,
+            int nb_samples,
+            uint64_t channel_layout,
+            AVSampleFormat samplefmt,
+            uint64_t timestamp_us
+        );
+
+        bool is_empty() const;
+
+        /*image*/
+        bool is_image() const;
+        AVPixelFormat pixfmt() const;
+
+        /*audio*/
         bool is_audio() const;
-        int size() const;
         int nchannels() const;
+        AVSampleFormat samplefmt() const;
 
-        av_ptr<AVFrame> copy_to_avframe() const;
-
-        std::string description() const;
-
-        struct state {
-            uint8_t*    data[8]         = {nullptr};
-            int         linesize[8]     = {0};
-            uint64_t    timestamp_us    = 0;
-
-            /*video*/
-            int             h       = 0;
-            int             w       = 0;
-            AVPixelFormat   pixfmt  = AV_PIX_FMT_NONE;
-
-            /*audio*/
-            int             sample_rate     = 0;
-            int             nb_samples      = 0;
-            uint64_t        channel_layout  = 0;
-            AVSampleFormat  samplefmt       = AV_SAMPLE_FMT_NONE;
-        } st;
+        av_ptr<AVFrame> frame;
+        uint64_t        timestamp_us = 0;
     };
 
     class sw_image_resizer
@@ -157,36 +140,14 @@ namespace dlib
         );
 
         void resize(
-            const sw_frame &src,
+            const Frame &src,
             int dst_h, int dst_w, AVPixelFormat dst_fmt,
-            sw_frame &dst
+            Frame &dst
         );
 
         void resize(
-            const sw_frame &src,
-            sw_frame &dst
-        );
-
-        void resize(
-            const av_ptr<AVFrame>& src,
-            uint64_t src_timestamp,
-            int dst_h, int dst_w, AVPixelFormat dst_fmt,
-            sw_frame &dst
-        );
-
-        void resize(
-            const av_ptr<AVFrame>& src,
-            uint64_t src_timestamp,
-            sw_frame &dst
-        );
-
-        void resize_inplace(
-            int dst_h, int dst_w, AVPixelFormat dst_fmt,
-            sw_frame &f
-        );
-
-        void resize_inplace(
-            sw_frame &f
+            const Frame &src,
+            Frame &dst
         );
 
         int get_src_h() const;
@@ -216,36 +177,14 @@ namespace dlib
         );
 
         void resize(
-            const sw_frame &src,
+            const Frame &src,
             int dst_sample_rate, uint64_t dst_channel_layout, AVSampleFormat dst_fmt,
-            sw_frame &dst
+            Frame &dst
         );
 
         void resize(
-            const sw_frame &src,
-            sw_frame &dst
-        );
-
-        void resize(
-            const av_ptr<AVFrame> &src,
-            uint64_t src_timestamp,
-            int dst_sample_rate, uint64_t dst_channel_layout, AVSampleFormat dst_fmt,
-            sw_frame &dst
-        );
-
-        void resize(
-            const av_ptr<AVFrame> &src,
-            uint64_t src_timestamp,
-            sw_frame &dst
-        );
-
-        void resize_inplace(
-            int dst_sample_rate, uint64_t dst_channel_layout, AVSampleFormat dst_fmt,
-            sw_frame &f
-        );
-
-        void resize_inplace(
-            sw_frame &f
+            const Frame &src,
+            Frame &dst
         );
 
         int             get_src_rate()      const;
@@ -256,13 +195,6 @@ namespace dlib
         AVSampleFormat  get_dst_fmt()       const;
 
     private:
-
-        void unchecked_resize(
-            const uint8_t** src_data,
-            int src_nb_samples,
-            uint64_t src_timestamp,
-            sw_frame &dst
-        );
 
         int             src_sample_rate_    = 0;
         uint64_t        src_channel_layout_ = AV_CH_LAYOUT_STEREO;
@@ -286,8 +218,8 @@ namespace dlib
             int nchannels
         );
 
-        std::vector <sw_frame> push_pull(
-            sw_frame &&in
+        std::vector<Frame> push_pull(
+            Frame &&in
         );
 
     private:
