@@ -70,7 +70,7 @@ namespace dlib
         );
 
         /*expert use*/
-        suc_t read(sw_frame& dst_frame);
+        suc_t read(Frame& dst_frame);
 
     private:
         bool open();
@@ -85,7 +85,7 @@ namespace dlib
         std::vector<uint8_t>            encoded_buffer;
         sw_image_resizer                resizer_image;
         sw_audio_resampler              resizer_audio;
-        std::queue<sw_frame>            src_frame_buffer;
+        std::queue<Frame>               src_frame_buffer;
     };
 
     class demuxer_ffmpeg
@@ -173,7 +173,7 @@ namespace dlib
 
         /*expert use*/
         bool read(
-            sw_frame& frame
+            Frame& frame
         );
 
         /*metadata*/
@@ -210,7 +210,7 @@ namespace dlib
             uint64_t connecting_time_ms = 0;
             uint64_t connected_time_ms  = 0;
             uint64_t last_read_time_ms  = 0;
-            std::queue<sw_frame> src_frame_buffer;
+            std::queue<Frame> src_frame_buffer;
             std::map<int, std::map<std::string, std::string>> metadata;
         } st;
     };
