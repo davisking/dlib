@@ -2251,7 +2251,7 @@ namespace dlib
 
         void back_propagate_error(
             const tensor& /*x*/,
-            should_set_gradient_inputs_to_zero /*zero_grads*/
+            should_set_gradient_inputs_to_zero zero_grads = should_set_gradient_inputs_to_zero::yes
         )
         {
             // nothing to do
@@ -2259,7 +2259,7 @@ namespace dlib
         void back_propagate_error(
             const tensor& /*x*/,
             const tensor& /*gradient_input*/,
-            should_set_gradient_inputs_to_zero /*zero_grads*/
+            should_set_gradient_inputs_to_zero zero_grads = should_set_gradient_inputs_to_zero::yes
         )
         {
             // nothing to do
