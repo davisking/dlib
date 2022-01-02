@@ -1436,7 +1436,7 @@ namespace dlib
 
         unsigned int sample_expansion_factor() const { return _sample_expansion_factor; }
 
-        void zero_out_gradients()
+        void set_gradient_inputs_to_zero()
         {
             gradient_input_is_stale = true;
         }
