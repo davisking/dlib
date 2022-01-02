@@ -1438,7 +1438,7 @@ namespace dlib
 
         void zero_out_gradients()
         {
-            x_grad = 0;
+            gradient_input_is_stale = true;
         }
 
         void clean()
