@@ -1032,7 +1032,7 @@ namespace dlib
             subnetwork->back_propagate_error(x, zero_grads); 
 
             // zero out get_gradient_input()
-            gradient_input_is_stale = zero_grads == should_set_gradient_inputs_to_zero::yes ? true : false;
+            gradient_input_is_stale = zero_grads == should_set_gradient_inputs_to_zero::yes;
         }
 
         template <typename solver_type>
@@ -1419,7 +1419,7 @@ namespace dlib
                 gradient_input, wsub, static_cast<tensor&>(params_grad));
 
             // zero out get_gradient_input()
-            gradient_input_is_stale = zero_grads == should_set_gradient_inputs_to_zero::yes ? true : false;
+            gradient_input_is_stale = zero_grads == should_set_gradient_inputs_to_zero::yes;
         }
 
         template <typename solver_type>
