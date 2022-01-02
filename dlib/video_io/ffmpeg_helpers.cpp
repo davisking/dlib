@@ -355,23 +355,33 @@ namespace dlib
     {
         DLIB_ASSERT(src.is_image());
 
+        const bool is_same_object = std::addressof(src) == std::addressof(dst);
+
         reset(src.frame->height, src.frame->width, src.pixfmt(),
               dst_h, dst_w, dst_pixfmt);
 
         if (_imgConvertCtx)
         {
-            if (!dst.is_image() ||
+            Frame tmp;
+            Frame* ptr = std::addressof(dst);
+
+            if (is_same_object ||
+                !dst.is_image() ||
                 std::tie(dst.frame->height, dst.frame->width, dst.frame->format) !=
                 std::tie(_dst_h, _dst_w, _dst_fmt))
             {
-                dst = Frame::make_image(_dst_h, _dst_w, _dst_fmt, src.timestamp_us);
+                tmp = Frame::make_image(_dst_h, _dst_w, _dst_fmt, src.timestamp_us);
+                ptr = std::addressof(tmp);
             }
 
             sws_scale(_imgConvertCtx.get(),
                       src.frame->data, src.frame->linesize, 0, src.frame->height,
-                      dst.frame->data, dst.frame->linesize);
+                      ptr->frame->data, ptr->frame->linesize);
+
+            if (ptr != std::addressof(dst))
+                dst = std::move(tmp);
         }
-        else
+        else if (!is_same_object)
         {
             dst = src;
         }
@@ -441,33 +451,43 @@ namespace dlib
     {
         DLIB_ASSERT(src.is_audio());
 
+        const bool is_same_object = std::addressof(src) == std::addressof(dst);
+
         reset(src.frame->sample_rate, src.frame->channel_layout, (AVSampleFormat)src.frame->format,
               dst_sample_rate, dst_channel_layout, dst_samplefmt);
 
         if (_audioResamplerCtx)
         {
+            Frame tmp;
+            Frame* ptr = std::addressof(dst);
+
             const int64_t delay       = swr_get_delay(_audioResamplerCtx.get(), src_sample_rate_);
             const auto dst_nb_samples = av_rescale_rnd(delay + src.frame->nb_samples, dst_sample_rate_, src_sample_rate_, AV_ROUND_UP);
 
-            if (!dst.is_audio() ||
+            if (is_same_object ||
+                !dst.is_audio() ||
                 std::tie(dst.frame->sample_rate, dst.frame->channel_layout, dst.frame->format, dst.frame->nb_samples) !=
                 std::tie(dst_sample_rate_, dst_channel_layout_, dst_fmt_, dst_nb_samples))
             {
-                dst = Frame::make_audio(dst_sample_rate_, dst_nb_samples, dst_channel_layout_, dst_fmt_, 0);
+                tmp = Frame::make_audio(dst_sample_rate_, dst_nb_samples, dst_channel_layout_, dst_fmt_, 0);
+                ptr = std::addressof(tmp);
             }
 
             int ret = swr_convert(_audioResamplerCtx.get(),
-                                  dst.frame->data, dst.frame->nb_samples,
+                                  ptr->frame->data, ptr->frame->nb_samples,
                                   (const uint8_t**)src.frame->data, src.frame->nb_samples);
             if (ret < 0)
                 throw std::runtime_error("swr_convert() failed : " + get_av_error(ret));
 
-            dst.frame->nb_samples = ret;
-            dst.frame->pts   = _tracked_samples;
-            dst.timestamp_us = av_rescale_q(_tracked_samples, {1, dst_sample_rate_}, {1,1000000});
-            _tracked_samples += dst.frame->nb_samples;
+            ptr->frame->nb_samples = ret;
+            ptr->frame->pts   = _tracked_samples;
+            ptr->timestamp_us = av_rescale_q(_tracked_samples, {1, dst_sample_rate_}, {1,1000000});
+            _tracked_samples += ptr->frame->nb_samples;
+
+            if (ptr!= std::addressof(dst))
+                dst = std::move(tmp);
         }
-        else
+        else if (!is_same_object)
         {
             dst = src;
         }
@@ -522,7 +542,7 @@ namespace dlib
         if (frame_size > 0)
         {
             fifo.reset(av_audio_fifo_alloc((AVSampleFormat)fmt, channels, frame_size));
-            if (fifo)
+            if (!fifo)
                 throw std::runtime_error("av_audio_fifo_alloc() failed");
         }
     }

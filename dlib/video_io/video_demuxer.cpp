@@ -7,6 +7,56 @@ using namespace std::chrono;
 
 namespace dlib
 {
+    array2d<rgb_pixel> frame_to_dlib_image(
+        Frame& f,
+        sw_image_resizer& resizer
+    )
+    {
+        if (f.pixfmt() != AV_PIX_FMT_RGB24)
+        {
+            resizer.resize(
+                    f,
+                    resizer.get_dst_h(),
+                    resizer.get_dst_w(),
+                    AV_PIX_FMT_RGB24,
+                    f);
+        }
+
+        array2d<rgb_pixel> frame_image(f.frame->height, f.frame->width);
+
+        for (int row = 0 ; row < f.frame->height ; row++)
+        {
+            memcpy(frame_image.begin() + row * f.frame->width,
+                   f.frame->data[0] + row * f.frame->linesize[0],
+                   f.frame->width*3);
+        }
+
+        return frame_image;
+    }
+
+    audio_frame frame_to_dlib_audio(
+        Frame& f,
+        sw_audio_resampler& resizer
+    )
+    {
+        if (f.samplefmt() != AV_CH_LAYOUT_STEREO ||
+            f.samplefmt() != AV_SAMPLE_FMT_S16)
+        {
+            resizer.resize(
+                    f,
+                    f.frame->sample_rate,
+                    AV_CH_LAYOUT_STEREO,
+                    AV_SAMPLE_FMT_S16,
+                    f);
+        }
+        audio_frame frame_audio;
+        frame_audio.sample_rate = f.frame->sample_rate;
+        frame_audio.samples.resize(f.frame->nb_samples);
+        memcpy(frame_audio.samples.data(), f.frame->data[0], frame_audio.samples.size()*sizeof(audio_frame::sample));
+
+        return frame_audio;
+    }
+
     decoder_ffmpeg::decoder_ffmpeg(const args& a)
     : _args(a)
     {
@@ -15,11 +65,7 @@ namespace dlib
 
     bool decoder_ffmpeg::open()
     {
-        if (_args.options.is_empty())
-        {
-            DLIB_ASSERT("You must set `options` to either an instance of image_args or audio_args");
-            return false;
-        }
+        DLIB_CASSERT(!_args.options.is_empty(), "You must set `options` to either an instance of image_args or audio_args");
 
         packet = make_avpacket();
         frame  = make_avframe();
@@ -36,13 +82,6 @@ namespace dlib
             return false;
         }
 
-        parser.reset(av_parser_init(pCodec->id));
-        if (!parser)
-        {
-            printf("AV : parser for codec `%s` not found\n", pCodec->name);
-            return false;
-        }
-
         pCodecCtx.reset(avcodec_alloc_context3(pCodec));
         if (!pCodecCtx)
         {
@@ -50,13 +89,21 @@ namespace dlib
             return false;
         }
 
-        pCodecCtx->thread_count = _args.base.nthreads > 0 ? _args.base.nthreads : std::thread::hardware_concurrency();
+        if (_args.base.nthreads > 0)
+            pCodecCtx->thread_count = _args.base.nthreads;
 
         av_dict opt = _args.base.codec_options;
         int ret = avcodec_open2(pCodecCtx.get(), pCodec, opt.avdic ? &opt.avdic : nullptr);
         if (ret < 0)
         {
             printf("avcodec_open2() failed : `%s`\n", get_av_error(ret).c_str());
+            return false;
+        }
+
+        parser.reset(av_parser_init(pCodec->id));
+        if (!parser)
+        {
+            printf("AV : parser for codec `%s` not found\n", pCodec->name);
             return false;
         }
 
@@ -182,7 +229,7 @@ namespace dlib
             }
             else if (ret == AVERROR_EOF)
             {
-                printf("AV : EOF\n");
+//                printf("AV : EOF\n");
             }
             else if (ret < 0)
             {
@@ -309,49 +356,11 @@ namespace dlib
         {
             if (f.is_image())
             {
-                if (f.pixfmt() != AV_PIX_FMT_RGB24)
-                {
-                    Frame tmp;
-                    resizer_image.resize(
-                        f,
-                        resizer_image.get_dst_h(),
-                        resizer_image.get_dst_w(),
-                        AV_PIX_FMT_RGB24,
-                        tmp);
-                    f = std::move(tmp);
-                }
-
-                array2d<rgb_pixel> frame_image(f.frame->height, f.frame->width);
-
-                for (int row = 0 ; row < f.frame->height ; row++)
-                {
-                    memcpy(frame_image.begin() + row * f.frame->width,
-                           f.frame->data[0] + row * f.frame->linesize[0],
-                           f.frame->width*3);
-                }
-
-                frame = std::move(frame_image);
+                frame = frame_to_dlib_image(f, resizer_image);
             }
             else if (f.is_audio())
             {
-                if (f.samplefmt() != AV_CH_LAYOUT_STEREO ||
-                    f.samplefmt() != AV_SAMPLE_FMT_S16)
-                {
-                    Frame tmp;
-                    resizer_audio.resize(
-                            f,
-                            f.frame->sample_rate,
-                            AV_CH_LAYOUT_STEREO,
-                            AV_SAMPLE_FMT_S16,
-                            tmp);
-                    f = std::move(tmp);
-                }
-                audio_frame frame_audio;
-                frame_audio.sample_rate = f.frame->sample_rate;
-                frame_audio.samples.resize(f.frame->nb_samples);
-                memcpy(frame_audio.samples.data(), f.frame->data[0], frame_audio.samples.size()*sizeof(audio_frame::sample));
-
-                frame = std::move(frame_audio);
+                frame = frame_to_dlib_audio(f, resizer_audio);
             }
 
             timestamp_us = f.timestamp_us;
@@ -761,50 +770,11 @@ namespace dlib
 
         if (f.is_image())
         {
-            if (f.pixfmt() != AV_PIX_FMT_RGB24)
-            {
-                Frame tmp;
-                st.channel_video.resizer_image.resize(
-                        f,
-                        st.channel_video.resizer_image.get_dst_h(),
-                        st.channel_video.resizer_image.get_dst_w(),
-                        AV_PIX_FMT_RGB24,
-                        tmp);
-                f = std::move(tmp);
-            }
-
-            array2d<rgb_pixel> frame_image(f.frame->height, f.frame->width);
-
-            for (int row = 0 ; row < f.frame->height ; row++)
-            {
-                memcpy(frame_image.begin() + row * f.frame->width,
-                       f.frame->data[0] + row * f.frame->linesize[0],
-                       f.frame->width*3);
-            }
-
-            frame = std::move(frame_image);
+            frame = frame_to_dlib_image(f, st.channel_video.resizer_image);
         }
         else if (f.is_audio())
         {
-            if (f.samplefmt() != AV_CH_LAYOUT_STEREO ||
-                f.samplefmt() != AV_SAMPLE_FMT_S16)
-            {
-                Frame tmp;
-                st.channel_audio.resizer_audio.resize(
-                        f,
-                        f.frame->sample_rate,
-                        AV_CH_LAYOUT_STEREO,
-                        AV_SAMPLE_FMT_S16,
-                        tmp);
-                f = std::move(tmp);
-            }
-
-            audio_frame frame_audio;
-            frame_audio.sample_rate = f.frame->sample_rate;
-            frame_audio.samples.resize(f.frame->nb_samples);
-            memcpy(frame_audio.samples.data(), f.frame->data[0], frame_audio.samples.size()*sizeof(audio_frame::sample));
-
-            frame = std::move(frame_audio);;
+            frame = frame_to_dlib_audio(f, st.channel_audio.resizer_audio);
         }
 
         timestamp_us = f.timestamp_us;

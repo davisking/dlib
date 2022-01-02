@@ -1,5 +1,8 @@
-#ifndef DLIB_VIDEO_DEMUXER_H
-#define DLIB_VIDEO_DEMUXER_H
+// Copyright (C) 2021  Davis E. King (davis@dlib.net)
+// License: Boost Software License   See LICENSE.txt for the full license.
+
+#ifndef DLIB_VIDEO_DEMUXER
+#define DLIB_VIDEO_DEMUXER
 
 #include <queue>
 #include <functional>
@@ -21,7 +24,7 @@ namespace dlib
                 AVCodecID                           codec = AV_CODEC_ID_NONE;
                 std::string                         codec_name;     //only used if codec==AV_CODEC_ID_NONE
                 std::map<std::string, std::string>  codec_options;  //It's rare you should have to set this
-                int                                 nthreads = -1;  //-1 means std::thread::hardware_concurrency()
+                int                                 nthreads = -1;  //-1 means use default
             };
 
             struct image_args

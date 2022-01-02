@@ -617,7 +617,8 @@ if (NOT TARGET dlib)
             set(source_files ${source_files}
                     video_io/ffmpeg_info.cpp
                     video_io/ffmpeg_helpers.cpp
-                    video_io/video_demuxer.cpp)
+                    video_io/video_demuxer.cpp
+                    video_io/video_muxer.cpp)
             enable_preprocessor_switch(DLIB_USE_FFMPEG)
          else()
             disable_preprocessor_switch(DLIB_USE_FFMPEG)

@@ -10,6 +10,7 @@ static_assert(false, "This version of dlib isn't built with the FFMPEG wrappers"
 
 #include "test_for_odr_violations.h"
 #include "video_io/video_demuxer.h"
+#include "video_io/video_muxer.h"
 #include "video_io/ffmpeg_info.h"
 
 #endif // DLIB_VIDEO_IO_ 
