@@ -731,7 +731,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    enum class should_set_gradient_inputs_to_zero : uint8_t
+    enum class zero_gradients : uint8_t
     {
         no = 0,
         yes = 1
@@ -1013,7 +1013,7 @@ namespace dlib
 
         void back_propagate_error(
             const tensor& x,
-            should_set_gradient_inputs_to_zero zero_grads = should_set_gradient_inputs_to_zero::yes
+            zero_gradients zero_grads = zero_gradients::yes
         )
         {
             back_propagate_error(x, private_get_gradient_input(), zero_grads);
@@ -1021,7 +1021,7 @@ namespace dlib
         void back_propagate_error(
             const tensor& x,
             const tensor& gradient_input,
-            should_set_gradient_inputs_to_zero zero_grads = should_set_gradient_inputs_to_zero::yes
+            zero_gradients zero_grads = zero_gradients::yes
         )
         {
             dimpl::subnet_wrapper<subnet_type> wsub(*subnetwork);
@@ -1032,7 +1032,7 @@ namespace dlib
             subnetwork->back_propagate_error(x, zero_grads); 
 
             // zero out get_gradient_input()
-            gradient_input_is_stale = zero_grads == should_set_gradient_inputs_to_zero::yes;
+            gradient_input_is_stale = zero_grads == zero_gradients::yes;
         }
 
         template <typename solver_type>
@@ -1397,7 +1397,7 @@ namespace dlib
 
         void back_propagate_error(
             const tensor& x,
-            should_set_gradient_inputs_to_zero zero_grads = should_set_gradient_inputs_to_zero::yes
+            zero_gradients zero_grads = zero_gradients::yes
         )
         {
             back_propagate_error(x, private_get_gradient_input(), zero_grads);
@@ -1405,7 +1405,7 @@ namespace dlib
         void back_propagate_error(
             const tensor& x,
             const tensor& gradient_input,
-            should_set_gradient_inputs_to_zero zero_grads = should_set_gradient_inputs_to_zero::yes
+            zero_gradients zero_grads = zero_gradients::yes
         )
         {
             // make sure grad_final is initialized to 0
@@ -1419,7 +1419,7 @@ namespace dlib
                 gradient_input, wsub, static_cast<tensor&>(params_grad));
 
             // zero out get_gradient_input()
-            gradient_input_is_stale = zero_grads == should_set_gradient_inputs_to_zero::yes;
+            gradient_input_is_stale = zero_grads == zero_gradients::yes;
         }
 
         template <typename solver_type>
@@ -1677,7 +1677,7 @@ namespace dlib
 
         void back_propagate_error(
             const tensor& x,
-            should_set_gradient_inputs_to_zero zero_grads = should_set_gradient_inputs_to_zero::yes
+            zero_gradients zero_grads = zero_gradients::yes
         )
         {
             subnetwork.back_propagate_error(x, zero_grads);
@@ -1685,7 +1685,7 @@ namespace dlib
         void back_propagate_error(
             const tensor& x,
             const tensor& gradient_input,
-            should_set_gradient_inputs_to_zero zero_grads = should_set_gradient_inputs_to_zero::yes
+            zero_gradients zero_grads = zero_gradients::yes
         )
         {
             subnetwork.back_propagate_error(x,gradient_input, zero_grads);
@@ -1981,7 +1981,7 @@ namespace dlib
 
         void back_propagate_error(
             const tensor& x,
-            should_set_gradient_inputs_to_zero zero_grads = should_set_gradient_inputs_to_zero::yes
+            zero_gradients zero_grads = zero_gradients::yes
         )
         {
             back_propagate_error(x, private_get_gradient_input(), zero_grads);
@@ -1989,7 +1989,7 @@ namespace dlib
         void back_propagate_error(
             const tensor& x,
             const tensor& gradient_input,
-            should_set_gradient_inputs_to_zero zero_grads = should_set_gradient_inputs_to_zero::yes
+            zero_gradients zero_grads = zero_gradients::yes
         )
         {
             if (details.size() > 1)
@@ -2251,7 +2251,7 @@ namespace dlib
 
         void back_propagate_error(
             const tensor& /*x*/,
-            should_set_gradient_inputs_to_zero zero_grads = should_set_gradient_inputs_to_zero::yes
+            zero_gradients zero_grads = zero_gradients::yes
         )
         {
             // nothing to do
@@ -2259,7 +2259,7 @@ namespace dlib
         void back_propagate_error(
             const tensor& /*x*/,
             const tensor& /*gradient_input*/,
-            should_set_gradient_inputs_to_zero zero_grads = should_set_gradient_inputs_to_zero::yes
+            zero_gradients zero_grads = zero_gradients::yes
         )
         {
             // nothing to do
@@ -2590,7 +2590,7 @@ namespace dlib
 
         void back_propagate_error(
             const tensor& x,
-            should_set_gradient_inputs_to_zero zero_grads = should_set_gradient_inputs_to_zero::yes
+            zero_gradients zero_grads = zero_gradients::yes
         )
         {
             subnet().back_propagate_error(x, zero_grads);
@@ -2599,7 +2599,7 @@ namespace dlib
         void back_propagate_error(
             const tensor& x,
             const tensor& gradient_input,
-            should_set_gradient_inputs_to_zero zero_grads = should_set_gradient_inputs_to_zero::yes
+            zero_gradients zero_grads = zero_gradients::yes
         )
         {
             subnet().back_propagate_error(x, gradient_input, zero_grads);
@@ -2682,7 +2682,7 @@ namespace dlib
         double compute_parameter_gradients (
             const tensor& x,
             label_iterator lbegin,
-            should_set_gradient_inputs_to_zero zero_grads = should_set_gradient_inputs_to_zero::yes
+            zero_gradients zero_grads = zero_gradients::yes
         )
         {
             subnetwork.forward(x);
@@ -2696,7 +2696,7 @@ namespace dlib
             forward_iterator ibegin,
             forward_iterator iend,
             label_iterator lbegin,
-            should_set_gradient_inputs_to_zero zero_grads = should_set_gradient_inputs_to_zero::yes
+            zero_gradients zero_grads = zero_gradients::yes
         )
         {
             to_tensor(ibegin,iend,temp_tensor);
@@ -2704,7 +2704,7 @@ namespace dlib
         }
         double compute_parameter_gradients (
             const tensor& x,
-            should_set_gradient_inputs_to_zero zero_grads = should_set_gradient_inputs_to_zero::yes
+            zero_gradients zero_grads = zero_gradients::yes
         )
         {
             subnetwork.forward(x);
@@ -2717,7 +2717,7 @@ namespace dlib
         double compute_parameter_gradients (
             forward_iterator ibegin,
             forward_iterator iend,
-            should_set_gradient_inputs_to_zero zero_grads = should_set_gradient_inputs_to_zero::yes
+            zero_gradients zero_grads = zero_gradients::yes
         )
         {
             to_tensor(ibegin,iend,temp_tensor);
@@ -3111,7 +3111,7 @@ namespace dlib
 
         void back_propagate_error(
             const tensor& x,
-            should_set_gradient_inputs_to_zero zero_grads = should_set_gradient_inputs_to_zero::yes
+            zero_gradients zero_grads = zero_gradients::yes
         )
         {
             subnetwork.back_propagate_error(x, zero_grads);
