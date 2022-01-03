@@ -1,7 +1,6 @@
 // Copyright (C) 2015  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_DNn_CORE_ABSTRACT_H_
-#define DLIB_DNn_CORE_ABSTRACT_H_
 #ifdef DLIB_DNn_CORE_ABSTRACT_H_
 
 #include "../cuda/tensor_abstract.h"
