@@ -22,9 +22,9 @@ namespace dlib
         )
         {
             std::map<unsigned long,unsigned long> class_labels;
-            for (unsigned long i = 0; i < row_labels.size(); ++i)
+            for (size_t i = 0; i < row_labels.size(); ++i)
             {
-                const unsigned long next = class_labels.size();
+                const unsigned long next = static_cast<unsigned long>(class_labels.size());
                 if (class_labels.count(row_labels[i]) == 0)
                     class_labels[row_labels[i]] = next;
             }

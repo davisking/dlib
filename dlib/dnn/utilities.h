@@ -25,7 +25,7 @@ namespace dlib
             // from Understanding the difficulty of training deep feedforward neural
             // networks by Xavier Glorot and Yoshua Bengio.
             val = 2*rnd.get_random_float()-1;
-            val *= std::sqrt(6.0/(num_inputs_and_outputs));
+            val *= static_cast<float>(std::sqrt(6.0/(num_inputs_and_outputs)));
         }
     }
 

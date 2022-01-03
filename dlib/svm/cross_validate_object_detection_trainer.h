@@ -44,7 +44,7 @@ namespace dlib
         {
             if (boxes.size() == 0)
             {
-                missing_detections += truth_boxes.size();
+                missing_detections += static_cast<unsigned long>(truth_boxes.size());
                 return 0;
             }
 

@@ -544,17 +544,17 @@ namespace dlib
             const size_t max_iters = get_feature_pool_size()*get_feature_pool_size();
             for (size_t i = 0; i < max_iters; ++i)
             {
-                feat.idx1   = rnd.get_integer(get_feature_pool_size());
-                feat.idx2   = rnd.get_integer(get_feature_pool_size());
+                feat.idx1 = static_cast<long>(rnd.get_integer(get_feature_pool_size()));
+                feat.idx2 = static_cast<long>(rnd.get_integer(get_feature_pool_size()));
                 while (feat.idx1 == feat.idx2)
-                    feat.idx2   = rnd.get_integer(get_feature_pool_size());
+                    feat.idx2 = static_cast<long>(rnd.get_integer(get_feature_pool_size()));
                 const double dist = length(pixel_coordinates[feat.idx1]-pixel_coordinates[feat.idx2]);
                 const double accept_prob = std::exp(-dist/lambda);
                 if (accept_prob > rnd.get_random_double())
                     break;
             }
 
-            feat.thresh = (rnd.get_random_double()*256 - 128)/2.0;
+            feat.thresh = static_cast<float>((rnd.get_random_double()*256 - 128)/2.0);
 
             return feat;
         }
@@ -771,8 +771,8 @@ namespace dlib
             pixel_coordinates.resize(get_feature_pool_size());
             for (unsigned long i = 0; i < get_feature_pool_size(); ++i)
             {
-                pixel_coordinates[i].x() = rnd.get_random_double()*(max_x-min_x) + min_x;
-                pixel_coordinates[i].y() = rnd.get_random_double()*(max_y-min_y) + min_y;
+                pixel_coordinates[i].x() = static_cast<float>(rnd.get_random_double()*(max_x-min_x) + min_x);
+                pixel_coordinates[i].y() = static_cast<float>(rnd.get_random_double()*(max_y-min_y) + min_y);
             }
         }
 

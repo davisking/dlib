@@ -122,7 +122,7 @@ namespace dlib
             static_assert((is_same_type<float, typename EXP::type>::value == true),
                 "To assign a matrix to a tensor the matrix must contain float values");
 
-            set_ptrm(host_write_only(), m_n, m_nr*m_nc*m_k) = item;
+            set_ptrm(host_write_only(), static_cast<long>(m_n), static_cast<long>(m_nr*m_nc*m_k)) = item;
             return *this;
         }
 
@@ -241,7 +241,7 @@ namespace dlib
                     << "\n\t t.size(): " << t.size()
         );
         typedef op_pointer_to_mat<float> op;
-        return matrix_op<op>(op(t.host(),nr,nc));
+        return matrix_op<op>(op(t.host(),static_cast<long>(nr),static_cast<long>(nc)));
     }
 
     inline const matrix_op<op_pointer_to_mat<float> > mat (
@@ -275,8 +275,8 @@ namespace dlib
 
         typedef op_pointer_to_mat<float> op;
         return matrix_op<op>(op(t.host() + ((sample*t.k() + k)*t.nr())*t.nc(), 
-                                t.nr(), 
-                                t.nc()));
+                                static_cast<long>(t.nr()), 
+                                static_cast<long>(t.nc())));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -390,7 +390,10 @@ namespace dlib
             if ((long long)data_instance.size() < m_size)
                 data_instance.set_size(m_size);
 #ifdef DLIB_USE_CUDA
-            cudnn_descriptor.set_size(m_n,m_k,m_nr,m_nc);
+            cudnn_descriptor.set_size(static_cast<int>(m_n),
+                                      static_cast<int>(m_k),
+                                      static_cast<int>(m_nr),
+                                      static_cast<int>(m_nc));
 #endif
         }
 
@@ -629,7 +632,10 @@ namespace dlib
             if (!inst.cudnn_descriptor)
             {
                 inst.cudnn_descriptor = std::make_shared<cuda::tensor_descriptor>();
-                inst.cudnn_descriptor->set_size(inst.m_n, inst.m_k, inst.m_nr, inst.m_nc);
+                inst.cudnn_descriptor->set_size(static_cast<int>(inst.m_n),
+                                                static_cast<int>(inst.m_k),
+                                                static_cast<int>(inst.m_nr),
+                                                static_cast<int>(inst.m_nc));
             }
 #endif
             inst.data_instance = &t.data();

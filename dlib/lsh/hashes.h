@@ -73,7 +73,7 @@ namespace dlib
             const result_type& b
         ) const
         {
-            return hamming_distance(a,b);
+            return static_cast<unsigned int>(hamming_distance(a,b));
         }
 
     private:
@@ -112,8 +112,10 @@ namespace dlib
             const result_type& b
         ) const
         {
-            return hamming_distance(a.first,b.first) + 
-                   hamming_distance(a.second,b.second);
+            return static_cast<unsigned int>(
+                hamming_distance(a.first,b.first) + 
+                hamming_distance(a.second,b.second)
+            );
         }
 
     private:

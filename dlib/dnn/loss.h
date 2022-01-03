@@ -509,7 +509,7 @@ namespace dlib
 
         unsigned long number_of_labels() const { return total_num_labels; }
 
-        unsigned long number_of_classifiers() const { return possible_labels.size(); }
+        unsigned long number_of_classifiers() const { return static_cast<unsigned long>(possible_labels.size()); }
 
         std::map<std::string,std::vector<std::string>> get_labels ( 
         ) const 
@@ -536,7 +536,7 @@ namespace dlib
             ) const 
             { 
                 DLIB_CASSERT(i < num_classes());
-                return class_probs(i); 
+                return class_probs(static_cast<long>(i)); 
             }
 
             const std::string& label(
@@ -745,7 +745,7 @@ namespace dlib
         unsigned long total_num_labels = 0;
 
         // We make it true that: possible_labels[classifier][label_idx_lookup[classifier][label]] == label
-        std::map<std::string, std::map<std::string,long>> label_idx_lookup;
+        std::map<std::string, std::map<std::string, size_t>> label_idx_lookup;
 
 
         // Scratch doesn't logically contribute to the state of this object.  It's just

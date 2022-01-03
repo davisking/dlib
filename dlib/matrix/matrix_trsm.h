@@ -395,7 +395,7 @@ namespace dlib
                                 /* L190: */
                             }
                             if (nounit) {
-                                temp = 1. / a[j + j * a_dim1];
+                                temp = static_cast<T>(1. / a[j + j * a_dim1]);
                                 i__2 = m;
                                 for (i__ = 1; i__ <= i__2; ++i__) {
                                     b[i__ + j * b_dim1] = temp * b[i__ + j * b_dim1];
@@ -427,7 +427,7 @@ namespace dlib
                                 /* L240: */
                             }
                             if (nounit) {
-                                temp = 1. / a[j + j * a_dim1];
+                                temp = static_cast<T>(1. / a[j + j * a_dim1]);
                                 i__1 = m;
                                 for (i__ = 1; i__ <= i__1; ++i__) {
                                     b[i__ + j * b_dim1] = temp * b[i__ + j * b_dim1];
@@ -444,7 +444,7 @@ namespace dlib
                     if (upper) {
                         for (k = n; k >= 1; --k) {
                             if (nounit) {
-                                temp = 1. / a[k + k * a_dim1];
+                                temp = static_cast<T>(1. / a[k + k * a_dim1]);
                                 i__1 = m;
                                 for (i__ = 1; i__ <= i__1; ++i__) {
                                     b[i__ + k * b_dim1] = temp * b[i__ + k * b_dim1];
@@ -478,7 +478,7 @@ namespace dlib
                         i__1 = n;
                         for (k = 1; k <= i__1; ++k) {
                             if (nounit) {
-                                temp = 1. / a[k + k * a_dim1];
+                                temp = static_cast<T>(1. / a[k + k * a_dim1]);
                                 i__2 = m;
                                 for (i__ = 1; i__ <= i__2; ++i__) {
                                     b[i__ + k * b_dim1] = temp * b[i__ + k * b_dim1];

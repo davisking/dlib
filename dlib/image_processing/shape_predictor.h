@@ -58,7 +58,7 @@ namespace dlib
             std::vector<split_feature> splits;
             std::vector<matrix<float,0,1> > leaf_values;
 
-            unsigned long num_leaves() const { return leaf_values.size(); }
+            unsigned long num_leaves() const { return static_cast<unsigned long>(leaf_values.size()); }
 
             inline const matrix<float,0,1>& operator()(
                 const std::vector<float>& feature_pixel_values,
@@ -84,7 +84,7 @@ namespace dlib
                     else
                         i = right_child(i);
                 }
-                i = i - splits.size();
+                i = i - static_cast<unsigned long>(splits.size());
                 return leaf_values[i];
             }
 
