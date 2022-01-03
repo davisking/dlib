@@ -1680,7 +1680,7 @@ namespace dlib
             should_set_gradient_inputs_to_zero zero_grads = should_set_gradient_inputs_to_zero::yes
         )
         {
-            subnetwork.back_propagate_error(x, true);
+            subnetwork.back_propagate_error(x, zero_grads);
         }
         void back_propagate_error(
             const tensor& x,
