@@ -2188,8 +2188,8 @@ namespace dlib
             {
                 // These values used to be hard coded, so for this version of the metric
                 // learning loss we just use these values.
-                item.margin = 0.1;
-                item.dist_thresh = 0.75;
+                item.margin = 0.1f;
+                item.dist_thresh = 0.75f;
                 return;
             }
             else if (version == "loss_metric_2")
@@ -2215,8 +2215,8 @@ namespace dlib
         }
 
     private:
-        float margin = 0.04;
-        float dist_thresh = 0.6;
+        float margin = 0.04f;
+        float dist_thresh = 0.6f;
 
 
         // These variables are only here to avoid being reallocated over and over in

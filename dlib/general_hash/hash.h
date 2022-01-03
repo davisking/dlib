@@ -23,7 +23,7 @@ namespace dlib
         if (item.size() == 0)
             return 0;
         else
-            return murmur_hash3(&item[0], sizeof(item[0])*item.size(), seed);
+            return murmur_hash3(&item[0], static_cast<int>(sizeof(item[0])*item.size()), seed);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -36,7 +36,7 @@ namespace dlib
         if (item.size() == 0)
             return 0;
         else
-            return murmur_hash3(&item[0], sizeof(item[0])*item.size(), seed);
+            return murmur_hash3(&item[0], static_cast<int>(sizeof(item[0])*item.size()), seed);
     }
 
 // ----------------------------------------------------------------------------------------
