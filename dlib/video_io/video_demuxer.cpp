@@ -65,20 +65,18 @@ namespace dlib
 
     bool decoder_ffmpeg::open()
     {
-        DLIB_CASSERT(!_args.options.is_empty(), "You must set `options` to either an instance of image_args or audio_args");
-
         packet = make_avpacket();
         frame  = make_avframe();
         AVCodec* pCodec = nullptr;
 
-        if (_args.base.codec != AV_CODEC_ID_NONE)
-            pCodec = avcodec_find_decoder(_args.base.codec);
-        else if (!_args.base.codec_name.empty())
-            pCodec = avcodec_find_decoder_by_name(_args.base.codec_name.c_str());
+        if (_args.args_common.codec != AV_CODEC_ID_NONE)
+            pCodec = avcodec_find_decoder(_args.args_common.codec);
+        else if (!_args.args_common.codec_name.empty())
+            pCodec = avcodec_find_decoder_by_name(_args.args_common.codec_name.c_str());
 
         if (!pCodec)
         {
-            printf("Codec %i : `%s` not found\n", _args.base.codec, _args.base.codec_name.c_str());
+            printf("Codec %i : `%s` not found\n", _args.args_common.codec, _args.args_common.codec_name.c_str());
             return false;
         }
 
@@ -89,10 +87,27 @@ namespace dlib
             return false;
         }
 
-        if (_args.base.nthreads > 0)
-            pCodecCtx->thread_count = _args.base.nthreads;
+        if (_args.args_common.nthreads > 0)
+            pCodecCtx->thread_count = _args.args_common.nthreads;
 
-        av_dict opt = _args.base.codec_options;
+        if (pCodecCtx->codec_id == AV_CODEC_ID_AAC)
+            pCodecCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
+
+        if (pCodecCtx->codec_id == AV_CODEC_ID_PCM_S16LE)
+        {
+            /*!
+                Raw codecs require you to set parameters rather than reading it from the encoded stream.
+                Indeed, there is no such metadata within the stream
+            !*/
+            DLIB_CASSERT(_args.args_audio.sample_rate > 0, "raw encoders require you to set sample rate manually");
+            DLIB_CASSERT(_args.args_audio.channel_layout > 0, "raw encoder require you to set channel layout manually");
+            pCodecCtx->sample_rate      = _args.args_audio.sample_rate;
+            pCodecCtx->channel_layout   = _args.args_audio.channel_layout;
+            pCodecCtx->channels         = av_get_channel_layout_nb_channels(_args.args_audio.channel_layout);
+            pCodecCtx->sample_fmt       = AV_SAMPLE_FMT_S16;
+        }
+
+        av_dict opt = _args.args_common.codec_options;
         int ret = avcodec_open2(pCodecCtx.get(), pCodec, opt.avdic ? &opt.avdic : nullptr);
         if (ret < 0)
         {
@@ -100,11 +115,16 @@ namespace dlib
             return false;
         }
 
-        parser.reset(av_parser_init(pCodec->id));
-        if (!parser)
+        const bool no_parser_required = pCodecCtx->codec_id == AV_CODEC_ID_PCM_S16LE;
+
+        if (!no_parser_required)
         {
-            printf("AV : parser for codec `%s` not found\n", pCodec->name);
-            return false;
+            parser.reset(av_parser_init(pCodec->id));
+            if (!parser)
+            {
+                printf("AV : parser for codec `%s` not found\n", pCodec->name);
+                return false;
+            }
         }
 
         return true;
@@ -117,7 +137,6 @@ namespace dlib
 
         return FFMPEG_INITIALIZED &&
                connected &&
-               parser != nullptr &&
                pCodecCtx != nullptr;
     }
 
@@ -173,28 +192,40 @@ namespace dlib
 
         auto recv_packet = [&]
         {
-            int ret = av_parser_parse2(
-                    parser.get(),
-                    pCodecCtx.get(),
-                    &packet->data,
-                    &packet->size,
-                    encoded,
-                    nencoded,
-                    AV_NOPTS_VALUE,
-                    AV_NOPTS_VALUE,
-                    0
-            );
-
-            if (ret < 0)
+            if (parser)
             {
-                printf("AV : error while parsing encoded buffer\n");
+                int ret = av_parser_parse2(
+                        parser.get(),
+                        pCodecCtx.get(),
+                        &packet->data,
+                        &packet->size,
+                        encoded,
+                        nencoded,
+                        AV_NOPTS_VALUE,
+                        AV_NOPTS_VALUE,
+                        0
+                );
+
+                if (ret < 0)
+                {
+                    printf("AV : error while parsing encoded buffer\n");
+                }
+                else
+                {
+                    encoded     += ret;
+                    nencoded    -= ret;
+                }
+                return ret >= 0;
             }
             else
             {
-                encoded     += ret;
-                nencoded    -= ret;
+                /*! Codec does not require parser!*/
+                packet->data = const_cast<uint8_t*>(encoded);
+                packet->size = nencoded;
+                encoded += nencoded;
+                nencoded = 0;
+                return true;
             }
-            return ret >= 0;
         };
 
         auto send_packet = [&](const AVPacket* pkt)
@@ -250,22 +281,20 @@ namespace dlib
 
                 if (src.is_image())
                 {
-                    auto& opts = _args.options.cast_to<args::image_args>();
                     resizer_image.resize(
                             src,
-                            opts.h > 0 ? opts.h : src.frame->height,
-                            opts.w > 0 ? opts.w : src.frame->width,
-                            opts.fmt != AV_PIX_FMT_NONE ? opts.fmt : src.pixfmt(),
+                            _args.args_image.h > 0 ? _args.args_image.h : src.frame->height,
+                            _args.args_image.w > 0 ? _args.args_image.w : src.frame->width,
+                            _args.args_image.fmt != AV_PIX_FMT_NONE ? _args.args_image.fmt : src.pixfmt(),
                             decoded);
                 }
                 else
                 {
-                    auto& opts = _args.options.cast_to<args::audio_args>();
                     resizer_audio.resize(
                             src,
-                            opts.sample_rate > 0            ? opts.sample_rate      : src.frame->sample_rate,
-                            opts.channel_layout > 0         ? opts.channel_layout   : src.frame->channel_layout,
-                            opts.fmt != AV_SAMPLE_FMT_NONE  ? opts.fmt              : src.samplefmt(),
+                            _args.args_audio.sample_rate > 0            ? _args.args_audio.sample_rate      : src.frame->sample_rate,
+                            _args.args_audio.channel_layout > 0         ? _args.args_audio.channel_layout   : src.frame->channel_layout,
+                            _args.args_audio.fmt != AV_SAMPLE_FMT_NONE  ? _args.args_audio.fmt              : src.samplefmt(),
                             decoded);
                 }
 
@@ -327,6 +356,7 @@ namespace dlib
     void decoder_ffmpeg::flush()
     {
         push_encoded(nullptr, 0);
+        pCodecCtx.reset(nullptr); //decoder
     }
 
     decoder_ffmpeg::suc_t decoder_ffmpeg::read(Frame& dst_frame)

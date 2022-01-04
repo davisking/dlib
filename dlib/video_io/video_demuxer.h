@@ -41,8 +41,9 @@ namespace dlib
                 AVSampleFormat  fmt             = AV_SAMPLE_FMT_S16;    //sensible default
             };
 
-            channel_args base;
-            type_safe_union<image_args, audio_args> options;
+            channel_args args_common;
+            image_args   args_image;
+            audio_args   args_audio;
         };
 
         typedef enum {
@@ -114,8 +115,8 @@ namespace dlib
             struct audio_args
             {
                 channel_args    common;
-                int             sample_rate = 0;                        //use whatever comes out the decoder
-                uint64_t        channel_layout = AV_CH_LAYOUT_STEREO;   //sensible default
+                int             sample_rate     = 0;    //use whatever comes out the decoder
+                uint64_t        channel_layout  = 0;    //use whatever comes out the decoder
                 AVSampleFormat  fmt = AV_SAMPLE_FMT_S16;                //sensible default
             };
 

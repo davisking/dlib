@@ -20,6 +20,78 @@ namespace dlib
         return f;
     }
 
+    void check_audio_properties(
+        AVCodec* pCodec,
+        AVCodecContext* pCodecCtx
+    )
+    {
+        if (pCodec->supported_samplerates)
+        {
+            bool sample_rate_supported = false;
+
+            for (int i = 0 ; pCodec->supported_samplerates[i] != 0 ; i++)
+            {
+                if (pCodecCtx->sample_rate == pCodec->supported_samplerates[i])
+                {
+                    sample_rate_supported = true;
+                    break;
+                }
+            }
+
+            if (!sample_rate_supported)
+            {
+                printf("Requested sample rate %i not supported. Changing to default %i\n",
+                       pCodecCtx->sample_rate,
+                       pCodec->supported_samplerates[0]);
+                pCodecCtx->sample_rate = pCodec->supported_samplerates[0];
+            }
+        }
+
+        if (pCodec->sample_fmts)
+        {
+            bool sample_fmt_supported = false;
+
+            for (int i = 0 ; pCodec->sample_fmts[i] != AV_SAMPLE_FMT_NONE ; i++)
+            {
+                if (pCodecCtx->sample_fmt == pCodec->sample_fmts[i])
+                {
+                    sample_fmt_supported = true;
+                    break;
+                }
+            }
+
+            if (!sample_fmt_supported)
+            {
+                printf("Requested sample format `%s` not supported. Changing to default `%s`\n",
+                       av_get_sample_fmt_name(pCodecCtx->sample_fmt),
+                       av_get_sample_fmt_name(pCodec->sample_fmts[0]));
+                pCodecCtx->sample_fmt = pCodec->sample_fmts[0];
+            }
+        }
+
+        if (pCodec->channel_layouts)
+        {
+            bool channel_layout_supported= false;
+
+            for (int i = 0 ; pCodec->channel_layouts[i] != 0 ; i++)
+            {
+                if (pCodecCtx->channel_layout == pCodec->channel_layouts[i])
+                {
+                    channel_layout_supported = true;
+                    break;
+                }
+            }
+
+            if (!channel_layout_supported)
+            {
+                printf("Channel layout `%s` not supported. Changing to default `%s`\n",
+                       get_channel_layout_str(pCodecCtx->channel_layout).c_str(),
+                       get_channel_layout_str(pCodec->channel_layouts[0]).c_str());
+                pCodecCtx->channel_layout = pCodec->channel_layouts[0];
+            }
+        }
+    }
+
     Frame dlib_audio_to_frame(
         const audio_frame& frame,
         uint64_t timestamp_us
@@ -41,20 +113,19 @@ namespace dlib
 
     bool encoder_ffmpeg::open()
     {
-        DLIB_CASSERT(!_args.options.is_empty(), "You must set `options` to either an instance of image_args or audio_args");
         DLIB_CASSERT(encoded != nullptr, "encoded must be set to a non-null pointer");
 
         packet = make_avpacket();
         AVCodec* pCodec = nullptr;
 
-        if (_args.base.codec != AV_CODEC_ID_NONE)
-            pCodec = avcodec_find_encoder(_args.base.codec);
-        else if (!_args.base.codec_name.empty())
-            pCodec = avcodec_find_encoder_by_name(_args.base.codec_name.c_str());
+        if (_args.args_common.codec != AV_CODEC_ID_NONE)
+            pCodec = avcodec_find_encoder(_args.args_common.codec);
+        else if (!_args.args_common.codec_name.empty())
+            pCodec = avcodec_find_encoder_by_name(_args.args_common.codec_name.c_str());
 
         if (!pCodec)
         {
-            printf("Codec %i : `%s` not found\n", _args.base.codec, _args.base.codec_name.c_str());
+            printf("Codec %i : `%s` not found\n", _args.args_common.codec, _args.args_common.codec_name.c_str());
             return false;
         }
 
@@ -65,124 +136,44 @@ namespace dlib
             return false;
         }
 
-        if (_args.base.nthreads > 0)
-            pCodecCtx->thread_count = _args.base.nthreads;
-        if (_args.base.bitrate > 0)
-            pCodecCtx->bit_rate = _args.base.bitrate;
-        if (_args.base.gop_size > 0)
-            pCodecCtx->gop_size = _args.base.gop_size;
+        if (_args.args_common.nthreads > 0)
+            pCodecCtx->thread_count = _args.args_common.nthreads;
+        if (_args.args_common.bitrate > 0)
+            pCodecCtx->bit_rate = _args.args_common.bitrate;
+        if (_args.args_common.gop_size > 0)
+            pCodecCtx->gop_size = _args.args_common.gop_size;
 
         if (pCodec->type == AVMEDIA_TYPE_VIDEO)
         {
-            if (!_args.options.contains<args::image_args>())
-            {
-                printf("You forgot to set encoder_ffmpeg::args::options to image_args and fill the options\n");
-                return false;
-            }
+            DLIB_CASSERT(_args.args_image.h > 0, "height must be set");
+            DLIB_CASSERT(_args.args_image.w > 0, "width must be set");
+            DLIB_CASSERT(_args.args_image.fmt != AV_PIX_FMT_NONE, "pixel format must be set");
+            DLIB_CASSERT(_args.args_image.fps.num > 0 && _args.args_image.fps.den > 0, "FPS must be set");
 
-            const auto& opts = _args.options.cast_to<args::image_args>();
-            DLIB_ASSERT(opts.h > 0, "height must be set");
-            DLIB_ASSERT(opts.w > 0, "width must be set");
-            DLIB_ASSERT(opts.fmt != AV_PIX_FMT_NONE, "pixel format must be set");
-            DLIB_ASSERT(opts.fps.num > 0 && opts.fps.den > 0, "FPS must be set");
-
-            pCodecCtx->height       = opts.h;
-            pCodecCtx->width        = opts.w;
-            pCodecCtx->pix_fmt      = opts.fmt;
-            pCodecCtx->time_base    = (AVRational){opts.fps.den, opts.fps.num};
-            pCodecCtx->framerate    = (AVRational){opts.fps.num, opts.fps.den};
+            pCodecCtx->height       = _args.args_image.h;
+            pCodecCtx->width        = _args.args_image.w;
+            pCodecCtx->pix_fmt      = _args.args_image.fmt;
+            pCodecCtx->time_base    = (AVRational){_args.args_image.fps.den, _args.args_image.fps.num};
+            pCodecCtx->framerate    = (AVRational){_args.args_image.fps.num, _args.args_image.fps.den};
         }
         else if (pCodec->type == AVMEDIA_TYPE_AUDIO)
         {
-            if (!_args.options.contains<args::audio_args>())
-            {
-                printf("You forgot to set encoder_ffmpeg::args::options to audio_args and fill the options\n");
-                return false;
-            }
+            DLIB_CASSERT(_args.args_audio.sample_rate > 0, "sample rate not set");
+            DLIB_CASSERT(_args.args_audio.channel_layout > 0, "channel layout not set");
+            DLIB_CASSERT(_args.args_audio.fmt != AV_SAMPLE_FMT_NONE, "audio sample format not set");
 
-            const auto& opts = _args.options.cast_to<args::audio_args>();
-
-            pCodecCtx->sample_rate      = opts.sample_rate != 0 ? opts.sample_rate : pCodec->supported_samplerates ? pCodec->supported_samplerates[0] : 44100;
-            pCodecCtx->sample_fmt       = opts.fmt != AV_SAMPLE_FMT_NONE ? opts.fmt : pCodec->sample_fmts ? pCodec->sample_fmts[0] : AV_SAMPLE_FMT_S16;
-            pCodecCtx->channel_layout   = opts.channel_layout != 0 ? opts.channel_layout : pCodec->channel_layouts ? pCodec->channel_layouts[0] : AV_CH_LAYOUT_STEREO;
+            pCodecCtx->sample_rate      = _args.args_audio.sample_rate;
+            pCodecCtx->sample_fmt       = _args.args_audio.fmt;
+            pCodecCtx->channel_layout   = _args.args_audio.channel_layout;
             pCodecCtx->channels         = av_get_channel_layout_nb_channels(pCodecCtx->channel_layout);
             pCodecCtx->time_base        = (AVRational){ 1, pCodecCtx->sample_rate };
+            check_audio_properties(pCodec, pCodecCtx.get());
 
             if (pCodecCtx->codec_id == AV_CODEC_ID_AAC)
                 pCodecCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
-
-            if ((pCodecCtx->codec->capabilities & AV_CODEC_CAP_VARIABLE_FRAME_SIZE) == 0) {
-                printf("Codec `%s` does not support variable frame size!\n", pCodecCtx->codec->name);
-            }
-
-            if (pCodec->supported_samplerates)
-            {
-                bool sample_rate_supported = false;
-
-                for (int i = 0 ; pCodec->supported_samplerates[i] != 0 ; i++)
-                {
-                    if (pCodecCtx->sample_rate == pCodec->supported_samplerates[i])
-                    {
-                        sample_rate_supported = true;
-                        break;
-                    }
-                }
-
-                if (!sample_rate_supported)
-                {
-                    printf("Requested sample rate %i not supported. Changing to default %i\n",
-                             pCodecCtx->sample_rate,
-                           pCodec->supported_samplerates[0]);
-                    pCodecCtx->sample_rate = pCodec->supported_samplerates[0];
-                }
-            }
-
-            if (pCodec->sample_fmts)
-            {
-                bool sample_fmt_supported = false;
-
-                for (int i = 0 ; pCodec->sample_fmts[i] != AV_SAMPLE_FMT_NONE ; i++)
-                {
-                    if (pCodecCtx->sample_fmt == pCodec->sample_fmts[i])
-                    {
-                        sample_fmt_supported = true;
-                        break;
-                    }
-                }
-
-                if (!sample_fmt_supported)
-                {
-                    printf("Requested sample format `%s` not supported. Changing to default `%s`\n",
-                             av_get_sample_fmt_name(pCodecCtx->sample_fmt),
-                             av_get_sample_fmt_name(pCodec->sample_fmts[0]));
-                    pCodecCtx->sample_fmt = pCodec->sample_fmts[0];
-                }
-            }
-
-            if (pCodec->channel_layouts)
-            {
-                bool channel_layout_supported= false;
-
-                for (int i = 0 ; pCodec->channel_layouts[i] != 0 ; i++)
-                {
-                    if (pCodecCtx->channel_layout == pCodec->channel_layouts[i])
-                    {
-                        channel_layout_supported = true;
-                        break;
-                    }
-                }
-
-                if (!channel_layout_supported)
-                {
-                    printf("Channel layout `%s` not supported. Changing to default `%s`\n",
-                             get_channel_layout_str(pCodecCtx->channel_layout).c_str(),
-                             get_channel_layout_str(pCodec->channel_layouts[0]).c_str());
-                    pCodecCtx->channel_layout = pCodec->channel_layouts[0];
-                }
-            }
         }
 
-        av_dict opt = _args.base.codec_options;
+        av_dict opt = _args.args_common.codec_options;
         int ret = avcodec_open2(pCodecCtx.get(), pCodec, opt.avdic ? &opt.avdic : nullptr);
         if (ret < 0)
         {
@@ -202,7 +193,7 @@ namespace dlib
 
     bool encoder_ffmpeg::is_open() const
     {
-        return connected && pCodecCtx != nullptr && FFMPEG_INITIALIZED;
+        return connected && pCodecCtx != nullptr && encoded != nullptr && FFMPEG_INITIALIZED;
     }
 
     bool encoder_ffmpeg::is_image_encoder() const
@@ -215,13 +206,16 @@ namespace dlib
         return is_open() && pCodecCtx->codec_type == AVMEDIA_TYPE_AUDIO;
     }
 
-    void encoder_ffmpeg::swap_encoded_stream(std::unique_ptr<std::ostream> &out)
+    std::unique_ptr<std::ostream> encoder_ffmpeg::get_encoded_stream()
     {
-        std::swap(encoded, out);
+        return std::move(encoded);
     }
 
     bool encoder_ffmpeg::push(Frame &&frame)
     {
+        if (!is_open())
+            return false;
+
         auto send_frame = [&](const AVFrame* frame)
         {
             int ret = avcodec_send_frame(pCodecCtx.get(), frame);
@@ -306,7 +300,6 @@ namespace dlib
         }
         else if (frame.is_audio())
         {
-            const auto& opts = _args.options.cast_to<args::audio_args>();
             resizer_audio.resize(frame,
                                  pCodecCtx->sample_rate,
                                  pCodecCtx->channel_layout,
@@ -362,8 +355,44 @@ namespace dlib
         return push(dlib_audio_to_frame(frame, timestamp_us));
     }
 
-    bool encoder_ffmpeg::flush()
+    void encoder_ffmpeg::flush()
     {
-        return push(Frame{});
+        push(Frame{});
+        pCodecCtx.reset(nullptr); //close encoder
+    }
+
+    int encoder_ffmpeg::height() const
+    {
+        return is_image_encoder() ? pCodecCtx->height : 0;
+    }
+
+    int encoder_ffmpeg::width() const
+    {
+        return is_image_encoder() ? pCodecCtx->width : 0;
+    }
+
+    AVPixelFormat encoder_ffmpeg::pixel_fmt() const
+    {
+        return is_image_encoder() ? pCodecCtx->pix_fmt : AV_PIX_FMT_NONE;
+    }
+
+    int encoder_ffmpeg::sample_rate() const
+    {
+        return is_audio_encoder() ? pCodecCtx->sample_rate : 0;
+    }
+
+    uint64_t encoder_ffmpeg::channel_layout() const
+    {
+        return is_audio_encoder() ? pCodecCtx->channel_layout : 0;
+    }
+
+    int encoder_ffmpeg::nchannels() const
+    {
+        return is_audio_encoder() ? av_get_channel_layout_nb_channels(pCodecCtx->channel_layout) : 0;
+    }
+
+    AVSampleFormat encoder_ffmpeg::sample_fmt() const
+    {
+        return is_audio_encoder() ? pCodecCtx->sample_fmt : AV_SAMPLE_FMT_NONE;
     }
 }

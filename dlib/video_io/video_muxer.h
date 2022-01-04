@@ -39,13 +39,14 @@ namespace dlib
 
             struct audio_args
             {
-                int             sample_rate     = 0; //0 means use one of the supported sample rates by the encoder
+                int             sample_rate     = 0;
                 uint64_t        channel_layout  = AV_CH_LAYOUT_STEREO;
                 AVSampleFormat  fmt             = AV_SAMPLE_FMT_S16;
             };
 
-            channel_args base;
-            type_safe_union<image_args, audio_args> options;
+            channel_args    args_common;
+            image_args      args_image;
+            audio_args      args_audio;
         };
 
         encoder_ffmpeg() = default;
@@ -72,11 +73,20 @@ namespace dlib
         /*expert use*/
         bool push(Frame&& frame);
 
-        bool flush();
+        void flush();
 
-        void swap_encoded_stream(
-            std::unique_ptr<std::ostream>& encoded
-        );
+        std::unique_ptr<std::ostream> get_encoded_stream();
+
+        /*video dims*/
+        int             height()    const;
+        int             width()     const;
+        AVPixelFormat   pixel_fmt()       const;
+
+        /*audio dims*/
+        int             sample_rate()       const;
+        uint64_t        channel_layout()    const;
+        AVSampleFormat  sample_fmt()        const;
+        int             nchannels()         const;
 
     private:
 
