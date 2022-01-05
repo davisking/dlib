@@ -277,6 +277,14 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    enum class zero_gradients : uint8_t
+    {
+        no,
+        yes
+    };
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename LAYER_DETAILS, 
         typename SUBNET
@@ -603,7 +611,8 @@ namespace dlib
         !*/
 
         void back_propagate_error(
-            const tensor& x
+            const tensor& x,
+            zero_gradients zero_grads = zero_gradients::yes
         );
         /*!
             requires
@@ -617,7 +626,7 @@ namespace dlib
                   network and computes parameter and data gradients, via backpropagation.
                   Specifically, this function populates get_final_data_gradient() and also,
                   for each layer, the tensor returned by get_parameter_gradient().
-                - All elements of #get_gradient_input() are set to 0. 
+                - All elements of #get_gradient_input() are set to 0 if zero_grads == zero_gradients::yes.
                 - have_same_dimensions(#get_final_data_gradient(), x) == true.
                 - have_same_dimensions(#get_parameter_gradient(), layer_details().get_layer_params()) == true.
                 - #get_final_data_gradient() contains the gradient of the network with
@@ -626,7 +635,8 @@ namespace dlib
 
         void back_propagate_error(
             const tensor& x, 
-            const tensor& gradient_input
+            const tensor& gradient_input,
+            zero_gradients zero_grads = zero_gradients::yes
         );
         /*!
             requires
@@ -643,7 +653,7 @@ namespace dlib
                     back_propagate_error(x);
                   Except that calling back_propagate_error(x,gradient_input) avoids the
                   copy and is therefore slightly more efficient.
-                - All elements of #get_gradient_input() are set to 0. 
+                - All elements of #get_gradient_input() are set to 0 if zero_grads == zero_gradients::yes.
                 - have_same_dimensions(#get_final_data_gradient(), x) == true.
                 - have_same_dimensions(#get_parameter_gradient(), layer_details().get_layer_params()) == true.
                 - #get_final_data_gradient() contains the gradient of the network with
@@ -679,6 +689,20 @@ namespace dlib
         { update_parameters(make_sstack(solvers), learning_rate); }
         /*!
             Convenience method for calling update_parameters()
+        !*/
+
+        void set_gradient_inputs_to_zero(
+        );
+        /*!
+            ensures
+                - Sets all elements in all gradient inputs in the network to 0.
+                  That is, for each layer, we will have:
+                    - get_gradient_input() == 0
+                - Note that You only need to call this method if you manually called either
+                    - back_propagate_error
+                    - compute_parameter_gradients
+                  with the zero_grads parameter set to zero_gradients::no.
+                - invokes subnet().set_gradient_inputs_to_zero()
         !*/
 
         void clean(
@@ -1147,7 +1171,8 @@ namespace dlib
         template <typename label_iterator>
         double compute_parameter_gradients (
             const tensor& x,
-            label_iterator lbegin
+            label_iterator lbegin,
+            zero_gradients zero_grads = zero_gradients::yes
         );
         /*!
             requires
@@ -1164,6 +1189,7 @@ namespace dlib
                   respect to the loss, via backpropagation.  Specifically, this function
                   updates get_final_data_gradient() and also, for each layer, the tensor
                   returned by get_parameter_gradient().
+                - All elements of #subnet().get_gradient_input() are set to 0 if zero_grads == zero_gradients::yes.
                 - for all valid k:
                     - the expected label of the kth sample in x is *(lbegin+k/sample_expansion_factor()).
                 - returns compute_loss(x,lbegin)
@@ -1173,7 +1199,8 @@ namespace dlib
         double compute_parameter_gradients (
             forward_iterator ibegin,
             forward_iterator iend,
-            label_iterator lbegin
+            label_iterator lbegin,
+            zero_gradients zero_grads = zero_gradients::yes
         );
         /*!
             requires
@@ -1187,13 +1214,15 @@ namespace dlib
                   gradients with respect to the loss, via backpropagation.  Specifically,
                   this function updates get_final_data_gradient() and also, for each layer,
                   the tensor returned by get_parameter_gradient().
+                - All elements of #subnet().get_gradient_input() are set to 0 if zero_grads == zero_gradients::yes.
                 - for all valid k:
                     - the expected label of *(ibegin+k) is *(lbegin+k).
                 - returns compute_loss(ibegin,iend,lbegin)
         !*/
 
         double compute_parameter_gradients (
-            const tensor& x
+            const tensor& x,
+            zero_gradients zero_grads = zero_gradients::yes
         );
         /*!
             requires
@@ -1208,13 +1237,15 @@ namespace dlib
                   respect to the loss, via backpropagation.  Specifically, this function
                   updates get_final_data_gradient() and also, for each layer, the tensor
                   returned by get_parameter_gradient().
+                - All elements of #subnet().get_gradient_input() are set to 0 if zero_grads == zero_gradients::yes.
                 - returns compute_loss(x)
         !*/
 
         template <typename forward_iterator>
         double compute_parameter_gradients (
             forward_iterator ibegin,
-            forward_iterator iend
+            forward_iterator iend,
+            zero_gradients zero_grads = zero_gradients::yes
         );
         /*!
             requires
@@ -1226,6 +1257,7 @@ namespace dlib
                   gradients with respect to the loss, via backpropagation.  Specifically,
                   this function updates get_final_data_gradient() and also, for each layer,
                   the tensor returned by get_parameter_gradient().
+                - All elements of #subnet().get_gradient_input() are set to 0 if zero_grads == zero_gradients::yes.
                 - returns compute_loss(ibegin,iend)
         !*/
 
@@ -1262,6 +1294,7 @@ namespace dlib
 
         void back_propagate_error(
             const tensor& x
+            zero_gradients zero_grads = zero_gradients::yes
         );
         /*!
             requires
@@ -1276,7 +1309,7 @@ namespace dlib
                   network and computes parameter and data gradients, via backpropagation.
                   Specifically, this function populates get_final_data_gradient() and also,
                   for each layer, the tensor returned by get_parameter_gradient().
-                - All elements of #subnet().get_gradient_input() are set to 0. 
+                - All elements of #subnet().get_gradient_input() are set to 0 if zero_grads == zero_gradients::yes.
                 - have_same_dimensions(#get_final_data_gradient(), x) == true.
                 - #get_final_data_gradient() contains the gradient of the network with
                   respect to x.
@@ -1301,7 +1334,7 @@ namespace dlib
                     back_propagate_error(x);
                   Except that calling back_propagate_error(x,gradient_input) avoids the
                   copy and is therefore slightly more efficient.
-                - All elements of #subnet.get_gradient_input() are set to 0. 
+                - All elements of #subnet().get_gradient_input() are set to 0 if zero_grads == zero_gradients::yes.
                 - have_same_dimensions(#get_final_data_gradient(), x) == true.
                 - #get_final_data_gradient() contains the gradient of the network with
                   respect to x.
@@ -1319,6 +1352,13 @@ namespace dlib
                   not one per layer, since there is only one input to the entire network.
         !*/
 
+        void set_gradient_inputs_to_zero(
+        );
+        /*!
+            ensures
+                - Sets all elements in all gradient inputs in the network to 0.
+                - invokes subnet().set_gradient_inputs_to_zero()
+        !*/
 
     // -------------
 
