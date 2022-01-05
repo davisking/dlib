@@ -34,7 +34,7 @@ namespace dlib
 
         const rectangle& get_rect() const { return rect; }
         rectangle& get_rect() { return rect; }
-        unsigned long num_parts() const { return static_cast<unsigned long>(parts.size()); }
+        unsigned long num_parts() const { return parts.size(); }
 
         const point& part(
             unsigned long idx

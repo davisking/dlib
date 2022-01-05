@@ -274,7 +274,7 @@ namespace dlib
             while (sout.tellp() < 28+8) sout << " ";
             sout << "nc:" << t.nc() << ")";
             while (sout.tellp() < min_length) sout << " ";
-            min_length = static_cast<int>(sout.tellp());
+            min_length = sout.tellp();
             sout << "\t";
             return sout.str();
         }
@@ -3164,7 +3164,7 @@ namespace dlib
         {
             float* data = t.host();
             for (size_t i = 0; i < t.size(); ++i)
-                data[i] = static_cast<float>(rnd.get_random_gaussian()*sigma);
+                data[i] = rnd.get_random_gaussian()*sigma;
         }
 
         class test_layer_subnet 
@@ -3206,9 +3206,9 @@ namespace dlib
             unsigned long count_outputs() const
             {
                 if (subnetwork)
-                    return static_cast<unsigned long>(subnetwork->count_outputs() + output.size());
+                    return subnetwork->count_outputs() + output.size();
                 else
-                    return static_cast<unsigned long>(output.size());
+                    return output.size();
             }
 
             float& get_output_element(unsigned long i)
@@ -3216,7 +3216,7 @@ namespace dlib
                 if (i < output.size())
                     return output.host()[i];
                 else
-                    return subnet().get_output_element(i-static_cast<unsigned long>(output.size()));
+                    return subnet().get_output_element(i-output.size());
             }
 
             float get_gradient_input_element(unsigned long i) const
@@ -3224,7 +3224,7 @@ namespace dlib
                 if (i < gradient_input.size())
                     return gradient_input.host()[i];
                 else
-                    return subnet().get_gradient_input_element(i-static_cast<unsigned long>(gradient_input.size()));
+                    return subnet().get_gradient_input_element(i-gradient_input.size());
             }
 
 

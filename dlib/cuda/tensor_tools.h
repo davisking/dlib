@@ -1803,8 +1803,7 @@ namespace dlib { namespace tt
     inline void resize_bilinear (
         tensor& dest,
         const tensor& src
-    ) { resize_bilinear(dest, static_cast<long>(dest.nc()), static_cast<long>(dest.nr()*dest.nc()),
-                        src, static_cast<long>(src.nc()), static_cast<long>(src.nr()*src.nc())); }
+    ) { resize_bilinear(dest, dest.nc(), dest.nr()*dest.nc(), src, src.nc(), src.nr()*src.nc()); }
     /*!
         requires
             - is_same_object(dest, src)==false
@@ -1819,8 +1818,7 @@ namespace dlib { namespace tt
     inline void resize_bilinear_gradient (
         tensor& grad,
         const tensor& gradient_input
-    ) { resize_bilinear_gradient(grad, static_cast<long>(grad.nc()), static_cast<long>(grad.nr()*grad.nc()),
-                                 gradient_input, static_cast<long>(gradient_input.nc()), static_cast<long>(gradient_input.nr()*gradient_input.nc())); }
+    ) { resize_bilinear_gradient(grad, grad.nc(), grad.nr()*grad.nc(), gradient_input, gradient_input.nc(), gradient_input.nr()*gradient_input.nc()); }
     /*!
         requires
             - is_same_object(grad, gradient_input)==false

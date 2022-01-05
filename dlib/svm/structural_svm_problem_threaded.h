@@ -134,9 +134,9 @@ namespace dlib
             const uint64 stop_time = ts.get_timestamp();
 
             if (buffer_subgradients_locally)
-                with_buffer_time.add(static_cast<double>(stop_time-start_time));
+                with_buffer_time.add(stop_time-start_time);
             else
-                without_buffer_time.add(static_cast<double>(stop_time-start_time));
+                without_buffer_time.add(stop_time-start_time);
 
         }
 

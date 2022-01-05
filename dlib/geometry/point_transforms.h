@@ -235,7 +235,7 @@ namespace dlib
             // the above box.
             double scale = std::sqrt(new_area/temp.area());
 
-            return centered_rect(center(temp), static_cast<unsigned long>(std::round(temp.width()*scale)), static_cast<unsigned long>(std::round(temp.height()*scale)));
+            return centered_rect(center(temp), std::round(temp.width()*scale), std::round(temp.height()*scale));
         }
 
         rectangle operator() (
@@ -299,12 +299,10 @@ namespace dlib
             << "\n\t to_points.size():   " << to_points.size()
             );
 
-        unsigned long point_count = static_cast<unsigned long>(from_points.size());
+        matrix<double,3,0> P(3, from_points.size());
+        matrix<double,2,0> Q(2, from_points.size());
 
-        matrix<double,3,0> P(3, point_count);
-        matrix<double,2,0> Q(2, point_count);
-
-        for (unsigned long i = 0; i < point_count; ++i)
+        for (unsigned long i = 0; i < from_points.size(); ++i)
         {
             P(0,i) = from_points[i].x();
             P(1,i) = from_points[i].y();
@@ -344,26 +342,24 @@ namespace dlib
         matrix<double,2,2> cov;
         cov = 0;
 
-        unsigned long point_count = static_cast<unsigned long>(from_points.size());
-
-        for (unsigned long i = 0; i < point_count; ++i)
+        for (unsigned long i = 0; i < from_points.size(); ++i)
         {
             mean_from += from_points[i];
             mean_to += to_points[i];
         }
-        mean_from /= point_count;
-        mean_to   /= point_count;
+        mean_from /= from_points.size();
+        mean_to   /= from_points.size();
 
-        for (unsigned long i = 0; i < point_count; ++i)
+        for (unsigned long i = 0; i < from_points.size(); ++i)
         {
             sigma_from += length_squared(from_points[i] - mean_from);
             sigma_to += length_squared(to_points[i] - mean_to);
             cov += (to_points[i] - mean_to)*trans(from_points[i] - mean_from);
         }
 
-        sigma_from /= point_count;
-        sigma_to   /= point_count;
-        cov        /= point_count;
+        sigma_from /= from_points.size();
+        sigma_to   /= from_points.size();
+        cov        /= from_points.size();
 
         matrix<double,2,2> u, v, s, d;
         svd(cov, u,d,v);
