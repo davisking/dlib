@@ -1074,7 +1074,7 @@ namespace dlib
 
         void set_gradient_inputs_to_zero()
         {
-            x_grad = 0;
+            gradient_input_is_stale = true;
             subnetwork->set_gradient_inputs_to_zero();
         }
 
