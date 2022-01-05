@@ -228,7 +228,7 @@ namespace
 
         auto populate_encoder_and_decoder = [](encoder_ffmpeg& enc, decoder_ffmpeg& dec)
         {
-            std::unique_ptr<std::ostream> encoded = enc.get_encoded_stream();
+            std::shared_ptr<std::ostream> encoded = enc.get_encoded_stream();
             const std::string encoded_str = dynamic_cast<std::stringstream&>(*encoded).str();
             DLIB_TEST(dec.push_encoded((const uint8_t*)encoded_str.c_str(), encoded_str.size()));
             dec.flush();
