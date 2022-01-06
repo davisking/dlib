@@ -1868,7 +1868,7 @@ namespace dlib { namespace tt
             if (items.size() < 1)
                 return;
 
-            scale = 1.0/items.size();
+            scale = 1.f/items.size();
 
             // split item into groups of accessible devices
             std::vector<tensor*> group, unused;
