@@ -745,7 +745,7 @@ namespace dlib
         unsigned long total_num_labels = 0;
 
         // We make it true that: possible_labels[classifier][label_idx_lookup[classifier][label]] == label
-        std::map<std::string, std::map<std::string,long>> label_idx_lookup;
+        std::map<std::string, std::map<std::string, size_t>> label_idx_lookup;
 
 
         // Scratch doesn't logically contribute to the state of this object.  It's just
@@ -2188,8 +2188,8 @@ namespace dlib
             {
                 // These values used to be hard coded, so for this version of the metric
                 // learning loss we just use these values.
-                item.margin = 0.1;
-                item.dist_thresh = 0.75;
+                item.margin = 0.1f;
+                item.dist_thresh = 0.75f;
                 return;
             }
             else if (version == "loss_metric_2")
@@ -2215,8 +2215,8 @@ namespace dlib
         }
 
     private:
-        float margin = 0.04;
-        float dist_thresh = 0.6;
+        float margin = 0.04f;
+        float dist_thresh = 0.6f;
 
 
         // These variables are only here to avoid being reallocated over and over in

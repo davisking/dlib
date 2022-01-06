@@ -40,9 +40,9 @@ namespace dlib
 
         input_rgb_image (
         ) : 
-            avg_red(122.782), 
-            avg_green(117.001),
-            avg_blue(104.298) 
+            avg_red(122.782f),
+            avg_green(117.001f),
+            avg_blue(104.298f)
         {
         }
 

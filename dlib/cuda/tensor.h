@@ -110,7 +110,7 @@ namespace dlib
         
         tensor& operator/= (float val)
         {
-            *this *= 1.0/val;
+            *this *= 1.f/val;
             return *this;
         }
 
