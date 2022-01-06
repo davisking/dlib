@@ -43,6 +43,37 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template<typename Variant>
+    struct variant_size;
+    /*!
+        ensures
+            - if Variant is of type type_safe_union<Types...> with possible cv qualification
+              for some althernative types Types... then returns sizeof...(Types)
+            - Identical behaviour to std::variant_size except it works with dlib::type_safe_union,
+              not std::variant. See cppreference on const, volative or cv qualification behaviour.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <size_t I, typename Variant>
+    struct variant_alternative;
+    /*!
+        ensures
+            - if Variant is of type type_safe_union<Types...> for some althernative types Types... then
+                provides a member typedef type which corresponds to the Ith type in Types...
+            - Identical behaviour to std::variant_alternative except it works with dlib::type_safe_union,
+              not std::variant. See cppreference on const, volative or cv qualification behaviour.
+    !*/
+
+    template<size_t I, typename Variant>
+    using variant_alternative_t;
+    /*!
+        ensures
+            - provides template alias for variant_alternative
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <typename... Types>
     class type_safe_union
     {
@@ -283,33 +314,6 @@ namespace dlib
                 equivalent to calling visit(std::forward<F>(f)) with void return type
         !*/
 
-        template <typename F>
-        void for_each(
-            F&& f
-        );
-        /*!
-            requires
-                - f is a callable object such that the following expression is valid for
-                  all types U in Types...:
-
-                    std::forward<F>(f)(const in_place_tag<U>& tag, type_safe_union<Types...>& x)
-            ensures
-                - the state of x is unchanged
-        !*/
-
-        template <typename F>
-        void for_each(
-            F&& f
-        ) const;
-        /*!
-            requires
-                - f is a callable object such that the following expression is valid for
-                  all types U in Types...:
-
-                    std::forward<F>(f)(const in_place_tag<U>& tag, const type_safe_union<Types...>& x)
-
-        !*/
-
         template <typename T> 
         T& get(
         );
@@ -384,6 +388,33 @@ namespace dlib
     ) { a.swap(b); }   
     /*!
         provides a global swap function
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template<
+        typename Variant,
+        typename F
+    >
+    void for_each_type(
+        Variant&& tsu,
+        F&& f
+    );
+    /*!
+        requires
+            - Variant&& is a universal reference to object of type type_safe_union<Types...> for some
+              alternative types Types...
+            - f is a callable object such that the following expression is valid for
+              all types U in Types...:
+
+                std::forward<F>(f)(const in_place_tag<U>& tag, Variant&& tsu)
+        ensures
+            - This function iterates over all types U in Types... and calls:
+
+                std::forward<F>(f)(const in_place_tag<U>& tag, Variant&& tsu)
+
+            - tsu is perfect-forwarded for all types U in Types... regardless of whether U is the current
+              object held by tsu.
     !*/
 
 // ----------------------------------------------------------------------------------------

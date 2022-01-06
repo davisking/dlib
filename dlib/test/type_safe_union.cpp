@@ -679,28 +679,22 @@ namespace
 
         using tsu = type_safe_union<int,float,std::string>;
 
-        //for_each() using private visitor
-        class for_each_visitor
+        struct for_each_visitor
         {
-        public: 
             std::vector<int> type_indices;
 
-        private:
-
             template<typename T>
-            void operator()(dlib::in_place_tag<T>, tsu& item)
+            void operator()(dlib::in_place_tag<T>, const tsu& item)
             {
                 type_indices.push_back(item.get_type_id<T>());
             }
-
-            friend tsu;
         };
 
         void test()
         {
             tsu a;
             for_each_visitor visitor;
-            a.for_each(visitor);
+            for_each_type(a, visitor);
             
             DLIB_TEST(visitor.type_indices.size() == 3);
             DLIB_TEST(visitor.type_indices[0] == 1);
@@ -737,19 +731,19 @@ namespace
         void test()
         {
             tsu a;
-            a.for_each(for_each_visitor{1});
+            for_each_type(a, for_each_visitor{1});
             DLIB_TEST(a.contains<int>());
             a.clear();
-            a.for_each(for_each_visitor{2});
+            for_each_type(a, for_each_visitor{2});
             DLIB_TEST(a.contains<float>());
             a.clear();
-            a.for_each(for_each_visitor{3});
+            for_each_type(a, for_each_visitor{3});
             DLIB_TEST(a.contains<std::string>());
             a.clear();
-            a.for_each(for_each_visitor{-1});
+            for_each_type(a, for_each_visitor{-1});
             DLIB_TEST(a.is_empty());
             a.clear();
-            a.for_each(for_each_visitor{215465});
+            for_each_type(a, for_each_visitor{215465});
             DLIB_TEST(a.is_empty());
         }
     }
@@ -800,7 +794,7 @@ namespace
             a.visit(serializer_typeid(out));
 
             tsu2 b;
-            b.for_each(deserializer_typeid(out));
+            for_each_type(b, deserializer_typeid(out));
 
             DLIB_TEST(b.contains<std::string>());
             DLIB_TEST(b.get<std::string>() == "hello from tsu1");

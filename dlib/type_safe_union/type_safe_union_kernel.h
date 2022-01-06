@@ -12,6 +12,8 @@
 
 namespace dlib
 {
+    // ---------------------------------------------------------------------
+
     class bad_type_safe_union_cast : public std::bad_cast 
     {
     public:
@@ -21,8 +23,59 @@ namespace dlib
           }
     };
 
+    // ---------------------------------------------------------------------
+
     template<typename T>
     struct in_place_tag { using type = T;};
+
+    // ---------------------------------------------------------------------
+
+    template <typename... Types> class type_safe_union;
+
+    template<typename Variant>
+    struct variant_size;
+
+    template<typename Variant>
+    struct variant_size<const Variant> : variant_size<Variant> {};
+
+    template<typename Variant>
+    struct variant_size<volatile Variant> : variant_size<Variant> {};
+
+    template<typename Variant>
+    struct variant_size<const volatile Variant> : variant_size<Variant> {};
+
+    template<typename... Types>
+    struct variant_size<type_safe_union<Types...>>
+    : std::integral_constant<size_t, sizeof...(Types)> {};
+
+    // ---------------------------------------------------------------------
+
+    template <size_t I, typename Variant>
+    struct variant_alternative;
+
+    template <size_t I, typename T0, typename... Ts>
+    struct variant_alternative<I, type_safe_union<T0, Ts...>> : variant_alternative<I-1, type_safe_union<Ts...>> {};
+
+    template <typename T0, typename... Ts>
+    struct variant_alternative<0, type_safe_union<T0, Ts...>>
+    { using type = T0;};
+
+    template<size_t I, typename Variant>
+    using variant_alternative_t =  typename variant_alternative<I, Variant>::type;
+
+    template <size_t I, typename Variant>
+    struct variant_alternative<I, const Variant>
+    { using type = typename std::add_const<variant_alternative_t<I, Variant>>::type; };
+
+    template <size_t I, typename Variant>
+    struct variant_alternative<I, volatile Variant>
+    { using type = typename std::add_volatile<variant_alternative_t<I, Variant>>::type; };
+
+    template <size_t I, typename Variant>
+    struct variant_alternative<I, const volatile Variant>
+    { using type = typename std::add_cv<variant_alternative_t<I, Variant>>::type; };
+
+    // ---------------------------------------------------------------------
 
     namespace internal
     {
@@ -33,17 +86,6 @@ namespace dlib
 
         template <typename T, typename First>
         struct is_any<T,First> : std::is_same<T,First> {};
-
-        // ---------------------------------------------------------------------
-
-        template <size_t I, typename... Ts>
-        struct variant_get_type;
-
-        template <size_t I, typename T0, typename... Ts>
-        struct variant_get_type<I, T0, Ts...> : variant_get_type<I-1, Ts...> {};
-
-        template <typename T0, typename... Ts>
-        struct variant_get_type<0, T0, Ts...> { using type = T0;};
 
         // ---------------------------------------------------------------------
 
@@ -89,10 +131,7 @@ namespace dlib
         using is_valid_check = typename std::enable_if<is_valid<T>::value, bool>::type;
 
         template <size_t I>
-        struct get_type : internal::variant_get_type<I,Types...> {};
-
-        template <size_t I>
-        using get_type_t = typename get_type<I>::type;
+        using get_type_t = variant_alternative_t<I, type_safe_union<Types...>>;
 
         using T0 = get_type_t<0>;
 
@@ -196,54 +235,6 @@ namespace dlib
                 return std::forward<F>(f)(unchecked_get<get_type_t<I>>());
             else
                 return visit_impl<I+1>(std::forward<F>(f));
-        }
-
-        template<
-            size_t I,
-            typename F
-        >
-        typename std::enable_if<(I == sizeof...(Types))>::type
-        for_each_impl(
-            F&&
-        ) const
-        {
-        }
-
-        template<
-            size_t I,
-            typename F
-        >
-        typename std::enable_if<(I < sizeof...(Types))>::type
-        for_each_impl(
-            F&& f
-        ) const
-        {
-            std::forward<F>(f)(in_place_tag<get_type_t<I>>{}, *this);
-            for_each_impl<I+1>(std::forward<F>(f));
-        }
-
-        template<
-            size_t I,
-            typename F
-        >
-        typename std::enable_if<(I == sizeof...(Types))>::type
-        for_each_impl(
-            F&&
-        )
-        {
-        }
-
-        template<
-            size_t I,
-            typename F
-        >
-        typename std::enable_if<(I < sizeof...(Types))>::type
-        for_each_impl(
-            F&& f
-        )
-        {
-            std::forward<F>(f)(in_place_tag<get_type_t<I>>{}, *this);
-            for_each_impl<I+1>(std::forward<F>(f));
         }
 
         template <typename T>
@@ -487,22 +478,6 @@ namespace dlib
             visit(std::forward<F>(f));
         }
 
-        template <typename F>
-        void for_each(
-            F&& f
-        )
-        {
-            for_each_impl<0>(std::forward<F>(f));
-        }
-
-        template <typename F>
-        void for_each(
-            F&& f
-        ) const
-        {
-            for_each_impl<0>(std::forward<F>(f));
-        }
-
         template <typename T>
         bool contains (
         ) const
@@ -605,6 +580,52 @@ namespace dlib
 
     namespace detail
     {
+        template<
+            size_t I,
+            typename Variant,
+            typename F,
+            typename Tsu = typename std::decay<Variant>::type
+        >
+        typename std::enable_if<(I == variant_size<Tsu>::value)>::type
+        for_each_type_impl(
+            Variant&& tsu,
+            F&&
+        )
+        {
+        }
+
+        template<
+            size_t I,
+            typename Variant,
+            typename F,
+            typename Tsu = typename std::decay<Variant>::type
+        >
+        typename std::enable_if<(I < variant_size<Tsu>::value)>::type
+        for_each_type_impl(
+            Variant&& tsu,
+            F&& f
+        )
+        {
+            using T = variant_alternative_t<I, Tsu>;
+            std::forward<F>(f)(in_place_tag<T>{}, std::forward<Variant>(tsu));
+            for_each_type_impl<I+1>(std::forward<Variant>(tsu), std::forward<F>(f));
+        }
+    }
+
+    template<
+        typename Variant,
+        typename F
+    >
+    void for_each_type(
+        Variant&& tsu,
+        F&& f
+    )
+    {
+        detail::for_each_type_impl<0>(std::forward<Variant>(tsu), std::forward<F>(f));
+    }
+
+    namespace detail
+    {
         struct serialize_helper
         {
             serialize_helper(std::ostream& out_) : out(out_) {}
@@ -670,7 +691,7 @@ namespace dlib
             if (index == 0)
                 item.clear();
             else if (index > 0 && index <= (int)sizeof...(Types))
-                item.for_each(detail::deserialize_helper(in, index));
+                for_each_type(item, detail::deserialize_helper(in, index));
             else
                 throw serialization_error("bad index value. Should be in range [0,sizeof...(Types))");
         }
