@@ -559,7 +559,7 @@ namespace dlib
             Variant&& tsu
         ) -> typename std::enable_if<
                 (I == variant_size<Tsu>::value) &&
-                std::is_same<void, typename std::decay<invoke_result_t<F, decltype(tsu.template cast_to<T0>())>>::type>::value
+                std::is_same<void, typename std::decay<dlib::invoke_result_t<F, decltype(tsu.template cast_to<T0>())>>::type>::value
         >::type
         {
         }
@@ -576,11 +576,11 @@ namespace dlib
             Variant&& tsu
         ) -> typename std::enable_if<
                 (I == variant_size<Tsu>::value) &&
-                ! std::is_same<void, typename std::decay<invoke_result_t<F, decltype(tsu.template cast_to<T0>())>>::type>::value,
-                invoke_result_t<F, decltype(tsu.template cast_to<T0>())>
+                ! std::is_same<void, typename std::decay<dlib::invoke_result_t<F, decltype(tsu.template cast_to<T0>())>>::type>::value,
+                dlib::invoke_result_t<F, decltype(tsu.template cast_to<T0>())>
         >::type
         {
-            using R = invoke_result_t<F, decltype(tsu.template cast_to<T0>())>;
+            using R = dlib::invoke_result_t<F, decltype(tsu.template cast_to<T0>())>;
             return R{};
         }
 
@@ -596,13 +596,13 @@ namespace dlib
             Variant&& tsu
         ) -> typename std::enable_if<
                 (I < variant_size<Tsu>::value),
-                invoke_result_t<F, decltype(tsu.template cast_to<T0>())>
+                dlib::invoke_result_t<F, decltype(tsu.template cast_to<T0>())>
         >::type
         {
             using T = variant_alternative_t<I, Tsu>;
 
             if (tsu.get_current_type_id() == (I+1))
-                return invoke(std::forward<F>(f), tsu.template cast_to<T>());
+                return dlib::invoke(std::forward<F>(f), tsu.template cast_to<T>());
             else
                 return visit_impl<I+1>(std::forward<F>(f), std::forward<Variant>(tsu));
         }
