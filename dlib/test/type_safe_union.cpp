@@ -573,7 +573,7 @@ namespace
                 DLIB_TEST(b.is_empty());
                 DLIB_TEST(b.get_current_type_id() == 0);
                 //visit can return non-void types
-                auto ret = a.visit(overloaded(
+                auto ret = visit(overloaded(
                     [](int) {
                         return std::string("int");
                     },
@@ -583,7 +583,7 @@ namespace
                     [](const std::string&) {
                         return std::string("std::string");
                     }
-                ));
+                ), a);
                 static_assert(std::is_same<std::string, decltype(ret)>::value, "bad return type");
                 DLIB_TEST(ret == "int");
                 //apply_to_contents can only return void
@@ -611,7 +611,7 @@ namespace
                 tsu_b object(dlib::in_place_tag<tsu_a>{}, std::string("hello from bottom node"));
                 DLIB_TEST(object.contains<tsu_a>());
                 DLIB_TEST(object.get<tsu_a>().get<std::string>() == "hello from bottom node");
-                auto ret = object.visit(overloaded(
+                auto ret = visit(overloaded(
                     [](int) {
                         return std::string("int");
                     },
@@ -622,7 +622,7 @@ namespace
                         return std::string("std::string");
                     },
                     [](const tsu_a& item) {
-                        return item.visit(overloaded(
+                        return visit( overloaded(
                             [](int) {
                                 return std::string("nested int");
                             },
@@ -632,20 +632,19 @@ namespace
                             [](std::string str) {
                                 return str;
                             }
-                        ));
+                        ), item);
                     }
-                ));
+                ), object);
                 static_assert(std::is_same<std::string, decltype(ret)>::value, "bad type");
                 DLIB_TEST(ret == "hello from bottom node");
             }
 
             {
-                //"private" visitor
+                //struct visitor
                 using tsu = type_safe_union<int,float,std::string>;
 
-                class visitor_private
+                struct visitor_private
                 {
-                private:
                     std::string operator()(int)
                     {
                         return std::string("int");
@@ -660,13 +659,11 @@ namespace
                     {
                         return str;
                     }
-
-                    friend tsu;
                 };
 
                 visitor_private visitor;
                 tsu a = std::string("hello from private visitor");
-                auto ret = a.visit(visitor);
+                auto ret = visit(visitor, a);
                 static_assert(std::is_same<std::string, decltype(ret)>::value, "bad type");
                 DLIB_TEST(ret == "hello from private visitor");
             }
@@ -791,7 +788,7 @@ namespace
             a.get<std::string>() = "hello from tsu1";
 
             std::stringstream out;
-            a.visit(serializer_typeid(out));
+            visit(serializer_typeid(out), a);
 
             tsu2 b;
             for_each_type(b, deserializer_typeid(out));

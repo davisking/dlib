@@ -9,6 +9,7 @@
 #include <type_traits>
 #include <functional>
 #include "../serialize.h"
+#include "../invoke.h"
 
 namespace dlib
 {
@@ -61,7 +62,7 @@ namespace dlib
     { using type = T0;};
 
     template<size_t I, typename Variant>
-    using variant_alternative_t =  typename variant_alternative<I, Variant>::type;
+    using variant_alternative_t = typename variant_alternative<I, Variant>::type;
 
     template <size_t I, typename Variant>
     struct variant_alternative<I, const Variant>
@@ -133,108 +134,59 @@ namespace dlib
         template <size_t I>
         using get_type_t = variant_alternative_t<I, type_safe_union<Types...>>;
 
-        using T0 = get_type_t<0>;
-
-        template<typename F, typename T>
-        struct return_type
-        {
-            using type = decltype(std::declval<F>()(std::declval<T>()));
-        };
-
-        template<typename F, typename T>
-        using return_type_t = typename return_type<F,T>::type;
-
         typename std::aligned_union<0, Types...>::type mem;
         int type_identity = 0;
 
         template<
             size_t I,
-            typename F
+            typename F,
+            typename std::enable_if<(I == sizeof...(Types)), bool>::type = true
         >
-        auto visit_impl(
+        void apply_to_contents_impl(
             F&&
-        ) -> typename std::enable_if<
-                (I == sizeof...(Types)) &&
-                std::is_same<void, return_type_t<F, T0&>>::value
-        >::type
+        )
         {
         }
 
         template<
             size_t I,
-            typename F
+            typename F,
+            typename std::enable_if<(I == sizeof...(Types)), bool>::type = true
         >
-        auto visit_impl(
+        void apply_to_contents_impl(
             F&&
-        ) -> typename std::enable_if<
-                (I == sizeof...(Types)) &&
-                ! std::is_same<void, return_type_t<F, T0&>>::value,
-                return_type_t<F, T0&>
-        >::type
+        ) const
         {
-            return return_type_t<F, T0&>{};
         }
 
         template<
             size_t I,
-            typename F
+            typename F,
+            typename std::enable_if<(I <sizeof...(Types)), bool>::type = true
         >
-        auto visit_impl(
+        void apply_to_contents_impl(
             F&& f
-        )  -> typename std::enable_if<
-                (I < sizeof...(Types)),
-                return_type_t<F, T0&>
-        >::type
+        )
         {
             if (type_identity == (I+1))
-                return std::forward<F>(f)(unchecked_get<get_type_t<I>>());
+                std::forward<F>(f)(unchecked_get<get_type_t<I>>());
             else
-                return visit_impl<I+1>(std::forward<F>(f));
+                apply_to_contents_impl<I+1>(std::forward<F>(f));
         }
 
         template<
             size_t I,
-            typename F
+            typename F,
+            typename std::enable_if<(I <sizeof...(Types)), bool>::type = true
         >
-        auto visit_impl(
-            F&&
-        ) const -> typename std::enable_if<
-                (I == sizeof...(Types)) &&
-                std::is_same<void, return_type_t<F, const T0&>>::value
-        >::type
-        {
-        }
-
-        template<
-            size_t I,
-            typename F
-        >
-        auto visit_impl(
-            F&&
-        ) const -> typename std::enable_if<
-                (I == sizeof...(Types)) &&
-                ! std::is_same<void, return_type_t<F, const T0&>>::value,
-                return_type_t<F, const T0&>
-        >::type
-        {
-            return return_type_t<F, const T0&>{};
-        }
-
-        template<
-            size_t I,
-            typename F
-        >
-        auto visit_impl(
+        void apply_to_contents_impl(
             F&& f
-        ) const -> typename std::enable_if<
-                (I < sizeof...(Types)),
-                return_type_t<F, const T0&>
-        >::type
+        ) const
         {
             if (type_identity == (I+1))
-                return std::forward<F>(f)(unchecked_get<get_type_t<I>>());
+                std::forward<F>(f)(unchecked_get<get_type_t<I>>());
             else
-                return visit_impl<I+1>(std::forward<F>(f));
+                apply_to_contents_impl<I+1>(std::forward<F>(f));
         }
 
         template <typename T>
@@ -260,7 +212,7 @@ namespace dlib
 
         void destruct ()
         {
-            visit(destruct_helper{});
+            apply_to_contents(destruct_helper{});
             type_identity = 0;
         }
 
@@ -350,7 +302,7 @@ namespace dlib
             const type_safe_union& item
         ) : type_safe_union()
         {
-            item.visit(assign_to{*this});
+            item.apply_to_contents(assign_to{*this});
         }
 
         type_safe_union& operator=(
@@ -360,7 +312,7 @@ namespace dlib
             if (item.is_empty())
                 destruct();
             else
-                item.visit(assign_to{*this});
+                item.apply_to_contents(assign_to{*this});
             return *this;
         }
 
@@ -368,7 +320,7 @@ namespace dlib
             type_safe_union&& item
         ) : type_safe_union()
         {
-            item.visit(move_to{*this});
+            item.apply_to_contents(move_to{*this});
             item.destruct();
         }
 
@@ -382,7 +334,7 @@ namespace dlib
             }
             else
             {
-                item.visit(move_to{*this});
+                item.apply_to_contents(move_to{*this});
                 item.destruct();
             }
             return *this;
@@ -447,27 +399,11 @@ namespace dlib
         }
 
         template <typename F>
-        auto visit(
-            F&& f
-        ) -> decltype(visit_impl<0>(std::forward<F>(f)))
-        {
-            return visit_impl<0>(std::forward<F>(f));
-        }
-
-        template <typename F>
-        auto visit(
-            F&& f
-        ) const -> decltype(visit_impl<0>(std::forward<F>(f)))
-        {
-            return visit_impl<0>(std::forward<F>(f));
-        }
-
-        template <typename F>
         void apply_to_contents(
             F&& f
         )
         {
-            visit(std::forward<F>(f));
+            apply_to_contents_impl<0>(std::forward<F>(f));
         }
 
         template <typename F>
@@ -475,7 +411,7 @@ namespace dlib
             F&& f
         ) const
         {
-            visit(std::forward<F>(f));
+            apply_to_contents_impl<0>(std::forward<F>(f));
         }
 
         template <typename T>
@@ -502,16 +438,16 @@ namespace dlib
         {
             if (type_identity == item.type_identity)
             {
-                item.visit(swap_to{*this});
+                item.apply_to_contents(swap_to{*this});
             }
             else if (is_empty())
             {
-                item.visit(move_to{*this});
+                item.apply_to_contents(move_to{*this});
                 item.destruct();
             }
             else if (item.is_empty())
             {
-                visit(move_to{item});
+                apply_to_contents(move_to{item});
                 destruct();
             }
             else
@@ -588,7 +524,7 @@ namespace dlib
         >
         typename std::enable_if<(I == variant_size<Tsu>::value)>::type
         for_each_type_impl(
-            Variant&& tsu,
+            Variant&&,
             F&&
         )
         {
@@ -610,6 +546,66 @@ namespace dlib
             std::forward<F>(f)(in_place_tag<T>{}, std::forward<Variant>(tsu));
             for_each_type_impl<I+1>(std::forward<Variant>(tsu), std::forward<F>(f));
         }
+
+        template<
+            size_t I,
+            typename F,
+            typename Variant,
+            typename Tsu = typename std::decay<Variant>::type,
+            typename T0  = variant_alternative_t<0, Tsu>
+        >
+        auto visit_impl(
+            F&&,
+            Variant&& tsu
+        ) -> typename std::enable_if<
+                (I == variant_size<Tsu>::value) &&
+                std::is_same<void, typename std::decay<invoke_result_t<F, decltype(tsu.template cast_to<T0>())>>::type>::value
+        >::type
+        {
+        }
+
+        template<
+            size_t I,
+            typename F,
+            typename Variant,
+            typename Tsu = typename std::decay<Variant>::type,
+            typename T0  = variant_alternative_t<0, Tsu>
+        >
+        auto visit_impl(
+            F&&,
+            Variant&& tsu
+        ) -> typename std::enable_if<
+                (I == variant_size<Tsu>::value) &&
+                ! std::is_same<void, typename std::decay<invoke_result_t<F, decltype(tsu.template cast_to<T0>())>>::type>::value,
+                invoke_result_t<F, decltype(tsu.template cast_to<T0>())>
+        >::type
+        {
+            using R = invoke_result_t<F, decltype(tsu.template cast_to<T0>())>;
+            return R{};
+        }
+
+        template<
+            size_t I,
+            typename F,
+            typename Variant,
+            typename Tsu = typename std::decay<Variant>::type,
+            typename T0  = variant_alternative_t<0, Tsu>
+        >
+        auto visit_impl(
+            F&& f,
+            Variant&& tsu
+        ) -> typename std::enable_if<
+                (I < variant_size<Tsu>::value),
+                invoke_result_t<F, decltype(tsu.template cast_to<T0>())>
+        >::type
+        {
+            using T = variant_alternative_t<I, Tsu>;
+
+            if (tsu.get_current_type_id() == (I+1))
+                return invoke(std::forward<F>(f), tsu.template cast_to<T>());
+            else
+                return visit_impl<I+1>(std::forward<F>(f), std::forward<Variant>(tsu));
+        }
     }
 
     template<
@@ -622,6 +618,18 @@ namespace dlib
     )
     {
         detail::for_each_type_impl<0>(std::forward<Variant>(tsu), std::forward<F>(f));
+    }
+
+    template<
+        typename F,
+        typename Variant
+    >
+    auto visit(
+        F&& f,
+        Variant&& tsu
+    ) -> decltype(detail::visit_impl<0>(std::forward<F>(f), std::forward<Variant>(tsu)))
+    {
+        return detail::visit_impl<0>(std::forward<F>(f), std::forward<Variant>(tsu));
     }
 
     namespace detail
@@ -669,7 +677,7 @@ namespace dlib
         try
         {
             serialize(item.get_current_type_id(), out);
-            item.visit(detail::serialize_helper(out));
+            item.apply_to_contents(detail::serialize_helper(out));
         }
         catch (serialization_error& e)
         {

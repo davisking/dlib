@@ -265,7 +265,7 @@ namespace dlib
         !*/
 
         template <typename F>
-        auto visit(
+        void apply_to_contents(
             F&& f
         );
         /*!
@@ -276,12 +276,12 @@ namespace dlib
             ensures
                 - if (is_empty() == false) then
                     - Let U denote the type of object currently contained in this type_safe_union
-                    - returns std::forward<F>(f)(this->get<U>())
+                    - calls std::forward<F>(f)(this->get<U>())
                     - The object passed to f() (i.e. by this->get<U>()) will be non-const.
         !*/
 
         template <typename F>
-        auto visit(
+        void apply_to_contents(
             F&& f
         ) const;
         /*!
@@ -292,26 +292,8 @@ namespace dlib
             ensures
                 - if (is_empty() == false) then
                     - Let U denote the type of object currently contained in this type_safe_union
-                    - returns std::forward<F>(f)(this->get<U>())
+                    - calls std::forward<F>(f)(this->get<U>())
                     - The object passed to f() (i.e. by this->get<U>()) will be const.
-        !*/
-
-        template <typename F>
-        void apply_to_contents(
-            F&& f
-        );
-        /*!
-            ensures:
-                equivalent to calling visit(std::forward<F>(f)) with void return type
-        !*/
-
-        template <typename F>
-        void apply_to_contents(
-            F&& f
-        ) const;
-        /*!
-            ensures:
-                equivalent to calling visit(std::forward<F>(f)) with void return type
         !*/
 
         template <typename T> 
@@ -419,6 +401,30 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template<
+        typename F,
+        typename Variant
+    >
+    auto visit(
+        F&& f,
+        Variant&& tsu
+    );
+    /*!
+        requires
+            - Variant&& is a universal reference to an object of type type_safe_union<Types...>
+              for some alternative types Types...
+            - f is a callable object capable of operating on all the types contained
+              in tsu.  I.e.  std::forward<F>(f)(this->get<U>()) must be a valid
+              expression for all the possible U types.
+        ensures
+            - if (tsu.is_empty() == false) then
+                - Let U denote the type of object currently contained in tsu
+                - returns std::forward<F>(f)(this->get<U>())
+                - The object passed to f() (i.e. by this->get<U>()) will have the same reference type as Variant.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template<typename... Types>
     void serialize (
         const type_safe_union<Types...>& item, 
@@ -477,7 +483,7 @@ namespace dlib
         assert(result == "hello there");
         result = "";
 
-        result = a.visit(overloaded(
+        result = visit(overloaded(
             [](int) {
                 return std::string("int");
             },
@@ -487,13 +493,13 @@ namespace dlib
             [](const std::string& item) {
                 return item;
             }
-        ));
+        ), a);
 
         assert(result == "hello there");
 
         std::vector<int> type_ids;
 
-        a.for_each(overloaded(
+        for_each_type(a, overloaded(
             [&type_ids](in_place_tag<int>, tsu& me) {
                 type_ids.push_back(me.get_type_id<int>());
             },
