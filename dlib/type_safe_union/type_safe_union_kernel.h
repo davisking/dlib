@@ -517,34 +517,24 @@ namespace dlib
     namespace detail
     {
         template<
-            size_t I,
             typename Variant,
             typename F,
-            typename Tsu = typename std::decay<Variant>::type
+            std::size_t... I
         >
-        typename std::enable_if<(I == variant_size<Tsu>::value)>::type
-        for_each_type_impl(
-            Variant&&,
-            F&&
-        )
-        {
-        }
-
-        template<
-            size_t I,
-            typename Variant,
-            typename F,
-            typename Tsu = typename std::decay<Variant>::type
-        >
-        typename std::enable_if<(I < variant_size<Tsu>::value)>::type
-        for_each_type_impl(
+        void for_each_type_impl(
             Variant&& tsu,
-            F&& f
+            F&& f,
+            dlib::index_sequence<I...>
         )
         {
-            using T = variant_alternative_t<I, Tsu>;
-            std::forward<F>(f)(in_place_tag<T>{}, std::forward<Variant>(tsu));
-            for_each_type_impl<I+1>(std::forward<Variant>(tsu), std::forward<F>(f));
+            using Tsu = typename std::decay<Variant>::type;
+            return (void)std::initializer_list<int>{
+                (std::forward<F>(f)(
+                        in_place_tag<variant_alternative_t<I, Tsu>>{},
+                        std::forward<Variant>(tsu)),
+                 0
+                )...
+            };
         }
 
         template<
@@ -617,7 +607,9 @@ namespace dlib
         F&& f
     )
     {
-        detail::for_each_type_impl<0>(std::forward<Variant>(tsu), std::forward<F>(f));
+        using Tsu = typename std::decay<Variant>::type;
+        static constexpr std::size_t Size = variant_size<Tsu>::value;
+        detail::for_each_type_impl(std::forward<Variant>(tsu), std::forward<F>(f), dlib::make_index_sequence<Size>{});
     }
 
     template<
