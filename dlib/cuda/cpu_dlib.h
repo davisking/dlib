@@ -527,7 +527,8 @@ namespace dlib
                 int stride_y,
                 int stride_x,
                 int padding_y,
-                int padding_x
+                int padding_x,
+                long groups
             ) 
             {
                 (void)data;    /* silence compiler */
@@ -538,6 +539,7 @@ namespace dlib
                 last_stride_x = stride_x;
                 last_padding_y = padding_y;
                 last_padding_x = padding_x;            
+                groups = 1;
             }
 
              void operator() (
@@ -590,6 +592,7 @@ namespace dlib
             long last_stride_x = 0;
             long last_padding_y = 0;
             long last_padding_x = 0;
+            long groups = 1;
         };
 
     // -----------------------------------------------------------------------------------
