@@ -939,10 +939,22 @@ namespace dlib
             int stride_y_,
             int stride_x_,
             int padding_y_,
-            int padding_x_
-        ) 
+            int padding_x_,
+            long groups_
+        )
         {
-            DLIB_CASSERT(data.k() == filters.k());
+            DLIB_CASSERT(groups_ > 0);
+            if (groups_ == 1)
+            {
+                DLIB_CASSERT(data.k() == filters.k());
+            }
+            else
+            {
+                DLIB_CASSERT(data.k() % filters.num_samples() == 0,
+                    "The number of input channels (" << data.k()
+                    << ") must be a muliple of the number of filters ("
+                    << filters.num_samples() << ")");
+            }
 
             // if the last call to setup gave the same exact settings then don't do
             // anything.
@@ -955,7 +967,8 @@ namespace dlib
                 padding_y_ == padding_y && 
                 padding_x_ == padding_x &&
                 filters_num_samples == filters.num_samples() &&
-                filters_k == filters.k() &&
+                filters_k == filters.k() * groups_ &&
+                groups_ == groups &&
                 filters_nr == filters.nr() &&
                 filters_nc == filters.nc()
             )
@@ -978,6 +991,7 @@ namespace dlib
                 filters_k = filters.k();
                 filters_nr = filters.nr();
                 filters_nc = filters.nc();
+                groups = groups_;
 
                 CHECK_CUDNN(cudnnCreateFilterDescriptor((cudnnFilterDescriptor_t*)&filter_handle));
                 CHECK_CUDNN(cudnnSetFilter4dDescriptor((cudnnFilterDescriptor_t)filter_handle, 
@@ -1006,6 +1020,12 @@ namespace dlib
                         stride_x,
                         1, 1, // must be 1,1
                         CUDNN_CROSS_CORRELATION)); // could also be CUDNN_CONVOLUTION
+#endif
+
+#if CUDNN_MAJOR >= 7
+                CHECK_CUDNN(cudnnSetConvolutionGroupCount((cudnnConvolutionDescriptor_t)conv_handle, groups));
+#else
+                DLIB_CASSERT(groups == 1, "Grouped convolutions are not supported in CUDA " << CUDNN_MAJOR);
 #endif
 
                 CHECK_CUDNN(cudnnGetConvolution2dForwardOutputDim(
@@ -1161,7 +1181,7 @@ namespace dlib
         {
             DLIB_CASSERT(is_same_object(output,data) == false);
             DLIB_CASSERT(is_same_object(output,filters) == false);
-            DLIB_CASSERT(filters.k() == data.k());
+            DLIB_CASSERT(filters.k() == data.k() / groups);
             DLIB_CASSERT(stride_y > 0 && stride_x > 0, "You must call setup() before calling this function");
             DLIB_CASSERT(filters.nc() <= data.nc() + 2*padding_x,
                 "Filter windows must be small enough to fit into the padded image."

@@ -221,7 +221,8 @@ namespace dlib
                 int stride_y,
                 int stride_x,
                 int padding_y,
-                int padding_x
+                int padding_x,
+                long groups
             );
 
            void setup(
@@ -243,6 +244,7 @@ namespace dlib
             int padding_x;
             long data_num_samples, data_k, data_nr, data_nc;
             long filters_num_samples, filters_k, filters_nr, filters_nc;
+            long groups;
 
 
             void* filter_handle;

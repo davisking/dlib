@@ -34,7 +34,8 @@ namespace dlib
         int _stride_y,
         int _stride_x,
         int _padding_y = _stride_y!=1? 0 : _nr/2,
-        int _padding_x = _stride_x!=1? 0 : _nc/2
+        int _padding_x = _stride_x!=1? 0 : _nc/2,
+        long _groups = 1
         >
     class con_
     {
@@ -49,6 +50,7 @@ namespace dlib
         static_assert(_nc==0 || (0 <= _padding_x && _padding_x < _nc), "The padding must be smaller than the filter size.");
         static_assert(_nr!=0 || 0 == _padding_y, "If _nr==0 then the padding must be set to 0 as well.");
         static_assert(_nc!=0 || 0 == _padding_x, "If _nr==0 then the padding must be set to 0 as well.");
+        static_assert(_groups >= 0, "The number of groups must be >= 0");
 
         con_(
             num_con_outputs o
@@ -58,16 +60,19 @@ namespace dlib
             bias_learning_rate_multiplier(1),
             bias_weight_decay_multiplier(0),
             num_filters_(o.num_outputs),
+            groups_(_groups),
             padding_y_(_padding_y),
             padding_x_(_padding_x),
             use_bias(true)
         {
             DLIB_CASSERT(num_filters_ > 0);
+            DLIB_CASSERT(groups_ >= 0);
         }
 
         con_() : con_(num_con_outputs(_num_filters)) {}
 
         long num_filters() const { return num_filters_; }
+        long groups() const { return groups_; }
         long nr() const 
         { 
             if (_nr==0)
@@ -95,6 +100,17 @@ namespace dlib
                 DLIB_CASSERT(get_layer_params().size() == 0, 
                     "You can't change the number of filters in con_ if the parameter tensor has already been allocated.");
                 num_filters_ = num;
+            }
+        }
+
+        void set_groups(long num)
+        {
+            DLIB_CASSERT(num > 0);
+            if (num != groups_)
+            {
+                DLIB_CASSERT(get_layer_params().size() == 0, 
+                    "You can't change the number of groups in con_ if the parameter tensor has already been allocated.");
+                groups_ = num;
             }
         }
 
@@ -169,6 +185,7 @@ namespace dlib
             bias_learning_rate_multiplier(item.bias_learning_rate_multiplier),
             bias_weight_decay_multiplier(item.bias_weight_decay_multiplier),
             num_filters_(item.num_filters_),
+            groups_(item.groups_),
             padding_y_(item.padding_y_),
             padding_x_(item.padding_x_),
             use_bias(item.use_bias)
@@ -196,6 +213,7 @@ namespace dlib
             bias_learning_rate_multiplier = item.bias_learning_rate_multiplier;
             bias_weight_decay_multiplier = item.bias_weight_decay_multiplier;
             num_filters_ = item.num_filters_;
+            groups_ = item.groups_;
             use_bias = item.use_bias;
             return *this;
         }
@@ -205,16 +223,17 @@ namespace dlib
         {
             const long filt_nr = _nr!=0 ? _nr : sub.get_output().nr();
             const long filt_nc = _nc!=0 ? _nc : sub.get_output().nc();
+            groups_ = _groups!=0 ? _groups : sub.get_output().k();
 
-            long num_inputs = filt_nr*filt_nc*sub.get_output().k();
-            long num_outputs = num_filters_;
+            const long num_inputs = filt_nr*filt_nc*sub.get_output().k();
+            const long num_outputs = num_filters_;
             // allocate params for the filters and also for the filter bias values.
-            params.set_size(num_inputs*num_filters_ + static_cast<int>(use_bias) * num_filters_);
+            params.set_size(num_inputs*num_filters_/groups_ + static_cast<int>(use_bias) * num_filters_);
 
             dlib::rand rnd(std::rand());
             randomize_parameters(params, num_inputs+num_outputs, rnd);
 
-            filters = alias_tensor(num_filters_, sub.get_output().k(), filt_nr, filt_nc);
+            filters = alias_tensor(num_filters_, sub.get_output().k()/groups_, filt_nr, filt_nc);
             if (use_bias)
             {
                 biases = alias_tensor(1,num_filters_);
@@ -231,7 +250,8 @@ namespace dlib
                        _stride_y,
                        _stride_x,
                        padding_y_,
-                       padding_x_);
+                       padding_x_,
+                       groups_);
             if (use_bias)
             {
                 conv(false, output,
@@ -338,8 +358,10 @@ namespace dlib
                 << ", stride_y="<<_stride_y
                 << ", stride_x="<<_stride_x
                 << ", padding_y="<<item.padding_y_
-                << ", padding_x="<<item.padding_x_
-                << ")";
+                << ", padding_x="<<item.padding_x_;
+            if (item.groups_ != 1)
+                out << ", groups=" << item.groups_;
+            out << ")";
             out << " learning_rate_mult="<<item.learning_rate_multiplier;
             out << " weight_decay_mult="<<item.weight_decay_multiplier;
             if (item.use_bias)
@@ -384,6 +406,7 @@ namespace dlib
         double bias_learning_rate_multiplier;
         double bias_weight_decay_multiplier;
         long num_filters_;
+        long groups_;
 
         // These are here only because older versions of con (which you might encounter
         // serialized to disk) used different padding settings.
@@ -562,7 +585,7 @@ namespace dlib
             unsigned int gnsamps = sub.get_output().num_samples();
             unsigned int gk = filt.k();
             output.set_size(gnsamps,gk,gnr,gnc);
-            conv.setup(output,filt,_stride_y,_stride_x,padding_y_,padding_x_);
+            conv.setup(output,filt,_stride_y,_stride_x,padding_y_,padding_x_,1);
             conv.get_gradient_for_data(false, sub.get_output(),filt,output);            
             if (use_bias)
             {
