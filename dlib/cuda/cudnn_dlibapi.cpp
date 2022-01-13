@@ -1107,7 +1107,7 @@ namespace dlib
         {
             DLIB_CASSERT(is_same_object(output,data) == false);
             DLIB_CASSERT(is_same_object(output,filters) == false);
-            DLIB_CASSERT(filters.k() == data.k());
+            DLIB_CASSERT(filters.k() == data.k() / groups);
             DLIB_CASSERT(stride_y > 0 && stride_x > 0, "You must call setup() before calling this function");
             DLIB_CASSERT(filters.nc() <= data.nc() + 2*padding_x,
                 "Filter windows must be small enough to fit into the padded image."
