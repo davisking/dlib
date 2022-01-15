@@ -2251,7 +2251,7 @@ namespace dlib
 
         void back_propagate_error(
             const tensor& /*x*/,
-            zero_gradients zero_grads = zero_gradients::yes
+            zero_gradients /*zero_grads*/ = zero_gradients::yes
         )
         {
             // nothing to do
