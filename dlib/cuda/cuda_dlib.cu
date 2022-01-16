@@ -1917,8 +1917,6 @@ namespace dlib
         {
             for (auto n : grid_stride_range_y(0, ns))
             {
-                float temp_bg = 0;
-                float temp_gg = 0;
                 float temp_dv = 0;
                 for (auto i : grid_stride_range(0, num))
                 {
