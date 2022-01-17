@@ -43,33 +43,35 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template<typename Variant>
-    struct variant_size;
+    template<typename TSU>
+    struct type_safe_union_size
+    {
+        static constexpr size_t value = The number of types in the TSU.
+    };
     /*!
+        requires
+            - TSU must be of type type_safe_union<Types...> with possible cv qualification
         ensures
-            - if Variant is of type type_safe_union<Types...> with possible cv qualification
-              for some althernative types Types... then returns sizeof...(Types)
-            - Identical behaviour to std::variant_size except it works with dlib::type_safe_union,
-              not std::variant. See cppreference on const, volative or cv qualification behaviour.
+            - value contains the number of types in TSU, i.e. sizeof...(Types...)
     !*/
 
 // ----------------------------------------------------------------------------------------
 
-    template <size_t I, typename Variant>
-    struct variant_alternative;
+    template <size_t I, typename TSU>
+    struct type_safe_union_alternative;
     /*!
+        requires
+            - TSU is a type_safe_union
         ensures
-            - if Variant is of type type_safe_union<Types...> for some althernative types Types... then
-                provides a member typedef type which corresponds to the Ith type in Types...
-            - Identical behaviour to std::variant_alternative except it works with dlib::type_safe_union,
-              not std::variant. See cppreference on const, volative or cv qualification behaviour.
+            - type_safe_union_alternative<I, TSU>::type is the Ith type in the TSU.
+            - TSU::get_type_id<typename type_safe_union_alternative<I, TSU>::type>() == I
     !*/
 
-    template<size_t I, typename Variant>
-    using variant_alternative_t;
+    template<size_t I, typename TSU>
+    using type_safe_union_alternative_t;
     /*!
         ensures
-            - provides template alias for variant_alternative
+            - provides template alias for type_safe_union_alternative
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -239,9 +241,9 @@ namespace dlib
         /*!
             ensures
                 - if (this type_safe_union currently contains an object of type T) then
-                    - returns true
+                    returns true
                 - else
-                    - returns false
+                    returns false
         !*/
 
         bool is_empty (
@@ -249,9 +251,9 @@ namespace dlib
         /*!
             ensures
                 - if (this type_safe_union currently contains any object at all) then
-                    - returns true
+                    returns true
                 - else
-                    - returns false
+                    returns false
         !*/
 
         int get_current_type_id(
@@ -261,7 +263,7 @@ namespace dlib
                 - returns type_identity, i.e, the index of the currently held type.
                   For example if the current type is the first template argument it returns 1, if it's the second then 2, and so on.
                   If the current object is empty, i.e. is_empty() == true, then
-                    - returns 0
+                    returns 0
         !*/
 
         template <typename F>
@@ -375,25 +377,23 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template<
-        typename Variant,
+        typename TSU,
         typename F
     >
     void for_each_type(
-        Variant&& tsu,
-        F&& f
+        F&& f,
+        TSU&& tsu
     );
     /*!
         requires
-            - Variant&& is a universal reference to object of type type_safe_union<Types...> for some
+            - TSU&& is a universal reference to object of type type_safe_union<Types...> for some
               alternative types Types...
             - f is a callable object such that the following expression is valid for
               all types U in Types...:
-
-                std::forward<F>(f)(const in_place_tag<U>& tag, Variant&& tsu)
+                std::forward<F>(f)(const in_place_tag<U>& tag, TSU&& tsu)
         ensures
             - This function iterates over all types U in Types... and calls:
-
-                std::forward<F>(f)(const in_place_tag<U>& tag, Variant&& tsu)
+                std::forward<F>(f)(const in_place_tag<U>& tag, TSU&& tsu)
 
             - tsu is perfect-forwarded for all types U in Types... regardless of whether U is the current
               object held by tsu.
@@ -403,15 +403,15 @@ namespace dlib
 
     template<
         typename F,
-        typename Variant
+        typename TSU
     >
     auto visit(
         F&& f,
-        Variant&& tsu
+        TSU&& tsu
     );
     /*!
         requires
-            - Variant&& is a universal reference to an object of type type_safe_union<Types...>
+            - TSU&& is a universal reference to an object of type type_safe_union<Types...>
               for some alternative types Types...
             - f is a callable object capable of operating on all the types contained
               in tsu.  I.e.  std::forward<F>(f)(this->get<U>()) must be a valid
@@ -420,7 +420,7 @@ namespace dlib
             - if (tsu.is_empty() == false) then
                 - Let U denote the type of object currently contained in tsu
                 - returns std::forward<F>(f)(this->get<U>())
-                - The object passed to f() (i.e. by this->get<U>()) will have the same reference type as Variant.
+                - The object passed to f() (i.e. by this->get<U>()) will have the same reference type as TSU.
     !*/
 
 // ----------------------------------------------------------------------------------------

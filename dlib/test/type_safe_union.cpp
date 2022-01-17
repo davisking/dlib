@@ -675,6 +675,22 @@ namespace
         /*! Local classes aren't allowed to have template member functions... !*/
 
         using tsu = type_safe_union<int,float,std::string>;
+        static_assert(type_safe_union_size<tsu>::value == 3, "bad number of types");
+        static_assert(std::is_same<type_safe_union_alternative_t<0, tsu>, int>::value, "bad type");
+        static_assert(std::is_same<type_safe_union_alternative_t<1, tsu>, float>::value, "bad type");
+        static_assert(std::is_same<type_safe_union_alternative_t<2, tsu>, std::string>::value, "bad type");
+
+        static_assert(std::is_same<type_safe_union_alternative_t<0, const tsu>, const int>::value, "bad type");
+        static_assert(std::is_same<type_safe_union_alternative_t<1, const tsu>, const float>::value, "bad type");
+        static_assert(std::is_same<type_safe_union_alternative_t<2, const tsu>, const std::string>::value, "bad type");
+
+        static_assert(std::is_same<type_safe_union_alternative_t<0, volatile tsu>, volatile int>::value, "bad type");
+        static_assert(std::is_same<type_safe_union_alternative_t<1, volatile tsu>, volatile float>::value, "bad type");
+        static_assert(std::is_same<type_safe_union_alternative_t<2, volatile tsu>, volatile std::string>::value, "bad type");
+
+        static_assert(std::is_same<type_safe_union_alternative_t<0, const volatile tsu>, const volatile int>::value, "bad type");
+        static_assert(std::is_same<type_safe_union_alternative_t<1, const volatile tsu>, const volatile float>::value, "bad type");
+        static_assert(std::is_same<type_safe_union_alternative_t<2, const volatile tsu>, const volatile std::string>::value, "bad type");
 
         struct for_each_visitor
         {
@@ -691,7 +707,7 @@ namespace
         {
             tsu a;
             for_each_visitor visitor;
-            for_each_type(a, visitor);
+            for_each_type(visitor, a);
             
             DLIB_TEST(visitor.type_indices.size() == 3);
             DLIB_TEST(visitor.type_indices[0] == 1);
@@ -728,19 +744,19 @@ namespace
         void test()
         {
             tsu a;
-            for_each_type(a, for_each_visitor{1});
+            for_each_type(for_each_visitor{1}, a);
             DLIB_TEST(a.contains<int>());
             a.clear();
-            for_each_type(a, for_each_visitor{2});
+            for_each_type(for_each_visitor{2}, a);
             DLIB_TEST(a.contains<float>());
             a.clear();
-            for_each_type(a, for_each_visitor{3});
+            for_each_type(for_each_visitor{3}, a);
             DLIB_TEST(a.contains<std::string>());
             a.clear();
-            for_each_type(a, for_each_visitor{-1});
+            for_each_type(for_each_visitor{-1}, a);
             DLIB_TEST(a.is_empty());
             a.clear();
-            for_each_type(a, for_each_visitor{215465});
+            for_each_type(for_each_visitor{215465}, a);
             DLIB_TEST(a.is_empty());
         }
     }
@@ -791,7 +807,7 @@ namespace
             visit(serializer_typeid(out), a);
 
             tsu2 b;
-            for_each_type(b, deserializer_typeid(out));
+            for_each_type(deserializer_typeid(out), b);
 
             DLIB_TEST(b.contains<std::string>());
             DLIB_TEST(b.get<std::string>() == "hello from tsu1");
