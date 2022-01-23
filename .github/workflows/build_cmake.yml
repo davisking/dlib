@@ -33,4 +33,9 @@ jobs:
 
     - name: Test
       working-directory: ${{ github.workspace }}/dlib/test/${{ env.build_dir }}
-      run: ./dtest --runall
+      run: |
+        if [ "$RUNNER_OS" == "Windows" ]; then
+          dtest.exe --runall
+        else
+          ./dtest --runall
+        fi;
