@@ -19,7 +19,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template<typename T>
-    struct in_place_tag {};
+    struct in_place_tag { using type = T; };
     /*!
         This is an empty class type used as a special disambiguation tag to be
         passed as the first argument to the constructor of type_safe_union that performs
@@ -68,7 +68,7 @@ namespace dlib
     !*/
 
     template<size_t I, typename TSU>
-    using type_safe_union_alternative_t;
+    using type_safe_union_alternative_t = type_safe_union_alternative<I,TSU>::type;
     /*!
         ensures
             - provides template alias for type_safe_union_alternative
@@ -227,12 +227,12 @@ namespace dlib
         /*!
            ensures
                 - if (T is the same type as one of the template arguments) then
-                    returns a number indicating which template argument it is. In particular,
-                    if it's the first template argument it returns 1, if the second then 2, and so on.
+                    - returns a number indicating which template argument it is. In particular,
+                      if it's the first template argument it returns 1, if the second then 2, and so on.
                 - else if (T is in_place_tag<U>) then 
-                    equivalent to returning get_type_id<U>())
+                    - equivalent to returning get_type_id<U>())
                 - else
-                    returns -1
+                    - returns -1
         !*/
 
         template <typename T>
@@ -241,9 +241,9 @@ namespace dlib
         /*!
             ensures
                 - if (this type_safe_union currently contains an object of type T) then
-                    returns true
+                    - returns true
                 - else
-                    returns false
+                    - returns false
         !*/
 
         bool is_empty (
@@ -251,19 +251,21 @@ namespace dlib
         /*!
             ensures
                 - if (this type_safe_union currently contains any object at all) then
-                    returns true
+                    - returns true
                 - else
-                    returns false
+                    - returns false
         !*/
 
         int get_current_type_id(
         ) const;
         /*!
             ensures
-                - returns type_identity, i.e, the index of the currently held type.
-                  For example if the current type is the first template argument it returns 1, if it's the second then 2, and so on.
-                  If the current object is empty, i.e. is_empty() == true, then
-                    returns 0
+                - if (is_empty()) then
+                    - returns 0
+                - else
+                    - Returns the type id of the currently held type.  This is the same as
+                      get_type_id<WhateverTypeIsCurrentlyHeld>().  Therefore, if the current type is
+                      the first template argument it returns 1, if it's the second then 2, and so on.
         !*/
 
         template <typename F>
@@ -316,15 +318,13 @@ namespace dlib
                     - returns a non-const reference to the newly created T object.
         !*/
 
-        template <
-            typename T
-        >
+        template <typename T>
         T& get(
             const in_place_tag<T>& tag
         );
         /*!
             ensures
-                equivalent to calling get<T>()
+                - equivalent to calling get<T>()
         !*/
 
         template <typename T>
@@ -386,17 +386,13 @@ namespace dlib
     );
     /*!
         requires
-            - TSU&& is a universal reference to object of type type_safe_union<Types...> for some
-              alternative types Types...
+            - tsu is an object of type type_safe_union<Types...> for some types Types...
             - f is a callable object such that the following expression is valid for
               all types U in Types...:
-                std::forward<F>(f)(const in_place_tag<U>& tag, TSU&& tsu)
+                std::forward<F>(f)(in_place_tag<U>{}, std::forward<TSU>(tsu))
         ensures
             - This function iterates over all types U in Types... and calls:
-                std::forward<F>(f)(const in_place_tag<U>& tag, TSU&& tsu)
-
-            - tsu is perfect-forwarded for all types U in Types... regardless of whether U is the current
-              object held by tsu.
+                std::forward<F>(f)(in_place_tag<U>{}, std::forward<TSU>(tsu))
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -411,16 +407,16 @@ namespace dlib
     );
     /*!
         requires
-            - TSU&& is a universal reference to an object of type type_safe_union<Types...>
-              for some alternative types Types...
+            - tsu is an object of type type_safe_union<Types...> for some types Types...
             - f is a callable object capable of operating on all the types contained
               in tsu.  I.e.  std::forward<F>(f)(this->get<U>()) must be a valid
               expression for all the possible U types.
         ensures
             - if (tsu.is_empty() == false) then
-                - Let U denote the type of object currently contained in tsu
+                - Let U denote the type of object currently contained in tsu.
                 - returns std::forward<F>(f)(this->get<U>())
-                - The object passed to f() (i.e. by this->get<U>()) will have the same reference type as TSU.
+                - The object passed to f() (i.e. by this->get<U>()) will have the same reference
+                  type as TSU.
     !*/
 
 // ----------------------------------------------------------------------------------------

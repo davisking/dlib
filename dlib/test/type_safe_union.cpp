@@ -787,8 +787,8 @@ namespace
                 dlib::deserialize(hash_code, in);
             }
 
-            template<typename T, typename Variant>
-            void operator()(in_place_tag<T>, Variant&& me)
+            template<typename T, typename TSU>
+            void operator()(in_place_tag<T>, TSU&& me)
             {
                 if (typeid(T).hash_code() == hash_code)
                     dlib::deserialize(me.template get<T>(), in);
