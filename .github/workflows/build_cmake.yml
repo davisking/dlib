@@ -1,0 +1,38 @@
+name: CMake
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+env:
+  build_type: RelWithDebInfo
+  build_dir: build
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure CMake
+        working-directory: ${{ github.workspace }}/dlib/test
+        run: cmake -S . -B . ${{ env.build_dir }} -DCMAKE_BUILD_TYPE=${{ env.build_type  }}
+
+      - name: Build
+        working-directory: ${{ github.workspace }}/dlib/test
+        run: cmake --build ${{ env.build_dir }}
+
+      - name: Test
+        working-directory: ${{ github.workspace }}/dlib/test/${{ env.build_dir }}
+        run: ./dtest --runall
