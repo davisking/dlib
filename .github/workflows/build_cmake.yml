@@ -24,13 +24,13 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Configure CMake
-        working-directory: ${{ github.workspace }}/dlib/test
+        working-directory: ${{ github.workspace }}/test
         run: cmake -S . -B . ${{ env.build_dir }} -DCMAKE_BUILD_TYPE=${{ env.build_type  }}
 
       - name: Build
-        working-directory: ${{ github.workspace }}/dlib/test
+        working-directory: ${{ github.workspace }}/test
         run: cmake --build ${{ env.build_dir }}
 
       - name: Test
-        working-directory: ${{ github.workspace }}/dlib/test/${{ env.build_dir }}
+        working-directory: ${{ github.workspace }}/test/${{ env.build_dir }}
         run: ./dtest --runall
