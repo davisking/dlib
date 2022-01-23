@@ -346,7 +346,7 @@ namespace dlib
             }
 
             if (_verbose)
-                std::cout << "Training complete                          " << std::endl;
+                std::cout << "\nTraining complete" << std::endl;
 
             return shape_predictor(initial_shape, forests, pixel_coordinates);
         }

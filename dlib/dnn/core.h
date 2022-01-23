@@ -652,7 +652,10 @@ namespace dlib
             // Not much here because in this case T is one of the input layer types 
             // that doesn't have anything in it.
             typedef T layer_details_type;
+            typedef T input_layer_type;
             const layer_details_type& layer_details() const { return l; }
+            const input_layer_type& input_layer() const { return l; }
+            input_layer_type& input_layer() { return l; }
             unsigned int sample_expansion_factor() const { return _sample_expansion_factor; }
         private:
             T& l;
@@ -671,6 +674,7 @@ namespace dlib
             const static size_t num_computational_layers = T::num_computational_layers;
             const static size_t num_layers = T::num_layers;
             typedef typename T::layer_details_type layer_details_type;
+            typedef typename T::input_layer_type input_layer_type;
 
             subnet_wrapper(T& l_, unsigned int = 0) : l(l_),subnetwork(l.subnet(), l.sample_expansion_factor()) {}
 
@@ -682,6 +686,9 @@ namespace dlib
             const subnet_wrapper<typename T::subnet_type,false>& subnet() const { return subnetwork; }
             subnet_wrapper<typename T::subnet_type,false>& subnet() { return subnetwork; }
             unsigned int sample_expansion_factor() const { return l.sample_expansion_factor(); }
+
+            const input_layer_type& input_layer() const { return l.input_layer(); }
+            input_layer_type& input_layer() { return l.input_layer(); }
 
         private:
             T& l;
@@ -700,6 +707,7 @@ namespace dlib
             const static size_t num_computational_layers = T::num_computational_layers;
             const static size_t num_layers = T::num_layers;
             typedef typename T::layer_details_type layer_details_type;
+            typedef typename T::input_layer_type input_layer_type;
 
             subnet_wrapper(T& l_, unsigned int = 0) : l(l_),subnetwork(l.subnet(), l.sample_expansion_factor()) {}
 
@@ -712,11 +720,22 @@ namespace dlib
             subnet_wrapper<typename T::subnet_type,false>& subnet() { return subnetwork; }
             unsigned int sample_expansion_factor() const { return l.sample_expansion_factor(); }
 
+            const input_layer_type& input_layer() const { return l.input_layer(); }
+            input_layer_type& input_layer() { return l.input_layer(); }
+
         private:
             T& l;
             subnet_wrapper<typename T::subnet_type,false> subnetwork;
         };
     }
+
+// ----------------------------------------------------------------------------------------
+
+    enum class zero_gradients : uint8_t
+    {
+        no = 0,
+        yes = 1
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -738,6 +757,7 @@ namespace dlib
     public:
         typedef LAYER_DETAILS layer_details_type;
         typedef SUBNET subnet_type;
+        typedef typename subnet_type::input_layer_type input_layer_type;
         typedef typename subnet_type::input_type input_type;
         const static size_t num_layers = subnet_type::num_layers + 1;
         const static size_t num_computational_layers = subnet_type::num_computational_layers + 1;
@@ -991,21 +1011,28 @@ namespace dlib
         const tensor& get_final_data_gradient(
         ) const { return subnetwork->get_final_data_gradient(); }
 
-        void back_propagate_error(const tensor& x)
+        void back_propagate_error(
+            const tensor& x,
+            zero_gradients zero_grads = zero_gradients::yes
+        )
         {
-            back_propagate_error(x, private_get_gradient_input());
+            back_propagate_error(x, private_get_gradient_input(), zero_grads);
         }
-        void back_propagate_error(const tensor& x, const tensor& gradient_input)
+        void back_propagate_error(
+            const tensor& x,
+            const tensor& gradient_input,
+            zero_gradients zero_grads = zero_gradients::yes
+        )
         {
             dimpl::subnet_wrapper<subnet_type> wsub(*subnetwork);
             params_grad.copy_size(details.get_layer_params());
             impl::call_layer_backward(details, private_get_output(),
                 gradient_input, wsub, static_cast<tensor&>(params_grad));
 
-            subnetwork->back_propagate_error(x); 
+            subnetwork->back_propagate_error(x, zero_grads); 
 
             // zero out get_gradient_input()
-            gradient_input_is_stale = true;
+            gradient_input_is_stale = zero_grads == zero_gradients::yes;
         }
 
         template <typename solver_type>
@@ -1037,10 +1064,19 @@ namespace dlib
         const subnet_type& subnet() const { return *subnetwork; }
         subnet_type& subnet() { return *subnetwork; }
 
+        const input_layer_type& input_layer() const { return subnet().input_layer(); } 
+        input_layer_type& input_layer() { return subnet().input_layer(); } 
+
         const layer_details_type& layer_details() const { return details; } 
         layer_details_type& layer_details() { return details; } 
 
         unsigned int sample_expansion_factor() const { return subnet().sample_expansion_factor(); }
+
+        void set_gradient_inputs_to_zero()
+        {
+            gradient_input_is_stale = true;
+            subnetwork->set_gradient_inputs_to_zero();
+        }
 
         void clean()
         {
@@ -1164,6 +1200,7 @@ namespace dlib
     public:
         typedef LAYER_DETAILS layer_details_type;
         typedef INPUT_LAYER subnet_type;
+        typedef INPUT_LAYER input_layer_type;
         typedef typename INPUT_LAYER::input_type input_type;
         const static size_t num_layers = 2;
         const static size_t num_computational_layers = 1;
@@ -1198,7 +1235,7 @@ namespace dlib
         add_layer(
             const add_layer<T,U,E>& item
         ):
-            input_layer(item.subnet()),
+            input_layer_(item.subnet()),
             details(item.layer_details()),
             this_layer_setup_called(item.this_layer_setup_called),
             gradient_input_is_stale(item.gradient_input_is_stale),
@@ -1223,7 +1260,7 @@ namespace dlib
         add_layer(
             const INPUT_LAYER& il 
         ) : 
-            input_layer(il), 
+            input_layer_(il), 
             this_layer_setup_called(false),
             gradient_input_is_stale(true),
             get_output_and_gradient_input_disabled(false),
@@ -1245,7 +1282,7 @@ namespace dlib
             INPUT_LAYER il
         ) : 
             details(std::move(layer_det)),
-            input_layer(std::move(il)),
+            input_layer_(std::move(il)),
             this_layer_setup_called(false),
             gradient_input_is_stale(true),
             get_output_and_gradient_input_disabled(false),
@@ -1284,7 +1321,7 @@ namespace dlib
             resizable_tensor& data
         ) const
         {
-            input_layer.to_tensor(ibegin, iend, data);
+            input_layer_.to_tensor(ibegin, iend, data);
             // make sure the input layer's to_tensor() function is implemented properly.
             DLIB_CASSERT(data.num_samples() >= std::distance(ibegin,iend), 
             "The input layer can't produce fewer output tensors than there are inputs.");
@@ -1358,11 +1395,18 @@ namespace dlib
         const tensor& get_final_data_gradient(
         ) const { return grad_final; }
 
-        void back_propagate_error(const tensor& x)
+        void back_propagate_error(
+            const tensor& x,
+            zero_gradients zero_grads = zero_gradients::yes
+        )
         {
-            back_propagate_error(x, private_get_gradient_input());
+            back_propagate_error(x, private_get_gradient_input(), zero_grads);
         }
-        void back_propagate_error(const tensor& x, const tensor& gradient_input)
+        void back_propagate_error(
+            const tensor& x,
+            const tensor& gradient_input,
+            zero_gradients zero_grads = zero_gradients::yes
+        )
         {
             // make sure grad_final is initialized to 0
             if (!have_same_dimensions(x, grad_final))
@@ -1375,7 +1419,7 @@ namespace dlib
                 gradient_input, wsub, static_cast<tensor&>(params_grad));
 
             // zero out get_gradient_input()
-            gradient_input_is_stale = true;
+            gradient_input_is_stale = zero_grads == zero_gradients::yes;
         }
 
         template <typename solver_type>
@@ -1403,13 +1447,21 @@ namespace dlib
         tensor& get_parameter_gradient (
         )  { return params_grad; }
 
-        const subnet_type& subnet() const { return input_layer; } 
-        subnet_type& subnet() { return input_layer; } 
+        const subnet_type& subnet() const { return input_layer_; } 
+        subnet_type& subnet() { return input_layer_; } 
+
+        const subnet_type& input_layer() const { return input_layer_; } 
+        subnet_type& input_layer() { return input_layer_; } 
 
         const layer_details_type& layer_details() const { return details; } 
         layer_details_type& layer_details() { return details; } 
 
         unsigned int sample_expansion_factor() const { return _sample_expansion_factor; }
+
+        void set_gradient_inputs_to_zero()
+        {
+            gradient_input_is_stale = true;
+        }
 
         void clean()
         {
@@ -1426,7 +1478,7 @@ namespace dlib
         {
             int version = 3;
             serialize(version, out);
-            serialize(item.input_layer, out);
+            serialize(item.input_layer_, out);
             serialize(item.details, out);
             serialize(item.this_layer_setup_called, out);
             serialize(item.gradient_input_is_stale, out);
@@ -1443,7 +1495,7 @@ namespace dlib
             deserialize(version, in);
             if (!(2 <= version && version <= 3))
                 throw serialization_error("Unexpected version found while deserializing dlib::add_layer.");
-            deserialize(item.input_layer, in);
+            deserialize(item.input_layer_, in);
             deserialize(item.details, in);
             deserialize(item.this_layer_setup_called, in);
             deserialize(item.gradient_input_is_stale, in);
@@ -1512,7 +1564,7 @@ namespace dlib
 
         void swap(add_layer& item)
         {
-            std::swap(input_layer, item.input_layer);
+            std::swap(input_layer_, item.input_layer_);
             std::swap(details, item.details);
             std::swap(this_layer_setup_called, item.this_layer_setup_called);
             std::swap(gradient_input_is_stale, item.gradient_input_is_stale);
@@ -1523,7 +1575,7 @@ namespace dlib
             std::swap(_sample_expansion_factor, item._sample_expansion_factor); 
         }
 
-        subnet_type input_layer;
+        subnet_type input_layer_;
         LAYER_DETAILS details;
         bool this_layer_setup_called;
         bool gradient_input_is_stale;
@@ -1558,6 +1610,7 @@ namespace dlib
     public:
         typedef SUBNET subnet_type;
         typedef typename subnet_type::input_type input_type;
+        typedef typename subnet_type::input_layer_type input_layer_type;
         typedef int layer_details_type; // not really used anywhere, but required by subnet_wrapper.
         const static size_t num_layers = subnet_type::num_layers + 1;
         const static size_t num_computational_layers = subnet_type::num_computational_layers;
@@ -1622,13 +1675,20 @@ namespace dlib
         const tensor& get_final_data_gradient(
         ) const { return subnetwork.get_final_data_gradient(); }
 
-        void back_propagate_error(const tensor& x)
+        void back_propagate_error(
+            const tensor& x,
+            zero_gradients zero_grads = zero_gradients::yes
+        )
         {
-            subnetwork.back_propagate_error(x);
+            subnetwork.back_propagate_error(x, zero_grads);
         }
-        void back_propagate_error(const tensor& x, const tensor& gradient_input)
+        void back_propagate_error(
+            const tensor& x,
+            const tensor& gradient_input,
+            zero_gradients zero_grads = zero_gradients::yes
+        )
         {
-            subnetwork.back_propagate_error(x,gradient_input);
+            subnetwork.back_propagate_error(x,gradient_input, zero_grads);
         }
 
         template <typename solver_type>
@@ -1652,7 +1712,15 @@ namespace dlib
         const subnet_type& subnet() const { return subnetwork; }
         subnet_type& subnet() { return subnetwork; }
 
+        const input_layer_type& input_layer() const { return subnet().input_layer(); } 
+        input_layer_type& input_layer() { return subnet().input_layer(); } 
+
         unsigned int sample_expansion_factor() const { return subnet().sample_expansion_factor(); }
+
+        void set_gradient_inputs_to_zero()
+        {
+            subnetwork.set_gradient_inputs_to_zero();
+        }
 
         void clean()
         {
@@ -1760,6 +1828,7 @@ namespace dlib
     public:
         typedef SUBNET subnet_type;
         typedef typename SUBNET::input_type input_type;
+        typedef typename subnet_type::input_layer_type input_layer_type;
         typedef int layer_details_type; // not really used anywhere, but required by subnet_wrapper.
         const static size_t comp_layers_in_each_group = (REPEATED_LAYER<SUBNET>::num_computational_layers-SUBNET::num_computational_layers);
         const static size_t comp_layers_in_repeated_group = comp_layers_in_each_group*num;
@@ -1901,34 +1970,44 @@ namespace dlib
             return details[0].get_gradient_input();
         }
 
+        const tensor& get_final_data_gradient(
+        ) const { return subnetwork.get_final_data_gradient(); }
+
         const tensor& get_parameter_gradient(
         ) const { return details[0].get_parameter_gradient(); }
 
         tensor& get_parameter_gradient (
         ) { return details[0].get_parameter_gradient(); }
 
-        void back_propagate_error(const tensor& x)
+        void back_propagate_error(
+            const tensor& x,
+            zero_gradients zero_grads = zero_gradients::yes
+        )
         {
-            back_propagate_error(x, private_get_gradient_input());
+            back_propagate_error(x, private_get_gradient_input(), zero_grads);
         }
-        void back_propagate_error(const tensor& x, const tensor& gradient_input)
+        void back_propagate_error(
+            const tensor& x,
+            const tensor& gradient_input,
+            zero_gradients zero_grads = zero_gradients::yes
+        )
         {
             if (details.size() > 1)
             {
-                details[0].back_propagate_error(details[1].get_output(), gradient_input);
+                details[0].back_propagate_error(details[1].get_output(), gradient_input, zero_grads);
                 for (size_t i = 1; i < details.size(); ++i)
                 {
                     if (i+1 < details.size())
-                        details[i].back_propagate_error(details[i+1].get_output(), details[i-1].get_final_data_gradient());
+                        details[i].back_propagate_error(details[i+1].get_output(), details[i-1].get_final_data_gradient(), zero_grads);
                     else
-                        details[i].back_propagate_error(subnetwork.get_output(), details[i-1].get_final_data_gradient());
+                        details[i].back_propagate_error(subnetwork.get_output(), details[i-1].get_final_data_gradient(), zero_grads);
                 }
             }
             else
             {
-                details[0].back_propagate_error(subnetwork.get_output(), gradient_input);
+                details[0].back_propagate_error(subnetwork.get_output(), gradient_input, zero_grads);
             }
-            subnetwork.back_propagate_error(x, details.back().get_final_data_gradient());
+            subnetwork.back_propagate_error(x, details.back().get_final_data_gradient(), zero_grads);
         }
 
         template <typename solver_type>
@@ -1948,7 +2027,15 @@ namespace dlib
         const subnet_type& subnet() const { return subnetwork; }
         subnet_type& subnet() { return subnetwork; }
 
+        const input_layer_type& input_layer() const { return subnet().input_layer(); } 
+        input_layer_type& input_layer() { return subnet().input_layer(); } 
+
         unsigned int sample_expansion_factor() const { return subnet().sample_expansion_factor(); }
+
+        void set_gradient_inputs_to_zero()
+        {
+            subnetwork.set_gradient_inputs_to_zero();
+        }
 
         void clean()
         {
@@ -2044,6 +2131,7 @@ namespace dlib
     public:
         typedef INPUT_LAYER subnet_type;
         typedef typename subnet_type::input_type input_type;
+        typedef INPUT_LAYER input_layer_type;
         typedef int layer_details_type; // not really used anywhere, but required by subnet_wrapper.
         const static size_t num_computational_layers = 0;
         const static size_t num_layers = 2;
@@ -2059,7 +2147,7 @@ namespace dlib
         template <typename T, typename E>
         add_tag_layer(
             const add_tag_layer<ID,T,E>& item
-        ) : input_layer(item.subnet()), 
+        ) : input_layer_(item.subnet()), 
             cached_output(item.cached_output),
             cached_output_ptr(nullptr),
             grad_final(item.grad_final),
@@ -2071,7 +2159,7 @@ namespace dlib
         add_tag_layer(
             T ...args
         ) : 
-            input_layer(std::move(args)...),
+            input_layer_(std::move(args)...),
             cached_output_ptr(nullptr),
             gradient_input_is_stale(true),
             _sample_expansion_factor(0)
@@ -2093,7 +2181,7 @@ namespace dlib
             resizable_tensor& data
         ) const
         {
-            input_layer.to_tensor(ibegin,iend,data);
+            input_layer_.to_tensor(ibegin,iend,data);
 
             // make sure the input layer's to_tensor() function is implemented properly.
             DLIB_CASSERT(data.num_samples() >= std::distance(ibegin,iend), 
@@ -2113,7 +2201,7 @@ namespace dlib
             forward_iterator iend
         )
         {
-            input_layer.to_tensor(ibegin,iend,cached_output);
+            input_layer_.to_tensor(ibegin,iend,cached_output);
             cached_output_ptr = nullptr;
             return get_output();
         }
@@ -2160,11 +2248,19 @@ namespace dlib
             return grad_final; 
         }
 
-        void back_propagate_error(const tensor& /*x*/)
+
+        void back_propagate_error(
+            const tensor& /*x*/,
+            zero_gradients /*zero_grads*/ = zero_gradients::yes
+        )
         {
             // nothing to do
         }
-        void back_propagate_error(const tensor& /*x*/, const tensor& /*gradient_input*/)
+        void back_propagate_error(
+            const tensor& /*x*/,
+            const tensor& /*gradient_input*/,
+            zero_gradients zero_grads = zero_gradients::yes
+        )
         {
             // nothing to do
         }
@@ -2181,8 +2277,16 @@ namespace dlib
             update_parameters(make_sstack(solvers), learning_rate);
         }
 
-        const subnet_type& subnet() const { return input_layer; }
-        subnet_type& subnet() { return input_layer; }
+        const subnet_type& subnet() const { return input_layer_; }
+        subnet_type& subnet() { return input_layer_; }
+
+        const input_layer_type& input_layer() const { return input_layer_; } 
+        input_layer_type& input_layer() { return input_layer_; } 
+
+        void set_gradient_inputs_to_zero()
+        {
+            // nothing to do
+        }
 
         void clean()
         {
@@ -2195,7 +2299,7 @@ namespace dlib
         {
             int version = 2;
             serialize(version, out);
-            serialize(item.input_layer, out);
+            serialize(item.input_layer_, out);
             serialize(item.cached_output, out);
             serialize(item.grad_final, out);
             serialize(item.gradient_input_is_stale, out);
@@ -2208,7 +2312,7 @@ namespace dlib
             deserialize(version, in);
             if (!(1 <= version && version <= 2))
                 throw serialization_error("Unexpected version found while deserializing dlib::add_tag_layer.");
-            deserialize(item.input_layer, in);
+            deserialize(item.input_layer_, in);
             deserialize(item.cached_output, in);
             deserialize(item.grad_final, in);
             deserialize(item.gradient_input_is_stale, in);
@@ -2272,7 +2376,7 @@ namespace dlib
 
         void swap(add_tag_layer& item)
         {
-            std::swap(input_layer, item.input_layer);
+            std::swap(input_layer_, item.input_layer_);
             std::swap(cached_output, item.cached_output);
             std::swap(cached_output_ptr, item.cached_output_ptr);
             std::swap(grad_final, item.grad_final);
@@ -2280,7 +2384,7 @@ namespace dlib
             std::swap(_sample_expansion_factor, item._sample_expansion_factor);
         }
 
-        subnet_type input_layer;
+        subnet_type input_layer_;
         resizable_tensor cached_output;
         tensor* cached_output_ptr;
         resizable_tensor grad_final;
@@ -2345,6 +2449,7 @@ namespace dlib
         typedef LOSS_DETAILS loss_details_type;
         typedef SUBNET subnet_type;
         typedef typename subnet_type::input_type input_type;
+        typedef typename subnet_type::input_layer_type input_layer_type;
         const static size_t num_layers = subnet_type::num_layers + 1;
         // Note that the loss layer doesn't count as an additional computational layer.
         const static size_t num_computational_layers = subnet_type::num_computational_layers;
@@ -2483,14 +2588,21 @@ namespace dlib
             return results;
         }
 
-        void back_propagate_error(const tensor& x)
+        void back_propagate_error(
+            const tensor& x,
+            zero_gradients zero_grads = zero_gradients::yes
+        )
         {
-            subnet().back_propagate_error(x);
+            subnet().back_propagate_error(x, zero_grads);
         }
 
-        void back_propagate_error(const tensor& x, const tensor& gradient_input) 
+        void back_propagate_error(
+            const tensor& x,
+            const tensor& gradient_input,
+            zero_gradients zero_grads = zero_gradients::yes
+        )
         {
-            subnet().back_propagate_error(x, gradient_input);
+            subnet().back_propagate_error(x, gradient_input, zero_grads);
         }
 
         const tensor& get_final_data_gradient(
@@ -2569,43 +2681,47 @@ namespace dlib
         template <typename label_iterator>
         double compute_parameter_gradients (
             const tensor& x,
-            label_iterator lbegin
+            label_iterator lbegin,
+            zero_gradients zero_grads = zero_gradients::yes
         )
         {
             subnetwork.forward(x);
             dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
             double l = loss.compute_loss_value_and_gradient(x, lbegin, wsub);
-            subnetwork.back_propagate_error(x);
+            subnetwork.back_propagate_error(x, zero_grads);
             return l;
         }
         template <typename forward_iterator, typename label_iterator>
         double compute_parameter_gradients (
             forward_iterator ibegin,
             forward_iterator iend,
-            label_iterator lbegin
+            label_iterator lbegin,
+            zero_gradients zero_grads = zero_gradients::yes
         )
         {
             to_tensor(ibegin,iend,temp_tensor);
-            return compute_parameter_gradients(temp_tensor, lbegin);
+            return compute_parameter_gradients(temp_tensor, lbegin, zero_grads);
         }
         double compute_parameter_gradients (
-            const tensor& x
+            const tensor& x,
+            zero_gradients zero_grads = zero_gradients::yes
         )
         {
             subnetwork.forward(x);
             dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
             double l = loss.compute_loss_value_and_gradient(x, wsub);
-            subnetwork.back_propagate_error(x);
+            subnetwork.back_propagate_error(x, zero_grads);
             return l;
         }
         template <typename forward_iterator>
         double compute_parameter_gradients (
             forward_iterator ibegin,
-            forward_iterator iend
+            forward_iterator iend,
+            zero_gradients zero_grads = zero_gradients::yes
         )
         {
             to_tensor(ibegin,iend,temp_tensor);
-            return compute_parameter_gradients(temp_tensor);
+            return compute_parameter_gradients(temp_tensor, zero_grads);
         }
 
         template <typename solver_type>
@@ -2625,8 +2741,18 @@ namespace dlib
 
         const subnet_type& subnet() const { return subnetwork; }
         subnet_type& subnet() { return subnetwork; }
+
+        const input_layer_type& input_layer() const { return subnet().input_layer(); } 
+        input_layer_type& input_layer() { return subnet().input_layer(); } 
+
         const loss_details_type& loss_details() const { return loss; }
         loss_details_type& loss_details() { return loss; }
+
+        void set_gradient_inputs_to_zero (
+        )
+        {
+            subnetwork.set_gradient_inputs_to_zero();
+        }
 
         void clean (
         )
@@ -2885,43 +3011,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-
-    namespace dimpl
+    template <typename net_type>
+    typename net_type::input_layer_type& input_layer (
+        net_type& net
+    )
     {
-        template <typename T>
-        T& get_input_details (
-            T& net
-        ) 
-        { 
-            return net; 
-        } 
-
-        template <typename T, bool is_first, typename enabled>
-        auto get_input_details (
-            dimpl::subnet_wrapper<T,is_first,enabled>& net
-        ) -> decltype(net.layer_details())&
-        {
-            return net.layer_details();
-        }
-
-        template <typename T, bool is_first, typename enabled>
-        auto get_input_details (
-            const dimpl::subnet_wrapper<T,is_first,enabled>& net
-        ) -> decltype(net.layer_details())&
-        {
-            return net.layer_details();
-        }
+        return net.input_layer();
     }
 
     template <typename net_type>
-    auto input_layer (
-        net_type& net
-    ) -> decltype(dimpl::get_input_details(layer<net_type::num_layers-1>(net)))&
+    const typename net_type::input_layer_type& input_layer (
+        const net_type& net
+    )
     {
-        // Calling input_layer() on a subnet_wrapper is a little funny since the behavior of
-        // .subnet() returns another subnet_wrapper rather than an input details object as it
-        // does in add_layer.
-        return dimpl::get_input_details(layer<net_type::num_layers-1>(net));
+        return net.input_layer();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -2932,6 +3035,7 @@ namespace dlib
     public:
         typedef SUBNET subnet_type;
         typedef typename subnet_type::input_type input_type;
+        typedef typename subnet_type::input_layer_type input_layer_type;
         typedef int layer_details_type; // not really used anywhere, but required by subnet_wrapper.
         const static size_t num_layers = subnet_type::num_layers + 1;
         const static size_t num_computational_layers = subnet_type::num_computational_layers;
@@ -3005,9 +3109,12 @@ namespace dlib
             return subnetwork.get_final_data_gradient(); 
         }
 
-        void back_propagate_error(const tensor& x)
+        void back_propagate_error(
+            const tensor& x,
+            zero_gradients zero_grads = zero_gradients::yes
+        )
         {
-            subnetwork.back_propagate_error(x);
+            subnetwork.back_propagate_error(x, zero_grads);
         }
 
         template <typename solver_type>
@@ -3039,7 +3146,15 @@ namespace dlib
             return subnetwork; 
         }
 
+        const input_layer_type& input_layer() const { return subnet().input_layer(); } 
+        input_layer_type& input_layer() { return subnet().input_layer(); } 
+
         unsigned int sample_expansion_factor() const { return subnet().sample_expansion_factor(); }
+
+        void set_gradient_inputs_to_zero()
+        {
+            subnetwork.set_gradient_inputs_to_zero();
+        }
 
         void clean()
         {

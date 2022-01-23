@@ -1865,6 +1865,98 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        void clipped_relu (
+            tensor& dest,
+            const tensor& src,
+            const float ceiling
+        )
+        {
+            dest = upperbound(lowerbound(mat(src), 0), ceiling);
+        }
+
+        void clipped_relu_gradient (
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input,
+            const float ceiling
+        )
+        {
+            const auto out = grad.host();
+            const auto in = dest.host();
+            const auto gi = gradient_input.host();
+            if (is_same_object(grad, gradient_input))
+            {
+                for (size_t i = 0; i < dest.size(); ++i)
+                {
+                    if (in[i] > 0 && in[i] < ceiling)
+                        out[i] = gi[i];
+                    else
+                        out[i] = 0;
+                }
+            }
+            else
+            {
+                for (size_t i = 0; i < dest.size(); ++i)
+                {
+                    if (in[i] > 0 && in[i] < ceiling)
+                        out[i] += gi[i];
+                }
+            }
+        }
+
+    // ----------------------------------------------------------------------------------------
+
+        void elu (
+            tensor& dest,
+            const tensor& src,
+            const float alpha
+        )
+        {
+            const auto d = dest.host();
+            const auto s = src.host();
+            for (size_t i = 0; i < src.size(); ++i)
+            {
+                if (s[i] > 0)
+                    d[i] = s[i];
+                else
+                    d[i] = alpha * (std::exp(s[i]) - 1.0f);
+            }
+        }
+
+        void elu_gradient (
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input,
+            const float alpha
+        )
+        {
+            const auto out = grad.host();
+            const auto in = dest.host();
+            const auto gi = gradient_input.host();
+            if (is_same_object(grad, gradient_input))
+            {
+                for (size_t i = 0; i < dest.size(); ++i)
+                {
+                    if (in[i] > 0)
+                        out[i] = gi[i];
+                    else
+                        out[i] = (alpha + in[i]) * gi[i];
+                }
+            }
+            else
+            {
+                for (size_t i = 0; i < dest.size(); ++i)
+                {
+                    if (in[i] > 0)
+                        out[i] += gi[i];
+                    else
+                        out[i] += (alpha + in[i]) * gi[i];
+                }
+            }
+        }
+
+    // ----------------------------------------------------------------------------------------
+
         void gelu (
             tensor& dest,
             const tensor& src
@@ -1908,11 +2000,11 @@ namespace dlib
 
         void resize_bilinear (
             tensor& dest,
-            long dest_row_stride,
-            long dest_channel_stride,
+            long long dest_row_stride,
+            long long dest_channel_stride,
             const tensor& src,
-            long src_row_stride,
-            long src_channel_stride
+            long long src_row_stride,
+            long long src_channel_stride
         )
         {
             DLIB_CASSERT(is_same_object(dest, src)==false);
@@ -1936,11 +2028,11 @@ namespace dlib
 
         void resize_bilinear_gradient (
             tensor& grad,
-            long grad_row_stride,
-            long grad_channel_stride,
+            long long grad_row_stride,
+            long long grad_channel_stride,
             const tensor& gradient_input,
-            long gradient_input_row_stride,
-            long gradient_input_channel_stride
+            long long gradient_input_row_stride,
+            long long gradient_input_channel_stride
         )
         {
             DLIB_CASSERT(is_same_object(grad, gradient_input)==false);
@@ -2372,6 +2464,33 @@ namespace dlib
                     output.set_sample(n, mat(filters)*trans(temp));
             }
         }
+
+        void tensor_conv::operator() (
+            const bool add_to_output,
+            resizable_tensor& output,
+            const tensor& data,
+            const tensor& filters,
+            const tensor& biases
+        )
+        {
+            DLIB_CASSERT(filters.num_samples() == biases.k());
+            (*this)(add_to_output, output,data,filters);
+            tt::add(1, output, 1, biases);
+        }
+
+        void tensor_conv::operator() (
+            const bool add_to_output,
+            tensor& output,
+            const tensor& data,
+            const tensor& filters,
+            const tensor& biases
+        )
+        {
+            DLIB_CASSERT(filters.num_samples() == biases.k());
+            (*this)(add_to_output, output, data, filters);
+            tt::add(1, output, 1, biases);
+        }
+
 
     // ------------------------------------------------------------------------------------
 

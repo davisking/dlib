@@ -589,6 +589,22 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp soft_max (
+        const matrix_exp& m
+    );
+    /*!
+        requires
+            - matrix_exp::type == float, double, or long double
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in m
+                - R has the same dimensions as m
+                - for all valid r and c:
+                  R(r,c) == std::exp(m(r,c)) / sum(std::exp(m))
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_MATRIx_MATH_FUNCTIONS_ABSTRACT_

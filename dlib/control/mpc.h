@@ -184,6 +184,19 @@ namespace dlib
             return target[time];
         }
 
+        double get_target_error_threshold (
+        ) const 
+        {
+            return target_error_threshold;
+        }
+
+        void set_target_error_threshold (
+            const double thresh 
+        )
+        {
+            target_error_threshold = thresh;
+        }
+
         unsigned long get_max_iterations (
         ) const { return max_iterations; }
 
@@ -258,8 +271,23 @@ namespace dlib
             M[0] = A*initial_state + C;
             for (unsigned long i = 1; i < horizon; ++i)
                 M[i] = A*M[i-1] + C;
-            for (unsigned long i = 0; i < horizon; ++i)
+            double min_error_seen = std::numeric_limits<double>::infinity();
+            for (unsigned long i = 0; i < horizon; ++i) {
                 M[i] = diagm(Q)*(M[i]-target[i]);
+                if (target_error_threshold >= 0) {
+                    const double current_error = dot(M[i]-target[i], M[i]);
+                    min_error_seen = std::min(current_error, min_error_seen);
+                    // Once our trajectory gets us within target_error_threshold of the target at any time
+                    // then we essentially stop caring about what happens at times after that.  This
+                    // gives us a "just hit the target, I don't care what happens after the hit" model.
+                    if (min_error_seen < target_error_threshold) 
+                    {
+                        // Make it so all future errors now appear to be 0.  E.g. it is as if target[i]
+                        // was equal to the state the current control sequence generates at time i.
+                        M[i] = 0;
+                    }
+                }
+            }
             for (long i = (long)horizon-2; i >= 0; --i)
                 M[i] += trans(A)*M[i+1];
             for (unsigned long i = 0; i < horizon; ++i)
@@ -348,6 +376,7 @@ namespace dlib
 
         unsigned long max_iterations;
         double eps;
+        double target_error_threshold = -1;
 
         matrix<double,S,S> A;
         matrix<double,S,I> B;

@@ -71,6 +71,7 @@ set (tests
    hash_table.cpp
    hog_image.cpp
    image.cpp
+   invoke.cpp
    iosockstream.cpp
    is_same_object.cpp
    isotonic_regression.cpp
@@ -171,6 +172,7 @@ if (CMAKE_COMPILER_IS_GNUCXX)
    # I don't care about unused testing functions though.  I like to keep them
    # around.  Don't warn about it.
    add_definitions("-Wno-unused-function")
+   add_definitions("-Wno-strict-overflow")
 endif()
 
 

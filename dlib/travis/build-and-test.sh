@@ -7,11 +7,16 @@ if [ -n "${MATRIX_EVAL+set}" ]; then
     eval "${MATRIX_EVAL}"
 fi
 
+CXX_FLAGS="-std=c++11"
+if [ ! -z ${CXXFLAGS+set} ]; then
+    CXX_FLAGS="${CXXFLAGS}"
+fi
+
 # build dlib and tests
 if [ "$VARIANT" = "test" ]; then
   mkdir build
   cd build
-  cmake ../dlib/test 
+  cmake ../dlib/test -DCMAKE_CXX_FLAGS="${CXX_FLAGS}"
   cmake --build . --target dtest -- -j 2
   ./dtest --runall $DISABLED_TESTS
 fi
@@ -20,23 +25,9 @@ fi
 if [ "$VARIANT" = "test-debug" ]; then
   mkdir build
   cd build
-  cmake ../dlib/test -DDLIB_ENABLE_ASSERTS=1
+  cmake ../dlib/test -DDLIB_ENABLE_ASSERTS=1 -DCMAKE_CXX_FLAGS="${CXX_FLAGS}"
   cmake --build . --target dtest -- -j 2
   ./dtest --runall $DISABLED_TESTS
-fi
-
-if [ "$VARIANT" = "dlib_all_source_cpp" ]; then
-  mkdir build
-  cd build
-  cmake ../dlib/test 
-  cmake --build . --target dlib_all_source_cpp -- -j 2
-fi
-
-if [ "$VARIANT" = "tools" ]; then
-  mkdir build
-  cd build
-  cmake ../dlib/test/tools 
-  cmake --build .  -- -j 2
 fi
 
 # The point of this test is just to make sure the cmake scripts work with the
@@ -46,36 +37,22 @@ if [ "$VARIANT" = "old-cmake" ]; then
   cd build
   CMAKEDIR=../cmake
 
-  $CMAKEDIR/2.8/bin/cmake ../dlib/test/tools 
+  $CMAKEDIR/2.8/bin/cmake ../dlib/test/tools
   $CMAKEDIR/2.8/bin/cmake --build .  -- -j 2
 
   rm -rf *
-  $CMAKEDIR/3.1/bin/cmake ../dlib/test/tools 
+  $CMAKEDIR/3.1/bin/cmake ../dlib/test/tools
   $CMAKEDIR/3.1/bin/cmake --build .  -- -j 2
 
   rm -rf *
-  $CMAKEDIR/3.5/bin/cmake ../dlib/test/tools 
+  $CMAKEDIR/3.5/bin/cmake ../dlib/test/tools
   $CMAKEDIR/3.5/bin/cmake --build .  -- -j 2
 
 
   # just to make sure there isn't anything funny about building standalone dlib
   rm -rf *
-  $CMAKEDIR/2.8/bin/cmake ../dlib 
+  $CMAKEDIR/2.8/bin/cmake ../dlib
   $CMAKEDIR/2.8/bin/cmake --build .  -- -j 2
-fi
-
-if [ "$VARIANT" = "examples" ]; then
-  mkdir build
-  cd build
-  cmake ../examples 
-  cmake --build . -- -j 1
-fi
-
-if [ "$VARIANT" = "examples-debug" ]; then
-  mkdir build
-  cd build
-  cmake ../examples -DDLIB_ENABLE_ASSERTS=1
-  cmake --build . -- -j 1
 fi
 
 if [ "$VARIANT" = "python-api" ]; then
@@ -83,4 +60,3 @@ if [ "$VARIANT" = "python-api" ]; then
   pip uninstall numpy -y
   python setup.py test --clean
 fi
-

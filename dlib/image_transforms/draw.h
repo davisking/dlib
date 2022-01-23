@@ -227,6 +227,61 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct string_dims
+    {
+        string_dims() = default;
+        string_dims (
+            unsigned long width,
+            unsigned long height
+        ) : width(width), height(height) {}
+        unsigned long width = 0;
+        unsigned long height = 0;
+    };
+
+    template <
+        typename T, typename traits,
+        typename alloc
+    >
+    string_dims compute_string_dims (
+        const std::basic_string<T, traits, alloc>& str,
+        const std::shared_ptr<font>& f_ptr = default_font::get_font()
+    )
+    {
+        using string = std::basic_string<T, traits, alloc>;
+
+        const font& f = *f_ptr;
+
+        long height = f.height();
+        long width = 0;
+        for (typename string::size_type i = 0; i < str.size(); ++i)
+        {
+            // ignore the '\r' character
+            if (str[i] == '\r')
+                continue;
+
+            // A combining character should be applied to the previous character, and we
+            // therefore make one step back. If a combining comes right after a newline,
+            // then there must be some kind of error in the string, and we don't combine.
+            if (is_combining_char(str[i]))
+            {
+                width -= f[str[i]].width();
+            }
+
+            if (str[i] == '\n')
+            {
+                height += f.height();
+                width = f.left_overflow();
+                continue;
+            }
+
+            const letter& l = f[str[i]];
+            width += l.width();
+        }
+        return string_dims(width, height);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename T,
         typename traits,

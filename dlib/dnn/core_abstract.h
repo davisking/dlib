@@ -277,6 +277,14 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    enum class zero_gradients : uint8_t
+    {
+        no,
+        yes
+    };
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename LAYER_DETAILS, 
         typename SUBNET
@@ -308,6 +316,7 @@ namespace dlib
         typedef LAYER_DETAILS layer_details_type;
         typedef SUBNET subnet_type;
         typedef typename subnet_type::input_type input_type;
+        typedef typename subnet_type::input_layer_type input_layer_type;
         // num_computational_layers will always give the number of layers in the network
         // that transform tensors (i.e. layers defined by something that implements the
         // EXAMPLE_COMPUTATIONAL_LAYER_ interface).  This is all the layers except for
@@ -446,6 +455,26 @@ namespace dlib
                 - returns the immediate subnetwork of *this network.  
         !*/
 
+        const input_layer_type& input_layer(
+        ) const;  
+        /*!
+            ensures
+                - returns the very first layer in *this network.  It's equivalent to calling
+                  subnet() recursively until you get to the first layer.  This means it will return
+                  the object that is an implementation of the EXAMPLE_INPUT_LAYER interface defined
+                  in input_abstract.h
+        !*/
+
+        input_layer_type& input_layer(
+        ); 
+        /*!
+            ensures
+                - returns the very first layer in *this network.  It's equivalent to calling
+                  subnet() recursively until you get to the first layer.  This means it will return
+                  the object that is an implementation of the EXAMPLE_INPUT_LAYER interface defined
+                  in input_abstract.h
+        !*/
+
         const layer_details_type& layer_details(
         ) const; 
         /*!
@@ -582,7 +611,8 @@ namespace dlib
         !*/
 
         void back_propagate_error(
-            const tensor& x
+            const tensor& x,
+            zero_gradients zero_grads = zero_gradients::yes
         );
         /*!
             requires
@@ -596,7 +626,7 @@ namespace dlib
                   network and computes parameter and data gradients, via backpropagation.
                   Specifically, this function populates get_final_data_gradient() and also,
                   for each layer, the tensor returned by get_parameter_gradient().
-                - All elements of #get_gradient_input() are set to 0. 
+                - All elements of #get_gradient_input() are set to 0 if zero_grads == zero_gradients::yes.
                 - have_same_dimensions(#get_final_data_gradient(), x) == true.
                 - have_same_dimensions(#get_parameter_gradient(), layer_details().get_layer_params()) == true.
                 - #get_final_data_gradient() contains the gradient of the network with
@@ -605,7 +635,8 @@ namespace dlib
 
         void back_propagate_error(
             const tensor& x, 
-            const tensor& gradient_input
+            const tensor& gradient_input,
+            zero_gradients zero_grads = zero_gradients::yes
         );
         /*!
             requires
@@ -622,7 +653,7 @@ namespace dlib
                     back_propagate_error(x);
                   Except that calling back_propagate_error(x,gradient_input) avoids the
                   copy and is therefore slightly more efficient.
-                - All elements of #get_gradient_input() are set to 0. 
+                - All elements of #get_gradient_input() are set to 0 if zero_grads == zero_gradients::yes.
                 - have_same_dimensions(#get_final_data_gradient(), x) == true.
                 - have_same_dimensions(#get_parameter_gradient(), layer_details().get_layer_params()) == true.
                 - #get_final_data_gradient() contains the gradient of the network with
@@ -658,6 +689,20 @@ namespace dlib
         { update_parameters(make_sstack(solvers), learning_rate); }
         /*!
             Convenience method for calling update_parameters()
+        !*/
+
+        void set_gradient_inputs_to_zero(
+        );
+        /*!
+            ensures
+                - Sets all elements in all gradient inputs in the network to 0.
+                  That is, for each layer, we will have:
+                    - get_gradient_input() == 0
+                - Note that You only need to call this method if you manually called either
+                    - back_propagate_error
+                    - compute_parameter_gradients
+                  with the zero_grads parameter set to zero_gradients::no.
+                - invokes subnet().set_gradient_inputs_to_zero()
         !*/
 
         void clean(
@@ -730,6 +775,7 @@ namespace dlib
         typedef LOSS_DETAILS loss_details_type;
         typedef SUBNET subnet_type;
         typedef typename subnet_type::input_type input_type;
+        typedef typename subnet_type::input_layer_type input_layer_type;
         const static size_t num_computational_layers = subnet_type::num_computational_layers;
         const static size_t num_layers = subnet_type::num_layers + 1;
         // If LOSS_DETAILS is an unsupervised loss then training_label_type==no_label_type.
@@ -816,6 +862,26 @@ namespace dlib
         /*!
             ensures
                 - returns the immediate subnetwork of *this network.  
+        !*/
+
+        const input_layer_type& input_layer(
+        ) const;  
+        /*!
+            ensures
+                - returns the very first layer in *this network.  It's equivalent to calling
+                  subnet() recursively until you get to the first layer.  This means it will return
+                  the object that is an implementation of the EXAMPLE_INPUT_LAYER interface defined
+                  in input_abstract.h
+        !*/
+
+        input_layer_type& input_layer(
+        ); 
+        /*!
+            ensures
+                - returns the very first layer in *this network.  It's equivalent to calling
+                  subnet() recursively until you get to the first layer.  This means it will return
+                  the object that is an implementation of the EXAMPLE_INPUT_LAYER interface defined
+                  in input_abstract.h
         !*/
 
         const loss_details_type& loss_details(
@@ -1105,7 +1171,8 @@ namespace dlib
         template <typename label_iterator>
         double compute_parameter_gradients (
             const tensor& x,
-            label_iterator lbegin
+            label_iterator lbegin,
+            zero_gradients zero_grads = zero_gradients::yes
         );
         /*!
             requires
@@ -1122,6 +1189,7 @@ namespace dlib
                   respect to the loss, via backpropagation.  Specifically, this function
                   updates get_final_data_gradient() and also, for each layer, the tensor
                   returned by get_parameter_gradient().
+                - All elements of #subnet().get_gradient_input() are set to 0 if zero_grads == zero_gradients::yes.
                 - for all valid k:
                     - the expected label of the kth sample in x is *(lbegin+k/sample_expansion_factor()).
                 - returns compute_loss(x,lbegin)
@@ -1131,7 +1199,8 @@ namespace dlib
         double compute_parameter_gradients (
             forward_iterator ibegin,
             forward_iterator iend,
-            label_iterator lbegin
+            label_iterator lbegin,
+            zero_gradients zero_grads = zero_gradients::yes
         );
         /*!
             requires
@@ -1145,13 +1214,15 @@ namespace dlib
                   gradients with respect to the loss, via backpropagation.  Specifically,
                   this function updates get_final_data_gradient() and also, for each layer,
                   the tensor returned by get_parameter_gradient().
+                - All elements of #subnet().get_gradient_input() are set to 0 if zero_grads == zero_gradients::yes.
                 - for all valid k:
                     - the expected label of *(ibegin+k) is *(lbegin+k).
                 - returns compute_loss(ibegin,iend,lbegin)
         !*/
 
         double compute_parameter_gradients (
-            const tensor& x
+            const tensor& x,
+            zero_gradients zero_grads = zero_gradients::yes
         );
         /*!
             requires
@@ -1166,13 +1237,15 @@ namespace dlib
                   respect to the loss, via backpropagation.  Specifically, this function
                   updates get_final_data_gradient() and also, for each layer, the tensor
                   returned by get_parameter_gradient().
+                - All elements of #subnet().get_gradient_input() are set to 0 if zero_grads == zero_gradients::yes.
                 - returns compute_loss(x)
         !*/
 
         template <typename forward_iterator>
         double compute_parameter_gradients (
             forward_iterator ibegin,
-            forward_iterator iend
+            forward_iterator iend,
+            zero_gradients zero_grads = zero_gradients::yes
         );
         /*!
             requires
@@ -1184,6 +1257,7 @@ namespace dlib
                   gradients with respect to the loss, via backpropagation.  Specifically,
                   this function updates get_final_data_gradient() and also, for each layer,
                   the tensor returned by get_parameter_gradient().
+                - All elements of #subnet().get_gradient_input() are set to 0 if zero_grads == zero_gradients::yes.
                 - returns compute_loss(ibegin,iend)
         !*/
 
@@ -1220,6 +1294,7 @@ namespace dlib
 
         void back_propagate_error(
             const tensor& x
+            zero_gradients zero_grads = zero_gradients::yes
         );
         /*!
             requires
@@ -1234,7 +1309,7 @@ namespace dlib
                   network and computes parameter and data gradients, via backpropagation.
                   Specifically, this function populates get_final_data_gradient() and also,
                   for each layer, the tensor returned by get_parameter_gradient().
-                - All elements of #subnet().get_gradient_input() are set to 0. 
+                - All elements of #subnet().get_gradient_input() are set to 0 if zero_grads == zero_gradients::yes.
                 - have_same_dimensions(#get_final_data_gradient(), x) == true.
                 - #get_final_data_gradient() contains the gradient of the network with
                   respect to x.
@@ -1259,7 +1334,7 @@ namespace dlib
                     back_propagate_error(x);
                   Except that calling back_propagate_error(x,gradient_input) avoids the
                   copy and is therefore slightly more efficient.
-                - All elements of #subnet.get_gradient_input() are set to 0. 
+                - All elements of #subnet().get_gradient_input() are set to 0 if zero_grads == zero_gradients::yes.
                 - have_same_dimensions(#get_final_data_gradient(), x) == true.
                 - #get_final_data_gradient() contains the gradient of the network with
                   respect to x.
@@ -1277,6 +1352,13 @@ namespace dlib
                   not one per layer, since there is only one input to the entire network.
         !*/
 
+        void set_gradient_inputs_to_zero(
+        );
+        /*!
+            ensures
+                - Sets all elements in all gradient inputs in the network to 0.
+                - invokes subnet().set_gradient_inputs_to_zero()
+        !*/
 
     // -------------
 
@@ -1357,6 +1439,7 @@ namespace dlib
 
         typedef SUBNET subnet_type;
         typedef typename SUBNET::input_type input_type;
+        typedef typename subnet_type::input_layer_type input_layer_type;
         const static size_t num_computational_layers = (REPEATED_LAYER<SUBNET>::num_computational_layers-SUBNET::num_computational_layers)*num + SUBNET::num_computational_layers;
         const static size_t num_layers = (REPEATED_LAYER<SUBNET>::num_layers-SUBNET::num_layers)*num + SUBNET::num_layers;
         typedef REPEATED_LAYER<an_unspecified_input_type> repeated_layer_type;
@@ -1437,6 +1520,27 @@ namespace dlib
                 - returns the SUBNET base network that repeat sits on top of.  If you want
                   to access the REPEATED_LAYER components then you must use get_repeated_layer(). 
         !*/
+
+        const input_layer_type& input_layer(
+        ) const;  
+        /*!
+            ensures
+                - returns the very first layer in *this network.  It's equivalent to calling
+                  subnet() recursively until you get to the first layer.  This means it will return
+                  the object that is an implementation of the EXAMPLE_INPUT_LAYER interface defined
+                  in input_abstract.h
+        !*/
+
+        input_layer_type& input_layer(
+        ); 
+        /*!
+            ensures
+                - returns the very first layer in *this network.  It's equivalent to calling
+                  subnet() recursively until you get to the first layer.  This means it will return
+                  the object that is an implementation of the EXAMPLE_INPUT_LAYER interface defined
+                  in input_abstract.h
+        !*/
+
     };
 
     template < size_t num, template<typename> class T, typename U >
@@ -1651,13 +1755,11 @@ namespace dlib
     );
     /*!
         requires
-            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, repeat, or
               add_tag_layer.
         ensures
-            - returns the input later of the given network object.  Specifically, this
-              function is equivalent to calling:
-                layer<net_type::num_layers-1>(net);
-              That is, you get the input layer details object for the network.
+            - returns the input later of the given network object.  This is the same as just calling
+              net.input_layer().
     !*/
 
 // ----------------------------------------------------------------------------------------

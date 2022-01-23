@@ -23,6 +23,7 @@ namespace dlib
         double max_object_size = 0.7; // cropped object will be at most this fraction of the size of the image.
         double background_crops_fraction = 0.5;
         double translate_amount = 0.10;
+        double min_object_coverage = 1.0;
 
         std::mutex rnd_mutex;
         dlib::rand rnd;
@@ -104,15 +105,26 @@ namespace dlib
             max_object_size = value; 
         }
 
+        double get_min_object_coverage (
+        ) const { return min_object_coverage; }
+        void set_min_object_coverage (
+            double value
+        )
+        {
+            DLIB_CASSERT(0 < value && value <= 1);
+            min_object_coverage = value;
+        }
+
         template <
-            typename array_type
+            typename array_type,
+            typename rectangle_type
             >
         void operator() (
             size_t num_crops,
             const array_type& images,
-            const std::vector<std::vector<mmod_rect>>& rects,
+            const std::vector<std::vector<rectangle_type>>& rects,
             array_type& crops,
-            std::vector<std::vector<mmod_rect>>& crop_rects
+            std::vector<std::vector<rectangle_type>>& crop_rects
         )
         {
             DLIB_CASSERT(images.size() == rects.size());
@@ -122,14 +134,15 @@ namespace dlib
         }
 
         template <
-            typename array_type
+            typename array_type,
+            typename rectangle_type
             >
         void append (
             size_t num_crops,
             const array_type& images,
-            const std::vector<std::vector<mmod_rect>>& rects,
+            const std::vector<std::vector<rectangle_type>>& rects,
             array_type& crops,
-            std::vector<std::vector<mmod_rect>>& crop_rects
+            std::vector<std::vector<rectangle_type>>& crop_rects
         )
         {
             DLIB_CASSERT(images.size() == rects.size());
@@ -145,13 +158,14 @@ namespace dlib
 
         template <
             typename array_type,
-            typename image_type
+            typename image_type,
+            typename rectangle_type
             >
         void operator() (
             const array_type& images,
-            const std::vector<std::vector<mmod_rect>>& rects,
+            const std::vector<std::vector<rectangle_type>>& rects,
             image_type& crop,
-            std::vector<mmod_rect>& crop_rects
+            std::vector<rectangle_type>& crop_rects
         )
         {
             DLIB_CASSERT(images.size() == rects.size());
@@ -163,27 +177,29 @@ namespace dlib
         }
 
         template <
-            typename image_type1
+            typename image_type1,
+            typename rectangle_type
             >
         image_type1 operator() (
             const image_type1& img
         )
         {
             image_type1 crop;
-            std::vector<mmod_rect> junk1, junk2;
+            std::vector<rectangle_type> junk1, junk2;
             (*this)(img, junk1, crop, junk2);
             return crop;
         }
 
         template <
             typename image_type1,
-            typename image_type2
+            typename image_type2,
+            typename rectangle_type
             >
         void operator() (
             const image_type1& img,
-            const std::vector<mmod_rect>& rects,
+            const std::vector<rectangle_type>& rects,
             image_type2& crop,
-            std::vector<mmod_rect>& crop_rects
+            std::vector<rectangle_type>& crop_rects
         )
         {
             DLIB_CASSERT(num_rows(img)*num_columns(img) != 0);
@@ -202,12 +218,14 @@ namespace dlib
                 // map to crop
                 rect.rect = tform(rect.rect);
 
+                const double intersection = get_rect(crop).intersect(rect.rect).area();
+
                 // if the rect is at least partly in the crop
-                if (get_rect(crop).intersect(rect.rect).area() != 0)
+                if (intersection != 0)
                 {
                     // set to ignore if not totally in the crop or if too small.
-                    if (!get_rect(crop).contains(rect.rect) || 
-                        ((long)rect.rect.height() < min_object_length_long_dim  && (long)rect.rect.width() < min_object_length_long_dim) || 
+                    if (intersection / rect.rect.area() < min_object_coverage ||
+                        ((long)rect.rect.height() < min_object_length_long_dim  && (long)rect.rect.width() < min_object_length_long_dim) ||
                         ((long)rect.rect.height() < min_object_length_short_dim || (long)rect.rect.width() < min_object_length_short_dim))
                     {
                         rect.ignore = true;
@@ -230,10 +248,13 @@ namespace dlib
 
     private:
 
-        template <typename image_type1>
+        template <
+            typename image_type1,
+            typename rectangle_type
+            >
         void make_crop_plan (
             const image_type1& img,
-            const std::vector<mmod_rect>& rects,
+            const std::vector<rectangle_type>& rects,
             chip_details& crop_plan,
             bool& should_flip_crop
         )
@@ -285,8 +306,9 @@ namespace dlib
             crop_plan = chip_details(crop_rect, dims, angle);
         }
 
+        template <typename rectangle_type>
         bool has_non_ignored_box (
-            const std::vector<mmod_rect>& rects
+            const std::vector<rectangle_type>& rects
         ) const
         {
             for (auto&& b : rects)
@@ -297,8 +319,9 @@ namespace dlib
             return false;
         }
 
+        template <typename rectangle_type>
         size_t randomly_pick_rect (
-            const std::vector<mmod_rect>& rects
+            const std::vector<rectangle_type>& rects
         ) 
         {
             DLIB_CASSERT(has_non_ignored_box(rects));

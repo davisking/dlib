@@ -22,7 +22,11 @@
     // Disable the "statement is unreachable" message since it will go off on code that is
     // actually reachable but just happens to not be reachable sometimes during certain
     // template instantiations.
+    #ifdef __NVCC_DIAG_PRAGMA_SUPPORT__
+    #pragma nv_diag_suppress code_is_unreachable
+    #else
     #pragma diag_suppress code_is_unreachable
+    #endif
 #endif
 
 
@@ -480,6 +484,23 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    /*!A is_any 
+
+        This is a template where is_any<T,Rest...>::value == true when T is 
+        the same type as any one of the types in Rest... 
+    !*/
+
+    template <typename T, typename... Rest>
+    struct is_any : std::false_type {};
+    
+    template <typename T, typename First>
+    struct is_any<T,First> : std::is_same<T,First> {};
+    
+    template <typename T, typename First, typename... Rest>
+    struct is_any<T,First,Rest...> : std::integral_constant<bool, std::is_same<T,First>::value || is_any<T,Rest...>::value> {};
+
+// ----------------------------------------------------------------------------------------
+    
     /*!A is_float_type
 
         This is a template that can be used to determine if a type is one of the built

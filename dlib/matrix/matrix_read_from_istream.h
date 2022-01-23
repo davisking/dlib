@@ -21,6 +21,7 @@ namespace dlib
             return in.peek() == '\n' ||
                 in.peek() == ' ' || 
                 in.peek() == ',' || 
+                in.peek() == ';' ||
                 in.peek() == '\t' ||
                 in.peek() == '\r';
         }

@@ -82,4 +82,9 @@ endif()
 pybind11_add_module(_dlib_pybind11 ${python_srcs})
 target_link_libraries(_dlib_pybind11 PRIVATE dlib::dlib)
 
-configure_file(${PROJECT_SOURCE_DIR}/dlib/__init__.py.in ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/dlib/__init__.py)
+# When invoked from setup.py CMAKE_LIBRARY_OUTPUT_DIRECTORY will be set.  But when you are just building via say
+# `cd dlib/tools/python; mkdir build; cd build; cmake ..` it won't be set.  It only matters for building the actual
+# distribution.  So skip this for people building directly with cmake (which they might do when testing stuff).
+if (CMAKE_LIBRARY_OUTPUT_DIRECTORY) 
+   configure_file(${PROJECT_SOURCE_DIR}/dlib/__init__.py.in ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/dlib/__init__.py)
+endif()

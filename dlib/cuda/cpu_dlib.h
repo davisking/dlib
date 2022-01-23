@@ -376,6 +376,36 @@ namespace dlib
             const tensor& gradient_input
         );
 
+    // ------------------------------------------------------------------------------------
+
+        void clipped_relu (
+            tensor& dest,
+            const tensor& src,
+            const float ceiling
+        );
+
+        void clipped_relu_gradient (
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input,
+            const float ceiling
+        );
+
+    // ------------------------------------------------------------------------------------
+
+        void elu (
+            tensor& dest,
+            const tensor& src,
+            const float alpha
+        );
+
+        void elu_gradient (
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input,
+            const float alpha
+        );
+
     // ----------------------------------------------------------------------------------------
 
         void gelu (
@@ -393,20 +423,20 @@ namespace dlib
 
         void resize_bilinear (
             tensor& dest,
-            long dest_row_stride,
-            long dest_channel_stride,
+            long long dest_row_stride,
+            long long dest_channel_stride,
             const tensor& src,
-            long src_row_stride,
-            long src_channel_stride
+            long long src_row_stride,
+            long long src_channel_stride
         );
 
         void resize_bilinear_gradient (
             tensor& grad,
-            long grad_row_stride,
-            long grad_channel_stride,
+            long long grad_row_stride,
+            long long grad_channel_stride,
             const tensor& gradient_input,
-            long gradient_input_row_stride,
-            long gradient_input_channel_stride
+            long long gradient_input_row_stride,
+            long long gradient_input_channel_stride
         );
 
         inline void resize_bilinear (
@@ -522,6 +552,22 @@ namespace dlib
                 tensor& output,
                 const tensor& data,
                 const tensor& filters
+            );
+
+            void operator() (
+                const bool add_to_output,
+                resizable_tensor& output,
+                const tensor& data,
+                const tensor& filters,
+                const tensor& biases
+            );
+
+            void operator() (
+                const bool add_to_output,
+                tensor& output,
+                const tensor& data,
+                const tensor& filters,
+                const tensor& biases
             );
 
             void get_gradient_for_data (

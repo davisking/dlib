@@ -83,6 +83,26 @@ namespace dlib
                   begins with layer2.
         !*/
 
+        const INPUT_LAYER& input_layer(
+        ) const;
+        /*!
+            ensures
+                - returns the very first layer in *this network.  It's equivalent to calling
+                  subnet() recursively until you get to the first layer.  This means it will return
+                  the object that is an implementation of the EXAMPLE_INPUT_LAYER interface defined
+                  in input_abstract.h
+        !*/
+
+        INPUT_LAYER& input_layer(
+        );
+        /*!
+            ensures
+                - returns the very first layer in *this network.  It's equivalent to calling
+                  subnet() recursively until you get to the first layer.  This means it will return
+                  the object that is an implementation of the EXAMPLE_INPUT_LAYER interface defined
+                  in input_abstract.h
+        !*/
+
         const layer_details_type& layer_details(
         ) const; 
         /*!
@@ -924,6 +944,17 @@ namespace dlib
         /*!
             ensures
                 - bias_is_disabled() returns true
+                - if bias was enabled and allocated, it resizes the layer parameters
+                  to accommodate the filter parameters only, and free the bias parameters.
+        !*/
+
+        void enable_bias(
+        );
+        /*!
+            ensures
+                - bias_is_disabled() returns false
+                - if bias was disabled and not allocated, it resizes the layer parameters
+                  to accommodate the new zero-inizialized biases
         !*/
 
         bool bias_is_disabled(
@@ -1832,24 +1863,24 @@ namespace dlib
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
                 defined above.  In particular, it applies a simple pointwise linear
                 transformation to an input tensor.  You can think of it as having two
-                parameter tensors, A and B.  If the input tensor is called INPUT then the
-                output of this layer is:
-                    A*INPUT+B
+                parameter tensors, gamma and beta.  If the input tensor is called INPUT
+                then the output of this layer is:
+                    gamma*INPUT+beta
                 where all operations are performed element wise and each sample in the
                 INPUT tensor is processed separately.
 
-                Moreover, this object has two modes that affect the dimensionalities of A
-                and B and how they are applied to compute A*INPUT+B.  If
-                get_mode()==FC_MODE then A and B each have the same dimensionality as the
-                input tensor, except their num_samples() dimensions are 1.  If
-                get_mode()==CONV_MODE then A and B have all their dimensions set to 1
-                except for k(), which is equal to INPUT.k().
+                Moreover, this object has two modes that affect the dimensionalities of
+                gamma and beta and how they are applied to compute gamma*INPUT+beta.  If
+                get_mode()==FC_MODE then gamma and beta each have the same dimensionality
+                as the input tensor, except their num_samples() dimensions are 1.  If
+                get_mode()==CONV_MODE then gamma and beta have all their dimensions set
+                to 1 except for k(), which is equal to INPUT.k().
 
-                In either case, the computation of A*INPUT+B is performed pointwise over all
-                the elements of INPUT using either:
-                    OUTPUT(n,k,r,c) == A(1,k,r,c)*INPUT(n,k,r,c)+B(1,k,r,c)
+                In either case, the computation of gamma*INPUT+beta is performed pointwise
+                over all the elements of INPUT using either:
+                    OUTPUT(n,k,r,c) == gamma(1,k,r,c)*INPUT(n,k,r,c)+beta(1,k,r,c)
                 or
-                    OUTPUT(n,k,r,c) == A(1,k,1,1)*INPUT(n,k,r,c)+B(1,k,1,1)
+                    OUTPUT(n,k,r,c) == gamma(1,k,1,1)*INPUT(n,k,r,c)+beta(1,k,1,1)
                 as appropriate.
 
 
@@ -1897,6 +1928,39 @@ namespace dlib
         /*!
             ensures
                 - returns the mode of this layer, either CONV_MODE or FC_MODE.  
+        !*/
+
+        void disable(
+        );
+        /*!
+            ensures
+                - #get_layer_params().size() == 0.
+                - when forward_inplace and backward_inplace are called, they return immediately doing nothing.
+                  Causing this layer to trivially perform the an identity transform.
+        !*/
+
+        alias_tensor_instance get_gamma();
+        /*!
+            ensures
+                - returns the gamma parameter that defines the behavior of forward().
+        !*/
+
+        alias_tensor_const_instance get_gamma() const;
+        /*!
+            ensures
+                - returns the gamma parameter that defines the behavior of forward().
+        !*/
+
+        alias_tensor_instance get_beta();
+        /*!
+            ensures
+                - returns the beta parameter that defines the behavior of forward().
+        !*/
+
+        alias_tensor_const_instance get_beta() const;
+        /*!
+            ensures
+                - returns the beta parameter that defines the behavior of forward().
         !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);
@@ -2394,6 +2458,9 @@ namespace dlib
                 passes its inputs through the function
                     f(x)= x*tanh(log(1+exp(x)))
                 where f() is applied pointwise across the input tensor.
+
+                This is the layer type introduced in the paper:
+                Diganta Misra. "Mish: A Self Regularized Non-Monotonic Activation Function"
         !*/
 
     public:
@@ -2452,6 +2519,103 @@ namespace dlib
 
     template <typename SUBNET>
     using htan = add_layer<htan_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class clipped_relu_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines a clipped version of the relu layer.
+                Therefore, it passes its inputs through the function
+                    f(x) = min(max(x, 0), ceiling)
+                where f() is applied pointwise across the input tensor and ceiling is a
+                non-learned scalar.
+        !*/
+
+    public:
+
+        clipped_relu_(
+            const float ceiling = 6.0f
+        );
+        /*!
+            ensures
+                - the ceiling parameter will be initialized with the ceiling value
+        !*/
+
+        float get_ceiling() const;
+        /*!
+            ensures
+                - returns the celiling parameter of the clipped_relu
+        !*/
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        void forward_inplace(const tensor& input, tensor& output);
+        void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_
+            interface.  Note that this layer doesn't have any parameters, so the tensor
+            returned by get_layer_params() is always empty.
+        !*/
+    };
+
+    template <typename SUBNET>
+    using clipped_relu = add_layer<clipped_relu_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class elu_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines an exponential linear unit.
+                Therefore, it passes its inputs through the function
+                    f(x) = x>0 ? x : alpha*(exp(x)-1)
+                where f() is applied pointwise across the input tensor and alpha is a
+                non-learned scalar.
+
+                This is the layer type introduced in the paper:
+                Djork-Arné Clevert, Thomas Unterthiner, Sepp Hochreiter.
+                "Fast and Accurate Deep Network Learning by Exponential Linear Units (ELUs)".
+        !*/
+
+    public:
+
+        elu_(
+            const float alpha = 1.0f
+        );
+        /*!
+            ensures
+                - the alpha parameter will be initialized with the alpha value
+        !*/
+
+        float get_alpha() const;
+        /*!
+            ensures
+                - returns the alpha parameter of the elu
+        !*/
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        void forward_inplace(const tensor& input, tensor& output);
+        void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_
+            interface.  Note that this layer doesn't have any parameters, so the tensor
+            returned by get_layer_params() is always empty.
+        !*/
+    };
+
+    template <typename SUBNET>
+    using elu = add_layer<elu_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -3135,6 +3299,23 @@ namespace dlib
         typename SUBNET
         >
     using extract = add_layer<extract_<offset,k,nr,nc>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename net_type>
+    void fuse_layers (
+        net_type& net
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+            - net has been properly allocated, that is: count_parameters(net) > 0.
+        ensures
+            - Disables all the affine_ layers that have a convolution as an input.
+            - Updates the convolution weights beneath the affine_ layers to produce the same
+              output as with the affine_ layers enabled.
+    !*/
 
 // ----------------------------------------------------------------------------------------
 

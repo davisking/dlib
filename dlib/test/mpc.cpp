@@ -253,6 +253,75 @@ namespace
         return iter;
     }
 
+    void test_with_positive_target_error_thresh() 
+    {
+        // a basic position + velocity model
+        matrix<double,2,2> A;
+        A = 1, 1,
+            0, 1;
+        matrix<double,2,1> B, C;
+        B = 0,
+            1;
+
+        C = 0.0,0.0; // no constant bias
+
+        matrix<double,2,1> Q;
+        Q = 2, 0; // only care about getting the position right
+        matrix<double,1,1> R, lower, upper;
+        R = 0.001;
+
+        // We set it up so that the controller that only cares about getting to the target but
+        // doesn't care about what happens after can just give large controls of -1.  It will fly
+        // past the target once it gets there, but it doesn't care about that.  The solver_normal
+        // however wants to come to rest at the target.  So it will have to give a much smaller
+        // control to get it moving towards the target and then slowly decelerate over time to end
+        // up stopping.  So it will take longer to get to the target, which we test below.
+        lower = -1.0;
+        upper =  0.05;
+
+        mpc<2,1,30> solver_normal(A,B,C,Q,R,lower,upper);
+        solver_normal.set_epsilon(0.00000001);
+        solver_normal.set_max_iterations(10000);
+
+        mpc<2,1,30> solver_target_thresh = solver_normal;
+        solver_target_thresh.set_target_error_threshold(1.0);
+
+        matrix<double,2,1> state_normal;
+        state_normal = 10, 0;
+        matrix<double,2,1> state_target_thresh = state_normal;
+
+        // Run the control law with and without set_target_error_threshold() called.  We should
+        // observe that the controller using set_target_error_threshold(1) drives us to the target
+        // state faster, however, only the normal solver results in a rest state at the target
+        // state.
+        int time_at_target_normal = -1;
+        int time_at_target_other  = -1;
+        for (int i = 0; i < 30; ++i)
+        {
+            print_spinner();
+            const double normal_control = solver_normal(state_normal);
+            state_normal = A*state_normal + B*normal_control + C;
+            
+            const double target_thresh_control = solver_target_thresh(state_target_thresh);
+            state_target_thresh = A*state_target_thresh + B*target_thresh_control + C;
+
+            const double normal_error = trans(state_normal)*diagm(Q)*state_normal;
+            const double target_error = trans(state_target_thresh)*diagm(Q)*state_target_thresh;
+            if (normal_error < 1.0 && time_at_target_normal == -1)
+                time_at_target_normal = i;
+            if (target_error < 1.0 && time_at_target_other == -1)
+                time_at_target_other = i;
+        }
+
+        // Check that the normal solver took longer to get to the target.
+        DLIB_TEST(time_at_target_normal == 13);
+        DLIB_TEST(time_at_target_other == 7);
+
+        // Check that the normal solver ends up right on the target.
+        DLIB_TEST(length(state_normal) < 0.01);
+        // But the one that got there faster blew past the target and is no way off in the distance.
+        DLIB_TEST(length(state_target_thresh) > 20);
+    }
 
 
     class test_mpc : public tester
@@ -336,6 +405,8 @@ namespace
                 dlog << LINFO << "objective value2: " << 0.5*trans(alpha2)*Q*alpha + trans(b)*alpha2;
                 DLIB_TEST_MSG(max(abs(alpha-alpha2)) < 1e-7, max(abs(alpha-alpha2)));
             }
+
+            test_with_positive_target_error_thresh();
         }
     } a;
 

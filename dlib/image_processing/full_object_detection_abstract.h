@@ -196,8 +196,51 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct yolo_rect
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple struct that is used to give training data and receive detections
+                from the YOLO Detection loss layer loss_yolo_ object.
+        !*/
+
+        yolo_rect() = default;
+        yolo_rect(const drectangle& r) : rect(r) {}
+        yolo_rect(const drectangle& r, double score) : rect(r),detection_confidence(score) {}
+        yolo_rect(const drectangle& r, double score, const std::string& label) : rect(r),detection_confidence(score), label(label) {}
+        yolo_rect(const mmod_rect& r) : rect(r.rect), detection_confidence(r.detection_confidence), ignore(r.ignore), label(r.label) {}
+
+        drectangle rect;
+        double detection_confidence = 0;
+        bool ignore = false;
+        std::string label;
+        // YOLO detectors are multi label detectors: this field will contain all confidences and labels for a particular detection
+        std::vector<std::pair<double, std::string>> labels;
+
+        operator rectangle() const { return rect; }
+        bool operator== (const yolo_rect& rhs) const;
+        /*!
+            ensures
+                - returns true if and only if rect == rhs.rect && detection_confidence == rhs.detection_confidence && label == rhs.label.
+        !*/
+
+        bool operator<(const yolo_rect& rhs) const
+        /*!
+            ensures
+                - returns true if and only if detection_confidence < rhs.detection_confidence.
+        !*/
+
+    };
+
+    inline void serialize(const yolo_rect& item, std::ostream& out);
+    inline void deserialize(yolo_rect& item, std::istream& in);
+    /*!
+        provides serialization support
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_FULL_OBJECT_DeTECTION_ABSTRACT_Hh_
-
 

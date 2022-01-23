@@ -138,7 +138,7 @@
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_multiclass_log_per_pixel_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_multiclass_log_per_pixel_weighted_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_mean_squared_per_channel_and_pixel_" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/loss_abstract.h.html" name="loss_mean_squared_per_channel_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/loss_abstract.h.html" name="loss_multibinary_log_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_ranking_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_dot_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_epsilon_insensitive_" include="dlib/dnn.h"/>
@@ -164,7 +164,9 @@
          <term file="dlib/dnn/layers_abstract.h.html" name="upsample_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="cont_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="scale_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="scale_prev_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="l2normalize_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="layer_norm_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="dropout_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="multiply_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="bn_" include="dlib/dnn.h"/>
@@ -172,6 +174,7 @@
          <term file="dlib/dnn/layers_abstract.h.html" name="max_pool_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="avg_pool_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="relu_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="gelu_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="leaky_relu_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="mish_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="prelu_" include="dlib/dnn.h"/>
@@ -460,6 +463,8 @@
          <term file="dlib/statistics/running_gradient_abstract.h.html" name="probability_gradient_less_than"  include="dlib/statistics/running_gradient.h"/>
          <term file="algorithms.html" name="count_steps_without_decrease_robust"  include="dlib/statistics/running_gradient.h"/>
          <term file="algorithms.html" name="count_steps_without_decrease"  include="dlib/statistics/running_gradient.h"/>
+         <term file="algorithms.html" name="probability_values_are_increasing_robust"  include="dlib/statistics/running_gradient.h"/>
+         <term file="algorithms.html" name="probability_values_are_increasing"  include="dlib/statistics/running_gradient.h"/>
          <term file="algorithms.html" name="count_steps_without_increase"  include="dlib/statistics/running_gradient.h"/>
          <term file="algorithms.html" name="running_scalar_covariance"     include="dlib/statistics.h"/>
          <term file="algorithms.html" name="mean_sign_agreement"           include="dlib/statistics.h"/>
@@ -497,6 +502,7 @@
          <term link="ml.html#load_image_dataset_metadata" name="image_dataset_metadata"      include="dlib/data_io.h"/>
          <term file="ml.html" name="load_image_dataset_metadata"                 include="dlib/data_io.h"/>
          <term file="ml.html" name="load_image_dataset"                          include="dlib/data_io.h"/>
+         <term file="ml.html" name="load_cifar_10_dataset"                       include="dlib/data_io.h"/>
          <term file="ml.html" name="save_image_dataset_metadata"                 include="dlib/data_io.h"/>
          <term file="ml.html" name="load_libsvm_formatted_data"                  include="dlib/data_io.h"/>
          <term file="ml.html" name="save_libsvm_formatted_data"                  include="dlib/data_io.h"/>
@@ -714,6 +720,7 @@
          <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="round_zeros"   include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="complex_matrix" include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="normalize"     include="dlib/matrix.h"/>
+         <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="soft_max"      include="dlib/matrix.h"/>
 
          <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="abs"           include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="acos"          include="dlib/matrix.h"/>
@@ -841,6 +848,7 @@
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="min_pointwise" include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="max_pointwise" include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="pointwise_multiply" include="dlib/matrix.h"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="pointwise_pow" include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="join_rows"          include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="join_cols"          include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="equal"              include="dlib/matrix.h"/>
