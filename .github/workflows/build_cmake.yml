@@ -29,7 +29,7 @@ jobs:
 
     - name: Build
       working-directory: ${{ github.workspace }}/dlib/test
-      run: cmake --build ${{ env.build_dir }}
+      run: cmake --build ${{ env.build_dir }} --target dtest
 
     - name: Test
       working-directory: ${{ github.workspace }}/dlib/test/${{ env.build_dir }}
