@@ -47,7 +47,7 @@ namespace dlib
             ensures
                 - treats data from in as C++ source code and pretty prints it in
                   HTML and writes it to out.
-                - The title of the HTML document writen to out will be title
+                - The title of the HTML document written to out will be title
             throws
                 - std::ios_base::failure
                     If there was a problem writing to out then this exception will 
@@ -65,7 +65,7 @@ namespace dlib
             ensures
                 - treats data from in as C++ source code and pretty prints it in
                   HTML with line numbers and writes it to out.
-                - The title of the HTML document writen to out will be title
+                - The title of the HTML document written to out will be title
             throws
                 - std::ios_base::failure
                     If there was a problem writing to out then this exception will 
