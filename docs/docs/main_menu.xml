@@ -296,6 +296,14 @@
                   <name>Deep Learning Max-Margin Object Detection</name>
                   <link>dnn_mmod_ex.cpp.html</link>
                </item>
+               <item>
+                  <name>Self-supervised deep feature learning</name>
+                  <link>dnn_self_supervised_learning_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Training a YOLO object detector</name>
+                  <link>dnn_yolo_train_ex.cpp.html</link>
+               </item>
 
                <item>
                   <name>Random Cropper</name>
