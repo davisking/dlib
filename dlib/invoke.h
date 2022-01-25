@@ -25,7 +25,7 @@ namespace dlib
             typename Derived,
             typename... Args
         >
-        constexpr auto INVOKE(
+        constexpr auto invoke_(
             T Base::*pmf, //pointer to member function
             Derived&& ref,
             Args&&... args
@@ -46,7 +46,7 @@ namespace dlib
             typename RefWrap,
             typename... Args
         >
-        constexpr auto INVOKE(
+        constexpr auto invoke_(
             T Base::*pmf, //pointer to member function
             RefWrap&& ref,
             Args&&... args
@@ -66,7 +66,7 @@ namespace dlib
             typename Ptr,
             typename... Args
         >
-        constexpr auto INVOKE(
+        constexpr auto invoke_(
             T Base::*pmf, //pointer to member function
             Ptr&& ptr,
             Args&&... args
@@ -86,7 +86,7 @@ namespace dlib
             typename T,
             typename Derived
         >
-        constexpr auto INVOKE(
+        constexpr auto invoke_(
             T Base::*pmd, //pointer to member data
             Derived&& ref
         )
@@ -104,7 +104,7 @@ namespace dlib
             typename T,
             typename RefWrap
         >
-        constexpr auto INVOKE(
+        constexpr auto invoke_(
             T Base::*pmd, //pointer to member data
             RefWrap&& ref
         )
@@ -122,7 +122,7 @@ namespace dlib
             typename T,
             typename Ptr
         >
-        constexpr auto INVOKE(
+        constexpr auto invoke_(
             T Base::*pmd, //pointer to member data
             Ptr&& ptr
         )
@@ -140,7 +140,7 @@ namespace dlib
             typename F,
             typename... Args
         >
-        constexpr auto INVOKE(
+        constexpr auto invoke_(
             F && f,
             Args&&... args
         )
@@ -162,10 +162,10 @@ namespace dlib
             - identical to std::invoke(std::forward<F>(f), std::forward<Args>(args)...)
             - works with C++11 onwards
     !*/
-    noexcept(noexcept(detail::INVOKE(std::forward<F>( f ), std::forward<Args>( args )...)))
-    -> decltype(detail::INVOKE(std::forward<F>( f ), std::forward<Args>( args )...))
+    noexcept(noexcept(detail::invoke_(std::forward<F>( f ), std::forward<Args>( args )...)))
+    -> decltype(detail::invoke_(std::forward<F>( f ), std::forward<Args>( args )...))
     {
-        return detail::INVOKE(std::forward<F>( f ), std::forward<Args>( args )...);
+        return detail::invoke_(std::forward<F>( f ), std::forward<Args>( args )...);
     }
 
 // ----------------------------------------------------------------------------------------
