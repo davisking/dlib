@@ -556,7 +556,7 @@ namespace
         tt::tensor_rand rnd(0);
         rnd.fill_uniform(x);
         resizable_tensor means_cpu(x.num_samples()), invstds_cpu(x.num_samples());
-        resizable_tensor gamma(x.num_samples()), beta(x.num_samples());
+        resizable_tensor gamma(1, x.k(), x.nr(), x.nc()), beta(1, x.k(), x.nr(), x.nc());
         gamma = 1;
         beta = 0;
         const float eps = 1e-5;
@@ -588,8 +588,8 @@ namespace
         DLIB_TEST(max(abs(mat(means_cpu) - mat(means_cuda))) < 1e-5);
         DLIB_TEST(max(abs(mat(invstds_cpu) - mat(invstds_cuda))) < 1e-5);
         resizable_tensor gradient_input(x);
-        resizable_tensor src_grad_cpu(x), gamma_grad_cpu(x.num_samples()), beta_grad_cpu(x.num_samples());
-        resizable_tensor src_grad_cuda(x), gamma_grad_cuda(x.num_samples()), beta_grad_cuda(x.num_samples());
+        resizable_tensor src_grad_cpu(x), gamma_grad_cpu(1, x.k(), x.nr(), x.nc()), beta_grad_cpu(1, x.k(), x.nr(), x.nc());
+        resizable_tensor src_grad_cuda(x), gamma_grad_cuda(1, x.k(), x.nr(), x.nc()), beta_grad_cuda(1, x.k(), x.nr(), x.nc());
         rnd.fill_gaussian(gradient_input);
         src_grad_cpu = 0;
         src_grad_cuda = 0;
