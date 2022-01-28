@@ -14,6 +14,8 @@ using namespace std;
 
 // ----------------------------------------------------------------------------------------
 
+#error "don't build"
+
 int main()
 {
     // Let's begin this example by using the library to solve a simple 
