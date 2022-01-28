@@ -1,10 +1,22 @@
 
-environment:
-  matrix:
-    - PATH: C:\Python37;%PATH%
-    - PATH: C:\Python37-x64;%PATH%
-    - PATH: C:\Python310;%PATH%
-    - PATH: C:\Python310-x64;%PATH%
+image: 
+  - Visual Studio 2017
+  - Visual Studio 2022
+
+for:
+  - 
+    matrix:
+      only:
+         - image: Visual Studio 2017
+      - PATH: C:\Python37;%PATH%
+      - PATH: C:\Python37-x64;%PATH%
+
+  - 
+    matrix:
+      only:
+         - image: Visual Studio 2022
+      - PATH: C:\Python310;%PATH%
+      - PATH: C:\Python310-x64;%PATH%
 
 
 build_script:
