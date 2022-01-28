@@ -1,10 +1,10 @@
 
 environment:
   matrix:
-    - PATH: C:\Python36;%PATH%
-    - PATH: C:\Python36-x64;%PATH%
     - PATH: C:\Python37;%PATH%
     - PATH: C:\Python37-x64;%PATH%
+    - PATH: C:\Python310;%PATH%
+    - PATH: C:\Python310-x64;%PATH%
 
 
 build_script:
