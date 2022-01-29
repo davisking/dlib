@@ -56,6 +56,10 @@ namespace dlib
         decoder_ffmpeg(const args &a);
 
         bool is_open() const;
+        bool is_image_decoder() const;
+        bool is_audio_decoder() const;
+        AVCodecID   get_codec_id() const;
+        std::string get_codec_name() const;
 
         /*video dims*/
         int             height()    const;

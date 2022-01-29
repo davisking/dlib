@@ -137,15 +137,33 @@ namespace
         AVCodecID audio_codec
     )
     {
-        dlib::demuxer_ffmpeg::args args;
-        args.filepath = filepath;
-        dlib::demuxer_ffmpeg cap(args);
+        dlib::demuxer_ffmpeg cap(dlib::demuxer_ffmpeg::args{filepath});
 
         DLIB_TEST(cap.is_open());
         print_spinner();
 
         dlib::encoder_ffmpeg enc_image, enc_audio;
         dlib::decoder_ffmpeg dec_image, dec_audio;
+
+        auto test_empty_encoder = [](dlib::encoder_ffmpeg& enc) {
+            DLIB_TEST(!enc.is_open());
+            DLIB_TEST(!enc.is_audio_encoder());
+            DLIB_TEST(!enc.is_image_encoder());
+            DLIB_TEST(enc.get_codec_id() == AV_CODEC_ID_NONE);
+            DLIB_TEST(enc.get_codec_name() == "NONE");
+            DLIB_TEST(enc.get_encoded_stream() == nullptr);
+            DLIB_TEST(enc.height() <= 0);
+            DLIB_TEST(enc.width() <= 0);
+            DLIB_TEST(enc.pixel_fmt() == AV_PIX_FMT_NONE);
+            DLIB_TEST(enc.sample_fmt() == AV_SAMPLE_FMT_NONE);
+            DLIB_TEST(enc.sample_rate() == 0);
+            DLIB_TEST(enc.channel_layout() == 0);
+            DLIB_TEST(enc.nchannels() == 0);
+            print_spinner();
+        };
+
+        test_empty_encoder(enc_image);
+        test_empty_encoder(enc_audio);
 
         if (cap.video_enabled())
         {
@@ -156,20 +174,26 @@ namespace
                 args2.args_image.w      = cap.width();
                 args2.args_image.fmt    = AV_PIX_FMT_YUV420P;
 
-                enc_image = dlib::encoder_ffmpeg(args2, std::unique_ptr<std::ostream>(new std::stringstream()));
+                enc_image = dlib::encoder_ffmpeg(args2,  std::make_shared<std::stringstream>());
                 DLIB_TEST(enc_image.is_open());
+                DLIB_TEST(enc_image.is_image_encoder());
+                DLIB_TEST(enc_image.get_codec_id() == args2.args_common.codec);
+                DLIB_TEST(enc_image.height() == cap.height());
+                DLIB_TEST(enc_image.width() == cap.width());
                 print_spinner();
             }
 
             {
                 dlib::decoder_ffmpeg::args args2;
-                args2.args_common.codec = AV_CODEC_ID_MPEG4;
-                args2.args_image.h   = cap.height();
-                args2.args_image.w   = cap.width();
-                args2.args_image.fmt = cap.fmt();
+                args2.args_common.codec = enc_image.get_codec_id();
+                args2.args_image.h      = cap.height();
+                args2.args_image.w      = cap.width();
+                args2.args_image.fmt    = cap.fmt();
 
                 dec_image = dlib::decoder_ffmpeg(args2);
                 DLIB_TEST(dec_image.is_open());
+                DLIB_TEST(dec_image.is_image_decoder());
+                DLIB_TEST(dec_image.get_codec_id() == args2.args_common.codec);
                 print_spinner();
             }
         }
@@ -178,25 +202,32 @@ namespace
         {
             {
                 dlib::encoder_ffmpeg::args args2;
-                args2.args_common.codec = audio_codec;
+                args2.args_common.codec         = audio_codec;
                 args2.args_audio.sample_rate    = cap.sample_rate();
                 args2.args_audio.channel_layout = cap.channel_layout();
                 args2.args_audio.fmt            = cap.sample_fmt();
 
-                enc_audio = dlib::encoder_ffmpeg(args2, std::unique_ptr<std::ostream>(new std::stringstream()));
+                enc_audio = dlib::encoder_ffmpeg(args2, std::make_shared<std::stringstream>());
                 DLIB_TEST(enc_audio.is_open());
+                DLIB_TEST(enc_audio.is_audio_encoder());
+                DLIB_TEST(enc_audio.get_codec_id() == args2.args_common.codec);
+                //You can't guarantee that the requested sample rate or sample format are supported.
+                //In which case, the object changes them to values that ARE supported. So we can't add
+                //tests that check that the sample rate is set to what we asked for.
                 print_spinner();
             }
 
             {
                 dlib::decoder_ffmpeg::args args2;
-                args2.args_common.codec = audio_codec;
+                args2.args_common.codec         = enc_audio.get_codec_id();
                 args2.args_audio.sample_rate    = cap.sample_rate();
                 args2.args_audio.channel_layout = cap.channel_layout();
                 args2.args_audio.fmt            = cap.sample_fmt();
 
                 dec_audio = dlib::decoder_ffmpeg(args2);
                 DLIB_TEST(dec_audio.is_open());
+                DLIB_TEST(dec_audio.is_audio_decoder());
+                DLIB_TEST(dec_audio.get_codec_id() == args2.args_common.codec);
                 print_spinner();
             }
         }
@@ -226,8 +257,8 @@ namespace
 
         auto populate_encoder_and_decoder = [](encoder_ffmpeg& enc, decoder_ffmpeg& dec)
         {
-            std::shared_ptr<std::ostream> encoded = enc.get_encoded_stream();
-            const std::string encoded_str = dynamic_cast<std::stringstream&>(*encoded).str();
+            auto encoded = std::dynamic_pointer_cast<std::stringstream>(enc.get_encoded_stream());
+            const std::string encoded_str = encoded->str();
             DLIB_TEST(dec.push_encoded((const uint8_t*)encoded_str.c_str(), encoded_str.size()));
             dec.flush();
             print_spinner();

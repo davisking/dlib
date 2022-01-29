@@ -130,10 +130,7 @@ namespace dlib
 
     bool encoder_ffmpeg::open()
     {
-        if (packet_ready_callback == nullptr)
-        {
-            DLIB_CASSERT(encoded != nullptr, "encoded must be set to a non-null pointer");
-        }
+        DLIB_CASSERT(packet_ready_callback != nullptr || encoded != nullptr, "Empty std::shared_ptr<std::ostream>");
 
         packet = make_avpacket();
         AVCodec* pCodec = nullptr;
@@ -145,7 +142,7 @@ namespace dlib
 
         if (!pCodec)
         {
-            printf("Codec %i : `%s` not found\n", _args.args_common.codec, _args.args_common.codec_name.c_str());
+            printf("Codec `%s` or `%s` not found\n", avcodec_get_name(_args.args_common.codec), _args.args_common.codec_name.c_str());
             return false;
         }
 
@@ -240,6 +237,16 @@ namespace dlib
     bool encoder_ffmpeg::is_audio_encoder() const
     {
         return is_open() && pCodecCtx->codec_type == AVMEDIA_TYPE_AUDIO;
+    }
+
+    AVCodecID encoder_ffmpeg::get_codec_id() const
+    {
+        return is_open() ? pCodecCtx->codec_id : AV_CODEC_ID_NONE;
+    }
+
+    std::string encoder_ffmpeg::get_codec_name() const
+    {
+        return is_open() ? avcodec_get_name(pCodecCtx->codec_id) : "NONE";
     }
 
     std::shared_ptr<std::ostream> encoder_ffmpeg::get_encoded_stream()
@@ -645,8 +652,7 @@ namespace dlib
                 return false;
             }
 
-            if (!st.encoder_image.push(std::move(frame)))
-                return false;
+            return st.encoder_image.push(std::move(frame));
         }
 
         else if (frame.is_image())
@@ -657,15 +663,10 @@ namespace dlib
                 return false;
             }
 
-            if (!st.encoder_audio.push(std::move(frame)))
-                return false;
-        }
-        else
-        {
-            return false;
+            return st.encoder_audio.push(std::move(frame));
         }
 
-        return true;
+        return false;
     }
 
     void muxer_ffmpeg::flush()

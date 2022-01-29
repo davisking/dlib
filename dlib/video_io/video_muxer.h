@@ -65,6 +65,8 @@ namespace dlib
         bool is_open() const;
         bool is_image_encoder() const;
         bool is_audio_encoder() const;
+        AVCodecID   get_codec_id() const;
+        std::string get_codec_name() const;
 
         bool push(
             const array2d<rgb_pixel>& frame,
@@ -86,7 +88,7 @@ namespace dlib
         /*video dims*/
         int             height()    const;
         int             width()     const;
-        AVPixelFormat   pixel_fmt()       const;
+        AVPixelFormat   pixel_fmt() const;
 
         /*audio dims*/
         int             sample_rate()       const;

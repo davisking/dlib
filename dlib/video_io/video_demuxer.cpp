@@ -76,7 +76,7 @@ namespace dlib
 
         if (!pCodec)
         {
-            printf("Codec %i : `%s` not found\n", _args.args_common.codec, _args.args_common.codec_name.c_str());
+            printf("Codec `%s` or `%s` not found\n", avcodec_get_name(_args.args_common.codec), _args.args_common.codec_name.c_str());
             return false;
         }
 
@@ -142,6 +142,26 @@ namespace dlib
         return FFMPEG_INITIALIZED &&
                connected &&
                pCodecCtx != nullptr;
+    }
+
+    bool decoder_ffmpeg::is_image_decoder() const
+    {
+        return pCodecCtx && pCodecCtx->codec_type == AVMEDIA_TYPE_VIDEO;
+    }
+
+    bool decoder_ffmpeg::is_audio_decoder() const
+    {
+        return pCodecCtx && pCodecCtx->codec_type == AVMEDIA_TYPE_AUDIO;
+    }
+
+    AVCodecID decoder_ffmpeg::get_codec_id() const
+    {
+        return pCodecCtx ? pCodecCtx->codec_id : AV_CODEC_ID_NONE;
+    }
+
+    std::string decoder_ffmpeg::get_codec_name() const
+    {
+        return pCodecCtx ? avcodec_get_name(pCodecCtx->codec_id) : "NONE";
     }
 
     int decoder_ffmpeg::height() const
@@ -361,6 +381,7 @@ namespace dlib
     {
         push_encoded(nullptr, 0);
         pCodecCtx.reset(nullptr); //decoder
+        connected = false;
     }
 
     decoder_ffmpeg::suc_t decoder_ffmpeg::read(Frame& dst_frame)
