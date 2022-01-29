@@ -25,6 +25,8 @@ namespace dlib
                 std::string                         codec_name;     //only used if codec==AV_CODEC_ID_NONE
                 std::map<std::string, std::string>  codec_options;  //It's rare you should have to set this
                 int                                 nthreads = -1;  //-1 means use default
+                int64_t                             bitrate  = -1;  //-1 means use default. See documentation for AVCodecContext::bit_rate
+                int                                 flags    = 0;   //See documentation for AVCodecContext::flags. You almost never have to use this.
             };
 
             struct image_args
@@ -122,6 +124,9 @@ namespace dlib
 
             typedef std::function<bool()> interrupter_t;
 
+            args() = default;
+            args(std::string filepath);
+
             /*
              * This can be:
              *  - video filepath    (eg *.mp4)
@@ -146,12 +151,12 @@ namespace dlib
         };
 
         demuxer_ffmpeg() = default;
-        demuxer_ffmpeg(const args &a);
+        demuxer_ffmpeg(args a);
         demuxer_ffmpeg(demuxer_ffmpeg&& other);
         demuxer_ffmpeg& operator=(demuxer_ffmpeg&& other);
         friend void swap(demuxer_ffmpeg &a, demuxer_ffmpeg &b);
 
-        bool open(const args &a);
+        bool open(args a);
         bool is_open() const;
         bool audio_enabled() const;
         bool video_enabled() const;

@@ -39,7 +39,7 @@ namespace dlib
         sw_audio_resampler& resizer
     )
     {
-        if (f.samplefmt() != AV_CH_LAYOUT_STEREO ||
+        if (f.frame->channel_layout != AV_CH_LAYOUT_STEREO ||
             f.samplefmt() != AV_SAMPLE_FMT_S16)
         {
             resizer.resize(
@@ -89,6 +89,10 @@ namespace dlib
 
         if (_args.args_common.nthreads > 0)
             pCodecCtx->thread_count = _args.args_common.nthreads;
+        if (_args.args_common.bitrate > 0)
+            pCodecCtx->bit_rate = _args.args_common.bitrate;
+        if (_args.args_common.flags > 0)
+            pCodecCtx->flags |= _args.args_common.flags;
 
         if (pCodecCtx->codec_id == AV_CODEC_ID_AAC)
             pCodecCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
@@ -399,9 +403,15 @@ namespace dlib
         return suc;
     }
 
-    demuxer_ffmpeg::demuxer_ffmpeg(const args& a)
+    demuxer_ffmpeg::args::args(
+        std::string filepath_
+    ) : filepath(std::move(filepath_))
     {
-        st.connected = open(a);
+    }
+
+    demuxer_ffmpeg::demuxer_ffmpeg(args a)
+    {
+        st.connected = open(std::move(a));
     }
 
     demuxer_ffmpeg::demuxer_ffmpeg(demuxer_ffmpeg &&other)
@@ -457,10 +467,10 @@ namespace dlib
         swap(empty, *this);
     }
 
-    bool demuxer_ffmpeg::open(const args& a)
+    bool demuxer_ffmpeg::open(args a)
     {
         reset();
-        st._args = a;
+        st._args = std::move(a);
 
         AVFormatContext* pFormatCtx = avformat_alloc_context();
         pFormatCtx->opaque = this;
@@ -742,7 +752,7 @@ namespace dlib
         };
 
         bool ok = true;
-        size_t ndecoded_frames = st.src_frame_buffer.size();
+        const size_t ndecoded_frames = st.src_frame_buffer.size();
 
         while (ok && (st.src_frame_buffer.size() - ndecoded_frames) == 0)
         {

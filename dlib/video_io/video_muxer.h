@@ -176,7 +176,6 @@ namespace dlib
         bool interrupt_callback();
         bool handle_packet(AVPacket* pkt, AVCodecContext* ctx);
 
-
         struct {
             args _args;
             bool                            connected = false;

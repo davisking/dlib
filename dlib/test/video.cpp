@@ -30,9 +30,7 @@ namespace
         const int width     = dlib::get_option(cfg, "width", 0);
         const int rate      = dlib::get_option(cfg, "sample_rate", 0);
 
-        dlib::demuxer_ffmpeg::args args;
-        args.filepath = filepath;
-        dlib::demuxer_ffmpeg cap(args);
+        dlib::demuxer_ffmpeg cap(dlib::demuxer_ffmpeg::args{filepath});
 
         DLIB_TEST(cap.is_open());
         DLIB_TEST(cap.height() == height);
