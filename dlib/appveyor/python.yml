@@ -1,45 +1,20 @@
 
 image: 
   - Visual Studio 2017
+    environment:
+      matrix:
+        - PATH: C:\Python37;%PATH%
+        - PATH: C:\Python37-x64;%PATH%
+
   - Visual Studio 2022
-
-# The versions of python we test against
-environment:
-  matrix:
-    - image_type: 2017
-      PATH: C:\Python37;%PATH%
-
-    - image_type: 2017
-      PATH: C:\Python37-x64;%PATH%
-
-    - image_type: 2022
-      PATH: C:\Python310;%PATH%
-
-    - image_type: 2022
-      PATH: C:\Python310-x64;%PATH%
+    environment:
+      matrix:
+        - PATH: C:\Python310;%PATH%
+        - PATH: C:\Python310-x64;%PATH%
 
 
-# this for block tells appveyor to only run image_type environments with the
-# corresponding visual studio version. 
-for:
-  - 
-    matrix:
-      only:
-         - image: Visual Studio 2017
-           image_type: 2017
-    build_script:
-      - python setup.py build --clean
-    test_script:
-      - python setup.py test
+build_script:
+  - python setup.py build --clean
 
-  - 
-    matrix:
-      only:
-         - image: Visual Studio 2022
-           image_type: 2022
-    build_script:
-      - python setup.py build --clean
-    test_script:
-      - python setup.py test
-
-
+test_script:
+  - python setup.py test
