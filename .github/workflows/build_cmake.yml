@@ -36,8 +36,9 @@ jobs:
       working-directory: ${{ github.workspace }}/dlib/test/${{ env.build_dir }}
       run: |
         if [ "$RUNNER_OS" == "Windows" ]; then
-          dir
-          ./dtest.exe --runall
+          dir Debug
+          dir dtest.dir
+          ./Debug/dtest.exe --runall
         else
           ./dtest --runall
         fi;
