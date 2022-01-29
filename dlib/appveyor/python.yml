@@ -27,16 +27,19 @@ for:
       only:
          - image: Visual Studio 2017
            image_type: 2017
+    build_script:
+      - python setup.py build --clean
+    test_script:
+      - python setup.py test
 
   - 
     matrix:
       only:
          - image: Visual Studio 2022
            image_type: 2022
+    build_script:
+      - python setup.py build --clean
+    test_script:
+      - python setup.py test
 
 
-build_script:
-  - python setup.py build --clean
-
-test_script:
-  - python setup.py test
