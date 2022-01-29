@@ -17,12 +17,12 @@ for:
     matrix:
       only:
         - image_type: 2017
-      image: Visual Studio 2017
+    image: Visual Studio 2017
   -
     matrix:
       only:
         - image_type: 2022
-      image: Visual Studio 2022
+    image: Visual Studio 2022
 
 
 build_script:
