@@ -46,7 +46,7 @@ namespace
 
         while (cap.read(frame, timestamp_us))
         {
-            frame.visit(overloaded(
+            visit(overloaded(
                 [&](const array2d<rgb_pixel>& frame) {
                     DLIB_TEST(frame.nc() == width);
                     DLIB_TEST(frame.nr() == height);
@@ -56,7 +56,7 @@ namespace
                     DLIB_TEST(frame.sample_rate == rate);
                     counter_samples += frame.samples.size();
                 }
-            ));
+            ), frame);
             print_spinner();
         }
 
@@ -112,7 +112,7 @@ namespace
 
         while (cap.read(frame, timestamp_us) == decoder_ffmpeg::FRAME_AVAILABLE)
         {
-            frame.visit(overloaded(
+            visit(overloaded(
                     [&](const array2d<rgb_pixel>& frame) {
                         DLIB_TEST(frame.nc() == width);
                         DLIB_TEST(frame.nr() == height);
@@ -122,7 +122,7 @@ namespace
                         DLIB_TEST(frame.sample_rate == rate);
                         counter_samples += frame.samples.size();
                     }
-            ));
+            ), frame);
             print_spinner();
         }
 
@@ -208,7 +208,7 @@ namespace
 
         while (cap.read(frame, timestamp_us))
         {
-            frame.visit(overloaded(
+            visit(overloaded(
                     [&](const array2d<rgb_pixel>& frame) {
                         DLIB_TEST(enc_image.push(frame, timestamp_us));
                         counter_images++;
@@ -217,7 +217,7 @@ namespace
                         DLIB_TEST(enc_audio.push(frame, timestamp_us));
                         counter_audio += frame.samples.size();
                     }
-            ));
+            ), frame);
             print_spinner();
         }
 
@@ -252,7 +252,7 @@ namespace
 
             while (dec.read(frame, timestamp_us) == decoder_ffmpeg::FRAME_AVAILABLE)
             {
-                frame.visit(overloaded(
+                visit(overloaded(
                         [&](const array2d<rgb_pixel>& frame) {
                             DLIB_TEST(frame.nc() == cap.width());
                             DLIB_TEST(frame.nr() == cap.height());
@@ -262,7 +262,7 @@ namespace
                             DLIB_TEST(frame.sample_rate == cap.sample_rate());
                             counter_audio_actual += frame.samples.size();
                         }
-                ));
+                ), frame);
                 print_spinner();
             }
 
