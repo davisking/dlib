@@ -1,17 +1,15 @@
 
-image: 
-  - Visual Studio 2017
-    environment:
-      matrix:
-        - PATH: C:\Python37;%PATH%
-        - PATH: C:\Python37-x64;%PATH%
 
-  - Visual Studio 2022
-    environment:
-      matrix:
-        - PATH: C:\Python310;%PATH%
-        - PATH: C:\Python310-x64;%PATH%
-
+environment:
+  matrix:
+    - PATH: C:\Python37;%PATH%
+      image: Visual Studio 2017
+    - PATH: C:\Python37-x64;%PATH%
+      image: Visual Studio 2017
+    - PATH: C:\Python310;%PATH%
+      image: Visual Studio 2022
+    - PATH: C:\Python310-x64;%PATH%
+      image: Visual Studio 2022
 
 build_script:
   - python setup.py build --clean
