@@ -24,7 +24,7 @@ namespace dlib
         }
 
         sgd(
-        ) : sgd(0.0005, 0.9) 
+        ) : sgd(0.0005f, 0.9f)
         { 
         }
 
@@ -209,7 +209,7 @@ namespace dlib
         }
 
         adam(
-        ) : adam(0.0005, 0.9, 0.999) 
+        ) : adam(0.0005f, 0.9f, 0.999f)
         {}
 
         float get_momentum1 (

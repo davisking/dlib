@@ -1732,11 +1732,11 @@ namespace dlib
 
         void resize_bilinear (
             tensor& dest,
-            long dest_row_stride,
-            long dest_channel_stride,
+            long long dest_row_stride,
+            long long dest_channel_stride,
             const tensor& src,
-            long src_row_stride,
-            long src_channel_stride
+            long long src_row_stride,
+            long long src_channel_stride
         )
         {
             DLIB_CASSERT(is_same_object(dest, src)==false);
@@ -1838,11 +1838,11 @@ namespace dlib
 
         void resize_bilinear_gradient (
             tensor& grad,
-            long grad_row_stride,
-            long grad_channel_stride,
+            long long grad_row_stride,
+            long long grad_channel_stride,
             const tensor& gradient_input,
-            long gradient_input_row_stride,
-            long gradient_input_channel_stride
+            long long gradient_input_row_stride,
+            long long gradient_input_channel_stride
         )
         {
             DLIB_CASSERT(is_same_object(grad, gradient_input)==false);
@@ -1908,7 +1908,7 @@ namespace dlib
                 for (auto i : grid_stride_range(0, num))
                 {
                     const float val = (s[n*num+i]-m[n])*v[n];
-                    out[n*num+i] = val*g[n]+b[n];
+                    out[n*num+i] = val*g[i]+b[i];
                 }
             }
         }
@@ -1917,21 +1917,17 @@ namespace dlib
         {
             for (auto n : grid_stride_range_y(0, ns))
             {
-                float temp_bg = 0;
-                float temp_gg = 0;
                 float temp_dv = 0;
                 for (auto i : grid_stride_range(0, num))
                 {
                     auto idx = n*num+i;
                     const float x_hat = (s[idx] - m[n])*v[n];
-                    temp_bg += gi[idx];
-                    temp_gg += gi[idx]*x_hat;
+                    bg[i] += gi[idx];
+                    gg[i] += gi[idx]*x_hat;
 
                     const float dx = gi[idx] * g[n];
                     temp_dv += dx*(s[idx] - m[n])*-0.5*v[n]*v[n]*v[n];
                 }
-                warp_reduce_atomic_add(bg[n], temp_bg);
-                warp_reduce_atomic_add(gg[n], temp_gg);
                 warp_reduce_atomic_add(dv[n], temp_dv);
             }
             __syncthreads();
@@ -1942,7 +1938,7 @@ namespace dlib
                 for (auto i : grid_stride_range(0, num))
                 {
                     auto idx = n*num+i;
-                    const float dx = gi[idx]*g[n];
+                    const float dx = gi[idx]*g[i];
                     temp_dm += dx*-v[n] + dv[n] * -2*(s[idx] - m[n])/num;
                 }
                 warp_reduce_atomic_add(dm[n], temp_dm);
@@ -1954,7 +1950,7 @@ namespace dlib
                 for (auto i : grid_stride_range(0, num))
                 {
                     auto idx = n*num+i;
-                    const float dx = gi[idx]*g[n];
+                    const float dx = gi[idx]*g[i];
                     out[idx] += dx*v[n] + dv[n] * 2*(s[idx] - m[n])/num + dm[n]/num;
                 }
             }
@@ -1973,8 +1969,9 @@ namespace dlib
             const long num = src.k() * src.nr() * src.nc();
             DLIB_CASSERT(
                 have_same_dimensions(gamma, beta) &&
-                src.num_samples() == gamma.size() &&
-                src.num_samples() == beta.size() &&
+                src.k() == gamma.k() &&
+                src.nr() == gamma.nr() &&
+                src.nc() == gamma.nc() &&
                 eps > 0,
                 "\ngamma.k():  " << gamma.k() <<
                 "\ngamma.nr(): " << gamma.nr() <<
@@ -1982,9 +1979,9 @@ namespace dlib
                 "\nbeta.k():   " << beta.k() <<
                 "\nbeta.nr():  " << beta.nr() <<
                 "\nbeta.nc():  " << beta.nc() <<
-                "\nsrc.k():   " << src.k() <<
-                "\nsrc.nr():  " << src.nr() <<
-                "\nsrc.nc():  " << src.nc() <<
+                "\nsrc.k():    " << src.k() <<
+                "\nsrc.nr():   " << src.nr() <<
+                "\nsrc.nc():   " << src.nc() <<
                 "\neps:  " << eps
             );
 
@@ -2012,11 +2009,13 @@ namespace dlib
             const long num = src.k() * src.nr() * src.nc();
             DLIB_CASSERT(src.num_samples() == means.size());
             DLIB_CASSERT(src.num_samples() == invstds.size());
-            DLIB_CASSERT(src.num_samples() == gamma.size());
-            DLIB_CASSERT(src.num_samples() == gamma_grad.size());
-            DLIB_CASSERT(src.num_samples() == beta_grad.size());
+            DLIB_CASSERT(src.k() == gamma.k());
+            DLIB_CASSERT(src.nr() == gamma.nr());
+            DLIB_CASSERT(src.nc() == gamma.nc());
             DLIB_CASSERT(have_same_dimensions(gradient_input, src));
             DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad));
+            DLIB_CASSERT(have_same_dimensions(gamma_grad, gamma));
+            DLIB_CASSERT(have_same_dimensions(gamma_grad, beta_grad));
             DLIB_CASSERT(eps > 0);
 
             beta_grad = 0;

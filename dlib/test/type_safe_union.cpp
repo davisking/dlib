@@ -80,6 +80,13 @@ namespace
     public:
         void test_stuff()
         {
+            static_assert(tsu::get_type_id<float>() == 1,       "bad type id");
+            static_assert(tsu::get_type_id<double>() == 2,      "bad type id");
+            static_assert(tsu::get_type_id<char>() == 3,        "bad type id");
+            static_assert(tsu::get_type_id<std::string>() == 4, "bad type id");
+            static_assert(tsu::get_type_id<long>() == -1,       "This should be -1");
+
+
             DLIB_TEST(a.is_empty() == true);
             DLIB_TEST(a.contains<char>() == false);
             DLIB_TEST(a.contains<float>() == false);
@@ -566,7 +573,7 @@ namespace
                 DLIB_TEST(b.is_empty());
                 DLIB_TEST(b.get_current_type_id() == 0);
                 //visit can return non-void types
-                auto ret = a.visit(overloaded(
+                auto ret = visit(overloaded(
                     [](int) {
                         return std::string("int");
                     },
@@ -576,7 +583,7 @@ namespace
                     [](const std::string&) {
                         return std::string("std::string");
                     }
-                ));
+                ), a);
                 static_assert(std::is_same<std::string, decltype(ret)>::value, "bad return type");
                 DLIB_TEST(ret == "int");
                 //apply_to_contents can only return void
@@ -604,7 +611,7 @@ namespace
                 tsu_b object(dlib::in_place_tag<tsu_a>{}, std::string("hello from bottom node"));
                 DLIB_TEST(object.contains<tsu_a>());
                 DLIB_TEST(object.get<tsu_a>().get<std::string>() == "hello from bottom node");
-                auto ret = object.visit(overloaded(
+                auto ret = visit(overloaded(
                     [](int) {
                         return std::string("int");
                     },
@@ -615,7 +622,7 @@ namespace
                         return std::string("std::string");
                     },
                     [](const tsu_a& item) {
-                        return item.visit(overloaded(
+                        return visit( overloaded(
                             [](int) {
                                 return std::string("nested int");
                             },
@@ -625,20 +632,19 @@ namespace
                             [](std::string str) {
                                 return str;
                             }
-                        ));
+                        ), item);
                     }
-                ));
+                ), object);
                 static_assert(std::is_same<std::string, decltype(ret)>::value, "bad type");
                 DLIB_TEST(ret == "hello from bottom node");
             }
 
             {
-                //"private" visitor
+                //struct visitor
                 using tsu = type_safe_union<int,float,std::string>;
 
-                class visitor_private
+                struct visitor_private
                 {
-                private:
                     std::string operator()(int)
                     {
                         return std::string("int");
@@ -653,18 +659,161 @@ namespace
                     {
                         return str;
                     }
-
-                    friend tsu;
                 };
 
                 visitor_private visitor;
                 tsu a = std::string("hello from private visitor");
-                auto ret = a.visit(visitor);
+                auto ret = visit(visitor, a);
                 static_assert(std::is_same<std::string, decltype(ret)>::value, "bad type");
                 DLIB_TEST(ret == "hello from private visitor");
             }
         }
     };
+
+    namespace test_for_each_1
+    {
+        /*! Local classes aren't allowed to have template member functions... !*/
+
+        using tsu = type_safe_union<int,float,std::string>;
+        static_assert(type_safe_union_size<tsu>::value == 3, "bad number of types");
+        static_assert(std::is_same<type_safe_union_alternative_t<0, tsu>, int>::value, "bad type");
+        static_assert(std::is_same<type_safe_union_alternative_t<1, tsu>, float>::value, "bad type");
+        static_assert(std::is_same<type_safe_union_alternative_t<2, tsu>, std::string>::value, "bad type");
+
+        static_assert(std::is_same<type_safe_union_alternative_t<0, const tsu>, const int>::value, "bad type");
+        static_assert(std::is_same<type_safe_union_alternative_t<1, const tsu>, const float>::value, "bad type");
+        static_assert(std::is_same<type_safe_union_alternative_t<2, const tsu>, const std::string>::value, "bad type");
+
+        static_assert(std::is_same<type_safe_union_alternative_t<0, volatile tsu>, volatile int>::value, "bad type");
+        static_assert(std::is_same<type_safe_union_alternative_t<1, volatile tsu>, volatile float>::value, "bad type");
+        static_assert(std::is_same<type_safe_union_alternative_t<2, volatile tsu>, volatile std::string>::value, "bad type");
+
+        static_assert(std::is_same<type_safe_union_alternative_t<0, const volatile tsu>, const volatile int>::value, "bad type");
+        static_assert(std::is_same<type_safe_union_alternative_t<1, const volatile tsu>, const volatile float>::value, "bad type");
+        static_assert(std::is_same<type_safe_union_alternative_t<2, const volatile tsu>, const volatile std::string>::value, "bad type");
+
+        struct for_each_visitor
+        {
+            std::vector<int> type_indices;
+
+            template<typename T>
+            void operator()(dlib::in_place_tag<T>, const tsu& item)
+            {
+                type_indices.push_back(item.get_type_id<T>());
+            }
+        };
+
+        void test()
+        {
+            tsu a;
+            for_each_visitor visitor;
+            for_each_type(visitor, a);
+            
+            DLIB_TEST(visitor.type_indices.size() == 3);
+            DLIB_TEST(visitor.type_indices[0] == 1);
+            DLIB_TEST(visitor.type_indices[1] == 2);
+            DLIB_TEST(visitor.type_indices[2] == 3);
+        }
+    }
+
+    namespace test_for_each_2
+    {
+        /*! Local classes aren't allowed to have template member functions... !*/
+        
+        using tsu = type_safe_union<int,float,std::string>;
+
+        //for_each() that demonstrates an actual use-case. 
+        //Instead of something simple like a target index, you might want to set the variant
+        //based on some specific state that is unique to one of the alternative types.
+        //For example, you might want to conditionally set the variant based on hashes.
+
+        struct for_each_visitor
+        {
+            for_each_visitor(int target_index_) : target_index(target_index_) {}
+
+            template<typename TagType>
+            void operator()(TagType tag, tsu& item)
+            {
+                if (item.get_type_id<TagType>() == target_index)
+                    item = tsu{tag};
+            }
+
+            const int target_index = 0;
+        };
+
+        void test()
+        {
+            tsu a;
+            for_each_type(for_each_visitor{1}, a);
+            DLIB_TEST(a.contains<int>());
+            a.clear();
+            for_each_type(for_each_visitor{2}, a);
+            DLIB_TEST(a.contains<float>());
+            a.clear();
+            for_each_type(for_each_visitor{3}, a);
+            DLIB_TEST(a.contains<std::string>());
+            a.clear();
+            for_each_type(for_each_visitor{-1}, a);
+            DLIB_TEST(a.is_empty());
+            a.clear();
+            for_each_type(for_each_visitor{215465}, a);
+            DLIB_TEST(a.is_empty());
+        }
+    }
+
+    namespace test_for_each_3
+    {
+        using tsu1 = type_safe_union<int,float,std::string>;
+        using tsu2 = type_safe_union<std::string,long,char>;
+
+        struct serializer_typeid
+        {
+            serializer_typeid(std::ostream& out_) : out(out_) {}
+
+            template<typename T>
+            void operator()(const T& x)
+            {
+                dlib::serialize(typeid(T).hash_code(), out);
+                dlib::serialize(x, out);
+            }
+
+            std::ostream& out;
+        };
+
+        struct deserializer_typeid
+        {
+            deserializer_typeid(std::istream& in_) : in(in_) 
+            {
+                dlib::deserialize(hash_code, in);
+            }
+
+            template<typename T, typename TSU>
+            void operator()(in_place_tag<T>, TSU&& me)
+            {
+                if (typeid(T).hash_code() == hash_code)
+                    dlib::deserialize(me.template get<T>(), in);
+            }
+
+            std::size_t hash_code = 0;
+            std::istream& in;
+        };
+
+        void test()
+        {
+            tsu1 a;
+            a.get<std::string>() = "hello from tsu1";
+
+            std::stringstream out;
+            visit(serializer_typeid(out), a);
+
+            tsu2 b;
+            for_each_type(deserializer_typeid(out), b);
+
+            DLIB_TEST(b.contains<std::string>());
+            DLIB_TEST(b.get<std::string>() == "hello from tsu1");
+        }
+    }
+
 
     class type_safe_union_tester : public tester
     {
@@ -682,6 +831,9 @@ namespace
             {
                 test a;
                 a.test_stuff();
+                test_for_each_1::test();
+                test_for_each_2::test();
+                test_for_each_3::test();
             }
         }
     } a;

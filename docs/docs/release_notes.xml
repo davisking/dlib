@@ -10,8 +10,36 @@
 
 <!-- **************************************************************************************  -->
 
-
 <current>
+New Features and Improvements:
+   - Added serialization support for std::variant and std::optional.
+   - Added upgrades to dlib::type_safe_union: type_safe_union_size, type_safe_union_alternative_t,
+     made into variadic template, more generic visit() method.
+   - Added dlib/invoke.hh which contains C++11 backports of std::invoke and related tooling.
+   - Added letterbox_image()
+   - Exposed momentum_filter to Python.
+   - Deep learning tooling:
+      - Added Clipped ReLU and ELU activations
+      - Made input_layer() work with networks that contain repeat layers.
+      - Added loss_yolo_ for training YOLO style object detectors.
+      - Added support for fused convolutions, see dlib::fuse_layers().
+      - Added dnn self supervised learning example: dnn_self_supervised_learning_ex.cpp
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fix input/output mappings with repeat layers (PR #2337)
+   - Fix disable_duplicative_biases when the input is a skip layer (PR #2367)
+   - Fix cannot compile iso only code (PR #2384)
+   - Fix running gradient crashing sometimes (PR #2401)
+   - Fix trainer with unsupervised loss (PR #2436)
+   - Fix dnn_trainer trying to decrease the learning rate (PR #2442)
+   - Fix Layer Normalize (PR #2489)
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.22" date="Mar 28, 2021">
 New Features and Improvements:
    - Deep learning tooling:
       - Added loss_multibinary_log_
@@ -39,7 +67,7 @@ Bug fixes:
    - Fixed bug in loss_mmod that degraded the quality of bounding box regression.  Now
      bounding box regression works a lot better.
    - Fixes for code not compiling in various environments and support newer CUDA tooling.
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 

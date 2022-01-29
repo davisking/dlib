@@ -111,7 +111,7 @@ namespace dlib
             {  
                 // if they are trying to push back a character that they didn't read last
                 // that is an error
-                const unsigned long prev = read_pos-1;
+                const auto prev = read_pos-1;
                 if (c != EOF && prev < buffer.size() && 
                     c != static_cast<unsigned char>(buffer[prev]))
                 {

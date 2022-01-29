@@ -748,6 +748,12 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    // Circumvent what appears to be a bug in Visual Studio 2019's optimizer
+    // (see: https://forum.juce.com/t/warning-in-the-lastest-vs2019/38267)
+#if defined (_MSVC_VER)
+#pragma warning ( push )
+#pragma warning ( disable: 4723 )
+#endif
     inline rectangle set_rect_area (
         const rectangle& rect,
         unsigned long area
@@ -768,6 +774,9 @@ namespace dlib
             return centered_rect(rect, (long)std::round(rect.width()*scale), (long)std::round(rect.height()*scale));
         }
     }
+#if defined (_MSVC_VER)
+#pragma warning ( pop )
+#endif
 
 // ----------------------------------------------------------------------------------------
 

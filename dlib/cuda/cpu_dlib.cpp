@@ -1273,8 +1273,9 @@ namespace dlib
             const long num = src.k() * src.nr() * src.nc();
             DLIB_CASSERT(
                 have_same_dimensions(gamma, beta) &&
-                src.num_samples() == gamma.size() &&
-                src.num_samples() == beta.size() &&
+                src.k() == gamma.k() &&
+                src.nr() == gamma.nr() &&
+                src.nc() == gamma.nc() &&
                 eps > 0,
                 "\ngamma.k():  " << gamma.k() <<
                 "\ngamma.nr(): " << gamma.nr() <<
@@ -1282,9 +1283,9 @@ namespace dlib
                 "\nbeta.k():   " << beta.k() <<
                 "\nbeta.nr():  " << beta.nr() <<
                 "\nbeta.nc():  " << beta.nc() <<
-                "\nsrc.k():   " << src.k() <<
-                "\nsrc.nr():  " << src.nr() <<
-                "\nsrc.nc():  " << src.nc() <<
+                "\nsrc.k():    " << src.k() <<
+                "\nsrc.nr():   " << src.nr() <<
+                "\nsrc.nc():   " << src.nc() <<
                 "\neps:  " << eps
             );
 
@@ -1329,7 +1330,7 @@ namespace dlib
                 for (long i = 0; i < num; ++i)
                 {
                     *p_dest = (*p_src - p_means[n])*p_invstds[n];
-                    *p_dest = (*p_dest)*p_gamma[n] + p_beta[n];
+                    *p_dest = (*p_dest)*p_gamma[i] + p_beta[i];
                     ++p_src;
                     ++p_dest;
                 }
@@ -1351,11 +1352,12 @@ namespace dlib
             const long num = src.k() * src.nr() * src.nc();
             DLIB_CASSERT(src.num_samples() == means.size());
             DLIB_CASSERT(src.num_samples() == invstds.size());
-            DLIB_CASSERT(src.num_samples() == gamma.size());
-            DLIB_CASSERT(src.num_samples() == gamma_grad.size());
-            DLIB_CASSERT(src.num_samples() == beta_grad.size());
+            DLIB_CASSERT(src.k() == gamma.k());
+            DLIB_CASSERT(src.nr() == gamma_grad.nr());
+            DLIB_CASSERT(src.nc() == beta_grad.nc());
             DLIB_CASSERT(have_same_dimensions(gradient_input, src));
             DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad));
+            DLIB_CASSERT(have_same_dimensions(gamma_grad, beta_grad));
             DLIB_CASSERT(eps > 0);
 
             beta_grad = 0;
@@ -1381,12 +1383,12 @@ namespace dlib
                 for (long i = 0; i < num; ++i)
                 {
                     const float x_hat = (*p_src - p_means[n])*p_invstds[n];
-                    p_beta_grad[n] += *p_grad;
-                    p_gamma_grad[n] += (*p_grad)*x_hat;
+                    p_beta_grad[i] += *p_grad;
+                    p_gamma_grad[i] += (*p_grad)*x_hat;
 
                     const float dx = *p_grad * p_gamma[n];
 
-                    p_dvars[n] += dx*(*p_src - p_means[n])*-0.5*std::pow(p_invstds[n], 3.0f);
+                    p_dvars[n] += dx*(*p_src - p_means[n])*-0.5*p_invstds[n]*p_invstds[n]*p_invstds[n];
 
                     ++p_grad;
                     ++p_src;
@@ -1400,7 +1402,7 @@ namespace dlib
             {
                 for (long i = 0; i < num; ++i)
                 {
-                    const float dx = *p_grad * p_gamma[n];
+                    const float dx = *p_grad * p_gamma[i];
 
                     p_dmeans[n] += dx*-p_invstds[n] + p_dvars[n] * -2*(*p_src - p_means[n])*invnum;
 
@@ -1415,7 +1417,7 @@ namespace dlib
             {
                 for (long i = 0; i < num; ++i)
                 {
-                    const float dx = *p_grad * p_gamma[n];
+                    const float dx = *p_grad * p_gamma[i];
 
                     *p_src_grad += dx*p_invstds[n] +
                         p_dvars[n] *2*(*p_src - p_means[n])*invnum +
@@ -2000,11 +2002,11 @@ namespace dlib
 
         void resize_bilinear (
             tensor& dest,
-            long dest_row_stride,
-            long dest_channel_stride,
+            long long dest_row_stride,
+            long long dest_channel_stride,
             const tensor& src,
-            long src_row_stride,
-            long src_channel_stride
+            long long src_row_stride,
+            long long src_channel_stride
         )
         {
             DLIB_CASSERT(is_same_object(dest, src)==false);
@@ -2028,11 +2030,11 @@ namespace dlib
 
         void resize_bilinear_gradient (
             tensor& grad,
-            long grad_row_stride,
-            long grad_channel_stride,
+            long long grad_row_stride,
+            long long grad_channel_stride,
             const tensor& gradient_input,
-            long gradient_input_row_stride,
-            long gradient_input_channel_stride
+            long long gradient_input_row_stride,
+            long long gradient_input_channel_stride
         )
         {
             DLIB_CASSERT(is_same_object(grad, gradient_input)==false);
