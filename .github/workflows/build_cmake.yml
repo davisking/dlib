@@ -18,7 +18,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
+        os: ['windows-latest']
+        # os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
 
     steps:
     - uses: actions/checkout@v2
@@ -35,9 +36,8 @@ jobs:
       working-directory: ${{ github.workspace }}/dlib/test/${{ env.build_dir }}
       run: |
         if [ "$RUNNER_OS" == "Windows" ]; then
-          tree .
+          dir
           ./dtest.exe --runall
         else
-          ls
           ./dtest --runall
         fi;
