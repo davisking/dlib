@@ -147,7 +147,7 @@
          <term file="ml.html" name="loss_mean_squared_multioutput_" include="dlib/dnn.h"/>
          <term file="ml.html" name="loss_mmod_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="mmod_options" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/loss_abstract.h.html" name="loss_yolo_" include="dlib/dnn.h"/>
+         <term file="ml.html" name="loss_yolo_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="yolo_options" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_barlow_twins_" include="dlib/dnn.h"/>
 
