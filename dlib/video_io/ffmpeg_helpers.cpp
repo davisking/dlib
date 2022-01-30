@@ -336,7 +336,7 @@ namespace dlib
                 _dst_w != _src_w ||
                 _dst_fmt != _src_fmt)
             {
-//                printf("sw_image_resizer::reset() (h,w,fmt) : (%i,%i,%s) -> (%i,%i,%s)\n",
+//                printf("sw_image_resizer::reset() (h,w,pixel_fmt) : (%i,%i,%s) -> (%i,%i,%s)\n",
 //                         _src_w, _src_h, av_get_pix_fmt_name(_src_fmt),
 //                         _dst_w, _dst_h, av_get_pix_fmt_name(_dst_fmt));
 
@@ -423,7 +423,7 @@ namespace dlib
                 src_channel_layout_ != dst_channel_layout_ ||
                 src_fmt_            != dst_fmt_)
             {
-//                printf("sw_audio_resampler::reset() (sr, layout, fmt) : (%i,%s,%s}) -> (%i,%s,%s)\n",
+//                printf("sw_audio_resampler::reset() (sr, layout, pixel_fmt) : (%i,%s,%s}) -> (%i,%s,%s)\n",
 //                         src_sample_rate_, get_channel_layout_str(src_channel_layout_).c_str(), av_get_sample_fmt_name(src_fmt_),
 //                         dst_sample_rate_, get_channel_layout_str(dst_channel_layout_).c_str(), av_get_sample_fmt_name(dst_fmt_));
 

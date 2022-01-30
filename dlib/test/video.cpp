@@ -134,6 +134,7 @@ namespace
 
     void test_demux_to_encode_to_decode(
         const std::string& filepath,
+        AVCodecID image_codec,
         AVCodecID audio_codec
     )
     {
@@ -169,7 +170,7 @@ namespace
         {
             {
                 dlib::encoder_ffmpeg::args args2;
-                args2.args_common.codec = AV_CODEC_ID_MPEG4;
+                args2.args_common.codec = image_codec;
                 args2.args_image.h      = cap.height();
                 args2.args_image.w      = cap.width();
                 args2.args_image.fmt    = AV_PIX_FMT_YUV420P;
@@ -188,7 +189,7 @@ namespace
                 args2.args_common.codec = enc_image.get_codec_id();
                 args2.args_image.h      = cap.height();
                 args2.args_image.w      = cap.width();
-                args2.args_image.fmt    = cap.fmt();
+                args2.args_image.fmt    = cap.pixel_fmt();
 
                 dec_image = dlib::decoder_ffmpeg(args2);
                 DLIB_TEST(dec_image.is_open());
@@ -311,29 +312,74 @@ namespace
         print_spinner();
     }
 
-//    void test_decode_to_encode_to_decode(
-//        const std::string& filepath,
-//        const dlib::config_reader& cfg
-//    )
-//    {
-//
-//    }
-//
-//    void test_demux_to_mux_to_demux(
-//        const std::string& filepath,
-//        const dlib::config_reader& cfg
-//    )
-//    {
-//
-//    }
-//
-//    void test_decode_to_mux_to_demux(
-//        const std::string& filepath,
-//        const dlib::config_reader& cfg
-//    )
-//    {
-//
-//    }
+    void test_demux_to_mux_to_demux(
+        const std::string& filepath,
+        AVCodecID image_codec,
+        AVCodecID audio_codec
+    )
+    {
+        dlib::demuxer_ffmpeg cap(dlib::demuxer_ffmpeg::args{filepath});
+
+        DLIB_TEST(cap.is_open());
+        print_spinner();
+
+        dlib::muxer_ffmpeg::args args;
+        args.filepath       = "dummy.mp4";
+        args.enable_image   = cap.video_enabled();
+        args.enable_audio   = cap.audio_enabled();
+
+        if (cap.video_enabled())
+        {
+            args.args_image.codec   = image_codec;
+            args.args_image.h       = cap.height();
+            args.args_image.w       = cap.width();
+            args.args_image.fmt     = AV_PIX_FMT_YUV420P;
+        }
+
+        if (cap.audio_enabled())
+        {
+            args.args_audio.codec           = audio_codec;
+            args.args_audio.sample_rate     = cap.sample_rate();
+            args.args_audio.channel_layout  = cap.channel_layout();
+            args.args_audio.fmt             = cap.sample_fmt();
+        }
+
+        dlib::muxer_ffmpeg mux(args);
+        DLIB_TEST(mux.is_open());
+        DLIB_TEST(mux.video_enabled() == cap.video_enabled());
+        DLIB_TEST(mux.audio_enabled() == cap.audio_enabled());
+        print_spinner();
+    }
+
+    /*!
+        NOTE, we can't test encoding/muxing of codecs such as:
+            - AV_CODEC_ID_H264
+            - AV_CODEC_ID_H265
+            - AV_CODEC_ID_AV1
+            - ...
+        because they are not supported BY DEFAULT. Indeed they have to be enabled
+        by building with third-party libraries such as libx264, libx265, libav1, etc.
+
+        However, we CAN test decoding/demuxing of these codecs, since FFMPEG DOES
+        have native implementations for the decoders.
+    !*/
+
+    struct codec_info
+    {
+        AVCodecID   codec;
+        bool        is_mp4_compatible; //can we use this in an MP4 container
+    };
+
+    constexpr codec_info TESTABLE_VIDEO_CODECS[] = {
+            {AV_CODEC_ID_MPEG4, true}
+    };
+
+    constexpr codec_info TESTABLE_AUDIO_CODECS[] = {
+            {AV_CODEC_ID_MP2,       true},
+//            {AV_CODEC_ID_AAC,       true},
+            {AV_CODEC_ID_AC3,       true},
+            {AV_CODEC_ID_PCM_S16LE, false}
+    };
 
     class video_tester : public tester
     {
@@ -361,16 +407,17 @@ namespace
                 if (type == 0)
                 {
                     test_demux_video(filepath, sublock);
-                    test_demux_to_encode_to_decode(filepath, AV_CODEC_ID_MP2);
-                    test_demux_to_encode_to_decode(filepath, AV_CODEC_ID_AC3);
-                    test_demux_to_encode_to_decode(filepath, AV_CODEC_ID_PCM_S16LE);
-//                    test_demux_to_mux_to_demux(filepath, sublock);
+                    for (auto video_codec : TESTABLE_VIDEO_CODECS) {
+                        for (auto audio_codec: TESTABLE_AUDIO_CODECS) {
+                            test_demux_to_encode_to_decode(filepath, video_codec.codec, audio_codec.codec);
+                            if (video_codec.is_mp4_compatible && audio_codec.is_mp4_compatible)
+                                test_demux_to_mux_to_demux(filepath, video_codec.codec, audio_codec.codec);
+                        }
+                    }
                 }
                 else if (type == 1)
                 {
                     test_decode_video(filepath, sublock);
-//                    test_decode_to_encode_to_decode(filepath, sublock);
-//                    test_decode_to_mux_to_demux(filepath, sublock);
                 }
             }
         }

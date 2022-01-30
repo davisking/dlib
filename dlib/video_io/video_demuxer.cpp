@@ -174,7 +174,7 @@ namespace dlib
         return resizer_image.get_dst_w();
     }
 
-    AVPixelFormat decoder_ffmpeg::fmt() const
+    AVPixelFormat decoder_ffmpeg::pixel_fmt() const
     {
         return resizer_image.get_dst_fmt();
     }
@@ -588,7 +588,7 @@ namespace dlib
                     ch.pCodecCtx->width    == 0 ||
                     ch.pCodecCtx->pix_fmt  == AV_PIX_FMT_NONE)
                 {
-                    printf("Codec parameters look wrong : (h,w,fmt) : (%i,%i,%s)\n",
+                    printf("Codec parameters look wrong : (h,w,pixel_fmt) : (%i,%i,%s)\n",
                              ch.pCodecCtx->height,
                              ch.pCodecCtx->width,
                              get_pixel_fmt_str(ch.pCodecCtx->pix_fmt).c_str());
@@ -609,7 +609,7 @@ namespace dlib
                 if (ch.pCodecCtx->sample_rate == 0 ||
                     ch.pCodecCtx->sample_fmt  == AV_SAMPLE_FMT_NONE)
                 {
-                    printf("Codec parameters look wrong: sample_rate : %i fmt : %i\n",
+                    printf("Codec parameters look wrong: sample_rate : %i sample_fmt : %i\n",
                              ch.pCodecCtx->sample_rate,
                              ch.pCodecCtx->sample_fmt);
                     return false;
@@ -873,7 +873,7 @@ namespace dlib
         return st.channel_video.is_enabled() ? st.channel_video.resizer_image.get_dst_w() : 0;
     }
 
-    AVPixelFormat demuxer_ffmpeg::fmt() const
+    AVPixelFormat demuxer_ffmpeg::pixel_fmt() const
     {
         return st.channel_video.is_enabled() ? st.channel_video.resizer_image.get_dst_fmt() : AV_PIX_FMT_NONE;
     }

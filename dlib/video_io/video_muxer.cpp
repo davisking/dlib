@@ -193,8 +193,9 @@ namespace dlib
             pCodecCtx->time_base        = (AVRational){ 1, pCodecCtx->sample_rate };
             check_audio_properties(pCodec, pCodecCtx.get());
 
-            if (pCodecCtx->codec_id == AV_CODEC_ID_AAC)
+            if (pCodecCtx->codec_id == AV_CODEC_ID_AAC) {
                 pCodecCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
+            }
 
             //don't know what src options are, but at least dst options are set
             resizer_audio.reset(
@@ -488,7 +489,17 @@ namespace dlib
 
     bool muxer_ffmpeg::is_open() const
     {
-        return st.connected && st.pFormatCtx != nullptr && (st.encoder_audio.is_open() || st.encoder_image.is_open());
+        return video_enabled() || audio_enabled();
+    }
+
+    bool muxer_ffmpeg::video_enabled() const
+    {
+        return st.connected && st.pFormatCtx != nullptr && st.encoder_image.is_open() && FFMPEG_INITIALIZED;
+    }
+
+    bool muxer_ffmpeg::audio_enabled() const
+    {
+        return st.connected && st.pFormatCtx != nullptr && st.encoder_audio.is_open() && FFMPEG_INITIALIZED;
     }
 
     bool muxer_ffmpeg::open()

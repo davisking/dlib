@@ -154,6 +154,8 @@ namespace dlib
         friend void swap(muxer_ffmpeg &a, muxer_ffmpeg &b);
 
         bool is_open() const;
+        bool audio_enabled() const;
+        bool video_enabled() const;
 
         /*expert use*/
         bool push(Frame&& frame);

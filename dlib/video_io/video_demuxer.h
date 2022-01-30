@@ -64,7 +64,7 @@ namespace dlib
         /*video dims*/
         int             height()    const;
         int             width()     const;
-        AVPixelFormat   fmt()       const;
+        AVPixelFormat   pixel_fmt() const;
 
         /*audio dims*/
         int             sample_rate()       const;
@@ -168,7 +168,7 @@ namespace dlib
         /*video dims*/
         int             height() const;
         int             width() const;
-        AVPixelFormat   fmt() const;
+        AVPixelFormat   pixel_fmt() const;
         float           fps() const;
 
         /*audio dims*/
