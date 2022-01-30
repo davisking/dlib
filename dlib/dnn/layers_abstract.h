@@ -3333,7 +3333,7 @@ namespace dlib
 
 
                 Finally, you can think of this layer as an alternative to a strided convolutonal
-                layer to perform of performing downsampling on a tensor.
+                layer to downsample a tensor.
         !*/
 
     public:
