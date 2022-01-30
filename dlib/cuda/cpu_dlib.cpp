@@ -2080,6 +2080,84 @@ namespace dlib
             }
         }
 
+    // ----------------------------------------------------------------------------------------
+
+        void reorg (
+            tensor& dest,
+            const int row_stride,
+            const int col_stride,
+            const tensor& src
+        )
+        {
+            DLIB_CASSERT(is_same_object(dest, src)==false);
+            DLIB_CASSERT(src.nr() % row_stride == 0);
+            DLIB_CASSERT(src.nc() % col_stride == 0);
+            DLIB_CASSERT(dest.num_samples() == src.num_samples());
+            DLIB_CASSERT(dest.k() == src.k() * row_stride * col_stride);
+            DLIB_CASSERT(dest.nr() == src.nr() / row_stride);
+            DLIB_CASSERT(dest.nc() == src.nc() / col_stride);
+            const float* s = src.host();
+            float* d = dest.host();
+
+            parallel_for(0, dest.num_samples(), [&](long n)
+            {
+                for (long k = 0; k < dest.k(); ++k)
+                {
+                    for (long r = 0; r < dest.nr(); ++r)
+                    {
+                        for (long c = 0; c < dest.nc(); ++c)
+                        {
+                            const auto out_idx = tensor_index(dest, n, k, r, c);
+                            const auto in_idx = tensor_index(src,
+                                                             n,
+                                                             k % src.k(),
+                                                             r * row_stride + (k / src.k()) / row_stride,
+                                                             c * col_stride + (k / src.k()) % col_stride);
+                            d[out_idx] = s[in_idx];
+                        }
+                    }
+                }
+            });
+        }
+
+        void reorg_gradient (
+            tensor& grad,
+            const int row_stride,
+            const int col_stride,
+            const tensor& gradient_input
+        )
+        {
+            DLIB_CASSERT(is_same_object(grad, gradient_input)==false);
+            DLIB_CASSERT(grad.nr() % row_stride == 0);
+            DLIB_CASSERT(grad.nc() % col_stride == 0);
+            DLIB_CASSERT(grad.num_samples() == gradient_input.num_samples());
+            DLIB_CASSERT(grad.k() == gradient_input.k() / row_stride / col_stride);
+            DLIB_CASSERT(grad.nr() == gradient_input.nr() * row_stride);
+            DLIB_CASSERT(grad.nc() == gradient_input.nc() * row_stride);
+            const float* gi = gradient_input.host();
+            float* g = grad.host();
+
+            parallel_for(0, gradient_input.num_samples(), [&](long n)
+            {
+                for (long k = 0; k < gradient_input.k(); ++k)
+                {
+                    for (long r = 0; r < gradient_input.nr(); ++r)
+                    {
+                        for (long c = 0; c < gradient_input.nc(); ++c)
+                        {
+                            const auto in_idx = tensor_index(gradient_input, n, k, r, c);
+                            const auto out_idx = tensor_index(grad,
+                                                              n,
+                                                              k % grad.k(),
+                                                              r * row_stride + (k / grad.k()) / row_stride,
+                                                              c * col_stride + (k / grad.k()) % col_stride);
+                            g[out_idx] += gi[in_idx];
+                        }
+                    }
+                }
+            });
+        }
+
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
