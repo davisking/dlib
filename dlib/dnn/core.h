@@ -3273,8 +3273,8 @@ namespace dlib
                 // layer.
                 const long num_samples = rnd.get_random_32bit_number()%4+3;
                 const long k  = rnd.get_random_32bit_number()%4+2;
-                const long nr = rnd.get_random_32bit_number()%4+2;
-                const long nc = rnd.get_random_32bit_number()%4+2;
+                const long nr = ((rnd.get_random_32bit_number()%4)/2)*2+2;
+                const long nc = ((rnd.get_random_32bit_number()%4)/2)*2+2;
 
                 output.set_size(num_samples, k, nr, nc);
                 gradient_input.set_size(num_samples, k, nr, nc);
