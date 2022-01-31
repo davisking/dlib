@@ -4366,6 +4366,19 @@ namespace dlib
             tt::reorg_gradient(sub.get_gradient_input(), row_stride, col_stride, gradient_input);
         }
 
+        inline dpoint map_input_to_output (dpoint p) const
+        {
+            p.x() = p.x() / col_stride;
+            p.y() = p.y() / row_stride;
+            return p;
+        }
+        inline dpoint map_output_to_input (dpoint p) const
+        {
+            p.x() = p.x() * col_stride;
+            p.y() = p.y() * row_stride;
+            return p;
+        }
+
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
