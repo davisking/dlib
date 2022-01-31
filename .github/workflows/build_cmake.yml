@@ -5,7 +5,7 @@ on:
   push:
 
 env:
-  build_type: RelWithDebInfo
+  build_type: Release
   build_dir: build
 
 defaults:
@@ -35,7 +35,7 @@ jobs:
       working-directory: ${{ github.workspace }}/dlib/test/${{ env.build_dir }}
       run: |
         if [ "$RUNNER_OS" == "Windows" ]; then
-          ./Debug/dtest.exe --runall
+          ./Release/dtest.exe --runall
         else
           ./dtest --runall
         fi;
