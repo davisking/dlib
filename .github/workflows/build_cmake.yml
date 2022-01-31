@@ -36,6 +36,8 @@ jobs:
       run: |
         if [ "$RUNNER_OS" == "Windows" ]; then
           ./${{ env.config }}/dtest.exe --runall
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+          ./dtest --runall --no_test_timer
         else
           ./dtest --runall
         fi;
