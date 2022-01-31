@@ -9,9 +9,9 @@ environment:
       image_type: 2017
     - PATH: C:\Python37-x64;%PATH%
       image_type: 2017
-    - PATH: C:\Python310;%PATH%
+    - PATH: C:\Python39;%PATH%
       image_type: 2022
-    - PATH: C:\Python310-x64;%PATH%
+    - PATH: C:\Python39-x64;%PATH%
       image_type: 2022
 
 # Establish mapping between image_type env var and the visual studio version
