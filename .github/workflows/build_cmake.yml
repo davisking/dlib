@@ -5,7 +5,7 @@ on:
   push:
 
 env:
-  build_type: Release
+  config: Release
   build_dir: build
 
 defaults:
@@ -25,18 +25,17 @@ jobs:
 
     - name: Configure
       working-directory: ${{ github.workspace }}/dlib/test
-      run: cmake . -B ${{ env.build_dir }} -DCMAKE_BUILD_TYPE=${{ env.build_type  }}
+      run: cmake . -B ${{ env.build_dir }}
 
     - name: Build
       working-directory: ${{ github.workspace }}/dlib/test
-      run: cmake --build ${{ env.build_dir }} --target dtest
+      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --target dtest
 
     - name: Test
       working-directory: ${{ github.workspace }}/dlib/test/${{ env.build_dir }}
       run: |
         if [ "$RUNNER_OS" == "Windows" ]; then
-          dir
-          ./Debug/dtest.exe --runall
+          ./${{ env.config }}/dtest.exe --runall
         else
           ./dtest --runall
         fi;
