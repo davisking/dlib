@@ -123,6 +123,7 @@
          <term file="ml.html" name="input_rgb_image" include="dlib/dnn.h"/>
          <term file="ml.html" name="input_rgb_image_sized" include="dlib/dnn.h"/>
          <term file="ml.html" name="input_rgb_image_pyramid" include="dlib/dnn.h"/>
+         <term file="ml.html" name="input_rgb_image_pair" include="dlib/dnn.h"/>
          <term file="ml.html" name="input_grayscale_image_pyramid" include="dlib/dnn.h"/>
 
          <term file="ml.html" name="dnn_trainer" include="dlib/dnn.h"/>

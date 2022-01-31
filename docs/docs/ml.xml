@@ -127,6 +127,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                <item>input_rgb_image_sized</item>
                <item>input_rgb_image_pyramid</item>
                <item>input_grayscale_image_pyramid</item>
+               <item>input_grayscale_image_pair</item>
                <item>
                   <name>EXAMPLE_INPUT_LAYER</name>
                   <link>dlib/dnn/input_abstract.h.html#EXAMPLE_INPUT_LAYER</link>
@@ -815,6 +816,28 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             This input layer is just like <a href="#input_rgb_image_pyramid">input_rgb_image_pyramid</a> 
             except it takes a grayscale image as input.
          </description>
+      </component>
+
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>input_rgb_image_pair</name>
+         <file>dlib/dnn.h</file>
+         <spec_file link="true">dlib/dnn/input_abstract.h</spec_file>
+         <description>
+            This is a simple input layer type for use in a deep neural network
+            which takes a pair of RGB images as input and loads it into a network.
+            It is useful when you want to input image pairs that are related to each other,
+            for instance, they are different distorted views of the same original image.
+            This input layer is meant to be used with a loss layer such as the
+            <a href="#loss_barlow_twins_">Barlow Twins loss layer</a>.  You can also
+            convert between <a href="#input_rgb_image">input_rgb_image</a> and
+            this input layer by copy construction or assignment.
+         </description>
+         <examples>
+            <example>dnn_self_supervised_learning_ex.cpp.html</example>
+         </examples>
       </component>
 
    <!-- ************************************************************************* -->
