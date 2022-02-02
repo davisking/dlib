@@ -1655,6 +1655,7 @@
          <term file="dlib/image_processing/object_detector_abstract.h.html" name="full_detection"        include="dlib/image_processing.h"/>
          <term file="imaging.html" name="full_object_detection"   include="dlib/image_processing.h"/>
          <term file="imaging.html" name="mmod_rect"   include="dlib/image_processing.h"/>
+         <term file="imaging.html" name="yolo_rect"   include="dlib/image_processing.h"/>
          <term file="dlib/image_processing/full_object_detection_abstract.h.html" name="all_parts_in_rect" include="dlib/image_processing.h"/>
 
          <term file="imaging.html" name="scan_image_movable_parts" include="dlib/image_processing.h"/>
