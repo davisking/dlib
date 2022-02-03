@@ -1851,7 +1851,8 @@ namespace dlib { namespace tt
             - dest.nr() == src.nr() / row_stride
             - dest.nc() == src.nc() / col_stride
         ensures
-            - Converts downsamples the spatial resolution into channel information
+            - Converts the spatial resolution into channel information.  So all the values in the input tensor 
+              appear in the output tensor, just in different positions.  
             - For all n, k, r, c in dest:
                 dest.host[tensor_index(dest, n, k, r, c)] ==
                 src.host[tensor_index(src,
