@@ -211,16 +211,17 @@ namespace dlib
             !*/
 
             double get_random_beta (
-                double a,
-                double b,
+                double alpha,
+                double beta,
             )
             /*!
                 requires
-                    - a > 0, b > 0
+                    - alpha > 0
+                    - beta > 0
 
                 ensures
                     - returns a random number sampled from a Beta distribution
-                      with shape parameters a and b.
+                      with shape parameters alpha and beta.
             !*/
 
             void swap (

@@ -292,17 +292,17 @@ namespace dlib
             }
 
             double get_random_beta (
-                double a,
-                double b
+                double alpha,
+                double beta
             )
             {
-                DLIB_CASSERT(a > 0 && b > 0, "a and b must be greater than zero");
-                auto u = std::pow(get_random_double(), 1 / a);
-                auto v = std::pow(get_random_double(), 1 / b);
-                while ((u + v) > 1 || (u == 0 && v == 0))
+                DLIB_CASSERT(alpha > 0 && beta > 0, "a and b must be greater than zero");
+                auto u = std::pow(get_random_double(), 1 / alpha);
+                auto v = std::pow(get_random_double(), 1 / beta);
+                while ((u + v) > 1 || u == 0 || v == 0)
                 {
-                    u = std::pow(get_random_double(), 1 / a);
-                    v = std::pow(get_random_double(), 1 / b);
+                    u = std::pow(get_random_double(), 1 / alpha);
+                    v = std::pow(get_random_double(), 1 / beta);
                 }
                 return u / (u + v);
             }
