@@ -65,6 +65,16 @@ namespace dlib
                 - #first and #second contain copies of the items a and b.
         !*/ {}
 
+        unordered_pair (
+            const unordered_pair& p
+        ) :
+            first(p.first),
+            second(p.second)
+        /*!
+            ensures
+                - #*this is a copy of p
+        !*/ {}
+
         template <typename U>
         unordered_pair (
             const unordered_pair <U>& p
