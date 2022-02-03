@@ -1120,6 +1120,36 @@ namespace dlib { namespace tt
 
 // ------------------------------------------------------------------------------------
 
+    void reorg (
+        tensor& dest,
+        const int row_stride,
+        const int col_stride,
+        const tensor& src
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::reorg(dest, row_stride, col_stride, src);
+#else
+        cpu::reorg(dest, row_stride, col_stride, src);
+#endif
+    }
+
+    void reorg_gradient (
+        tensor& grad,
+        const int row_stride,
+        const int col_stride,
+        const tensor& gradient_input
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::reorg_gradient(grad, row_stride, col_stride, gradient_input);
+#else
+        cpu::reorg_gradient(grad, row_stride, col_stride, gradient_input);
+#endif
+    }
+
+// ------------------------------------------------------------------------------------
+
     void copy_tensor(
             bool add_to,
             tensor& dest,
@@ -1156,4 +1186,3 @@ namespace dlib { namespace tt
 }}
 
 #endif // DLIB_TeNSOR_TOOLS_CPP_
-
