@@ -278,6 +278,16 @@ namespace dlib
             result_type f = decision_funct(x);
             return 1/(1 + std::exp(alpha*f + beta));
         }
+		
+        probabilistic_decision_function& operator= (
+            const probabilistic_decision_function& d
+        )		
+        {
+            alpha = d.alpha;
+            beta = d.beta;
+            decision_funct = d.decision_funct;
+			return *this;
+        }
     };
 
     template <

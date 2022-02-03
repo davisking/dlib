@@ -343,6 +343,15 @@ namespace dlib
             // the output of the decision function.
             return 1/(1 + std::exp(alpha*f + beta));
         }
+
+        probabilistic_decision_function& operator= (
+            const probabilistic_decision_function& f
+        );
+        /*!
+            ensures
+                - #*this is a copy of f
+        !*/
+
     };
 
     template <
