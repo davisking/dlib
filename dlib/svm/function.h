@@ -710,6 +710,16 @@ namespace dlib
             return temp2;
         }
 
+        projection_function& operator= (
+            const projection_function& f
+        )
+        {
+            weights = f.weights;
+            kernel_function = f.kernel_function;
+            basis_vectors = f.basis_vectors;
+            return *this;
+        }
+
     private:
         mutable result_type temp1, temp2;
     };

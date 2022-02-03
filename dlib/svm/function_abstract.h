@@ -85,7 +85,7 @@ namespace dlib
         !*/
 
         decision_function& operator= (
-            const decision_function& d
+            const decision_function& f
         )
         /*!
             ensures
@@ -847,6 +847,14 @@ namespace dlib
             temp2 = weights*temp1;
             return temp2;
         }
+
+        projection_function& operator= (
+            const projection_function& f
+        );
+        /*!
+            ensures
+                - #*this is a copy of f
+        !*/
 
     private:
         mutable result_type temp1, temp2;
