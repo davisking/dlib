@@ -445,6 +445,62 @@ namespace
         DLIB_TEST(std::abs(stats.skewness() - 2.0) < 0.01);
         DLIB_TEST(std::abs(stats.ex_kurtosis() - 6.0) < 0.1);
     }
+
+    void outputs_are_not_changed()
+    {
+        // dlib::rand has been around a really long time and it is a near certainty that there is
+        // client code that depends on dlib::rand yielding the exact random sequence it happens to
+        // yield for any given seed.  So we test that the output values of dlib::rand are not
+        // changed in this test.
+
+        {
+            dlib::rand rnd;
+            std::vector<long> out;
+            for (int i = 0; i < 30; ++i) {
+                out.push_back(rnd.get_random_32bit_number());
+            }
+
+            const std::vector<long> expected = {
+                725333953,251387296,3200466189,2466988778,2049276419,2620437198,2806522923,
+                2922190659,4151412029,2894696296,1344442829,1165961100,328304965,1533685458,
+                3399102146,3995382051,1569312238,2353373514,2512982725,2903494783,787425157,
+                699798098,330364342,2870851082,659976556,1726343583,3551405331,3171822159,
+                1292599360,955731010};
+            DLIB_TEST(out == expected);
+        }
+
+        {
+            dlib::rand rnd;
+            rnd.set_seed("this seed");
+            std::vector<long> out;
+            for (int i = 0; i < 30; ++i) {
+                out.push_back(rnd.get_random_32bit_number());
+            }
+
+            const std::vector<long> expected = {
+                856663397,2356564049,1192662566,3478257893,1069117227,
+                1922448468,497418632,2504525324,987414451,769612124,77224022,2998161761,
+                1364481427,639342008,1778351952,1931573847,3213816676,3019312695,4179936779,
+                3637269252,4279821094,3738954922,3651625265,3159592157,333323775,4075800582,
+                4237631248,357468843,483435718,1255945812};
+            DLIB_TEST(out == expected);
+        }
+
+        {
+            dlib::rand rnd;
+            rnd.set_seed("some other seed");
+            std::vector<long> out;
+            for (int i = 0; i < 30; ++i) {
+                out.push_back(rnd.get_integer(1000));
+            }
+
+            const std::vector<long> expected = {
+                243,556,158,256,772,84,837,920,767,769,939,394,121,367,575,877,861,506,
+                451,845,870,638,825,516,327,25,646,373,386,227};
+            DLIB_TEST(out == expected);
+        }
+
+    }
     
     class rand_tester : public tester
     {
@@ -459,6 +515,8 @@ namespace
         )
         {
             dlog << LINFO << "testing kernel_1a";
+            outputs_are_not_changed();
+
             rand_test<dlib::rand>();
             rand_test<dlib::rand>();
 
