@@ -1,0 +1,28 @@
+name: Python
+
+on:
+  pull_request:
+  push:
+
+env:
+  config: Release
+  build_dir: build
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build
+      working-directory: ${{ github.workspace }}
+      run: python setup.py build
