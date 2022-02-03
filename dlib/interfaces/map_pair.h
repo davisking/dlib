@@ -55,11 +55,6 @@ namespace dlib
                 - returns a non-const reference to the value associated with key
         !*/
 
-    protected:
-
-        // restricted functions
-        map_pair<T1,T2>& operator=(const map_pair<T1,T2>&) {return *this;} // no assignment operator
-
     };
 
     // destructor does nothing
