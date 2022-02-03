@@ -35,9 +35,9 @@ jobs:
       working-directory: ${{ github.workspace }}/dlib/test/${{ env.build_dir }}
       run: |
         if [ "$RUNNER_OS" == "Windows" ]; then
-          ./${{ env.config }}/dtest.exe --runall
+          ./${{ env.config }}/dtest.exe --runall -q
         elif [ "$RUNNER_OS" == "macOS" ]; then
-          ./dtest --runall --no_test_timer
+          ./dtest --runall --no_test_timer -q
         else
-          ./dtest --runall
+          ./dtest --runall -q
         fi;
