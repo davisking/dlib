@@ -5,6 +5,7 @@
 
 #include <string>
 #include <complex>
+#include <random>
 #include "../algs.h"
 #include "rand_kernel_abstract.h"
 #include "mersenne_twister.h"
@@ -288,6 +289,47 @@ namespace dlib
                 while (u == 0.0)
                     u = get_random_double();
                 return gamma + lambda*std::pow(-std::log(u), 1.0 / k);
+            }
+
+            double get_random_beta (
+                double a,
+                double b
+            )
+            {
+                DLIB_CASSERT(a > 0 && b > 0);
+                if ((a <= 1) && (b <= 1))
+                {
+                    double u = 0, v = 0;
+                    while (true)
+                    {
+                        while (u == 0 || v == 0)
+                        {
+                            u = get_random_double();
+                            v = get_random_double();
+                        }
+                        const auto x = std::pow(u, 1 / a);
+                        const auto y = std::pow(v, 1 / b);
+                        const auto z = x + y;
+                        if ((z <= 1) && (z > 0))
+                        {
+                            return x / z;
+                        }
+                        else
+                        {
+                            auto log_x = std::log(u) / a;
+                            auto log_y = std::log(v) / b;
+                            const auto log_m = std::max(log_x, log_y);
+                            log_x -= log_m;
+                            log_y -= log_m;
+                            return std::exp(log_x - std::log(std::exp(log_x) + std::exp(log_y)));
+                        }
+                    }
+                }
+                else
+                {
+                    std::gamma_distribution<> g(a, b);
+                    return g(mt);
+                }
             }
             
             void swap (
