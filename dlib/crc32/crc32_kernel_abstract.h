@@ -31,6 +31,14 @@ namespace dlib
                 - #*this is properly initialized
         !*/
 
+        crc32 (
+            const dlib::crc32& item
+        );
+        /*!
+            ensures
+                - *this equals item
+        !*/ 
+
         crc32 (        
             const std::string& item
         );
@@ -114,6 +122,14 @@ namespace dlib
         /*!
             ensures
                 - swaps *this and item
+        !*/ 
+
+        crc32& operator=(
+            const crc32& item
+        );  
+        /*!
+            ensures
+                - *this equals item
         !*/ 
 
     };    
