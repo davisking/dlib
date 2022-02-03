@@ -209,7 +209,20 @@ namespace dlib
                       with shape parameter k, scale parameter lambda and 
                       threshold parameter gamma.
             !*/
-            
+
+            double get_random_beta (
+                double a,
+                double b,
+            )
+            /*!
+                requires
+                    - a > 0, b > 0
+
+                ensures
+                    - returns a random number sampled from a Beta distribution
+                      with shape parameters a and b.
+            !*/
+
             void swap (
                 rand& item
             );

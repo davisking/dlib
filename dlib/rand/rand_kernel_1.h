@@ -296,42 +296,17 @@ namespace dlib
                 double b
             )
             {
-                DLIB_CASSERT(a > 0 && b > 0);
-                if ((a <= 1) && (b <= 1))
+                DLIB_CASSERT(a > 0 && b > 0, "a and b must be greater than zero");
+                auto u = std::pow(get_random_double(), 1 / a);
+                auto v = std::pow(get_random_double(), 1 / b);
+                while ((u + v) > 1 || (u == 0 && v == 0))
                 {
-                    double u = 0, v = 0;
-                    while (true)
-                    {
-                        while (u == 0 || v == 0)
-                        {
-                            u = get_random_double();
-                            v = get_random_double();
-                        }
-                        const auto x = std::pow(u, 1 / a);
-                        const auto y = std::pow(v, 1 / b);
-                        const auto z = x + y;
-                        if ((z <= 1) && (z > 0))
-                        {
-                            return x / z;
-                        }
-                        else
-                        {
-                            auto log_x = std::log(u) / a;
-                            auto log_y = std::log(v) / b;
-                            const auto log_m = std::max(log_x, log_y);
-                            log_x -= log_m;
-                            log_y -= log_m;
-                            return std::exp(log_x - std::log(std::exp(log_x) + std::exp(log_y)));
-                        }
-                    }
+                    u = std::pow(get_random_double(), 1 / a);
+                    v = std::pow(get_random_double(), 1 / b);
                 }
-                else
-                {
-                    std::gamma_distribution<> g(a, b);
-                    return g(mt);
-                }
+                return u / (u + v);
             }
-            
+
             void swap (
                 rand& item
             )
