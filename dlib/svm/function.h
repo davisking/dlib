@@ -456,6 +456,17 @@ namespace dlib
                 return 0;
         }
 
+        distance_function& operator= (
+            const distance_function& d
+        )
+        {
+            alpha = d.alpha;
+            b = d.b;
+            kernel_function = d.kernel_function;
+            basis_vectors = d.basis_vectors;
+            return *this;
+        }
+
         distance_function operator* (
             const scalar_type& val
         ) const

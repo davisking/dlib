@@ -557,6 +557,14 @@ namespace dlib
                 - returns the distance between the points in kernel space represented by *this and x.
         !*/
 
+        distance_function& operator= (
+            const distance_function& d
+        );
+        /*!
+            ensures
+                - #*this is a copy of f
+        !*/
+
         distance_function operator* (
             const scalar_type& val
         ) const;
