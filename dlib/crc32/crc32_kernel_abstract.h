@@ -32,22 +32,6 @@ namespace dlib
         !*/
 
         crc32 (
-            const dlib::crc32& item
-        );
-        /*!
-            ensures
-                - *this equals item
-        !*/ 
-
-        crc32& operator=(
-            const crc32& item
-        );  
-        /*!
-            ensures
-                - *this equals item
-        !*/ 
-
-        crc32 (
             const std::string& item
         );
         /*!

@@ -29,14 +29,6 @@ namespace dlib
         inline crc32 (
         );
 
-        crc32 (
-            const dlib::crc32&
-        ) = default;
-
-        crc32& operator=(
-            const crc32&
-        ) = default;
-
         inline crc32 (
             const std::string& item
         );
