@@ -75,7 +75,7 @@ namespace
             bool detected_error = false;
             try {
                 test.decompress(sin,sout);
-            } catch ( typename cs::decompression_error& e )
+            } catch ( typename cs::decompression_error& )
             {
                 detected_error = true;
                 ++count;
