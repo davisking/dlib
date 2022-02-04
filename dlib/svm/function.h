@@ -44,13 +44,12 @@ namespace dlib
         ) : b(0), kernel_function(K()) {}
 
         decision_function (
-            const decision_function& d
-        ) : 
-            alpha(d.alpha), 
-            b(d.b),
-            kernel_function(d.kernel_function),
-            basis_vectors(d.basis_vectors) 
-        {}
+            const decision_function&
+        ) = default;
+
+        decision_function& operator= (
+            const decision_function&
+        ) = default;
 
         decision_function (
             const scalar_vector_type& alpha_,
@@ -63,17 +62,6 @@ namespace dlib
             kernel_function(kernel_function_),
             basis_vectors(basis_vectors_)
         {}
-
-        decision_function& operator= (
-            const decision_function& d
-        )
-        {
-            alpha = d.alpha;
-            b = d.b;
-            kernel_function = d.kernel_function;
-            basis_vectors = d.basis_vectors;
-            return *this;
-        }
 
         result_type operator() (
             const sample_type& x
@@ -149,12 +137,12 @@ namespace dlib
         ) : alpha(0), beta(0), decision_funct(function_type()) {}
 
         probabilistic_function (
-            const probabilistic_function& d
-        ) : 
-            alpha(d.alpha),
-            beta(d.beta),
-            decision_funct(d.decision_funct)
-        {}
+            const probabilistic_function&
+        ) = default;
+
+        probabilistic_function& operator= (
+            const probabilistic_function&
+        ) = default;
 
         probabilistic_function (
             const scalar_type a_,
@@ -173,16 +161,6 @@ namespace dlib
             result_type f = decision_funct(x);
             return 1/(1 + std::exp(alpha*f + beta));
         }
-
-        probabilistic_function& operator= (
-            const probabilistic_function& d
-        )
-        {
-            alpha = d.alpha;
-            beta = d.beta;
-            decision_funct = d.decision_funct;
-            return *this;
-        }		
     };
 
     template <
@@ -254,12 +232,12 @@ namespace dlib
         {}
 
         probabilistic_decision_function (
-            const probabilistic_decision_function& d
-        ) : 
-            alpha(d.alpha),
-            beta(d.beta),
-            decision_funct(d.decision_funct)
-        {}
+            const probabilistic_decision_function&
+        ) = default;
+
+        probabilistic_decision_function& operator= (
+            const probabilistic_decision_function&
+        ) = default;
 
         probabilistic_decision_function (
             const scalar_type a_,
@@ -277,16 +255,6 @@ namespace dlib
         {
             result_type f = decision_funct(x);
             return 1/(1 + std::exp(alpha*f + beta));
-        }
-		
-        probabilistic_decision_function& operator= (
-            const probabilistic_decision_function& d
-        )		
-        {
-            alpha = d.alpha;
-            beta = d.beta;
-            decision_funct = d.decision_funct;
-			return *this;
         }
     };
 
@@ -385,14 +353,12 @@ namespace dlib
         }
 
         distance_function (
-            const distance_function& d
-        ) : 
-            alpha(d.alpha), 
-            b(d.b),
-            kernel_function(d.kernel_function),
-            basis_vectors(d.basis_vectors) 
-        {
-        }
+            const distance_function&
+        ) = default;
+
+        distance_function& operator= (
+            const distance_function&
+        ) = default;
 
         distance_function (
             const scalar_vector_type& alpha_,
@@ -474,17 +440,6 @@ namespace dlib
                 return std::sqrt(temp);
             else
                 return 0;
-        }
-
-        distance_function& operator= (
-            const distance_function& d
-        )
-        {
-            alpha = d.alpha;
-            b = d.b;
-            kernel_function = d.kernel_function;
-            basis_vectors = d.basis_vectors;
-            return *this;
         }
 
         distance_function operator* (
@@ -717,7 +672,11 @@ namespace dlib
 
         projection_function (
             const projection_function& f
-        ) : weights(f.weights), kernel_function(f.kernel_function), basis_vectors(f.basis_vectors) {}
+        ) = default;
+
+        projection_function& operator= (
+            const projection_function& f
+        ) = default;
 
         projection_function (
             const scalar_matrix_type& weights_,
@@ -739,16 +698,6 @@ namespace dlib
             temp1 = kernel_matrix(kernel_function, basis_vectors, x);
             temp2 = weights*temp1;
             return temp2;
-        }
-
-        projection_function& operator= (
-            const projection_function& f
-        )
-        {
-            weights = f.weights;
-            kernel_function = f.kernel_function;
-            basis_vectors = f.basis_vectors;
-            return *this;
         }
 
     private:

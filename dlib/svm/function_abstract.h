@@ -84,14 +84,6 @@ namespace dlib
                   b term, and kernel function.
         !*/
 
-        decision_function& operator= (
-            const decision_function& f
-        )
-        /*!
-            ensures
-                - #*this is a copy of f
-        !*/
-
         result_type operator() (
             const sample_type& x
         ) const
@@ -185,6 +177,14 @@ namespace dlib
                 - #*this is a copy of f
         !*/
 
+        probabilistic_function& operator= (
+            const probabilistic_function& f
+        );
+        /*!
+            ensures
+                - #*this is a copy of f
+        !*/
+
         probabilistic_function (
             const scalar_type a,
             const scalar_type b,
@@ -214,15 +214,6 @@ namespace dlib
             // the output of the decision function.
             return 1/(1 + std::exp(alpha*f + beta));
         }
-
-        probabilistic_function& operator= (
-            const probabilistic_function& f
-        );
-        /*!
-            ensures
-                - #*this is a copy of f
-        !*/
-
     };
 
     template <
@@ -307,7 +298,15 @@ namespace dlib
         !*/
 
         probabilistic_decision_function (
-            const probabilistic_function<decision_function<K> >& d
+            const probabilistic_function<decision_function<K> >& f
+        );
+        /*!
+            ensures
+                - #*this is a copy of f
+        !*/
+
+        probabilistic_decision_function& operator= (
+            const probabilistic_decision_function& f
         );
         /*!
             ensures
@@ -343,15 +342,6 @@ namespace dlib
             // the output of the decision function.
             return 1/(1 + std::exp(alpha*f + beta));
         }
-
-        probabilistic_decision_function& operator= (
-            const probabilistic_decision_function& f
-        );
-        /*!
-            ensures
-                - #*this is a copy of f
-        !*/
-
     };
 
     template <
@@ -482,6 +472,14 @@ namespace dlib
                 - #*this is a copy of f
         !*/
 
+        distance_function& operator= (
+            const distance_function& f
+        );
+        /*!
+            ensures
+                - #*this is a copy of f
+        !*/
+
         distance_function (
             const scalar_vector_type& alpha,
             const scalar_type& squared_norm,
@@ -573,14 +571,6 @@ namespace dlib
                 - kernel_function == x.kernel_function
             ensures
                 - returns the distance between the points in kernel space represented by *this and x.
-        !*/
-
-        distance_function& operator= (
-            const distance_function& d
-        );
-        /*!
-            ensures
-                - #*this is a copy of f
         !*/
 
         distance_function operator* (
@@ -833,6 +823,14 @@ namespace dlib
                 - #*this is a copy of f
         !*/
 
+        projection_function& operator= (
+            const projection_function& f
+        );
+        /*!
+            ensures
+                - #*this is a copy of f
+        !*/
+
         projection_function (
             const scalar_matrix_type& weights_,
             const K& kernel_function_,
@@ -873,14 +871,6 @@ namespace dlib
             temp2 = weights*temp1;
             return temp2;
         }
-
-        projection_function& operator= (
-            const projection_function& f
-        );
-        /*!
-            ensures
-                - #*this is a copy of f
-        !*/
 
     private:
         mutable result_type temp1, temp2;
