@@ -477,6 +477,7 @@ namespace dlib
 
         input() {}
         input(const input&) {}
+        input& operator= (const input&) { return *this; }
 
         template <typename mm>
         input(const input<array2d<T,mm>>&) {}
