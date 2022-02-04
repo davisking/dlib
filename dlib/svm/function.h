@@ -64,6 +64,17 @@ namespace dlib
             basis_vectors(basis_vectors_)
         {}
 
+        decision_function& operator= (
+            const decision_function& d
+        )
+        {
+            alpha = d.alpha;
+            b = d.b;
+            kernel_function = d.kernel_function;
+            basis_vectors = d.basis_vectors;
+            return *this;
+        }
+
         result_type operator() (
             const sample_type& x
         ) const

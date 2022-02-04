@@ -84,6 +84,14 @@ namespace dlib
                   b term, and kernel function.
         !*/
 
+        decision_function& operator= (
+            const decision_function& d
+        )
+        /*!
+            ensures
+                - #*this is a copy of f
+        !*/
+
         result_type operator() (
             const sample_type& x
         ) const
