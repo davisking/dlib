@@ -295,7 +295,8 @@ namespace dlib
                 double beta
             )
             {
-                DLIB_CASSERT(alpha > 0 && beta > 0, "a and b must be greater than zero");
+                DLIB_CASSERT(alpha > 0, "alpha must be greater than zero")
+                DLIB_CASSERT(beta > 0, "beta must be greater than zero");
                 auto u = std::pow(get_random_double(), 1 / alpha);
                 auto v = std::pow(get_random_double(), 1 / beta);
                 while ((u + v) > 1 || u == 0 || v == 0)
