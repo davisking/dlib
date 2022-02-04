@@ -29,11 +29,15 @@ namespace dlib
         inline crc32 (
         );
 
-        inline crc32 (
+        crc32 (
             const dlib::crc32&
-        );
+        ) = default;
 
-        inline crc32 (        
+        crc32& operator=(
+            const crc32&
+        ) = default;
+
+        inline crc32 (
             const std::string& item
         );
 
@@ -68,10 +72,6 @@ namespace dlib
         inline void swap (
             crc32& item
         );
-
-        inline crc32& operator=(
-            const crc32&
-        );  
 
     private:
 
@@ -155,16 +155,6 @@ namespace dlib
     )
     {
         checksum = 0xFFFFFFFF;
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    crc32::
-    crc32 (
-        const crc32& item
-    )
-    {
-        checksum = item.checksum;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -255,17 +245,6 @@ namespace dlib
     )
     {
         exchange(checksum,item.checksum);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    crc32& crc32::
-    operator=(
-        const crc32& item
-    )
-    {
-        checksum = item.checksum;
-        return *this;
     }
 
 // ----------------------------------------------------------------------------------------
