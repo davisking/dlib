@@ -403,7 +403,7 @@ namespace
                 dlog << LINFO << trans(alpha2);
                 dlog << LINFO << "objective value:  " << 0.5*trans(alpha)*Q*alpha + trans(b)*alpha;
                 dlog << LINFO << "objective value2: " << 0.5*trans(alpha2)*Q*alpha + trans(b)*alpha2;
-                DLIB_TEST_MSG(max(abs(alpha-alpha2)) < 1e-6, max(abs(alpha-alpha2)));
+                DLIB_TEST_MSG(max(abs(alpha-alpha2)) < 1e-4, max(abs(alpha-alpha2)));
             }
 
             test_with_positive_target_error_thresh();
