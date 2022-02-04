@@ -5,6 +5,7 @@
 
 #include <string>
 #include <complex>
+#include <random>
 #include "../algs.h"
 #include "rand_kernel_abstract.h"
 #include "mersenne_twister.h"
