@@ -32,7 +32,7 @@ namespace dlib
         typedef T2 value_type;
 
         map_pair() = default;
-        map_pair(const map_pair&) = delete;
+        map_pair(const map_pair&) = default;
 
         virtual ~map_pair(
         )=0;
