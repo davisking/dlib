@@ -29,9 +29,9 @@
 #include <dlib/dir_nav.h>
 #include <iterator>
 #include <thread>
-#if __cplusplus >= 201703L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
+#if defined(_MSVC_LANG) && _MSVC_LANG >= 201703L
 #include <execution>
-#endif // __cplusplus >= 201703L
+#endif // defined(_MSVC_LANG) && _MSVC_LANG >= 201703L
 
 using namespace std;
 using namespace dlib;
@@ -556,9 +556,9 @@ std::vector<std::vector<truth_instance>> load_all_truth_instances(const std::vec
     std::vector<std::vector<truth_instance>> truth_instances(listing.size());
 
     std::transform(
-#if __cplusplus >= 201703L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
+#if defined(_MSVC_LANG) && _MSVC_LANG >= 201703L
         std::execution::par,
-#endif // __cplusplus >= 201703L
+#endif // defined(_MSVC_LANG) && _MSVC_LANG >= 201703L
         listing.begin(),
         listing.end(),
         truth_instances.begin(),
