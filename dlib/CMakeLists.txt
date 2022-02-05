@@ -972,11 +972,6 @@ if (MSVC)
    set_target_properties(dlib PROPERTIES RELWITHDEBINFO_POSTFIX "${VERSION}_relwithdebinfo_${numbits}bit_msvc${MSVC_VERSION}")
 endif()
 
-if (NOT MSVC)
-   # Treat warnings as errors.
-   target_compile_options(dlib PRIVATE -Werror)
-endif()
-
 # Check if we are being built as part of a pybind11 module. 
 if (COMMAND pybind11_add_module)
    # Don't export unnecessary symbols.
