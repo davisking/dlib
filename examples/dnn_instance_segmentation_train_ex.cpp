@@ -29,9 +29,6 @@
 #include <dlib/dir_nav.h>
 #include <iterator>
 #include <thread>
-#if defined(_MSVC_LANG) && _MSVC_LANG >= 201703L
-#include <execution>
-#endif // defined(_MSVC_LANG) && _MSVC_LANG >= 201703L
 
 using namespace std;
 using namespace dlib;
@@ -555,14 +552,13 @@ std::vector<std::vector<truth_instance>> load_all_truth_instances(const std::vec
 {
     std::vector<std::vector<truth_instance>> truth_instances(listing.size());
 
-    std::transform(
-#if defined(_MSVC_LANG) && _MSVC_LANG >= 201703L
-        std::execution::par,
-#endif // defined(_MSVC_LANG) && _MSVC_LANG >= 201703L
-        listing.begin(),
-        listing.end(),
-        truth_instances.begin(),
-        load_truth_instances
+    parallel_for(
+        0,
+        listing.size(),
+        [&](size_t index)
+        {
+            truth_instances[index] = load_truth_instances(listing[index]);
+        }
     );
 
     return truth_instances;
