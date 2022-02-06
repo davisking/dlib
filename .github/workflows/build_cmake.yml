@@ -27,7 +27,7 @@ jobs:
       working-directory: ${{ github.workspace }}/dlib/test
       run: cmake . -B ${{ env.build_dir }}
 
-    - name: Build
+    - name: Build just tests
       working-directory: ${{ github.workspace }}/dlib/test
       run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --target dtest
 
@@ -41,3 +41,8 @@ jobs:
         else
           ./dtest --runall -q
         fi;
+
+    - name: Build examples, etc
+      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+      working-directory: ${{ github.workspace }}/dlib/test
+      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }}
