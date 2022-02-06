@@ -58,7 +58,7 @@ namespace
     {
         print_spinner();
 
-        matrix<T,2,1> ans;
+        matrix<T,0,1> ans;
         ans = 1,1;
 
         matrix<T,2,1> p = 100*matrix_cast<T>(randm(2,1,rnd)) - 50;
