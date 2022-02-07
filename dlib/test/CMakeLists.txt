@@ -181,6 +181,12 @@ TARGET_LINK_LIBRARIES(${target_name} dlib::dlib )
 
 if (NOT DLIB_NO_GUI_SUPPORT)
    add_subdirectory(gui)
-   add_subdirectory(examples)
    add_subdirectory(tools)
+
+   if (CMAKE_COMPILER_IS_GNUCXX)
+      # The tutorials set some variables that are not used.
+      add_definitions("-Wno-unused-but-set-variable")
+   endif()
+
+   add_subdirectory(examples)
 endif()
