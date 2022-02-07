@@ -173,6 +173,7 @@ if (CMAKE_COMPILER_IS_GNUCXX)
    # around.  Don't warn about it.
    add_definitions("-Wno-unused-function")
    add_definitions("-Wno-strict-overflow")
+   add_definitions("-Wno-maybe-uninitialized")
 endif()
 
 
