@@ -29,7 +29,7 @@ jobs:
 
     - name: Build just tests
       working-directory: ${{ github.workspace }}/dlib/test
-      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --target dtest
+      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --target dtest --parallel 8
 
     - name: Test
       working-directory: ${{ github.workspace }}/dlib/test/${{ env.build_dir }}
@@ -45,4 +45,4 @@ jobs:
     - name: Build examples, etc
       if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
       working-directory: ${{ github.workspace }}/dlib/test
-      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }}
+      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --parallel 8
