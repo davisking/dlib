@@ -29,7 +29,13 @@ jobs:
 
     - name: Build just tests
       working-directory: ${{ github.workspace }}/dlib/test
-      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --target dtest --parallel 4
+      run: |
+        if [ "$RUNNER_OS" == "macOS" ]; then
+          # MacOS machines often come with low quality BLAS libraries installed, so don't use those.
+          cmake --build ${{ env.build_dir }} --config ${{ env.config }} --target dtest --parallel 4 -DDLIB_USE_BLAS=0 -DDLIB_USE_LAPACK=0
+        else
+          cmake --build ${{ env.build_dir }} --config ${{ env.config }} --target dtest --parallel 4
+        fi;
 
     - name: Test
       working-directory: ${{ github.workspace }}/dlib/test/${{ env.build_dir }}
