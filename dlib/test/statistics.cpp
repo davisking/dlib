@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <dlib/matrix.h>
 #include <cmath>
+#include <random>
 
 #include "tester.h"
 
@@ -404,6 +405,8 @@ namespace
 
             string str = "DlibRocks";
 
+            std::minstd_rand shuffle_random;
+
             for(int j = 0; j<5 ; j++)
             {
                 matrix<double,1,100000> dat;
@@ -422,7 +425,7 @@ namespace
                 double exkurdenom = 0;
                 double unbi_exkur = 0;
 
-                random_shuffle(str.begin(), str.end());
+                std::shuffle(str.begin(), str.end(), shuffle_random);
                 rnum.set_seed(str);
 
                 for(int i = 0; i<n; i++)
