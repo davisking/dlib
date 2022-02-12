@@ -412,7 +412,7 @@ namespace
     {
         print_spinner();
         dlib::rand rnd(0);
-        
+
         const size_t N = 1024*1024*4;
         const double tol = 0.01;
         double k=1.0, lambda=2.0, g=6.0;
@@ -426,24 +426,44 @@ namespace
         DLIB_TEST(std::abs(stats.mean() - expected_mean) < tol);
         DLIB_TEST(std::abs(stats.variance() - expected_var) < tol);
     }
-    
+
     void test_exponential_distribution()
     {
         print_spinner();
         dlib::rand rnd(0);
-        
+
         const size_t N = 1024*1024*5;
-        
+
         const double lambda = 1.5;
         print_spinner();
         dlib::running_stats<double> stats;
         for (size_t i = 0; i < N; i++) 
             stats.add(rnd.get_random_exponential(lambda));
-        
+
         DLIB_TEST(std::abs(stats.mean() - 1.0 / lambda) < 0.001);
         DLIB_TEST(std::abs(stats.variance() - 1.0 / (lambda*lambda)) < 0.001);
         DLIB_TEST(std::abs(stats.skewness() - 2.0) < 0.01);
         DLIB_TEST(std::abs(stats.ex_kurtosis() - 6.0) < 0.1);
+    }
+
+    void test_beta_distribution()
+    {
+        print_spinner();
+        dlib::rand rnd(0);
+
+        const size_t N = 1024*1024*5;
+
+        const double a = 0.2;
+        const double b = 1.5;
+
+        running_stats<double> stats;
+        for (size_t i = 0; i < N; i++)
+            stats.add(rnd.get_random_beta(a, b));
+
+        const double expected_mean = a / (a + b);
+        const double expected_var = a * b / (std::pow(a + b, 2) * (a + b + 1));
+        DLIB_TEST(std::abs(stats.mean() - expected_mean) < 1e-5);
+        DLIB_TEST(std::abs(stats.variance() - expected_var) < 1e-5);
     }
 
     void outputs_are_not_changed()
@@ -501,7 +521,7 @@ namespace
         }
 
     }
-    
+
     class rand_tester : public tester
     {
     public:
@@ -527,6 +547,7 @@ namespace
             test_get_integer();
             test_weibull_distribution();
             test_exponential_distribution();
+            test_beta_distribution();
         }
     } a;
 
