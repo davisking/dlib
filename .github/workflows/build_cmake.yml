@@ -45,6 +45,22 @@ jobs:
     - name: Build examples, etc
       run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --parallel 2
 
+  ubuntu-latest-clang:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Configure
+      run: |
+        export CC=/usr/bin/clang
+        export CXX=/usr/bin/clang++
+        cmake ${{ github.workspace }}/dlib/test -B ${{ env.build_dir }}
+    - name: Build just tests
+      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --target dtest --parallel 4
+    - name: Test
+      run: ${{ env.build_dir }}/dtest --runall -q
+    - name: Build examples, etc
+      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --parallel 2
+
   windows-latest:
     runs-on: 'windows-latest'
     steps:
