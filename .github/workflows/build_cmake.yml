@@ -14,17 +14,25 @@ defaults:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.runs_on }}
     strategy:
       fail-fast: false
       matrix:
-        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
+        include:
+          - displayTargetName: ubuntu-latest-gcc-default
+            runs_on: ubuntu-latest
+          - displayTargetName: ubuntu-latest-gcc-11
+            runs_on: ubuntu-latest
+          - displayTargetName: windows-latest
+            runs_on: windows-latest
+          - displayTargetName: macos-latest
+            runs_on: macos-latest
 
     steps:
     - uses: actions/checkout@v2
 
     - name: Install gcc 11
-      if: matrix.os == 'ubuntu-latest'
+      if: matrix.displayTargetName == 'ubuntu-latest-gcc-11'
       run: |
         sudo apt update
         sudo apt install gcc-11 g++-11
