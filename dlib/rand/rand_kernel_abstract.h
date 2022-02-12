@@ -218,7 +218,6 @@ namespace dlib
                 requires
                     - alpha > 0
                     - beta > 0
-
                 ensures
                     - returns a random number sampled from a Beta distribution
                       with shape parameters alpha and beta.
