@@ -11,44 +11,99 @@ env:
 defaults:
   run:
     shell: bash
+    working-directory: dlib/test
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
-
+  ubuntu-latest-gcc-default:    
+    runs-on: 'ubuntu-latest'
     steps:
     - uses: actions/checkout@v2
-
     - name: Configure
-      working-directory: ${{ github.workspace }}/dlib/test
-      run: |
-        if [ "$RUNNER_OS" == "macOS" ]; then
-          # MacOS machines often come with low quality BLAS libraries installed, so don't use those.
-          cmake . -B ${{ env.build_dir }} -DDLIB_USE_BLAS=0 -DDLIB_USE_LAPACK=0
-        else
-          cmake . -B ${{ env.build_dir }}
-        fi;
-
+      run: cmake ${{ github.workspace }}/dlib/test -B ${{ env.build_dir }}
     - name: Build just tests
-      working-directory: ${{ github.workspace }}/dlib/test
       run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --target dtest --parallel 4
-
     - name: Test
-      working-directory: ${{ github.workspace }}/dlib/test/${{ env.build_dir }}
-      run: |
-        if [ "$RUNNER_OS" == "Windows" ]; then
-          ./${{ env.config }}/dtest.exe --runall -q
-        elif [ "$RUNNER_OS" == "macOS" ]; then
-          ./dtest --runall --no_test_timer -q
-        else
-          ./dtest --runall -q
-        fi;
-
+      run: ${{ env.build_dir }}/dtest --runall -q
     - name: Build examples, etc
-      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
-      working-directory: ${{ github.workspace }}/dlib/test
+      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --parallel 2
+
+  ubuntu-latest-gcc-11:
+    if: ${{ false }}  # disabled until https://github.com/davisking/dlib/issues/2506 has been resolved
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install gcc 11
+      run: |
+        sudo apt update
+        sudo apt install gcc-11 g++-11
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110 --slave /usr/bin/g++ g++ /usr/bin/g++-11 --slave /usr/bin/gcov gcov /usr/bin/gcov-11
+    - name: Configure
+      run: cmake ${{ github.workspace }}/dlib/test -B ${{ env.build_dir }}
+    - name: Build just tests
+      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --target dtest --parallel 4
+    - name: Test
+      run: ${{ env.build_dir }}/dtest --runall -q
+    - name: Build examples, etc
+      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --parallel 2
+
+  ubuntu-latest-clang-default:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Configure
+      run: |
+        export CC=/usr/bin/clang
+        export CXX=/usr/bin/clang++
+        cmake ${{ github.workspace }}/dlib/test -B ${{ env.build_dir }}
+    - name: Build just tests
+      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --target dtest --parallel 4
+    - name: Test
+      run: ${{ env.build_dir }}/dtest --runall -q
+    - name: Build examples, etc
+      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --parallel 2
+
+  ubuntu-latest-clang-13:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install clang 13
+      run: |
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x llvm.sh
+        sudo ./llvm.sh 13
+    - name: Configure
+      run: |
+        export CC=/usr/bin/clang-13
+        export CXX=/usr/bin/clang++-13
+        cmake ${{ github.workspace }}/dlib/test -B ${{ env.build_dir }}
+    - name: Build just tests
+      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --target dtest --parallel 4
+    - name: Test
+      run: ${{ env.build_dir }}/dtest --runall -q
+    - name: Build examples, etc
+      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --parallel 2
+
+  windows-latest:
+    runs-on: 'windows-latest'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Configure
+      run: cmake . -B ${{ env.build_dir }}
+    - name: Build just tests
+      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --target dtest --parallel 4
+    - name: Test
+      run: ${{ env.build_dir }}/${{ env.config }}/dtest.exe --runall -q
+
+  macos-latest:
+    runs-on: 'macos-latest'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Configure
+      # MacOS machines often come with low quality BLAS libraries installed, so don't use those.
+      run: cmake ${{ github.workspace }}/dlib/test -B ${{ env.build_dir }} -DDLIB_USE_BLAS=0 -DDLIB_USE_LAPACK=0
+    - name: Build just tests
+      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --target dtest --parallel 4
+    - name: Test
+      run: ${{ env.build_dir }}/dtest --runall --no_test_timer -q
+    - name: Build examples, etc
       run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --parallel 2
