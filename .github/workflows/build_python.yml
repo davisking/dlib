@@ -1,8 +1,12 @@
 name: Python
 
 on:
-  pull_request:
   push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
 
 env:
   config: Release
