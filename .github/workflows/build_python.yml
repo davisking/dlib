@@ -26,3 +26,8 @@ jobs:
     - name: Build
       working-directory: ${{ github.workspace }}
       run: python setup.py build
+
+    - name: test
+      working-directory: ${{ github.workspace }}
+      run: python setup.py test 
+
