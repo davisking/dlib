@@ -215,6 +215,7 @@ namespace  {
         if (srv.error_occurred)
         {
             dlog << LDEBUG << "tag: " << srv.tag;
+            cout << "srv.error_occurred, tag: " << srv.tag << endl;
         }
 
         srv.clear();
