@@ -14,7 +14,7 @@ defaults:
 
 jobs:
   Windows:    
-    runs-on: 'windos-latest'
+    runs-on: 'windows-latest'
     steps:
     - uses: actions/checkout@v2
     - name: Build
