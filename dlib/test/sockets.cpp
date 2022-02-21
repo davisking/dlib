@@ -25,6 +25,7 @@ namespace  {
     const char magic_num = 42;
     const int min_bytes_sent = 10000;
     int assigned_port;
+    const int num_test_connections = 10;
 
     logger dlog("test.sockets");
 
@@ -36,7 +37,8 @@ namespace  {
         serv (
         ) :
             error_occurred (false),
-            got_connections(false)
+            got_connections(false),
+            s(m)
         {}
 
         void on_listening_port_assigned (
@@ -75,11 +77,33 @@ namespace  {
             }
             got_connections = true;
             dlog << LINFO << "in serv::on_connect(): on_connect ending";
+
+            auto_mutex M(m);
+            ++num_connections;
+            s.broadcast();
+
         }
 
         bool error_occurred;
         bool got_connections;
         double tag;
+
+        void wait_for_all_connections_to_close()
+        {
+            auto_mutex M(m);
+            while(num_connections != num_test_connections) 
+            {
+                // something has gone wrong if it takes more than 10 seconds.  So just end and let
+                // the test fail in that case.
+                s.wait_or_timeout(10000);
+            }
+
+        }
+
+    private:
+        dlib::mutex m;
+        dlib::signaler s;
+        int num_connections = 0;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -94,7 +118,7 @@ namespace  {
             serv& srv_
         ) : srv(srv_)
         {
-            for (int i = 0; i < 10; ++i)
+            for (int i = 0; i < num_test_connections; ++i)
                 register_thread(*this, &thread_container::thread_proc);
 
             // start up the threads
@@ -211,7 +235,7 @@ namespace  {
 
         // wait until all the sending threads have ended
         stuff.wait();
-
+        srv.wait_for_all_connections_to_close();
         srv.clear();
 
         if (srv.error_occurred)
