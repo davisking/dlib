@@ -277,7 +277,7 @@ try
                 // visualize it.
                 tt::gemm(0, eccm, 1, za_norm, true, zb_norm, false);
                 eccm /= batch_size;
-                win.set_image(abs(mat(eccm)) * 255);
+                win.set_image(round(abs(mat(eccm)) * 255));
                 win.set_title("Barlow Twins step#: " + to_string(trainer.get_train_one_step_calls()));
             }
         }
