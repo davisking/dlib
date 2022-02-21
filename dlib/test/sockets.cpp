@@ -212,13 +212,13 @@ namespace  {
         // wait until all the sending threads have ended
         stuff.wait();
 
+        srv.clear();
+
         if (srv.error_occurred)
         {
             dlog << LDEBUG << "tag: " << srv.tag;
             cout << "srv.error_occurred, tag: " << srv.tag << endl;
         }
-
-        srv.clear();
 
         dlog << LTRACE << "ending successful test";
         DLIB_TEST( !srv.error_occurred); 
