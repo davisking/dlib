@@ -1518,7 +1518,6 @@ namespace dlib
 
 
                 bool message_sent = true;
-                std::vector<unsigned long>::iterator iter;
                 while (message_sent)
                 {
                     message_sent = false;
