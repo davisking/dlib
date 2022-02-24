@@ -4066,8 +4066,8 @@ namespace dlib
             resizable_tensor off_mask(ones_matrix<float>(sample_size, sample_size) - identity_matrix<float>(sample_size));
             resizable_tensor off_diag(sample_size, sample_size);
             tt::multiply(false, off_diag, eccm, off_mask);
-            tt::gemm(1, grad_input_a, lambda, zb_norm, false, off_diag, false);
-            tt::gemm(1, grad_input_b, lambda, za_norm, false, off_diag, false);
+            tt::gemm(1, grad_input_a, 2 * lambda, zb_norm, false, off_diag, false);
+            tt::gemm(1, grad_input_b, 2 * lambda, za_norm, false, off_diag, false);
 
             // Compute the batch norm gradients, g and b grads are not used
             resizable_tensor g_grad, b_grad;
