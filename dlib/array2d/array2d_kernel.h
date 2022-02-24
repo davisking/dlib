@@ -117,14 +117,24 @@ namespace dlib
         private:
 
             row(T* data_, long cols) : data(data_), nc_(cols) {}
+            row(row&& r)
+            {
+                *this = std::move(r);
+            }
+            row& operator=(row&& r)
+            {
+                std::swap(data, r.data);
+                std::swap(nc_, r.nc_);
+                return *this;
+            }
 
-            T* data; 
-            long nc_;
+            T* data = nullptr;
+            long nc_ = 0;
 
 
             // restricted functions
-            row(){}
-            row& operator=(row&);
+            row(const row&) = delete;
+            row& operator=(const row&) = delete;
         };
 
         // -----------------------------------
