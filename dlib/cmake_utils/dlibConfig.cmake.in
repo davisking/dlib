@@ -19,6 +19,16 @@ if(NOT TARGET dlib-shared AND NOT dlib_BINARY_DIR)
    # Compute paths
    get_filename_component(dlib_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
    include("${dlib_CMAKE_DIR}/dlib.cmake")
+   # Check if Threads::Threads target is required and find it if necessary
+   get_target_property(dlib_deps_threads_check dlib::dlib INTERFACE_LINK_LIBRARIES)
+   list(FIND dlib_deps_threads_check "Threads::Threads" dlib_deps_threads_idx)
+   if (${dlib_deps_threads_idx} GREATER -1)
+      if (NOT TARGET Threads)
+         find_package(Threads REQUIRED)
+      endif()
+   endif()
+   unset(dlib_deps_threads_idx)
+   unset(dlib_deps_threads_check)
 endif()
 
 set(dlib_LIBRARIES dlib::dlib)
