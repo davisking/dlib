@@ -1,0 +1,42 @@
+name: Python
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  Windows:    
+    runs-on: 'windows-latest'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build
+      run: python setup.py build
+    - name: Test
+      run: python setup.py test 
+
+  Ubuntu:    
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build
+      run: python setup.py build
+    - name: Test
+      run: python setup.py test 
+
+  # we don't run python setup.py test on MacOS because there is some system
+  # issue that prevents it from running at all.
+  MacOS:    
+    runs-on: 'macos-latest'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build
+      run: python setup.py build
+

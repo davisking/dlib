@@ -9,7 +9,7 @@ def add_lib_to_dll_path(path):
     try:
         import os
         os.add_dll_directory(os.path.join(os.path.dirname(path), '../../bin'))
-    except (AttributeError,KeyError):
+    except (AttributeError,KeyError,FileNotFoundError):
         pass
 
 if '@DLIB_USE_CUDA@' == 'ON':

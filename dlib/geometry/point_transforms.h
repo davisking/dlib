@@ -235,14 +235,15 @@ namespace dlib
             // the above box.
             double scale = std::sqrt(new_area/temp.area());
 
-            return centered_rect(center(temp), std::round(temp.width()*scale), std::round(temp.height()*scale));
+            return centered_drect(dcenter(temp), temp.width()*scale, temp.height()*scale);
         }
 
         rectangle operator() (
             const rectangle& r
         ) const
         {
-            return (*this)(drectangle(r));
+            const auto temp = (*this)(drectangle(r));
+            return centered_rect(center(temp), std::round(temp.width()), std::round(temp.height()));
         }
 
         const point_transform_affine& get_tform(

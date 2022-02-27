@@ -495,6 +495,22 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        void reorg (
+            tensor& dest,
+            const int row_stride,
+            const int col_stride,
+            const tensor& src
+        );
+
+        void reorg_gradient (
+            tensor& grad,
+            const int row_stride,
+            const int col_stride,
+            const tensor& gradient_input
+        );
+
+    // ----------------------------------------------------------------------------------------
+
         void copy_tensor(
             bool add_to,
             tensor& dest,

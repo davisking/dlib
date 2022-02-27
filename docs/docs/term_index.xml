@@ -39,6 +39,9 @@
          <term file="dlib/dnn/utilities_abstract.h.html" name="randomize_parameters" include="dlib/dnn.h"/>
          <term file="dlib/dnn/utilities_abstract.h.html" name="input_tensor_to_output_tensor" include="dlib/dnn.h"/>
          <term file="dlib/dnn/utilities_abstract.h.html" name="output_tensor_to_input_tensor" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/utilities_abstract.h.html" name="count_parameters" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/utilities_abstract.h.html" name="set_all_learning_rate_multipliers" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/utilities_abstract.h.html" name="set_learning_rate_multipliers_range" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="tuple_head" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="tuple_tail" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="get_learning_rate_multiplier" include="dlib/dnn.h"/>
@@ -101,6 +104,8 @@
          <term file="dlib/dnn/layers_abstract.h.html" name="CONV_MODE" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="FC_MODE" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="set_all_bn_running_stats_window_sizes" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="disable_duplicative_biases" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="fuse_layers" include="dlib/dnn.h"/>
          <term file="dlib/cuda/tensor_abstract.h.html" name="tensor" include="dlib/cuda/tensor.h"/>
          <term file="dlib/cuda/tensor_abstract.h.html" name="resizable_tensor" include="dlib/cuda/tensor.h"/>
          <term file="dlib/cuda/tensor_abstract.h.html" name="alias_tensor_instance" include="dlib/cuda/tensor.h"/>
@@ -123,6 +128,7 @@
          <term file="ml.html" name="input_rgb_image" include="dlib/dnn.h"/>
          <term file="ml.html" name="input_rgb_image_sized" include="dlib/dnn.h"/>
          <term file="ml.html" name="input_rgb_image_pyramid" include="dlib/dnn.h"/>
+         <term file="ml.html" name="input_rgb_image_pair" include="dlib/dnn.h"/>
          <term file="ml.html" name="input_grayscale_image_pyramid" include="dlib/dnn.h"/>
 
          <term file="ml.html" name="dnn_trainer" include="dlib/dnn.h"/>
@@ -147,6 +153,9 @@
          <term file="ml.html" name="loss_mean_squared_multioutput_" include="dlib/dnn.h"/>
          <term file="ml.html" name="loss_mmod_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="mmod_options" include="dlib/dnn.h"/>
+         <term file="ml.html" name="loss_yolo_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/loss_abstract.h.html" name="yolo_options" include="dlib/dnn.h"/>
+         <term file="ml.html" name="loss_barlow_twins_" include="dlib/dnn.h"/>
 
          <term file="dlib/dnn/solvers_abstract.h.html" name="EXAMPLE_SOLVER" include="dlib/dnn.h"/>
          <term file="dlib/dnn/solvers_abstract.h.html" name="sgd" include="dlib/dnn.h"/>
@@ -161,6 +170,7 @@
          <term file="dlib/dnn/layers_abstract.h.html" name="resize_prev_to_tagged_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="mult_prev_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="extract_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="reorg_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="upsample_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="cont_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="scale_" include="dlib/dnn.h"/>
@@ -174,6 +184,8 @@
          <term file="dlib/dnn/layers_abstract.h.html" name="max_pool_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="avg_pool_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="relu_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="elu_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="clipped_relu_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="gelu_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="leaky_relu_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="mish_" include="dlib/dnn.h"/>
@@ -1424,12 +1436,23 @@
          <term file="dlib/ref.h.html" name="cref"                       include="dlib/ref.h"/>
          <term file="containers.html" name="reference_wrapper"          include="dlib/ref.h"/>
          <term file="containers.html" name="tuple"                      include="dlib/tuple.h"/>
-         <term file="dlib/type_safe_union/type_safe_union_kernel_abstract.h.html" 
-               name="bad_type_safe_union_cast"            include="dlib/type_safe_union.h"/>
+         <term file="dlib/type_safe_union/type_safe_union_kernel_abstract.h.html" name="bad_type_safe_union_cast"            include="dlib/type_safe_union.h"/>
+         <term file="dlib/type_safe_union/type_safe_union_kernel_abstract.h.html" name="in_place_tag"            include="dlib/type_safe_union.h"/>
+         <term file="dlib/type_safe_union/type_safe_union_kernel_abstract.h.html" name="type_safe_union_size"            include="dlib/type_safe_union.h"/>
+         <term file="dlib/type_safe_union/type_safe_union_kernel_abstract.h.html" name="type_safe_union_alternative"            include="dlib/type_safe_union.h"/>
+         <term file="dlib/type_safe_union/type_safe_union_kernel_abstract.h.html" name="for_each_type"            include="dlib/type_safe_union.h"/>
+         <term file="dlib/type_safe_union/type_safe_union_kernel_abstract.h.html" name="overloaded"            include="dlib/type_safe_union.h"/>
+         <term file="dlib/type_safe_union/type_safe_union_kernel_abstract.h.html" name="visit"            include="dlib/type_safe_union.h"/>
          <term file="containers.html" name="type_safe_union"            include="dlib/type_safe_union.h"/>
 
          <term file="containers.html" name="array2d"                    include="dlib/array2d.h"/>
 
+         <term file="dlib/invoke.h.html" name="invoke"            include="dlib/invoke.h"/>
+         <term file="dlib/invoke.h.html" name="invoke_r"            include="dlib/invoke.h"/>
+         <term file="dlib/invoke.h.html" name="apply"            include="dlib/invoke.h"/>
+         <term file="dlib/invoke.h.html" name="invoke_result"            include="dlib/invoke.h"/>
+         <term file="dlib/invoke.h.html" name="is_invocable"            include="dlib/invoke.h"/>
+         <term file="dlib/invoke.h.html" name="make_from_tuple"            include="dlib/invoke.h"/>
 
          <term file="containers.html" name="hash_map"                   include="dlib/hash_map.h"/>
          <term file="containers.html" name="hash_set"                   include="dlib/hash_set.h"/>
@@ -1550,6 +1573,7 @@
          <term file="imaging.html" name="transform_image"         include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="rotate_image"            include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="resize_image"            include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="letterbox_image"         include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="extract_image_chips"     include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="extract_image_4points"   include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="random_cropper"          include="dlib/image_transforms.h"/>
@@ -1632,6 +1656,7 @@
          <term file="dlib/image_processing/object_detector_abstract.h.html" name="full_detection"        include="dlib/image_processing.h"/>
          <term file="imaging.html" name="full_object_detection"   include="dlib/image_processing.h"/>
          <term file="imaging.html" name="mmod_rect"   include="dlib/image_processing.h"/>
+         <term file="imaging.html" name="yolo_rect"   include="dlib/image_processing.h"/>
          <term file="dlib/image_processing/full_object_detection_abstract.h.html" name="all_parts_in_rect" include="dlib/image_processing.h"/>
 
          <term file="imaging.html" name="scan_image_movable_parts" include="dlib/image_processing.h"/>

@@ -1840,6 +1840,59 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void reorg (
+        tensor& dest,
+        const int row_stride,
+        const int col_stride,
+        const tensor& src
+    );
+    /*!
+        requires
+            - is_same_object(dest, src)==false
+            - src.nr() % row_stride == 0
+            - src.nc() % col_stride == 0
+            - dest.num_samples() == src.num_samples()
+            - dest.k() == src.k() * row_stride * col_stride
+            - dest.nr() == src.nr() / row_stride
+            - dest.nc() == src.nc() / col_stride
+        ensures
+            - Converts the spatial resolution into channel information.  So all the values in the input tensor 
+              appear in the output tensor, just in different positions.  
+            - For all n, k, r, c in dest:
+                dest.host[tensor_index(dest, n, k, r, c)] ==
+                src.host[tensor_index(src,
+                                      n,
+                                      k % src.k(),
+                                      r * row_stride + (k / src.k()) / row_stride,
+                                      c * col_stride + (k / src.k()) % col_stride)]
+
+
+    !*/
+
+    void reorg_gradient (
+        tensor& grad,
+        const int row_stride,
+        const int col_stride,
+        const tensor& gradient_input
+    );
+    /*!
+        requires
+            - is_same_object(dest, src)==false
+            - gradient_input.nr % row_stride == 0
+            - gradient_input.nc % col_stride == 0
+            - dest.num_samples() == src.num_samples()
+            - grad.k() == gradient_input.k() / row_stride / col_stride
+            - grad.nr() == gradient_input.nr() * row_stride
+            - grad.nc() == gradient_input.nc() * col_stride
+        ensures
+            - Suppose that DEST is the output of reog(DEST, row_stride, col_stride, SRC)
+              for some SRC tensor, let f(SRC) == dot(gradient_input,DEST).  Then this
+              function computes the gradient of f() with respect to SRC and adds it to grad.
+            - It effectively reverts the reorg operation
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     class multi_device_tensor_averager
     {
         /*!

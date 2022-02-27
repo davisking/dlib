@@ -98,6 +98,7 @@
          <item>evaluate_detectors</item>
          <item>full_object_detection</item>
          <item>mmod_rect</item>
+         <item>yolo_rect</item>
          <item>scan_image</item>
          <item>scan_image_movable_parts</item>
          <item>find_points_above_thresh</item>
@@ -226,6 +227,7 @@
          <item>transform_image</item> 
          <item>rotate_image</item> 
          <item>resize_image</item> 
+         <item>letterbox_image</item> 
          <item>flip_image_left_right</item> 
          <item>flip_image_up_down</item> 
          <item>add_image_left_right_flips</item> 
@@ -1886,6 +1888,22 @@
    <!-- ************************************************************************* -->
 
       <component>
+         <name>letterbox_image</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/interpolation_abstract.h</spec_file>
+         <description>        
+            Scales an image so that it fits into a size * size square, while preserving the aspect
+            ratio of the actual contents by appropriate 0 padding.
+
+         <examples>
+            <example>dnn_yolo_train_ex.cpp.html</example>
+         </examples>
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
          <name>extract_image_chips</name>
          <file>dlib/image_transforms.h</file>
          <spec_file link="true">dlib/image_transforms/interpolation_abstract.h</spec_file>
@@ -2534,6 +2552,19 @@
                                  
       </component>
             
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>yolo_rect</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/full_object_detection_abstract.h</spec_file>
+         <description>
+                This is a simple struct that is used to give training data and receive detections
+                from the <a href="ml.html#loss_yolo_">YOLO loss layer for object detection</a>.
+         </description>
+
+      </component>
+
    <!-- ************************************************************************* -->
 
       <component>

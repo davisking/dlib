@@ -4352,6 +4352,107 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <long long row_stride = 2, long long col_stride = 2>
+    class reorg_
+    {
+        static_assert(row_stride >= 1, "The row_stride must be >= 1");
+        static_assert(row_stride >= 1, "The col_stride must be >= 1");
+
+    public:
+        reorg_(
+        )
+        {
+        }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& sub)
+        {
+            DLIB_CASSERT(sub.get_output().nr() % row_stride == 0);
+            DLIB_CASSERT(sub.get_output().nc() % col_stride == 0);
+        }
+
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            output.set_size(
+                sub.get_output().num_samples(),
+                sub.get_output().k() * col_stride * row_stride,
+                sub.get_output().nr() / row_stride,
+                sub.get_output().nc() / col_stride
+            );
+            tt::reorg(output, row_stride, col_stride, sub.get_output());
+        }
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
+        {
+            tt::reorg_gradient(sub.get_gradient_input(), row_stride, col_stride, gradient_input);
+        }
+
+        inline dpoint map_input_to_output (dpoint p) const
+        {
+            p.x() = p.x() / col_stride;
+            p.y() = p.y() / row_stride;
+            return p;
+        }
+        inline dpoint map_output_to_input (dpoint p) const
+        {
+            p.x() = p.x() * col_stride;
+            p.y() = p.y() * row_stride;
+            return p;
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const reorg_& /*item*/, std::ostream& out)
+        {
+            serialize("reorg_", out);
+            serialize(row_stride, out);
+            serialize(col_stride, out);
+        }
+
+        friend void deserialize(reorg_& /*item*/, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "reorg_")
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::reorg_.");
+            long long rs;
+            long long cs;
+            deserialize(rs, in);
+            deserialize(cs, in);
+            if (rs != row_stride) throw serialization_error("Wrong row_stride found while deserializing dlib::reorg_");
+            if (cs != col_stride) throw serialization_error("Wrong col_stride found while deserializing dlib::reorg_");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const reorg_& /*item*/)
+        {
+            out << "reorg\t ("
+                << "row_stride=" << row_stride
+                << ", col_stride=" << col_stride
+                << ")";
+            return out;
+        }
+
+        friend void to_xml(const reorg_ /*item*/, std::ostream& out)
+        {
+            out << "<reorg";
+            out << " row_stride='" << row_stride << "'";
+            out << " col_stride='" << col_stride << "'";
+            out << "/>\n";
+        }
+
+    private:
+        resizable_tensor params; // unused
+
+    };
+
+    template <typename SUBNET>
+    using reorg = add_layer<reorg_<2, 2>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     namespace impl
     {
         class visitor_fuse_layers

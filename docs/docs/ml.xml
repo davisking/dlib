@@ -126,6 +126,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                <item>input_rgb_image</item>
                <item>input_rgb_image_sized</item>
                <item>input_rgb_image_pyramid</item>
+               <item>input_rgb_image_pair</item>
                <item>input_grayscale_image_pyramid</item>
                <item>
                   <name>EXAMPLE_INPUT_LAYER</name>
@@ -163,6 +164,10 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                <item>
                   <name>extract</name>
                   <link>dlib/dnn/layers_abstract.h.html#extract_</link>
+               </item>
+               <item>
+                  <name>reorg</name>
+                  <link>dlib/dnn/layers_abstract.h.html#reorg_</link>
                </item>
                <item>
                   <name>mult_prev</name>
@@ -219,6 +224,14 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                <item>
                   <name>mish</name>
                   <link>dlib/dnn/layers_abstract.h.html#mish_</link>
+               </item>
+               <item>
+                  <name>clipped_relu</name>
+                  <link>dlib/dnn/layers_abstract.h.html#clipped_relu_</link>
+               </item>
+               <item>
+                  <name>elu</name>
+                  <link>dlib/dnn/layers_abstract.h.html#elu_</link>
                </item>
                <item>
                   <name>relu</name>
@@ -318,6 +331,10 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                   <link>#loss_mmod_</link>
                </item>
                <item>
+                  <name>loss_yolo</name>
+                  <link>#loss_yolo_</link>
+               </item>
+               <item>
                   <name>loss_metric</name>
                   <link>#loss_metric_</link>
                </item>
@@ -340,6 +357,10 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                <item>
                   <name>loss_multibinary_log</name>
                   <link>dlib/dnn/loss_abstract.h.html#loss_multibinary_log_</link>
+               </item>
+               <item>
+                  <name>loss_barlow_twins</name>
+                  <link>#loss_barlow_twins_</link>
                </item>
             </sub>
          </item>
@@ -801,6 +822,28 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          </description>
       </component>
 
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>input_rgb_image_pair</name>
+         <file>dlib/dnn.h</file>
+         <spec_file link="true">dlib/dnn/input_abstract.h</spec_file>
+         <description>
+            This is a simple input layer type for use in a deep neural network
+            which takes a pair of RGB images as input and loads it into a network.
+            It is useful when you want to input image pairs that are related to each other,
+            for instance, they are different distorted views of the same original image.
+            This input layer is meant to be used with a loss layer such as the
+            <a href="#loss_barlow_twins_">Barlow Twins loss layer</a>.  You can also
+            convert between <a href="#input_rgb_image">input_rgb_image</a> and
+            this input layer by copy construction or assignment.
+         </description>
+         <examples>
+            <example>dnn_self_supervised_learning_ex.cpp.html</example>
+         </examples>
+      </component>
+
    <!-- ************************************************************************* -->
 
       <component>
@@ -829,6 +872,26 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             <example>dnn_mmod_face_detection_ex.cpp.html</example>
             <example>dnn_mmod_dog_hipsterizer.cpp.html</example>
             <example>cnn_face_detector.py.html</example>
+         </examples>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>loss_yolo_</name>
+         <file>dlib/dnn.h</file>
+         <spec_file link="true">dlib/dnn/loss_abstract.h</spec_file>
+         <description>
+            This object is a <a href="dlib/dnn/loss_abstract.h.html#EXAMPLE_LOSS_LAYER_">loss layer</a>
+            for a deep neural network.  In particular, it implements the YOLO detection loss defined in
+            the paper:
+            <blockquote><a href="https://arxiv.org/abs/1804.02767">YOLOv3: An Incremental Improvement</a> by Joseph Redmon and Ali Farhadi.</blockquote>
+
+            This means you use this loss if you want to detect the locations of objects
+            in images.
+         </description>
+         <examples>
+            <example>dnn_yolo_train_ex.cpp.html</example>
          </examples>
       </component>
       
@@ -878,6 +941,32 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             appropriate for regression problems.  It is identical to the <a href="#loss_mean_squared_">loss_mean_squared_</a> 
             loss except this version supports multiple output values.
          </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>loss_barlow_twins_</name>
+         <file>dlib/dnn.h</file>
+         <spec_file link="true">dlib/dnn/loss_abstract.h</spec_file>
+         <description>
+            This object is a <a href="dlib/dnn/loss_abstract.h.html#EXAMPLE_LOSS_LAYER_">loss layer</a>
+            for a deep neural network.  In particular, it implements the Barlow Twins loss layer presented
+            in the paper:
+
+            <blockquote>
+            <a href="https://arxiv.org/abs/2103.03230">Barlow Twins: Self-Supervised Learning
+            via Redundancy Reduction</a>, by Jure Zbontar, Li Jing, Ishan Misra, Yann LeCun, St&#233;phane Deny.
+            </blockquote>
+
+            This means you use this loss to learn useful representations from data that has no label
+            information.  Useful representations mean that can be used to train another downstream task,
+            such as classification.  In particular, this loss function applies the redundancy reduction
+            principle to the representations learned by the network it sits on top of.
+         </description>
+         <examples>
+            <example>dnn_self_supervised_learning_ex.cpp.html</example>
+         </examples>
       </component>
 
    <!-- ************************************************************************* -->

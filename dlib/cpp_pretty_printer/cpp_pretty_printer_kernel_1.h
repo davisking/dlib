@@ -191,7 +191,7 @@ namespace dlib
                         if (temp.find_first_of("\n\r") != string::npos)
                             recently_seen_preprocessor = false;
                     }
-                    if (t.peek_token() != ";" && t.peek_type() != tok::IDENTIFIER &&
+                    if (t.peek_type() != tok::IDENTIFIER &&
                         t.peek_token() != "*" && t.peek_token() != "&")
                     {
                         // this is the name of a class or struct in a class or

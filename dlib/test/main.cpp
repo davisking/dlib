@@ -29,7 +29,7 @@ int main (int argc, char** argv)
         parser.add_option("d","log debugging statements to file debug.txt.");
         parser.add_option("l","Set the logging level (all, trace, debug, info, warn, error, or fatal), the default is all.",1);
         parser.add_option("a","Append debugging messages to debug.txt rather than clearing the file at program startup.");
-        parser.add_option("q","Be quiet.  Don't print the testing progress or results to standard out.");
+        parser.add_option("q","Be quiet.  Don't print the testing progress or non-failure results to standard out.");
 
         unsigned long num = 1;
 
@@ -159,14 +159,11 @@ int main (int argc, char** argv)
                     }
                     catch (std::exception& e)
                     {
-                        if (be_verbose)
-                        {
-                            cout << "\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
-                            cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TEST FAILED: " << test.cmd_line_switch() 
-                                << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
-                            cout << "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n";
-                            cout << "Failure message from test: " << e.what() << endl;
-                        }
+                        cout << "\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
+                        cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TEST FAILED: " << test.cmd_line_switch() 
+                            << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+                        cout << "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n";
+                        cout << "Failure message from test: " << e.what() << endl;
 
 
                         dlog << LERROR << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
@@ -198,13 +195,10 @@ int main (int argc, char** argv)
         }
         else
         {
-            if (be_verbose)
-            {
-                cout << "\n\nTesting Finished\n";
-                cout << "Total number of individual testing statements executed: "<< number_of_testing_statements_executed() << endl;
-                cout << "Number of failed tests: " << num_of_failed_tests << "\n";
-                cout << "Number of passed tests: " << num_of_passed_tests << "\n\n";
-            }
+            cout << "\n\nTesting Finished\n";
+            cout << "Total number of individual testing statements executed: "<< number_of_testing_statements_executed() << endl;
+            cout << "Number of failed tests: " << num_of_failed_tests << "\n";
+            cout << "Number of passed tests: " << num_of_passed_tests << "\n\n";
             dlog << LINFO << "Total number of individual testing statements executed: "<< number_of_testing_statements_executed();
             dlog << LWARN << "Number of failed tests: " << num_of_failed_tests;
             dlog << LWARN << "Number of passed tests: " << num_of_passed_tests;

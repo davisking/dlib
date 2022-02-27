@@ -1841,6 +1841,12 @@ namespace
     {
         {
             print_spinner();
+            reorg_<2,2> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
             extract_<0,2,2,2> l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
@@ -4189,6 +4195,26 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_reorg()
+    {
+#ifdef DLIB_USE_CUDA
+        print_spinner();
+        resizable_tensor x(2, 4, 8, 16);
+        resizable_tensor out_cpu(2, 16, 4, 8), out_cuda(2, 16, 4, 8);
+        resizable_tensor grad_cpu(x), grad_cuda(x);
+        tt::tensor_rand rnd;
+        rnd.fill_gaussian(x);
+        cpu::reorg(out_cpu, 2, 2, x);
+        cuda::reorg(out_cuda, 2, 2, x);
+        DLIB_TEST(max(squared(mat(out_cuda) - mat(out_cpu))) == 0);
+        cpu::reorg_gradient(grad_cpu, 2, 2, out_cpu);
+        cuda::reorg_gradient(grad_cuda, 2, 2, out_cuda);
+        DLIB_TEST(max(squared(mat(out_cuda) - mat(out_cpu))) == 0);
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class dnn_tester : public tester
     {
     public:
@@ -4294,6 +4320,7 @@ namespace
             test_set_learning_rate_multipliers();
             test_input_ouput_mappers();
             test_fuse_layers();
+            test_reorg();
         }
 
         void perform_test()
