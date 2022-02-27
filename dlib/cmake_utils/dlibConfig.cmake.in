@@ -6,15 +6,8 @@
 #  Usage from an external project:
 #    In your CMakeLists.txt, add these lines:
 #
-#    FIND_PACKAGE(dlib REQUIRED)
-#    TARGET_LINK_LIBRARIES(MY_TARGET_NAME ${dlib_LIBRARIES})
-#
-#    This file will define the following variables:
-#      - dlib_LIBRARIES                : The list of all imported targets for dlib modules.
-#      - dlib_INCLUDE_DIRS             : The dlib include directories.
-#      - dlib_VERSION                  : The version of this dlib build.
-#      - dlib_VERSION_MAJOR            : Major version part of this dlib revision.
-#      - dlib_VERSION_MINOR            : Minor version part of this dlib revision.
+#    find_package(dlib REQUIRED)
+#    target_link_libraries(MY_TARGET_NAME dlib::dlib)
 #
 # ===================================================================================
 
