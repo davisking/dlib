@@ -792,12 +792,14 @@ namespace dlib
         {
             // Calling the cuDNN "find the best algorithm" functions are really slow.  So we keep a
             // cache that tells us what method was best for a particular configuration.
-            thread_local std::map<std::tuple<int,int,int,int,long,long>,
+            thread_local std::map<std::tuple<int,int,int,int,long,long,long,long,long,long,long,long>,
                                   std::tuple<int,int,int>> config_to_algo_cache;
 
             // If we have already found good algorithms for this setting then just pull them from
             // the cache.
-            const auto cache_key = std::make_tuple(stride_y, stride_x, padding_y, padding_x, filters_nr, filters_nc);
+            const auto cache_key = std::make_tuple(stride_y, stride_x, padding_y, padding_x,
+                                                   filters_nr, filters_nc, filters_num_samples, filters_k,
+                                                   data_nr, data_nc, data_num_samples, data_k);
             const auto iter = config_to_algo_cache.find(cache_key);
             if (iter != config_to_algo_cache.end())
             {
