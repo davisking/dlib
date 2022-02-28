@@ -7,8 +7,6 @@
 #include "layers.h"
 #include "loss.h"
 
-#endif // DLIB_DNn_VISITORS_H_
-
 namespace dlib
 {
     namespace impl
@@ -515,3 +513,6 @@ namespace dlib
         net_to_dot(net, fout);
     }
 }
+
+#endif // DLIB_DNn_VISITORS_H_
+
