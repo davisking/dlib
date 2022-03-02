@@ -787,10 +787,11 @@ namespace dlib
         void tensor_conv::
         select_best_algorithms (
             const tensor& data,
-            const tensor_descriptor& dest_desc
+            const tensor_descriptor& dest_desc,
+            allow_cache_use allow_cache_use
         ) 
         {
-            // Calling the cuDNN "find the best algorithm" functions are really slow.  So we keep a
+            // Calling the cuDNN "find the best algorithm" functions is really slow.  So we keep a
             // cache that tells us what method was best for a particular configuration.
             thread_local std::map<std::tuple<int,int,int,int,long,long>,
                                   std::tuple<int,int,int>> config_to_algo_cache;
@@ -799,7 +800,7 @@ namespace dlib
             // the cache.
             const auto cache_key = std::make_tuple(stride_y, stride_x, padding_y, padding_x, filters_nr, filters_nc);
             const auto iter = config_to_algo_cache.find(cache_key);
-            if (iter != config_to_algo_cache.end())
+            if (iter != config_to_algo_cache.end() && allow_cache_use == allow_cache_use::yes)
             {
                 std::tie(forward_algo, backward_data_algo, backward_filters_algo) = iter->second;
                 return;
@@ -934,6 +935,40 @@ namespace dlib
         }
 
         void tensor_conv::
+        update_convolution_data_workspace_sizes(
+            const tensor& data,
+            const tensor_descriptor& dest_desc
+        )
+        {
+            CHECK_CUDNN(cudnnGetConvolutionForwardWorkspaceSize(
+                context(),
+                descriptor(data),
+                (const cudnnFilterDescriptor_t)filter_handle,
+                (const cudnnConvolutionDescriptor_t)conv_handle,
+                descriptor(dest_desc),
+                (cudnnConvolutionFwdAlgo_t)forward_algo,
+                &forward_workspace_size_in_bytes));
+
+            CHECK_CUDNN(cudnnGetConvolutionBackwardDataWorkspaceSize(
+                context(),
+                (const cudnnFilterDescriptor_t)filter_handle,
+                descriptor(dest_desc),
+                (const cudnnConvolutionDescriptor_t)conv_handle,
+                descriptor(data),
+                (cudnnConvolutionBwdDataAlgo_t)backward_data_algo,
+                &backward_data_workspace_size_in_bytes));
+
+            CHECK_CUDNN(cudnnGetConvolutionBackwardFilterWorkspaceSize(
+                context(),
+                descriptor(data),
+                descriptor(dest_desc),
+                (const cudnnConvolutionDescriptor_t)conv_handle,
+                (const cudnnFilterDescriptor_t)filter_handle,
+                (cudnnConvolutionBwdFilterAlgo_t)backward_filters_algo,
+                &backward_filters_workspace_size_in_bytes));
+        }
+
+        void tensor_conv::
         setup(
             const tensor& data,
             const tensor& filters,
@@ -1021,36 +1056,18 @@ namespace dlib
                 tensor_descriptor dest_desc;
                 dest_desc.set_size(out_num_samples,out_k,out_nr,out_nc);
 
-                select_best_algorithms(data, dest_desc);
-
-                CHECK_CUDNN(cudnnGetConvolutionForwardWorkspaceSize( 
-                        context(),
-                        descriptor(data),
-                        (const cudnnFilterDescriptor_t)filter_handle,
-                        (const cudnnConvolutionDescriptor_t)conv_handle,
-                        descriptor(dest_desc),
-                        (cudnnConvolutionFwdAlgo_t)forward_algo,
-                        &forward_workspace_size_in_bytes));
-
-
-                CHECK_CUDNN(cudnnGetConvolutionBackwardDataWorkspaceSize(
-                        context(),
-                        (const cudnnFilterDescriptor_t)filter_handle,
-                        descriptor(dest_desc),
-                        (const cudnnConvolutionDescriptor_t)conv_handle,
-                        descriptor(data),
-                        (cudnnConvolutionBwdDataAlgo_t)backward_data_algo,
-                        &backward_data_workspace_size_in_bytes));
-
-
-                CHECK_CUDNN(cudnnGetConvolutionBackwardFilterWorkspaceSize( 
-                        context(),
-                        descriptor(data),
-                        descriptor(dest_desc),
-                        (const cudnnConvolutionDescriptor_t)conv_handle,
-                        (const cudnnFilterDescriptor_t)filter_handle,
-                        (cudnnConvolutionBwdFilterAlgo_t)backward_filters_algo,
-                        &backward_filters_workspace_size_in_bytes));
+                try
+                {
+                    select_best_algorithms(data, dest_desc, allow_cache_use::yes);
+                    update_convolution_data_workspace_sizes(data, dest_desc);
+                }
+                catch (dlib::cudnn_error&)
+                {
+                    // Sometimes the values stored in `config_to_algo_cache` do not quite work -
+                    // so let's get a fresh estimate, instead of using a cached value.
+                    select_best_algorithms(data, dest_desc, allow_cache_use::no);
+                    update_convolution_data_workspace_sizes(data, dest_desc);
+                }
             }
             catch(...)
             {
