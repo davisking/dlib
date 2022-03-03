@@ -254,15 +254,20 @@ namespace dlib
             int out_nr;
             int out_nc;
 
+            enum class allow_cache_use { no, yes };
+
             // sets the three _algo fields.
-            void select_best_algorithms(const tensor& data, const tensor_descriptor& dest_desc);
+            void select_best_algorithms(const tensor& data, const tensor_descriptor& dest_desc, allow_cache_use allow_cache_use);
             int forward_algo;
             int backward_data_algo;
             int backward_filters_algo;
 
+            // sets the three _workspace_size_in_bytes fields.
+            void update_convolution_data_workspace_sizes(const tensor& data, const tensor_descriptor& dest_desc);
             size_t forward_workspace_size_in_bytes;
             size_t backward_data_workspace_size_in_bytes;
             size_t backward_filters_workspace_size_in_bytes;
+
             cuda_data_void_ptr forward_workspace;
             cuda_data_void_ptr backward_data_workspace;
             cuda_data_void_ptr backward_filters_workspace;
