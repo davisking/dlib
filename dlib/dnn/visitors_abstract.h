@@ -13,6 +13,40 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename net_type>
+    void set_all_bn_running_stats_window_sizes (
+        const net_type& net,
+        unsigned long new_window_size
+    );
+    /*!
+        requires
+            - new_window_size > 0
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+        ensures
+            - Sets the get_running_stats_window_size() field of all bn_ layers in net to
+              new_window_size.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename net_type>
+    void fuse_layers (
+        net_type& net
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+            - net has been properly allocated, that is: count_parameters(net) > 0.
+        ensures
+            - Disables all the affine_ layers that have a convolution as an input.
+            - Updates the convolution weights beneath the affine_ layers to produce the same
+              output as with the affine_ layers enabled.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename net_type>
     void net_to_xml (
         const net_type& net,
         std::ostream& out
