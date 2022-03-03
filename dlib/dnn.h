@@ -31,6 +31,7 @@
 #include "cuda/tensor_tools.h"
 #include "dnn/utilities.h"
 #include "dnn/validation.h"
+#include "dnn/visitors.h"
 
 #endif // DLIB_DNn_
 
