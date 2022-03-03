@@ -8,7 +8,7 @@
 
 #include "tensor.h"
 #include "../geometry/rectangle.h"
-#include "../dnn/misc.h"
+#include "../dnn/utilities.h"
 
 namespace dlib
 {

@@ -9,6 +9,408 @@
 
 namespace dlib
 {
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+
+        class visitor_net_map_input_to_output
+        {
+        public:
+
+            visitor_net_map_input_to_output(dpoint& p_) : p(p_) {}
+
+            dpoint& p;
+
+            template<typename input_layer_type>
+            void operator()(const input_layer_type& ) 
+            {
+            }
+
+            template <typename T, typename U>
+            void operator()(const add_loss_layer<T,U>& net) 
+            {
+                (*this)(net.subnet());
+            }
+
+            template <typename T, typename U, typename E>
+            void operator()(const add_layer<T,U,E>& net) 
+            {
+                (*this)(net.subnet());
+                p = net.layer_details().map_input_to_output(p);
+            }
+            template <bool B, typename T, typename U, typename E>
+            void operator()(const dimpl::subnet_wrapper<add_layer<T,U,E>,B>& net) 
+            {
+                (*this)(net.subnet());
+                p = net.layer_details().map_input_to_output(p);
+            }
+            template <size_t N, template <typename> class R, typename U>
+            void operator()(const repeat<N, R, U>& net)
+            {
+                (*this)(net.subnet());
+                for (size_t i = 0; i < N; ++i)
+                {
+                    (*this)(net.get_repeated_layer(N-1-i).subnet());
+                }
+            }
+
+
+            template <unsigned long ID, typename U, typename E>
+            void operator()(const add_tag_layer<ID,U,E>& net) 
+            {
+                // tag layers are an identity transform, so do nothing
+                (*this)(net.subnet());
+            }
+            template <bool is_first, unsigned long ID, typename U, typename E>
+            void operator()(const dimpl::subnet_wrapper<add_tag_layer<ID,U,E>,is_first>& net) 
+            {
+                // tag layers are an identity transform, so do nothing
+                (*this)(net.subnet());
+            }
+
+
+            template <template<typename> class TAG_TYPE, typename U>
+            void operator()(const add_skip_layer<TAG_TYPE,U>& net) 
+            {
+                (*this)(layer<TAG_TYPE>(net));
+            }
+            template <bool is_first, template<typename> class TAG_TYPE, typename SUBNET>
+            void operator()(const dimpl::subnet_wrapper<add_skip_layer<TAG_TYPE,SUBNET>,is_first>& net) 
+            {
+                // skip layers are an identity transform, so do nothing
+                (*this)(layer<TAG_TYPE>(net));
+            }
+
+        };
+
+        class visitor_net_map_output_to_input
+        {
+        public:
+            visitor_net_map_output_to_input(dpoint& p_) : p(p_) {}
+
+            dpoint& p;
+
+            template<typename input_layer_type>
+            void operator()(const input_layer_type& ) 
+            {
+            }
+
+            template <typename T, typename U>
+            void operator()(const add_loss_layer<T,U>& net) 
+            {
+                (*this)(net.subnet());
+            }
+
+            template <typename T, typename U, typename E>
+            void operator()(const add_layer<T,U,E>& net) 
+            {
+                p = net.layer_details().map_output_to_input(p);
+                (*this)(net.subnet());
+            }
+            template <bool B, typename T, typename U, typename E>
+            void operator()(const dimpl::subnet_wrapper<add_layer<T,U,E>,B>& net) 
+            {
+                p = net.layer_details().map_output_to_input(p);
+                (*this)(net.subnet());
+            }
+            template <size_t N, template <typename> class R, typename U>
+            void operator()(const repeat<N, R, U>& net)
+            {
+                for (size_t i = 0; i < N; ++i)
+                {
+                    (*this)(net.get_repeated_layer(i).subnet());
+                }
+                (*this)(net.subnet());
+            }
+
+
+            template <unsigned long ID, typename U, typename E>
+            void operator()(const add_tag_layer<ID,U,E>& net) 
+            {
+                // tag layers are an identity transform, so do nothing
+                (*this)(net.subnet());
+            }
+            template <bool is_first, unsigned long ID, typename U, typename E>
+            void operator()(const dimpl::subnet_wrapper<add_tag_layer<ID,U,E>,is_first>& net) 
+            {
+                // tag layers are an identity transform, so do nothing
+                (*this)(net.subnet());
+            }
+
+
+            template <template<typename> class TAG_TYPE, typename U>
+            void operator()(const add_skip_layer<TAG_TYPE,U>& net) 
+            {
+                (*this)(layer<TAG_TYPE>(net));
+            }
+            template <bool is_first, template<typename> class TAG_TYPE, typename SUBNET>
+            void operator()(const dimpl::subnet_wrapper<add_skip_layer<TAG_TYPE,SUBNET>,is_first>& net) 
+            {
+                // skip layers are an identity transform, so do nothing
+                (*this)(layer<TAG_TYPE>(net));
+            }
+
+        };
+    }
+
+    template <typename net_type>
+    inline dpoint input_tensor_to_output_tensor(
+        const net_type& net,
+        dpoint p 
+    )
+    {
+        impl::visitor_net_map_input_to_output temp(p);
+        temp(net);
+        return p;
+    }
+
+    template <typename net_type>
+    inline dpoint output_tensor_to_input_tensor(
+        const net_type& net,
+        dpoint p  
+    )
+    {
+        impl::visitor_net_map_output_to_input temp(p);
+        temp(net);
+        return p;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename net_type>
+    size_t count_parameters(
+        const net_type& net
+    )
+    {
+        size_t num_parameters = 0;
+        visit_layer_parameters(net, [&](const tensor& t) { num_parameters += t.size(); });
+        return num_parameters;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        class visitor_learning_rate_multiplier
+        {
+        public:
+            visitor_learning_rate_multiplier(double new_learning_rate_multiplier_) :
+                new_learning_rate_multiplier(new_learning_rate_multiplier_) {}
+
+            template <typename layer>
+            void operator()(layer& l) const
+            {
+                set_learning_rate_multiplier(l, new_learning_rate_multiplier);
+            }
+
+        private:
+
+            double new_learning_rate_multiplier;
+        };
+    }
+
+    template <typename net_type>
+    void set_all_learning_rate_multipliers(
+        net_type& net,
+        double learning_rate_multiplier
+    )
+    {
+        DLIB_CASSERT(learning_rate_multiplier >= 0);
+        impl::visitor_learning_rate_multiplier temp(learning_rate_multiplier);
+        visit_computational_layers(net, temp);
+    }
+
+    template <size_t begin, size_t end, typename net_type>
+    void set_learning_rate_multipliers_range(
+        net_type& net,
+        double learning_rate_multiplier
+    )
+    {
+        static_assert(begin <= end, "Invalid range");
+        static_assert(end <= net_type::num_layers, "Invalid range");
+        DLIB_CASSERT(learning_rate_multiplier >= 0);
+        impl::visitor_learning_rate_multiplier temp(learning_rate_multiplier);
+        visit_computational_layers_range<begin, end>(net, temp);
+    }
+
+// ----------------------------------------------------------------------------------------
+    template <typename net_type>
+    void set_all_bn_running_stats_window_sizes (
+        net_type& net,
+        unsigned long new_window_size
+    )
+    {
+        visit_layers(net, impl::visitor_bn_running_stats_window_size(new_window_size));
+    }
+
+    template <typename net_type>
+    void disable_duplicative_biases (
+        net_type& net
+    )
+    {
+        visit_layers(net, impl::visitor_disable_input_bias());
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        class visitor_fuse_layers
+        {
+            public:
+            template <typename T>
+            void fuse_convolution(T&) const
+            {
+                // disable other layer types
+            }
+
+            // handle the standard case (convolutional layer followed by affine;
+            template <long nf, long nr, long nc, int sy, int sx, int py, int px, typename U, typename E>
+            void fuse_convolution(add_layer<affine_, add_layer<con_<nf, nr, nc, sy, sx, py, px>, U>, E>& l)
+            {
+                if (l.layer_details().is_disabled())
+                    return;
+
+                // get the convolution below the affine layer
+                auto& conv = l.subnet().layer_details();
+
+                // get the parameters from the affine layer as alias_tensor_instance
+                alias_tensor_instance gamma = l.layer_details().get_gamma();
+                alias_tensor_instance beta = l.layer_details().get_beta();
+
+                if (conv.bias_is_disabled())
+                {
+                    conv.enable_bias();
+                }
+
+                tensor& params = conv.get_layer_params();
+
+                // update the biases
+                auto biases = alias_tensor(1, conv.num_filters());
+                biases(params, params.size() - conv.num_filters()) += mat(beta);
+
+                // guess the number of input channels
+                const long k_in = (params.size() - conv.num_filters()) / conv.num_filters() / conv.nr() / conv.nc();
+
+                // rescale the filters
+                DLIB_CASSERT(conv.num_filters() == gamma.k());
+                alias_tensor filter(1, k_in, conv.nr(), conv.nc());
+                const float* g = gamma.host();
+                for (long n = 0; n < conv.num_filters(); ++n)
+                {
+                    filter(params, n * filter.size()) *= g[n];
+                }
+
+                // disable the affine layer
+                l.layer_details().disable();
+            }
+
+            template <typename input_layer_type>
+            void operator()(size_t , input_layer_type& ) const
+            {
+                // ignore other layers
+            }
+
+            template <typename T, typename U, typename E>
+            void operator()(size_t , add_layer<T, U, E>& l)
+            {
+                fuse_convolution(l);
+            }
+        };
+    }
+
+    template <typename net_type>
+    void fuse_layers (
+        net_type& net
+    )
+    {
+        DLIB_CASSERT(count_parameters(net) > 0, "The network has to be allocated before fusing the layers.");
+        visit_layers(net, impl::visitor_fuse_layers());
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        class visitor_net_to_xml
+        {
+        public:
+
+            visitor_net_to_xml(std::ostream& out_) : out(out_) {}
+
+            template<typename input_layer_type>
+            void operator()(size_t idx, const input_layer_type& l) 
+            {
+                out << "<layer idx='"<<idx<<"' type='input'>\n";
+                to_xml(l,out);
+                out << "</layer>\n";
+            }
+
+            template <typename T, typename U>
+            void operator()(size_t idx, const add_loss_layer<T,U>& l) 
+            {
+                out << "<layer idx='"<<idx<<"' type='loss'>\n";
+                to_xml(l.loss_details(),out);
+                out << "</layer>\n";
+            }
+
+            template <typename T, typename U, typename E>
+            void operator()(size_t idx, const add_layer<T,U,E>& l) 
+            {
+                out << "<layer idx='"<<idx<<"' type='comp'>\n";
+                to_xml(l.layer_details(),out);
+                out << "</layer>\n";
+            }
+
+            template <unsigned long ID, typename U, typename E>
+            void operator()(size_t idx, const add_tag_layer<ID,U,E>& /*l*/) 
+            {
+                out << "<layer idx='"<<idx<<"' type='tag' id='"<<ID<<"'/>\n";
+            }
+
+            template <template<typename> class T, typename U>
+            void operator()(size_t idx, const add_skip_layer<T,U>& /*l*/) 
+            {
+                out << "<layer idx='"<<idx<<"' type='skip' id='"<<(tag_id<T>::id)<<"'/>\n";
+            }
+
+        private:
+
+            std::ostream& out;
+        };
+    }
+
+    template <typename net_type>
+    void net_to_xml (
+        const net_type& net,
+        std::ostream& out
+    )
+    {
+        auto old_precision = out.precision(9);
+        out << "<net>\n";
+        visit_layers(net, impl::visitor_net_to_xml(out));
+        out << "</net>\n";
+        // restore the original stream precision.
+        out.precision(old_precision);
+    }
+
+    template <typename net_type>
+    void net_to_xml (
+        const net_type& net,
+        const std::string& filename
+    )
+    {
+        std::ofstream fout(filename);
+        net_to_xml(net, fout);
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
     namespace impl
     {
         class visitor_net_to_dot
