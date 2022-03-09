@@ -422,7 +422,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
             template <typename input_layer_type>
-            void operator()(size_t i, input_layer_type& l)
+            void operator()(size_t i, input_layer_type&)
             {
                 start_node(i, "input");
                 end_node();
@@ -487,7 +487,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
             template <template <typename> class TAG, typename U>
-            void operator()(size_t i, const add_skip_layer<TAG, U>&)
+            void operator()(size_t, const add_skip_layer<TAG, U>&)
             {
                 const auto t = tag_id<TAG>::id;
                 from = tag_to_layer.at(t);
@@ -813,7 +813,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
             template <template <typename> class... TAGS, typename U, typename E>
-            void operator()(size_t i, const add_layer<concat_<TAGS...>, U, E>& l)
+            void operator()(size_t i, const add_layer<concat_<TAGS...>, U, E>&)
             {
                 start_node(i, "concat");
                 end_node();
@@ -864,7 +864,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
             template <typename T, typename U, typename E>
-            void operator()(size_t i, const add_layer<T, U, E>& l)
+            void operator()(size_t i, const add_layer<T, U, E>&)
             {
                 start_node(i, "unhandled layer");
                 update(i);
