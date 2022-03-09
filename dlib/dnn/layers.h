@@ -1838,23 +1838,6 @@ namespace dlib
         };
     }
 
-    template <typename net_type>
-    void set_all_bn_running_stats_window_sizes (
-        net_type& net,
-        unsigned long new_window_size
-    )
-    {
-        visit_layers(net, impl::visitor_bn_running_stats_window_size(new_window_size));
-    }
-
-    template <typename net_type>
-    void disable_duplicative_biases (
-        net_type& net
-    )
-    {
-        visit_layers(net, impl::visitor_disable_input_bias());
-    }
-
 // ----------------------------------------------------------------------------------------
 
     enum fc_bias_mode
@@ -4427,83 +4410,6 @@ namespace dlib
 
     template <typename SUBNET>
     using reorg = add_layer<reorg_<2, 2>, SUBNET>;
-
-// ----------------------------------------------------------------------------------------
-
-    namespace impl
-    {
-        class visitor_fuse_layers
-        {
-            public:
-            template <typename T>
-            void fuse_convolution(T&) const
-            {
-                // disable other layer types
-            }
-
-            // handle the standard case (convolutional layer followed by affine;
-            template <long nf, long nr, long nc, int sy, int sx, int py, int px, typename U, typename E>
-            void fuse_convolution(add_layer<affine_, add_layer<con_<nf, nr, nc, sy, sx, py, px>, U>, E>& l)
-            {
-                if (l.layer_details().is_disabled())
-                    return;
-
-                // get the convolution below the affine layer
-                auto& conv = l.subnet().layer_details();
-
-                // get the parameters from the affine layer as alias_tensor_instance
-                alias_tensor_instance gamma = l.layer_details().get_gamma();
-                alias_tensor_instance beta = l.layer_details().get_beta();
-
-                if (conv.bias_is_disabled())
-                {
-                    conv.enable_bias();
-                }
-
-                tensor& params = conv.get_layer_params();
-
-                // update the biases
-                auto biases = alias_tensor(1, conv.num_filters());
-                biases(params, params.size() - conv.num_filters()) += mat(beta);
-
-                // guess the number of input channels
-                const long k_in = (params.size() - conv.num_filters()) / conv.num_filters() / conv.nr() / conv.nc();
-
-                // rescale the filters
-                DLIB_CASSERT(conv.num_filters() == gamma.k());
-                alias_tensor filter(1, k_in, conv.nr(), conv.nc());
-                const float* g = gamma.host();
-                for (long n = 0; n < conv.num_filters(); ++n)
-                {
-                    filter(params, n * filter.size()) *= g[n];
-                }
-
-                // disable the affine layer
-                l.layer_details().disable();
-            }
-
-            template <typename input_layer_type>
-            void operator()(size_t , input_layer_type& ) const
-            {
-                // ignore other layers
-            }
-
-            template <typename T, typename U, typename E>
-            void operator()(size_t , add_layer<T, U, E>& l)
-            {
-                fuse_convolution(l);
-            }
-        };
-    }
-
-    template <typename net_type>
-    void fuse_layers (
-        net_type& net
-    )
-    {
-        DLIB_CASSERT(count_parameters(net) > 0, "The network has to be allocated before fusing the layers.");
-        visit_layers(net, impl::visitor_fuse_layers());
-    }
 
 // ----------------------------------------------------------------------------------------
 

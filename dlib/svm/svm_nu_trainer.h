@@ -3,8 +3,6 @@
 #ifndef DLIB_SVm_NU_TRAINER_Hh_ 
 #define DLIB_SVm_NU_TRAINER_Hh_
 
-//#include "local/make_label_kernel_matrix.h"
-
 #include "svm_nu_trainer_abstract.h"
 #include <cmath>
 #include <limits>
@@ -185,7 +183,6 @@ namespace dlib
             solve_qp2_using_smo<scalar_vector_type> solver;
 
             solver(symmetric_matrix_cache<float>((diagm(y)*kernel_matrix(kernel_function,x)*diagm(y)), cache_size), 
-            //solver(symmetric_matrix_cache<float>(make_label_kernel_matrix(kernel_matrix(kernel_function,x),y), cache_size), 
                    y, 
                    nu,
                    alpha,

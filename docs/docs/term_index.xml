@@ -34,14 +34,18 @@
 
 
          <term file="dlib/algs.h.html" name="stack_based_memory_block" include="dlib/algs.h"/>
-         <term file="dlib/dnn/utilities_abstract.h.html" name="net_to_xml" include="dlib/dnn.h"/>
          <term file="dlib/dnn/utilities_abstract.h.html" name="log1pexp" include="dlib/dnn.h"/>
          <term file="dlib/dnn/utilities_abstract.h.html" name="randomize_parameters" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/utilities_abstract.h.html" name="input_tensor_to_output_tensor" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/utilities_abstract.h.html" name="output_tensor_to_input_tensor" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/utilities_abstract.h.html" name="count_parameters" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/utilities_abstract.h.html" name="set_all_learning_rate_multipliers" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/utilities_abstract.h.html" name="set_learning_rate_multipliers_range" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/visitors_abstract.h.html" name="set_all_bn_running_stats_window_sizes" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/visitors_abstract.h.html" name="disable_duplicative_biases" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/visitors_abstract.h.html" name="fuse_layers" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/visitors_abstract.h.html" name="net_to_xml" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/visitors_abstract.h.html" name="net_to_dot" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/visitors_abstract.h.html" name="input_tensor_to_output_tensor" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/visitors_abstract.h.html" name="output_tensor_to_input_tensor" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/visitors_abstract.h.html" name="count_parameters" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/visitors_abstract.h.html" name="set_all_learning_rate_multipliers" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/visitors_abstract.h.html" name="set_learning_rate_multipliers_range" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="tuple_head" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="tuple_tail" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="get_learning_rate_multiplier" include="dlib/dnn.h"/>
@@ -103,9 +107,6 @@
          <term file="dlib/dnn/layers_abstract.h.html" name="layer_mode" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="CONV_MODE" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="FC_MODE" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/layers_abstract.h.html" name="set_all_bn_running_stats_window_sizes" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/layers_abstract.h.html" name="disable_duplicative_biases" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/layers_abstract.h.html" name="fuse_layers" include="dlib/dnn.h"/>
          <term file="dlib/cuda/tensor_abstract.h.html" name="tensor" include="dlib/cuda/tensor.h"/>
          <term file="dlib/cuda/tensor_abstract.h.html" name="resizable_tensor" include="dlib/cuda/tensor.h"/>
          <term file="dlib/cuda/tensor_abstract.h.html" name="alias_tensor_instance" include="dlib/cuda/tensor.h"/>
