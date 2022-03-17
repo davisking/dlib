@@ -885,6 +885,150 @@ namespace dlib
     using loss_multibinary_log = add_loss_layer<loss_multibinary_log_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
+
+    class loss_focal_
+    {
+    public:
+        typedef std::vector<float> training_label_type;
+        typedef std::vector<float> output_label_type;
+
+        loss_focal_() = default;
+
+        loss_focal_(float gamma) : gamma(gamma)
+        {
+            DLIB_CASSERT(gamma >= 0);
+        }
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const
+        {
+            const tensor& output_tensor = sub.get_output();
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+            DLIB_CASSERT(output_tensor.nr() == 1 && output_tensor.nc() == 1);
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+
+            // Note that output_tensor.k() should match the number of labels.
+
+            const float* out_data = output_tensor.host();
+            for (long i = 0; i < output_tensor.num_samples(); ++i)
+            {
+                output_label_type predictions(output_tensor.k(), 0);
+                for (long k = 0; k < output_tensor.k(); ++k)
+                {
+                    predictions[k] = out_data[i * output_tensor.k() + k];
+                }
+                *iter++ = std::move(predictions);
+            }
+        }
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            const_label_iterator truth,
+            SUBNET& sub
+        ) const
+        {
+            const tensor& output_tensor = sub.get_output();
+            tensor& grad = sub.get_gradient_input();
+
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+            DLIB_CASSERT(input_tensor.num_samples() != 0);
+            DLIB_CASSERT(input_tensor.num_samples() % sub.sample_expansion_factor() == 0);
+            DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+            DLIB_CASSERT(output_tensor.nr() == 1 && output_tensor.nc() == 1);
+            DLIB_CASSERT(grad.nr() == 1 && grad.nc() == 1);
+
+            tt::sigmoid(grad, output_tensor);
+
+            // The loss we output is the average loss over the mini-batch.
+            const double scale = 1.0 / output_tensor.num_samples();
+            double loss = 0;
+            float* g = grad.host();
+            const float* out_data  = output_tensor.host();
+            for (long i = 0; i < output_tensor.num_samples(); ++i, ++truth)
+            {
+                const long long num_label_categories = truth->size();
+                DLIB_CASSERT(output_tensor.k() == num_label_categories,
+                    "Number of label types should match the number of output channels. "
+                    "output_tensor.k(): " << output_tensor.k()
+                    << ", num_label_categories: "<< num_label_categories);
+                for (long k = 0; k < output_tensor.k(); ++k)
+                {
+                    const float y = (*truth)[k];
+                    DLIB_CASSERT(y != 0, "y: " << y);
+                    const size_t idx = i * output_tensor.k() + k;
+                    const float focus = std::pow(1 - g[idx], gamma);
+                    if (y > 0)
+                    {
+                        const float temp = log1pexp(-out_data[idx]);
+                        const float focus = std::pow(1 - g[idx], gamma);
+                        loss += y * scale * temp * focus;
+                        g[idx] = y * scale * focus * (g[idx] * (1 - gamma * temp) - 1);
+                    }
+                    else
+                    {
+                        const float temp = -(-out_data[idx] - log1pexp(-out_data[idx]));
+                        const float focus = std::pow(g[idx], gamma);
+                        loss += -y * scale * temp * focus;
+                        g[idx] = -y * scale * focus * g[idx] * (1 - gamma * temp);
+                    }
+                }
+            }
+            return loss;
+        }
+
+        float get_gamma() const  { return gamma; }
+
+        friend void serialize(const loss_focal_& item, std::ostream& out)
+        {
+            serialize("loss_focal_", out);
+            serialize(item.gamma, out);
+        }
+
+        friend void deserialize(loss_focal_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version == "loss_focal_")
+            {
+                deserialize(item.gamma, in);
+            }
+            else
+            {
+                throw serialization_error("Unexpected version found while deserializing dlib::loss_focal_.  Instead found " + version);
+            }
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const loss_focal_& item)
+        {
+            out << "loss_focal (gamma=" << item.gamma<< ")";
+            return out;
+        }
+
+        friend void to_xml(const loss_focal_& item, std::ostream& out)
+        {
+            out << "<loss_focal gamma='" << item.gamma<< "'/>";
+        }
+
+    private:
+        float gamma = 0;
+    };
+
+    template <typename SUBNET>
+    using loss_focal = add_loss_layer<loss_focal_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     enum class use_image_pyramid : uint8_t

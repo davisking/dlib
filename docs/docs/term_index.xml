@@ -146,6 +146,7 @@
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_multiclass_log_per_pixel_weighted_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_mean_squared_per_channel_and_pixel_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_multibinary_log_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/loss_abstract.h.html" name="loss_focal_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_ranking_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_dot_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_epsilon_insensitive_" include="dlib/dnn.h"/>

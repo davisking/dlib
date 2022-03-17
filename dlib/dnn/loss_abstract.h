@@ -779,6 +779,100 @@ namespace dlib
     using loss_multibinary_log = add_loss_layer<loss_multibinary_log_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
+
+    class loss_focal_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object implements the loss layer interface defined above by
+                EXAMPLE_LOSS_LAYER_.  In particular, it implements the Focal loss layer
+                presented in the paper:
+                    Focal Loss for Dense Object Detection
+                    by Tsung-Yi Lin, Priya Goyal, Ross Girshick, Kaiming He, Piotr Dollár
+                    (https://arxiv.org/abs/1708.02002)
+
+                Despite the name of the paper, this loss layer is meant to be used for
+                classification tasks.  In particular, this layer is almost identical to
+                the loss_binary_log_.  The only difference is that it accepts a focusing
+                parameter gamma which acts as a modulating factor to the cross-entropy
+                layer by reducing the relative loss for well-classified samples, and
+                focusing on the difficult ones.  As a result, this means that you might
+                want to use this loss layer when your dataset is very imbalanced.
+                Note that when gamma == 0, this loss is exactly the same as the
+                loss_multibinary_log_ defined above.
+        !*/
+
+    public:
+        typedef std::vector<float> training_label_type;
+        typedef std::vector<float> output_label_type;
+
+        loss_focal_ (
+        );
+        /*!
+            ensures
+                - #get_gamma() == 0
+        !*/
+
+        loss_focal_(float gamma);
+        /*!
+            ensures
+                - #get_gamma() == gamma
+        !*/
+
+        float get_gamma() const;
+        /*!
+            ensures
+                - returns the gamma value used by the loss function.
+        !*/
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
+            it has the additional calling requirements that:
+                - sub.get_output().nr() == 1
+                - sub.get_output().nc() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+            and the output labels are the raw scores for each classified object.  If a score
+            is > 0 then the classifier is predicting the +1 class for that category, otherwise
+            it is predicting the -1 class.
+        !*/
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            const_label_iterator truth,
+            SUBNET& sub
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient()
+            except it has the additional calling requirements that:
+                - sub.get_output().nr() == 1
+                - sub.get_output().nc() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+                - truth points to training_label_type elements, each of size sub.get_output.k().
+                  The elements of each truth training_label_type instance are nominally +1 or -1,
+                  each representing a binary class label.
+        !*/
+
+    };
+
+    template <typename SUBNET>
+    using loss_focal = add_loss_layer<loss_focal_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     enum class use_image_pyramid : uint8_t
