@@ -815,6 +815,8 @@ namespace dlib
 
         loss_focal_(float gamma);
         /*!
+            requires
+                - gamma >= 0
             ensures
                 - #get_gamma() == gamma
         !*/
@@ -2182,6 +2184,8 @@ namespace dlib
 
         loss_barlow_twins_(float lambda);
         /*!
+            requires
+                - lambda > 0
             ensures
                 - #get_lambda() == lambda
         !*/
