@@ -797,8 +797,9 @@ namespace dlib
                 parameter gamma which acts as a modulating factor to the cross-entropy
                 layer by reducing the relative loss for well-classified samples, and
                 focusing on the difficult ones.  As a result, this means that you might
-                want to use this loss layer when your dataset is very imbalanced.
-                Note that when gamma == 0, this loss is exactly the same as the
+                want to use this loss layer when your dataset has some kind of information
+                assymetry between classes, i.e. one class is easier to distinguish than
+                the rest.  Note that when gamma == 0, this loss is exactly the same as the
                 loss_multibinary_log_ defined above.
         !*/
 
