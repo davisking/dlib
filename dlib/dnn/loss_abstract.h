@@ -799,7 +799,9 @@ namespace dlib
                 focusing on the difficult ones.  As a result, this means that you might
                 want to use this loss layer when your dataset has some kind of information
                 assymetry between classes, i.e. one class is easier to distinguish than
-                the rest.  Note that when gamma == 0, this loss is exactly the same as the
+                the rest.  In the paper, the authors find that gamma == 2.0 works best in
+                their experiments.  However the optimal value will depend on the task.
+                Note that when gamma == 0, this loss is exactly the same as the
                 loss_multibinary_log_ defined above.
         !*/
 
