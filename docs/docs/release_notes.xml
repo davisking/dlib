@@ -15,6 +15,7 @@ New Features and Improvements:
    - Added Beta distribution to dlib::rand.
    - Deep learning tooling:
       - Added ReOrg layer.
+      - Added Focal loss layer.
       - Added visitor to draw network architectures using the DOT language.
       - Made Barlow Twins loss much faster for high dimensionality inputs.
 
