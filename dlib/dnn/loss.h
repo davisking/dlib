@@ -973,14 +973,14 @@ namespace dlib
                         const float temp = log1pexp(-out_data[idx]);
                         const float focus = std::pow(1 - g[idx], gamma);
                         loss += y * scale * temp * focus;
-                        g[idx] = y * scale * focus * (g[idx] * (1 - gamma * temp) - 1);
+                        g[idx] = y * scale * focus * (g[idx] * (gamma * temp + 1) - 1);
                     }
                     else
                     {
                         const float temp = -(-out_data[idx] - log1pexp(-out_data[idx]));
                         const float focus = std::pow(g[idx], gamma);
                         loss += -y * scale * temp * focus;
-                        g[idx] = -y * scale * focus * g[idx] * (1 - gamma * temp);
+                        g[idx] = -y * scale * focus * g[idx] * (gamma * temp + 1);
                     }
                 }
             }
