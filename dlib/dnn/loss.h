@@ -968,7 +968,6 @@ namespace dlib
                     const float y = (*truth)[k];
                     DLIB_CASSERT(y != 0, "y: " << y);
                     const size_t idx = i * output_tensor.k() + k;
-                    const float focus = std::pow(1 - g[idx], gamma);
                     if (y > 0)
                     {
                         const float temp = log1pexp(-out_data[idx]);
