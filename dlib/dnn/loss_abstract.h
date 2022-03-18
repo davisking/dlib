@@ -813,7 +813,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_gamma() == 0
+                - #get_gamma() == 2.0
         !*/
 
         loss_focal_(float gamma);

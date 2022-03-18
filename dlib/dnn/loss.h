@@ -1021,7 +1021,7 @@ namespace dlib
         }
 
     private:
-        float gamma = 0;
+        float gamma = 2.0;
     };
 
     template <typename SUBNET>
