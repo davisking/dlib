@@ -26,8 +26,10 @@ public:
     {
         thread_local int stuff1 = 999;
         auto x = 4;
+        ++stuff1;
 
         decltype(x) asdf = 9;
+        ++asdf;
 
         auto f = []() { cout << "in a lambda!" << endl; };
         f();
