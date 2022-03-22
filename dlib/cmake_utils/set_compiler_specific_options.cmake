@@ -131,8 +131,9 @@ if (CMAKE_COMPILER_IS_GNUCXX)
    list(APPEND active_compile_opts "-Wreturn-type")
 endif()
 
-if ("Clang" MATCHES ${CMAKE_CXX_COMPILER_ID})
-   # Increase clang's default tempalte recurision depth so the dnn examples don't error out.
+if ("Clang" MATCHES ${CMAKE_CXX_COMPILER_ID} AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.0.0)
+   # Clang 6 had a default template recursion depth of 256. This was changed to 1024 in Clang 7.
+   # It must be increased on Clang 6 and below to ensure that the dnn examples don't error out.
    list(APPEND active_compile_opts "-ftemplate-depth=500")
 endif()
 
