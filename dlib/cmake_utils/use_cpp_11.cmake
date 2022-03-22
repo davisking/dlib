@@ -22,13 +22,15 @@ set(COMPILER_CAN_DO_CPP_11 0)
 macro(test_compiler_for_cpp11)
    message(STATUS "Building a C++11 test project to see if your compiler supports C++11")
    try_compile(test_for_cpp11_worked ${PROJECT_BINARY_DIR}/cpp11_test_build 
-      ${_where_is_cmake_utils_dir}/test_for_cpp11 cpp11_test)
+      ${_where_is_cmake_utils_dir}/test_for_cpp11 cpp11_test
+      OUTPUT_VARIABLE cpp11_test_output)
    if (test_for_cpp11_worked)
       message(STATUS "C++11 activated.")
       set(COMPILER_CAN_DO_CPP_11 1)
    else()
       set(COMPILER_CAN_DO_CPP_11 0)
       message(STATUS "********** Your compiler failed to build a C++11 project.  C++11 is required to use all parts of dlib! **********")
+      message(STATUS "********** Compiler output: ${cpp11_test_output} **********")
    endif()
 endmacro()
 
