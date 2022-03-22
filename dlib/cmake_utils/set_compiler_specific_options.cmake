@@ -151,7 +151,8 @@ if (MSVC)
 
    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 3.3) 
       # Clang can compile all Dlib's code at Windows platform. Tested with Clang 5
-      list(APPEND active_compile_opts "-Xclang -fcxx-exceptions")
+      list(APPEND active_compile_opts -Xclang)
+      list(APPEND active_compile_opts -fcxx-exceptions)
    endif()
 endif()
 
