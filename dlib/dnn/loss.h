@@ -877,10 +877,19 @@ namespace dlib
         {
             std::string version;
             deserialize(version, in);
-            if (version != "loss_multibinary_log_" || version != "loss_multibinary_log_2")
-                throw serialization_error("Unexpected version found while deserializing dlib::loss_multibinary_log_.");
-            if (version == "loss_multibinary_log_2")
+            if (version == "loss_multibinary_log_")
+            {
+                item.gamma = 0;
+                return;
+            }
+            else if (version == "loss_multibinary_log_2")
+            {
                 deserialize(item.gamma, in);
+            }
+            else
+            {
+                throw serialization_error("Unexpected version found while deserializing dlib::loss_multibinary_log_.");
+            }
         }
 
         friend std::ostream& operator<<(std::ostream& out, const loss_multibinary_log_& item)
