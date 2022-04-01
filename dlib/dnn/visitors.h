@@ -24,24 +24,24 @@ namespace dlib
             dpoint& p;
 
             template<typename input_layer_type>
-            void operator()(const input_layer_type& ) 
+            void operator()(const input_layer_type& )
             {
             }
 
             template <typename T, typename U>
-            void operator()(const add_loss_layer<T,U>& net) 
+            void operator()(const add_loss_layer<T,U>& net)
             {
                 (*this)(net.subnet());
             }
 
             template <typename T, typename U, typename E>
-            void operator()(const add_layer<T,U,E>& net) 
+            void operator()(const add_layer<T,U,E>& net)
             {
                 (*this)(net.subnet());
                 p = net.layer_details().map_input_to_output(p);
             }
             template <bool B, typename T, typename U, typename E>
-            void operator()(const dimpl::subnet_wrapper<add_layer<T,U,E>,B>& net) 
+            void operator()(const dimpl::subnet_wrapper<add_layer<T,U,E>,B>& net)
             {
                 (*this)(net.subnet());
                 p = net.layer_details().map_input_to_output(p);
@@ -58,13 +58,13 @@ namespace dlib
 
 
             template <unsigned long ID, typename U, typename E>
-            void operator()(const add_tag_layer<ID,U,E>& net) 
+            void operator()(const add_tag_layer<ID,U,E>& net)
             {
                 // tag layers are an identity transform, so do nothing
                 (*this)(net.subnet());
             }
             template <bool is_first, unsigned long ID, typename U, typename E>
-            void operator()(const dimpl::subnet_wrapper<add_tag_layer<ID,U,E>,is_first>& net) 
+            void operator()(const dimpl::subnet_wrapper<add_tag_layer<ID,U,E>,is_first>& net)
             {
                 // tag layers are an identity transform, so do nothing
                 (*this)(net.subnet());
@@ -72,12 +72,12 @@ namespace dlib
 
 
             template <template<typename> class TAG_TYPE, typename U>
-            void operator()(const add_skip_layer<TAG_TYPE,U>& net) 
+            void operator()(const add_skip_layer<TAG_TYPE,U>& net)
             {
                 (*this)(layer<TAG_TYPE>(net));
             }
             template <bool is_first, template<typename> class TAG_TYPE, typename SUBNET>
-            void operator()(const dimpl::subnet_wrapper<add_skip_layer<TAG_TYPE,SUBNET>,is_first>& net) 
+            void operator()(const dimpl::subnet_wrapper<add_skip_layer<TAG_TYPE,SUBNET>,is_first>& net)
             {
                 // skip layers are an identity transform, so do nothing
                 (*this)(layer<TAG_TYPE>(net));
@@ -93,24 +93,24 @@ namespace dlib
             dpoint& p;
 
             template<typename input_layer_type>
-            void operator()(const input_layer_type& ) 
+            void operator()(const input_layer_type& )
             {
             }
 
             template <typename T, typename U>
-            void operator()(const add_loss_layer<T,U>& net) 
+            void operator()(const add_loss_layer<T,U>& net)
             {
                 (*this)(net.subnet());
             }
 
             template <typename T, typename U, typename E>
-            void operator()(const add_layer<T,U,E>& net) 
+            void operator()(const add_layer<T,U,E>& net)
             {
                 p = net.layer_details().map_output_to_input(p);
                 (*this)(net.subnet());
             }
             template <bool B, typename T, typename U, typename E>
-            void operator()(const dimpl::subnet_wrapper<add_layer<T,U,E>,B>& net) 
+            void operator()(const dimpl::subnet_wrapper<add_layer<T,U,E>,B>& net)
             {
                 p = net.layer_details().map_output_to_input(p);
                 (*this)(net.subnet());
@@ -127,13 +127,13 @@ namespace dlib
 
 
             template <unsigned long ID, typename U, typename E>
-            void operator()(const add_tag_layer<ID,U,E>& net) 
+            void operator()(const add_tag_layer<ID,U,E>& net)
             {
                 // tag layers are an identity transform, so do nothing
                 (*this)(net.subnet());
             }
             template <bool is_first, unsigned long ID, typename U, typename E>
-            void operator()(const dimpl::subnet_wrapper<add_tag_layer<ID,U,E>,is_first>& net) 
+            void operator()(const dimpl::subnet_wrapper<add_tag_layer<ID,U,E>,is_first>& net)
             {
                 // tag layers are an identity transform, so do nothing
                 (*this)(net.subnet());
@@ -141,12 +141,12 @@ namespace dlib
 
 
             template <template<typename> class TAG_TYPE, typename U>
-            void operator()(const add_skip_layer<TAG_TYPE,U>& net) 
+            void operator()(const add_skip_layer<TAG_TYPE,U>& net)
             {
                 (*this)(layer<TAG_TYPE>(net));
             }
             template <bool is_first, template<typename> class TAG_TYPE, typename SUBNET>
-            void operator()(const dimpl::subnet_wrapper<add_skip_layer<TAG_TYPE,SUBNET>,is_first>& net) 
+            void operator()(const dimpl::subnet_wrapper<add_skip_layer<TAG_TYPE,SUBNET>,is_first>& net)
             {
                 // skip layers are an identity transform, so do nothing
                 (*this)(layer<TAG_TYPE>(net));
@@ -158,7 +158,7 @@ namespace dlib
     template <typename net_type>
     inline dpoint input_tensor_to_output_tensor(
         const net_type& net,
-        dpoint p 
+        dpoint p
     )
     {
         impl::visitor_net_map_input_to_output temp(p);
@@ -169,7 +169,7 @@ namespace dlib
     template <typename net_type>
     inline dpoint output_tensor_to_input_tensor(
         const net_type& net,
-        dpoint p  
+        dpoint p
     )
     {
         impl::visitor_net_map_output_to_input temp(p);
@@ -236,6 +236,45 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        class visitor_bn_running_stats_window_size
+        {
+        public:
+
+            visitor_bn_running_stats_window_size(unsigned long new_window_size_) : new_window_size(new_window_size_) {}
+
+            template <typename T>
+            void set_window_size(T&) const
+            {
+                // ignore other layer detail types
+            }
+
+            template < layer_mode mode >
+            void set_window_size(bn_<mode>& l) const
+            {
+                l.set_running_stats_window_size(new_window_size);
+            }
+
+            template<typename input_layer_type>
+            void operator()(size_t , input_layer_type& )  const
+            {
+                // ignore other layers
+            }
+
+            template <typename T, typename U, typename E>
+            void operator()(size_t , add_layer<T,U,E>& l)  const
+            {
+                set_window_size(l.layer_details());
+            }
+
+        private:
+
+            unsigned long new_window_size;
+        };
+    }
+
     template <typename net_type>
     void set_all_bn_running_stats_window_sizes (
         net_type& net,
@@ -245,6 +284,102 @@ namespace dlib
         visit_layers(net, impl::visitor_bn_running_stats_window_size(new_window_size));
     }
 
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        class visitor_disable_input_bias
+        {
+        public:
+
+            template <typename T>
+            void disable_input_bias(T&) const
+            {
+                // ignore other layer types
+            }
+
+            // handle the standard case
+            template <typename U, typename E>
+            void disable_input_bias(add_layer<layer_norm_, U, E>& l)
+            {
+                disable_bias(l.subnet().layer_details());
+                set_bias_learning_rate_multiplier(l.subnet().layer_details(), 0);
+                set_bias_weight_decay_multiplier(l.subnet().layer_details(), 0);
+            }
+
+            template <layer_mode mode, typename U, typename E>
+            void disable_input_bias(add_layer<bn_<mode>, U, E>& l)
+            {
+                disable_bias(l.subnet().layer_details());
+                set_bias_learning_rate_multiplier(l.subnet().layer_details(), 0);
+                set_bias_weight_decay_multiplier(l.subnet().layer_details(), 0);
+            }
+
+            // handle input repeat layer case
+            template <layer_mode mode, size_t N, template <typename> class R, typename U, typename E>
+            void disable_input_bias(add_layer<bn_<mode>, repeat<N, R, U>, E>& l)
+            {
+                disable_bias(l.subnet().get_repeated_layer(0).layer_details());
+                set_bias_learning_rate_multiplier(l.subnet().get_repeated_layer(0).layer_details(), 0);
+                set_bias_weight_decay_multiplier(l.subnet().get_repeated_layer(0).layer_details(), 0);
+            }
+
+            template <size_t N, template <typename> class R, typename U, typename E>
+            void disable_input_bias(add_layer<layer_norm_, repeat<N, R, U>, E>& l)
+            {
+                disable_bias(l.subnet().get_repeated_layer(0).layer_details());
+                set_bias_learning_rate_multiplier(l.subnet().get_repeated_layer(0).layer_details(), 0);
+                set_bias_weight_decay_multiplier(l.subnet().get_repeated_layer(0).layer_details(), 0);
+            }
+
+            // handle input repeat layer with tag case
+            template <layer_mode mode, unsigned long ID, typename E>
+            void disable_input_bias(add_layer<bn_<mode>, add_tag_layer<ID, impl::repeat_input_layer>, E>& )
+            {
+            }
+
+            template <unsigned long ID, typename E>
+            void disable_input_bias(add_layer<layer_norm_, add_tag_layer<ID, impl::repeat_input_layer>, E>& )
+            {
+            }
+
+            // handle tag layer case
+            template <layer_mode mode, unsigned long ID, typename U, typename E>
+            void disable_input_bias(add_layer<bn_<mode>, add_tag_layer<ID, U>, E>& )
+            {
+            }
+
+            template <unsigned long ID, typename U, typename E>
+            void disable_input_bias(add_layer<layer_norm_, add_tag_layer<ID, U>, E>& )
+            {
+            }
+
+            // handle skip layer case
+            template <layer_mode mode, template <typename> class TAG, typename U, typename E>
+            void disable_input_bias(add_layer<bn_<mode>, add_skip_layer<TAG, U>, E>& )
+            {
+            }
+
+            template <template <typename> class TAG, typename U, typename E>
+            void disable_input_bias(add_layer<layer_norm_, add_skip_layer<TAG, U>, E>& )
+            {
+            }
+
+            template<typename input_layer_type>
+            void operator()(size_t , input_layer_type& ) const
+            {
+                // ignore other layers
+            }
+
+            template <typename T, typename U, typename E>
+            void operator()(size_t , add_layer<T,U,E>& l)
+            {
+                disable_input_bias(l);
+            }
+        };
+    }
+
+
     template <typename net_type>
     void disable_duplicative_biases (
         net_type& net
@@ -253,7 +388,6 @@ namespace dlib
         visit_layers(net, impl::visitor_disable_input_bias());
     }
 
-// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     namespace impl
@@ -332,7 +466,6 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
 
     namespace impl
     {
@@ -343,7 +476,7 @@ namespace dlib
             visitor_net_to_xml(std::ostream& out_) : out(out_) {}
 
             template<typename input_layer_type>
-            void operator()(size_t idx, const input_layer_type& l) 
+            void operator()(size_t idx, const input_layer_type& l)
             {
                 out << "<layer idx='"<<idx<<"' type='input'>\n";
                 to_xml(l,out);
@@ -351,7 +484,7 @@ namespace dlib
             }
 
             template <typename T, typename U>
-            void operator()(size_t idx, const add_loss_layer<T,U>& l) 
+            void operator()(size_t idx, const add_loss_layer<T,U>& l)
             {
                 out << "<layer idx='"<<idx<<"' type='loss'>\n";
                 to_xml(l.loss_details(),out);
@@ -359,7 +492,7 @@ namespace dlib
             }
 
             template <typename T, typename U, typename E>
-            void operator()(size_t idx, const add_layer<T,U,E>& l) 
+            void operator()(size_t idx, const add_layer<T,U,E>& l)
             {
                 out << "<layer idx='"<<idx<<"' type='comp'>\n";
                 to_xml(l.layer_details(),out);
@@ -367,13 +500,13 @@ namespace dlib
             }
 
             template <unsigned long ID, typename U, typename E>
-            void operator()(size_t idx, const add_tag_layer<ID,U,E>& /*l*/) 
+            void operator()(size_t idx, const add_tag_layer<ID,U,E>& /*l*/)
             {
                 out << "<layer idx='"<<idx<<"' type='tag' id='"<<ID<<"'/>\n";
             }
 
             template <template<typename> class T, typename U>
-            void operator()(size_t idx, const add_skip_layer<T,U>& /*l*/) 
+            void operator()(size_t idx, const add_skip_layer<T,U>& /*l*/)
             {
                 out << "<layer idx='"<<idx<<"' type='skip' id='"<<(tag_id<T>::id)<<"'/>\n";
             }
@@ -409,7 +542,6 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
 
     namespace impl
     {
@@ -419,8 +551,6 @@ namespace dlib
 
             visitor_net_to_dot(std::ostream& out) : out(out) {}
 
-// ----------------------------------------------------------------------------------------
-
             template <typename input_layer_type>
             void operator()(size_t i, input_layer_type&)
             {
@@ -429,17 +559,13 @@ namespace dlib
                 from = i;
             }
 
-// ----------------------------------------------------------------------------------------
-
-            template <typename T, typename U> 
+            template <typename T, typename U>
             void operator()(size_t i, const add_loss_layer<T, U>&)
             {
                 start_node(i, "loss");
                 end_node();
                 update(i);
             }
-
-// ----------------------------------------------------------------------------------------
 
             template <template <typename> class... TAGS, typename U>
             void operator()(size_t i, const add_loss_layer<loss_yolo_<TAGS...>, U>&)
@@ -452,8 +578,6 @@ namespace dlib
                 for (const auto& tag : tags)
                     out << tag_to_layer.at(std::stoul(tag)) << " -> " << i << '\n';
             }
-
-// ----------------------------------------------------------------------------------------
 
             template <unsigned long ID, typename U, typename E>
             void operator()(size_t i, const add_tag_layer<ID, U, E>&)
@@ -484,16 +608,12 @@ namespace dlib
                 // update(i);
             }
 
-// ----------------------------------------------------------------------------------------
-
             template <template <typename> class TAG, typename U>
             void operator()(size_t, const add_skip_layer<TAG, U>&)
             {
                 const auto t = tag_id<TAG>::id;
                 from = tag_to_layer.at(t);
             }
-
-// ----------------------------------------------------------------------------------------
 
             template <long nf, long nr, long nc, int sy, int sx, int py, int px, typename U, typename E>
             void operator()(size_t i, const add_layer<con_<nf, nr, nc, sy, sx, py, px>, U, E>& l)
@@ -509,8 +629,6 @@ namespace dlib
                 update(i);
             }
 
-// ----------------------------------------------------------------------------------------
-
             template <long nf, long nr, long nc, int sy, int sx, int py, int px, typename U, typename E>
             void operator()(size_t i, const add_layer<cont_<nf, nr, nc, sy, sx, py, px>, U, E>& l)
             {
@@ -525,19 +643,15 @@ namespace dlib
                 update(i);
             }
 
-// ----------------------------------------------------------------------------------------
-
             template <int sy, int sx, typename U, typename E>
             void operator()(size_t i, const add_layer<upsample_<sy, sx>, U, E>&)
             {
                 start_node(i, "upsample");
                 if (sy != 1 || sx != 1)
-                    out << " | {stride|{" << sy<< "," << sx << "}}";
+                    out << " | {scale|{" << sy<< "," << sx << "}}";
                 end_node();
                 update(i);
             }
-
-// ----------------------------------------------------------------------------------------
 
             template <int NR, int NC, typename U, typename E>
             void operator()(size_t i, const add_layer<resize_to_<NR, NC>, U, E>&)
@@ -547,8 +661,6 @@ namespace dlib
                 end_node();
                 update(i);
             }
-
-// ----------------------------------------------------------------------------------------
 
             template <long nr, long nc, int sy, int sx, int py, int px, typename U, typename E>
             void operator()(size_t i, const add_layer<max_pool_<nr, nc, sy, sx, py, px>, U, E>&)
@@ -563,8 +675,6 @@ namespace dlib
                 update(i);
             }
 
-// ----------------------------------------------------------------------------------------
-
             template <long nr, long nc, int sy, int sx, int py, int px, typename U, typename E>
             void operator()(size_t i, const add_layer<avg_pool_<nr, nc, sy, sx, py, px>, U, E>&)
             {
@@ -578,8 +688,6 @@ namespace dlib
                 update(i);
             }
 
-// ----------------------------------------------------------------------------------------
-
             template <typename U, typename E>
             void operator()(size_t i, const add_layer<layer_norm_, U, E>&)
             {
@@ -588,8 +696,6 @@ namespace dlib
                 update(i);
             }
 
-// ----------------------------------------------------------------------------------------
-
             template <layer_mode MODE, typename U, typename E>
             void operator()(size_t i, const add_layer<bn_<MODE>, U, E>&)
             {
@@ -597,8 +703,6 @@ namespace dlib
                 end_node();
                 update(i);
             }
-
-// ----------------------------------------------------------------------------------------
 
             template <unsigned long no, fc_bias_mode bm, typename U, typename E>
             void operator()(size_t i, const add_layer<fc_<no, bm>, U, E>& l)
@@ -609,8 +713,6 @@ namespace dlib
                 update(i);
             }
 
-// ----------------------------------------------------------------------------------------
-
             template <typename U, typename E>
             void operator()(size_t i, const add_layer<dropout_, U, E>&)
             {
@@ -618,8 +720,6 @@ namespace dlib
                 end_node();
                 update(i);
             }
-
-// ----------------------------------------------------------------------------------------
 
             template <typename U, typename E>
             void operator()(size_t i, const add_layer<multiply_, U, E>&)
@@ -629,8 +729,6 @@ namespace dlib
                 update(i);
             }
 
-// ----------------------------------------------------------------------------------------
-
             template <typename U, typename E>
             void operator()(size_t i, const add_layer<affine_, U, E>&)
             {
@@ -638,8 +736,6 @@ namespace dlib
                 end_node();
                 update(i);
             }
-
-// ----------------------------------------------------------------------------------------
 
             template <template <typename> class TAG, typename U, typename E>
             void operator()(size_t i, const add_layer<add_prev_<TAG>, U, E>&)
@@ -651,8 +747,6 @@ namespace dlib
                 update(i);
             }
 
-// ----------------------------------------------------------------------------------------
-
             template <template <typename> class TAG, typename U, typename E>
             void operator()(size_t i, const add_layer<mult_prev_<TAG>, U, E>&)
             {
@@ -662,8 +756,6 @@ namespace dlib
                 out << tag_to_layer.at(t) << " -> " << i << '\n';
                 update(i);
             }
-
-// ----------------------------------------------------------------------------------------
 
             template <template <typename> class TAG, typename U, typename E>
             void operator()(size_t i, const add_layer<resize_prev_to_tagged_<TAG>, U, E>&)
@@ -676,8 +768,6 @@ namespace dlib
                 from = i;
             }
 
-// ----------------------------------------------------------------------------------------
-
             template <template <typename> class TAG, typename U, typename E>
             void operator()(size_t i, const add_layer<scale_<TAG>, U, E>&)
             {
@@ -687,8 +777,6 @@ namespace dlib
                 out << tag_to_layer.at(t) << " -> " << i << '\n';
                 update(i);
             }
-
-// ----------------------------------------------------------------------------------------
 
             template <template <typename> class TAG, typename U, typename E>
             void operator()(size_t i, const add_layer<scale_prev_<TAG>, U, E>&)
@@ -700,8 +788,6 @@ namespace dlib
                 update(i);
             }
 
-// ----------------------------------------------------------------------------------------
-
             template <typename U, typename E>
             void operator()(size_t i, const add_layer<relu_, U, E>&)
             {
@@ -709,8 +795,6 @@ namespace dlib
                 end_node();
                 update(i);
             }
-
-// ----------------------------------------------------------------------------------------
 
             template <typename U, typename E>
             void operator()(size_t i, const add_layer<prelu_, U, E>&)
@@ -720,8 +804,6 @@ namespace dlib
                 update(i);
             }
 
-// ----------------------------------------------------------------------------------------
-
             template <typename U, typename E>
             void operator()(size_t i, const add_layer<leaky_relu_, U, E>&)
             {
@@ -729,8 +811,6 @@ namespace dlib
                 end_node();
                 update(i);
             }
-
-// ----------------------------------------------------------------------------------------
 
             template <typename U, typename E>
             void operator()(size_t i, const add_layer<sig_, U, E>&)
@@ -740,8 +820,6 @@ namespace dlib
                 update(i);
             }
 
-// ----------------------------------------------------------------------------------------
-
             template <typename U, typename E>
             void operator()(size_t i, const add_layer<mish_, U, E>&)
             {
@@ -749,8 +827,6 @@ namespace dlib
                 end_node();
                 update(i);
             }
-
-// ----------------------------------------------------------------------------------------
 
             template <typename U, typename E>
             void operator()(size_t i, const add_layer<htan_, U, E>&)
@@ -760,8 +836,6 @@ namespace dlib
                 update(i);
             }
 
-// ----------------------------------------------------------------------------------------
-
             template <typename U, typename E>
             void operator()(size_t i, const add_layer<clipped_relu_, U, E>&)
             {
@@ -769,8 +843,6 @@ namespace dlib
                 end_node();
                 update(i);
             }
-
-// ----------------------------------------------------------------------------------------
 
             template <typename U, typename E>
             void operator()(size_t i, const add_layer<elu_, U, E>&)
@@ -780,8 +852,6 @@ namespace dlib
                 update(i);
             }
 
-// ----------------------------------------------------------------------------------------
-
             template <typename U, typename E>
             void operator()(size_t i, const add_layer<gelu_, U, E>&)
             {
@@ -789,8 +859,6 @@ namespace dlib
                 end_node();
                 update(i);
             }
-
-// ----------------------------------------------------------------------------------------
 
             template <typename U, typename E>
             void operator()(size_t i, const add_layer<softmax_, U, E>&)
@@ -800,8 +868,6 @@ namespace dlib
                 update(i);
             }
 
-// ----------------------------------------------------------------------------------------
-
             template <typename U, typename E>
             void operator()(size_t i, const add_layer<softmax_all_, U, E>&)
             {
@@ -809,8 +875,6 @@ namespace dlib
                 end_node();
                 update(i);
             }
-
-// ----------------------------------------------------------------------------------------
 
             template <template <typename> class... TAGS, typename U, typename E>
             void operator()(size_t i, const add_layer<concat_<TAGS...>, U, E>&)
@@ -825,8 +889,6 @@ namespace dlib
                 from = i;
             }
 
-// ----------------------------------------------------------------------------------------
-
             template <typename U, typename E>
             void operator()(size_t i, const add_layer<l2normalize_, U, E>&)
             {
@@ -834,8 +896,6 @@ namespace dlib
                 end_node();
                 update(i);
             }
-
-// ----------------------------------------------------------------------------------------
 
             template <long offset, long k, int nr, int nc, typename U, typename E>
             void operator()(size_t i, const add_layer<extract_<offset, k, nr, nc>, U, E>&)
@@ -849,8 +909,6 @@ namespace dlib
                 update(i);
             }
 
-// ----------------------------------------------------------------------------------------
-
             template <long long sy, long long sx, typename U, typename E>
             void operator()(size_t i, const add_layer<reorg_<sy, sx>, U, E>&)
             {
@@ -861,16 +919,12 @@ namespace dlib
                 update(i);
             }
 
-// ----------------------------------------------------------------------------------------
-
             template <typename T, typename U, typename E>
             void operator()(size_t i, const add_layer<T, U, E>&)
             {
                 start_node(i, "unhandled layer");
                 update(i);
             }
-
-// ----------------------------------------------------------------------------------------
 
         private:
             size_t from;
@@ -914,6 +968,9 @@ namespace dlib
         std::ofstream fout(filename);
         net_to_dot(net, fout);
     }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_VISITORS_H_

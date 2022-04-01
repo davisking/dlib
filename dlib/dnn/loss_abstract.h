@@ -718,6 +718,15 @@ namespace dlib
                 To be more specific, this object contains a sigmoid layer followed by a
                 cross-entropy layer.
 
+                Additionaly, this layer also contains a focusing parameter gamma, which
+                acts as a modulating factor to the cross-entropy layer by reducing the
+                relative loss for well-classified examples, and focusing on the difficult
+                ones.  This gamma parameter makes this layer behave like the Focal loss,
+                presented in the paper:
+                    Focal Loss for Dense Object Detection
+                    by Tsung-Yi Lin, Priya Goyal, Ross Girshick, Kaiming He, Piotr Dollár
+                    (https://arxiv.org/abs/1708.02002)
+
                 An example will make its use clear.  So suppose, for example, that you want
                 to make a classifier for cats and dogs, but what happens if they both
                 appear in one image? Or none of them? This layer allows you to handle
@@ -727,9 +736,31 @@ namespace dlib
                     - std::vector<float> both_label = {1.f, 1.f};
                     - std::vector<float> none_label = {-1.f, -1.f};
         !*/
+
     public:
         typedef std::vector<float> training_label_type;
         typedef std::vector<float> output_label_type;
+
+        loss_multibinary_log_ (
+        );
+        /*!
+            ensures
+                - #get_gamma() == 0
+        !*/
+
+        loss_multibinary_log_(double gamma);
+        /*!
+            requires
+                - gamma >= 0
+            ensures
+                - #get_gamma() == gamma
+        !*/
+
+        double get_gamma() const;
+        /*!
+            ensures
+                - returns the gamma value used by the loss function.
+        !*/
 
         template <
             typename SUB_TYPE,
