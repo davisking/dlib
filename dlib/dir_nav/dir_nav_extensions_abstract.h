@@ -30,7 +30,7 @@ namespace dlib
     );
     /*!
         ensures
-            - if (a directory with the given filename exists) then
+            - if (a directory with the given dirname exists) then
                 - returns true
             - else
                 - returns false
