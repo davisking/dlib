@@ -1998,6 +1998,61 @@ namespace dlib
             }
         }
 
+        void smelu (
+            tensor& dest,
+            const tensor& src,
+            const float beta
+        )
+        {
+            const float* s = src.host();
+            float* d = dest.host();
+            for (size_t i = 0; i < dest.size(); ++i)
+            {
+                if (s[i] >= beta)
+                    d[i] = s[i];
+                else if (s[i] <= -beta)
+                    d[i] = 0;
+                else
+                    d[i] = (s[i] + beta) * (s[i] + beta) / (4 * beta);
+            }
+        }
+
+        void smelu_gradient (
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input,
+            const float beta
+        )
+        {
+            const float* gi = gradient_input.host();
+            const float* in = dest.host();
+            float* out = grad.host();
+            if (is_same_object(grad, gradient_input))
+            {
+                for (size_t i = 0; i < dest.size(); ++i)
+                {
+                    if (in[i] >= beta)
+                        out[i] = gi[i];
+                    else if (in[i] == 0)
+                        out[i] = 0;
+                    else
+                        out[i] = std::sqrt(beta * in[i]) / beta * gi[i];
+                }
+            }
+            else
+            {
+                for (size_t i = 0; i < dest.size(); ++i)
+                {
+                    if (in[i] >= beta)
+                        out[i] += gi[i];
+                    else if (in[i] == 0)
+                        continue;
+                    else
+                        out[i] += std::sqrt(beta * in[i]) / beta * gi[i];
+                }
+            }
+        }
+
     // ----------------------------------------------------------------------------------------
 
         void resize_bilinear (

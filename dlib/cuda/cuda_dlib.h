@@ -465,6 +465,21 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        void smelu (
+            tensor& dest,
+            const tensor& src,
+            const float beta
+        );
+
+        void smelu_gradient (
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input,
+            const float beta
+        );
+
+    // ------------------------------------------------------------------------------------
+
         void resize_bilinear (
             tensor& dest,
             long long dest_row_stride,
