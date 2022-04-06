@@ -3113,6 +3113,7 @@ namespace dlib
     using prelu = add_layer<prelu_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
+
     class leaky_relu_
     {
     public:
@@ -3628,6 +3629,85 @@ namespace dlib
 
     template <typename SUBNET>
     using gelu = add_layer<gelu_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class smelu_
+    {
+    public:
+        explicit smelu_(
+            float beta_ = 1
+        ) : beta(beta_)
+        {
+        }
+
+        float get_beta(
+        ) const {
+            return beta;
+        }
+
+        template <typename SUBNET>
+        void setup(const SUBNET& /*sub*/)
+        {
+        }
+
+        void forward_inplace(const tensor& input, tensor& output)
+        {
+            tt::smelu(output, input, beta);
+        }
+
+        void backward_inplace(
+            const tensor& computed_output,
+            const tensor& gradient_input,
+            tensor& data_grad,
+            tensor&
+        )
+        {
+            tt::smelu_gradient(data_grad, computed_output, gradient_input, beta);
+        }
+
+        inline dpoint map_input_to_output (const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input (const dpoint& p) const { return p; }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const smelu_& item, std::ostream& out)
+        {
+            serialize("smelu_", out);
+            serialize(item.beta, out);
+        }
+
+        friend void deserialize(smelu_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "smelu_")
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::smelu_.");
+            deserialize(item.beta, in);
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const smelu_& item)
+        {
+            out << "smelu\t("
+                << "beta=" << item.beta
+                << ")";
+            return out;
+        }
+
+        friend void to_xml(const smelu_& item, std::ostream& out)
+        {
+            out << "<smelu beta='"<< item.beta << "'>\n";
+            out << "<smelu/>\n";
+        }
+
+    private:
+        resizable_tensor params;
+        float beta;
+    };
+
+    template <typename SUBNET>
+    using smelu = add_layer<smelu_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
