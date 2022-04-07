@@ -19,6 +19,7 @@ New Features and Improvements:
       - Added visitor to draw network architectures using the DOT language.
       - Made Barlow Twins loss much faster for high dimensionality inputs.
       - Added Focal loss gamma to loss_multibinary_log_.
+      - Added SmeLU activation layer.
 
 Non-Backwards Compatible Changes:
    - Do not round coordinates in rectangle_transform (PR #2498).
