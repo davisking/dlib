@@ -189,9 +189,9 @@
          <term file="dlib/dnn/layers_abstract.h.html" name="clipped_relu_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="gelu_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="leaky_relu_" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/layers_abstract.h.html" name="prelu_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="mish_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="prelu_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="smelu_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="sig_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="htan_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="softmax_" include="dlib/dnn.h"/>
