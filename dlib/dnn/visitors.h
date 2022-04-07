@@ -805,9 +805,10 @@ namespace dlib
             }
 
             template <typename U, typename E>
-            void operator()(size_t i, const add_layer<leaky_relu_, U, E>&)
+            void operator()(size_t i, const add_layer<leaky_relu_, U, E>& l)
             {
                 start_node(i, "leaky_relu");
+                out << " | { alpha |{" << l.layer_details().get_alpha() << "}}";
                 end_node();
                 update(i);
             }
@@ -856,6 +857,15 @@ namespace dlib
             void operator()(size_t i, const add_layer<gelu_, U, E>&)
             {
                 start_node(i, "gelu");
+                end_node();
+                update(i);
+            }
+
+            template <typename U, typename E>
+            void operator()(size_t i, const add_layer<smelu_, U, E>& l)
+            {
+                start_node(i, "smelu");
+                out << " | { beta |{" << l.layer_details().get_beta() << "}}";
                 end_node();
                 update(i);
             }
