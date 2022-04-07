@@ -427,7 +427,7 @@ namespace dlib
             const float beta
         );
 
-        void smelu (
+        void smelu_gradient (
             tensor& grad,
             const tensor& dest,
             const tensor& gradient_input,
