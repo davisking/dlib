@@ -25,6 +25,19 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    bool directory_exists (
+        const std::string& dirname
+    );
+    /*!
+        ensures
+            - if (a directory with the given dirname exists) then
+                - returns true
+            - else
+                - returns false
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <typename T>
     const std::vector<file> get_files_in_directory_tree (
         const directory& top_of_tree,

@@ -1094,6 +1094,7 @@
          <term file="dlib/dir_nav/dir_nav_extensions_abstract.h.html" name="get_files_in_directory_tree"    include="dlib/dir_nav.h"/>
          <term file="dlib/dir_nav/dir_nav_extensions_abstract.h.html" name="get_parent_directory"     include="dlib/dir_nav.h"/>
          <term file="dlib/dir_nav/dir_nav_extensions_abstract.h.html" name="file_exists"        include="dlib/dir_nav.h"/>
+         <term file="dlib/dir_nav/dir_nav_extensions_abstract.h.html" name="directory_exists"        include="dlib/dir_nav.h"/>
          <term file="dlib/dir_nav/dir_nav_extensions_abstract.h.html" name="select_oldest_file"        include="dlib/dir_nav.h"/>
          <term file="dlib/dir_nav/dir_nav_extensions_abstract.h.html" name="select_newest_file"        include="dlib/dir_nav.h"/>
          <term file="dlib/dir_nav/dir_nav_extensions_abstract.h.html" name="match_ending"       include="dlib/dir_nav.h"/>
