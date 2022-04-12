@@ -166,13 +166,22 @@ set (tests
 # cmake that they are part of our target (which is the executable named dtest)
 ADD_EXECUTABLE(${target_name} main.cpp tester.cpp ${tests})
 
-# Turn on all warnings when using gcc.
 if (CMAKE_COMPILER_IS_GNUCXX)
-   add_definitions("-W -Wall")
+   # Turn on all warnings, and treat them as errors.
+   add_definitions("-W -Wall -Wextra -Werror")
    # I don't care about unused testing functions though.  I like to keep them
    # around.  Don't warn about it.
    add_definitions("-Wno-unused-function")
    add_definitions("-Wno-strict-overflow")
+   add_definitions("-Wno-maybe-uninitialized")
+elseif (MSVC)
+   # Treat warnings as errors.
+   add_definitions("/WX")
+else() # basically Clang
+   # Treat warnings as errors, but do not turn on all warnings.
+   add_definitions("-W -Werror")
+   # This is for the comment in face_detection_ex.cpp that says "faces/*.jpg"
+   add_definitions("-Wno-comment")
 endif()
 
 
@@ -181,6 +190,12 @@ TARGET_LINK_LIBRARIES(${target_name} dlib::dlib )
 
 if (NOT DLIB_NO_GUI_SUPPORT)
    add_subdirectory(gui)
-   add_subdirectory(examples)
    add_subdirectory(tools)
+
+   if (CMAKE_COMPILER_IS_GNUCXX)
+      # The tutorials set some variables that are not used.
+      add_definitions("-Wno-unused-but-set-variable")
+   endif()
+
+   add_subdirectory(examples)
 endif()

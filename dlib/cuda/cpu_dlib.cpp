@@ -2479,7 +2479,7 @@ namespace dlib
             float* t = &output(0,0);
 
             // now fill in the Toeplitz output matrix for the n-th sample in data.  
-            size_t cnt = 0;
+            long cnt = 0;
             const long max_r = data.nr() + padding_y-(filter_nr-1);
             const long max_c = data.nc() + padding_x-(filter_nc-1);
             for (long r = -padding_y; r < max_r; r+=stride_y)

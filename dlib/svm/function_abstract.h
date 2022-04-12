@@ -65,14 +65,6 @@ namespace dlib
         !*/
 
         decision_function (
-            const decision_function& f
-        );
-        /*!
-            ensures
-                - #*this is a copy of f
-        !*/
-
-        decision_function (
             const scalar_vector_type& alpha_,
             const scalar_type& b_,
             const K& kernel_function_,
@@ -167,14 +159,6 @@ namespace dlib
                 - #alpha == 0
                 - #beta == 0
                 - #decision_funct has its initial value
-        !*/
-
-        probabilistic_function (
-            const probabilistic_function& f
-        );
-        /*!
-            ensures
-                - #*this is a copy of f
         !*/
 
         probabilistic_function (
@@ -282,15 +266,7 @@ namespace dlib
         !*/
 
         probabilistic_decision_function (
-            const probabilistic_decision_function& f
-        );
-        /*!
-            ensures
-                - #*this is a copy of f
-        !*/
-
-        probabilistic_decision_function (
-            const probabilistic_function<decision_function<K> >& d
+            const probabilistic_function<decision_function<K> >& f
         );
         /*!
             ensures
@@ -443,17 +419,6 @@ namespace dlib
                     - #get_alpha() == f.alpha
                     - #get_kernel() == f.kernel_function
                     - #get_basis_vectors() == f.basis_vectors
-        !*/
-
-        distance_function (
-            const distance_function& f
-        );
-        /*!
-            requires
-                - f is a valid distance_function.  In particular, this means that
-                  f.alpha.size() == f.basis_vectors.size()
-            ensures
-                - #*this is a copy of f
         !*/
 
         distance_function (
@@ -680,14 +645,6 @@ namespace dlib
         !*/
 
         normalized_function (
-            const normalized_function& f
-        );
-        /*!
-            ensures
-                - #*this is a copy of f
-        !*/
-
-        normalized_function (
             const vector_normalizer<sample_type>& normalizer_,
             const function_type& funct 
         ) : normalizer(normalizer_), function(funct) {}
@@ -789,14 +746,6 @@ namespace dlib
             ensures
                 - #weights.size() == 0
                 - #basis_vectors.size() == 0
-        !*/
-
-        projection_function (
-            const projection_function& f
-        );
-        /*!
-            ensures
-                - #*this is a copy of f
         !*/
 
         projection_function (

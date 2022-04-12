@@ -154,7 +154,7 @@ namespace dlib
             {
                 // max_cost_assignment() only works with integer matrices, so convert from
                 // double to integer.
-                const double scale = (std::numeric_limits<dlib::int64>::max()/1000)/max(abs(cost));
+                const double scale = static_cast<double>(std::numeric_limits<dlib::int64>::max())/1000/max(abs(cost));
                 matrix<dlib::int64> int_cost = matrix_cast<dlib::int64>(round(cost*scale));
                 assignment = max_cost_assignment(int_cost);
                 assignment.resize(lhs.size());

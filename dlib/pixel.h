@@ -710,6 +710,12 @@ namespace dlib
         }
     // -----------------------------
 
+        // Apparently Visual Studio's optimizer complains about branches that would not be taken anyway.
+#if defined (_MSC_VER)
+#pragma warning ( push )
+#pragma warning ( disable: 4756 )
+#endif
+
         template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::grayscale && pixel_traits<P2>::grayscale>::type
         assign(P1& dest, const P2& src) 
@@ -727,6 +733,10 @@ namespace dlib
             else
                 dest = pixel_traits<P1>::max();
         }
+
+#if defined (_MSC_VER)
+#pragma warning ( pop )
+#endif
 
     // -----------------------------
     // -----------------------------

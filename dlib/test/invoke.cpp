@@ -323,6 +323,9 @@ namespace
         static_assert(dlib::invoke(multiply_ints, 2, 5) == 10, "this should be constexpr");
         static_assert(dlib::invoke_r<long>(multiply_ints, 2, 5) == 10, "this should be constexpr");
         constexpr constexpr_object constexpr_obj;
+#if defined (_MSC_VER)
+        constexpr_obj; // avoid warning C4101: 'constexpr_obj': unreferenced local variable
+#endif
         static_assert(dlib::invoke(&constexpr_object::multiply_ints, constexpr_obj, 2, 5) == 10, "this should be constexpr");
         static_assert(dlib::invoke_r<long>(&constexpr_object::multiply_ints, constexpr_obj, 2, 5) == 10, "this should be constexpr");
     }

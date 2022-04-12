@@ -47,12 +47,12 @@ namespace dlib
                 - if (current_element_valid()) then
                     - element() == mp
         !*/
-        
+       
         class mpair : public map_pair<domain,range>
         {
         public:
-            const domain* d;
-            range* r;
+            const domain* d = nullptr;
+            range* r = nullptr;
 
             const domain& key( 
             ) const { return *d; }

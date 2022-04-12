@@ -370,7 +370,7 @@ namespace dlib
         and the fact that this has a different name (global swap has the same name as
         the member functions called swap) makes them compile right.
 
-        So this is a workaround but not too ugly of one.  But hopefully I get get
+        So this is a workaround but not too ugly of one.  But hopefully I can get
         rid of this in a few years.  So this function is already deprecated. 
 
         This also means you should NOT use this function in your own code unless
