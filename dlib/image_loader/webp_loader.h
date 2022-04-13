@@ -39,7 +39,7 @@ namespace dlib
             vimg.set_size(height_, width_);
             typedef typename image_traits<T>::pixel_type pixel_type;
 
-            unsigned char *output = reinterpret_cast<unsigned char*>(image_data(vimg));
+            unsigned char* output = reinterpret_cast<unsigned char *>(image_data(vimg));
             const int stride = width_step(vimg);
             const size_t output_size = stride * height_;
 
@@ -73,9 +73,9 @@ namespace dlib
 
             read_rgba(output_dec, output_dec_size, stride_dec);
 
-            for (unsigned r = 0; r < height_; r++)
+            for (int r = 0; r < height_; r++)
             {
-                for (unsigned c = 0; c < width_; c++)
+                for (int c = 0; c < width_; c++)
                 {
                     assign_pixel(vimg[r][c], decoded[r][c]);
                 }
