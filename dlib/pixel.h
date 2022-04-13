@@ -224,6 +224,46 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct bgr_alpha_pixel
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple struct that represents an BGR colored graphical pixel
+                with an alpha channel.
+        !*/
+
+        bgr_alpha_pixel (
+        ) {}
+
+        bgr_alpha_pixel (
+            unsigned char blue_,
+            unsigned char green_,
+            unsigned char red_,
+            unsigned char alpha_
+        ) : blue(blue_), green(green_), red(red_), alpha(alpha_) {}
+
+        unsigned char blue;
+        unsigned char green;
+        unsigned char red;
+        unsigned char alpha;
+
+        bool operator == (const rgb_alpha_pixel& that) const
+        {
+            return this->blue == that.blue
+                && this->green == that.green
+                && this->red == that.red
+                && this->alpha == that.alpha;
+        }
+
+        bool operator != (const rgb_alpha_pixel& that) const
+        {
+            return !(*this == that);
+        }
+
+    };
+
+// ----------------------------------------------------------------------------------------
+
     struct hsi_pixel
     {
         /*!
@@ -516,6 +556,25 @@ namespace dlib
     {
         constexpr static bool rgb  = false;
         constexpr static bool bgr_layout  = false;
+        constexpr static bool rgb_alpha  = true;
+        constexpr static bool grayscale = false;
+        constexpr static bool hsi = false;
+        constexpr static bool lab = false;
+        constexpr static long num = 4;
+        typedef unsigned char basic_pixel_type;
+        static basic_pixel_type min() { return 0;}
+        static basic_pixel_type max() { return 255;}
+        constexpr static bool is_unsigned = true;
+        constexpr static bool has_alpha = true;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <>
+    struct pixel_traits<bgr_alpha_pixel>
+    {
+        constexpr static bool rgb  = false;
+        constexpr static bool bgr_layout = true;
         constexpr static bool rgb_alpha  = true;
         constexpr static bool grayscale = false;
         constexpr static bool hsi = false;
