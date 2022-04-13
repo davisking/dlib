@@ -36,7 +36,6 @@ namespace dlib
             - bool rgb
             - bool bgr_layout
             - bool rgb_alpha
-            - bool bgr_alpha
             - bool hsi
             - bool lab
 
@@ -80,19 +79,6 @@ namespace dlib
                 - This type of pixel represents the BGR color space (same as RGB, but with the red and blue channel swapped).
                 - num == 3
                 - has_alpha == false
-                - basic_pixel_type == unsigned char
-                - min() == 0 
-                - max() == 255
-                - is_unsigned == true
-            - else if (bgr_alpha == true) then
-                - The type T will be a struct with 4 public members of type 
-                  unsigned char named "blue" "green" "red" and "alpha".  
-                - This type of pixel represents the BGR color space with
-                  an alpha channel where an alpha of 0 represents a pixel
-                  that is totally transparent and 255 represents a pixel 
-                  with maximum opacity.
-                - num == 4
-                - has_alpha == true 
                 - basic_pixel_type == unsigned char
                 - min() == 0 
                 - max() == 255
@@ -501,7 +487,6 @@ namespace dlib
         constexpr static bool rgb  = true;
         constexpr static bool bgr_layout  = false;
         constexpr static bool rgb_alpha  = false;
-        constexpr static bool bgr_alpha  = false;
         constexpr static bool grayscale = false;
         constexpr static bool hsi = false;
         constexpr static bool lab = false;
@@ -521,7 +506,6 @@ namespace dlib
         constexpr static bool rgb  = true;
         constexpr static bool bgr_layout  = true;
         constexpr static bool rgb_alpha  = false;
-        constexpr static bool bgr_alpha  = false;
         constexpr static bool grayscale = false;
         constexpr static bool hsi = false;
         constexpr static bool lab = false;
@@ -541,7 +525,6 @@ namespace dlib
         constexpr static bool rgb  = false;
         constexpr static bool bgr_layout  = false;
         constexpr static bool rgb_alpha  = true;
-        constexpr static bool bgr_alpha  = false;
         constexpr static bool grayscale = false;
         constexpr static bool hsi = false;
         constexpr static bool lab = false;
@@ -562,7 +545,6 @@ namespace dlib
         constexpr static bool rgb  = false;
         constexpr static bool bgr_layout  = false;
         constexpr static bool rgb_alpha  = false;
-        constexpr static bool bgr_alpha  = false;
         constexpr static bool grayscale = false;
         constexpr static bool hsi = true;
         constexpr static bool lab = false;
@@ -583,7 +565,6 @@ namespace dlib
         constexpr static bool rgb  = false;
         constexpr static bool bgr_layout  = false;
         constexpr static bool rgb_alpha  = false;
-        constexpr static bool bgr_alpha  = false;
         constexpr static bool grayscale = false;
         constexpr static bool hsi = false;
         constexpr static bool lab = true;
@@ -603,7 +584,6 @@ namespace dlib
         constexpr static bool rgb  = false;
         constexpr static bool bgr_layout  = false;
         constexpr static bool rgb_alpha  = false;
-        constexpr static bool bgr_alpha  = false;
         constexpr static bool grayscale = true;
         constexpr static bool hsi = false;
         constexpr static bool lab = false;

@@ -15,9 +15,6 @@ namespace dlib
     class webp_loader : noncopyable
     {
         /*!
-            INITIAL VALUE
-                Defined by the constructors
-
             WHAT THIS OBJECT REPRESENTS
                 This object represents a class capable of loading WEBP image files.
                 Once an instance of it is created to contain a WEBP file from
