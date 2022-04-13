@@ -41,8 +41,7 @@ namespace dlib
             static_assert(sizeof(T) == 0, "webp support not enabled.");
 #endif
         const_image_view<image_type> img(img_);
-        // using pixel_type = typename image_traits<image_type>::pixel_type;
-        typedef typename image_traits<image_type>::pixel_type pixel_type;
+        using pixel_type = typename image_traits<image_type>::pixel_type;
 
         // make sure requires clause is not broken
         DLIB_CASSERT(img.size() != 0,
@@ -96,6 +95,7 @@ namespace dlib
         {
             throw image_save_error("Error while encoding image to " + filename + ".");
         }
+        fflush(fp);
         WebPFree(output);
     }
 

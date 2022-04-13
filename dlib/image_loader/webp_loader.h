@@ -39,7 +39,7 @@ namespace dlib
             vimg.set_size(height_, width_);
             typedef typename image_traits<T>::pixel_type pixel_type;
 
-            unsigned char* output = reinterpret_cast<unsigned char *>(image_data(vimg));
+            unsigned char* output = reinterpret_cast<unsigned char*>(image_data(vimg));
             const int stride = width_step(vimg);
             const size_t output_size = stride * height_;
 
