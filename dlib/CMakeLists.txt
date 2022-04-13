@@ -567,7 +567,6 @@ if (NOT TARGET dlib)
             set (dlib_needed_libraries ${dlib_needed_libraries} ${WEBP_LIBRARY})
             set(source_files ${source_files}
                image_loader/webp_loader.cpp
-               image_saver/save_webp.cpp
                )
          else()
              set(DLIB_WEBP_SUPPORT OFF CACHE BOOL ${DLIB_WEBP_SUPPORT_STR} FORCE )
