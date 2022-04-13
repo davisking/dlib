@@ -34,12 +34,12 @@ namespace dlib
         This traits class will define the following public static members:
             - bool grayscale
             - bool rgb
-            - bool bgr_layout
             - bool rgb_alpha
             - bool hsi
             - bool lab
 
             - bool has_alpha
+            - bool bgr_layout
 
             - long num 
 
@@ -56,6 +56,7 @@ namespace dlib
                 - This type of pixel represents the RGB color space.
                 - num == 3
                 - has_alpha == false
+                - bgr_layout == true if the channel order is BGR, and false if it's RGB
                 - basic_pixel_type == unsigned char
                 - min() == 0 
                 - max() == 255
@@ -69,16 +70,7 @@ namespace dlib
                   with maximum opacity.
                 - num == 4
                 - has_alpha == true 
-                - basic_pixel_type == unsigned char
-                - min() == 0 
-                - max() == 255
-                - is_unsigned == true
-            - else if (bgr_layout == true) then
-                - The type T will be a struct with 3 public members of type 
-                  unsigned char named "blue" "green" and "red".  
-                - This type of pixel represents the BGR color space (same as RGB, but with the red and blue channel swapped).
-                - num == 3
-                - has_alpha == false
+                - bgr_layout == true if the channel order is BGR, and false if it's RGB
                 - basic_pixel_type == unsigned char
                 - min() == 0 
                 - max() == 255
