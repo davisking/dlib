@@ -43,24 +43,20 @@ namespace dlib
             const int stride = width_step(vimg);
             const size_t output_size = stride * height_;
 
-            if (pixel_traits<pixel_type>::bgr_layout && pixel_traits<pixel_type>::rgb_alpha)
-            {
-                read_bgra(output, output_size, stride);
-                return;
-            }
-            if (pixel_traits<pixel_type>::bgr_layout)
-            {
-                read_bgr(output, output_size, stride);
-                return;
-            }
             if (pixel_traits<pixel_type>::rgb_alpha)
             {
-                read_rgba(output, output_size, stride);
+                if (pixel_traits<pixel_type>::bgr_layout)
+                    read_bgra(output, output_size, stride);
+                else
+                    read_rgba(output, output_size, stride);
                 return;
             }
             if (pixel_traits<pixel_type>::rgb)
             {
-                read_rgb(output, output_size, stride);
+                if (pixel_traits<pixel_type>::bgr_layout)
+                    read_bgr(output, output_size, stride);
+                else
+                    read_rgb(output, output_size, stride);
                 return;
             }
             // If we end up here, we are out of our fast path, and have to do it manually
