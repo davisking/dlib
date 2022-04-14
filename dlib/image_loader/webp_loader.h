@@ -23,8 +23,8 @@ namespace dlib
         webp_loader(const dlib::file& f);
         webp_loader(const unsigned char* imgbuffer, size_t buffersize);
 
-        template<typename T>
-        void get_image(T& image) const
+        template<typename image_type>
+        void get_image(image_type& image) const
         {
 #ifndef DLIB_WEBP_SUPPORT
             /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -33,11 +33,11 @@ namespace dlib
                 this object.   You must also make sure you set your build environment
                 to link against the libwebp library.
             !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-            static_assert(sizeof(T) == 0, "webp support not enabled.");
+            static_assert(sizeof(image_type) == 0, "webp support not enabled.");
 #endif
-            image_view<T> vimg(image);
+            image_view<image_type> vimg(image);
             vimg.set_size(height_, width_);
-            typedef typename image_traits<T>::pixel_type pixel_type;
+            typedef typename image_traits<image_type>::pixel_type pixel_type;
 
             unsigned char* output = reinterpret_cast<unsigned char*>(image_data(vimg));
             const int stride = width_step(vimg);

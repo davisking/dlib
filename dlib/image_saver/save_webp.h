@@ -58,7 +58,7 @@ namespace dlib
                 this object.   You must also make sure you set your build environment
                 to link against the libwebp library.
             !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-            static_assert(sizeof(T) == 0, "webp support not enabled.");
+            static_assert(sizeof(image_type) == 0, "webp support not enabled.");
 #endif
         const_image_view<image_type> img(img_);
         using pixel_type = typename image_traits<image_type>::pixel_type;
