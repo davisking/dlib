@@ -47,7 +47,7 @@ namespace dlib {
                 if (quality > 100)
                     output_size = WebPEncodeLosslessRGBA(data, width, height, stride, &output);
                 else
-                output_size = WebPEncodeRGBA(data, width, height, stride, quality, &output);
+                    output_size = WebPEncodeRGBA(data, width, height, stride, quality, &output);
             }
             if (type == webp_type::bgr)
             {
