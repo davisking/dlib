@@ -3,9 +3,6 @@
 #ifndef DLIB_SAVE_WEBP_Hh_
 #define DLIB_SAVE_WEBP_Hh_
 
-// only do anything with this file if DLIB_WEBP_SUPPORT is defined
-#ifdef DLIB_WEBP_SUPPORT
-
 #include "save_webp_abstract.h"
 
 #include "../enable_if.h"
@@ -15,17 +12,40 @@
 #include "../pixel.h"
 #include "../image_processing/generic_image.h"
 #include <string>
-#include <webp/encode.h>
 
 namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
 
+    namespace impl
+    {
+        enum class webp_type
+        {
+            rgb,
+            bgr,
+            rgba,
+            bgra
+        };
+
+        void impl_save_webp (
+            const std::string& filename,
+            const uint8_t* data,
+            const int width,
+            const int height,
+            const int stride,
+            const float quality,
+            const webp_type type,
+            uint8_t* output
+        );
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename image_type
         >
-    typename disable_if<is_matrix<image_type>>::type save_webp(
+    typename disable_if<is_matrix<image_type>>::type save_webp (
         const image_type& img_,
         const std::string& filename,
         float quality = 75
@@ -48,7 +68,7 @@ namespace dlib
             "\t save_webp()"
             << "\n\t You can't save an empty image as a WEBP."
             );
-        DLIB_CASSERT(0 <= quality && quality <= 100,
+        DLIB_CASSERT(0 <= quality,
             "\t save_webp()"
             << "\n\t Invalid quality value."
             << "\n\t quality: " << quality
@@ -60,23 +80,22 @@ namespace dlib
 
         auto data = reinterpret_cast<const uint8_t*>(image_data(img));
         uint8_t* output;
-        size_t output_size = 0;
         const int width = img.nc();
         const int height = img.nr();
         const int stride = width_step(img);
         if (pixel_traits<pixel_type>::rgb_alpha)
         {
             if (pixel_traits<pixel_type>::bgr_layout)
-                output_size = WebPEncodeBGRA(data, width, height, stride, quality, &output);
+                impl::impl_save_webp(filename, data, width, height, stride, quality, impl::webp_type::bgra, output);
             else
-                output_size = WebPEncodeRGBA(data, width, height, stride, quality, &output);
+                impl::impl_save_webp(filename, data, width, height, stride, quality, impl::webp_type::rgba, output);
         }
         else if (pixel_traits<pixel_type>::rgb)
         {
             if (pixel_traits<pixel_type>::bgr_layout)
-                output_size = WebPEncodeBGR(data, width, height, stride, quality, &output);
+                impl::impl_save_webp(filename, data, width, height, stride, quality, impl::webp_type::bgr, output);
             else
-                output_size = WebPEncodeRGB(data, width, height, stride, quality, &output);
+                impl::impl_save_webp(filename, data, width, height, stride, quality, impl::webp_type::rgb, output);
         }
         else
         {
@@ -84,19 +103,8 @@ namespace dlib
             array2d<rgb_pixel> temp;
             assign_image(temp, img);
             auto data = reinterpret_cast<const uint8_t*>(image_data(temp));
-            output_size = WebPEncodeRGB(data, width, height, stride, quality, &output);
+            impl::impl_save_webp(filename, data, width, height, stride, quality, impl::webp_type::rgb, output);
         }
-        if (output_size > 0)
-        {
-            if (fwrite(output, output_size, 1, fp) == 0)
-                throw image_save_error("Error while writing image to " + filename + ".");
-        }
-        else
-        {
-            throw image_save_error("Error while encoding image to " + filename + ".");
-        }
-        fflush(fp);
-        WebPFree(output);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -120,6 +128,3 @@ namespace dlib
 }
 
 #endif // DLIB_WEBP_SUPPORT
-
-#endif // DLIB_SAVE_WEBP_Hh_
-
