@@ -30,8 +30,8 @@ namespace dlib {
             uint8_t* output
         )
         {
-            auto fp = fopen(filename.c_str(), "wb");
-            if (fp == NULL)
+            std::ofstream fout(filename, std::ios::binary);
+            if (!fout.good())
                 throw image_save_error("Unable to open " + filename + " for writing.");
 
             size_t output_size = 0;
@@ -66,9 +66,9 @@ namespace dlib {
 
             if (output_size > 0)
             {
-                if (fwrite(output, output_size, 1, fp) == 0)
+                fout.write((char*)output, output_size);
+                if (!fout.good())
                     throw image_save_error("Error while writing image to " + filename + ".");
-                fflush(fp);
             }
             else
             {
