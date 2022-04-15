@@ -66,7 +66,7 @@ namespace dlib {
 
             if (output_size > 0)
             {
-                fout.write((char*)output, output_size);
+                fout.write(reinterpret_cast<char*>(output), output_size);
                 if (!fout.good())
                     throw image_save_error("Error while writing image to " + filename + ".");
             }
