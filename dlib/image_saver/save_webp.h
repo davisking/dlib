@@ -35,8 +35,7 @@ namespace dlib
             const int height,
             const int stride,
             const float quality,
-            const webp_type type,
-            uint8_t* output
+            const webp_type type
         );
     }
 
@@ -79,23 +78,22 @@ namespace dlib
             throw image_save_error("Unable to open " + filename + " for writing.");
 
         auto data = reinterpret_cast<const uint8_t*>(image_data(img));
-        uint8_t* output;
         const int width = img.nc();
         const int height = img.nr();
         const int stride = width_step(img);
         if (pixel_traits<pixel_type>::rgb_alpha)
         {
             if (pixel_traits<pixel_type>::bgr_layout)
-                impl::impl_save_webp(filename, data, width, height, stride, quality, impl::webp_type::bgra, output);
+                impl::impl_save_webp(filename, data, width, height, stride, quality, impl::webp_type::bgra);
             else
-                impl::impl_save_webp(filename, data, width, height, stride, quality, impl::webp_type::rgba, output);
+                impl::impl_save_webp(filename, data, width, height, stride, quality, impl::webp_type::rgba);
         }
         else if (pixel_traits<pixel_type>::rgb)
         {
             if (pixel_traits<pixel_type>::bgr_layout)
-                impl::impl_save_webp(filename, data, width, height, stride, quality, impl::webp_type::bgr, output);
+                impl::impl_save_webp(filename, data, width, height, stride, quality, impl::webp_type::bgr);
             else
-                impl::impl_save_webp(filename, data, width, height, stride, quality, impl::webp_type::rgb, output);
+                impl::impl_save_webp(filename, data, width, height, stride, quality, impl::webp_type::rgb);
         }
         else
         {
@@ -103,7 +101,7 @@ namespace dlib
             array2d<rgb_pixel> temp;
             assign_image(temp, img);
             auto data = reinterpret_cast<const uint8_t*>(image_data(temp));
-            impl::impl_save_webp(filename, data, width, height, stride, quality, impl::webp_type::rgb, output);
+            impl::impl_save_webp(filename, data, width, height, stride, quality, impl::webp_type::rgb);
         }
     }
 

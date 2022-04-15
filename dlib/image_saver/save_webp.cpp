@@ -26,14 +26,14 @@ namespace dlib {
             const int height,
             const int stride,
             const float quality,
-            const webp_type type,
-            uint8_t* output
+            const webp_type type
         )
         {
             std::ofstream fout(filename, std::ios::binary);
             if (!fout.good())
                 throw image_save_error("Unable to open " + filename + " for writing.");
 
+            uint8_t* output;
             size_t output_size = 0;
             if (type == webp_type::rgb)
             {
