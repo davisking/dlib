@@ -247,7 +247,7 @@ namespace dlib
         unsigned char red;
         unsigned char alpha;
 
-        bool operator == (const rgb_alpha_pixel& that) const
+        bool operator == (const bgr_alpha_pixel& that) const
         {
             return this->blue == that.blue
                 && this->green == that.green
@@ -255,7 +255,7 @@ namespace dlib
                 && this->alpha == that.alpha;
         }
 
-        bool operator != (const rgb_alpha_pixel& that) const
+        bool operator != (const bgr_alpha_pixel& that) const
         {
             return !(*this == that);
         }
