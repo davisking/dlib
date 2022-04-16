@@ -23,7 +23,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install dependecies
-    - run: |
+      run: |
         sudo apt update
         sudo apt install libwebp-dev
     - name: Configure
@@ -41,7 +41,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install dependecies
-    - run: |
+      run: |
         sudo apt update
         sudo apt install libwebp-dev
     - name: Install gcc 11
