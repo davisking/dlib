@@ -34,33 +34,34 @@ namespace dlib {
 
             uint8_t* output;
             size_t output_size = 0;
-            if (type == webp_type::rgb)
+            switch (type)
             {
+            case webp_type::rgb:
                 if (quality > 100)
                     output_size = WebPEncodeLosslessRGB(data, width, height, stride, &output);
                 else
                     output_size = WebPEncodeRGB(data, width, height, stride, quality, &output);
-            }
-            if (type == webp_type::rgba)
-            {
+                break;
+            case webp_type::rgba:
                 if (quality > 100)
                     output_size = WebPEncodeLosslessRGBA(data, width, height, stride, &output);
                 else
                     output_size = WebPEncodeRGBA(data, width, height, stride, quality, &output);
-            }
-            if (type == webp_type::bgr)
-            {
+                break;
+            case webp_type::bgr:
                 if (quality > 100)
                     output_size = WebPEncodeLosslessBGR(data, width, height, stride, &output);
                 else
                     output_size = WebPEncodeBGR(data, width, height, stride, quality, &output);
-            }
-            if (type == webp_type::bgra)
-            {
+                break;
+            case webp_type::bgra:
                 if (quality > 100)
                     output_size = WebPEncodeLosslessBGRA(data, width, height, stride, &output);
                 else
                     output_size = WebPEncodeBGRA(data, width, height, stride, quality, &output);
+                break;
+            default:
+                throw image_save_error("Unsupported WebP format");
             }
 
             if (output_size > 0)

@@ -73,10 +73,6 @@ namespace dlib
             << "\n\t quality: " << quality
             );
 
-        auto fp = fopen(filename.c_str(), "wb");
-        if (fp == NULL)
-            throw image_save_error("Unable to open " + filename + " for writing.");
-
         auto data = reinterpret_cast<const uint8_t*>(image_data(img));
         const int width = img.nc();
         const int height = img.nr();
