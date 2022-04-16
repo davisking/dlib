@@ -1,4 +1,4 @@
-// Copyright (C) 2014  Davis E. King (davis@dlib.net)
+// Copyright (C) 2022  Davis E. King (davis@dlib.net), Adrià Arrufat
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_SAVE_WEBP_Hh_
 #define DLIB_SAVE_WEBP_Hh_
@@ -104,7 +104,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename EXP 
+        typename EXP
         >
     void save_webp(
         const matrix_exp<EXP>& img,

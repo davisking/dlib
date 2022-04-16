@@ -1,4 +1,4 @@
-// Copyright (C) 2010  Davis E. King (davis@dlib.net), Nils Labugt
+// Copyright (C) 2022  Davis E. King (davis@dlib.net), Martin Sandsmark, Adrià Arrufat
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_WEBP_IMPORT_ABSTRACT
 #ifdef DLIB_WEBP_IMPORT_ABSTRACT

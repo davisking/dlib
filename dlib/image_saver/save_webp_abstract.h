@@ -1,4 +1,4 @@
-// Copyright (C) 2022  Davis E. King (davis@dlib.net)
+// Copyright (C) 2022  Davis E. King (davis@dlib.net), Adrià Arrufat
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_SAVE_WEBP_ABSTRACT_Hh_
 #ifdef DLIB_SAVE_WEBP_ABSTRACT_Hh_
