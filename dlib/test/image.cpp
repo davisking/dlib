@@ -2306,20 +2306,6 @@ namespace
         DLIB_TEST(image == result);
     }
 
-    template <typename pixel_type>
-    double psnr(const matrix<pixel_type>& img1, const matrix<pixel_type>& img2)
-    {
-        DLIB_TEST(have_same_dimensions(img1, img2));
-        double mse = 0;
-        auto data1 = reinterpret_cast<const uint8_t*>(image_data(img1));
-        auto data2 = reinterpret_cast<const uint8_t*>(image_data(img2));
-        const long data_size = img1.size() * pixel_traits<pixel_type>::num;
-        for (long i = 0; i < data_size; ++i)
-            mse += std::pow(static_cast<double>(data1[i]) - static_cast<double>(data2[i]), 2);
-        mse /= data_size;
-        return 20 * std::log10(255) - 10 * std::log10(mse);
-    }
-
     void test_webp()
     {
 #ifdef DLIB_WEBP_SUPPORT
@@ -2370,22 +2356,25 @@ namespace
         sin.clear();
         sin.str(sout.str());
         deserialize(rgba_img, sin);
-        DLIB_TEST(rgba_img.nr() == 32 && rgba_img.nc() == 32);
-        save_webp(rgba_img, "test.webp");
-        load_webp(rgba_dec, "test.webp");
-        DLIB_TEST(psnr(rgba_img, rgba_dec) > 10);
+        // perform lossless test
+        const float quality = 101;
+        save_webp(rgba_img, "test_rgba.webp", quality);
+        load_webp(rgba_dec, "test_rgba.webp");
+        save_webp(rgba_dec, "test_rgba_dec.webp", quality);
+        // If we check both files externally, they are exactly the same, however, the test fails
+        DLIB_TEST(rgba_img == rgba_dec);
         assign_image(bgra_img, rgba_img);
-        save_webp(bgra_img, "test.webp");
-        load_webp(bgra_dec, "test.webp");
-        DLIB_TEST(psnr(bgra_img, bgra_dec) > 10);
+        save_webp(bgra_img, "test_bgra.webp", quality);
+        load_webp(bgra_dec, "test_bgra.webp");
+        DLIB_TEST(bgra_img == bgra_dec);
         assign_image(rgb_img, rgba_img);
-        save_webp(rgb_img, "test.webp");
-        load_webp(rgb_dec, "test.webp");
-        DLIB_TEST(psnr(rgb_img, rgb_dec) > 10);
+        save_webp(rgb_img, "test_rgb.webp", quality);
+        load_webp(rgb_dec, "test_rgb.webp");
+        DLIB_TEST(rgb_img == rgb_dec);
         assign_image(bgr_img, rgb_img);
-        save_webp(bgr_img, "test.webp");
-        load_webp(bgr_dec, "test.webp");
-        DLIB_TEST(psnr(bgr_img, bgr_dec) > 10);
+        save_webp(bgr_img, "test_bgr.webp", quality);
+        load_webp(bgr_dec, "test_bgr.webp");
+        DLIB_TEST(bgr_img == bgr_dec);
 #endif
     }
 
