@@ -61,7 +61,7 @@ namespace dlib {
                     output_size = WebPEncodeBGRA(data, width, height, stride, quality, &output);
                 break;
             default:
-                throw image_save_error("Unsupported WebP format");
+                throw image_save_error("Invalid color type");
             }
 
             if (output_size > 0)
