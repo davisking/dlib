@@ -28,6 +28,13 @@ namespace dlib {
             const webp_type type
         )
         {
+            const int webp_max_dimension = 16383;
+            if (width > webp_max_dimension || height > webp_max_dimension)
+                throw image_save_error("Error while encoding " + filename + ". Bad picture dimensions: "
+                + std::to_string(width) + "x" + std::to_string(height)
+                + ". Maximum WebP width and height allowed is "
+                + std::to_string(webp_max_dimension) + " pixels");
+
             std::ofstream fout(filename, std::ios::binary);
             if (!fout.good())
                 throw image_save_error("Unable to open " + filename + " for writing.");
@@ -61,18 +68,18 @@ namespace dlib {
                     output_size = WebPEncodeBGRA(data, width, height, stride, quality, &output);
                 break;
             default:
-                throw image_save_error("Invalid color type");
+                throw image_save_error("Invalid WebP color type");
             }
 
             if (output_size > 0)
             {
                 fout.write(reinterpret_cast<char*>(output), output_size);
                 if (!fout.good())
-                    throw image_save_error("Error while writing image to " + filename + ".");
+                    throw image_save_error("Error while writing WebP image to " + filename + ".");
             }
             else
             {
-                throw image_save_error("Error while encoding image to " + filename + ".");
+                throw image_save_error("Error while encoding WebP image to " + filename + ".");
             }
             WebPFree(output);
         }
