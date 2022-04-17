@@ -61,6 +61,10 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
     - uses: actions/checkout@v2
+    - name: Install dependecies
+      run: |
+        sudo apt update
+        sudo apt install libwebp-dev
     - name: Configure
       run: |
         export CC=/usr/bin/clang
@@ -77,6 +81,10 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
     - uses: actions/checkout@v2
+    - name: Install dependecies
+      run: |
+        sudo apt update
+        sudo apt install libwebp-dev
     - name: Install clang 13
       run: |
         wget https://apt.llvm.org/llvm.sh
