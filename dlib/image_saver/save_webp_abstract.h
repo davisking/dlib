@@ -27,7 +27,7 @@ namespace dlib
             - image.size() != 0
             - 0 <= quality
         ensures
-            - writes the image to the file indicated by file_name in the WEBP format.
+            - writes the image to the file indicated by filename in the WEBP format.
             - image[0][0] will be in the upper left corner of the image.
             - image[image.nr()-1][image.nc()-1] will be in the lower right corner of the
               image.

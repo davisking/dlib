@@ -108,13 +108,13 @@ namespace dlib
         >
     void save_webp(
         const matrix_exp<EXP>& img,
-        const std::string& file_name,
+        const std::string& filename,
         float quality = 75
     )
     {
         array2d<typename EXP::type> temp;
         assign_image(temp, img);
-        save_webp(temp, file_name, quality);
+        save_webp(temp, filename, quality);
     }
 
 // ----------------------------------------------------------------------------------------
