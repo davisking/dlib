@@ -2306,6 +2306,30 @@ namespace
         DLIB_TEST(image == result);
     }
 
+    template <typename pixel_type>
+    double psnr(const matrix<pixel_type>& img1, const matrix<pixel_type>& img2)
+    {
+        DLIB_TEST(have_same_dimensions(img1, img2));
+        double mse = 0;
+        const long nk = width_step(img1) / img1.nc();
+        const long data_size = img1.size() * nk;
+        const bool has_alpha = nk == 4;
+        auto data1 = reinterpret_cast<const uint8_t*>(image_data(img1));
+        auto data2 = reinterpret_cast<const uint8_t*>(image_data(img2));
+        for (long i = 0; i < data_size; i += nk)
+        {
+            // We are using the default WebP settings, which means 'exact' is disabled.
+            // RGB values in transparent areas will be modified to improve compression.
+            // As a result, we skip matching transparent pixels.
+            if (has_alpha && data1[i + 3] == 0 && data2[i + 3] == 0)
+                    continue;
+            for (long k = 0; k < nk; ++k)
+                mse += std::pow(static_cast<double>(data1[i + k]) - static_cast<double>(data2[i + k]), 2);
+        }
+        mse /= data_size;
+        return 20 * std::log10(pixel_traits<pixel_type>::max()) - 10 * std::log10(mse);
+    }
+
     void test_webp()
     {
 #ifdef DLIB_WEBP_SUPPORT
@@ -2356,25 +2380,42 @@ namespace
         sin.clear();
         sin.str(sout.str());
         deserialize(rgba_img, sin);
-        // perform lossless test
-        const float quality = 101;
-        save_webp(rgba_img, "test_rgba.webp", quality);
-        load_webp(rgba_dec, "test_rgba.webp");
-        save_webp(rgba_dec, "test_rgba_dec.webp", quality);
-        // If we check both files externally, they are exactly the same, however, the test fails
-        DLIB_TEST(rgba_img == rgba_dec);
-        assign_image(bgra_img, rgba_img);
-        save_webp(bgra_img, "test_bgra.webp", quality);
-        load_webp(bgra_dec, "test_bgra.webp");
-        DLIB_TEST(bgra_img == bgra_dec);
-        assign_image(rgb_img, rgba_img);
-        save_webp(rgb_img, "test_rgb.webp", quality);
-        load_webp(rgb_dec, "test_rgb.webp");
-        DLIB_TEST(rgb_img == rgb_dec);
-        assign_image(bgr_img, rgb_img);
-        save_webp(bgr_img, "test_bgr.webp", quality);
-        load_webp(bgr_dec, "test_bgr.webp");
-        DLIB_TEST(bgr_img == bgr_dec);
+        for (auto quality : {75., 101.})
+        {
+            save_webp(rgba_img, "test_rgba.webp", quality);
+            load_webp(rgba_dec, "test_rgba.webp");
+            if (quality > 100)
+                DLIB_TEST(psnr(rgba_img, rgba_dec) == std::numeric_limits<double>::infinity());
+            else
+                DLIB_TEST(psnr(rgba_img, rgba_dec) > 30);
+
+            assign_image(bgra_img, rgba_img);
+            save_webp(bgra_img, "test_bgra.webp", quality);
+            load_webp(bgra_dec, "test_bgra.webp");
+            if (quality > 100)
+                DLIB_TEST(psnr(bgra_img, bgra_dec) == std::numeric_limits<double>::infinity());
+            else
+                DLIB_TEST(psnr(bgra_img, bgra_dec) > 30);
+
+            // Here we assign an image with an alpha channel to an image without an alpha channel.
+            // Since we are not using the exact mode in WebP, the PSNR will be quite low, since
+            // pixels in transparent areas will have different values.
+            assign_image(rgb_img, rgba_img);
+            save_webp(rgb_img, "test_rgb.webp", quality);
+            load_webp(rgb_dec, "test_rgb.webp");
+            if (quality > 100)
+                DLIB_TEST(psnr(rgb_img, rgb_dec) == std::numeric_limits<double>::infinity());
+            else
+                DLIB_TEST(psnr(rgb_img, rgb_dec) > 15);
+
+            assign_image(bgr_img, rgb_img);
+            save_webp(bgr_img, "test_bgr.webp", quality);
+            load_webp(bgr_dec, "test_bgr.webp");
+            if (quality > 100)
+                DLIB_TEST(psnr(bgr_img, bgr_dec) == std::numeric_limits<double>::infinity());
+            else
+                DLIB_TEST(psnr(bgr_img, bgr_dec) > 15);
+        }
 #endif
     }
 
