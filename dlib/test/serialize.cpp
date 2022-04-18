@@ -448,7 +448,7 @@ namespace
         std::shared_ptr<string> ptr_shared2;
         std::vector<std::complex<double>> p; 
 #if __cplusplus >= 201703L
-        std::variant<int,float,std::string,immutable_type> q;
+        std::variant<int,float,std::string> q;
         std::optional<std::vector<std::string>> r;
 #endif
 
@@ -1163,115 +1163,132 @@ namespace
         v1.v.push_back(t1);
         v1.v.push_back(t2);
 
+#if __cplusplus >= 201703L
+        std::variant<int,float,std::string,immutable_type> i1, i2;
+        i1 = std::string("hello from variant that can hold an immutable type");
+#else
+        // make it so that we don't need to add #if guards in every block below
+        std::string i1, i2;
+        i1 = "std::variant not supported";
+#endif
         {
-            dlib::serialize("serialization_test_macros.dat") << t1 << t2 << v1 << uptr1 << uptr2;
-            dlib::deserialize("serialization_test_macros.dat") >> t3 >> t4 >> v2 >> uptr3 >> uptr4;
+            dlib::serialize("serialization_test_macros.dat") << t1 << t2 << v1 << uptr1 << uptr2 << i1;
+            dlib::deserialize("serialization_test_macros.dat") >> t3 >> t4 >> v2 >> uptr3 >> uptr4 >> i2;
 
             DLIB_TEST(t1 == t3);
             DLIB_TEST(t2 == t4);
             DLIB_TEST(v1 == v2);
             DLIB_TEST(pointers_values_equal(uptr1, uptr3));
             DLIB_TEST(pointers_values_equal(uptr2, uptr4));
+            DLIB_TEST(i1 == i2);
         }
         
         {
             std::stringstream ss;
-            dlib::serialize(ss) << t1 << t2 << v1 << uptr1 << uptr2;
-            dlib::deserialize(ss) >> t3 >> t4 >> v2 >> uptr3 >> uptr4;
+            dlib::serialize(ss) << t1 << t2 << v1 << uptr1 << uptr2 << i1;
+            dlib::deserialize(ss) >> t3 >> t4 >> v2 >> uptr3 >> uptr4 >> i2;
 
             DLIB_TEST(t1 == t3);
             DLIB_TEST(t2 == t4);
             DLIB_TEST(v1 == v2);
             DLIB_TEST(pointers_values_equal(uptr1, uptr3));
             DLIB_TEST(pointers_values_equal(uptr2, uptr4));
+            DLIB_TEST(i1 == i2);
         }
         
         {
             std::ostringstream sout;
-            dlib::serialize(sout) << t1 << t2 << v1 << uptr1 << uptr2;
+            dlib::serialize(sout) << t1 << t2 << v1 << uptr1 << uptr2 << i1;
             std::istringstream sin(sout.str());
-            dlib::deserialize(sin) >> t3 >> t4 >> v2 >> uptr3 >> uptr4;
+            dlib::deserialize(sin) >> t3 >> t4 >> v2 >> uptr3 >> uptr4 >> i2;
 
             DLIB_TEST(t1 == t3);
             DLIB_TEST(t2 == t4);
             DLIB_TEST(v1 == v2);
             DLIB_TEST(pointers_values_equal(uptr1, uptr3));
             DLIB_TEST(pointers_values_equal(uptr2, uptr4));
+            DLIB_TEST(i1 == i2);
         }
         
         {
             std::vector<char> buf;
-            dlib::serialize(buf) << t1 << t2 << v1 << uptr1 << uptr2;
-            dlib::deserialize(buf) >> t3 >> t4 >> v2 >> uptr3 >> uptr4;
+            dlib::serialize(buf) << t1 << t2 << v1 << uptr1 << uptr2 << i1;
+            dlib::deserialize(buf) >> t3 >> t4 >> v2 >> uptr3 >> uptr4 >> i2;
 
             DLIB_TEST(t1 == t3);
             DLIB_TEST(t2 == t4);
             DLIB_TEST(v1 == v2);
             DLIB_TEST(pointers_values_equal(uptr1, uptr3));
             DLIB_TEST(pointers_values_equal(uptr2, uptr4));
+            DLIB_TEST(i1 == i2);
         }
         
         {
             std::vector<int8_t> buf;
-            dlib::serialize(buf) << t1 << t2 << v1 << uptr1 << uptr2;
-            dlib::deserialize(buf) >> t3 >> t4 >> v2 >> uptr3 >> uptr4;
+            dlib::serialize(buf) << t1 << t2 << v1 << uptr1 << uptr2 << i1;
+            dlib::deserialize(buf) >> t3 >> t4 >> v2 >> uptr3 >> uptr4 >> i2;
 
             DLIB_TEST(t1 == t3);
             DLIB_TEST(t2 == t4);
             DLIB_TEST(v1 == v2);
             DLIB_TEST(pointers_values_equal(uptr1, uptr3));
             DLIB_TEST(pointers_values_equal(uptr2, uptr4));
+            DLIB_TEST(i1 == i2);
         }
         
         {
             std::vector<uint8_t> buf;
-            dlib::serialize(buf) << t1 << t2 << v1 << uptr1 << uptr2;
-            dlib::deserialize(buf) >> t3 >> t4 >> v2 >> uptr3 >> uptr4;
+            dlib::serialize(buf) << t1 << t2 << v1 << uptr1 << uptr2 << i1;
+            dlib::deserialize(buf) >> t3 >> t4 >> v2 >> uptr3 >> uptr4 >> i2;
 
             DLIB_TEST(t1 == t3);
             DLIB_TEST(t2 == t4);
             DLIB_TEST(v1 == v2);
             DLIB_TEST(pointers_values_equal(uptr1, uptr3));
             DLIB_TEST(pointers_values_equal(uptr2, uptr4));
+            DLIB_TEST(i1 == i2);
         }
         
         {
             std::vector<char> buf1;
-            dlib::serialize(buf1) << t1 << t2 << v1 << uptr1 << uptr2;
+            dlib::serialize(buf1) << t1 << t2 << v1 << uptr1 << uptr2 << i1;
             std::vector<int8_t> buf2(buf1.begin(), buf1.end());
-            dlib::deserialize(buf2) >> t3 >> t4 >> v2 >> uptr3 >> uptr4;
+            dlib::deserialize(buf2) >> t3 >> t4 >> v2 >> uptr3 >> uptr4 >> i2;
 
             DLIB_TEST(t1 == t3);
             DLIB_TEST(t2 == t4);
             DLIB_TEST(v1 == v2);
             DLIB_TEST(pointers_values_equal(uptr1, uptr3));
             DLIB_TEST(pointers_values_equal(uptr2, uptr4));
+            DLIB_TEST(i1 == i2);
         }
         
         {
             std::vector<char> buf1;
-            dlib::serialize(buf1) << t1 << t2 << v1 << uptr1 << uptr2;
+            dlib::serialize(buf1) << t1 << t2 << v1 << uptr1 << uptr2 << i1;
             std::vector<uint8_t> buf2(buf1.begin(), buf1.end());
-            dlib::deserialize(buf2) >> t3 >> t4 >> v2 >> uptr3 >> uptr4;
+            dlib::deserialize(buf2) >> t3 >> t4 >> v2 >> uptr3 >> uptr4 >> i2;
 
             DLIB_TEST(t1 == t3);
             DLIB_TEST(t2 == t4);
             DLIB_TEST(v1 == v2);
             DLIB_TEST(pointers_values_equal(uptr1, uptr3));
             DLIB_TEST(pointers_values_equal(uptr2, uptr4));
+            DLIB_TEST(i1 == i2);
         }
         
-         {
+        {
             std::vector<int8_t> buf1;
-            dlib::serialize(buf1) << t1 << t2 << v1 << uptr1 << uptr2;
+            dlib::serialize(buf1) << t1 << t2 << v1 << uptr1 << uptr2 << i1;
             std::vector<uint8_t> buf2(buf1.begin(), buf1.end());
-            dlib::deserialize(buf2) >> t3 >> t4 >> v2 >> uptr3 >> uptr4;
+            dlib::deserialize(buf2) >> t3 >> t4 >> v2 >> uptr3 >> uptr4 >> i2;
 
             DLIB_TEST(t1 == t3);
             DLIB_TEST(t2 == t4);
             DLIB_TEST(v1 == v2);
             DLIB_TEST(pointers_values_equal(uptr1, uptr3));
             DLIB_TEST(pointers_values_equal(uptr2, uptr4));
+            DLIB_TEST(i1 == i2);
         }
     }
 
