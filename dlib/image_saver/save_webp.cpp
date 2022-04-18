@@ -28,12 +28,11 @@ namespace dlib {
             const webp_type type
         )
         {
-            const int webp_max_dimension = 16383;
-            if (width > webp_max_dimension || height > webp_max_dimension)
+            if (width > WEBP_MAX_DIMENSION || height > WEBP_MAX_DIMENSION)
                 throw image_save_error("Error while encoding " + filename + ". Bad picture dimensions: "
                 + std::to_string(width) + "x" + std::to_string(height)
                 + ". Maximum WebP width and height allowed is "
-                + std::to_string(webp_max_dimension) + " pixels");
+                + std::to_string(WEBP_MAX_DIMENSION) + " pixels");
 
             std::ofstream fout(filename, std::ios::binary);
             if (!fout.good())
