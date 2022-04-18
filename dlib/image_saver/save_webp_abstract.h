@@ -25,7 +25,7 @@ namespace dlib
             - image_type == an image object that implements the interface defined in
               dlib/image_processing/generic_image.h or a matrix expression
             - image.size() != 0
-            - 0 <= quality
+            - quality >= 0
         ensures
             - writes the image to the file indicated by filename in the WEBP format.
             - image[0][0] will be in the upper left corner of the image.
