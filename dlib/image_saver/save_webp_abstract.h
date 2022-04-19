@@ -32,7 +32,7 @@ namespace dlib
             - image[image.nr()-1][image.nc()-1] will be in the lower right corner of the
               image.
             - This routine can save images containing any type of pixel.  However,
-              save_webp() can only natively store rgb_pixel, bgr_pixel,  rgb_alpha_pixel and
+              save_webp() can only natively store rgb_pixel, bgr_pixel, rgb_alpha_pixel and
               bgr_alpha_pixel pixel types.  All other pixel types will be converted into one
               of these types as appropriate before being saved to disk.
             - The quality value determines how lossy the compression is.  Larger quality
