@@ -14,6 +14,8 @@
 New Features and Improvements:
    - Added Beta distribution to dlib::rand.
    - Added directory_exists.
+   - Added bgr_alpha_pixel type.
+   - Added support for loading and saving WebP images.
    - Deep learning tooling:
       - Added ReOrg layer.
       - Added visitor to draw network architectures using the DOT language.

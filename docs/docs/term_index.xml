@@ -1529,6 +1529,7 @@
          <term file="imaging.html" name="load_png"             include="dlib/image_io.h"/>
          <term file="imaging.html" name="load_jpeg"            include="dlib/image_io.h"/>
          <term file="imaging.html" name="load_dng"             include="dlib/image_io.h"/>
+         <term file="imaging.html" name="load_webp"             include="dlib/image_io.h"/>
          <term file="imaging.html" name="pixel_traits"         include="dlib/pixel.h"/>
          <term file="imaging.html" name="rgb_pixel"            include="dlib/pixel.h"/>
          <term file="imaging.html" name="bgr_pixel"            include="dlib/pixel.h"/>
@@ -1536,12 +1537,14 @@
          <term file="imaging.html" name="toMat"                include="dlib/opencv.h"/>
          <term link="imaging.html#cv_image" name="OpenCV Image"/>
          <term file="imaging.html" name="rgb_alpha_pixel"      include="dlib/pixel.h"/>
+         <term file="imaging.html" name="bgr_alpha_pixel"      include="dlib/pixel.h"/>
          <term link="imaging.html#rgb_alpha_pixel" name="alpha"/>
          <term file="imaging.html" name="save_bmp"             include="dlib/image_io.h"/>
          <term file="imaging.html" name="save_png"             include="dlib/image_io.h"/>
          <term file="imaging.html" name="save_jpeg"            include="dlib/image_io.h"/>
          <term file="imaging.html" name="load_image"           include="dlib/image_io.h"/>
          <term file="imaging.html" name="save_dng"             include="dlib/image_io.h"/>
+         <term file="imaging.html" name="save_webp"             include="dlib/image_io.h"/>
          <term file="dlib/image_transforms/spatial_filtering_abstract.h.html" name="create_gaussian_filter" include="dlib/image_transforms.h"/>
          <term name="gaussian">
             <term link="dlib/image_transforms/spatial_filtering_abstract.h.html#gaussian" name="1D Gaussian" include="dlib/image_transforms.h"/>
@@ -1569,6 +1572,7 @@
          <term file="imaging.html" name="partition_pixels"           include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="png_loader"                 include="dlib/image_io.h"/>
          <term file="imaging.html" name="jpeg_loader"                include="dlib/image_io.h"/>
+         <term file="imaging.html" name="webp_loader"                include="dlib/image_io.h"/>
 
          <term file="imaging.html" name="interpolate_nearest_neighbor" include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="interpolate_bilinear"    include="dlib/image_transforms.h"/>

@@ -39,6 +39,7 @@ namespace dlib
             - bool lab
 
             - bool has_alpha
+            - bool bgr_layout
 
             - long num 
 
@@ -55,6 +56,7 @@ namespace dlib
                 - This type of pixel represents the RGB color space.
                 - num == 3
                 - has_alpha == false
+                - bgr_layout == true if the channel order is BGR, and false if it's RGB
                 - basic_pixel_type == unsigned char
                 - min() == 0 
                 - max() == 255
@@ -68,6 +70,7 @@ namespace dlib
                   with maximum opacity.
                 - num == 4
                 - has_alpha == true 
+                - bgr_layout == true if the channel order is BGR, and false if it's RGB
                 - basic_pixel_type == unsigned char
                 - min() == 0 
                 - max() == 255
@@ -213,6 +216,46 @@ namespace dlib
         }
 
         bool operator != (const rgb_alpha_pixel& that) const
+        {
+            return !(*this == that);
+        }
+
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    struct bgr_alpha_pixel
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple struct that represents an BGR colored graphical pixel
+                with an alpha channel.
+        !*/
+
+        bgr_alpha_pixel (
+        ) {}
+
+        bgr_alpha_pixel (
+            unsigned char blue_,
+            unsigned char green_,
+            unsigned char red_,
+            unsigned char alpha_
+        ) : blue(blue_), green(green_), red(red_), alpha(alpha_) {}
+
+        unsigned char blue;
+        unsigned char green;
+        unsigned char red;
+        unsigned char alpha;
+
+        bool operator == (const bgr_alpha_pixel& that) const
+        {
+            return this->blue == that.blue
+                && this->green == that.green
+                && this->red == that.red
+                && this->alpha == that.alpha;
+        }
+
+        bool operator != (const bgr_alpha_pixel& that) const
         {
             return !(*this == that);
         }
@@ -474,6 +517,7 @@ namespace dlib
     struct pixel_traits<rgb_pixel>
     {
         constexpr static bool rgb  = true;
+        constexpr static bool bgr_layout  = false;
         constexpr static bool rgb_alpha  = false;
         constexpr static bool grayscale = false;
         constexpr static bool hsi = false;
@@ -492,6 +536,7 @@ namespace dlib
     struct pixel_traits<bgr_pixel>
     {
         constexpr static bool rgb  = true;
+        constexpr static bool bgr_layout  = true;
         constexpr static bool rgb_alpha  = false;
         constexpr static bool grayscale = false;
         constexpr static bool hsi = false;
@@ -510,6 +555,26 @@ namespace dlib
     struct pixel_traits<rgb_alpha_pixel>
     {
         constexpr static bool rgb  = false;
+        constexpr static bool bgr_layout  = false;
+        constexpr static bool rgb_alpha  = true;
+        constexpr static bool grayscale = false;
+        constexpr static bool hsi = false;
+        constexpr static bool lab = false;
+        constexpr static long num = 4;
+        typedef unsigned char basic_pixel_type;
+        static basic_pixel_type min() { return 0;}
+        static basic_pixel_type max() { return 255;}
+        constexpr static bool is_unsigned = true;
+        constexpr static bool has_alpha = true;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <>
+    struct pixel_traits<bgr_alpha_pixel>
+    {
+        constexpr static bool rgb  = false;
+        constexpr static bool bgr_layout = true;
         constexpr static bool rgb_alpha  = true;
         constexpr static bool grayscale = false;
         constexpr static bool hsi = false;
@@ -529,6 +594,7 @@ namespace dlib
     struct pixel_traits<hsi_pixel>
     {
         constexpr static bool rgb  = false;
+        constexpr static bool bgr_layout  = false;
         constexpr static bool rgb_alpha  = false;
         constexpr static bool grayscale = false;
         constexpr static bool hsi = true;
@@ -548,6 +614,7 @@ namespace dlib
     struct pixel_traits<lab_pixel>
     {
         constexpr static bool rgb  = false;
+        constexpr static bool bgr_layout  = false;
         constexpr static bool rgb_alpha  = false;
         constexpr static bool grayscale = false;
         constexpr static bool hsi = false;
@@ -566,6 +633,7 @@ namespace dlib
     struct grayscale_pixel_traits
     {
         constexpr static bool rgb  = false;
+        constexpr static bool bgr_layout  = false;
         constexpr static bool rgb_alpha  = false;
         constexpr static bool grayscale = true;
         constexpr static bool hsi = false;
