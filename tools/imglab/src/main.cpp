@@ -567,15 +567,15 @@ int tile_dataset(const command_line_parser& parser)
     {
         save_png(tile_images(images), out_image);
     }
-    else if (ext == "jpg")
-    {
-        save_jpeg(tile_images(images), out_image, JPEG_QUALITY);
-    }
-    else
+    else if (ext == "webp")
     {
         // Lossless by default
         const float webp_quality = get_option(parser, "webp", 101.f);
         save_webp(tile_images(images), out_image, webp_quality);
+    }
+    else
+    {
+        save_jpeg(tile_images(images), out_image, JPEG_QUALITY);
     }
 
     return EXIT_SUCCESS;
