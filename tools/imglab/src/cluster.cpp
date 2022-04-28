@@ -302,9 +302,19 @@ int cluster_dataset(
                 temp.push_back(images[assignments[i].idx]);
         }
 
-        string outfile = "cluster_"+pad_int_with_zeros(c+1, 3) + ".jpg";
-        cout << "Saving " << outfile << endl;
-        save_jpeg(tile_images(temp), outfile);
+        if (parser.option("webp"))
+        {
+            string outfile = "cluster_"+pad_int_with_zeros(c+1, 3) + ".webp";
+            cout << "Saving " << outfile << endl;
+            const float webp_quality = std::stof(parser.option("webp").argument());
+            save_webp(tile_images(temp), outfile, webp_quality);
+        }
+        else
+        {
+            string outfile = "cluster_"+pad_int_with_zeros(c+1, 3) + ".jpg";
+            cout << "Saving " << outfile << endl;
+            save_jpeg(tile_images(temp), outfile);
+        }
     }
 
 
