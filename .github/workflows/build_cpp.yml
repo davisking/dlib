@@ -111,6 +111,8 @@ jobs:
       run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --target dtest --parallel 4
     - name: Test
       run: ${{ env.build_dir }}/${{ env.config }}/dtest.exe --runall -q
+    - name: Build examples, etc
+      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --parallel 2
 
   macos-latest:
     runs-on: 'macos-latest'
