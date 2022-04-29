@@ -112,7 +112,7 @@ jobs:
     - name: Test
       run: ${{ env.build_dir }}/${{ env.config }}/dtest.exe --runall -q
     - name: Build examples, etc
-      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --parallel 2
+      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --parallel 1
 
   macos-latest:
     runs-on: 'macos-latest'
