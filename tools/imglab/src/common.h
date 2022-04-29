@@ -34,6 +34,7 @@ void make_empty_file (
 
 std::string to_png_name (const std::string& filename);
 std::string to_jpg_name (const std::string& filename);
+std::string to_webp_name (const std::string& filename);
 
 // ----------------------------------------------------------------------------------------
 
