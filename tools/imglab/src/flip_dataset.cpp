@@ -220,12 +220,14 @@ void flip_dataset(const command_line_parser& parser)
             filename = to_jpg_name(filename);
             save_jpeg(temp, filename,JPEG_QUALITY);
         }
+#ifdef DLIB_WEBP_SUPPORT
         else if (parser.option("webp"))
         {
             filename = to_webp_name(filename);
             const float webp_quality = std::stof(parser.option("webp").argument());
             save_webp(temp, filename, webp_quality);
         }
+#endif
         else
         {
             save_png(temp, filename);

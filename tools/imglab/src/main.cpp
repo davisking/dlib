@@ -339,12 +339,14 @@ void rotate_dataset(const command_line_parser& parser)
             filename = to_jpg_name(filename);
             save_jpeg(temp, filename,JPEG_QUALITY);
         }
+#ifdef DLIB_WEBP_SUPPORT
         else if (parser.option("webp"))
         {
             filename = to_webp_name(filename);
             const float webp_quality = std::stof(parser.option("webp").argument());
             save_webp(temp, filename, webp_quality);
         }
+#endif
         else
         {
             save_png(temp, filename);
@@ -489,12 +491,14 @@ int resample_dataset(const command_line_parser& parser)
                 dimg.filename = to_jpg_name(dimg.filename);
                 save_jpeg(chip,dimg.filename, JPEG_QUALITY);
             }
+#ifdef DLIB_WEBP_SUPPORT
             else if (parser.option("webp"))
             {
                 dimg.filename = to_webp_name(dimg.filename);
                 const float webp_quality = std::stof(parser.option("webp").argument());
                 save_webp(chip, dimg.filename, webp_quality);
             }
+#endif
             else
             {
                 save_png(chip,dimg.filename);
@@ -567,12 +571,14 @@ int tile_dataset(const command_line_parser& parser)
     {
         save_png(tile_images(images), out_image);
     }
+#ifdef DLIB_WEBP_SUPPORT
     else if (ext == "webp")
     {
         // Lossless by default
         const float webp_quality = get_option(parser, "webp", 101.f);
         save_webp(tile_images(images), out_image, webp_quality);
     }
+#endif
     else
     {
         save_jpeg(tile_images(images), out_image, JPEG_QUALITY);
@@ -650,7 +656,9 @@ int main(int argc, char** argv)
         parser.add_option("rmignore","Remove all boxes marked ignore and save the results to a new XML file.");
         parser.add_option("rm-if-overlaps","Remove all boxes labeled <arg> if they overlap any box not labeled <arg> and save the results to a new XML file.",1);
         parser.add_option("jpg", "When saving images to disk, write them as jpg files instead of png.");
+#ifdef DLIB_WEBP_SUPPORT
         parser.add_option("webp", "When saving images to disk, write them as webp files instead of png or jpg, using <arg> as the quality factor.", 1);
+#endif
 
         parser.set_group_name("Cropping sub images");
         parser.add_option("resample", "Crop out images that are centered on each object in the dataset. "
@@ -764,7 +772,9 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("rmtrunc", "ignore");
         parser.check_incompatible_options("box-images", "rename");
         parser.check_incompatible_options("box-images", "ignore");
+#ifdef DLIB_WEBP_SUPPORT
         parser.check_incompatible_options("jpg", "webp");
+#endif
         const char* convert_args[] = {"pascal-xml","pascal-v1","idl"};
         parser.check_option_arg_range("convert", convert_args);
         parser.check_option_arg_range("cluster", 0, 999);
@@ -774,7 +784,9 @@ int main(int argc, char** argv)
         parser.check_option_arg_range("cropped-object-size", 4, 10000*10000);
         parser.check_option_arg_range("crop-size", 1.0, 100.0);
         parser.check_option_arg_range("split-train-test", 0.0, 1.0);
+#ifdef DLIB_WEBP_SUPPORT
         parser.check_option_arg_range("webp", 0.f, std::numeric_limits<float>::max());
+#endif
 
         if (parser.option("h"))
         {
