@@ -112,7 +112,7 @@ jobs:
     - name: Test
       run: ${{ env.build_dir }}/${{ env.config }}/dtest.exe --runall -q
     - name: Build ancillary tools
-      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --target imglab htmlify convert_dlib_nets_to_caffe_build --parallel 4
+      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --target imglab htmlify dtoc --parallel 4
 
   macos-latest:
     runs-on: 'macos-latest'
