@@ -302,6 +302,7 @@ int cluster_dataset(
                 temp.push_back(images[assignments[i].idx]);
         }
 
+#ifdef DLIB_WEBP_SUPPORT
         if (parser.option("webp"))
         {
             string outfile = "cluster_"+pad_int_with_zeros(c+1, 3) + ".webp";
@@ -310,6 +311,7 @@ int cluster_dataset(
             save_webp(tile_images(temp), outfile, webp_quality);
         }
         else
+#endif
         {
             string outfile = "cluster_"+pad_int_with_zeros(c+1, 3) + ".jpg";
             cout << "Saving " << outfile << endl;

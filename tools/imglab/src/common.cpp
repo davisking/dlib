@@ -58,6 +58,7 @@ std::string to_jpg_name (const std::string& filename)
 
 // ----------------------------------------------------------------------------------------
 
+#ifdef DLIB_WEBP_SUPPORT
 std::string to_webp_name (const std::string& filename)
 {
     std::string::size_type pos = filename.find_last_of(".");
@@ -65,6 +66,7 @@ std::string to_webp_name (const std::string& filename)
         throw dlib::error("invalid filename: " + filename);
     return filename.substr(0,pos) + ".webp";
 }
+#endif
 
 // ----------------------------------------------------------------------------------------
 
