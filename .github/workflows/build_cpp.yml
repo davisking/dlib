@@ -114,6 +114,19 @@ jobs:
     - name: Build ancillary tools
       run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --target imglab htmlify dtoc --parallel 4
 
+  windows-latest-debug:
+    runs-on: 'windows-latest'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Configure
+      run: cmake . -B ${{ env.build_dir }}
+    - name: Build just tests
+      run: cmake --build ${{ env.build_dir }} --config Debug --target dtest --parallel 4
+    - name: Build ancillary tools
+      run: cmake --build ${{ env.build_dir }} --config Debug --target imglab htmlify dtoc --parallel 4
+    - name: Build everything else 
+      run: cmake --build ${{ env.build_dir }} --config Debug 
+
   macos-latest:
     runs-on: 'macos-latest'
     steps:
