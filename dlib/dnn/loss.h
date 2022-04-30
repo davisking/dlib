@@ -6,7 +6,6 @@
 #include "loss_abstract.h"
 #include "core.h"
 #include "utilities.h"
-#include "misc.h"
 #include "../matrix.h"
 #include "../cuda/tensor_tools.h"
 #include "../geometry.h"
@@ -771,6 +770,13 @@ namespace dlib
         typedef std::vector<float> training_label_type;
         typedef std::vector<float> output_label_type;
 
+        loss_multibinary_log_() = default;
+
+        loss_multibinary_log_(double gamma) : gamma(gamma)
+        {
+            DLIB_CASSERT(gamma >= 0);
+        }
+
         template <
             typename SUB_TYPE,
             typename label_iterator
@@ -843,43 +849,62 @@ namespace dlib
                     if (y > 0)
                     {
                         const float temp = log1pexp(-out_data[idx]);
-                        loss += y * scale * temp;
-                        g[idx] = y * scale * (g[idx] - 1);
+                        const float focus = std::pow(1 - g[idx], gamma);
+                        loss += y * scale * temp * focus;
+                        g[idx] = y * scale * focus * (g[idx] * (gamma * temp + 1) - 1);
                     }
                     else
                     {
                         const float temp = -(-out_data[idx] - log1pexp(-out_data[idx]));
-                        loss += -y * scale * temp;
-                        g[idx] = -y * scale * g[idx];
+                        const float focus = std::pow(g[idx], gamma);
+                        loss += -y * scale * temp * focus;
+                        g[idx] = -y * scale * focus * g[idx] * (gamma * temp + 1);
                     }
                 }
             }
             return loss;
         }
 
-        friend void serialize(const loss_multibinary_log_&, std::ostream& out)
+        double get_gamma () const { return gamma; }
+
+        friend void serialize(const loss_multibinary_log_& item, std::ostream& out)
         {
-            serialize("loss_multibinary_log_", out);
+            serialize("loss_multibinary_log_2", out);
+            serialize(item.gamma, out);
         }
 
-        friend void deserialize(loss_multibinary_log_&, std::istream& in)
+        friend void deserialize(loss_multibinary_log_& item, std::istream& in)
         {
             std::string version;
             deserialize(version, in);
-            if (version != "loss_multibinary_log_")
+            if (version == "loss_multibinary_log_")
+            {
+                item.gamma = 0;
+                return;
+            }
+            else if (version == "loss_multibinary_log_2")
+            {
+                deserialize(item.gamma, in);
+            }
+            else
+            {
                 throw serialization_error("Unexpected version found while deserializing dlib::loss_multibinary_log_.");
+            }
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const loss_multibinary_log_& )
+        friend std::ostream& operator<<(std::ostream& out, const loss_multibinary_log_& item)
         {
-            out << "loss_multibinary_log";
+            out << "loss_multibinary_log (gamma=" << item.gamma << ")";
             return out;
         }
 
-        friend void to_xml(const loss_multibinary_log_& /*item*/, std::ostream& out)
+        friend void to_xml(const loss_multibinary_log_& item, std::ostream& out)
         {
-            out << "<loss_multibinary_log/>";
+            out << "<loss_multibinary_log gamma='" << item.gamma << "'/>";
         }
+
+    private:
+        double gamma = 0;
     };
 
     template <typename SUBNET>
@@ -3906,7 +3931,7 @@ namespace dlib
             if (count != tag_count())
                 throw serialization_error("Invalid number of detection tags " + std::to_string(count) +
                                           ", while deserializing dlib::loss_yolo_, expecting " +
-                                          std::to_string(tag_count()) + "tags instead.");
+                                          std::to_string(tag_count()) + " tags instead.");
             deserialize(item.options, in);
         }
 

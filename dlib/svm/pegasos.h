@@ -655,7 +655,7 @@ namespace dlib
 
         trainer_type trainer;
         scalar_type min_learning_rate;
-        bool verbose;
+        bool verbose = true;
         bool use_cache;
         long cache_size;
 

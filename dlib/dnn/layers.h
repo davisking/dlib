@@ -1733,153 +1733,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    namespace impl
-    {
-        class visitor_bn_running_stats_window_size
-        {
-        public:
-
-            visitor_bn_running_stats_window_size(unsigned long new_window_size_) : new_window_size(new_window_size_) {}
-
-            template <typename T>
-            void set_window_size(T&) const
-            {
-                // ignore other layer detail types
-            }
-
-            template < layer_mode mode >
-            void set_window_size(bn_<mode>& l) const
-            {
-                l.set_running_stats_window_size(new_window_size);
-            }
-
-            template<typename input_layer_type>
-            void operator()(size_t , input_layer_type& )  const
-            {
-                // ignore other layers
-            }
-
-            template <typename T, typename U, typename E>
-            void operator()(size_t , add_layer<T,U,E>& l)  const
-            {
-                set_window_size(l.layer_details());
-            }
-
-        private:
-
-            unsigned long new_window_size;
-        };
-
-        class visitor_disable_input_bias
-        {
-        public:
-
-            template <typename T>
-            void disable_input_bias(T&) const
-            {
-                // ignore other layer types
-            }
-
-            // handle the standard case
-            template <typename U, typename E>
-            void disable_input_bias(add_layer<layer_norm_, U, E>& l)
-            {
-                disable_bias(l.subnet().layer_details());
-                set_bias_learning_rate_multiplier(l.subnet().layer_details(), 0);
-                set_bias_weight_decay_multiplier(l.subnet().layer_details(), 0);
-            }
-
-            template <layer_mode mode, typename U, typename E>
-            void disable_input_bias(add_layer<bn_<mode>, U, E>& l)
-            {
-                disable_bias(l.subnet().layer_details());
-                set_bias_learning_rate_multiplier(l.subnet().layer_details(), 0);
-                set_bias_weight_decay_multiplier(l.subnet().layer_details(), 0);
-            }
-
-            // handle input repeat layer case
-            template <layer_mode mode, size_t N, template <typename> class R, typename U, typename E>
-            void disable_input_bias(add_layer<bn_<mode>, repeat<N, R, U>, E>& l)
-            {
-                disable_bias(l.subnet().get_repeated_layer(0).layer_details());
-                set_bias_learning_rate_multiplier(l.subnet().get_repeated_layer(0).layer_details(), 0);
-                set_bias_weight_decay_multiplier(l.subnet().get_repeated_layer(0).layer_details(), 0);
-            }
-
-            template <size_t N, template <typename> class R, typename U, typename E>
-            void disable_input_bias(add_layer<layer_norm_, repeat<N, R, U>, E>& l)
-            {
-                disable_bias(l.subnet().get_repeated_layer(0).layer_details());
-                set_bias_learning_rate_multiplier(l.subnet().get_repeated_layer(0).layer_details(), 0);
-                set_bias_weight_decay_multiplier(l.subnet().get_repeated_layer(0).layer_details(), 0);
-            }
-
-            // handle input repeat layer with tag case
-            template <layer_mode mode, unsigned long ID, typename E>
-            void disable_input_bias(add_layer<bn_<mode>, add_tag_layer<ID, impl::repeat_input_layer>, E>& )
-            {
-            }
-
-            template <unsigned long ID, typename E>
-            void disable_input_bias(add_layer<layer_norm_, add_tag_layer<ID, impl::repeat_input_layer>, E>& )
-            {
-            }
-
-            // handle tag layer case
-            template <layer_mode mode, unsigned long ID, typename U, typename E>
-            void disable_input_bias(add_layer<bn_<mode>, add_tag_layer<ID, U>, E>& )
-            {
-            }
-
-            template <unsigned long ID, typename U, typename E>
-            void disable_input_bias(add_layer<layer_norm_, add_tag_layer<ID, U>, E>& )
-            {
-            }
-
-            // handle skip layer case
-            template <layer_mode mode, template <typename> class TAG, typename U, typename E>
-            void disable_input_bias(add_layer<bn_<mode>, add_skip_layer<TAG, U>, E>& )
-            {
-            }
-
-            template <template <typename> class TAG, typename U, typename E>
-            void disable_input_bias(add_layer<layer_norm_, add_skip_layer<TAG, U>, E>& )
-            {
-            }
-
-            template<typename input_layer_type>
-            void operator()(size_t , input_layer_type& ) const
-            {
-                // ignore other layers
-            }
-
-            template <typename T, typename U, typename E>
-            void operator()(size_t , add_layer<T,U,E>& l)
-            {
-                disable_input_bias(l);
-            }
-        };
-    }
-
-    template <typename net_type>
-    void set_all_bn_running_stats_window_sizes (
-        net_type& net,
-        unsigned long new_window_size
-    )
-    {
-        visit_layers(net, impl::visitor_bn_running_stats_window_size(new_window_size));
-    }
-
-    template <typename net_type>
-    void disable_duplicative_biases (
-        net_type& net
-    )
-    {
-        visit_layers(net, impl::visitor_disable_input_bias());
-    }
-
-// ----------------------------------------------------------------------------------------
-
     enum fc_bias_mode
     {
         FC_HAS_BIAS = 0,
@@ -3283,6 +3136,7 @@ namespace dlib
     using prelu = add_layer<prelu_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
+
     class leaky_relu_
     {
     public:
@@ -3798,6 +3652,85 @@ namespace dlib
 
     template <typename SUBNET>
     using gelu = add_layer<gelu_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class smelu_
+    {
+    public:
+        explicit smelu_(
+            float beta_ = 1
+        ) : beta(beta_)
+        {
+        }
+
+        float get_beta(
+        ) const {
+            return beta;
+        }
+
+        template <typename SUBNET>
+        void setup(const SUBNET& /*sub*/)
+        {
+        }
+
+        void forward_inplace(const tensor& input, tensor& output)
+        {
+            tt::smelu(output, input, beta);
+        }
+
+        void backward_inplace(
+            const tensor& computed_output,
+            const tensor& gradient_input,
+            tensor& data_grad,
+            tensor&
+        )
+        {
+            tt::smelu_gradient(data_grad, computed_output, gradient_input, beta);
+        }
+
+        inline dpoint map_input_to_output (const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input (const dpoint& p) const { return p; }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const smelu_& item, std::ostream& out)
+        {
+            serialize("smelu_", out);
+            serialize(item.beta, out);
+        }
+
+        friend void deserialize(smelu_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "smelu_")
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::smelu_.");
+            deserialize(item.beta, in);
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const smelu_& item)
+        {
+            out << "smelu\t("
+                << "beta=" << item.beta
+                << ")";
+            return out;
+        }
+
+        friend void to_xml(const smelu_& item, std::ostream& out)
+        {
+            out << "<smelu beta='"<< item.beta << "'>\n";
+            out << "<smelu/>\n";
+        }
+
+    private:
+        resizable_tensor params;
+        float beta;
+    };
+
+    template <typename SUBNET>
+    using smelu = add_layer<smelu_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -4450,83 +4383,6 @@ namespace dlib
 
     template <typename SUBNET>
     using reorg = add_layer<reorg_<2, 2>, SUBNET>;
-
-// ----------------------------------------------------------------------------------------
-
-    namespace impl
-    {
-        class visitor_fuse_layers
-        {
-            public:
-            template <typename T>
-            void fuse_convolution(T&) const
-            {
-                // disable other layer types
-            }
-
-            // handle the standard case (convolutional layer followed by affine;
-            template <long nf, long nr, long nc, int sy, int sx, int py, int px, typename U, typename E>
-            void fuse_convolution(add_layer<affine_, add_layer<con_<nf, nr, nc, sy, sx, py, px>, U>, E>& l)
-            {
-                if (l.layer_details().is_disabled())
-                    return;
-
-                // get the convolution below the affine layer
-                auto& conv = l.subnet().layer_details();
-
-                // get the parameters from the affine layer as alias_tensor_instance
-                alias_tensor_instance gamma = l.layer_details().get_gamma();
-                alias_tensor_instance beta = l.layer_details().get_beta();
-
-                if (conv.bias_is_disabled())
-                {
-                    conv.enable_bias();
-                }
-
-                tensor& params = conv.get_layer_params();
-
-                // update the biases
-                auto biases = alias_tensor(1, conv.num_filters());
-                biases(params, params.size() - conv.num_filters()) += mat(beta);
-
-                // guess the number of input channels
-                const long k_in = (params.size() - conv.num_filters()) / conv.num_filters() / conv.nr() / conv.nc();
-
-                // rescale the filters
-                DLIB_CASSERT(conv.num_filters() == gamma.k());
-                alias_tensor filter(1, k_in, conv.nr(), conv.nc());
-                const float* g = gamma.host();
-                for (long n = 0; n < conv.num_filters(); ++n)
-                {
-                    filter(params, n * filter.size()) *= g[n];
-                }
-
-                // disable the affine layer
-                l.layer_details().disable();
-            }
-
-            template <typename input_layer_type>
-            void operator()(size_t , input_layer_type& ) const
-            {
-                // ignore other layers
-            }
-
-            template <typename T, typename U, typename E>
-            void operator()(size_t , add_layer<T, U, E>& l)
-            {
-                fuse_convolution(l);
-            }
-        };
-    }
-
-    template <typename net_type>
-    void fuse_layers (
-        net_type& net
-    )
-    {
-        DLIB_CASSERT(count_parameters(net) > 0, "The network has to be allocated before fusing the layers.");
-        visit_layers(net, impl::visitor_fuse_layers());
-    }
 
 // ----------------------------------------------------------------------------------------
 

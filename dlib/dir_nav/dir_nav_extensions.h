@@ -21,6 +21,12 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    bool directory_exists (
+        const std::string& dirname
+    );
+
+// ----------------------------------------------------------------------------------------
+
     namespace implementation_details
     {
         void get_all_sub_dirs (

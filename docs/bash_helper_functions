@@ -35,7 +35,7 @@ git_logs_as_xml()
     (echo "<log>"; git log --stat=80 --date=iso-strict --pretty=format:"</files_changed></logentry>%n<logentry revision=\"%H\">%n<author email=\"%ae\">%an</author>%n<date>%ad</date>%nGIT_COMMIT_MESSAGE_BEGIN%sGIT_COMMIT_MESSAGE_END%n<files_changed>%n" $logrange $paths | tail -n+2 ; echo; echo '</files_changed></logentry>' ; echo "</log>" ) > $outfile
 
     # sanitize git commit messages
-    sed -e '/GIT_COMMIT_MESSAGE_BEGIN.*GIT_COMMIT_MESSAGE_END/ { s/</\&lt;/g; s/>/\&gt;/g; s/GIT_COMMIT_MESSAGE_BEGIN/<msg>/g; s/GIT_COMMIT_MESSAGE_END/<\/msg>/g;  }' -i $outfile
+    sed -e '/GIT_COMMIT_MESSAGE_BEGIN.*GIT_COMMIT_MESSAGE_END/ { s/</\&lt;/g; s/>/\&gt;/g; s/&/&amp;/g; s/GIT_COMMIT_MESSAGE_BEGIN/<msg>/g; s/GIT_COMMIT_MESSAGE_END/<\/msg>/g;  }' -i $outfile
 
     # trim whitespace at start and end of <files_changed> tags.
     sed -e ':a' -e 'N' -e '$!ba'  -e "s/<files_changed>[ \n]*/<files_changed> /g" -e "s/[ \n]*<\/files_changed>/<\/files_changed>/g" -i $outfile

@@ -34,10 +34,10 @@ class serv : public server_iostream
         std::istream& in,
         std::ostream& out,
         const std::string& foreign_ip,
-        const std::string& local_ip,
-        unsigned short foreign_port,
-        unsigned short local_port,
-        uint64 connection_id
+        const std::string& /*local_ip*/,
+        unsigned short /*foreign_port*/,
+        unsigned short /*local_port*/,
+        uint64 /*connection_id*/
     )
     {
         // The details of the connection are contained in the last few arguments to

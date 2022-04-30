@@ -12,6 +12,29 @@
 
 <current>
 New Features and Improvements:
+   - Added Beta distribution to dlib::rand.
+   - Added directory_exists.
+   - Added bgr_alpha_pixel type.
+   - Added support for loading and saving WebP images.
+   - Deep learning tooling:
+      - Added ReOrg layer.
+      - Added visitor to draw network architectures using the DOT language.
+      - Made Barlow Twins loss much faster for high dimensionality inputs.
+      - Added Focal loss gamma to loss_multibinary_log_.
+      - Added SmeLU activation layer.
+
+Non-Backwards Compatible Changes:
+   - Do not round coordinates in rectangle_transform (PR #2498).
+
+Bug fixes:
+   - Fix missing ssize_t definition on Windows (PR #2492)
+   - Fix Barlow Twins loss gradient (PR #2518)
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.23" date="Jan 24, 2022">
+New Features and Improvements:
    - Added serialization support for std::variant and std::optional.
    - Added upgrades to dlib::type_safe_union: type_safe_union_size, type_safe_union_alternative_t,
      made into variadic template, more generic visit() method.
@@ -35,7 +58,7 @@ Bug fixes:
    - Fix trainer with unsupervised loss (PR #2436)
    - Fix dnn_trainer trying to decrease the learning rate (PR #2442)
    - Fix Layer Normalize (PR #2489)
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 

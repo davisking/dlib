@@ -29,7 +29,7 @@ endif()
 set(USING_OLD_VISUAL_STUDIO_COMPILER 0)
 if(MSVC AND MSVC_VERSION VERSION_LESS 1900)
    message(FATAL_ERROR "C++11 is required to use dlib, but the version of Visual Studio you are using is too old and doesn't support C++11.  You need Visual Studio 2015 or newer. ")
-elseif(MSVC AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.0.24210.0 ) 
+elseif(MSVC AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.0.24210.0 AND "MSVC" MATCHES ${CMAKE_CXX_COMPILER_ID})
    message(STATUS "NOTE: Visual Studio didn't have good enough C++11 support until Visual Studio 2015 update 3 (v19.0.24210.0)")
    message(STATUS "So we aren't enabling things that require full C++11 support (e.g. the deep learning tools).")
    message(STATUS "Also, be aware that Visual Studio's version naming is confusing, in particular, there are multiple versions of 'update 3'")
@@ -131,8 +131,9 @@ if (CMAKE_COMPILER_IS_GNUCXX)
    list(APPEND active_compile_opts "-Wreturn-type")
 endif()
 
-if ("Clang" MATCHES ${CMAKE_CXX_COMPILER_ID})
-   # Increase clang's default tempalte recurision depth so the dnn examples don't error out.
+if ("Clang" MATCHES ${CMAKE_CXX_COMPILER_ID} AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.0.0)
+   # Clang 6 had a default template recursion depth of 256. This was changed to 1024 in Clang 7.
+   # It must be increased on Clang 6 and below to ensure that the dnn examples don't error out.
    list(APPEND active_compile_opts "-ftemplate-depth=500")
 endif()
 
@@ -150,7 +151,8 @@ if (MSVC)
 
    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 3.3) 
       # Clang can compile all Dlib's code at Windows platform. Tested with Clang 5
-      list(APPEND active_compile_opts "-Xclang -fcxx-exceptions")
+      list(APPEND active_compile_opts -Xclang)
+      list(APPEND active_compile_opts -fcxx-exceptions)
    endif()
 endif()
 

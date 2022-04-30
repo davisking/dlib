@@ -31,7 +31,7 @@ namespace dlib
                 - #*this is properly initialized
         !*/
 
-        crc32 (        
+        crc32 (
             const std::string& item
         );
         /*!

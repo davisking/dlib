@@ -411,7 +411,6 @@ public:
         group1(*this),
         group2(*this),
         group3(*this),
-        keyboard_count(1),
         keydown(*this),
         keyup(*this),
         l1(*this),
@@ -759,7 +758,6 @@ private:
     widget_group group1;
     widget_group group2;
     widget_group group3;
-    int keyboard_count;
     label keydown;
     label keyup;
     label l1;

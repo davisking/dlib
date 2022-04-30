@@ -367,6 +367,19 @@ namespace
             }
         }
 
+        {
+            const rectangle input(1,1,6,4); 
+            const rectangle output = set_rect_area(input,4*input.area());
+            DLIB_TEST(output.area() == 4*input.area());
+            DLIB_TEST(output.width() == 2*input.width());
+            DLIB_TEST(output.height() == 2*input.height());
+
+            const auto input_center = center(input);
+            const auto output_center = center(output);
+            DLIB_TEST(std::abs(input_center.x() - output_center.x()) <= 1);
+            DLIB_TEST(std::abs(input_center.y() - output_center.y()) <= 1);
+        }
+
     }
 
 // ----------------------------------------------------------------------------------------

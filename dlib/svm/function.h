@@ -44,15 +44,6 @@ namespace dlib
         ) : b(0), kernel_function(K()) {}
 
         decision_function (
-            const decision_function& d
-        ) : 
-            alpha(d.alpha), 
-            b(d.b),
-            kernel_function(d.kernel_function),
-            basis_vectors(d.basis_vectors) 
-        {}
-
-        decision_function (
             const scalar_vector_type& alpha_,
             const scalar_type& b_,
             const K& kernel_function_,
@@ -138,14 +129,6 @@ namespace dlib
         ) : alpha(0), beta(0), decision_funct(function_type()) {}
 
         probabilistic_function (
-            const probabilistic_function& d
-        ) : 
-            alpha(d.alpha),
-            beta(d.beta),
-            decision_funct(d.decision_funct)
-        {}
-
-        probabilistic_function (
             const scalar_type a_,
             const scalar_type b_,
             const function_type& decision_funct_ 
@@ -226,14 +209,6 @@ namespace dlib
 
         probabilistic_decision_function (
             const probabilistic_function<decision_function<K> >& d
-        ) : 
-            alpha(d.alpha),
-            beta(d.beta),
-            decision_funct(d.decision_funct)
-        {}
-
-        probabilistic_decision_function (
-            const probabilistic_decision_function& d
         ) : 
             alpha(d.alpha),
             beta(d.beta),
@@ -351,16 +326,6 @@ namespace dlib
                 << "\n\t f.alpha.size(): " << f.alpha.size()
                 << "\n\t f.basis_vectors.size(): " << f.basis_vectors.size()
                 );
-        }
-
-        distance_function (
-            const distance_function& d
-        ) : 
-            alpha(d.alpha), 
-            b(d.b),
-            kernel_function(d.kernel_function),
-            basis_vectors(d.basis_vectors) 
-        {
         }
 
         distance_function (
@@ -586,13 +551,6 @@ namespace dlib
         normalized_function (
         ){}
 
-        normalized_function (
-            const normalized_function& f
-        ) :
-            normalizer(f.normalizer),
-            function(f.function)
-        {}
-
         const std::vector<result_type> get_labels(
         ) const { return function.get_labels(); }
 
@@ -672,10 +630,6 @@ namespace dlib
 
         projection_function (
         ) {}
-
-        projection_function (
-            const projection_function& f
-        ) : weights(f.weights), kernel_function(f.kernel_function), basis_vectors(f.basis_vectors) {}
 
         projection_function (
             const scalar_matrix_type& weights_,

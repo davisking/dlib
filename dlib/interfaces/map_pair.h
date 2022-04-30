@@ -31,6 +31,9 @@ namespace dlib
         typedef T1 key_type;
         typedef T2 value_type;
 
+        map_pair() = default;
+        map_pair(const map_pair&) = default;
+
         virtual ~map_pair(
         )=0;
 

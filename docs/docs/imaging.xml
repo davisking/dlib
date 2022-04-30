@@ -68,6 +68,7 @@
          <item>rgb_pixel</item>
          <item>bgr_pixel</item>
          <item>rgb_alpha_pixel</item>
+         <item>bgr_alpha_pixel</item>
          <item>hsi_pixel</item>
          <item>lab_pixel</item>
          <item>pixel_traits</item>
@@ -89,6 +90,9 @@
          <item>save_dng</item> 
          <item>save_png</item> 
          <item>save_jpeg</item> 
+         <item>webp_loader</item>
+         <item>load_webp</item>
+         <item>save_webp</item>
       </section>
 
       <section>
@@ -852,7 +856,27 @@
          </description>
                                  
       </component>
-            
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>bgr_alpha_pixel</name>
+         <file>dlib/pixel.h</file>
+         <spec_file link="true">dlib/pixel.h</spec_file>
+         <description>
+            This is a simple struct that represents an BGR colored graphical pixel with an
+            alpha channel.
+            <p>
+            The difference between this object and the <a href="#rgb_alpha_pixel">rgb_alpha_pixel</a>
+            is just that this struct lays its pixels down in memory in BGR order rather
+            than RGB order.  You only care about this if you are doing something like
+            using the <a href="#cv_image">cv_image</a> object to map an OpenCV image
+            into a more object oriented form.
+            </p>
+         </description>
+
+      </component>
+
    <!-- ************************************************************************* -->
       
       <component>
@@ -1067,7 +1091,26 @@
          </description>
                                  
       </component>
-            
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>webp_loader</name>
+         <file>dlib/image_io.h</file>
+         <spec_file link="true">dlib/image_loader/webp_loader_abstract.h</spec_file>
+         <description>
+            This object loads a WebP image file into
+            an <a href="containers.html#array2d">array2d</a> of <a href="dlib/pixel.h.html">pixels</a>.
+            <p>
+               Note that you must define DLIB_WEBP_SUPPORT if you want to use this object.  You
+               must also set your build environment to link to the libwebp library.  However,
+               if you use CMake and dlib's default CMakeLists.txt file then it will get setup
+               automatically.
+            </p>
+         </description>
+
+      </component>
+
    <!-- ************************************************************************* -->
       
       <component>
@@ -1078,7 +1121,7 @@
             This function loads a JPEG image file into 
             an <a href="containers.html#array2d">array2d</a> of <a href="dlib/pixel.h.html">pixels</a>.
             <p>
-               Note that you must define DLIB_JPEG_SUPPORT if you want to use this object.  You
+               Note that you must define DLIB_JPEG_SUPPORT if you want to use this function.  You
                must also set your build environment to link to the libjpeg library.  However,
                if you use CMake and dlib's default CMakeLists.txt file then it will get setup
                automatically.
@@ -1100,6 +1143,24 @@
                                  
       </component>
             
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>load_webp</name>
+         <file>dlib/image_io.h</file>
+         <spec_file link="true">dlib/image_loader/image_loader_abstract.h</spec_file>
+         <description>
+            This function loads a WebP image file into
+            an <a href="containers.html#array2d">array2d</a> of <a href="dlib/pixel.h.html">pixels</a>.
+            <p>
+               Note that you must define DLIB_WEBP_SUPPORT if you want to use this function.  You
+               must also set your build environment to link to the libwebp library.  However,
+               if you use CMake and dlib's default CMakeLists.txt file then it will get setup
+               automatically.
+            </p>
+         </description>
+      </component>
+
    <!-- ************************************************************************* -->
       
       <component>
@@ -1169,7 +1230,32 @@
          </description>
                                  
       </component>
-            
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>save_webp</name>
+         <file>dlib/image_io.h</file>
+         <spec_file link="true">dlib/image_saver/save_webp_abstract.h</spec_file>
+         <description>
+      This global function writes an image to disk as a WebP file.
+            <p>
+               Note that you must define DLIB_WEBP_SUPPORT if you want to use this function.  You
+               must also set your build environment to link to the libwebp library.  However,
+               if you use CMake and dlib's default CMakeLists.txt file then it will get setup
+               automatically.
+            </p>
+            <p>
+               This routine can save images containing any type of pixel.  However, save_webp() can
+               only natively store the following pixel types: <b>rgb_pixel</b>,
+               <b>rgb_alpha_pixel</b>, <b>bgr_pixel</b>, and <b>bgr_alpha_pixel</b>.
+               All other pixel types will be converted into one of these types as appropriate
+               before being saved to disk.
+            </p>
+         </description>
+
+      </component>
+
    <!-- ************************************************************************* -->
       
       <component>
@@ -1219,7 +1305,7 @@
             This function loads a Portable Network Graphics (PNG) image file into 
             an <a href="containers.html#array2d">array2d</a> of <a href="dlib/pixel.h.html">pixels</a>.
             <p>
-               Note that you must define DLIB_PNG_SUPPORT if you want to use this object.  You
+               Note that you must define DLIB_PNG_SUPPORT if you want to use this function.  You
                must also set your build environment to link to the libpng library.  However,
                if you use CMake and dlib's default CMakeLists.txt file then it will get setup
                automatically.

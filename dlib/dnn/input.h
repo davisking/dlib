@@ -476,7 +476,6 @@ namespace dlib
         typedef matrix<T,NR,NC,MM,L> input_type;
 
         input() {}
-        input(const input&) {}
 
         template <typename mm>
         input(const input<array2d<T,mm>>&) {}
@@ -728,25 +727,25 @@ namespace dlib
 
         }
 
-        friend void serialize(const input& item, std::ostream& out)
+        friend void serialize(const input&, std::ostream& out)
         {
             serialize("input<array2d>", out);
         }
 
-        friend void deserialize(input& item, std::istream& in)
+        friend void deserialize(input&, std::istream& in)
         {
             std::string version;
             deserialize(version, in);
             if (version != "input<array2d>")
                 throw serialization_error("Unexpected version found while deserializing dlib::input.");
         }
-        friend std::ostream& operator<<(std::ostream& out, const input& item)
+        friend std::ostream& operator<<(std::ostream& out, const input&)
         {
             out << "input<array2d>";
             return out;
         }
 
-        friend void to_xml(const input& item, std::ostream& out)
+        friend void to_xml(const input&, std::ostream& out)
         {
             out << "<input/>";
         }

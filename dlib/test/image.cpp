@@ -2306,6 +2306,119 @@ namespace
         DLIB_TEST(image == result);
     }
 
+    template <typename pixel_type>
+    double psnr(const matrix<pixel_type>& img1, const matrix<pixel_type>& img2)
+    {
+        DLIB_TEST(have_same_dimensions(img1, img2));
+        double mse = 0;
+        const long nk = width_step(img1) / img1.nc();
+        const long data_size = img1.size() * nk;
+        const bool has_alpha = nk == 4;
+        auto data1 = reinterpret_cast<const uint8_t*>(image_data(img1));
+        auto data2 = reinterpret_cast<const uint8_t*>(image_data(img2));
+        for (long i = 0; i < data_size; i += nk)
+        {
+            // We are using the default WebP settings, which means 'exact' is disabled.
+            // RGB values in transparent areas will be modified to improve compression.
+            // As a result, we skip matching transparent pixels.
+            if (has_alpha && data1[i + 3] == 0 && data2[i + 3] == 0)
+                    continue;
+            for (long k = 0; k < nk; ++k)
+                mse += std::pow(static_cast<double>(data1[i + k]) - static_cast<double>(data2[i + k]), 2);
+        }
+        mse /= data_size;
+        return 20 * std::log10(pixel_traits<pixel_type>::max()) - 10 * std::log10(mse);
+    }
+
+    void test_webp()
+    {
+#ifdef DLIB_WEBP_SUPPORT
+    print_spinner();
+    matrix<rgb_pixel> rgb_img, rgb_dec;
+    matrix<rgb_alpha_pixel> rgba_img, rgba_dec;
+    matrix<bgr_pixel> bgr_img, bgr_dec;
+    matrix<bgr_alpha_pixel> bgra_img, bgra_dec;
+    // this is a matrix<rgb_alpha_pixel> of the 32x32 dlib logo
+    const std::string data{
+        "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"
+    };
+        ostringstream sout;
+        istringstream sin;
+        base64 base64_coder;
+        compress_stream::kernel_1ea compressor;
+        sin.str(data);
+        base64_coder.decode(sin, sout);
+        sin.clear();
+        sin.str(sout.str());
+        sout.clear();
+        sout.str("");
+        compressor.decompress(sin, sout);
+        sin.clear();
+        sin.str(sout.str());
+        deserialize(rgba_img, sin);
+        for (auto quality : {75., 101.})
+        {
+            save_webp(rgba_img, "test_rgba.webp", quality);
+            load_webp(rgba_dec, "test_rgba.webp");
+            if (quality > 100)
+                DLIB_TEST(psnr(rgba_img, rgba_dec) == std::numeric_limits<double>::infinity());
+            else
+                DLIB_TEST(psnr(rgba_img, rgba_dec) > 30);
+
+            assign_image(bgra_img, rgba_img);
+            save_webp(bgra_img, "test_bgra.webp", quality);
+            load_webp(bgra_dec, "test_bgra.webp");
+            if (quality > 100)
+                DLIB_TEST(psnr(bgra_img, bgra_dec) == std::numeric_limits<double>::infinity());
+            else
+                DLIB_TEST(psnr(bgra_img, bgra_dec) > 30);
+
+            // Here we assign an image with an alpha channel to an image without an alpha channel.
+            // Since we are not using the exact mode in WebP, the PSNR will be quite low, since
+            // pixels in transparent areas will have different values.
+            assign_image(rgb_img, rgba_img);
+            save_webp(rgb_img, "test_rgb.webp", quality);
+            load_webp(rgb_dec, "test_rgb.webp");
+            if (quality > 100)
+                DLIB_TEST(psnr(rgb_img, rgb_dec) == std::numeric_limits<double>::infinity());
+            else
+                DLIB_TEST(psnr(rgb_img, rgb_dec) > 15);
+
+            assign_image(bgr_img, rgb_img);
+            save_webp(bgr_img, "test_bgr.webp", quality);
+            load_webp(bgr_dec, "test_bgr.webp");
+            if (quality > 100)
+                DLIB_TEST(psnr(bgr_img, bgr_dec) == std::numeric_limits<double>::infinity());
+            else
+                DLIB_TEST(psnr(bgr_img, bgr_dec) > 15);
+        }
+#endif
+    }
+
 // ----------------------------------------------------------------------------------------
 
     class image_tester : public tester
@@ -2411,6 +2524,7 @@ namespace
             test_interpolate_bilinear();
             test_letterbox_image();
             test_draw_string();
+            test_webp();
         }
     } a;
 

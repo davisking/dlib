@@ -2259,7 +2259,7 @@ namespace dlib
         void back_propagate_error(
             const tensor& /*x*/,
             const tensor& /*gradient_input*/,
-            zero_gradients zero_grads = zero_gradients::yes
+            zero_gradients /*zero_grads*/ = zero_gradients::yes
         )
         {
             // nothing to do
@@ -3746,7 +3746,7 @@ namespace dlib
                 typename visitor
                 >
             static void visit(
-                net_type& net,
+                net_type&,
                 const add_tag_layer<tag_id,SUBNET>& next_net,
                 visitor&& v
             )
@@ -3760,7 +3760,7 @@ namespace dlib
                 typename visitor
                 >
             static void visit(
-                net_type& net,
+                net_type&,
                 add_tag_layer<tag_id,SUBNET>& next_net,
                 visitor&& v
             )

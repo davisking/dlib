@@ -20,6 +20,7 @@
 // You should also consider telling dlib to link against libjpeg, libpng, libgif, fftw, CUDA, 
 // and a BLAS and LAPACK library.  To do this you need to uncomment the following #defines.
 #cmakedefine DLIB_JPEG_SUPPORT
+#cmakedefine DLIB_WEBP_SUPPORT
 #cmakedefine DLIB_PNG_SUPPORT
 #cmakedefine DLIB_GIF_SUPPORT
 #cmakedefine DLIB_USE_FFTW

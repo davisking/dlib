@@ -26,10 +26,10 @@ namespace dlib
         // this is here for backwards compatibility with older versions of dlib.
         typedef crc32 kernel_1a;
 
-        inline crc32 (        
+        inline crc32 (
         );
 
-        inline crc32 (        
+        inline crc32 (
             const std::string& item
         );
 
@@ -64,10 +64,6 @@ namespace dlib
         inline void swap (
             crc32& item
         );
-
-        inline crc32& operator=(
-            const crc32&
-        );  
 
     private:
 
@@ -147,7 +143,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     crc32::
-    crc32 (        
+    crc32 (
     )
     {
         checksum = 0xFFFFFFFF;
@@ -241,17 +237,6 @@ namespace dlib
     )
     {
         exchange(checksum,item.checksum);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    crc32& crc32::
-    operator=(
-        const crc32& item
-    )
-    {
-        checksum = item.checksum;
-        return *this;
     }
 
 // ----------------------------------------------------------------------------------------

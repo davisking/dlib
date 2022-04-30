@@ -687,7 +687,11 @@ namespace dlib { namespace tt
             tensor& beta_grad
     )
     {
+#ifdef DLIB_USE_CUDA
+        cuda::layer_normalize_gradient(eps, gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
+#else
         cpu::layer_normalize_gradient(eps, gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
+#endif
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1084,6 +1088,36 @@ namespace dlib { namespace tt
 #endif
     }
 
+// ----------------------------------------------------------------------------------------
+
+    void smelu (
+        tensor& dest,
+        const tensor& src,
+        const float beta
+    )
+    {
+        DLIB_CASSERT(beta > 0);
+#ifdef DLIB_USE_CUDA
+        cuda::smelu(dest, src, beta);
+#else
+        cpu::smelu(dest, src, beta);
+#endif
+    }
+
+    void smelu_gradient (
+        tensor& grad,
+        const tensor& dest,
+        const tensor& gradient_input,
+        const float beta
+    )
+    {
+        DLIB_CASSERT(beta > 0);
+#ifdef DLIB_USE_CUDA
+        cuda::smelu_gradient(grad, dest, gradient_input, beta);
+#else
+        cpu::smelu_gradient(grad, dest, gradient_input, beta);
+#endif
+    }
 // ----------------------------------------------------------------------------------------
 
     void resize_bilinear (

@@ -1824,23 +1824,6 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename net_type>
-    void set_all_bn_running_stats_window_sizes (
-        const net_type& net,
-        unsigned long new_window_size
-    );
-    /*!
-        requires
-            - new_window_size > 0
-            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
-              add_tag_layer.
-        ensures
-            - Sets the get_running_stats_window_size() field of all bn_ layers in net to
-              new_window_size.
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename net_type>
     void disable_duplicative_biases (
         const net_type& net
     );
@@ -2657,6 +2640,59 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class smelu_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines a smooth rectified linear
+                layer.  Therefore, it passes its inputs through the function f(x):
+                    - if (x > beta) 1
+                    - if (x < -beta) 0
+                    - else std::pow(x + beta, 2) / (4 * beta)
+                where f() is applied pointwise across the input tensor and beta is a
+                non-learned scalar.
+
+                This is the layer type introduced in the paper:
+                "Smooth activations and reproducibility in deep networks" by
+                Gil I. Shamir, Dong Lin, Lorenzo Coviello (https://arxiv.org/abs/2010.09931)
+        !*/
+
+    public:
+        explicit smelu_(
+            float beta = 1
+        );
+        /*!
+            ensures
+                - the beta parameter will be initialized with the beta value
+        !*/
+
+        float get_beta(
+        ) const;
+        /*!
+            ensures
+                - returns the beta parameter of the smelu
+        !*/
+
+        template <typename SUBNET> void setup(const SUBNET& sub);
+        void forward_inplace(const tensor& input, tensor& output);
+        void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_
+            interface.  Note that this layer doesn't have any parameters, so the tensor
+            returned by get_layer_params() is always empty.
+        !*/
+    };
+
+    template <typename SUBNET>
+    using smelu = add_layer<prelu_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     class softmax_
     {
         /*!
@@ -3352,23 +3388,6 @@ namespace dlib
 
     template <typename SUBNET>
     using reorg = add_layer<reorg_<2, 2>, SUBNET>;
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename net_type>
-    void fuse_layers (
-        net_type& net
-    );
-    /*!
-        requires
-            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
-              add_tag_layer.
-            - net has been properly allocated, that is: count_parameters(net) > 0.
-        ensures
-            - Disables all the affine_ layers that have a convolution as an input.
-            - Updates the convolution weights beneath the affine_ layers to produce the same
-              output as with the affine_ layers enabled.
-    !*/
 
 // ----------------------------------------------------------------------------------------
 

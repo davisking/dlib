@@ -117,14 +117,16 @@ namespace dlib
         private:
 
             row(T* data_, long cols) : data(data_), nc_(cols) {}
+            row(row&& r) = default;
+            row& operator=(row&& r) = default;
 
-            T* data; 
-            long nc_;
+            T* data = nullptr;
+            long nc_ = 0;
 
 
             // restricted functions
-            row(){}
-            row& operator=(row&);
+            row(const row&) = delete;
+            row& operator=(const row&) = delete;
         };
 
         // -----------------------------------

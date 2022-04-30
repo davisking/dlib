@@ -1,4 +1,4 @@
-name: C++ 
+name: C++
 
 on:
   push:
@@ -18,10 +18,14 @@ defaults:
     working-directory: dlib/test
 
 jobs:
-  ubuntu-latest-gcc-default:    
+  ubuntu-latest-gcc-default:
     runs-on: 'ubuntu-latest'
     steps:
     - uses: actions/checkout@v2
+    - name: Install dependecies
+      run: |
+        sudo apt update
+        sudo apt install libwebp-dev
     - name: Configure
       run: cmake ${{ github.workspace }}/dlib/test -B ${{ env.build_dir }}
     - name: Build just tests
@@ -32,13 +36,15 @@ jobs:
       run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --parallel 2
 
   ubuntu-latest-gcc-11:
-    if: ${{ false }}  # disabled until https://github.com/davisking/dlib/issues/2506 has been resolved
     runs-on: 'ubuntu-latest'
     steps:
     - uses: actions/checkout@v2
-    - name: Install gcc 11
+    - name: Install dependecies
       run: |
         sudo apt update
+        sudo apt install libwebp-dev
+    - name: Install gcc 11
+      run: |
         sudo apt install gcc-11 g++-11
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110 --slave /usr/bin/g++ g++ /usr/bin/g++-11 --slave /usr/bin/gcov gcov /usr/bin/gcov-11
     - name: Configure
@@ -54,6 +60,10 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
     - uses: actions/checkout@v2
+    - name: Install dependecies
+      run: |
+        sudo apt update
+        sudo apt install libwebp-dev
     - name: Configure
       run: |
         export CC=/usr/bin/clang
@@ -70,6 +80,10 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
     - uses: actions/checkout@v2
+    - name: Install dependecies
+      run: |
+        sudo apt update
+        sudo apt install libwebp-dev
     - name: Install clang 13
       run: |
         wget https://apt.llvm.org/llvm.sh
@@ -97,6 +111,8 @@ jobs:
       run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --target dtest --parallel 4
     - name: Test
       run: ${{ env.build_dir }}/${{ env.config }}/dtest.exe --runall -q
+    - name: Build ancillary tools
+      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --target imglab htmlify dtoc --parallel 4
 
   macos-latest:
     runs-on: 'macos-latest'
