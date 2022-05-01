@@ -979,8 +979,12 @@ namespace dlib
             long groups_
         )
         {
-            DLIB_CASSERT(groups_ > 0);
-            if (groups_ == 1)
+            DLIB_CASSERT(groups_ >= 0);
+            if (groups_ == 0)
+            {
+                groups_ = data.k();
+            }
+            else if (groups_ == 1)
             {
                 DLIB_CASSERT(data.k() == filters.k());
             }
