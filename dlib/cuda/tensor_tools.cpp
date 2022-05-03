@@ -1118,6 +1118,34 @@ namespace dlib { namespace tt
         cpu::smelu_gradient(grad, dest, gradient_input, beta);
 #endif
     }
+
+// ----------------------------------------------------------------------------------------
+
+    void silu (
+        tensor& dest,
+        const tensor& src
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::silu(dest,src);
+#else
+        cpu::silu(dest,src);
+#endif
+    }
+
+    void silu_gradient (
+        tensor& grad,
+        const tensor& src,
+        const tensor& gradient_input
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::silu_gradient(grad, src, gradient_input);
+#else
+        cpu::silu_gradient(grad, src, gradient_input);
+#endif
+    }
+
 // ----------------------------------------------------------------------------------------
 
     void resize_bilinear (

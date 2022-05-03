@@ -871,6 +871,14 @@ namespace dlib
             }
 
             template <typename U, typename E>
+            void operator()(size_t i, const add_layer<silu_, U, E>&)
+            {
+                start_node(i, "silu");
+                end_node();
+                update(i);
+            }
+
+            template <typename U, typename E>
             void operator()(size_t i, const add_layer<softmax_, U, E>&)
             {
                 start_node(i, "softmax");
