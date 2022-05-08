@@ -1792,6 +1792,41 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void silu (
+        tensor& dest,
+        const tensor& src
+    );
+    /*!
+        requires
+            - have_same_dimensions(dest, src) == true
+        ensures
+            - for all valid i:
+                - #dest.host()[i] == src.host()[i] * sigmoid(src.host()[i])
+            - This function supports in-place operation, i.e. having
+              is_same_object(dest, src)==true
+    !*/
+
+    void silu_gradient (
+        tensor& grad,
+        const tensor& src,
+        const tensor& gradient_input
+    );
+    /*!
+        requires
+            - have_same_dimensions(src,gradient_input) == true
+            - have_same_dimensions(src,grad) == true
+        ensures
+            - Recalling that dest is the output of silu(dest,src), let f(src) ==
+              dot(gradient_input,dest). Then this function computes the gradient of f() with respect
+              to src and stores it to grad.  Moreover, if is_same_object(grad,gradient_input)==true
+              then the output is assigned to grad, replacing its previous contents.  Otherwise the
+              output is added to grad.
+            - This function supports in-place operation, i.e. having
+              is_same_object(grad, gradient_input)==true
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     void resize_bilinear (
         tensor& dest,
         long dest_row_stride,

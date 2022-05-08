@@ -2693,6 +2693,44 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class silu_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines a silu layer.  Therefore, it
+                passes its inputs through the function
+                        f(x)= x * sigmoid(x) = x / (1 + exp(-x))
+                where f() is applied pointwise across the input tensor.
+
+                This is the layer type introduced in the paper:
+                Dan Hendrycks, Kevin Gimpel. "Gaussian Error Linear Units (GELUs)".
+        !*/
+
+    public:
+
+        silu_(
+        );
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& data_output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor&);
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_
+            interface.  Note that this layer doesn't have any parameters, so the tensor
+            returned by get_layer_params() is always empty.
+        !*/
+    };
+
+    template <typename SUBNET>
+    using silu = add_layer<silu_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     class softmax_
     {
         /*!

@@ -1729,6 +1729,58 @@ namespace dlib
                     out, src.device(), gi, grad.size(), beta);
             }
         }
+    // ----------------------------------------------------------------------------------------
+
+        __global__ void _cuda_silu(const float* s, float* d, size_t n)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                d[i] = s[i] / (1.0f + std::exp(-s[i]));
+            }
+        }
+
+        void silu (
+            tensor& dest,
+            const tensor& src
+        )
+        {
+            launch_kernel(_cuda_silu, max_jobs(dest.size()), src.device(), dest.device(), src.size());
+        }
+
+
+    // ----------------------------------------------------------------------------------------
+
+        __global__ void _cuda_silu_gradient_inplace(float* out, const float* s, const float* gi, size_t n)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                const auto sig_s = 1.0f / (1.0f + std::exp(-s[i]));
+                out[i] = gi[i] * (sig_s * (1.0f + s[i] * (1.0f - sig_s)));
+            }
+        }
+
+        __global__ void _cuda_silu_gradient(float* out, const float* s, const float* gi, size_t n)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                const auto sig_s = 1.0f / (1.0f + std::exp(-s[i]));
+                out[i] += gi[i] * (sig_s * (1.0f + s[i] * (1.0f - sig_s)));
+            }
+        }
+
+        void silu_gradient (
+            tensor& grad,
+            const tensor& src,
+            const tensor& gradient_input
+        )
+        {
+            float* out = grad.device();
+            const float* gi = gradient_input.device();
+            if (out == gi)
+                launch_kernel(_cuda_silu_gradient_inplace, max_jobs(grad.size()), out, src.device(), gi, grad.size());
+            else
+                launch_kernel(_cuda_silu_gradient, max_jobs(grad.size()), out, src.device(), gi, grad.size());
+        }
 
     // ----------------------------------------------------------------------------------------
 
