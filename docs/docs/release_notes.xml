@@ -12,6 +12,16 @@
 
 <current>
 New Features and Improvements:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.24" date="May 8, 2022">
+New Features and Improvements:
    - Added Beta distribution to dlib::rand.
    - Added directory_exists.
    - Added bgr_alpha_pixel type.
@@ -33,7 +43,7 @@ Bug fixes:
    - Fix bug with some versions of cuDNN (PR #2527)
    - Fix python import errors on some systems.
    - Various cmake adjustments to avoid build failures on some systems.
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
