@@ -1998,6 +1998,8 @@ namespace dlib
             }
         }
 
+    // ----------------------------------------------------------------------------------------
+
         void smelu (
             tensor& dest,
             const tensor& src,
@@ -2049,6 +2051,46 @@ namespace dlib
                         continue;
                     else
                         out[i] += std::sqrt(beta * in[i]) / beta * gi[i];
+                }
+            }
+        }
+
+    // ----------------------------------------------------------------------------------------
+
+        void silu (
+            tensor& dest,
+            const tensor& src
+        )
+        {
+            const auto d = dest.host();
+            const auto s = src.host();
+            for (size_t i = 0; i < src.size(); ++i)
+                d[i] = s[i] * impl::sigmoid(s[i]);
+        }
+
+        void silu_gradient (
+            tensor& grad,
+            const tensor& src,
+            const tensor& gradient_input
+        )
+        {
+            const auto g = grad.host();
+            const auto s = src.host();
+            const auto in = gradient_input.host();
+            if (is_same_object(grad, gradient_input))
+            {
+                for (size_t i = 0; i < src.size(); ++i)
+                {
+                    const auto sig_s = impl::sigmoid(s[i]);
+                    g[i] = in[i] * (sig_s * (1.0f + s[i] * (1.0f - sig_s)));
+                }
+            }
+            else
+            {
+                for (size_t i = 0; i < src.size(); ++i)
+                {
+                    const auto sig_s = impl::sigmoid(s[i]);
+                    g[i] += in[i] * (sig_s * (1.0f + s[i] * (1.0f - sig_s)));
                 }
             }
         }

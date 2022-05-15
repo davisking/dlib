@@ -12,12 +12,23 @@
 
 <current>
 New Features and Improvements:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.24" date="May 8, 2022">
+New Features and Improvements:
    - Added Beta distribution to dlib::rand.
    - Added directory_exists.
    - Added bgr_alpha_pixel type.
    - Added support for loading and saving WebP images.
    - Deep learning tooling:
       - Added ReOrg layer.
+      - Added SiLU layer.
       - Added visitor to draw network architectures using the DOT language.
       - Made Barlow Twins loss much faster for high dimensionality inputs.
       - Added Focal loss gamma to loss_multibinary_log_.
@@ -29,7 +40,10 @@ Non-Backwards Compatible Changes:
 Bug fixes:
    - Fix missing ssize_t definition on Windows (PR #2492)
    - Fix Barlow Twins loss gradient (PR #2518)
-</current>
+   - Fix bug with some versions of cuDNN (PR #2527)
+   - Fix python import errors on some systems.
+   - Various cmake adjustments to avoid build failures on some systems.
+</old>
 
 <!-- **************************************************************************************  -->
 

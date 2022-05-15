@@ -18,6 +18,7 @@ import sys, os
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../../../build/lib.linux-x86_64-2.7'))
+sys.path.insert(0, os.path.abspath('../../../build/lib.linux-x86_64-3.8'))
 
 import generate_dlib_listing
 generate_dlib_listing.make_listing_files()

@@ -434,6 +434,19 @@ namespace dlib
             const float beta
         );
 
+    // ----------------------------------------------------------------------------------------
+
+        void silu (
+            tensor& dest,
+            const tensor& src
+        );
+
+        void silu_gradient (
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input
+        );
+
     // ------------------------------------------------------------------------------------
 
         void resize_bilinear (

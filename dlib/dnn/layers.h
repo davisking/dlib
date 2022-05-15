@@ -3712,7 +3712,7 @@ namespace dlib
 
         friend std::ostream& operator<<(std::ostream& out, const smelu_& item)
         {
-            out << "smelu\t("
+            out << "smelu\t ("
                 << "beta=" << item.beta
                 << ")";
             return out;
@@ -3731,6 +3731,77 @@ namespace dlib
 
     template <typename SUBNET>
     using smelu = add_layer<smelu_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class silu_
+    {
+    public:
+        silu_(
+        )
+        {
+        }
+
+        template <typename SUBNET>
+        void setup(const SUBNET& /*sub*/)
+        {
+        }
+
+        template <typename SUBNET>
+        void forward(
+            const SUBNET& sub,
+            resizable_tensor& data_ouput)
+        {
+            data_ouput.copy_size(sub.get_output());
+            tt::silu(data_ouput, sub.get_output());
+        }
+
+        template <typename SUBNET>
+        void backward(
+            const tensor& gradient_input,
+            SUBNET& sub,
+            tensor&
+        )
+        {
+            tt::silu_gradient(sub.get_gradient_input(), sub.get_output(), gradient_input);
+        }
+
+        inline dpoint map_input_to_output (const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input (const dpoint& p) const { return p; }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const silu_& /*item*/, std::ostream& out)
+        {
+            serialize("silu_", out);
+        }
+
+        friend void deserialize(silu_& /*item*/, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "silu_")
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::silu_.");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const silu_& /*item*/)
+        {
+            out << "silu";
+            return out;
+        }
+
+        friend void to_xml(const silu_& /*item*/, std::ostream& out)
+        {
+            out << "<silu/>\n";
+        }
+
+    private:
+        resizable_tensor params;
+    };
+
+    template <typename SUBNET>
+    using silu = add_layer<silu_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
