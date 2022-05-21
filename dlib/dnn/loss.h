@@ -3518,6 +3518,7 @@ namespace dlib
         double lambda_obj = 1.0;
         double lambda_box = 1.0;
         double lambda_cls = 1.0;
+        double gamma_obj = 0.0;
         double gamma_cls = 0.0;
 
     };
@@ -3535,6 +3536,7 @@ namespace dlib
         serialize(item.lambda_obj, out);
         serialize(item.lambda_box, out);
         serialize(item.lambda_cls, out);
+        serialize(item.gamma_obj, out);
         serialize(item.gamma_cls, out);
     }
 
@@ -3554,7 +3556,10 @@ namespace dlib
         deserialize(item.lambda_box, in);
         deserialize(item.lambda_cls, in);
         if (version == 2)
+        {
+            deserialize(item.gamma_obj, in);
             deserialize(item.gamma_cls, in);
+        }
     }
 
     inline std::ostream& operator<<(std::ostream& out, const std::map<int, std::vector<yolo_options::anchor_box_details>>& anchors)
@@ -3743,9 +3748,14 @@ namespace dlib
                             }
 
                             // Incur loss for the boxes that are below a certain IoU threshold with any truth box
-                            const auto o_idx = tensor_index(output_tensor, n, k + 4, r, c);
                             if (best_iou < options.iou_ignore_threshold)
-                                g[o_idx] = options.lambda_obj * out_data[o_idx];
+                            {
+                                const auto o_idx = tensor_index(output_tensor, n, k + 4, r, c);
+                                const auto p = out_data[o_idx];
+                                const float focus = std::pow(p, options.gamma_obj);
+                                const float g_obj = focus * (options.gamma_obj * (1 - p) * safe_log(1 - p) + p);
+                                g[o_idx] = options.lambda_obj * g_obj;
+                            }
                         }
                     }
                 }
@@ -3823,7 +3833,12 @@ namespace dlib
 
                             // This grid cell should detect an object
                             const auto o_idx = tensor_index(output_tensor, n, k + 4, r, c);
-                            g[o_idx] = options.lambda_obj * (out_data[o_idx] - 1);
+                            {
+                                const auto p = out_data[o_idx];
+                                const float focus = std::pow(1 - p, options.gamma_obj);
+                                const float g_obj = focus * (options.gamma_obj * p * safe_log(p) + p - 1);
+                                g[o_idx] = options.lambda_obj * g_obj;
+                            }
 
                             // Compute the classification error using the truth weights and the focal loss
                             for (long i = 0; i < num_classes; ++i)
@@ -3977,6 +3992,7 @@ namespace dlib
             out << ", lambda_obj:" << opts.lambda_obj;
             out << ", lambda_box:" << opts.lambda_box;
             out << ", lambda_cls:" << opts.lambda_cls;
+            out << ", gamma_obj:" << opts.gamma_obj;
             out << ", gamma_cls:" << opts.gamma_cls;
             out << ", overlaps_nms:(" << opts.overlaps_nms.get_iou_thresh() << "," << opts.overlaps_nms.get_percent_covered_thresh() << ")";
             out << ", classwise_nms:" << std::boolalpha << opts.classwise_nms;

@@ -1949,11 +1949,13 @@ namespace dlib
         double lambda_obj = 1.0;
         double lambda_box = 1.0;
         double lambda_cls = 1.0;
-        // This parameter makes the classifier behave like the Focal loss, presented in the paper:
+        // This parameter makes YOLO behave like the Focal loss, presented in the paper:
         // "Focal Loss for Dense Object Detection", by Tsung-Yi Lin, et al.
         // (https://arxiv.org/abs/1708.02002)
-        // This gamma acts as a modulating factor to the cross-entropy layer by reducing the
-        // relative loss for well-classified examples, and focusing on the difficult ones.
+        // The gamma_obj and gamma_cls act as a modulating factor to the cross-entropy layers of
+        // objectness and classification by reducing the relative loss for well-classified
+        // examples, and focusing on the difficult ones.
+        double gamma_obj = 0.0;
         double gamma_cls = 0.0;
 
     };
