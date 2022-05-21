@@ -3925,6 +3925,7 @@ namespace dlib
         }
 
         const yolo_options& get_options() const { return options; }
+        yolo_options& get_options() { return options; }
 
         void adjust_nms(double iou_thresh, double percent_covered_thresh = 1, bool classwise = true)
         {
@@ -3976,6 +3977,7 @@ namespace dlib
             out << ", lambda_obj:" << opts.lambda_obj;
             out << ", lambda_box:" << opts.lambda_box;
             out << ", lambda_cls:" << opts.lambda_cls;
+            out << ", gamma_cls:" << opts.gamma_cls;
             out << ", overlaps_nms:(" << opts.overlaps_nms.get_iou_thresh() << "," << opts.overlaps_nms.get_percent_covered_thresh() << ")";
             out << ", classwise_nms:" << std::boolalpha << opts.classwise_nms;
             out << ")";
