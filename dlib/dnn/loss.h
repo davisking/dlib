@@ -3544,7 +3544,7 @@ namespace dlib
     {
         int version = 0;
         deserialize(version, in);
-        if (version != 1 && version != 2)
+        if (!(1 <= version && version <= 2))
             throw serialization_error("Unexpected version found while deserializing dlib::yolo_options.");
         deserialize(item.anchors, in);
         deserialize(item.labels, in);
@@ -3555,7 +3555,7 @@ namespace dlib
         deserialize(item.lambda_obj, in);
         deserialize(item.lambda_box, in);
         deserialize(item.lambda_cls, in);
-        if (version == 2)
+        if (version >= 2)
         {
             deserialize(item.gamma_obj, in);
             deserialize(item.gamma_cls, in);
