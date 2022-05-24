@@ -2014,12 +2014,6 @@ namespace dlib
             ensures
                 - returns the options object that defines the general behavior of this loss layer.
         !*/
-        yolo_options& get_options (
-        );
-        /*!
-            ensures
-                - returns the options object that defines the general behavior of this loss layer.
-        !*/
 
         template <
             typename SUB_TYPE,

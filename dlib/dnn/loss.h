@@ -3940,7 +3940,6 @@ namespace dlib
         }
 
         const yolo_options& get_options() const { return options; }
-        yolo_options& get_options() { return options; }
 
         void adjust_nms(double iou_thresh, double percent_covered_thresh = 1, bool classwise = true)
         {
