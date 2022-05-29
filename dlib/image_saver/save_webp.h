@@ -76,7 +76,7 @@ namespace dlib
         auto data = reinterpret_cast<const uint8_t*>(image_data(img));
         const int width = img.nc();
         const int height = img.nr();
-        const int stride = width_step(img);
+        int stride = width_step(img);
         if (pixel_traits<pixel_type>::rgb_alpha)
         {
             if (pixel_traits<pixel_type>::bgr_layout)
@@ -94,8 +94,10 @@ namespace dlib
         else
         {
             // This is some other kind of color image so just save it as an RGB image.
+            // We also need to recompute the stride in case we were given a grayscale image.
             array2d<rgb_pixel> temp;
             assign_image(temp, img);
+            stride = width_step(temp);
             auto data = reinterpret_cast<const uint8_t*>(image_data(temp));
             impl::impl_save_webp(filename, data, width, height, stride, quality, impl::webp_type::rgb);
         }
