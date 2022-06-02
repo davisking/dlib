@@ -1,3 +1,4 @@
+#include "../utility.h" // for dlib::exchange
 #include "ffmpeg_helpers.h"
 
 namespace dlib
@@ -12,13 +13,9 @@ namespace dlib
 
     std::string get_av_error(int ret)
     {
-        std::string error_str(100, '\0');
-        int suc = av_strerror(ret, &error_str[0], sizeof(error_str));
-        if (suc == 0)
-            error_str.resize(strlen(&error_str[0]));
-        else
-            error_str = "couldn't set error";
-        return error_str;
+        char buf[128] = {0};
+        int suc = av_strerror(ret, buf, sizeof(buf));
+        return suc == 0 ? buf : "couldn't set error";
     }
 
     std::string get_pixel_fmt_str(AVPixelFormat fmt)
@@ -93,6 +90,18 @@ namespace dlib
             avformat_close_input(&ptr);
     }
 
+    av_dict::av_dict(const std::map<std::string, std::string>& options)
+    {
+        int ret = 0;
+
+        for (const auto& opt : options) {
+            if ((ret = av_dict_set(&avdic, opt.first.c_str(), opt.second.c_str(), 0)) < 0) {
+                printf("av_dict_set() failed : %s\n", get_av_error(ret).c_str());
+                break;
+            }
+        }
+    }
+
     av_dict::av_dict(const av_dict& ori)
     {
         av_dict_copy(&avdic, ori.avdic, 0);
@@ -100,46 +109,31 @@ namespace dlib
 
     av_dict& av_dict::operator=(const av_dict& ori)
     {
-        if (this != &ori)
-        {
-            reset();
-            av_dict_copy(&avdic, ori.avdic, 0);
-        }
+        av_dict tmp(ori);
+        *this = std::move(tmp);
         return *this;
     }
 
-    av_dict::av_dict(av_dict&& ori)
+    av_dict::av_dict(av_dict &&ori)
+    : avdic{dlib::exchange(ori.avdic, nullptr)}
     {
-        std::swap(avdic, ori.avdic);
     }
 
-    av_dict& av_dict::operator=(av_dict&& ori)
+    av_dict &av_dict::operator=(av_dict &&ori)
     {
         std::swap(avdic, ori.avdic);
         return *this;
-    }
-
-    av_dict::av_dict(const std::map<std::string, std::string>& options)
-    {
-        int ret = 0;
-
-        for (const auto& opt : options) {
-            if ((ret = av_dict_set(&avdic, opt.first.c_str(), opt.second.c_str(), 0)) < 0)
-                throw std::runtime_error("av_dict_set() failed : " + get_av_error(ret));
-        }
     }
 
     av_dict::~av_dict()
     {
-        reset();
+        if (avdic)
+            av_dict_free(&avdic);
     }
 
-    void av_dict::reset()
+    AVDictionary** av_dict::get()
     {
-        if (avdic) {
-            av_dict_free(&avdic);
-            avdic = nullptr;
-        }
+        return avdic ? &avdic: nullptr;
     }
 
     av_ptr<AVFrame> make_avframe()
@@ -182,7 +176,7 @@ namespace dlib
         int ret = av_frame_get_buffer(obj.frame.get(), 0); //use default alignment, which is likely 32
         if (ret < 0)
         {
-            obj.frame.reset(nullptr);
+            obj.frame = nullptr;
             throw std::runtime_error("av_frame_get_buffer() failed : " + get_av_error(ret));
         }
 
@@ -222,16 +216,20 @@ namespace dlib
 
     Frame::Frame(const Frame &ori)
     {
-        Frame empty = ori;
-        std::swap(empty, *this);
+        copy(ori);
     }
 
-    Frame &Frame::operator=(const Frame &ori)
+    Frame& Frame::operator=(const Frame& ori)
+    {
+        copy(ori);
+        return *this;
+    }
+
+    void Frame::copy(const Frame &ori)
     {
         if (ori.is_empty())
         {
-            Frame empty;
-            std::swap(*this, empty);
+            Frame empty(std::move(*this));
         }
         else
         {
@@ -255,14 +253,12 @@ namespace dlib
                                  ori.frame->channel_layout,
                                  (AVSampleFormat)ori.frame->format,
                                  ori.timestamp_us);
-                std::swap(*this, tmp);
+                *this = std::move(tmp);
             }
 
             av_frame_copy(frame.get(), ori.frame.get());
             av_frame_copy_props(frame.get(), ori.frame.get());
         }
-
-        return *this;
     }
 
     bool Frame::is_empty() const

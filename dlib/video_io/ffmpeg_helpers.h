@@ -74,7 +74,7 @@ namespace dlib
         av_dict(av_dict &&ori);
         av_dict &operator=(av_dict &&ori);
         ~av_dict();
-        void reset();
+        AVDictionary** get();
 
         AVDictionary *avdic = nullptr;
     };
@@ -117,6 +117,7 @@ namespace dlib
         );
 
         bool is_empty() const;
+        void copy(const Frame& other);
 
         /*image*/
         bool is_image() const;
