@@ -4,6 +4,8 @@
 #define DLIB_UTILITY_Hh_
 
 #include <cstddef>
+#include <type_traits>
+#include <utility>
 
 /*
     This header contains back-ports of C++14/17 functions and type traits
@@ -37,6 +39,19 @@ namespace dlib
 
     template<typename... Ts>
     using index_sequence_for = make_index_sequence<sizeof...(Ts)>;
+
+    template<class T, class U = T>
+    /*constexpr (requires C++14)*/
+    T exchange(T& obj, U&& new_value)
+    noexcept(
+        std::is_nothrow_move_constructible<T>::value &&
+        std::is_nothrow_assignable<T&, U>::value
+    )
+    {
+        T old_value = std::move(obj);
+        obj = std::forward<U>(new_value);
+        return old_value;
+    }
 }
 
 #endif //DLIB_UTILITY_Hh_
