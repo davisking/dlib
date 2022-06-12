@@ -24,7 +24,7 @@ namespace dlib
             {
                 AVCodecID                           codec = AV_CODEC_ID_NONE;
                 std::string                         codec_name;     //only used if codec==AV_CODEC_ID_NONE
-                std::map<std::string, std::string>  codec_options;  // A dictionary filled with AVCodecContext and codec-private options.
+                std::map<std::string, std::string>  codec_options;  //A dictionary of AVCodecContext and codec-private options. Used by avcodec_open2().
                 int                                 nthreads = -1;  //-1 means use default. See documentation for AVCodecContext::thread_count
                 int64_t                             bitrate  = -1;  //-1 means use default. See documentation for AVCodecContext::bit_rate
                 int                                 flags    = 0;   //See documentation for AVCodecContext::flags. You almost never have to use this.
@@ -62,20 +62,20 @@ namespace dlib
 
         ~encoder_ffmpeg();
 
-        bool is_open() const;
-        bool is_image_encoder() const;
-        bool is_audio_encoder() const;
-        AVCodecID   get_codec_id() const;
-        std::string get_codec_name() const;
+        bool is_open()                  const noexcept;
+        bool is_image_encoder()         const noexcept;
+        bool is_audio_encoder()         const noexcept;
+        AVCodecID   get_codec_id()      const noexcept;
+        std::string get_codec_name()    const noexcept;
 
         bool push(
             const array2d<rgb_pixel>& frame,
-            uint64_t timestamp_us //use 0 to automatically set to next timestamp
+            std::chrono::system_clock::time_point timestamp //use default constructed value to automatically set to next best timestamp
         );
 
         bool push(
             const audio_frame& frame,
-            uint64_t timestamp_us //use 0 to automatically set to next timestamp
+            std::chrono::system_clock::time_point timestamp //use default constructed value to automatically set to next best timestamp
         );
 
         /*expert use*/
@@ -83,18 +83,18 @@ namespace dlib
 
         void flush();
 
-        std::shared_ptr<std::ostream> get_encoded_stream();
+        std::shared_ptr<std::ostream> get_encoded_stream() const noexcept;
 
         /*video dims*/
-        int             height()    const;
-        int             width()     const;
-        AVPixelFormat   pixel_fmt() const;
+        int             height()    const noexcept;
+        int             width()     const noexcept;
+        AVPixelFormat   pixel_fmt() const noexcept;
 
         /*audio dims*/
-        int             sample_rate()       const;
-        uint64_t        channel_layout()    const;
-        AVSampleFormat  sample_fmt()        const;
-        int             nchannels()         const;
+        int             sample_rate()       const noexcept;
+        uint64_t        channel_layout()    const noexcept;
+        AVSampleFormat  sample_fmt()        const noexcept;
+        int             nchannels()         const noexcept;
 
     private:
         friend class muxer_ffmpeg;
@@ -108,7 +108,7 @@ namespace dlib
         bool open();
 
         args                            _args;
-        bool                            connected = false;
+        bool                            flushed = false;
         av_ptr<AVCodecContext>          pCodecCtx;
         av_ptr<AVPacket>                packet;
         int                             next_pts = 0;
@@ -130,15 +130,13 @@ namespace dlib
             struct audio_args : encoder_ffmpeg::args::channel_args,
                                 encoder_ffmpeg::args::audio_args {};
 
-            typedef std::function<bool()> interrupter_t;
-
             std::string filepath        = "";
             std::string output_format   = "";                       //if empty, this is guessed from filepath
             int         max_delay       = -1;                       //See documentation for AVFormatContext::max_delay
-            std::map<std::string, std::string> format_options;      //AVFormatContext and muxer-private options
-            std::map<std::string, std::string> protocol_options;    //protocol-private options
-            uint64_t        connect_timeout_ms  = -1;               //timeout for establishing a connection if appropriate (RTSP/TCP client muxer for example)
-            interrupter_t   interrupter = nullptr;
+            std::map<std::string, std::string>  format_options;     //An AVDictionary filled with AVFormatContext and muxer-private options. Used by avformat_write_header()
+            std::map<std::string, std::string>  protocol_options;   //An AVDictionary filled with protocol-private options. Used by avio_open2()
+            std::chrono::milliseconds           connect_timeout{};     //timeout for establishing a connection if appropriate (RTSP/TCP client muxer for example)
+            std::function<bool()>               interrupter;
 
             bool enable_image = true;
             image_args args_image;
@@ -148,14 +146,23 @@ namespace dlib
 
         muxer_ffmpeg() = default;
         muxer_ffmpeg(const args& a);
-        muxer_ffmpeg(muxer_ffmpeg&& other);
-        muxer_ffmpeg& operator=(muxer_ffmpeg&& other);
+        muxer_ffmpeg(muxer_ffmpeg&& other) noexcept;
+        muxer_ffmpeg& operator=(muxer_ffmpeg&& other) noexcept;
         ~muxer_ffmpeg();
-        friend void swap(muxer_ffmpeg &a, muxer_ffmpeg &b);
 
-        bool is_open() const;
-        bool audio_enabled() const;
-        bool video_enabled() const;
+        bool is_open()          const noexcept;
+        bool audio_enabled()    const noexcept;
+        bool video_enabled()    const noexcept;
+
+        bool push(
+            const array2d<rgb_pixel>& frame,
+            std::chrono::system_clock::time_point timestamp //use 0 to automatically set to next timestamp
+        );
+
+        bool push(
+            const audio_frame& frame,
+            std::chrono::system_clock::time_point timestamp //use 0 to automatically set to next timestamp
+        );
 
         /*expert use*/
         bool push(Frame&& frame);
@@ -176,20 +183,19 @@ namespace dlib
     private:
 
         bool open();
-        void swap(muxer_ffmpeg& a);
+        void set_av_opaque_pointers();
         bool interrupt_callback();
         bool handle_packet(AVPacket* pkt, AVCodecContext* ctx);
 
         struct {
-            args _args;
-            bool                            connected = false;
-            av_ptr<AVFormatContext>         pFormatCtx;
-            encoder_ffmpeg                  encoder_image;
-            encoder_ffmpeg                  encoder_audio;
-            AVStream*                       stream_image; //non-owning pointer
-            AVStream*                       stream_audio; //non-owning pointer
-            uint64_t                        connecting_time_ms = 0;
-            uint64_t                        connected_time_ms  = 0;
+            args                    _args;
+            av_ptr<AVFormatContext> pFormatCtx;
+            encoder_ffmpeg          encoder_image;
+            encoder_ffmpeg          encoder_audio;
+            AVStream*               stream_image = nullptr; //non-owning pointer
+            AVStream*               stream_audio = nullptr; //non-owning pointer
+            std::chrono::system_clock::time_point   connecting_time{};
+            std::chrono::system_clock::time_point   connected_time{};
         } st;
     };
 }

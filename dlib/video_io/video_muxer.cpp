@@ -8,10 +8,10 @@ namespace dlib
 {
     Frame dlib_image_to_frame(
         const array2d<rgb_pixel>& frame,
-        uint64_t timestamp_us
+        std::chrono::system_clock::time_point timestamp
     )
     {
-        Frame f = Frame::make_image(frame.nr(), frame.nc(), AV_PIX_FMT_RGB24, timestamp_us);
+        Frame f = Frame::make_image(frame.nr(), frame.nc(), AV_PIX_FMT_RGB24, timestamp);
 
         for (int row = 0 ; row < f.frame->height ; row++)
         {
@@ -97,10 +97,10 @@ namespace dlib
 
     Frame dlib_audio_to_frame(
         const audio_frame& frame,
-        uint64_t timestamp_us
+        std::chrono::system_clock::time_point timestamp
     )
     {
-        Frame f = Frame::make_audio(frame.sample_rate, frame.samples.size(), AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16, timestamp_us);
+        Frame f = Frame::make_audio(frame.sample_rate, frame.samples.size(), AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16, timestamp);
         memcpy(f.frame->data[0], frame.samples.data(), frame.samples.size()*sizeof(audio_frame::sample));
         return f;
     }
@@ -111,7 +111,8 @@ namespace dlib
     ) : _args(a),
         encoded(std::move(out))
     {
-        connected = open();
+        if (!open())
+            pCodecCtx = nullptr;
     }
 
     encoder_ffmpeg::encoder_ffmpeg(
@@ -120,7 +121,8 @@ namespace dlib
     ) : _args(a),
         packet_ready_callback(std::move(clb))
     {
-        connected = open();
+        if (!open())
+            pCodecCtx = nullptr;
     }
 
     encoder_ffmpeg::~encoder_ffmpeg()
@@ -205,7 +207,7 @@ namespace dlib
         }
 
         av_dict opt = _args.args_common.codec_options;
-        int ret = avcodec_open2(pCodecCtx.get(), pCodec, opt.avdic ? &opt.avdic : nullptr);
+        const int ret = avcodec_open2(pCodecCtx.get(), pCodec, opt.get());
         if (ret < 0)
         {
             printf("avcodec_open2() failed : `%s`\n", get_av_error(ret).c_str());
@@ -222,126 +224,57 @@ namespace dlib
         return true;
     }
 
-    bool encoder_ffmpeg::is_open() const
+    bool encoder_ffmpeg::is_open() const noexcept
     {
-        return  connected &&
-                pCodecCtx != nullptr &&
+        return  pCodecCtx != nullptr &&
                 (encoded != nullptr || packet_ready_callback != nullptr) &&
+                !flushed &&
                 FFMPEG_INITIALIZED;
     }
 
-    bool encoder_ffmpeg::is_image_encoder() const
+    bool encoder_ffmpeg::is_image_encoder() const noexcept
     {
-        return is_open() && pCodecCtx->codec_type == AVMEDIA_TYPE_VIDEO;
+        return pCodecCtx && pCodecCtx->codec_type == AVMEDIA_TYPE_VIDEO;
     }
 
-    bool encoder_ffmpeg::is_audio_encoder() const
+    bool encoder_ffmpeg::is_audio_encoder() const noexcept
     {
-        return is_open() && pCodecCtx->codec_type == AVMEDIA_TYPE_AUDIO;
+        return pCodecCtx && pCodecCtx->codec_type == AVMEDIA_TYPE_AUDIO;
     }
 
-    AVCodecID encoder_ffmpeg::get_codec_id() const
+    AVCodecID encoder_ffmpeg::get_codec_id() const noexcept
     {
-        return is_open() ? pCodecCtx->codec_id : AV_CODEC_ID_NONE;
+        return pCodecCtx ? pCodecCtx->codec_id : AV_CODEC_ID_NONE;
     }
 
-    std::string encoder_ffmpeg::get_codec_name() const
+    std::string encoder_ffmpeg::get_codec_name() const noexcept
     {
-        return is_open() ? avcodec_get_name(pCodecCtx->codec_id) : "NONE";
+        return pCodecCtx ? avcodec_get_name(pCodecCtx->codec_id) : "NONE";
     }
 
-    std::shared_ptr<std::ostream> encoder_ffmpeg::get_encoded_stream()
+    std::shared_ptr<std::ostream> encoder_ffmpeg::get_encoded_stream() const noexcept
     {
         return encoded;
     }
 
-    bool encoder_ffmpeg::push(Frame &&frame)
+    typedef enum {
+        ENCODING_SEND_FRAME = 0,
+        ENCODING_RECV_PACKET,
+        ENCODING_RECV_PACKET_SEND_FRAME,
+        ENCODING_DONE,
+        ENCODING_ERROR = -1
+    } encoding_state;
+
+    bool encoder_ffmpeg::push(Frame&& frame)
     {
+        using namespace std::chrono;
+
         if (!is_open())
             return false;
 
-        auto send_frame = [&](const AVFrame* frame)
-        {
-            int ret = avcodec_send_frame(pCodecCtx.get(), frame);
-            int suc = -1; //default to not-ok
-
-            if (ret == AVERROR(EAGAIN))
-            {
-                suc = 0;
-            }
-            else if (ret < 0 && ret != AVERROR_EOF)
-            {
-                printf("avcodec_send_frame() failed : %i - `%s`\n", ret, get_av_error(ret).c_str());
-            }
-            else if (ret >= 0)
-            {
-                suc = 1;
-            }
-
-            return suc;
-        };
-
-        auto recv_packet = [&]
-        {
-            int ret = avcodec_receive_packet(pCodecCtx.get(), packet.get());
-            int suc = -1;
-
-            if (ret == AVERROR(EAGAIN))
-            {
-                suc = 0; //ok but need more input
-            }
-            else if (ret == AVERROR_EOF)
-            {
-            }
-            else if (ret < 0)
-            {
-                printf("avcodec_receive_packet() failed : %i - `%s`\n", ret, get_av_error(ret).c_str());
-            }
-            else
-            {
-                if (packet_ready_callback)
-                {
-                    /*invoke muxer callback*/
-                    if (packet_ready_callback(packet.get(), pCodecCtx.get()))
-                        suc = 1;
-                }
-                else
-                {
-                    encoded->write((char*)packet->data, packet->size);
-                    suc = 1;
-                }
-            }
-
-            return suc;
-        };
-
-        auto encode = [&](const AVFrame* frame)
-        {
-            int suc1 = 0; //-1 == error, 0 == ok but EAGAIN, 1 == ok
-            int suc2 = 0; //-1 == error, 0 == ok but EAGAIN, 1 == ok
-            bool ok = true;
-
-            while (ok && suc1 == 0)
-            {
-                suc1 = send_frame(frame);
-                ok   = suc1 >= 0;
-
-                if (ok)
-                {
-                    suc2 = 1;
-
-                    while (suc2 > 0)
-                        suc2 = recv_packet();
-
-                    ok = suc2 >= 0;
-                }
-            }
-
-            return ok;
-        };
-
         std::vector<Frame> frames;
 
+        /*! Resize if image. Resample if audio. Push through audio fifo if necessary (audio codec requires fixed size blocks) !*/
         if (frame.is_image())
         {
             resizer_image.resize(frame, frame);
@@ -358,13 +291,15 @@ namespace dlib
             frames.push_back(std::move(frame));
         }
 
+        /*! Set pts based on timestamps or tracked state !*/
         for (auto& frame : frames)
         {
-            if (frame.timestamp_us > 0)
+            if (frame.timestamp != std::chrono::system_clock::time_point{})
             {
-                const AVRational tb1 = {1,1000000};
-                const AVRational tb2 = pCodecCtx->time_base;
-                frame.frame->pts = av_rescale_q(frame.timestamp_us, tb1, tb2);
+                frame.frame->pts = av_rescale_q(
+                        frame.timestamp.time_since_epoch().count(),
+                        {nanoseconds::period::num,nanoseconds::period::den},
+                        pCodecCtx->time_base);
             }
             else if (frame.frame)
             {
@@ -375,69 +310,133 @@ namespace dlib
                 next_pts = frame.frame->pts + (frame.is_image() ? 1 : frame.frame->nb_samples);
         }
 
-        bool ok = true;
-        for(const auto& frame : frames)
-            ok = ok && encode(frame.frame.get());
+        encoding_state state = ENCODING_SEND_FRAME;
 
-        return ok;
+        auto send_frame = [&](Frame& frame)
+        {
+            const int ret = avcodec_send_frame(pCodecCtx.get(), frame.frame.get());
+
+            if (ret == AVERROR_EOF)
+                state = ENCODING_DONE;
+            else if (ret == AVERROR(EAGAIN))
+                state = ENCODING_RECV_PACKET_SEND_FRAME;
+            else if (ret >= 0)
+            {
+                state = ENCODING_RECV_PACKET;
+            }
+            else
+            {
+                printf("avcodec_send_frame() failed : %i - `%s`\n", ret, get_av_error(ret).c_str());
+                state = ENCODING_ERROR;
+            }
+        };
+
+        auto recv_packet = [&]
+        {
+            const int ret = avcodec_receive_packet(pCodecCtx.get(), packet.get());
+
+            if (ret == AVERROR_EOF) {
+                state   = ENCODING_DONE;
+                flushed = true;
+            }
+            else if (ret == AVERROR(EAGAIN) && state == ENCODING_RECV_PACKET)
+                state = ENCODING_DONE;
+            else if (ret == AVERROR(EAGAIN) && state == ENCODING_RECV_PACKET_SEND_FRAME)
+                state = ENCODING_SEND_FRAME;
+            else if (ret < 0)
+            {
+                printf("avcodec_receive_packet() failed : %i - `%s`\n", ret, get_av_error(ret).c_str());
+                state = ENCODING_ERROR;
+            }
+            else if (ret >= 0)
+            {
+                if (packet_ready_callback)
+                {
+                    /*! Invoke muxer callback !*/
+                    if (!packet_ready_callback(packet.get(), pCodecCtx.get()))
+                        state = ENCODING_ERROR;
+                }
+                else
+                {
+                    encoded->write((char*)packet->data, packet->size);
+                }
+            }
+        };
+
+        for (size_t i = 0 ; i < frames.size() && state != ENCODING_ERROR ; ++i)
+        {
+            state = ENCODING_SEND_FRAME;
+
+            while (state != ENCODING_DONE && state != ENCODING_ERROR)
+            {
+                switch(state)
+                {
+                    case ENCODING_SEND_FRAME:               send_frame(frames[i]);   break;
+                    case ENCODING_RECV_PACKET:              recv_packet();  break;
+                    case ENCODING_RECV_PACKET_SEND_FRAME:   recv_packet();  break;
+                    default: break;
+                }
+            }
+        }
+
+        return state != ENCODING_ERROR;
     }
 
     bool encoder_ffmpeg::push(
         const array2d<rgb_pixel> &frame,
-        uint64_t timestamp_us
+        std::chrono::system_clock::time_point timestamp
     )
     {
         DLIB_CASSERT(is_image_encoder(), "This object is either empty or doesn't represent an image/video encoder");
-        return push(dlib_image_to_frame(frame, timestamp_us));
+        return push(dlib_image_to_frame(frame, timestamp));
     }
 
     bool encoder_ffmpeg::push(
         const audio_frame &frame,
-        uint64_t timestamp_us
+        std::chrono::system_clock::time_point timestamp
     )
     {
         DLIB_CASSERT(is_audio_encoder(), "This object is either empty or doesn't represent an audio encoder");
-        return push(dlib_audio_to_frame(frame, timestamp_us));
+        return push(dlib_audio_to_frame(frame, timestamp));
     }
 
     void encoder_ffmpeg::flush()
     {
-        push(Frame{});
-        pCodecCtx.reset(nullptr); //close encoder
-        connected = false;
+        if (!flushed)
+            push(Frame{});
     }
 
-    int encoder_ffmpeg::height() const
+    int encoder_ffmpeg::height() const noexcept
     {
         return is_image_encoder() ? pCodecCtx->height : 0;
     }
 
-    int encoder_ffmpeg::width() const
+    int encoder_ffmpeg::width() const noexcept
     {
         return is_image_encoder() ? pCodecCtx->width : 0;
     }
 
-    AVPixelFormat encoder_ffmpeg::pixel_fmt() const
+    AVPixelFormat encoder_ffmpeg::pixel_fmt() const noexcept
     {
         return is_image_encoder() ? pCodecCtx->pix_fmt : AV_PIX_FMT_NONE;
     }
 
-    int encoder_ffmpeg::sample_rate() const
+    int encoder_ffmpeg::sample_rate() const noexcept
     {
         return is_audio_encoder() ? pCodecCtx->sample_rate : 0;
     }
 
-    uint64_t encoder_ffmpeg::channel_layout() const
+    uint64_t encoder_ffmpeg::channel_layout() const noexcept
     {
         return is_audio_encoder() ? pCodecCtx->channel_layout : 0;
     }
 
-    int encoder_ffmpeg::nchannels() const
+    int encoder_ffmpeg::nchannels() const noexcept
     {
         return is_audio_encoder() ? av_get_channel_layout_nb_channels(pCodecCtx->channel_layout) : 0;
     }
 
-    AVSampleFormat encoder_ffmpeg::sample_fmt() const
+    AVSampleFormat encoder_ffmpeg::sample_fmt() const noexcept
     {
         return is_audio_encoder() ? pCodecCtx->sample_fmt : AV_SAMPLE_FMT_NONE;
     }
@@ -445,17 +444,29 @@ namespace dlib
     muxer_ffmpeg::muxer_ffmpeg(const args &a)
     {
         st._args = a;
-        st.connected = open();
+        if (!open())
+            st.pFormatCtx = nullptr;
     }
 
-    muxer_ffmpeg::muxer_ffmpeg(muxer_ffmpeg &&other)
+    void muxer_ffmpeg::set_av_opaque_pointers()
     {
-        swap(other);
+        if (st.pFormatCtx)
+            st.pFormatCtx->opaque = this;
+        st.encoder_image.packet_ready_callback = [this](AVPacket* pkt, AVCodecContext* ctx){return handle_packet(pkt, ctx);};
+        st.encoder_image.packet_ready_callback = [this](AVPacket* pkt, AVCodecContext* ctx){return handle_packet(pkt, ctx);};
     }
 
-    muxer_ffmpeg& muxer_ffmpeg::operator=(muxer_ffmpeg &&other)
+    muxer_ffmpeg::muxer_ffmpeg(muxer_ffmpeg &&other) noexcept
+    : st{std::move(other.st)}
     {
-        swap(other);
+        set_av_opaque_pointers();
+    }
+
+    muxer_ffmpeg& muxer_ffmpeg::operator=(muxer_ffmpeg &&other) noexcept
+    {
+        flush();
+        st = std::move(other.st);
+        set_av_opaque_pointers();
         return *this;
     }
 
@@ -464,42 +475,19 @@ namespace dlib
         flush();
     }
 
-    void muxer_ffmpeg::swap(muxer_ffmpeg &b)
-    {
-        /*!
-            The reason why we don't let the compiler synthesise swap() and move semantics is because we must
-            manually reset the opaque pointers and callbacks.
-        !*/
-        using std::swap;
-        swap(st, b.st);
-        if (st.pFormatCtx)
-            st.pFormatCtx->opaque = this;
-        if (b.st.pFormatCtx)
-            b.st.pFormatCtx->opaque = &b;
-        st.encoder_image.packet_ready_callback = [this](AVPacket* pkt, AVCodecContext* ctx){return handle_packet(pkt, ctx);};
-        st.encoder_image.packet_ready_callback = [this](AVPacket* pkt, AVCodecContext* ctx){return handle_packet(pkt, ctx);};
-        b.st.encoder_image.packet_ready_callback = [&b](AVPacket* pkt, AVCodecContext* ctx){return b.handle_packet(pkt, ctx);};
-        b.st.encoder_image.packet_ready_callback = [&b](AVPacket* pkt, AVCodecContext* ctx){return b.handle_packet(pkt, ctx);};
-    }
-
-    void swap(muxer_ffmpeg& a, muxer_ffmpeg& b)
-    {
-        a.swap(b);
-    }
-
-    bool muxer_ffmpeg::is_open() const
+    bool muxer_ffmpeg::is_open() const noexcept
     {
         return video_enabled() || audio_enabled();
     }
 
-    bool muxer_ffmpeg::video_enabled() const
+    bool muxer_ffmpeg::video_enabled() const noexcept
     {
-        return st.connected && st.pFormatCtx != nullptr && st.encoder_image.is_open() && FFMPEG_INITIALIZED;
+        return st.pFormatCtx != nullptr && st.encoder_image.is_open() && FFMPEG_INITIALIZED;
     }
 
-    bool muxer_ffmpeg::audio_enabled() const
+    bool muxer_ffmpeg::audio_enabled() const noexcept
     {
-        return st.connected && st.pFormatCtx != nullptr && st.encoder_audio.is_open() && FFMPEG_INITIALIZED;
+        return st.pFormatCtx != nullptr && st.encoder_audio.is_open() && FFMPEG_INITIALIZED;
     }
 
     bool muxer_ffmpeg::open()
@@ -511,6 +499,9 @@ namespace dlib
         }
 
         {
+            st.connecting_time = system_clock::now();
+            st.connected_time  = system_clock::time_point::max();
+
             const char* const format_name   = st._args.output_format.empty() ? nullptr : st._args.output_format.c_str();
             const char* const filename      = st._args.filepath.empty()      ? nullptr : st._args.filepath.c_str();
             AVFormatContext* pFormatCtx = nullptr;
@@ -589,7 +580,7 @@ namespace dlib
                 return false;
         }
 
-        st.pFormatCtx->opaque = this; //be careful, this needs to be swapped when (*this) is swapped.
+        st.pFormatCtx->opaque = this;
         st.pFormatCtx->interrupt_callback.opaque    = st.pFormatCtx.get();
         st.pFormatCtx->interrupt_callback.callback  = [](void* ctx) -> int {
             AVFormatContext* pFormatCtx = (AVFormatContext*)ctx;
@@ -600,14 +591,13 @@ namespace dlib
         if (st._args.max_delay > 0)
             st.pFormatCtx->max_delay = st._args.max_delay;
 
-        //TODO: is this necessary?
-        //_pFormatCtx->flags = AVFMT_FLAG_NOBUFFER | AVFMT_FLAG_FLUSH_PACKETS;
+        //st.pFormatCtx->flags = AVFMT_FLAG_NOBUFFER | AVFMT_FLAG_FLUSH_PACKETS;
 
         if ((st.pFormatCtx->oformat->flags & AVFMT_NOFILE) == 0)
         {
             av_dict opt = st._args.protocol_options;
 
-            int ret = avio_open2(&st.pFormatCtx->pb, st._args.filepath.c_str(), AVIO_FLAG_WRITE, &st.pFormatCtx->interrupt_callback, opt.avdic ? &opt.avdic : nullptr);
+            int ret = avio_open2(&st.pFormatCtx->pb, st._args.filepath.c_str(), AVIO_FLAG_WRITE, &st.pFormatCtx->interrupt_callback, opt.get());
 
             if (ret < 0)
             {
@@ -618,36 +608,64 @@ namespace dlib
 
         av_dict opt = st._args.format_options;
 
-        int ret = avformat_write_header(st.pFormatCtx.get(), opt.avdic ? &opt.avdic : nullptr);
+        int ret = avformat_write_header(st.pFormatCtx.get(), opt.get());
         if (ret < 0)
         {
             printf("avformat_write_header() failed : `%s`\n", get_av_error(ret).c_str());
             return false;
         }
 
+        st.connected_time = system_clock::now();
+
         return true;
     }
 
     bool muxer_ffmpeg::interrupt_callback()
     {
-        bool do_interrupt = false;
-        const auto now = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+        const auto now = system_clock::now();
 
-        if (st._args.connect_timeout_ms > 0 && st.connected_time_ms == 0)
+        if (st._args.connect_timeout < std::chrono::milliseconds::max())
+            if (st.connected_time > now && now > (st.connecting_time + st._args.connect_timeout))
+                return true;
+
+        if (st._args.interrupter && st._args.interrupter())
+            return true;
+
+        return false;
+    }
+
+    bool muxer_ffmpeg::push(
+        const array2d<rgb_pixel> &frame,
+        std::chrono::system_clock::time_point timestamp
+    )
+    {
+        if (!is_open())
+            return false;
+
+        if (!st.encoder_image.is_open())
         {
-            if (st.connecting_time_ms == 0)
-                st.connecting_time_ms = now;
-
-            const auto diff_ms = now - st.connecting_time_ms;
-            do_interrupt = do_interrupt || (diff_ms > st._args.connect_timeout_ms);
+            printf("frame is an image type but image encoder is not initialized\n");
+            return false;
         }
 
-        if (st._args.interrupter)
+        return st.encoder_image.push(frame, timestamp);
+    }
+
+    bool muxer_ffmpeg::push(
+        const audio_frame &frame,
+        std::chrono::system_clock::time_point timestamp
+    )
+    {
+        if (!is_open())
+            return false;
+
+        if (!st.encoder_audio.is_open())
         {
-            do_interrupt = do_interrupt || st._args.interrupter();
+            printf("frame is of audio type but audio encoder is not initialized\n");
+            return false;
         }
 
-        return do_interrupt;
+        return st.encoder_audio.push(frame, timestamp);
     }
 
     bool muxer_ffmpeg::push(Frame &&frame)
@@ -685,13 +703,10 @@ namespace dlib
         if (!is_open())
             return;
 
-        if (st.encoder_image.is_open())
-            st.encoder_image.flush();
+        st.encoder_image.flush();
+        st.encoder_audio.flush();
 
-        if (st.encoder_audio.is_open())
-            st.encoder_audio.flush();
-
-        int ret = av_write_trailer(st.pFormatCtx.get());
+        const int ret = av_write_trailer(st.pFormatCtx.get());
         if (ret < 0)
             printf("AV : failed to write trailer : `%s`\n", get_av_error(ret).c_str());
 
@@ -699,7 +714,6 @@ namespace dlib
             avio_closep(&st.pFormatCtx->pb);
 
         st.pFormatCtx.reset(nullptr); //close
-        st.connected = false;
     }
 
     bool muxer_ffmpeg::handle_packet(AVPacket* pkt, AVCodecContext* pCodecCtx)
