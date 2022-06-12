@@ -60,7 +60,8 @@ namespace dlib
     decoder_ffmpeg::decoder_ffmpeg(const args& a)
     : _args(a)
     {
-        connected = open();
+        if (!open())
+            pCodecCtx = nullptr;
     }
 
     bool decoder_ffmpeg::open()
@@ -112,7 +113,7 @@ namespace dlib
         }
 
         av_dict opt = _args.args_common.codec_options;
-        int ret = avcodec_open2(pCodecCtx.get(), pCodec, opt.avdic ? &opt.avdic : nullptr);
+        int ret = avcodec_open2(pCodecCtx.get(), pCodec, opt.get());
         if (ret < 0)
         {
             printf("avcodec_open2() failed : `%s`\n", get_av_error(ret).c_str());
@@ -134,91 +135,113 @@ namespace dlib
         return true;
     }
 
-    bool decoder_ffmpeg::is_open() const
+    bool decoder_ffmpeg::is_open() const noexcept
     {
         if (!src_frame_buffer.empty())
             return true;
 
-        return FFMPEG_INITIALIZED &&
-               connected &&
-               pCodecCtx != nullptr;
+        return FFMPEG_INITIALIZED && pCodecCtx != nullptr && !flushed;
     }
 
-    bool decoder_ffmpeg::is_image_decoder() const
+    bool decoder_ffmpeg::is_image_decoder() const noexcept
     {
         return pCodecCtx && pCodecCtx->codec_type == AVMEDIA_TYPE_VIDEO;
     }
 
-    bool decoder_ffmpeg::is_audio_decoder() const
+    bool decoder_ffmpeg::is_audio_decoder() const noexcept
     {
         return pCodecCtx && pCodecCtx->codec_type == AVMEDIA_TYPE_AUDIO;
     }
 
-    AVCodecID decoder_ffmpeg::get_codec_id() const
+    AVCodecID decoder_ffmpeg::get_codec_id() const noexcept
     {
         return pCodecCtx ? pCodecCtx->codec_id : AV_CODEC_ID_NONE;
     }
 
-    std::string decoder_ffmpeg::get_codec_name() const
+    std::string decoder_ffmpeg::get_codec_name() const noexcept
     {
         return pCodecCtx ? avcodec_get_name(pCodecCtx->codec_id) : "NONE";
     }
 
-    int decoder_ffmpeg::height() const
+    int decoder_ffmpeg::height() const noexcept
     {
         return resizer_image.get_dst_h();
     }
 
-    int decoder_ffmpeg::width() const
+    int decoder_ffmpeg::width() const noexcept
     {
         return resizer_image.get_dst_w();
     }
 
-    AVPixelFormat decoder_ffmpeg::pixel_fmt() const
+    AVPixelFormat decoder_ffmpeg::pixel_fmt() const noexcept
     {
         return resizer_image.get_dst_fmt();
     }
 
-    int decoder_ffmpeg::sample_rate() const
+    int decoder_ffmpeg::sample_rate() const noexcept
     {
         return resizer_audio.get_dst_rate();
     }
 
-    uint64_t decoder_ffmpeg::channel_layout() const
+    uint64_t decoder_ffmpeg::channel_layout() const noexcept
     {
         return resizer_audio.get_dst_layout();
     }
 
-    AVSampleFormat decoder_ffmpeg::sample_fmt() const
+    AVSampleFormat decoder_ffmpeg::sample_fmt() const noexcept
     {
         return resizer_audio.get_dst_fmt();
     }
 
-    int decoder_ffmpeg::nchannels() const
+    int decoder_ffmpeg::nchannels() const noexcept
     {
         return av_get_channel_layout_nb_channels(channel_layout());
     }
 
+    /*!
+        We use a state machine to control decoding.
+        State machines are awesome.
+        Compile-time checked state machines are even better.
+        Maybe at some point dlib could have one.
+    !*/
+
+    typedef enum {
+        DECODING_RECV_PACKET = 0,
+        DECODING_SEND_PACKET,
+        DECODING_READ_FRAME_SEND_PACKET,
+        DECODING_READ_FRAME_RECV_PACKET,
+        DECODING_DONE,
+        DECODING_ERROR = -1
+    } decoder_state;
+
     bool decoder_ffmpeg::push_encoded(const uint8_t* encoded, int nencoded)
     {
-        if (!is_open())
+        using namespace std::chrono;
+
+        if (!pCodecCtx)
             return false;
 
         if (encoded && nencoded > 0)
         {
-            /*need this stupid padding*/
+            /*! According to FFMPEG docs we need this padding because of SIMD. !*/
             encoded_buffer.resize(nencoded + AV_INPUT_BUFFER_PADDING_SIZE, 0);
-            memcpy(&encoded_buffer[0], encoded, nencoded);
+            std::memcpy(&encoded_buffer[0], encoded, nencoded);
             encoded = &encoded_buffer[0];
         }
 
-        const bool is_flushing = encoded == nullptr || nencoded == 0;
+        decoder_state state     = DECODING_RECV_PACKET;
+        const bool is_flushing  = encoded == nullptr && nencoded == 0;
 
         auto recv_packet = [&]
         {
-            if (parser)
+            if (!is_flushing && nencoded == 0)
             {
-                int ret = av_parser_parse2(
+                /*! Consumed all encoded data. Exit loop. !*/
+                state = DECODING_DONE;
+            }
+            else if (parser)
+            {
+                const int ret = av_parser_parse2(
                         parser.get(),
                         pCodecCtx.get(),
                         &packet->data,
@@ -233,75 +256,71 @@ namespace dlib
                 if (ret < 0)
                 {
                     printf("AV : error while parsing encoded buffer\n");
+                    state = DECODING_ERROR;
                 }
                 else
                 {
                     encoded     += ret;
                     nencoded    -= ret;
                 }
-                return ret >= 0;
-            }
-            else
+            } else
             {
-                /*! Codec does not require parser!*/
-                packet->data = const_cast<uint8_t*>(encoded);
+                /*! Codec does not require parser !*/
+                packet->data = const_cast<uint8_t *>(encoded);
                 packet->size = nencoded;
-                encoded += nencoded;
-                nencoded = 0;
-                return true;
+                encoded      += nencoded;
+                nencoded     = 0;
             }
+
+            if (packet->size || is_flushing)
+                state = DECODING_SEND_PACKET;
         };
 
-        auto send_packet = [&](const AVPacket* pkt)
+        auto send_packet = [&]
         {
-            int ret = avcodec_send_packet(pCodecCtx.get(), pkt);
-            int suc = -1; //default to not-ok
+            const int ret = avcodec_send_packet(pCodecCtx.get(), packet.get());
 
-            if (ret == AVERROR(EAGAIN))
-            {
-                suc = 0;
-            }
-            else if (ret < 0 && ret != AVERROR_EOF)
+            if (ret == AVERROR_EOF)
+                state = DECODING_DONE;
+            else if (ret == AVERROR(EAGAIN))
+                state = DECODING_READ_FRAME_SEND_PACKET;
+            else if (ret >= 0)
+                state = DECODING_READ_FRAME_RECV_PACKET;
+            else
             {
                 printf("avcodec_send_packet() failed : %i - `%s`\n", ret, get_av_error(ret).c_str());
+                state = DECODING_ERROR;
             }
-            else if (ret >= 0)
-            {
-                suc = 1;
-            }
-
-            return suc;
         };
 
         auto recv_frame = [&]
         {
-            int ret = avcodec_receive_frame(pCodecCtx.get(), frame.get());
-            int suc = -1; //default to not-ok
+            const int ret = avcodec_receive_frame(pCodecCtx.get(), frame.get());
 
-            if (ret == AVERROR(EAGAIN))
-            {
-                suc = 0; //ok but need more input
-            }
-            else if (ret == AVERROR_EOF)
-            {
-//                printf("AV : EOF\n");
-            }
+            if (ret == AVERROR_EOF) {
+                state   = DECODING_DONE;
+                flushed = true;
+            } else if (ret == AVERROR(EAGAIN) && state == DECODING_READ_FRAME_SEND_PACKET)
+                state = DECODING_SEND_PACKET;
+            else if (ret == AVERROR(EAGAIN) && state == DECODING_READ_FRAME_RECV_PACKET)
+                state = DECODING_RECV_PACKET;
             else if (ret < 0)
             {
                 printf("avcodec_receive_frame() failed : %i - `%s`\n", ret, get_av_error(ret).c_str());
+                state = DECODING_ERROR;
             }
             else
             {
                 const bool is_video         = pCodecCtx->codec_type == AVMEDIA_TYPE_VIDEO;
                 const AVRational tb         = is_video ? pCodecCtx->time_base : AVRational{1, frame->sample_rate};
                 const uint64_t pts          = is_video ? frame->pts : next_pts;
-                const uint64_t timestamp_us = av_rescale_q(pts, tb, {1,1000000});
+                const uint64_t timestamp_ns = av_rescale_q(pts, tb, {1,1000000000});
                 next_pts                    += is_video ? 1 : frame->nb_samples;
 
                 Frame decoded;
                 Frame src;
-                src.timestamp_us = timestamp_us;
-                std::swap(src.frame, frame); //make sure you swap it back when you're done
+                src.frame       = std::move(frame); //make sure you move it back when you're done
+                src.timestamp   = system_clock::time_point{nanoseconds {timestamp_ns}};
 
                 if (src.is_image())
                 {
@@ -322,66 +341,29 @@ namespace dlib
                             decoded);
                 }
 
-                std::swap(src.frame, frame);
-
+                frame = std::move(src.frame);
                 src_frame_buffer.push(std::move(decoded));
-                suc = 1; //ok, keep receiving
             }
-
-            return suc;
         };
 
-        auto decode = [&](const AVPacket* pkt)
+        while (state != DECODING_ERROR && state != DECODING_DONE)
         {
-            int suc1 = 0; //-1 == error, 0 == ok but EAGAIN, 1 == ok
-            int suc2 = 0; //-1 == error, 0 == ok but EAGAIN, 1 == ok
-            bool ok = true;
-
-            while (ok && suc1 == 0)
+            switch(state)
             {
-                suc1 = send_packet(pkt);
-                ok   = suc1 >= 0;
-
-                if (ok)
-                {
-                    suc2 = 1;
-
-                    while (suc2 > 0)
-                        suc2 = recv_frame();
-
-                    ok = suc2 >= 0;
-                }
+                case DECODING_RECV_PACKET:              recv_packet(); break;
+                case DECODING_SEND_PACKET:              send_packet(); break;
+                case DECODING_READ_FRAME_SEND_PACKET:   recv_frame(); break;
+                case DECODING_READ_FRAME_RECV_PACKET:   recv_frame(); break;
+                default: break;
             }
-
-            return ok;
-        };
-
-        bool ok = true;
-
-        while (ok && nencoded > 0)
-        {
-            ok = recv_packet();
-
-            if (ok && packet->size > 0)
-                ok = decode(packet.get());
         }
 
-        if (!ok || is_flushing)
-        {
-            /*! FLUSH !*/
-            decode(nullptr);
-            ok = false;
-        }
-
-        connected = ok;
-        return connected;
+        return state != DECODING_ERROR;
     }
 
     void decoder_ffmpeg::flush()
     {
         push_encoded(nullptr, 0);
-        pCodecCtx.reset(nullptr); //decoder
-        connected = false;
     }
 
     decoder_ffmpeg::suc_t decoder_ffmpeg::read(Frame& dst_frame)
@@ -401,7 +383,7 @@ namespace dlib
 
     decoder_ffmpeg::suc_t decoder_ffmpeg::read(
         type_safe_union<array2d<rgb_pixel>, audio_frame> &frame,
-        uint64_t &timestamp_us
+        std::chrono::system_clock::time_point &timestamp
     )
     {
         Frame f;
@@ -418,7 +400,7 @@ namespace dlib
                 frame = frame_to_dlib_audio(f, resizer_audio);
             }
 
-            timestamp_us = f.timestamp_us;
+            timestamp = f.timestamp;
         }
 
         return suc;
@@ -430,35 +412,25 @@ namespace dlib
     {
     }
 
-    demuxer_ffmpeg::demuxer_ffmpeg(args a)
+    demuxer_ffmpeg::demuxer_ffmpeg(const args& a)
     {
-        st.connected = open(std::move(a));
+        if (!open(a))
+            st.pFormatCtx = nullptr;
     }
 
-    demuxer_ffmpeg::demuxer_ffmpeg(demuxer_ffmpeg &&other)
+    demuxer_ffmpeg::demuxer_ffmpeg(demuxer_ffmpeg &&other) noexcept
+    : st{std::move(other.st)}
     {
-        swap(*this, other);
+        if (st.pFormatCtx)
+            st.pFormatCtx->opaque = this;
     }
 
-    demuxer_ffmpeg& demuxer_ffmpeg::operator=(demuxer_ffmpeg &&other)
+    demuxer_ffmpeg& demuxer_ffmpeg::operator=(demuxer_ffmpeg &&other) noexcept
     {
-        swap(*this, other);
+        st = std::move(other.st);
+        if (st.pFormatCtx)
+            st.pFormatCtx->opaque = this;
         return *this;
-    }
-
-    void swap(demuxer_ffmpeg& a, demuxer_ffmpeg& b)
-    {
-        /*!
-            The reason why we don't let the compiler synthesise swap() and move semantics is because we must
-            manually reset the opaque pointers. If we don't do this, the interrupt callback breaks badly.
-            If it wasn't for this, we could let compiler generate everything.
-        !*/
-        using std::swap;
-        swap(a.st, b.st);
-        if (a.st.pFormatCtx)
-            a.st.pFormatCtx->opaque = &a;
-        if (b.st.pFormatCtx)
-            b.st.pFormatCtx->opaque = &b;
     }
 
     void demuxer_ffmpeg::populate_metadata()
@@ -482,16 +454,10 @@ namespace dlib
         }
     }
 
-    void demuxer_ffmpeg::reset()
+    bool demuxer_ffmpeg::open(const args& a)
     {
-        demuxer_ffmpeg empty;
-        swap(empty, *this);
-    }
-
-    bool demuxer_ffmpeg::open(args a)
-    {
-        reset();
-        st._args = std::move(a);
+        st = {};
+        st._args = a;
 
         AVFormatContext* pFormatCtx = avformat_alloc_context();
         pFormatCtx->opaque = this;
@@ -508,10 +474,13 @@ namespace dlib
         av_dict opts = st._args.format_options;
         AVInputFormat* input_format = st._args.input_format.empty() ? nullptr : av_find_input_format(st._args.input_format.c_str());
 
+        st.connecting_time = system_clock::now();
+        st.connected_time  = system_clock::time_point::max();
+
         int ret = avformat_open_input(&pFormatCtx,
                                       st._args.filepath.c_str(),
                                       input_format,
-                                      opts.avdic ? &opts.avdic : NULL);
+                                      opts.get());
 
         if (ret != 0)
         {
@@ -519,7 +488,7 @@ namespace dlib
             return false;
         }
 
-        st.connected_time_ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+        st.connected_time = system_clock::now();
         st.pFormatCtx.reset(pFormatCtx);
 
         ret = avformat_find_stream_info(st.pFormatCtx.get(), NULL);
@@ -571,11 +540,11 @@ namespace dlib
                 return false;
             }
 
-            ch.pCodecCtx->thread_count = common.nthreads > 0 ? common.nthreads : std::thread::hardware_concurrency() / 2;
+            if (common.nthreads > 0)
+                ch.pCodecCtx->thread_count = common.nthreads;
 
             av_dict opt = common.codec_options;
-
-            ret = avcodec_open2(ch.pCodecCtx.get(), pCodec, opt.avdic ? &opt.avdic : nullptr);
+            ret = avcodec_open2(ch.pCodecCtx.get(), pCodec, opt.get());
             if (ret < 0)
             {
                 printf("avcodec_open2() failed : `%s`\n", get_av_error(ret).c_str());
@@ -662,152 +631,174 @@ namespace dlib
 
         populate_metadata();
 
-        st.connected = true;
-        return st.connected;
+        return true;
     }
 
-    void demuxer_ffmpeg::fill_decoded_buffer()
+    typedef enum {
+        DEMUXER_RECV_PACKET = 0,
+        DEMUXER_SEND_PACKET,
+        DEMUXER_RECV_FRAME_SEND_PACKET,
+        DEMUXER_RECV_FRAME_RECV_PACKET,
+        DEMUXER_DONE,
+        DEMUXER_FLUSH,
+        DEMUXER_ERROR = -1
+    } demuxer_state;
+
+    bool demuxer_ffmpeg::fill_decoded_buffer()
     {
+        using namespace std::chrono;
+
         if (!st.src_frame_buffer.empty())
-            return;
+            return true;
 
         if (!is_open())
-            return;
+            return false;
 
-        auto recv_packet = [&]()
+        demuxer_state state = DEMUXER_RECV_PACKET;
+        channel* ch         = nullptr;
+
+        auto recv_packet = [&]
         {
-            int ret = av_read_frame(st.pFormatCtx.get(), st.packet.get());
-            if (ret < 0 && ret != AVERROR_EOF)
-                printf("av_read_frame() failed : `%s`\n", get_av_error(ret).c_str());
-            return ret >= 0;
-        };
-
-        auto send_packet = [&](channel &ch, const AVPacket* pkt)
-        {
-            int ret = avcodec_send_packet(ch.pCodecCtx.get(), pkt);
-            int suc = -1; //default to not-ok
-
-            if (ret == AVERROR(EAGAIN))
+            if (!st.src_frame_buffer.empty())
             {
-                suc = 0;
-            }
-            else if (ret < 0 && ret != AVERROR_EOF)
-            {
-                printf("avcodec_send_packet() failed : %i - `%s`\n", ret, get_av_error(ret).c_str());
-            }
-            else if (ret >= 0)
-            {
-                suc = 1;
-            }
-
-            return suc;
-        };
-
-        auto recv_frame = [&](channel &ch)
-        {
-            int ret = avcodec_receive_frame(ch.pCodecCtx.get(), st.frame.get());
-            int suc = -1; //default to not-ok
-
-            if (ret == AVERROR(EAGAIN))
-            {
-                suc = 0; //ok but need more input
-            }
-            else if (ret == AVERROR_EOF)
-            {
-            }
-            else if (ret < 0)
-            {
-                printf("avcodec_receive_frame() failed : %i - `%s`\n", ret, get_av_error(ret).c_str());
+                state = DEMUXER_DONE;
             }
             else
             {
-                const bool is_video         = ch.pCodecCtx->codec_type == AVMEDIA_TYPE_VIDEO;
-                const AVRational tb         = is_video ? st.pFormatCtx->streams[ch.stream_id]->time_base : AVRational{1, st.frame->sample_rate};
-                const uint64_t pts          = is_video ? st.frame->pts : ch.next_pts;
-                const uint64_t timestamp_us = av_rescale_q(pts, tb, {1,1000000});
-                ch.next_pts                 += is_video ? 1 : st.frame->nb_samples;
+                av_packet_unref(st.packet.get());
+                const int ret = av_read_frame(st.pFormatCtx.get(), st.packet.get());
+
+                if (ret == AVERROR_EOF)
+                {
+                    state = DEMUXER_FLUSH;
+                }
+                else if (ret >= 0)
+                {
+                    if (st.packet->stream_index == st.channel_video.stream_id ||
+                        st.packet->stream_index == st.channel_audio.stream_id)
+                    {
+                        ch      = st.packet->stream_index == st.channel_video.stream_id ? &st.channel_video : &st.channel_audio;
+                        state   = DEMUXER_SEND_PACKET;
+                    }
+                }
+                else
+                {
+                    printf("av_read_frame() failed : `%s`\n", get_av_error(ret).c_str());
+                    state = DEMUXER_ERROR;
+                }
+            }
+        };
+
+        auto send_packet = [&]
+        {
+            const int ret = avcodec_send_packet(ch->pCodecCtx.get(), st.packet.get());
+
+            if (ret == AVERROR_EOF)
+                state = DEMUXER_DONE;
+            else if (ret == AVERROR(EAGAIN))
+                state = DEMUXER_RECV_FRAME_SEND_PACKET;
+            else if (ret >= 0)
+                state = DEMUXER_RECV_FRAME_RECV_PACKET;
+            else
+            {
+                printf("avcodec_send_packet() failed : %i - `%s`\n", ret, get_av_error(ret).c_str());
+                state = DEMUXER_ERROR;
+            }
+        };
+
+        auto recv_frame = [&]
+        {
+            const int ret = avcodec_receive_frame(ch->pCodecCtx.get(), st.frame.get());
+
+            if (ret == AVERROR_EOF)
+                state = DEMUXER_DONE;
+            else if (ret == AVERROR(EAGAIN) && state == DEMUXER_RECV_FRAME_SEND_PACKET)
+                state = DEMUXER_SEND_PACKET;
+            else if (ret == AVERROR(EAGAIN) && state == DEMUXER_RECV_FRAME_RECV_PACKET)
+                state = DEMUXER_RECV_PACKET;
+            else if (ret < 0)
+            {
+                printf("avcodec_receive_frame() failed : %i - `%s`\n", ret, get_av_error(ret).c_str());
+                state = DEMUXER_ERROR;
+            }
+            else
+            {
+                const bool is_video         = ch->pCodecCtx->codec_type == AVMEDIA_TYPE_VIDEO;
+                const AVRational tb         = is_video ? st.pFormatCtx->streams[ch->stream_id]->time_base : AVRational{1, st.frame->sample_rate};
+                const uint64_t pts          = is_video ? st.frame->pts : ch->next_pts;
+                const uint64_t timestamp_ns = av_rescale_q(pts, tb, {1,1000000000});
+                ch->next_pts                += is_video ? 1 : st.frame->nb_samples;
 
                 Frame decoded;
                 Frame src;
-                src.timestamp_us = timestamp_us;
-                std::swap(src.frame, st.frame); //make sure you swap it back when you're done
+                src.timestamp   = system_clock::time_point{nanoseconds{timestamp_ns}};
+                src.frame       = std::move(st.frame);
 
                 if (src.is_image())
                     st.channel_video.resizer_image.resize(src, decoded);
                 else
                     st.channel_audio.resizer_audio.resize(src, decoded);
 
-                std::swap(src.frame, st.frame); //swap back
+                st.frame = std::move(src.frame);
 
                 st.src_frame_buffer.push(std::move(decoded));
-                st.last_read_time_ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
-                suc = 1; //ok, keep receiving
+                st.last_read_time = system_clock::now();
             }
-
-            return suc;
         };
 
-        auto decode = [&](channel& ch, const AVPacket* pkt)
+        auto flushing_channel = [&]
         {
-            int suc1 = 0; //-1 == error, 0 == ok but EAGAIN, 1 == ok
-            int suc2 = 0; //-1 == error, 0 == ok but EAGAIN, 1 == ok
-            bool ok = true;
+            state = DEMUXER_SEND_PACKET;
 
-            while (ok && suc1 == 0)
+            while (state != DEMUXER_ERROR && state != DEMUXER_DONE)
             {
-                suc1 = send_packet(ch, pkt);
-                ok   = suc1 >= 0;
-
-                if (ok)
+                switch(state)
                 {
-                    suc2 = 1;
-
-                    while (suc2 > 0)
-                        suc2 = recv_frame(ch);
-
-                    ok = suc2 >= 0;
+                    case DEMUXER_RECV_PACKET:              break;
+                    case DEMUXER_SEND_PACKET:              send_packet(); break;
+                    case DEMUXER_RECV_FRAME_SEND_PACKET:   recv_frame(); break;
+                    case DEMUXER_RECV_FRAME_RECV_PACKET:   recv_frame(); break;
+                    default: break;
                 }
             }
-
-            return ok;
         };
 
-        bool ok = true;
-        const size_t ndecoded_frames = st.src_frame_buffer.size();
-
-        while (ok && (st.src_frame_buffer.size() - ndecoded_frames) == 0)
+        auto flushing = [&]
         {
-            ok = recv_packet();
-
-            if (ok)
-            {
-                if (st.packet->stream_index == st.channel_video.stream_id ||
-                    st.packet->stream_index == st.channel_audio.stream_id)
-                {
-                    channel& ch = st.packet->stream_index == st.channel_video.stream_id ? st.channel_video : st.channel_audio;
-
-                    ok = decode(ch, st.packet.get());
-                }
-
-                av_packet_unref(st.packet.get());
-            }
-        }
-
-        if (!ok)
-        {
-            /*! FLUSH !*/
+            st.packet = nullptr;
             if (st.channel_video.is_enabled())
-                decode(st.channel_video, nullptr);
+            {
+                ch = &st.channel_video;
+                flushing_channel();
+            }
             if (st.channel_audio.is_enabled())
-                decode(st.channel_audio, nullptr);
+            {
+                ch = &st.channel_audio;
+                flushing_channel();
+            }
+            st.flushed = true;
+        };
+
+        while (state != DEMUXER_ERROR && state != DEMUXER_DONE)
+        {
+            switch(state)
+            {
+                case DEMUXER_RECV_PACKET:              recv_packet(); break;
+                case DEMUXER_SEND_PACKET:              send_packet(); break;
+                case DEMUXER_RECV_FRAME_SEND_PACKET:   recv_frame(); break;
+                case DEMUXER_RECV_FRAME_RECV_PACKET:   recv_frame(); break;
+                case DEMUXER_FLUSH:                    flushing(); break;
+                default: break;
+            }
         }
 
-        st.connected = ok;
+        return state != DEMUXER_ERROR;
     }
 
     bool demuxer_ffmpeg::read(Frame& dst_frame)
     {
-        fill_decoded_buffer();
+        if (!fill_decoded_buffer())
+            return false;
 
         if (!st.src_frame_buffer.empty())
         {
@@ -821,7 +812,7 @@ namespace dlib
 
     bool demuxer_ffmpeg::read(
         type_safe_union<array2d<rgb_pixel>, audio_frame> &frame,
-        uint64_t &timestamp_us
+        std::chrono::system_clock::time_point &timestamp
     )
     {
         Frame f;
@@ -838,47 +829,62 @@ namespace dlib
             frame = frame_to_dlib_audio(f, st.channel_audio.resizer_audio);
         }
 
-        timestamp_us = f.timestamp_us;
+        timestamp = f.timestamp;
 
         return true;
     }
 
-    bool demuxer_ffmpeg::is_open() const
+    bool demuxer_ffmpeg::is_open() const noexcept
     {
         const bool frames_available = !st.src_frame_buffer.empty();
         const bool object_ok        = FFMPEG_INITIALIZED        &&
-                                      st.connected              &&
                                       st.pFormatCtx != nullptr  &&
-                                      (st.channel_video.is_enabled() || st.channel_audio.is_enabled());
+                                      (st.channel_video.is_enabled() || st.channel_audio.is_enabled()) &&
+                                      !st.flushed;
         return frames_available || object_ok;
     }
 
-    bool demuxer_ffmpeg::video_enabled() const
+    bool demuxer_ffmpeg::video_enabled() const noexcept
     {
         return st.channel_video.is_enabled();
     }
 
-    bool demuxer_ffmpeg::audio_enabled() const
+    bool demuxer_ffmpeg::audio_enabled() const noexcept
     {
         return st.channel_audio.is_enabled();
     }
 
-    int demuxer_ffmpeg::height() const
+    int demuxer_ffmpeg::height() const noexcept
     {
         return st.channel_video.is_enabled() ? st.channel_video.resizer_image.get_dst_h() : 0;
     }
 
-    int demuxer_ffmpeg::width() const
+    int demuxer_ffmpeg::width() const noexcept
     {
         return st.channel_video.is_enabled() ? st.channel_video.resizer_image.get_dst_w() : 0;
     }
 
-    AVPixelFormat demuxer_ffmpeg::pixel_fmt() const
+    AVPixelFormat demuxer_ffmpeg::pixel_fmt() const noexcept
     {
         return st.channel_video.is_enabled() ? st.channel_video.resizer_image.get_dst_fmt() : AV_PIX_FMT_NONE;
     }
 
-    float demuxer_ffmpeg::fps() const
+    int demuxer_ffmpeg::estimated_nframes() const noexcept
+    {
+        return st.channel_video.is_enabled() ? st.pFormatCtx->streams[st.channel_video.stream_id]->nb_frames : 0;
+    }
+
+    AVCodecID demuxer_ffmpeg::get_video_codec_id() const noexcept
+    {
+        return st.channel_video.is_enabled() ? st.channel_video.pCodecCtx->codec_id : AV_CODEC_ID_NONE;
+    }
+
+    std::string demuxer_ffmpeg::get_video_codec_name() const noexcept
+    {
+        return st.channel_video.is_enabled() ? avcodec_get_name(st.channel_video.pCodecCtx->codec_id) : "NONE";
+    }
+
+    float demuxer_ffmpeg::fps() const noexcept
     {
         /*!
             Do we need to adjust _pFormatCtx->fps_probe_size ?
@@ -894,87 +900,87 @@ namespace dlib
         return 0.0f;
     }
 
-    int demuxer_ffmpeg::sample_rate() const
+    int demuxer_ffmpeg::sample_rate() const noexcept
     {
         return st.channel_audio.is_enabled() ? st.channel_audio.resizer_audio.get_dst_rate() : 0;
     }
 
-    uint64_t demuxer_ffmpeg::channel_layout() const
+    uint64_t demuxer_ffmpeg::channel_layout() const noexcept
     {
         return st.channel_audio.is_enabled() ? st.channel_audio.resizer_audio.get_dst_layout() : 0;
     }
 
-    AVSampleFormat demuxer_ffmpeg::sample_fmt() const
+    AVSampleFormat demuxer_ffmpeg::sample_fmt() const noexcept
     {
         return st.channel_audio.is_enabled() ? st.channel_audio.resizer_audio.get_dst_fmt() : AV_SAMPLE_FMT_NONE;
     }
 
-    int demuxer_ffmpeg::nchannels() const
+    int demuxer_ffmpeg::nchannels() const noexcept
     {
         return st.channel_audio.is_enabled() ? av_get_channel_layout_nb_channels(channel_layout()) : 0;
     }
 
-    int demuxer_ffmpeg::estimated_total_samples() const
+    AVCodecID demuxer_ffmpeg::get_audio_codec_id() const noexcept
+    {
+        return st.channel_audio.is_enabled() ? st.channel_audio.pCodecCtx->codec_id : AV_CODEC_ID_NONE;
+    }
+
+    std::string demuxer_ffmpeg::get_audio_codec_name() const noexcept
+    {
+        return st.channel_audio.is_enabled() ? avcodec_get_name(st.channel_audio.pCodecCtx->codec_id) : "NONE";
+    }
+
+    int demuxer_ffmpeg::estimated_total_samples() const noexcept
     {
         return st.channel_audio.is_enabled() ? st.pFormatCtx->streams[st.channel_audio.stream_id]->duration : 0;
     }
 
-    float demuxer_ffmpeg::duration() const
+    float demuxer_ffmpeg::duration() const noexcept
     {
         return (float)av_rescale_q(st.pFormatCtx->duration, {1, AV_TIME_BASE}, {1, 1000000}) * 1e-6;
     }
 
     bool demuxer_ffmpeg::interrupt_callback()
     {
-        bool do_interrupt = false;
-        const auto now = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+        const auto now = system_clock::now();
 
-        if (st._args.connect_timeout_ms > 0 && st.connected_time_ms == 0)
-        {
-            if (st.connecting_time_ms == 0)
-                st.connecting_time_ms = now;
+        if (st._args.connect_timeout < std::chrono::milliseconds::max())
+            if (st.connected_time > now && now > (st.connecting_time + st._args.connect_timeout))
+                return true;
 
-            const auto diff_ms = now - st.connecting_time_ms;
-            do_interrupt = do_interrupt || (diff_ms > st._args.connect_timeout_ms);
-        }
+        if (st._args.read_timeout < std::chrono::milliseconds::max())
+            if (now > (st.last_read_time + st._args.read_timeout))
+                return true;
 
-        if (st._args.read_timeout_ms > 0 && st.last_read_time_ms > 0)
-        {
-            const auto diff_ms = now - st.last_read_time_ms;
-            do_interrupt = do_interrupt || (diff_ms > st._args.read_timeout_ms);
-        }
+        if (st._args.interrupter && st._args.interrupter())
+            return true;
 
-        if (st._args.interrupter)
-        {
-            do_interrupt = do_interrupt || st._args.interrupter();
-        }
-
-        return do_interrupt;
+        return false;
     }
 
-    std::map<int, std::map<std::string, std::string>> demuxer_ffmpeg::get_all_metadata() const
+    std::map<int, std::map<std::string, std::string>> demuxer_ffmpeg::get_all_metadata() const noexcept
     {
         return st.metadata;
     }
 
-    std::map<std::string, std::string> demuxer_ffmpeg::get_video_metadata() const
+    std::map<std::string, std::string> demuxer_ffmpeg::get_video_metadata() const noexcept
     {
-        const static std::map<std::string,std::string> empty;
-        return st.pFormatCtx &&
-               st.channel_video.is_enabled() &&
-               st.metadata.find(st.channel_video.stream_id) != st.metadata.end() ?
-               st.metadata.at(st.channel_video.stream_id) :
-               empty;
+        if (st.pFormatCtx &&
+            st.channel_video.is_enabled() &&
+            st.metadata.find(st.channel_video.stream_id) != st.metadata.end())
+            return st.metadata.at(st.channel_video.stream_id);
+        else
+            return {};
     }
 
-    float demuxer_ffmpeg::get_rotation_angle() const
+    float demuxer_ffmpeg::get_rotation_angle() const noexcept
     {
         const auto metadata = get_video_metadata();
         const auto it = metadata.find("rotate");
         return it != metadata.end() ? std::stof(it->second) : 0;
     }
 
-    bool demuxer_ffmpeg::channel::is_enabled() const
+    bool demuxer_ffmpeg::channel::is_enabled() const noexcept
     {
         return pCodecCtx != nullptr;
     }

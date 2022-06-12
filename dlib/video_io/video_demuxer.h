@@ -23,8 +23,8 @@ namespace dlib
             {
                 AVCodecID                           codec = AV_CODEC_ID_NONE;
                 std::string                         codec_name;     //only used if codec==AV_CODEC_ID_NONE
-                std::map<std::string, std::string>  codec_options;  //It's rare you should have to set this
-                int                                 nthreads = -1;  //-1 means use default
+                std::map<std::string, std::string>  codec_options;  //A dictionary of AVCodecContext and codec-private options. Used by avcodec_open2().
+                int                                 nthreads = -1;  //-1 means use default. See documentation for AVCodecContext::thread_count
                 int64_t                             bitrate  = -1;  //-1 means use default. See documentation for AVCodecContext::bit_rate
                 int                                 flags    = 0;   //See documentation for AVCodecContext::flags. You almost never have to use this.
             };
@@ -53,31 +53,31 @@ namespace dlib
         } suc_t;
 
         decoder_ffmpeg() = default;
-        decoder_ffmpeg(const args &a);
+        explicit decoder_ffmpeg(const args &a);
 
-        bool is_open() const;
-        bool is_image_decoder() const;
-        bool is_audio_decoder() const;
-        AVCodecID   get_codec_id() const;
-        std::string get_codec_name() const;
+        bool is_open() const noexcept;
+        bool is_image_decoder() const noexcept;
+        bool is_audio_decoder() const noexcept;
+        AVCodecID   get_codec_id() const noexcept;
+        std::string get_codec_name() const noexcept;
 
         /*video dims*/
-        int             height()    const;
-        int             width()     const;
-        AVPixelFormat   pixel_fmt() const;
+        int             height()    const noexcept;
+        int             width()     const noexcept;
+        AVPixelFormat   pixel_fmt() const noexcept;
 
         /*audio dims*/
-        int             sample_rate()       const;
-        uint64_t        channel_layout()    const;
-        AVSampleFormat  sample_fmt()        const;
-        int             nchannels()         const;
+        int             sample_rate()       const noexcept;
+        uint64_t        channel_layout()    const noexcept;
+        AVSampleFormat  sample_fmt()        const noexcept;
+        int             nchannels()         const noexcept;
 
         bool push_encoded(const uint8_t *encoded, int nencoded);
         void flush();
 
         suc_t read(
             type_safe_union<array2d<rgb_pixel>, audio_frame>& frame,
-            uint64_t& timestamp_us
+            std::chrono::system_clock::time_point &timestamp
         );
 
         /*expert use*/
@@ -87,7 +87,7 @@ namespace dlib
         bool open();
 
         args                            _args;
-        bool                            connected   = false;
+        bool                            flushed     = false;
         uint64_t                        next_pts    = 0;
         av_ptr<AVCodecContext>          pCodecCtx;
         av_ptr<AVCodecParserContext>    parser;
@@ -106,8 +106,8 @@ namespace dlib
         {
             struct channel_args
             {
-                std::map<std::string, std::string> codec_options;
-                int nthreads = -1; //-1 means std::thread::hardware_concurrency() / 2 is used
+                std::map<std::string, std::string> codec_options; //A dictionary of AVCodecContext and codec-private options. Used by avcodec_open2().
+                int nthreads = -1; //-1 means use default. See documentation for AVCodecContext::thread_count
             };
 
             struct image_args
@@ -126,8 +126,6 @@ namespace dlib
                 AVSampleFormat  fmt = AV_SAMPLE_FMT_S16;                //sensible default
             };
 
-            typedef std::function<bool()> interrupter_t;
-
             args() = default;
             args(std::string filepath);
 
@@ -139,50 +137,54 @@ namespace dlib
              *  - screen buffer     (eg X11 screen grap) you need to set input_format to "X11" for this to work
              *  - audio device      (eg hw:0,0) you need to set input_format to "ALSA" for this to work
              */
-            std::string filepath;
-            std::string input_format;               //guessed if empty
-            int         probesize           = -1;   //determines how much space is reserved for frames in order to determine heuristics. -1 means use codec default
-            uint64_t    connect_timeout_ms  = -1;   //timeout for establishing a connection if appropriate (RTSP/TCP client muxer for example)
-            uint64_t    read_timeout_ms     = -1;   //timeout on read, -1 maps to something very large with uint64_t
+            std::string                 filepath;
+            std::string                 input_format;           //guessed if empty
+            int                         probesize       = -1;   //determines how much space is reserved for frames in order to determine heuristics. -1 means use codec default
+            std::chrono::milliseconds   connect_timeout = std::chrono::milliseconds::max();   //timeout for establishing a connection if appropriate (RTSP/TCP for example)
+            std::chrono::milliseconds   read_timeout    = std::chrono::milliseconds::max();   //timeout on read if using network muxer (RTSP/TCP for example)
 
             bool        enable_image = true;
             image_args  image_options;
             bool        enable_audio = true;
             audio_args  audio_options;
 
-            std::map<std::string, std::string> format_options;
-            interrupter_t interrupter;
+            std::map<std::string, std::string> format_options; //A dictionary filled with AVFormatContext and demuxer-private options. Used by avformat_open_input().
+            std::function<bool()>              interrupter;
         };
 
         demuxer_ffmpeg() = default;
-        demuxer_ffmpeg(args a);
-        demuxer_ffmpeg(demuxer_ffmpeg&& other);
-        demuxer_ffmpeg& operator=(demuxer_ffmpeg&& other);
-        friend void swap(demuxer_ffmpeg &a, demuxer_ffmpeg &b);
+        demuxer_ffmpeg(const args& a);
+        demuxer_ffmpeg(demuxer_ffmpeg&& other) noexcept;
+        demuxer_ffmpeg& operator=(demuxer_ffmpeg&& other) noexcept;
 
-        bool open(args a);
-        bool is_open() const;
-        bool audio_enabled() const;
-        bool video_enabled() const;
+        bool open(const args& a);
+        bool is_open() const noexcept;
+        bool audio_enabled() const noexcept;
+        bool video_enabled() const noexcept;
 
         /*video dims*/
-        int             height() const;
-        int             width() const;
-        AVPixelFormat   pixel_fmt() const;
-        float           fps() const;
+        int             height() const noexcept;
+        int             width() const noexcept;
+        AVPixelFormat   pixel_fmt() const noexcept;
+        float           fps() const noexcept;
+        int             estimated_nframes() const noexcept;
+        AVCodecID       get_video_codec_id() const noexcept;
+        std::string     get_video_codec_name() const noexcept;
 
         /*audio dims*/
-        int             sample_rate() const;
-        uint64_t        channel_layout() const;
-        AVSampleFormat  sample_fmt() const;
-        int             nchannels() const;
-        int             estimated_total_samples() const;
+        int             sample_rate() const noexcept;
+        uint64_t        channel_layout() const noexcept;
+        AVSampleFormat  sample_fmt() const noexcept;
+        int             nchannels() const noexcept;
+        int             estimated_total_samples() const noexcept;
+        AVCodecID       get_audio_codec_id() const noexcept;
+        std::string     get_audio_codec_name() const noexcept;
 
-        float duration() const;
+        float duration() const noexcept;
 
         bool read(
             type_safe_union<array2d<rgb_pixel>, audio_frame>& frame,
-            uint64_t& timestamp_us
+            std::chrono::system_clock::time_point &timestamp
         );
 
         /*expert use*/
@@ -191,15 +193,15 @@ namespace dlib
         );
 
         /*metadata*/
-        std::map<int,std::map<std::string,std::string>> get_all_metadata()      const;
-        std::map<std::string,std::string>               get_video_metadata()    const;
-        float get_rotation_angle() const;
+        std::map<int,std::map<std::string,std::string>> get_all_metadata()      const noexcept;
+        std::map<std::string,std::string>               get_video_metadata()    const noexcept;
+        float get_rotation_angle() const noexcept;
 
     private:
 
         struct channel
         {
-            bool is_enabled() const;
+            bool is_enabled() const noexcept;
             av_ptr<AVCodecContext>  pCodecCtx;
             int                     stream_id   = -1;
             uint64_t                next_pts    = 0;
@@ -207,23 +209,21 @@ namespace dlib
             sw_audio_resampler      resizer_audio;
         };
 
-        void reset();
         void populate_metadata();
         bool interrupt_callback();
-        void fill_decoded_buffer();
+        bool fill_decoded_buffer();
 
         struct {
             args _args;
-            bool connected = false;
+            bool                    flushed = false;
             av_ptr<AVFormatContext> pFormatCtx;
             av_ptr<AVPacket>        packet;
             av_ptr<AVFrame>         frame;
             channel                 channel_video;
             channel                 channel_audio;
-
-            uint64_t connecting_time_ms = 0;
-            uint64_t connected_time_ms  = 0;
-            uint64_t last_read_time_ms  = 0;
+            std::chrono::system_clock::time_point connecting_time{};
+            std::chrono::system_clock::time_point connected_time{};
+            std::chrono::system_clock::time_point last_read_time{};
             std::queue<Frame> src_frame_buffer;
             std::map<int, std::map<std::string, std::string>> metadata;
         } st;
