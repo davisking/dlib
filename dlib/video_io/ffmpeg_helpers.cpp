@@ -160,7 +160,7 @@ namespace dlib
         int             nb_samples,
         uint64_t        channel_layout,
         AVSampleFormat  samplefmt,
-        uint64_t        timestamp_us
+        std::chrono::system_clock::time_point timestamp
     )
     {
         Frame obj;
@@ -171,7 +171,7 @@ namespace dlib
         obj.frame->channel_layout   = channel_layout;
         obj.frame->nb_samples       = nb_samples;
         obj.frame->format           = h > 0 && w > 0 ? (int)pixfmt : (int)samplefmt;
-        obj.timestamp_us            = timestamp_us;
+        obj.timestamp               = timestamp;
 
         int ret = av_frame_get_buffer(obj.frame.get(), 0); //use default alignment, which is likely 32
         if (ret < 0)
@@ -188,7 +188,9 @@ namespace dlib
 //        }
 
         if (obj.is_audio())
-            obj.frame->pts = av_rescale_q(obj.timestamp_us, {1,1000000}, {1, obj.frame->sample_rate});
+            obj.frame->pts = av_rescale_q(obj.timestamp.time_since_epoch().count(),
+                                          {decltype(obj.timestamp)::period::num, (decltype(obj.timestamp)::period::den)},
+                                          {1, obj.frame->sample_rate});
 
         return obj;
     }
@@ -197,7 +199,7 @@ namespace dlib
         int h,
         int w,
         AVPixelFormat fmt,
-        uint64_t timestamp_us
+        std::chrono::system_clock::time_point timestamp_us
     )
     {
         return make(h, w, fmt, 0, 0, 0, AV_SAMPLE_FMT_NONE, timestamp_us);
@@ -208,7 +210,7 @@ namespace dlib
         int             nb_samples,
         uint64_t        channel_layout,
         AVSampleFormat  fmt,
-        uint64_t        timestamp_us
+        std::chrono::system_clock::time_point timestamp_us
     )
     {
         return make(0,0,AV_PIX_FMT_NONE, sample_rate, nb_samples, channel_layout, fmt, timestamp_us);
@@ -252,7 +254,7 @@ namespace dlib
                                  ori.frame->nb_samples,
                                  ori.frame->channel_layout,
                                  (AVSampleFormat)ori.frame->format,
-                                 ori.timestamp_us);
+                                 ori.timestamp);
                 *this = std::move(tmp);
             }
 
@@ -281,6 +283,16 @@ namespace dlib
         return is_image() ? (AVPixelFormat)frame->format : AV_PIX_FMT_NONE;
     }
 
+    int Frame::height() const
+    {
+        return is_image() ? frame->height : 0;
+    }
+
+    int Frame::width() const
+    {
+        return is_image() ? frame->width : 0;
+    }
+
     AVSampleFormat Frame::samplefmt() const
     {
         return is_audio() ? (AVSampleFormat)frame->format : AV_SAMPLE_FMT_NONE;
@@ -289,6 +301,11 @@ namespace dlib
     int Frame::nchannels() const
     {
         return is_audio() ? av_get_channel_layout_nb_channels(frame->channel_layout) : 0;
+    }
+
+    int Frame::sample_rate() const
+    {
+        return is_audio() ? frame->sample_rate : 0;
     }
 
     int sw_image_resizer::get_src_h() const {
@@ -366,7 +383,7 @@ namespace dlib
                 std::tie(dst.frame->height, dst.frame->width, dst.frame->format) !=
                 std::tie(_dst_h, _dst_w, _dst_fmt))
             {
-                tmp = Frame::make_image(_dst_h, _dst_w, _dst_fmt, src.timestamp_us);
+                tmp = Frame::make_image(_dst_h, _dst_w, _dst_fmt, src.timestamp);
                 ptr = std::addressof(tmp);
             }
 
@@ -445,6 +462,7 @@ namespace dlib
         Frame&          dst
     )
     {
+        using namespace std::chrono;
         DLIB_ASSERT(src.is_audio());
 
         const bool is_same_object = std::addressof(src) == std::addressof(dst);
@@ -465,7 +483,7 @@ namespace dlib
                 std::tie(dst.frame->sample_rate, dst.frame->channel_layout, dst.frame->format, dst.frame->nb_samples) !=
                 std::tie(dst_sample_rate_, dst_channel_layout_, dst_fmt_, dst_nb_samples))
             {
-                tmp = Frame::make_audio(dst_sample_rate_, dst_nb_samples, dst_channel_layout_, dst_fmt_, 0);
+                tmp = Frame::make_audio(dst_sample_rate_, dst_nb_samples, dst_channel_layout_, dst_fmt_, std::chrono::system_clock::time_point{});
                 ptr = std::addressof(tmp);
             }
 
@@ -477,7 +495,9 @@ namespace dlib
 
             ptr->frame->nb_samples = ret;
             ptr->frame->pts   = _tracked_samples;
-            ptr->timestamp_us = av_rescale_q(_tracked_samples, {1, dst_sample_rate_}, {1,1000000});
+            ptr->timestamp    = system_clock::time_point{nanoseconds{av_rescale_q(_tracked_samples,
+                                                                                  {1, dst_sample_rate_},
+                                                                                  {nanoseconds::period::num, nanoseconds::period::den})}};
             _tracked_samples += ptr->frame->nb_samples;
 
             if (ptr!= std::addressof(dst))
@@ -547,6 +567,7 @@ namespace dlib
         Frame&& in
     )
     {
+        using namespace std::chrono;
         DLIB_ASSERT(in.is_audio());
 
         std::vector<Frame> outs;
@@ -570,10 +591,12 @@ namespace dlib
 
             while (av_audio_fifo_size(fifo.get()) >= frame_size)
             {
-                const AVRational tb1 = {1, in.frame->sample_rate};
-                const AVRational tb2 = {1, 1000000};
-                const uint64_t timestamp_us = av_rescale_q(sample_count, tb1, tb2);
-                Frame out = Frame::make_audio(in.frame->sample_rate, frame_size, in.frame->channel_layout, in.samplefmt(), timestamp_us);
+                const system_clock::time_point timestamp{nanoseconds{av_rescale_q(
+                        sample_count,
+                        {1, in.frame->sample_rate},
+                        {nanoseconds::period::num, nanoseconds::period::den})}};
+
+                Frame out = Frame::make_audio(in.frame->sample_rate, frame_size, in.frame->channel_layout, in.samplefmt(), timestamp);
 
                 if (av_audio_fifo_read(fifo.get(), (void**)out.frame->data, out.frame->nb_samples) != out.frame->nb_samples)
                     throw std::runtime_error("av_audio_fifo_read() failed to read all requested samples");

@@ -11,6 +11,7 @@
 #include <utility>
 #include <memory>
 #include <map>
+#include <chrono>
 
 /*all things ffmpeg we might need*/
 
@@ -98,14 +99,14 @@ namespace dlib
             int nb_samples,
             uint64_t channel_layout,
             AVSampleFormat samplefmt,
-            uint64_t timestamp_us
+            std::chrono::system_clock::time_point timestamp
         );
 
         static Frame make_image(
             int h,
             int w,
             AVPixelFormat pixfmt,
-            uint64_t timestamp_us
+            std::chrono::system_clock::time_point timestamp_us
         );
 
         static Frame make_audio(
@@ -113,7 +114,7 @@ namespace dlib
             int nb_samples,
             uint64_t channel_layout,
             AVSampleFormat samplefmt,
-            uint64_t timestamp_us
+            std::chrono::system_clock::time_point timestamp
         );
 
         bool is_empty() const;
@@ -122,14 +123,17 @@ namespace dlib
         /*image*/
         bool is_image() const;
         AVPixelFormat pixfmt() const;
+        int height() const;
+        int width() const;
 
         /*audio*/
         bool is_audio() const;
         int nchannels() const;
         AVSampleFormat samplefmt() const;
+        int sample_rate() const;
 
         av_ptr<AVFrame> frame;
-        uint64_t        timestamp_us = 0;
+        std::chrono::system_clock::time_point timestamp;
     };
 
     class sw_image_resizer
