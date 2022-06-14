@@ -74,7 +74,10 @@ namespace dlib {
             {
                 fout.write(reinterpret_cast<char*>(output), output_size);
                 if (!fout.good())
+                {
+                    WebPFree(output);
                     throw image_save_error("Error while writing WebP image to " + filename + ".");
+                }
             }
             else
             {
