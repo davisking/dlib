@@ -115,7 +115,7 @@ namespace dlib
         template <typename First, typename... Rest>
         struct are_nothrow_copy_construtible
             : std::integral_constant<bool, std::is_nothrow_copy_constructible<First>::value &&
-                are_nothrow_copy_construtible<Rest...>::value> {};
+                                           are_nothrow_copy_construtible<Rest...>::value> {};
 
         template <typename T>
         struct are_nothrow_copy_construtible<T> : std::is_nothrow_copy_constructible<T> {};
@@ -125,7 +125,7 @@ namespace dlib
         template <typename First, typename... Rest>
         struct are_nothrow_copy_assignable
             : std::integral_constant<bool, std::is_nothrow_copy_assignable<First>::value &&
-                                           are_nothrow_move_assignable<Rest...>::value> {};
+                                           are_nothrow_copy_assignable<Rest...>::value> {};
 
         template <typename T>
         struct are_nothrow_copy_assignable<T> : std::is_nothrow_copy_assignable<T> {};
