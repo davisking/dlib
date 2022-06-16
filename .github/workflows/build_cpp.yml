@@ -22,7 +22,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
     - uses: actions/checkout@v2
-    - name: Install dependecies
+    - name: Install dependencies
       run: |
         sudo apt update
         sudo apt install libwebp-dev
@@ -39,7 +39,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
     - uses: actions/checkout@v2
-    - name: Install dependecies
+    - name: Install dependencies
       run: |
         sudo apt update
         sudo apt install libwebp-dev
@@ -60,7 +60,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
     - uses: actions/checkout@v2
-    - name: Install dependecies
+    - name: Install dependencies
       run: |
         sudo apt update
         sudo apt install libwebp-dev
@@ -80,7 +80,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
     - uses: actions/checkout@v2
-    - name: Install dependecies
+    - name: Install dependencies
       run: |
         sudo apt update
         sudo apt install libwebp-dev
