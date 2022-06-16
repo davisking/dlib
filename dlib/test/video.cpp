@@ -176,7 +176,7 @@ namespace
 
             {
                 dlib::decoder_ffmpeg::args args2;
-                args2.args_common.codec = enc_image.get_codec_id();
+                args2.args_codec.codec  = enc_image.get_codec_id();
                 args2.args_image.h      = cap.height();
                 args2.args_image.w      = cap.width();
                 args2.args_image.fmt    = cap.pixel_fmt();
@@ -184,7 +184,7 @@ namespace
                 dec_image = dlib::decoder_ffmpeg(args2);
                 DLIB_TEST(dec_image.is_open());
                 DLIB_TEST(dec_image.is_image_decoder());
-                DLIB_TEST(dec_image.get_codec_id() == args2.args_common.codec);
+                DLIB_TEST(dec_image.get_codec_id() == args2.args_codec.codec);
                 print_spinner();
             }
         }
@@ -210,7 +210,7 @@ namespace
 
             {
                 dlib::decoder_ffmpeg::args args2;
-                args2.args_common.codec         = enc_audio.get_codec_id();
+                args2.args_codec.codec         = enc_audio.get_codec_id();
                 args2.args_audio.sample_rate    = cap.sample_rate();
                 args2.args_audio.channel_layout = cap.channel_layout();
                 args2.args_audio.fmt            = cap.sample_fmt();
@@ -218,7 +218,7 @@ namespace
                 dec_audio = dlib::decoder_ffmpeg(args2);
                 DLIB_TEST(dec_audio.is_open());
                 DLIB_TEST(dec_audio.is_audio_decoder());
-                DLIB_TEST(dec_audio.get_codec_id() == args2.args_common.codec);
+                DLIB_TEST(dec_audio.get_codec_id() == args2.args_codec.codec);
                 print_spinner();
             }
         }
@@ -275,7 +275,7 @@ namespace
             counter_images  = 0;
             counter_samples = 0;
 
-            while (dec.read(frame, timestamp) == decoder_ffmpeg::FRAME_AVAILABLE)
+            while (dec.read(frame, timestamp) == DECODER_FRAME_AVAILABLE)
             {
                 visit(overloaded(
                         [&](const array2d<rgb_pixel>& frame) {
