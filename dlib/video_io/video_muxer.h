@@ -24,7 +24,7 @@ namespace dlib
             {
                 AVCodecID                           codec = AV_CODEC_ID_NONE;
                 std::string                         codec_name;     //only used if codec==AV_CODEC_ID_NONE
-                std::map<std::string, std::string>  codec_options;  //A dictionary of AVCodecContext and codec-private options. Used by avcodec_open2().
+                std::unordered_map<std::string, std::string>  codec_options;  //A dictionary of AVCodecContext and codec-private options. Used by avcodec_open2().
                 int                                 nthreads = -1;  //-1 means use default. See documentation for AVCodecContext::thread_count
                 int64_t                             bitrate  = -1;  //-1 means use default. See documentation for AVCodecContext::bit_rate
                 int                                 flags    = 0;   //See documentation for AVCodecContext::flags. You almost never have to use this.
@@ -133,8 +133,8 @@ namespace dlib
             std::string filepath        = "";
             std::string output_format   = "";                       //if empty, this is guessed from filepath
             int         max_delay       = -1;                       //See documentation for AVFormatContext::max_delay
-            std::map<std::string, std::string>  format_options;     //An AVDictionary filled with AVFormatContext and muxer-private options. Used by avformat_write_header()
-            std::map<std::string, std::string>  protocol_options;   //An AVDictionary filled with protocol-private options. Used by avio_open2()
+            std::unordered_map<std::string, std::string>  format_options;     //An AVDictionary filled with AVFormatContext and muxer-private options. Used by avformat_write_header()
+            std::unordered_map<std::string, std::string>  protocol_options;   //An AVDictionary filled with protocol-private options. Used by avio_open2()
             std::chrono::milliseconds           connect_timeout{};     //timeout for establishing a connection if appropriate (RTSP/TCP client muxer for example)
             std::function<bool()>               interrupter;
 
