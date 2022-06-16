@@ -261,26 +261,6 @@ namespace dlib
             type_safe_union& _me;
         };
 
-        struct swap_to
-        {
-            /*!
-                This class swaps an object with `me`.
-            !*/
-            swap_to(type_safe_union& me) : _me(me) {}
-            template<typename T>
-            void operator()(T& x)
-            /*!
-                requires
-                    - _me.contains<T>() == true
-            !*/
-            {
-                using std::swap;
-                swap(_me.unchecked_get<T>(), x);
-            }
-
-            type_safe_union& _me;
-        };
-
     public:
 
         type_safe_union() = default;
@@ -419,33 +399,6 @@ namespace dlib
             return type_identity;
         }
 
-        void swap (
-            type_safe_union& item
-        )
-        {
-            if (type_identity == item.type_identity)
-            {
-                item.apply_to_contents(swap_to{*this});
-            }
-            else if (is_empty())
-            {
-                item.apply_to_contents(move_to{*this});
-                item.destruct();
-            }
-            else if (item.is_empty())
-            {
-                apply_to_contents(move_to{item});
-                destruct();
-            }
-            else
-            {
-                type_safe_union tmp;
-                swap(tmp);      // this -> tmp
-                swap(item);     // item -> this
-                tmp.swap(item); // tmp (this) -> item
-            }
-        }
-
         template <
             typename T,
             is_valid_check<T> = true
@@ -494,12 +447,6 @@ namespace dlib
                 throw bad_type_safe_union_cast();
         }
     };
-
-    template <typename ...Types>
-    inline void swap (
-        type_safe_union<Types...>& a,
-        type_safe_union<Types...>& b
-    ) { a.swap(b); }
 
     namespace detail
     {
