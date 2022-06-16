@@ -10,7 +10,7 @@
 #include <vector>
 #include <utility>
 #include <memory>
-#include <map>
+#include <unordered_map>
 #include <chrono>
 
 /*all things ffmpeg we might need*/
@@ -69,7 +69,7 @@ namespace dlib
     struct av_dict
     {
         av_dict() = default;
-        av_dict(const std::map<std::string, std::string> &options);
+        av_dict(const std::unordered_map<std::string, std::string> &options);
         av_dict(const av_dict &ori);
         av_dict &operator=(const av_dict &ori);
         av_dict(av_dict &&ori);

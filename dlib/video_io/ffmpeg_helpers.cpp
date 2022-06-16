@@ -1,4 +1,3 @@
-#include "../utility.h" // for dlib::exchange
 #include "ffmpeg_helpers.h"
 
 namespace dlib
@@ -90,7 +89,7 @@ namespace dlib
             avformat_close_input(&ptr);
     }
 
-    av_dict::av_dict(const std::map<std::string, std::string>& options)
+    av_dict::av_dict(const std::unordered_map<std::string, std::string>& options)
     {
         int ret = 0;
 
@@ -115,8 +114,9 @@ namespace dlib
     }
 
     av_dict::av_dict(av_dict &&ori)
-    : avdic{dlib::exchange(ori.avdic, nullptr)}
+    : avdic{ori.avdic}
     {
+        ori.avdic = nullptr;
     }
 
     av_dict &av_dict::operator=(av_dict &&ori)
