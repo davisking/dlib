@@ -163,7 +163,7 @@ namespace
             DLIB_TEST(a.contains<long>() == false);
         // -----------
 
-            std::swap(a,b);
+            a.swap(b);
 
             DLIB_TEST(a.is_empty() == true);
             DLIB_TEST(a.contains<char>() == false);
@@ -186,7 +186,7 @@ namespace
 
         // -----------
 
-            std::swap(b,a);
+            b.swap(a);
 
             DLIB_TEST(b.is_empty() == true);
             DLIB_TEST(b.contains<char>() == false);

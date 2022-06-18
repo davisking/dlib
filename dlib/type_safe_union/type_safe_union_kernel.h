@@ -503,6 +503,14 @@ namespace dlib
             else
                 throw bad_type_safe_union_cast();
         }
+
+        void swap(
+            type_safe_union& item
+        ) noexcept(std::is_nothrow_move_constructible<type_safe_union>::value &&
+                   std::is_nothrow_move_assignable<type_safe_union>::value)
+        {
+            std::swap(*this, item);
+        }
     };
 
     namespace detail
