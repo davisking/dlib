@@ -364,6 +364,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template<typename... Types>
+    inline void swap (
+        type_safe_union<Types...>& a,
+        type_safe_union<Types...>& b
+    ) { a.swap(b); }
+    /*!
+        provides a global swap function
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template<
         typename TSU,
         typename F
