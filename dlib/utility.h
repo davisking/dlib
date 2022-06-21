@@ -12,6 +12,8 @@
 
 namespace dlib
 {
+    // ---------------------------------------------------------------------
+
     template<std::size_t... Ints>
     struct index_sequence
     {
@@ -37,6 +39,91 @@ namespace dlib
 
     template<typename... Ts>
     using index_sequence_for = make_index_sequence<sizeof...(Ts)>;
+
+    // ---------------------------------------------------------------------
+
+    template <typename First, typename... Rest>
+    struct are_nothrow_move_construtible
+        : std::integral_constant<bool, std::is_nothrow_move_constructible<First>::value &&
+                                       are_nothrow_move_construtible<Rest...>::value> {};
+
+    template <typename T>
+    struct are_nothrow_move_construtible<T> : std::is_nothrow_move_constructible<T> {};
+
+    // ---------------------------------------------------------------------
+
+    template <typename First, typename... Rest>
+    struct are_nothrow_move_assignable
+        : std::integral_constant<bool, std::is_nothrow_move_assignable<First>::value &&
+                                       are_nothrow_move_assignable<Rest...>::value> {};
+
+    template <typename T>
+    struct are_nothrow_move_assignable<T> : std::is_nothrow_move_assignable<T> {};
+
+    // ---------------------------------------------------------------------
+
+    template <typename First, typename... Rest>
+    struct are_nothrow_copy_construtible
+        : std::integral_constant<bool, std::is_nothrow_copy_constructible<First>::value &&
+                                       are_nothrow_copy_construtible<Rest...>::value> {};
+
+    template <typename T>
+    struct are_nothrow_copy_construtible<T> : std::is_nothrow_copy_constructible<T> {};
+
+    // ---------------------------------------------------------------------
+
+    template <typename First, typename... Rest>
+    struct are_nothrow_copy_assignable
+        : std::integral_constant<bool, std::is_nothrow_copy_assignable<First>::value &&
+                                       are_nothrow_copy_assignable<Rest...>::value> {};
+
+    template <typename T>
+    struct are_nothrow_copy_assignable<T> : std::is_nothrow_copy_assignable<T> {};
+
+    // ---------------------------------------------------------------------
+
+    template< class... >
+    using void_t = void;
+
+    // ---------------------------------------------------------------------
+
+    namespace swappable_details
+    {
+        using std::swap;
+
+        template<typename T, typename = void>
+        struct is_swappable : std::false_type {};
+
+        template<typename T>
+        struct is_swappable<T, void_t<decltype(swap(std::declval<T&>(), std::declval<T&>()))>> : std::true_type {};
+
+        template<typename T>
+        struct is_nothrow_swappable :
+            std::integral_constant<bool, is_swappable<T>::value &&
+                                         noexcept(swap(std::declval<T&>(), std::declval<T&>()))> {};
+    }
+
+    // ---------------------------------------------------------------------
+
+    template<typename T>
+    struct is_swappable : swappable_details::is_swappable<T>{};
+
+    // ---------------------------------------------------------------------
+
+    template<typename T>
+    struct is_nothrow_swappable : swappable_details::is_nothrow_swappable<T>{};
+
+    // ---------------------------------------------------------------------
+
+    template <typename First, typename... Rest>
+    struct are_nothrow_swappable
+        : std::integral_constant<bool, is_nothrow_swappable<First>::value &&
+                                       are_nothrow_swappable<Rest...>::value> {};
+
+    template <typename T>
+    struct are_nothrow_swappable<T> : is_nothrow_swappable<T> {};
+
+    // ---------------------------------------------------------------------
 }
 
 #endif //DLIB_UTILITY_Hh_

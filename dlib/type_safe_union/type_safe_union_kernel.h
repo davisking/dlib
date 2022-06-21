@@ -92,46 +92,6 @@ namespace dlib
 
         // ---------------------------------------------------------------------
 
-        template <typename First, typename... Rest>
-        struct are_nothrow_move_construtible
-            : std::integral_constant<bool, std::is_nothrow_move_constructible<First>::value &&
-                                           are_nothrow_move_construtible<Rest...>::value> {};
-
-        template <typename T>
-        struct are_nothrow_move_construtible<T> : std::is_nothrow_move_constructible<T> {};
-
-        // ---------------------------------------------------------------------
-
-        template <typename First, typename... Rest>
-        struct are_nothrow_move_assignable
-            : std::integral_constant<bool, std::is_nothrow_move_assignable<First>::value &&
-                                           are_nothrow_move_assignable<Rest...>::value> {};
-
-        template <typename T>
-        struct are_nothrow_move_assignable<T> : std::is_nothrow_move_assignable<T> {};
-
-        // ---------------------------------------------------------------------
-
-        template <typename First, typename... Rest>
-        struct are_nothrow_copy_construtible
-            : std::integral_constant<bool, std::is_nothrow_copy_constructible<First>::value &&
-                                           are_nothrow_copy_construtible<Rest...>::value> {};
-
-        template <typename T>
-        struct are_nothrow_copy_construtible<T> : std::is_nothrow_copy_constructible<T> {};
-
-        // ---------------------------------------------------------------------
-
-        template <typename First, typename... Rest>
-        struct are_nothrow_copy_assignable
-            : std::integral_constant<bool, std::is_nothrow_copy_assignable<First>::value &&
-                                           are_nothrow_copy_assignable<Rest...>::value> {};
-
-        template <typename T>
-        struct are_nothrow_copy_assignable<T> : std::is_nothrow_copy_assignable<T> {};
-
-        // ---------------------------------------------------------------------
-
         template <int nTs, typename T, typename... Ts>
         struct type_safe_union_type_id_impl
                 : std::integral_constant<int, -1 - nTs> {};
@@ -301,6 +261,27 @@ namespace dlib
             type_safe_union& _me;
         };
 
+        struct swap_to
+        {
+            /*!
+                This class swaps an object with `me`.
+            !*/
+            swap_to(type_safe_union& me) : _me(me) {}
+
+            template<typename T>
+            void operator()(T& x)
+            /*!
+                requires
+                    - _me.contains<T>() == true
+            !*/
+            {
+                using std::swap;
+                swap(_me.unchecked_get<T>(), x);
+            }
+
+            type_safe_union& _me;
+        };
+
     public:
 
         type_safe_union() = default;
@@ -308,7 +289,7 @@ namespace dlib
         type_safe_union (
             const type_safe_union& item
         )
-        noexcept(detail::are_nothrow_copy_construtible<Types...>::value)
+        noexcept(are_nothrow_copy_construtible<Types...>::value)
         : type_safe_union()
         {
             item.apply_to_contents(assign_to{*this});
@@ -317,8 +298,8 @@ namespace dlib
         type_safe_union& operator=(
             const type_safe_union& item
         )
-        noexcept(detail::are_nothrow_copy_construtible<Types...>::value &&
-                 detail::are_nothrow_copy_assignable<Types...>::value)
+        noexcept(are_nothrow_copy_construtible<Types...>::value &&
+                 are_nothrow_copy_assignable<Types...>::value)
         {
             if (item.is_empty())
                 destruct();
@@ -330,7 +311,7 @@ namespace dlib
         type_safe_union (
             type_safe_union&& item
         )
-        noexcept(detail::are_nothrow_move_construtible<Types...>::value)
+        noexcept(are_nothrow_move_construtible<Types...>::value)
         : type_safe_union()
         {
             item.apply_to_contents(move_to{*this});
@@ -340,8 +321,8 @@ namespace dlib
         type_safe_union& operator= (
             type_safe_union&& item
         )
-        noexcept(detail::are_nothrow_move_construtible<Types...>::value &&
-                 detail::are_nothrow_move_assignable<Types...>::value)
+        noexcept(are_nothrow_move_construtible<Types...>::value &&
+                 are_nothrow_move_assignable<Types...>::value)
         {
             if (item.is_empty())
             {
@@ -507,11 +488,35 @@ namespace dlib
         void swap(
             type_safe_union& item
         ) noexcept(std::is_nothrow_move_constructible<type_safe_union>::value &&
-                   std::is_nothrow_move_assignable<type_safe_union>::value)
+                   are_nothrow_swappable<Types...>::value)
         {
-            std::swap(*this, item);
+            if (type_identity == item.type_identity)
+            {
+                item.apply_to_contents(swap_to{*this});
+            }
+            else if (is_empty())
+            {
+                *this = std::move(item);
+            }
+            else if (item.is_empty())
+            {
+                item = std::move(*this);
+            }
+            else
+            {
+                type_safe_union tmp{std::move(*this)};
+                *this = std::move(item);
+                item  = std::move(tmp);
+            }
         }
     };
+
+    template <typename ...Types>
+    inline void swap (
+        type_safe_union<Types...>& a,
+        type_safe_union<Types...>& b
+    ) noexcept(noexcept(a.swap(b)))
+    { a.swap(b); }
 
     namespace detail
     {
