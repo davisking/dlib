@@ -177,13 +177,13 @@ namespace dlib
         }
 
         template <typename T>
-        const T& unchecked_get() const
+        const T& unchecked_get() const noexcept
         {
             return *reinterpret_cast<const T*>(&mem);
         }
 
         template <typename T>
-        T& unchecked_get()
+        T& unchecked_get() noexcept
         {
             return *reinterpret_cast<T*>(&mem);
         }
@@ -267,6 +267,7 @@ namespace dlib
                 This class swaps an object with `me`.
             !*/
             swap_to(type_safe_union& me) : _me(me) {}
+
             template<typename T>
             void operator()(T& x)
             /*!
@@ -287,7 +288,9 @@ namespace dlib
 
         type_safe_union (
             const type_safe_union& item
-        ) : type_safe_union()
+        )
+        noexcept(are_nothrow_copy_construtible<Types...>::value)
+        : type_safe_union()
         {
             item.apply_to_contents(assign_to{*this});
         }
@@ -295,6 +298,8 @@ namespace dlib
         type_safe_union& operator=(
             const type_safe_union& item
         )
+        noexcept(are_nothrow_copy_construtible<Types...>::value &&
+                 are_nothrow_copy_assignable<Types...>::value)
         {
             if (item.is_empty())
                 destruct();
@@ -305,7 +310,9 @@ namespace dlib
 
         type_safe_union (
             type_safe_union&& item
-        ) : type_safe_union()
+        )
+        noexcept(are_nothrow_move_construtible<Types...>::value)
+        : type_safe_union()
         {
             item.apply_to_contents(move_to{*this});
             item.destruct();
@@ -314,6 +321,8 @@ namespace dlib
         type_safe_union& operator= (
             type_safe_union&& item
         )
+        noexcept(are_nothrow_move_construtible<Types...>::value &&
+                 are_nothrow_move_assignable<Types...>::value)
         {
             if (item.is_empty())
             {
@@ -333,7 +342,9 @@ namespace dlib
         >
         type_safe_union (
             T&& item
-        ) : type_safe_union()
+        )
+        noexcept(std::is_nothrow_constructible<typename std::decay<T>::type, T>::value)
+        : type_safe_union()
         {
             assign_to{*this}(std::forward<T>(item));
         }
@@ -345,6 +356,8 @@ namespace dlib
         type_safe_union& operator= (
             T&& item
         )
+        noexcept(std::is_nothrow_constructible<typename std::decay<T>::type, T>::value &&
+                 std::is_nothrow_assignable<typename std::decay<T>::type, T>::value)
         {
             assign_to{*this}(std::forward<T>(item));
             return *this;
@@ -359,6 +372,8 @@ namespace dlib
             in_place_tag<T>,
             Args&&... args
         )
+        noexcept(std::is_nothrow_constructible<T, Args...>::value)
+        : type_safe_union()
         {
             construct<T>(std::forward<Args>(args)...);
         }
@@ -381,6 +396,7 @@ namespace dlib
         void emplace(
             Args&&... args
         )
+        noexcept(std::is_nothrow_constructible<T, Args...>::value)
         {
             construct<T>(std::forward<Args>(args)...);
         }
@@ -403,47 +419,20 @@ namespace dlib
 
         template <typename T>
         bool contains (
-        ) const
+        ) const noexcept
         {
             return type_identity == get_type_id<T>();
         }
 
         bool is_empty (
-        ) const
+        ) const noexcept
         {
             return type_identity == 0;
         }
 
-        int get_current_type_id() const
+        int get_current_type_id() const noexcept
         {
             return type_identity;
-        }
-
-        void swap (
-            type_safe_union& item
-        )
-        {
-            if (type_identity == item.type_identity)
-            {
-                item.apply_to_contents(swap_to{*this});
-            }
-            else if (is_empty())
-            {
-                item.apply_to_contents(move_to{*this});
-                item.destruct();
-            }
-            else if (item.is_empty())
-            {
-                apply_to_contents(move_to{item});
-                destruct();
-            }
-            else
-            {
-                type_safe_union tmp;
-                swap(tmp);      // this -> tmp
-                swap(item);     // item -> this
-                tmp.swap(item); // tmp (this) -> item
-            }
         }
 
         template <
@@ -452,6 +441,7 @@ namespace dlib
         >
         T& get(
         )
+        noexcept(std::is_nothrow_default_constructible<T>::value)
         {
             if (type_identity != get_type_id<T>())
                 construct<T>();
@@ -464,6 +454,7 @@ namespace dlib
         T& get(
             in_place_tag<T>
         )
+        noexcept(std::is_nothrow_default_constructible<T>::value)
         {
             return get<T>();
         }
@@ -493,13 +484,39 @@ namespace dlib
             else
                 throw bad_type_safe_union_cast();
         }
+
+        void swap(
+            type_safe_union& item
+        ) noexcept(std::is_nothrow_move_constructible<type_safe_union>::value &&
+                   are_nothrow_swappable<Types...>::value)
+        {
+            if (type_identity == item.type_identity)
+            {
+                item.apply_to_contents(swap_to{*this});
+            }
+            else if (is_empty())
+            {
+                *this = std::move(item);
+            }
+            else if (item.is_empty())
+            {
+                item = std::move(*this);
+            }
+            else
+            {
+                type_safe_union tmp{std::move(*this)};
+                *this = std::move(item);
+                item  = std::move(tmp);
+            }
+        }
     };
 
     template <typename ...Types>
     inline void swap (
         type_safe_union<Types...>& a,
         type_safe_union<Types...>& b
-    ) { a.swap(b); }
+    ) noexcept(noexcept(a.swap(b)))
+    { a.swap(b); }
 
     namespace detail
     {
