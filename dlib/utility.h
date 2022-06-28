@@ -43,12 +43,12 @@ namespace dlib
     // ---------------------------------------------------------------------
 
     template <typename First, typename... Rest>
-    struct are_nothrow_move_construtible
+    struct are_nothrow_move_constructible
         : std::integral_constant<bool, std::is_nothrow_move_constructible<First>::value &&
-                                       are_nothrow_move_construtible<Rest...>::value> {};
+                                       are_nothrow_move_constructible<Rest...>::value> {};
 
     template <typename T>
-    struct are_nothrow_move_construtible<T> : std::is_nothrow_move_constructible<T> {};
+    struct are_nothrow_move_constructible<T> : std::is_nothrow_move_constructible<T> {};
 
     // ---------------------------------------------------------------------
 
@@ -63,12 +63,12 @@ namespace dlib
     // ---------------------------------------------------------------------
 
     template <typename First, typename... Rest>
-    struct are_nothrow_copy_construtible
+    struct are_nothrow_copy_constructible
         : std::integral_constant<bool, std::is_nothrow_copy_constructible<First>::value &&
-                                       are_nothrow_copy_construtible<Rest...>::value> {};
+                                       are_nothrow_copy_constructible<Rest...>::value> {};
 
     template <typename T>
-    struct are_nothrow_copy_construtible<T> : std::is_nothrow_copy_constructible<T> {};
+    struct are_nothrow_copy_constructible<T> : std::is_nothrow_copy_constructible<T> {};
 
     // ---------------------------------------------------------------------
 

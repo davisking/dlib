@@ -289,7 +289,7 @@ namespace dlib
         type_safe_union (
             const type_safe_union& item
         )
-        noexcept(are_nothrow_copy_construtible<Types...>::value)
+        noexcept(are_nothrow_copy_constructible<Types...>::value)
         : type_safe_union()
         {
             item.apply_to_contents(assign_to{*this});
@@ -298,7 +298,7 @@ namespace dlib
         type_safe_union& operator=(
             const type_safe_union& item
         )
-        noexcept(are_nothrow_copy_construtible<Types...>::value &&
+        noexcept(are_nothrow_copy_constructible<Types...>::value &&
                  are_nothrow_copy_assignable<Types...>::value)
         {
             if (item.is_empty())
@@ -311,7 +311,7 @@ namespace dlib
         type_safe_union (
             type_safe_union&& item
         )
-        noexcept(are_nothrow_move_construtible<Types...>::value)
+        noexcept(are_nothrow_move_constructible<Types...>::value)
         : type_safe_union()
         {
             item.apply_to_contents(move_to{*this});
@@ -321,7 +321,7 @@ namespace dlib
         type_safe_union& operator= (
             type_safe_union&& item
         )
-        noexcept(are_nothrow_move_construtible<Types...>::value &&
+        noexcept(are_nothrow_move_constructible<Types...>::value &&
                  are_nothrow_move_assignable<Types...>::value)
         {
             if (item.is_empty())
