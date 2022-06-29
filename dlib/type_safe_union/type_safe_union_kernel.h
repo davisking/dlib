@@ -9,7 +9,7 @@
 #include <type_traits>
 #include <functional>
 #include "../serialize.h"
-#include "../invoke.h"
+#include "../utility.h"
 
 namespace dlib
 {
@@ -140,16 +140,16 @@ namespace dlib
         int type_identity = 0;
 
         template<
+            std::size_t I,
             typename F,
-            typename TSU,
-            std::size_t I
+            typename TSU
         >
-        static void apply_to_contents_as_type(
+        static auto apply_to_contents_as_type(
             F&& f,
             TSU&& me
-        )
-        {
-            std::forward<F>(f)(me.template unchecked_get<get_type_t<I>>());
+        ) noexcept(noexcept(std::forward<F>(f)(me.template unchecked_get<get_type_t<I>>())))
+        -> decltype(std::forward<F>(f)(me.template unchecked_get<get_type_t<I>>())) {
+            return std::forward<F>(f)(me.template unchecked_get<get_type_t<I>>());
         }
 
         template<
@@ -157,20 +157,24 @@ namespace dlib
             typename TSU,
             std::size_t... I
         >
-        static void apply_to_contents_impl(
+        static auto apply_to_contents_impl(
             F&& f,
             TSU&& me,
             dlib::index_sequence<I...>
-        )
+        ) noexcept(And<noexcept(apply_to_contents_as_type<I>(std::forward<F>(f), std::forward<TSU>(me)))...>::value)
+        -> decltype(apply_to_contents_as_type<0>(std::forward<F>(f), std::forward<TSU>(me)))
         {
-            using func_t = void(*)(F&&, TSU&&);
+            using R = decltype(apply_to_contents_as_type<0>(std::forward<F>(f), std::forward<TSU>(me)));
 
-            const func_t vtable[] = {
+            using func_t = R(*)(F&&, TSU&&);
+
+            static const func_t vtable[] = {
                 /*! Empty (type_identity == 0) case !*/
                 [](F&&, TSU&&) {
+                    return R();
                 },
                 /*! Non-empty cases !*/
-                &apply_to_contents_as_type<F&&,TSU&&,I>...
+                &apply_to_contents_as_type<I,F&&,TSU&&>...
             };
 
             return vtable[me.get_current_type_id()](std::forward<F>(f), std::forward<TSU>(me));
@@ -402,19 +406,19 @@ namespace dlib
         }
 
         template <typename F>
-        void apply_to_contents(
+        auto apply_to_contents(
             F&& f
-        )
-        {
-            apply_to_contents_impl(std::forward<F>(f), *this, dlib::make_index_sequence<sizeof...(Types)>{});
+        ) noexcept(noexcept(apply_to_contents_impl(std::forward<F>(f), std::declval<type_safe_union&>(), dlib::make_index_sequence<sizeof...(Types)>{})))
+        -> decltype(apply_to_contents_impl(std::forward<F>(f), *this, dlib::make_index_sequence<sizeof...(Types)>{})) {
+            return apply_to_contents_impl(std::forward<F>(f), *this, dlib::make_index_sequence<sizeof...(Types)>{});
         }
 
         template <typename F>
-        void apply_to_contents(
+        auto apply_to_contents(
             F&& f
-        ) const
-        {
-            apply_to_contents_impl(std::forward<F>(f), *this, dlib::make_index_sequence<sizeof...(Types)>{});
+        ) const noexcept(noexcept(apply_to_contents_impl(std::forward<F>(f), std::declval<const type_safe_union&>(), dlib::make_index_sequence<sizeof...(Types)>{})))
+         -> decltype(apply_to_contents_impl(std::forward<F>(f), *this, dlib::make_index_sequence<sizeof...(Types)>{})) {
+            return apply_to_contents_impl(std::forward<F>(f), *this, dlib::make_index_sequence<sizeof...(Types)>{});
         }
 
         template <typename T>
@@ -492,7 +496,7 @@ namespace dlib
         {
             if (type_identity == item.type_identity)
             {
-                item.apply_to_contents(swap_to{*this});
+                apply_to_contents(swap_to{item});
             }
             else if (is_empty())
             {
@@ -540,48 +544,6 @@ namespace dlib
                 )...
             };
         }
-
-        template<
-            typename R,
-            typename F,
-            typename TSU,
-            std::size_t I
-        >
-        R visit_impl_as_type(
-            F&& f,
-            TSU&& tsu
-        )
-        {
-            using Tsu = typename std::decay<TSU>::type;
-            using T   = type_safe_union_alternative_t<I, Tsu>;
-            return dlib::invoke(std::forward<F>(f), tsu.template cast_to<T>());
-        }
-
-        template<
-            typename R,
-            typename F,
-            typename TSU,
-            std::size_t... I
-        >
-        R visit_impl(
-            F&& f,
-            TSU&& tsu,
-            dlib::index_sequence<I...>
-        )
-        {
-            using func_t = R(*)(F&&, TSU&&);
-
-            const func_t vtable[] = {
-                /*! Empty (type_identity == 0) case !*/
-                [](F&&, TSU&&) {
-                    return R();
-                },
-                /*! Non-empty cases !*/
-                &visit_impl_as_type<R,F&&,TSU&&,I>...
-            };
-
-            return vtable[tsu.get_current_type_id()](std::forward<F>(f), std::forward<TSU>(tsu));
-        }
     }
 
     template<
@@ -598,20 +560,13 @@ namespace dlib
         detail::for_each_type_impl(std::forward<F>(f), std::forward<TSU>(tsu), dlib::make_index_sequence<Size>{});
     }
 
-    template<
-        typename F,
-        typename TSU,
-        typename Tsu = typename std::decay<TSU>::type,
-        typename T0  = type_safe_union_alternative_t<0, Tsu>
-    >
+    template<typename F, typename TSU>
     auto visit(
         F&& f,
         TSU&& tsu
-    ) -> dlib::invoke_result_t<F, decltype(tsu.template cast_to<T0>())>
-    {
-        using ReturnType = dlib::invoke_result_t<F, decltype(tsu.template cast_to<T0>())>;
-        static constexpr std::size_t Size = type_safe_union_size<Tsu>::value;
-        return detail::visit_impl<ReturnType>(std::forward<F>(f), std::forward<TSU>(tsu), dlib::make_index_sequence<Size>{});
+    ) noexcept(noexcept(tsu.apply_to_contents(std::forward<F>(f))))
+    -> decltype(tsu.apply_to_contents(std::forward<F>(f))) {
+        return tsu.apply_to_contents(std::forward<F>(f));
     }
 
     namespace detail
