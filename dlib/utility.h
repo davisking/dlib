@@ -124,6 +124,12 @@ namespace dlib
     struct are_nothrow_swappable<T> : is_nothrow_swappable<T> {};
 
     // ---------------------------------------------------------------------
+
+    template<bool First, bool... Rest>
+    struct And : std::integral_constant<bool, First && And<Rest...>::value> {};
+
+    template<bool Value>
+    struct And<Value> : std::integral_constant<bool, Value>{};
 }
 
 #endif //DLIB_UTILITY_Hh_
