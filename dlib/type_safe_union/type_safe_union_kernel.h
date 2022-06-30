@@ -139,45 +139,35 @@ namespace dlib
         typename std::aligned_union<0, Types...>::type mem;
         int type_identity = 0;
 
-        template<
-            std::size_t I,
-            typename F,
-            typename TSU
-        >
-        static auto apply_to_contents_as_type(
-            F&& f,
-            TSU&& me
-        ) noexcept(noexcept(std::forward<F>(f)(me.template unchecked_get<get_type_t<I>>())))
-        -> decltype(std::forward<F>(f)(me.template unchecked_get<get_type_t<I>>())) {
-            return std::forward<F>(f)(me.template unchecked_get<get_type_t<I>>());
-        }
-
-        template<
-            typename F,
-            typename TSU,
-            std::size_t... I
-        >
-        static auto apply_to_contents_impl(
-            F&& f,
-            TSU&& me,
-            dlib::index_sequence<I...>
-        ) noexcept(And<noexcept(apply_to_contents_as_type<I>(std::forward<F>(f), std::forward<TSU>(me)))...>::value)
-        -> decltype(apply_to_contents_as_type<0>(std::forward<F>(f), std::forward<TSU>(me)))
+        template<size_t I, typename F, typename TSU>
+        struct dispatcher
         {
-            using R = decltype(apply_to_contents_as_type<0>(std::forward<F>(f), std::forward<TSU>(me)));
+            constexpr static const std::size_t N = sizeof...(Types);
+            using R = decltype(std::declval<F>()(std::declval<TSU>().template unchecked_get<get_type_t<0>>()));
 
-            using func_t = R(*)(F&&, TSU&&);
+            template<size_t Q = I, typename std::enable_if<Q == N, bool>::type = true>
+            R operator()(F&&, TSU&&)
+            noexcept(std::is_default_constructible<R>::value) { return R(); }
 
-            static const func_t vtable[] = {
-                /*! Empty (type_identity == 0) case !*/
-                [](F&&, TSU&&) {
+            template<size_t Q = I, typename std::enable_if<Q < N, bool>::type = true>
+            R operator()(F&& f, TSU&& me)
+            noexcept(noexcept(std::forward<F>(f)(me.template unchecked_get<get_type_t<I>>())) &&
+                     noexcept(dispatcher<I+1,F&&,TSU&&>{}(std::forward<F>(f), std::forward<TSU>(me))))
+            {
+                if (me.is_empty())
                     return R();
-                },
-                /*! Non-empty cases !*/
-                &apply_to_contents_as_type<I,F&&,TSU&&>...
-            };
+                else if (me.get_current_type_id() == (I+1))
+                    return std::forward<F>(f)(me.template unchecked_get<get_type_t<I>>());
+                else
+                    return dispatcher<I+1,F&&,TSU&&>{}(std::forward<F>(f), std::forward<TSU>(me));
+            }
+        };
 
-            return vtable[me.get_current_type_id()](std::forward<F>(f), std::forward<TSU>(me));
+        template<typename F, typename TSU>
+        static auto dispatch(F&& f, TSU&& me)
+        noexcept(noexcept(dispatcher<0,F&&,TSU&&>{}(std::forward<F>(f), std::forward<TSU>(me))))
+        -> decltype(dispatcher<0,F&&,TSU&&>{}(std::forward<F>(f), std::forward<TSU>(me))) {
+            return dispatcher<0,F&&,TSU&&>{}(std::forward<F>(f), std::forward<TSU>(me));
         }
 
         template <typename T>
@@ -408,17 +398,17 @@ namespace dlib
         template <typename F>
         auto apply_to_contents(
             F&& f
-        ) noexcept(noexcept(apply_to_contents_impl(std::forward<F>(f), std::declval<type_safe_union&>(), dlib::make_index_sequence<sizeof...(Types)>{})))
-        -> decltype(apply_to_contents_impl(std::forward<F>(f), *this, dlib::make_index_sequence<sizeof...(Types)>{})) {
-            return apply_to_contents_impl(std::forward<F>(f), *this, dlib::make_index_sequence<sizeof...(Types)>{});
+        ) noexcept(noexcept(dispatch(std::forward<F>(f), std::declval<type_safe_union&>())))
+        -> decltype(dispatch(std::forward<F>(f), *this)) {
+            return dispatch(std::forward<F>(f), *this);
         }
 
         template <typename F>
         auto apply_to_contents(
             F&& f
-        ) const noexcept(noexcept(apply_to_contents_impl(std::forward<F>(f), std::declval<const type_safe_union&>(), dlib::make_index_sequence<sizeof...(Types)>{})))
-         -> decltype(apply_to_contents_impl(std::forward<F>(f), *this, dlib::make_index_sequence<sizeof...(Types)>{})) {
-            return apply_to_contents_impl(std::forward<F>(f), *this, dlib::make_index_sequence<sizeof...(Types)>{});
+        ) const noexcept(noexcept(dispatch(std::forward<F>(f), std::declval<const type_safe_union&>())))
+        -> decltype(dispatch(std::forward<F>(f), *this)) {
+            return dispatch(std::forward<F>(f), *this);
         }
 
         template <typename T>
