@@ -115,20 +115,33 @@ py::tuple py_find_max_global (
     py::list bound2,
     py::list is_integer_variable,
     unsigned long num_function_calls,
-    double solver_epsilon = 0
+    double solver_epsilon = 0,
+    unsigned long num_threads = 1
 )
 {
     DLIB_CASSERT(len(bound1) == len(bound2));
     DLIB_CASSERT(len(bound1) == len(is_integer_variable));
+    DLIB_CASSERT(num_threads > 0);
 
     auto func = [&](const matrix<double,0,1>& x)
     {
         return call_func(f, x);
     };
 
-    auto result = find_max_global(func, list_to_mat(bound1), list_to_mat(bound2),
-        list_to_bool_vector(is_integer_variable), max_function_calls(num_function_calls),
-        solver_epsilon);
+    function_evaluation result;
+    if (num_threads == 1)
+    {
+        result = find_max_global(func, list_to_mat(bound1), list_to_mat(bound2),
+            list_to_bool_vector(is_integer_variable), max_function_calls(num_function_calls),
+            solver_epsilon);
+    }
+    else
+    {
+        thread_pool tp(num_threads);
+        result = find_max_global(tp, func, list_to_mat(bound1), list_to_mat(bound2),
+            list_to_bool_vector(is_integer_variable), max_function_calls(num_function_calls),
+            solver_epsilon);
+    }
 
     return py::make_tuple(mat_to_list(result.x),result.y);
 }
@@ -138,17 +151,28 @@ py::tuple py_find_max_global2 (
     py::list bound1,
     py::list bound2,
     unsigned long num_function_calls,
-    double solver_epsilon = 0
+    double solver_epsilon = 0,
+    unsigned num_threads = 1
 )
 {
     DLIB_CASSERT(len(bound1) == len(bound2));
+    DLIB_CASSERT(num_threads > 0);
 
     auto func = [&](const matrix<double,0,1>& x)
     {
         return call_func(f, x);
     };
 
-    auto result = find_max_global(func, list_to_mat(bound1), list_to_mat(bound2), max_function_calls(num_function_calls), solver_epsilon);
+    function_evaluation result;
+    if (num_threads == 1)
+    {
+        result = find_max_global(func, list_to_mat(bound1), list_to_mat(bound2), max_function_calls(num_function_calls), solver_epsilon);
+    }
+    else
+    {
+        thread_pool tp(num_threads);
+        result = find_max_global(tp, func, list_to_mat(bound1), list_to_mat(bound2), max_function_calls(num_function_calls), solver_epsilon);
+    }
 
     return py::make_tuple(mat_to_list(result.x),result.y);
 }
@@ -161,20 +185,34 @@ py::tuple py_find_min_global (
     py::list bound2,
     py::list is_integer_variable,
     unsigned long num_function_calls,
-    double solver_epsilon = 0
+    double solver_epsilon = 0,
+    unsigned long num_threads = 1
 )
 {
     DLIB_CASSERT(len(bound1) == len(bound2));
     DLIB_CASSERT(len(bound1) == len(is_integer_variable));
+    DLIB_CASSERT(num_threads > 0);
 
     auto func = [&](const matrix<double,0,1>& x)
     {
         return call_func(f, x);
     };
 
-    auto result = find_min_global(func, list_to_mat(bound1), list_to_mat(bound2),
-        list_to_bool_vector(is_integer_variable), max_function_calls(num_function_calls),
-        solver_epsilon);
+    function_evaluation result;
+    if (num_threads == 1)
+    {
+        result = find_min_global(func, list_to_mat(bound1), list_to_mat(bound2),
+            list_to_bool_vector(is_integer_variable), max_function_calls(num_function_calls),
+            solver_epsilon);
+    }
+    else
+    {
+        thread_pool tp(num_threads);
+        result = find_min_global(tp, func, list_to_mat(bound1), list_to_mat(bound2),
+            list_to_bool_vector(is_integer_variable), max_function_calls(num_function_calls),
+            solver_epsilon);
+    }
+
 
     return py::make_tuple(mat_to_list(result.x),result.y);
 }
@@ -184,17 +222,28 @@ py::tuple py_find_min_global2 (
     py::list bound1,
     py::list bound2,
     unsigned long num_function_calls,
-    double solver_epsilon = 0
+    double solver_epsilon = 0,
+    unsigned long num_threads = 1
 )
 {
     DLIB_CASSERT(len(bound1) == len(bound2));
+    DLIB_CASSERT(num_threads > 0);
 
     auto func = [&](const matrix<double,0,1>& x)
     {
         return call_func(f, x);
     };
 
-    auto result = find_min_global(func, list_to_mat(bound1), list_to_mat(bound2), max_function_calls(num_function_calls), solver_epsilon);
+    function_evaluation result;
+    if (num_threads == 1)
+    {
+        result = find_min_global(func, list_to_mat(bound1), list_to_mat(bound2), max_function_calls(num_function_calls), solver_epsilon);
+    }
+    else
+    {
+        thread_pool tp(num_threads);
+        result = find_min_global(tp, func, list_to_mat(bound1), list_to_mat(bound2), max_function_calls(num_function_calls), solver_epsilon);
+    }
 
     return py::make_tuple(mat_to_list(result.x),result.y);
 }
@@ -274,6 +323,8 @@ void bind_global_optimization(py::module& m)
     - solver_epsilon >= 0 \n\
     - f() is a real valued multi-variate function.  It must take scalar real \n\
       numbers as its arguments and the number of arguments must be len(bound1). \n\
+    - if (num_threads > 1) then it must be safe to call the given functions\n\
+      concurrently.\n\
 ensures \n\
     - This function performs global optimization on the given f() function. \n\
       The goal is to maximize the following objective function: \n\
@@ -315,7 +366,9 @@ ensures \n\
       them and then undo the transform via exp() before invoking the function \n\
       being optimized.  Therefore, this transformation is invisible to the user \n\
       supplied functions.  In most cases, it improves the efficiency of the \n\
-      optimizer.";
+      optimizer.\n\
+    - if (num_threads > 1) then \n\
+      - This function will make concurrent calls to the given functions.";
     /*!
         requires
             - len(bound1) == len(bound2) == len(is_integer_variable)
@@ -323,6 +376,8 @@ ensures \n\
             - solver_epsilon >= 0
             - f() is a real valued multi-variate function.  It must take scalar real
               numbers as its arguments and the number of arguments must be len(bound1).
+            - if (num_threads > 1) then it must be safe to call the given functions
+              concurrently.
         ensures
             - This function performs global optimization on the given f() function.
               The goal is to maximize the following objective function:
@@ -365,27 +420,29 @@ ensures \n\
               being optimized.  Therefore, this transformation is invisible to the user
               supplied functions.  In most cases, it improves the efficiency of the
               optimizer.
+            - if (num_threads > 1) then
+              - This function will make concurrent calls to the given function.
     !*/
     m.def("find_max_global", &py_find_max_global, docstring, py::arg("f"),
         py::arg("bound1"), py::arg("bound2"), py::arg("is_integer_variable"),
-        py::arg("num_function_calls"), py::arg("solver_epsilon")=0);
+        py::arg("num_function_calls"), py::arg("solver_epsilon")=0, py::arg("num_threads")=1);
 
     m.def("find_max_global", &py_find_max_global2, 
         "This function simply calls the other version of find_max_global() with is_integer_variable set to False for all variables.", 
         py::arg("f"), py::arg("bound1"), py::arg("bound2"), py::arg("num_function_calls"),
-        py::arg("solver_epsilon")=0);
+        py::arg("solver_epsilon")=0, py::arg("num_threads")=1);
 
 
 
     m.def("find_min_global", &py_find_min_global, 
       "This function is just like find_max_global(), except it performs minimization rather than maximization.", 
         py::arg("f"), py::arg("bound1"), py::arg("bound2"), py::arg("is_integer_variable"),
-        py::arg("num_function_calls"), py::arg("solver_epsilon")=0);
+        py::arg("num_function_calls"), py::arg("solver_epsilon")=0, py::arg("num_threads")=1);
 
     m.def("find_min_global", &py_find_min_global2, 
         "This function simply calls the other version of find_min_global() with is_integer_variable set to False for all variables.", 
         py::arg("f"), py::arg("bound1"), py::arg("bound2"), py::arg("num_function_calls"),
-        py::arg("solver_epsilon")=0);
+        py::arg("solver_epsilon")=0, py::arg("num_threads")=1);
 
     // -------------------------------------------------
     // -------------------------------------------------
@@ -452,6 +509,4 @@ simply a struct that records x and the scalar value F(x). )RAW")
         .def("get_monte_carlo_upper_bound_sample_num", &global_function_search::get_monte_carlo_upper_bound_sample_num)
         .def("set_monte_carlo_upper_bound_sample_num", &global_function_search::set_monte_carlo_upper_bound_sample_num, py::arg("num"))
         ;
-
 }
-
