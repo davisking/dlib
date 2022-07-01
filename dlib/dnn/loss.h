@@ -3664,19 +3664,21 @@ namespace dlib
                     {
                         for (long c = 0; c < output_tensor.nc(); ++c)
                         {
-                            const float obj = out_data[tensor_index(output_tensor, n, k + 4, r, c)];
+                            const double obj = out_data[tensor_index(output_tensor, n, k + 4, r, c)];
                             if (obj > adjust_threshold)
                             {
-                                const auto x = out_data[tensor_index(output_tensor, n, k + 0, r, c)] * 2.0 - 0.5;
-                                const auto y = out_data[tensor_index(output_tensor, n, k + 1, r, c)] * 2.0 - 0.5;
-                                const auto w = out_data[tensor_index(output_tensor, n, k + 2, r, c)];
-                                const auto h = out_data[tensor_index(output_tensor, n, k + 3, r, c)];
+                                // The scaling and shifting in the x and y coordinates avoids the grid sensitivity
+                                // effect by allowing the network to output centers along the grid boundaries.
+                                const double x = out_data[tensor_index(output_tensor, n, k + 0, r, c)] * 2.0 - 0.5;
+                                const double y = out_data[tensor_index(output_tensor, n, k + 1, r, c)] * 2.0 - 0.5;
+                                const double w = out_data[tensor_index(output_tensor, n, k + 2, r, c)];
+                                const double h = out_data[tensor_index(output_tensor, n, k + 3, r, c)];
                                 yolo_rect det(centered_drect(dpoint((x + c) * stride_x, (y + r) * stride_y),
                                                              w / (1 - w) * anchors[a].width,
                                                              h / (1 - h) * anchors[a].height));
                                 for (long i = 0; i < num_classes; ++i)
                                 {
-                                    const float conf = obj * out_data[tensor_index(output_tensor, n, k + 5 + i, r, c)];
+                                    const double conf = obj * out_data[tensor_index(output_tensor, n, k + 5 + i, r, c)];
                                     if (conf > adjust_threshold)
                                         det.labels.emplace_back(conf, options.labels[i]);
                                 }
@@ -3728,10 +3730,10 @@ namespace dlib
                         for (size_t a = 0; a < anchors.size(); ++a)
                         {
                             const long k = a * num_feats;
-                            const auto x = out_data[tensor_index(output_tensor, n, k + 0, r, c)] * 2.0 - 0.5;
-                            const auto y = out_data[tensor_index(output_tensor, n, k + 1, r, c)] * 2.0 - 0.5;
-                            const auto w = out_data[tensor_index(output_tensor, n, k + 2, r, c)];
-                            const auto h = out_data[tensor_index(output_tensor, n, k + 3, r, c)];
+                            const double x = out_data[tensor_index(output_tensor, n, k + 0, r, c)] * 2.0 - 0.5;
+                            const double y = out_data[tensor_index(output_tensor, n, k + 1, r, c)] * 2.0 - 0.5;
+                            const double w = out_data[tensor_index(output_tensor, n, k + 2, r, c)];
+                            const double h = out_data[tensor_index(output_tensor, n, k + 3, r, c)];
 
                             // The prediction at r, c for anchor a
                             const yolo_rect pred(centered_drect(dpoint((x + c) * stride_x, (y + r) * stride_y),
@@ -3751,9 +3753,9 @@ namespace dlib
                             if (best_iou < options.iou_ignore_threshold)
                             {
                                 const auto o_idx = tensor_index(output_tensor, n, k + 4, r, c);
-                                const auto p = out_data[o_idx];
-                                const float focus = std::pow(p, options.gamma_obj);
-                                const float g_obj = focus * (options.gamma_obj * (1 - p) * safe_log(1 - p) + p);
+                                const double p = out_data[o_idx];
+                                const double focus = std::pow(p, options.gamma_obj);
+                                const double g_obj = focus * (options.gamma_obj * (1 - p) * safe_log(1 - p) + p);
                                 g[o_idx] = options.lambda_obj * g_obj;
                             }
                         }
@@ -3803,8 +3805,7 @@ namespace dlib
                             if (!(best_tag_id == tag_id<TAG_TYPE>::id && best_a == a))
                             {
                                 const yolo_rect anchor(centered_drect(t_center, anchors[a].width, anchors[a].height));
-                                const double iou = box_intersection_over_union(truth_box.rect, anchor.rect);
-                                if (iou < iou_anchor_threshold)
+                                if (box_intersection_over_union(truth_box.rect, anchor.rect) < iou_anchor_threshold)
                                     continue;
                             }
 
@@ -3835,8 +3836,8 @@ namespace dlib
                             const auto o_idx = tensor_index(output_tensor, n, k + 4, r, c);
                             {
                                 const auto p = out_data[o_idx];
-                                const float focus = std::pow(1 - p, options.gamma_obj);
-                                const float g_obj = focus * (options.gamma_obj * p * safe_log(p) + p - 1);
+                                const double focus = std::pow(1 - p, options.gamma_obj);
+                                const double g_obj = focus * (options.gamma_obj * p * safe_log(p) + p - 1);
                                 g[o_idx] = options.lambda_obj * g_obj;
                             }
 
@@ -3847,22 +3848,22 @@ namespace dlib
                                 const auto p = out_data[c_idx];
                                 if (truth_box.label == options.labels[i])
                                 {
-                                    const float focus = std::pow(1 - p, options.gamma_cls);
-                                    const float g_cls = focus * (options.gamma_cls * p * safe_log(p) + p - 1);
+                                    const double focus = std::pow(1 - p, options.gamma_cls);
+                                    const double g_cls = focus * (options.gamma_cls * p * safe_log(p) + p - 1);
                                     g[c_idx] = truth_box.detection_confidence * options.lambda_cls * g_cls;
                                 }
                                 else
                                 {
-                                    const float focus = std::pow(p, options.gamma_cls);
-                                    const float g_cls = focus * (options.gamma_cls * (1 - p) * safe_log(1 - p) + p);
-                                    g[c_idx] = truth_box.detection_confidence * options.lambda_cls * g_cls;
+                                    const double focus = std::pow(p, options.gamma_cls);
+                                    const double g_cls = focus * (options.gamma_cls * (1 - p) * safe_log(1 - p) + p);
+                                    g[c_idx] = options.lambda_cls * g_cls;
                                 }
                             }
                         }
                     }
                 }
 
-                // Compute the L2 loss
+                // The loss is the squared norm of the gradient
                 loss += length_squared(rowm(mat(grad), n));
             }
         };
