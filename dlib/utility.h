@@ -130,6 +130,13 @@ namespace dlib
 
     template<bool Value>
     struct And<Value> : std::integral_constant<bool, Value>{};
+
+    // ---------------------------------------------------------------------
+
+    template<std::size_t I>
+    using size_ = std::integral_constant<std::size_t, I>;
+
+    // ---------------------------------------------------------------------
 }
 
 #endif //DLIB_UTILITY_Hh_
