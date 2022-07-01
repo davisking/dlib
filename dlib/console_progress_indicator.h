@@ -93,7 +93,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - This objects prints the completed progress and the ellapsed time to out.
+                - This objects prints the completed progress and the elapsed time to out.
                   It is meant to be called after the loop we are training the progress of.
         !*/
 
@@ -236,7 +236,7 @@ namespace dlib
             const auto hours = std::chrono::duration_cast<std::chrono::hours>(delta_t);
             const auto minutes = std::chrono::duration_cast<std::chrono::minutes>(delta_t) - hours;
             const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(delta_t) - hours - minutes;
-            out << "Time ellapsed: ";
+            out << "Time elapsed: ";
             if (delta_t >= std::chrono::hours(1))
                 out << hours.count() << "h ";
             if (delta_t >= std::chrono::minutes(1))
