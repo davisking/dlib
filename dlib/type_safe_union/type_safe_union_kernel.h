@@ -139,35 +139,38 @@ namespace dlib
         typename std::aligned_union<0, Types...>::type mem;
         int type_identity = 0;
 
-        template<size_t I, typename F, typename TSU>
+        template<typename F, typename TSU>
         struct dispatcher
         {
             constexpr static const std::size_t N = sizeof...(Types);
             using R = decltype(std::declval<F>()(std::declval<TSU>().template unchecked_get<get_type_t<0>>()));
 
-            template<size_t Q = I, typename std::enable_if<Q == N, bool>::type = true>
-            R operator()(F&&, TSU&&)
-            noexcept(std::is_default_constructible<R>::value) { return R(); }
+            constexpr static const bool is_noexcept =
+                And<std::is_default_constructible<R>::value &&
+                    noexcept(std::declval<F>()(std::declval<TSU>().template unchecked_get<Types>()))...>::value;
 
-            template<size_t Q = I, typename std::enable_if<Q < N, bool>::type = true>
-            R operator()(F&& f, TSU&& me)
-            noexcept(noexcept(std::forward<F>(f)(me.template unchecked_get<get_type_t<I>>())) &&
-                     noexcept(dispatcher<I+1,F&&,TSU&&>{}(std::forward<F>(f), std::forward<TSU>(me))))
+            template<size_t I, typename std::enable_if<I == N, bool>::type = true>
+            inline R operator()(F&&, TSU&&, size_<I>)
+            noexcept(is_noexcept) { return R(); }
+
+            template<size_t I, typename std::enable_if<I < N, bool>::type = true>
+            inline R operator()(F&& f, TSU&& me, size_<I>)
+            noexcept(is_noexcept)
             {
                 if (me.is_empty())
                     return R();
                 else if (me.get_current_type_id() == (I+1))
                     return std::forward<F>(f)(me.template unchecked_get<get_type_t<I>>());
                 else
-                    return dispatcher<I+1,F&&,TSU&&>{}(std::forward<F>(f), std::forward<TSU>(me));
+                    return (*this)(std::forward<F>(f), std::forward<TSU>(me), size_<I+1>{});
             }
         };
 
         template<typename F, typename TSU>
-        static auto dispatch(F&& f, TSU&& me)
-        noexcept(noexcept(dispatcher<0,F&&,TSU&&>{}(std::forward<F>(f), std::forward<TSU>(me))))
-        -> decltype(dispatcher<0,F&&,TSU&&>{}(std::forward<F>(f), std::forward<TSU>(me))) {
-            return dispatcher<0,F&&,TSU&&>{}(std::forward<F>(f), std::forward<TSU>(me));
+        static inline auto dispatch(F&& f, TSU&& me)
+        noexcept(noexcept(dispatcher<F&&,TSU&&>{}(std::forward<F>(f), std::forward<TSU>(me), size_<0>{})))
+        -> decltype(dispatcher<F&&,TSU&&>{}(std::forward<F>(f), std::forward<TSU>(me), size_<0>{})) {
+            return dispatcher<F&&,TSU&&>{}(std::forward<F>(f), std::forward<TSU>(me), size_<0>{});
         }
 
         template <typename T>
