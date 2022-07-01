@@ -68,7 +68,7 @@ namespace dlib
         inline bool print_status (
             double cur,
             bool always_print = false,
-            std::ostream& out = std::cout
+            std::ostream& out = std::clog
         );
         /*!
             ensures
