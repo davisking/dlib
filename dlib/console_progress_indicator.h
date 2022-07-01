@@ -93,8 +93,8 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - This objects prints the completed progress and the elapsed time to out.
-                  It is meant to be called after the loop we are training the progress of.
+                - This object prints the completed progress and the elapsed time to out.
+                  It is meant to be called after the loop we are tracking the progress of.
         !*/
 
     private:
