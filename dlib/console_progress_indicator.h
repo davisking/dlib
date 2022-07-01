@@ -3,8 +3,8 @@
 #ifndef DLIB_CONSOLE_PROGRESS_INDiCATOR_Hh_
 #define DLIB_CONSOLE_PROGRESS_INDiCATOR_Hh_
 
-#include <ctime>
 #include <cmath>
+#include <chrono>
 #include <limits>
 #include <iostream>
 
@@ -88,14 +88,22 @@ namespace dlib
                   otherwise.
         !*/
 
+        inline void finish (
+            std::ostream& out = std::cout
+        ) const;
+        /*!
+            ensures
+                - This objects prints the completed progress and the ellapsed time to out.
+                  It is meant to be called after the loop we are training the progress of.
+        !*/
+
     private:
 
         double target_val;
-
-        time_t start_time;
+        std::chrono::time_point<std::chrono::steady_clock> start_time;
         double first_val;
         double seen_first_val;
-        time_t last_time;
+        std::chrono::time_point<std::chrono::steady_clock> last_time;
 
     };
 
@@ -110,10 +118,10 @@ namespace dlib
         double target_value 
     ) :
         target_val(target_value),
-        start_time(0),
+        start_time(std::chrono::steady_clock::now()),
         first_val(0),
         seen_first_val(false),
-        last_time(0)
+        last_time(std::chrono::steady_clock::now())
     {
     }
 
@@ -126,7 +134,7 @@ namespace dlib
         std::ostream& out
     )
     {
-        const time_t cur_time = std::time(0);
+        const auto cur_time = std::chrono::steady_clock::now();
 
         // if this is the first time print_status has been called
         // then collect some information and exit.  We will print status
@@ -140,23 +148,23 @@ namespace dlib
             return false;
         }
 
-        if (cur_time != last_time || always_print)
+        if ((cur_time - last_time) >= std::chrono::seconds(1) || always_print)
         {
             last_time = cur_time;
-            double delta_t = static_cast<double>(cur_time - start_time);
+            const auto delta_t = cur_time - start_time;
             double delta_val = std::abs(cur - first_val);
 
             // don't do anything if cur is equal to first_val
             if (delta_val < std::numeric_limits<double>::epsilon())
                 return false;
 
-            double seconds = delta_t/delta_val * std::abs(target_val - cur);
+            const auto rem_time = delta_t / delta_val * std::abs(target_val - cur);
 
-            std::ios::fmtflags oldflags = out.flags();
-
+            const auto oldflags = out.flags();
             out.setf(std::ios::fixed,std::ios::floatfield);
             std::streamsize ss;
 
+            // adapt the precision based on whether the target val is an integer
             if (std::trunc(target_val) == target_val)
                 ss = out.precision(0);
             else
@@ -166,21 +174,15 @@ namespace dlib
             ss = out.precision(2);
             out << " (" << cur / target_val * 100. << "%). ";
 
-            if (seconds < 60)
-            {
-                ss = out.precision(0);
-                out << "Time remaining: " << seconds << " seconds.                 \r" << std::flush;
-            }
-            else if (seconds < 60*60)
-            {
-                ss = out.precision(2);
-                out << "Time remaining: " << seconds/60 << " minutes.                 \r" << std::flush;
-            }
-            else 
-            {
-                ss = out.precision(2);
-                out << "Time remaining: " << seconds/60/60 << " hours.                 \r" << std::flush;
-            }
+            const auto hours = std::chrono::duration_cast<std::chrono::hours>(rem_time);
+            const auto minutes = std::chrono::duration_cast<std::chrono::minutes>(rem_time) - hours;
+            const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(rem_time) - hours - minutes;
+            out << "Time remaining: ";
+            if (rem_time >= std::chrono::hours(1))
+                out << hours.count() << "h ";
+            if (rem_time >= std::chrono::minutes(1))
+                out << minutes.count() << "min ";
+            out << seconds.count() << "s.                \r" << std::flush;
 
             // restore previous output flags and precision settings
             out.flags(oldflags);
@@ -209,6 +211,41 @@ namespace dlib
     ) 
     {
         *this = console_progress_indicator(target_value);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void console_progress_indicator::
+    finish (
+        std::ostream& out
+    ) const
+    {
+            const auto oldflags = out.flags();
+            out.setf(std::ios::fixed,std::ios::floatfield);
+            std::streamsize ss;
+
+            // adapt the precision based on whether the target val is an integer
+            if (std::trunc(target_val) == target_val)
+                ss = out.precision(0);
+            else
+                ss = out.precision(2);
+
+            out << "Progress: " << target_val << "/" << target_val;
+            out << " (100.00%). ";
+            const auto delta_t = std::chrono::steady_clock::now() - start_time;
+            const auto hours = std::chrono::duration_cast<std::chrono::hours>(delta_t);
+            const auto minutes = std::chrono::duration_cast<std::chrono::minutes>(delta_t) - hours;
+            const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(delta_t) - hours - minutes;
+            out << "Time ellapsed: ";
+            if (delta_t >= std::chrono::hours(1))
+                out << hours.count() << "h ";
+            if (delta_t >= std::chrono::minutes(1))
+                out << minutes.count() << "min ";
+            out << seconds.count() << "s.                " << std::endl;
+
+            // restore previous output flags and precision settings
+            out.flags(oldflags);
+            out.precision(ss);
     }
 
 // ----------------------------------------------------------------------------------------
