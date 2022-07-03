@@ -220,32 +220,32 @@ namespace dlib
         std::ostream& out
     ) const
     {
-            const auto oldflags = out.flags();
-            out.setf(std::ios::fixed,std::ios::floatfield);
-            std::streamsize ss;
+        const auto oldflags = out.flags();
+        out.setf(std::ios::fixed,std::ios::floatfield);
+        std::streamsize ss;
 
-            // adapt the precision based on whether the target val is an integer
-            if (std::trunc(target_val) == target_val)
-                ss = out.precision(0);
-            else
-                ss = out.precision(2);
+        // adapt the precision based on whether the target val is an integer
+        if (std::trunc(target_val) == target_val)
+            ss = out.precision(0);
+        else
+            ss = out.precision(2);
 
-            out << "Progress: " << target_val << "/" << target_val;
-            out << " (100.00%). ";
-            const auto delta_t = std::chrono::steady_clock::now() - start_time;
-            const auto hours = std::chrono::duration_cast<std::chrono::hours>(delta_t);
-            const auto minutes = std::chrono::duration_cast<std::chrono::minutes>(delta_t) - hours;
-            const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(delta_t) - hours - minutes;
-            out << "Time elapsed: ";
-            if (delta_t >= std::chrono::hours(1))
-                out << hours.count() << "h ";
-            if (delta_t >= std::chrono::minutes(1))
-                out << minutes.count() << "min ";
-            out << seconds.count() << "s.                " << std::endl;
+        out << "Progress: " << target_val << "/" << target_val;
+        out << " (100.00%). ";
+        const auto delta_t = std::chrono::steady_clock::now() - start_time;
+        const auto hours = std::chrono::duration_cast<std::chrono::hours>(delta_t);
+        const auto minutes = std::chrono::duration_cast<std::chrono::minutes>(delta_t) - hours;
+        const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(delta_t) - hours - minutes;
+        out << "Time elapsed: ";
+        if (delta_t >= std::chrono::hours(1))
+            out << hours.count() << "h ";
+        if (delta_t >= std::chrono::minutes(1))
+            out << minutes.count() << "min ";
+        out << seconds.count() << "s.                " << std::endl;
 
-            // restore previous output flags and precision settings
-            out.flags(oldflags);
-            out.precision(ss);
+        // restore previous output flags and precision settings
+        out.flags(oldflags);
+        out.precision(ss);
     }
 
 // ----------------------------------------------------------------------------------------
