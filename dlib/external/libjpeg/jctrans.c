@@ -2,7 +2,7 @@
  * jctrans.c
  *
  * Copyright (C) 1995-1998, Thomas G. Lane.
- * Modified 2000-2011 by Guido Vollbeding.
+ * Modified 2000-2020 by Guido Vollbeding.
  * This file is part of the Independent JPEG Group's software.
  * For conditions of distribution and use, see the accompanying README file.
  *
@@ -85,9 +85,15 @@ jpeg_copy_critical_parameters (j_decompress_ptr srcinfo,
   jpeg_set_defaults(dstinfo);
   /* jpeg_set_defaults may choose wrong colorspace, eg YCbCr if input is RGB.
    * Fix it to get the right header markers for the image colorspace.
+   * Note: Entropy table assignment in jpeg_set_colorspace
+   * depends on color_transform.
+   * Adaption is also required for setting the appropriate
+   * entropy coding mode dependent on image data precision.
    */
+  dstinfo->color_transform = srcinfo->color_transform;
   jpeg_set_colorspace(dstinfo, srcinfo->jpeg_color_space);
   dstinfo->data_precision = srcinfo->data_precision;
+  dstinfo->arith_code = srcinfo->data_precision > 8 ? TRUE : FALSE;
   dstinfo->CCIR601_sampling = srcinfo->CCIR601_sampling;
   /* Copy the source's quantization tables. */
   for (tblno = 0; tblno < NUM_QUANT_TBLS; tblno++) {
@@ -130,7 +136,7 @@ jpeg_copy_critical_parameters (j_decompress_ptr srcinfo,
 	  ERREXIT1(dstinfo, JERR_MISMATCHED_QUANT_TABLE, tblno);
       }
     }
-    /* Note: we do not copy the source's Huffman table assignments;
+    /* Note: we do not copy the source's entropy table assignments;
      * instead we rely on jpeg_set_colorspace to have made a suitable choice.
      */
   }
@@ -140,10 +146,10 @@ jpeg_copy_critical_parameters (j_decompress_ptr srcinfo,
    * if the application chooses to copy JFIF 1.02 extension markers from
    * the source file, we need to copy the version to make sure we don't
    * emit a file that has 1.02 extensions but a claimed version of 1.01.
-   * We will *not*, however, copy version info from mislabeled "2.01" files.
    */
   if (srcinfo->saw_JFIF_marker) {
-    if (srcinfo->JFIF_major_version == 1) {
+    if (srcinfo->JFIF_major_version == 1 ||
+	srcinfo->JFIF_major_version == 2) {
       dstinfo->JFIF_major_version = srcinfo->JFIF_major_version;
       dstinfo->JFIF_minor_version = srcinfo->JFIF_minor_version;
     }
@@ -151,6 +157,18 @@ jpeg_copy_critical_parameters (j_decompress_ptr srcinfo,
     dstinfo->X_density = srcinfo->X_density;
     dstinfo->Y_density = srcinfo->Y_density;
   }
+}
+
+
+LOCAL(void)
+jpeg_calc_trans_dimensions (j_compress_ptr cinfo)
+/* Do computations that are needed before master selection phase */
+{
+  if (cinfo->min_DCT_h_scaled_size != cinfo->min_DCT_v_scaled_size)
+    ERREXIT2(cinfo, JERR_BAD_DCTSIZE,
+	     cinfo->min_DCT_h_scaled_size, cinfo->min_DCT_v_scaled_size);
+
+  cinfo->block_size = cinfo->min_DCT_h_scaled_size;
 }
 
 
@@ -163,6 +181,9 @@ LOCAL(void)
 transencode_master_selection (j_compress_ptr cinfo,
 			      jvirt_barray_ptr * coef_arrays)
 {
+  /* Do computations that are needed before master selection phase */
+  jpeg_calc_trans_dimensions(cinfo);
+
   /* Initialize master control (includes parameter checking/processing) */
   jinit_c_master_control(cinfo, TRUE /* transcode only */);
 
@@ -203,7 +224,7 @@ typedef struct {
   struct jpeg_c_coef_controller pub; /* public fields */
 
   JDIMENSION iMCU_row_num;	/* iMCU row # within image */
-  JDIMENSION mcu_ctr;		/* counts MCUs processed in current row */
+  JDIMENSION MCU_ctr;		/* counts MCUs processed in current row */
   int MCU_vert_offset;		/* counts MCU rows within iMCU row */
   int MCU_rows_per_iMCU_row;	/* number of such rows needed */
 
@@ -211,7 +232,7 @@ typedef struct {
   jvirt_barray_ptr * whole_image;
 
   /* Workspace for constructing dummy blocks at right/bottom edges. */
-  JBLOCKROW dummy_buffer[C_MAX_BLOCKS_IN_MCU];
+  JBLOCK dummy_buffer[C_MAX_BLOCKS_IN_MCU];
 } my_coef_controller;
 
 typedef my_coef_controller * my_coef_ptr;
@@ -236,7 +257,7 @@ start_iMCU_row (j_compress_ptr cinfo)
       coef->MCU_rows_per_iMCU_row = cinfo->cur_comp_info[0]->last_row_height;
   }
 
-  coef->mcu_ctr = 0;
+  coef->MCU_ctr = 0;
   coef->MCU_vert_offset = 0;
 }
 
@@ -294,25 +315,30 @@ compress_output (j_compress_ptr cinfo, JSAMPIMAGE input_buf)
   /* Loop to process one whole iMCU row */
   for (yoffset = coef->MCU_vert_offset; yoffset < coef->MCU_rows_per_iMCU_row;
        yoffset++) {
-    for (MCU_col_num = coef->mcu_ctr; MCU_col_num < cinfo->MCUs_per_row;
+    for (MCU_col_num = coef->MCU_ctr; MCU_col_num <= last_MCU_col;
 	 MCU_col_num++) {
       /* Construct list of pointers to DCT blocks belonging to this MCU */
       blkn = 0;			/* index of current DCT block within MCU */
       for (ci = 0; ci < cinfo->comps_in_scan; ci++) {
 	compptr = cinfo->cur_comp_info[ci];
-	start_col = MCU_col_num * compptr->MCU_width;
 	blockcnt = (MCU_col_num < last_MCU_col) ? compptr->MCU_width
 						: compptr->last_col_width;
+	start_col = MCU_col_num * compptr->MCU_width;
 	for (yindex = 0; yindex < compptr->MCU_height; yindex++) {
 	  if (coef->iMCU_row_num < last_iMCU_row ||
-	      yindex+yoffset < compptr->last_row_height) {
+	      yoffset + yindex < compptr->last_row_height) {
 	    /* Fill in pointers to real blocks in this row */
-	    buffer_ptr = buffer[ci][yindex+yoffset] + start_col;
-	    for (xindex = 0; xindex < blockcnt; xindex++)
+	    buffer_ptr = buffer[ci][yoffset + yindex] + start_col;
+	    xindex = blockcnt;
+	    do {
 	      MCU_buffer[blkn++] = buffer_ptr++;
+	    } while (--xindex);
+	    /* Dummy blocks at right edge */
+	    if ((xindex = compptr->MCU_width - blockcnt) == 0)
+	      continue;
 	  } else {
 	    /* At bottom of image, need a whole row of dummy blocks */
-	    xindex = 0;
+	    xindex = compptr->MCU_width;
 	  }
 	  /* Fill in any dummy blocks needed in this row.
 	   * Dummy blocks are filled in the same way as in jccoefct.c:
@@ -320,23 +346,23 @@ compress_output (j_compress_ptr cinfo, JSAMPIMAGE input_buf)
 	   * block's DC value.  The init routine has already zeroed the
 	   * AC entries, so we need only set the DC entries correctly.
 	   */
-	  for (; xindex < compptr->MCU_width; xindex++) {
-	    MCU_buffer[blkn] = coef->dummy_buffer[blkn];
-	    MCU_buffer[blkn][0][0] = MCU_buffer[blkn-1][0][0];
-	    blkn++;
-	  }
+	  buffer_ptr = coef->dummy_buffer + blkn;
+	  do {
+	    buffer_ptr[0][0] = MCU_buffer[blkn-1][0][0];
+	    MCU_buffer[blkn++] = buffer_ptr++;
+	  } while (--xindex);
 	}
       }
       /* Try to write the MCU. */
       if (! (*cinfo->entropy->encode_mcu) (cinfo, MCU_buffer)) {
 	/* Suspension forced; update state counters and exit */
 	coef->MCU_vert_offset = yoffset;
-	coef->mcu_ctr = MCU_col_num;
+	coef->MCU_ctr = MCU_col_num;
 	return FALSE;
       }
     }
     /* Completed an MCU row, but perhaps not an iMCU row */
-    coef->mcu_ctr = 0;
+    coef->MCU_ctr = 0;
   }
   /* Completed the iMCU row, advance counters for next one */
   coef->iMCU_row_num++;
@@ -358,25 +384,16 @@ transencode_coef_controller (j_compress_ptr cinfo,
 			     jvirt_barray_ptr * coef_arrays)
 {
   my_coef_ptr coef;
-  JBLOCKROW buffer;
-  int i;
 
-  coef = (my_coef_ptr)
-    (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-				SIZEOF(my_coef_controller));
-  cinfo->coef = (struct jpeg_c_coef_controller *) coef;
+  coef = (my_coef_ptr) (*cinfo->mem->alloc_small)
+    ((j_common_ptr) cinfo, JPOOL_IMAGE, SIZEOF(my_coef_controller));
+  cinfo->coef = &coef->pub;
   coef->pub.start_pass = start_pass_coef;
   coef->pub.compress_data = compress_output;
 
   /* Save pointer to virtual arrays */
   coef->whole_image = coef_arrays;
 
-  /* Allocate and pre-zero space for dummy DCT blocks. */
-  buffer = (JBLOCKROW)
-    (*cinfo->mem->alloc_large) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-				C_MAX_BLOCKS_IN_MCU * SIZEOF(JBLOCK));
-  FMEMZERO((void FAR *) buffer, C_MAX_BLOCKS_IN_MCU * SIZEOF(JBLOCK));
-  for (i = 0; i < C_MAX_BLOCKS_IN_MCU; i++) {
-    coef->dummy_buffer[i] = buffer + i;
-  }
+  /* Pre-zero space for dummy DCT blocks */
+  MEMZERO(coef->dummy_buffer, SIZEOF(coef->dummy_buffer));
 }

@@ -2,7 +2,7 @@
  * jpeglib.h
  *
  * Copyright (C) 1991-1998, Thomas G. Lane.
- * Modified 2002-2011 by Guido Vollbeding.
+ * Modified 2002-2020 by Guido Vollbeding.
  * This file is part of the Independent JPEG Group's software.
  * For conditions of distribution and use, see the accompanying README file.
  *
@@ -34,17 +34,17 @@ extern "C" {
 #endif
 
 /* Version IDs for the JPEG library.
- * Might be useful for tests like "#if JPEG_LIB_VERSION >= 80".
+ * Might be useful for tests like "#if JPEG_LIB_VERSION >= 90".
  */
 
-#define JPEG_LIB_VERSION        80	/* Compatibility version 8.0 */
-#define JPEG_LIB_VERSION_MAJOR  8
-#define JPEG_LIB_VERSION_MINOR  4
+#define JPEG_LIB_VERSION        90	/* Compatibility version 9.0 */
+#define JPEG_LIB_VERSION_MAJOR  9
+#define JPEG_LIB_VERSION_MINOR  5
 
 
 /* Various constants determining the sizes of things.
- * All of these are specified by the JPEG standard, so don't change them
- * if you want to be compatible.
+ * All of these are specified by the JPEG standard,
+ * so don't change them if you want to be compatible.
  */
 
 #define DCTSIZE		    8	/* The basic DCT block is 8x8 coefficients */
@@ -137,9 +137,9 @@ typedef struct {
   /* The decompressor output side may not use these variables. */
   int dc_tbl_no;		/* DC entropy table selector (0..3) */
   int ac_tbl_no;		/* AC entropy table selector (0..3) */
-  
+
   /* Remaining fields should be treated as private by applications. */
-  
+
   /* These values are computed during compression or decompression startup: */
   /* Component's size in DCT blocks.
    * Any dummy blocks added to complete an MCU are not counted; therefore
@@ -157,16 +157,21 @@ typedef struct {
   /* The downsampled dimensions are the component's actual, unpadded number
    * of samples at the main buffer (preprocessing/compression interface);
    * DCT scaling is included, so
-   * downsampled_width = ceil(image_width * Hi/Hmax * DCT_h_scaled_size/DCTSIZE)
+   * downsampled_width =
+   *   ceil(image_width * Hi/Hmax * DCT_h_scaled_size/block_size)
    * and similarly for height.
    */
   JDIMENSION downsampled_width;	 /* actual width in samples */
   JDIMENSION downsampled_height; /* actual height in samples */
-  /* This flag is used only for decompression.  In cases where some of the
-   * components will be ignored (eg grayscale output from YCbCr image),
-   * we can skip most computations for the unused components.
+  /* For decompression, in cases where some of the components will be
+   * ignored (eg grayscale output from YCbCr image), we can skip most
+   * computations for the unused components.
+   * For compression, some of the components will need further quantization
+   * scale by factor of 2 after DCT (eg BG_YCC output from normal RGB input).
+   * The field is first set TRUE for decompression, FALSE for compression
+   * in initial_setup, and then adapted in color conversion setup.
    */
-  boolean component_needed;	/* do we need the value of this component? */
+  boolean component_needed;
 
   /* These values are computed before starting a scan of the component. */
   /* The decompressor output side may not use these variables. */
@@ -215,11 +220,20 @@ struct jpeg_marker_struct {
 typedef enum {
 	JCS_UNKNOWN,		/* error/unspecified */
 	JCS_GRAYSCALE,		/* monochrome */
-	JCS_RGB,		/* red/green/blue */
-	JCS_YCbCr,		/* Y/Cb/Cr (also known as YUV) */
+	JCS_RGB,		/* red/green/blue, standard RGB (sRGB) */
+	JCS_YCbCr,		/* Y/Cb/Cr (also known as YUV), standard YCC */
 	JCS_CMYK,		/* C/M/Y/K */
-	JCS_YCCK		/* Y/Cb/Cr/K */
+	JCS_YCCK,		/* Y/Cb/Cr/K */
+	JCS_BG_RGB,		/* big gamut red/green/blue, bg-sRGB */
+	JCS_BG_YCC		/* big gamut Y/Cb/Cr, bg-sYCC */
 } J_COLOR_SPACE;
+
+/* Supported color transforms. */
+
+typedef enum {
+	JCT_NONE           = 0,
+	JCT_SUBTRACT_GREEN = 1
+} J_COLOR_TRANSFORM;
 
 /* DCT/IDCT algorithm options. */
 
@@ -369,7 +383,10 @@ struct jpeg_compress_struct {
   UINT16 X_density;		/* Horizontal pixel density */
   UINT16 Y_density;		/* Vertical pixel density */
   boolean write_Adobe_marker;	/* should an Adobe marker be written? */
-  
+
+  J_COLOR_TRANSFORM color_transform;
+  /* Color transform identifier, writes LSE marker if nonzero */
+
   /* State variable: index of next scanline to be written to
    * jpeg_write_scanlines().  Application may use this to control its
    * processing loop, e.g., "while (next_scanline < image_height)".
@@ -394,10 +411,10 @@ struct jpeg_compress_struct {
   JDIMENSION total_iMCU_rows;	/* # of iMCU rows to be input to coef ctlr */
   /* The coefficient controller receives data in units of MCU rows as defined
    * for fully interleaved scans (whether the JPEG file is interleaved or not).
-   * There are v_samp_factor * DCTSIZE sample rows of each component in an
-   * "iMCU" (interleaved MCU) row.
+   * There are v_samp_factor * DCT_v_scaled_size sample rows of each component
+   * in an "iMCU" (interleaved MCU) row.
    */
-  
+
   /*
    * These fields are valid during any one scan.
    * They describe the components and MCUs actually appearing in the scan.
@@ -405,10 +422,10 @@ struct jpeg_compress_struct {
   int comps_in_scan;		/* # of JPEG components in this scan */
   jpeg_component_info * cur_comp_info[MAX_COMPS_IN_SCAN];
   /* *cur_comp_info[i] describes component that appears i'th in SOS */
-  
+
   JDIMENSION MCUs_per_row;	/* # of MCUs across the image */
   JDIMENSION MCU_rows_in_scan;	/* # of MCU rows in the image */
-  
+
   int blocks_in_MCU;		/* # of DCT blocks per MCU */
   int MCU_membership[C_MAX_BLOCKS_IN_MCU];
   /* MCU_membership[i] is index in cur_comp_info of component owning */
@@ -589,6 +606,9 @@ struct jpeg_decompress_struct {
   boolean saw_Adobe_marker;	/* TRUE iff an Adobe APP14 marker was found */
   UINT8 Adobe_transform;	/* Color transform code from Adobe marker */
 
+  J_COLOR_TRANSFORM color_transform;
+  /* Color transform identifier derived from LSE marker, otherwise zero */
+
   boolean CCIR601_sampling;	/* TRUE=first samples are cosited */
 
   /* Aside from the specific data retained from APPn markers known to the
@@ -616,7 +636,7 @@ struct jpeg_decompress_struct {
    * in fully interleaved JPEG scans, but are used whether the scan is
    * interleaved or not.  We define an iMCU row as v_samp_factor DCT block
    * rows of each component.  Therefore, the IDCT output contains
-   * v_samp_factor*DCT_v_scaled_size sample rows of a component per iMCU row.
+   * v_samp_factor * DCT_v_scaled_size sample rows of a component per iMCU row.
    */
 
   JSAMPLE * sample_range_limit; /* table for fast range-limiting */
@@ -681,7 +701,7 @@ struct jpeg_decompress_struct {
 
 struct jpeg_error_mgr {
   /* Error exit handler: does not return to caller */
-  JMETHOD(void, error_exit, (j_common_ptr cinfo));
+  JMETHOD(noreturn_t, error_exit, (j_common_ptr cinfo));
   /* Conditionally emit a trace or warning message */
   JMETHOD(void, emit_message, (j_common_ptr cinfo, int msg_level));
   /* Routine that actually outputs a trace or error message */
@@ -691,7 +711,7 @@ struct jpeg_error_mgr {
 #define JMSG_LENGTH_MAX  200	/* recommended size of format_message buffer */
   /* Reset error state variables at start of a new image */
   JMETHOD(void, reset_error_mgr, (j_common_ptr cinfo));
-  
+
   /* The message ID code and any parameters are saved here.
    * A message can have one string parameter or up to 8 int parameters.
    */
@@ -701,11 +721,11 @@ struct jpeg_error_mgr {
     int i[8];
     char s[JMSG_STR_PARM_MAX];
   } msg_parm;
-  
+
   /* Standard state variables for error facility */
-  
+
   int trace_level;		/* max msg_level that will be displayed */
-  
+
   /* For recoverable corrupt-data errors, we emit a warning message,
    * but keep going unless emit_message chooses to abort.  emit_message
    * should count warnings in num_warnings.  The surrounding application
@@ -889,6 +909,7 @@ typedef JMETHOD(boolean, jpeg_marker_parser_method, (j_decompress_ptr cinfo));
 #define jpeg_suppress_tables	jSuppressTables
 #define jpeg_alloc_quant_table	jAlcQTable
 #define jpeg_alloc_huff_table	jAlcHTable
+#define jpeg_std_huff_table	jStdHTable
 #define jpeg_start_compress	jStrtCompress
 #define jpeg_write_scanlines	jWrtScanlines
 #define jpeg_finish_compress	jFinCompress
@@ -957,10 +978,10 @@ EXTERN(void) jpeg_stdio_src JPP((j_decompress_ptr cinfo, FILE * infile));
 /* Data source and destination managers: memory buffers. */
 EXTERN(void) jpeg_mem_dest JPP((j_compress_ptr cinfo,
 			       unsigned char ** outbuffer,
-			       unsigned long * outsize));
+			       size_t * outsize));
 EXTERN(void) jpeg_mem_src JPP((j_decompress_ptr cinfo,
-			      unsigned char * inbuffer,
-			      unsigned long insize));
+			      const unsigned char * inbuffer,
+			      size_t insize));
 
 /* Default parameter setup for compression */
 EXTERN(void) jpeg_set_defaults JPP((j_compress_ptr cinfo));
@@ -985,6 +1006,8 @@ EXTERN(void) jpeg_suppress_tables JPP((j_compress_ptr cinfo,
 				       boolean suppress));
 EXTERN(JQUANT_TBL *) jpeg_alloc_quant_table JPP((j_common_ptr cinfo));
 EXTERN(JHUFF_TBL *) jpeg_alloc_huff_table JPP((j_common_ptr cinfo));
+EXTERN(JHUFF_TBL *) jpeg_std_huff_table JPP((j_common_ptr cinfo,
+					     boolean isDC, int tblno));
 
 /* Main entry points for compression */
 EXTERN(void) jpeg_start_compress JPP((j_compress_ptr cinfo,

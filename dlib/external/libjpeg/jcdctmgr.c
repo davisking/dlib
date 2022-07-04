@@ -2,6 +2,7 @@
  * jcdctmgr.c
  *
  * Copyright (C) 1994-1996, Thomas G. Lane.
+ * Modified 2003-2020 by Guido Vollbeding.
  * This file is part of the Independent JPEG Group's software.
  * For conditions of distribution and use, see the accompanying README file.
  *
@@ -25,20 +26,28 @@ typedef struct {
   /* Pointer to the DCT routine actually in use */
   forward_DCT_method_ptr do_dct[MAX_COMPONENTS];
 
-  /* The actual post-DCT divisors --- not identical to the quant table
-   * entries, because of scaling (especially for an unnormalized DCT).
-   * Each table is given in normal array order.
-   */
-  DCTELEM * divisors[NUM_QUANT_TBLS];
-
 #ifdef DCT_FLOAT_SUPPORTED
   /* Same as above for the floating-point case. */
   float_DCT_method_ptr do_float_dct[MAX_COMPONENTS];
-  FAST_FLOAT * float_divisors[NUM_QUANT_TBLS];
 #endif
 } my_fdct_controller;
 
 typedef my_fdct_controller * my_fdct_ptr;
+
+
+/* The allocated post-DCT divisor tables -- big enough for any
+ * supported variant and not identical to the quant table entries,
+ * because of scaling (especially for an unnormalized DCT) --
+ * are pointed to by dct_table in the per-component comp_info
+ * structures.  Each table is given in normal array order.
+ */
+
+typedef union {
+  DCTELEM int_array[DCTSIZE2];
+#ifdef DCT_FLOAT_SUPPORTED
+  FAST_FLOAT float_array[DCTSIZE2];
+#endif
+} divisor_table;
 
 
 /* The current scaled-DCT routines require ISLOW-style divisor tables,
@@ -57,25 +66,22 @@ typedef my_fdct_controller * my_fdct_ptr;
  * Perform forward DCT on one or more blocks of a component.
  *
  * The input samples are taken from the sample_data[] array starting at
- * position start_row/start_col, and moving to the right for any additional
- * blocks. The quantized coefficients are returned in coef_blocks[].
+ * position start_col, and moving to the right for any additional blocks.
+ * The quantized coefficients are returned in coef_blocks[].
  */
 
 METHODDEF(void)
 forward_DCT (j_compress_ptr cinfo, jpeg_component_info * compptr,
 	     JSAMPARRAY sample_data, JBLOCKROW coef_blocks,
-	     JDIMENSION start_row, JDIMENSION start_col,
-	     JDIMENSION num_blocks)
+	     JDIMENSION start_col, JDIMENSION num_blocks)
 /* This version is used for integer DCT implementations. */
 {
   /* This routine is heavily used, so it's worth coding it tightly. */
   my_fdct_ptr fdct = (my_fdct_ptr) cinfo->fdct;
   forward_DCT_method_ptr do_dct = fdct->do_dct[compptr->component_index];
-  DCTELEM * divisors = fdct->divisors[compptr->quant_tbl_no];
+  DCTELEM * divisors = (DCTELEM *) compptr->dct_table;
   DCTELEM workspace[DCTSIZE2];	/* work area for FDCT subroutine */
   JDIMENSION bi;
-
-  sample_data += start_row;	/* fold in the vertical offset once */
 
   for (bi = 0; bi < num_blocks; bi++, start_col += compptr->DCT_h_scaled_size) {
     /* Perform the DCT */
@@ -127,18 +133,15 @@ forward_DCT (j_compress_ptr cinfo, jpeg_component_info * compptr,
 METHODDEF(void)
 forward_DCT_float (j_compress_ptr cinfo, jpeg_component_info * compptr,
 		   JSAMPARRAY sample_data, JBLOCKROW coef_blocks,
-		   JDIMENSION start_row, JDIMENSION start_col,
-		   JDIMENSION num_blocks)
+		   JDIMENSION start_col, JDIMENSION num_blocks)
 /* This version is used for floating-point DCT implementations. */
 {
   /* This routine is heavily used, so it's worth coding it tightly. */
   my_fdct_ptr fdct = (my_fdct_ptr) cinfo->fdct;
   float_DCT_method_ptr do_dct = fdct->do_float_dct[compptr->component_index];
-  FAST_FLOAT * divisors = fdct->float_divisors[compptr->quant_tbl_no];
+  FAST_FLOAT * divisors = (FAST_FLOAT *) compptr->dct_table;
   FAST_FLOAT workspace[DCTSIZE2]; /* work area for FDCT subroutine */
   JDIMENSION bi;
-
-  sample_data += start_row;	/* fold in the vertical offset once */
 
   for (bi = 0; bi < num_blocks; bi++, start_col += compptr->DCT_h_scaled_size) {
     /* Perform the DCT */
@@ -338,13 +341,11 @@ start_pass_fdctmgr (j_compress_ptr cinfo)
 #endif
       default:
 	ERREXIT(cinfo, JERR_NOT_COMPILED);
-	break;
       }
       break;
     default:
       ERREXIT2(cinfo, JERR_BAD_DCTSIZE,
 	       compptr->DCT_h_scaled_size, compptr->DCT_v_scaled_size);
-      break;
     }
     qtblno = compptr->quant_tbl_no;
     /* Make sure specified quantization table is present */
@@ -352,22 +353,17 @@ start_pass_fdctmgr (j_compress_ptr cinfo)
 	cinfo->quant_tbl_ptrs[qtblno] == NULL)
       ERREXIT1(cinfo, JERR_NO_QUANT_TABLE, qtblno);
     qtbl = cinfo->quant_tbl_ptrs[qtblno];
-    /* Compute divisors for this quant table */
-    /* We may do this more than once for same table, but it's not a big deal */
+    /* Create divisor table from quant table */
     switch (method) {
 #ifdef PROVIDE_ISLOW_TABLES
     case JDCT_ISLOW:
       /* For LL&M IDCT method, divisors are equal to raw quantization
        * coefficients multiplied by 8 (to counteract scaling).
        */
-      if (fdct->divisors[qtblno] == NULL) {
-	fdct->divisors[qtblno] = (DCTELEM *)
-	  (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-				      DCTSIZE2 * SIZEOF(DCTELEM));
-      }
-      dtbl = fdct->divisors[qtblno];
+      dtbl = (DCTELEM *) compptr->dct_table;
       for (i = 0; i < DCTSIZE2; i++) {
-	dtbl[i] = ((DCTELEM) qtbl->quantval[i]) << 3;
+	dtbl[i] =
+	  ((DCTELEM) qtbl->quantval[i]) << (compptr->component_needed ? 4 : 3);
       }
       fdct->pub.forward_DCT[ci] = forward_DCT;
       break;
@@ -395,17 +391,12 @@ start_pass_fdctmgr (j_compress_ptr cinfo)
 	};
 	SHIFT_TEMPS
 
-	if (fdct->divisors[qtblno] == NULL) {
-	  fdct->divisors[qtblno] = (DCTELEM *)
-	    (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-					DCTSIZE2 * SIZEOF(DCTELEM));
-	}
-	dtbl = fdct->divisors[qtblno];
+	dtbl = (DCTELEM *) compptr->dct_table;
 	for (i = 0; i < DCTSIZE2; i++) {
 	  dtbl[i] = (DCTELEM)
 	    DESCALE(MULTIPLY16V16((INT32) qtbl->quantval[i],
 				  (INT32) aanscales[i]),
-		    CONST_BITS-3);
+		    compptr->component_needed ? CONST_BITS-4 : CONST_BITS-3);
 	}
       }
       fdct->pub.forward_DCT[ci] = forward_DCT;
@@ -422,25 +413,20 @@ start_pass_fdctmgr (j_compress_ptr cinfo)
 	 * What's actually stored is 1/divisor so that the inner loop can
 	 * use a multiplication rather than a division.
 	 */
-	FAST_FLOAT * fdtbl;
+	FAST_FLOAT * fdtbl = (FAST_FLOAT *) compptr->dct_table;
 	int row, col;
 	static const double aanscalefactor[DCTSIZE] = {
 	  1.0, 1.387039845, 1.306562965, 1.175875602,
 	  1.0, 0.785694958, 0.541196100, 0.275899379
 	};
 
-	if (fdct->float_divisors[qtblno] == NULL) {
-	  fdct->float_divisors[qtblno] = (FAST_FLOAT *)
-	    (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-					DCTSIZE2 * SIZEOF(FAST_FLOAT));
-	}
-	fdtbl = fdct->float_divisors[qtblno];
 	i = 0;
 	for (row = 0; row < DCTSIZE; row++) {
 	  for (col = 0; col < DCTSIZE; col++) {
 	    fdtbl[i] = (FAST_FLOAT)
-	      (1.0 / (((double) qtbl->quantval[i] *
-		       aanscalefactor[row] * aanscalefactor[col] * 8.0)));
+	      (1.0 / ((double) qtbl->quantval[i] *
+		      aanscalefactor[row] * aanscalefactor[col] *
+		      (compptr->component_needed ? 16.0 : 8.0)));
 	    i++;
 	  }
 	}
@@ -450,7 +436,6 @@ start_pass_fdctmgr (j_compress_ptr cinfo)
 #endif
     default:
       ERREXIT(cinfo, JERR_NOT_COMPILED);
-      break;
     }
   }
 }
@@ -464,19 +449,18 @@ GLOBAL(void)
 jinit_forward_dct (j_compress_ptr cinfo)
 {
   my_fdct_ptr fdct;
-  int i;
+  int ci;
+  jpeg_component_info *compptr;
 
-  fdct = (my_fdct_ptr)
-    (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-				SIZEOF(my_fdct_controller));
-  cinfo->fdct = (struct jpeg_forward_dct *) fdct;
+  fdct = (my_fdct_ptr) (*cinfo->mem->alloc_small)
+    ((j_common_ptr) cinfo, JPOOL_IMAGE, SIZEOF(my_fdct_controller));
+  cinfo->fdct = &fdct->pub;
   fdct->pub.start_pass = start_pass_fdctmgr;
 
-  /* Mark divisor tables unallocated */
-  for (i = 0; i < NUM_QUANT_TBLS; i++) {
-    fdct->divisors[i] = NULL;
-#ifdef DCT_FLOAT_SUPPORTED
-    fdct->float_divisors[i] = NULL;
-#endif
+  for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components;
+       ci++, compptr++) {
+    /* Allocate a divisor table for each component */
+    compptr->dct_table = (*cinfo->mem->alloc_small)
+      ((j_common_ptr) cinfo, JPOOL_IMAGE, SIZEOF(divisor_table));
   }
 }
