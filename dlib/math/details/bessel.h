@@ -6,6 +6,7 @@
 #include <cmath>
 #include <limits>
 #include <stdexcept>
+#include <algorithm>
 #include "../constants.h"
 
 namespace dlib
@@ -477,8 +478,8 @@ namespace dlib
                 return J_nu;
             }
         }
-    }
 #endif
+    }
 }
 
 #endif //DLIB_MATH_DETAIL_BESSEL
