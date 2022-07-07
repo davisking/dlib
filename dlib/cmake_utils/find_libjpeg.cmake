@@ -31,7 +31,7 @@ if(JPEG_FOUND)
    message (STATUS "Found system copy of libjpeg: ${JPEG_LIBRARY}")
    if(NOT test_for_libjpeg_worked)
       set(JPEG_FOUND 0)
-      message (STATUS "System copy of libjpeg is broken or too old.  Will build our own libjpeg and use that instead.")
+      message (STATUS "System copy of libjpeg is broken or too old.  Will build our own libjpeg-turbo and use that instead.")
    endif()
 endif()
 

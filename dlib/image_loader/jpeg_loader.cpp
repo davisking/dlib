@@ -12,7 +12,7 @@
 #include "jpeg_loader.h"
 #include <stdio.h>
 #ifdef DLIB_JPEG_STATIC
-#   include "../external/libjpeg/jpeglib.h"
+#include "../external/libjpeg-turbo/jpeglib.h"
 #else
 #   include <jpeglib.h>
 #endif

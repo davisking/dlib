@@ -15,7 +15,7 @@
 #include "image_saver.h"
 
 #ifdef DLIB_JPEG_STATIC
-#   include "../external/libjpeg/jpeglib.h"
+#   include "../external/libjpeg-turbo/jpeglib.h"
 #else
 #   include <jpeglib.h>
 #endif
