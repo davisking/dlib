@@ -5,6 +5,7 @@ namespace
 {
     using namespace test;
     using namespace dlib;
+    using namespace std;
 
     logger dlog("test.math");
 
@@ -53,6 +54,7 @@ namespace
 
         DLIB_TEST(std::abs(cyl_bessel_i<R,R>(2.0,0.0) - 0.000000000000000) < tol);
         DLIB_TEST(std::abs(cyl_bessel_i<R,R>(2.0,9.5367431640625e-7) - 1.13686837721624646204093977095674566928522671779753217215467e-13) < tol);
+        DLIB_TEST(std::abs(cyl_bessel_i<R,R>(5.0,1.0) - 0.000271463155956971875181073905153777342383564426758143634974124) < tol);
         DLIB_TEST(std::abs(cyl_bessel_i<R,R>(5.0,10.0) - 777.188286403259959907293484802339632852674154572666041953297) < tol);
     }
 
