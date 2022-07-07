@@ -6,11 +6,30 @@
 #include <cmath>
 #include <limits>
 #include <stdexcept>
+#include "../constants.h"
 
 namespace dlib
 {
     namespace detail
     {
+#if __cpp_lib_math_special_functions
+        using std::cyl_bessel_i;
+        using std::cyl_bessel_j;
+#else
+        template <typename R>
+        void gamma_temme(R mu, R& gam1, R& gam2, R& gampl, R& gammi)
+        {
+            gampl = R(1) / std::tgamma(R(1) + mu);
+            gammi = R(1) / std::tgamma(R(1) - mu);
+
+            if (std::abs(mu) < std::numeric_limits<R>::epsilon())
+                gam1 = -R(numeric_constants<R>::gamma_e());
+            else
+                gam1 = (gammi - gampl) / (R(2) * mu);
+
+            gam2 = (gammi + gampl) / (R(2));
+        }
+
         template <typename R>
         void bessel_ik(R nu, R x, R& Inu, R& Knu, R& Ipnu, R& Kpnu)
         {
@@ -24,7 +43,7 @@ namespace dlib
                 else if (nu == R{1})
                 {
                     Inu = R{0};
-                    Ipnu = R(0.5L);
+                    Ipnu = R{0.5};
                 }
                 else
                 {
@@ -37,7 +56,7 @@ namespace dlib
             }
 
             const R eps         = std::numeric_limits<R>::epsilon();
-            const R fp_min      = R(10) * std::numeric_limits<R>::epsilon();
+            const R fp_min      = R{10} * std::numeric_limits<R>::epsilon();
             const int max_iter  = 15000;
             const R x_min       = R{2};
 
@@ -88,15 +107,14 @@ namespace dlib
             if (x < x_min)
             {
                 const R x2 = x / R{2};
-                const R pimu = 3.1415926535897932384626433832795029L * mu;
+                const R pimu = numeric_constants<R>::pi() * mu;
                 const R fact = (std::abs(pimu) < eps ? R{1} : pimu / std::sin(pimu));
                 R d = -std::log(x2);
                 R e = mu * d;
                 const R fact2 = (std::abs(e) < eps ? R{1} : std::sinh(e) / e);
                 R gam1, gam2, gampl, gammi;
                 gamma_temme(mu, gam1, gam2, gampl, gammi);
-                R ff = fact
-                           * (gam1 * std::cosh(e) + gam2 * fact2 * d);
+                R ff = fact * (gam1 * std::cosh(e) + gam2 * fact2 * d);
                 R sum = ff;
                 e = std::exp(e);
                 R p = e / (R{2} * gampl);
@@ -158,8 +176,7 @@ namespace dlib
                     throw std::runtime_error("Steed's method failed "
                                                    "in bessel_ik.");
                 h = a1 * h;
-                Kmu = std::sqrt(3.1415926535897932384626433832795029L / (R{2} * x))
-                        * std::exp(-x) / s;
+                Kmu = std::sqrt(numeric_constants<R>::pi() / (R{2} * x)) * std::exp(-x) / s;
                 Knu1 = Kmu * (mu + x + R(0.5L) - h) * xi;
             }
 
@@ -192,7 +209,7 @@ namespace dlib
 
             for (unsigned int i = 1; i < max_iter; ++i)
             {
-                term *= xx4 / (R{i} * (nu + R{i}));
+                term *= xx4 / (R(i) * (nu + R(i)));
                 Jn   += term;
                 if (std::abs(term / Jn) < std::numeric_limits<R>::epsilon())
                     break;
@@ -243,7 +260,7 @@ namespace dlib
             const R mu2 = mu * mu;
             const R xi = R{1} / x;
             const R xi2 = R{2} * xi;
-            R w = xi2 / 3.1415926535897932384626433832795029L;
+            R w = xi2 / numeric_constants<R>::pi();
             int isign = 1;
             R h = nu * xi;
             if (h < fp_min)
@@ -291,7 +308,7 @@ namespace dlib
             if (x < x_min)
             {
                 const R x2 = x / R{2};
-                const R pimu = 3.1415926535897932384626433832795029L * mu;
+                const R pimu = numeric_constants<R>::pi() * mu;
                 R fact = (std::abs(pimu) < eps
                               ? R{1} : pimu / std::sin(pimu));
                 R d = -std::log(x2);
@@ -300,15 +317,13 @@ namespace dlib
                                ? R{1} : std::sinh(e) / e);
                 R gam1, gam2, gampl, gammi;
                 gamma_temme(mu, gam1, gam2, gampl, gammi);
-                R ff = (R{2} / 3.1415926535897932384626433832795029L)
-                           * fact * (gam1 * std::cosh(e) + gam2 * fact2 * d);
+                R ff = (R{2} / numeric_constants<R>::pi()) * fact * (gam1 * std::cosh(e) + gam2 * fact2 * d);
                 e = std::exp(e);
-                R p = e / (3.1415926535897932384626433832795029L * gampl);
-                R q = R{1} / (e * 3.1415926535897932384626433832795029L * gammi);
+                R p = e / (numeric_constants<R>::pi() * gampl);
+                R q = R{1} / (e * numeric_constants<R>::pi() * gammi);
                 const R pimu2 = pimu / R{2};
-                R fact3 = (std::abs(pimu2) < eps
-                               ? R{1} : std::sin(pimu2) / pimu2 );
-                R r = 3.1415926535897932384626433832795029L * pimu2 * fact3 * fact3;
+                R fact3 = (std::abs(pimu2) < eps ? R{1} : std::sin(pimu2) / pimu2 );
+                R r = numeric_constants<R>::pi() * pimu2 * fact3 * fact3;
                 R c = R{1};
                 d = -x2 * x2;
                 R sum = ff + r * q;
@@ -316,9 +331,9 @@ namespace dlib
                 for (i = 1; i <= max_iter; ++i)
                 {
                     ff = (i * ff + p + q) / (i * i - mu2);
-                    c *= d / R{i};
-                    p /= R{i} - mu;
-                    q /= R{i} + mu;
+                    c *= d / R(i);
+                    p /= R(i) - mu;
+                    q /= R(i) + mu;
                     const R del = c * (ff + r * q);
                     sum += del;
                     const R del1 = c * p - i * del;
@@ -414,15 +429,13 @@ namespace dlib
             const R P       = R{1} - mum1 * mum9 / (R{2} * xx) * (R{1} - mum25 * mum49 / (R(12) * xx));
             const R Q       = mum1 / (R(8) * x) * (R{1} - mum9 * mum25 / (R(6) * xx));
 
-            const R chi = x - (nu + R(0.5L)) * 1.5707963267948966192313216916397514L;
+            const R chi = x - (nu + R(0.5L)) * numeric_constants<R>::pi_2();
             const R c = std::cos(chi);
             const R s = std::sin(chi);
 
-            const R coef = std::sqrt(R{2} / (3.1415926535897932384626433832795029L * x));
+            const R coef = std::sqrt(R{2} / (numeric_constants<R>::pi() * x));
             Jnu = coef * (c * P - s * Q);
             Nnu = coef * (s * P + c * Q);
-
-            return;
         }
 
         template<typename R>
@@ -433,7 +446,7 @@ namespace dlib
             else if (std::isnan(nu) || std::isnan(x))
                 return std::numeric_limits<R>::quiet_NaN();
             else if (x * x < R{10} * (nu + R{1}))
-                return cyl_bessel_ij_series(nu, x, + R{1}, 200);
+                return cyl_bessel_ij_series(nu, x, R{1}, 200);
             else
             {
                 R I_nu, K_nu, Ip_nu, Kp_nu;
@@ -465,6 +478,7 @@ namespace dlib
             }
         }
     }
+#endif
 }
 
 #endif //DLIB_MATH_DETAIL_BESSEL

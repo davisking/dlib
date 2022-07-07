@@ -84,6 +84,7 @@ set (tests
    lspi.cpp
    lz77_buffer.cpp
    map.cpp
+   math.cpp
    matrix2.cpp
    matrix3.cpp
    matrix4.cpp
