@@ -11,7 +11,7 @@ namespace
     template<typename R>
     void test_cyl_bessel_i()
     {
-        constexpr R tol = std::is_same<R,float>::value ? 1e-3 : 1e-7;
+        constexpr R tol = std::is_same<R,float>::value ? 1e-3 : 1e-12;
 
         DLIB_TEST(std::abs(cyl_bessel_i<R,R>(0,0.0) - 1.0) < tol);
         DLIB_TEST(std::abs(cyl_bessel_i<R,R>(0,9.5367431640625e-7) - 1.00000000000022737367544324498417583090700894607432256476338) < tol);
@@ -34,6 +34,14 @@ namespace
         DLIB_TEST(std::abs(cyl_bessel_i<R,R>(0.5,2.0) - 2.046236863089057) < tol);
         DLIB_TEST(std::abs(cyl_bessel_i<R,R>(0.5,3.0) - 4.614822903407577) < tol);
 
+        // check case when nu=1
+        DLIB_TEST(std::abs(cyl_bessel_i<R,R>(1,0.0) - 0.000000000000000) < tol);
+        DLIB_TEST(std::abs(cyl_bessel_i<R,R>(1,9.5367431640625e-7) - 4.76837158203179210108624277276025646653133998635956784292029E-7) < tol);
+        DLIB_TEST(std::abs(cyl_bessel_i<R,R>(1,0.0009765625) - 0.000488281308207663226432087816784315537514225208473395063575150) < tol);
+        DLIB_TEST(std::abs(cyl_bessel_i<R,R>(1,1.0) - 0.565159103992485027207696027609863307328899621621092009480294) < tol);
+        DLIB_TEST(std::abs(cyl_bessel_i<R,R>(1,2.0) - 1.59063685463732906338225442499966624795447815949553664713229) < tol);
+        DLIB_TEST(std::abs(cyl_bessel_i<R,R>(1,4.0) - 9.75946515370444990947519256731268090005597033325296730692753) < tol);
+
         // check case when nu=1.3
         DLIB_TEST(std::abs(cyl_bessel_i<R,R>(1.3,0.0) - 0.000000000000000) < tol);
         DLIB_TEST(std::abs(cyl_bessel_i<R,R>(1.3,0.1) - 0.017465030873157) < tol);
@@ -42,6 +50,10 @@ namespace
         DLIB_TEST(std::abs(cyl_bessel_i<R,R>(1.3,1.0) - 0.387392350983796) < tol);
         DLIB_TEST(std::abs(cyl_bessel_i<R,R>(1.3,2.0) - 1.290819215135879) < tol);
         DLIB_TEST(std::abs(cyl_bessel_i<R,R>(1.3,3.0) - 3.450680420553085) < tol);
+
+        DLIB_TEST(std::abs(cyl_bessel_i<R,R>(2.0,0.0) - 0.000000000000000) < tol);
+        DLIB_TEST(std::abs(cyl_bessel_i<R,R>(2.0,9.5367431640625e-7) - 1.13686837721624646204093977095674566928522671779753217215467e-13) < tol);
+        DLIB_TEST(std::abs(cyl_bessel_i<R,R>(5.0,10.0) - 777.188286403259959907293484802339632852674154572666041953297) < tol);
     }
 
     void test_cyl_bessel_j()
