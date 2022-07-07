@@ -8,7 +8,7 @@
 namespace dlib
 {
     template<typename R>
-    R attenuation_to_beta(R attenuation)
+    inline R attenuation_to_beta(R attenuation)
     {
         R beta{0};
         if (attenuation > 50.0)
@@ -19,7 +19,7 @@ namespace dlib
     }
 
     template<typename R>
-    R kaiser_r(R x, R L, R beta)
+    inline R kaiser_r(R x, R L, R beta)
     {
         if (std::abs(x) <= L/R{2})
         {
@@ -35,7 +35,7 @@ namespace dlib
     }
 
     template<typename R>
-    R kaiser_i(std::size_t i, std::size_t N, R beta)
+    inline R kaiser_i(std::size_t i, std::size_t N, R beta)
     {
         return kaiser_r(R(i) - R(N-1) / R(2), R(N-1), beta);
     }
