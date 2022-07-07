@@ -5,5 +5,6 @@
 
 #include "math/constants.h"
 #include "math/bessel.h"
+#include "math/kaiser.h"
 
 #endif //DLIB_MATH
