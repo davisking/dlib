@@ -7,7 +7,7 @@
 #include <limits>
 #include <stdexcept>
 #include <algorithm>
-#include "../constants.h"
+#include "../../numeric_constants.h"
 
 namespace dlib
 {
@@ -24,7 +24,7 @@ namespace dlib
             gammi = R(1) / std::tgamma(R(1) - mu);
 
             if (std::abs(mu) < std::numeric_limits<R>::epsilon())
-                gam1 = -R(numeric_constants<R>::gamma_e());
+                gam1 = -R(euler_gamma);
             else
                 gam1 = (gammi - gampl) / (R(2) * mu);
 
@@ -108,7 +108,7 @@ namespace dlib
             if (x < x_min)
             {
                 const R x2 = x / R{2};
-                const R pimu = numeric_constants<R>::pi() * mu;
+                const R pimu = pi * mu;
                 const R fact = (std::abs(pimu) < eps ? R{1} : pimu / std::sin(pimu));
                 R d = -std::log(x2);
                 R e = mu * d;
@@ -177,7 +177,7 @@ namespace dlib
                     throw std::runtime_error("Steed's method failed "
                                                    "in bessel_ik.");
                 h = a1 * h;
-                Kmu = std::sqrt(numeric_constants<R>::pi() / (R{2} * x)) * std::exp(-x) / s;
+                Kmu = std::sqrt(pi / (R{2} * x)) * std::exp(-x) / s;
                 Knu1 = Kmu * (mu + x + R(0.5L) - h) * xi;
             }
 
@@ -261,7 +261,7 @@ namespace dlib
             const R mu2 = mu * mu;
             const R xi = R{1} / x;
             const R xi2 = R{2} * xi;
-            R w = xi2 / numeric_constants<R>::pi();
+            R w = xi2 / pi;
             int isign = 1;
             R h = nu * xi;
             if (h < fp_min)
@@ -309,7 +309,7 @@ namespace dlib
             if (x < x_min)
             {
                 const R x2 = x / R{2};
-                const R pimu = numeric_constants<R>::pi() * mu;
+                const R pimu = pi * mu;
                 R fact = (std::abs(pimu) < eps
                               ? R{1} : pimu / std::sin(pimu));
                 R d = -std::log(x2);
@@ -318,13 +318,13 @@ namespace dlib
                                ? R{1} : std::sinh(e) / e);
                 R gam1, gam2, gampl, gammi;
                 gamma_temme(mu, gam1, gam2, gampl, gammi);
-                R ff = (R{2} / numeric_constants<R>::pi()) * fact * (gam1 * std::cosh(e) + gam2 * fact2 * d);
+                R ff = (R{2} / pi) * fact * (gam1 * std::cosh(e) + gam2 * fact2 * d);
                 e = std::exp(e);
-                R p = e / (numeric_constants<R>::pi() * gampl);
-                R q = R{1} / (e * numeric_constants<R>::pi() * gammi);
+                R p = e / (pi * gampl);
+                R q = R{1} / (e * pi * gammi);
                 const R pimu2 = pimu / R{2};
                 R fact3 = (std::abs(pimu2) < eps ? R{1} : std::sin(pimu2) / pimu2 );
-                R r = numeric_constants<R>::pi() * pimu2 * fact3 * fact3;
+                R r = pi * pimu2 * fact3 * fact3;
                 R c = R{1};
                 d = -x2 * x2;
                 R sum = ff + r * q;
@@ -430,11 +430,11 @@ namespace dlib
             const R P       = R{1} - mum1 * mum9 / (R{2} * xx) * (R{1} - mum25 * mum49 / (R(12) * xx));
             const R Q       = mum1 / (R(8) * x) * (R{1} - mum9 * mum25 / (R(6) * xx));
 
-            const R chi = x - (nu + R(0.5L)) * numeric_constants<R>::pi_2();
+            const R chi = x - (nu + R(0.5L)) * pi_2;
             const R c = std::cos(chi);
             const R s = std::sin(chi);
 
-            const R coef = std::sqrt(R{2} / (numeric_constants<R>::pi() * x));
+            const R coef = std::sqrt(R{2} / (pi * x));
             Jnu = coef * (c * P - s * Q);
             Nnu = coef * (s * P + c * Q);
         }

@@ -3,7 +3,6 @@
 #ifndef DLIB_MATH
 #define DLIB_MATH
 
-#include "math/constants.h"
 #include "math/bessel.h"
 #include "math/kaiser.h"
 
