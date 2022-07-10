@@ -249,7 +249,7 @@ namespace dlib
         template <class T>
         inline T bessel_y_small_z_series(T v, T x, T* pscale)
         {
-            constexpr static const T log_max_value = log((std::numeric_limits<T>::max)());
+            static const T log_max_value = std::log((std::numeric_limits<T>::max)());
 
             T prefix;
             T gam;
@@ -485,7 +485,7 @@ namespace dlib
                 }
             }
 
-            constexpr static const T log_max_value = log((std::numeric_limits<T>::max)());
+            static const T log_max_value = std::log((std::numeric_limits<T>::max)());
 
             if(x >= log_max_value)
                 *Kv = exp(0.5f * log(pi / (2 * x)) - x - log(S));
