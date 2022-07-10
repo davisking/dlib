@@ -20,6 +20,7 @@ namespace dlib
 
     // e  -- Euler's Constant
     constexpr double e = 2.7182818284590452353602874713526625L;
+    constexpr double euler = e;
 
     // sqrt_2 -- The square root of 2
     constexpr double sqrt_2 = 1.4142135623730950488016887242096981L;
