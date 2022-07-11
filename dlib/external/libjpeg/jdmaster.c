@@ -2,7 +2,7 @@
  * jdmaster.c
  *
  * Copyright (C) 1991-1997, Thomas G. Lane.
- * Modified 2002-2011 by Guido Vollbeding.
+ * Modified 2002-2020 by Guido Vollbeding.
  * This file is part of the Independent JPEG Group's software.
  * For conditions of distribution and use, see the accompanying README file.
  *
@@ -45,13 +45,26 @@ LOCAL(boolean)
 use_merged_upsample (j_decompress_ptr cinfo)
 {
 #ifdef UPSAMPLE_MERGING_SUPPORTED
-  /* Merging is the equivalent of plain box-filter upsampling */
-  if (cinfo->do_fancy_upsampling || cinfo->CCIR601_sampling)
+  /* Merging is the equivalent of plain box-filter upsampling. */
+  /* The following condition is only needed if fancy shall select
+   * a different upsampling method.  In our current implementation
+   * fancy only affects the DCT scaling, thus we can use fancy
+   * upsampling and merged upsample simultaneously, in particular
+   * with scaled DCT sizes larger than the default DCTSIZE.
+   */
+#if 0
+  if (cinfo->do_fancy_upsampling)
+    return FALSE;
+#endif
+  if (cinfo->CCIR601_sampling)
     return FALSE;
   /* jdmerge.c only supports YCC=>RGB color conversion */
-  if (cinfo->jpeg_color_space != JCS_YCbCr || cinfo->num_components != 3 ||
+  if ((cinfo->jpeg_color_space != JCS_YCbCr &&
+       cinfo->jpeg_color_space != JCS_BG_YCC) ||
+      cinfo->num_components != 3 ||
       cinfo->out_color_space != JCS_RGB ||
-      cinfo->out_color_components != RGB_PIXELSIZE)
+      cinfo->out_color_components != RGB_PIXELSIZE ||
+      cinfo->color_transform)
     return FALSE;
   /* and it only handles 2h1v or 2h2v sampling ratios */
   if (cinfo->comp_info[0].h_samp_factor != 2 ||
@@ -90,10 +103,8 @@ jpeg_calc_output_dimensions (j_decompress_ptr cinfo)
  * This function is used for full decompression.
  */
 {
-#ifdef IDCT_SCALING_SUPPORTED
-  int ci;
+  int ci, i;
   jpeg_component_info *compptr;
-#endif
 
   /* Prevent application from calling me at wrong times */
   if (cinfo->global_state != DSTATE_READY)
@@ -112,18 +123,22 @@ jpeg_calc_output_dimensions (j_decompress_ptr cinfo)
   for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components;
        ci++, compptr++) {
     int ssize = 1;
-    while (cinfo->min_DCT_h_scaled_size * ssize <=
-	   (cinfo->do_fancy_upsampling ? DCTSIZE : DCTSIZE / 2) &&
-	   (cinfo->max_h_samp_factor % (compptr->h_samp_factor * ssize * 2)) == 0) {
-      ssize = ssize * 2;
-    }
+    if (! cinfo->raw_data_out)
+      while (cinfo->min_DCT_h_scaled_size * ssize <=
+	     (cinfo->do_fancy_upsampling ? DCTSIZE : DCTSIZE / 2) &&
+	     (cinfo->max_h_samp_factor % (compptr->h_samp_factor * ssize * 2)) ==
+	     0) {
+	ssize = ssize * 2;
+      }
     compptr->DCT_h_scaled_size = cinfo->min_DCT_h_scaled_size * ssize;
     ssize = 1;
-    while (cinfo->min_DCT_v_scaled_size * ssize <=
-	   (cinfo->do_fancy_upsampling ? DCTSIZE : DCTSIZE / 2) &&
-	   (cinfo->max_v_samp_factor % (compptr->v_samp_factor * ssize * 2)) == 0) {
-      ssize = ssize * 2;
-    }
+    if (! cinfo->raw_data_out)
+      while (cinfo->min_DCT_v_scaled_size * ssize <=
+	     (cinfo->do_fancy_upsampling ? DCTSIZE : DCTSIZE / 2) &&
+	     (cinfo->max_v_samp_factor % (compptr->v_samp_factor * ssize * 2)) ==
+	     0) {
+	ssize = ssize * 2;
+      }
     compptr->DCT_v_scaled_size = cinfo->min_DCT_v_scaled_size * ssize;
 
     /* We don't support IDCT ratios larger than 2. */
@@ -131,13 +146,10 @@ jpeg_calc_output_dimensions (j_decompress_ptr cinfo)
 	compptr->DCT_h_scaled_size = compptr->DCT_v_scaled_size * 2;
     else if (compptr->DCT_v_scaled_size > compptr->DCT_h_scaled_size * 2)
 	compptr->DCT_v_scaled_size = compptr->DCT_h_scaled_size * 2;
-  }
 
-  /* Recompute downsampled dimensions of components;
-   * application needs to know these if using raw downsampled data.
-   */
-  for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components;
-       ci++, compptr++) {
+    /* Recompute downsampled dimensions of components;
+     * application needs to know these if using raw downsampled data.
+     */
     /* Size in samples, after IDCT scaling */
     compptr->downsampled_width = (JDIMENSION)
       jdiv_round_up((long) cinfo->image_width *
@@ -152,24 +164,22 @@ jpeg_calc_output_dimensions (j_decompress_ptr cinfo)
 #endif /* IDCT_SCALING_SUPPORTED */
 
   /* Report number of components in selected colorspace. */
-  /* Probably this should be in the color conversion module... */
+  /* This should correspond to the actual code in the color conversion module. */
   switch (cinfo->out_color_space) {
   case JCS_GRAYSCALE:
     cinfo->out_color_components = 1;
     break;
   case JCS_RGB:
+  case JCS_BG_RGB:
     cinfo->out_color_components = RGB_PIXELSIZE;
     break;
-  case JCS_YCbCr:
-    cinfo->out_color_components = 3;
-    break;
-  case JCS_CMYK:
-  case JCS_YCCK:
-    cinfo->out_color_components = 4;
-    break;
-  default:			/* else must be same colorspace as in file */
-    cinfo->out_color_components = cinfo->num_components;
-    break;
+  default:	/* YCCK <=> CMYK conversion or same colorspace as in file */
+    i = 0;
+    for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components;
+	 ci++, compptr++)
+      if (compptr->component_needed)
+	i++;	/* count output color components */
+    cinfo->out_color_components = i;
   }
   cinfo->output_components = (cinfo->quantize_colors ? 1 :
 			      cinfo->out_color_components);
@@ -196,30 +206,20 @@ jpeg_calc_output_dimensions (j_decompress_ptr cinfo)
  * These processes all use a common table prepared by the routine below.
  *
  * For most steps we can mathematically guarantee that the initial value
- * of x is within MAXJSAMPLE+1 of the legal range, so a table running from
- * -(MAXJSAMPLE+1) to 2*MAXJSAMPLE+1 is sufficient.  But for the initial
- * limiting step (just after the IDCT), a wildly out-of-range value is 
- * possible if the input data is corrupt.  To avoid any chance of indexing
+ * of x is within 2*(MAXJSAMPLE+1) of the legal range, so a table running
+ * from -2*(MAXJSAMPLE+1) to 3*MAXJSAMPLE+2 is sufficient.  But for the
+ * initial limiting step (just after the IDCT), a wildly out-of-range value
+ * is possible if the input data is corrupt.  To avoid any chance of indexing
  * off the end of memory and getting a bad-pointer trap, we perform the
  * post-IDCT limiting thus:
- *		x = range_limit[x & MASK];
+ *		x = (sample_range_limit - SUBSET)[(x + CENTER) & MASK];
  * where MASK is 2 bits wider than legal sample data, ie 10 bits for 8-bit
  * samples.  Under normal circumstances this is more than enough range and
  * a correct output will be generated; with bogus input data the mask will
  * cause wraparound, and we will safely generate a bogus-but-in-range output.
  * For the post-IDCT step, we want to convert the data from signed to unsigned
  * representation by adding CENTERJSAMPLE at the same time that we limit it.
- * So the post-IDCT limiting table ends up looking like this:
- *   CENTERJSAMPLE,CENTERJSAMPLE+1,...,MAXJSAMPLE,
- *   MAXJSAMPLE (repeat 2*(MAXJSAMPLE+1)-CENTERJSAMPLE times),
- *   0          (repeat 2*(MAXJSAMPLE+1)-CENTERJSAMPLE times),
- *   0,1,...,CENTERJSAMPLE-1
- * Negative inputs select values from the upper half of the table after
- * masking.
- *
- * We can save some space by overlapping the start of the post-IDCT table
- * with the simpler range limiting table.  The post-IDCT table begins at
- * sample_range_limit + CENTERJSAMPLE.
+ * This is accomplished with SUBSET = CENTER - CENTERJSAMPLE.
  *
  * Note that the table is allocated in near data space on PCs; it's small
  * enough and used often enough to justify this.
@@ -232,25 +232,18 @@ prepare_range_limit_table (j_decompress_ptr cinfo)
   JSAMPLE * table;
   int i;
 
-  table = (JSAMPLE *)
-    (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-		(5 * (MAXJSAMPLE+1) + CENTERJSAMPLE) * SIZEOF(JSAMPLE));
-  table += (MAXJSAMPLE+1);	/* allow negative subscripts of simple table */
+  table = (JSAMPLE *) (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo,
+    JPOOL_IMAGE, (RANGE_CENTER * 2 + MAXJSAMPLE + 1) * SIZEOF(JSAMPLE));
+  /* First segment of range limit table: limit[x] = 0 for x < 0 */
+  MEMZERO(table, RANGE_CENTER * SIZEOF(JSAMPLE));
+  table += RANGE_CENTER;	/* allow negative subscripts of table */
   cinfo->sample_range_limit = table;
-  /* First segment of "simple" table: limit[x] = 0 for x < 0 */
-  MEMZERO(table - (MAXJSAMPLE+1), (MAXJSAMPLE+1) * SIZEOF(JSAMPLE));
-  /* Main part of "simple" table: limit[x] = x */
+  /* Main part of range limit table: limit[x] = x */
   for (i = 0; i <= MAXJSAMPLE; i++)
     table[i] = (JSAMPLE) i;
-  table += CENTERJSAMPLE;	/* Point to where post-IDCT table starts */
-  /* End of simple table, rest of first half of post-IDCT table */
-  for (i = CENTERJSAMPLE; i < 2*(MAXJSAMPLE+1); i++)
+  /* End of range limit table: limit[x] = MAXJSAMPLE for x > MAXJSAMPLE */
+  for (; i <=  MAXJSAMPLE + RANGE_CENTER; i++)
     table[i] = MAXJSAMPLE;
-  /* Second half of post-IDCT table */
-  MEMZERO(table + (2 * (MAXJSAMPLE+1)),
-	  (2 * (MAXJSAMPLE+1) - CENTERJSAMPLE) * SIZEOF(JSAMPLE));
-  MEMCOPY(table + (4 * (MAXJSAMPLE+1) - CENTERJSAMPLE),
-	  cinfo->sample_range_limit, CENTERJSAMPLE * SIZEOF(JSAMPLE));
 }
 
 
@@ -273,9 +266,18 @@ master_selection (j_decompress_ptr cinfo)
   long samplesperrow;
   JDIMENSION jd_samplesperrow;
 
+  /* For now, precision must match compiled-in value... */
+  if (cinfo->data_precision != BITS_IN_JSAMPLE)
+    ERREXIT1(cinfo, JERR_BAD_PRECISION, cinfo->data_precision);
+
   /* Initialize dimensions and other stuff */
   jpeg_calc_output_dimensions(cinfo);
   prepare_range_limit_table(cinfo);
+
+  /* Sanity check on image dimensions */
+  if (cinfo->output_height <= 0 || cinfo->output_width <= 0 ||
+      cinfo->out_color_components <= 0)
+    ERREXIT(cinfo, JERR_EMPTY_IMAGE);
 
   /* Width of an output scanline must be representable as JDIMENSION. */
   samplesperrow = (long) cinfo->output_width * (long) cinfo->out_color_components;
@@ -518,10 +520,9 @@ jinit_master_decompress (j_decompress_ptr cinfo)
 {
   my_master_ptr master;
 
-  master = (my_master_ptr)
-      (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-				  SIZEOF(my_decomp_master));
-  cinfo->master = (struct jpeg_decomp_master *) master;
+  master = (my_master_ptr) (*cinfo->mem->alloc_small)
+    ((j_common_ptr) cinfo, JPOOL_IMAGE, SIZEOF(my_decomp_master));
+  cinfo->master = &master->pub;
   master->pub.prepare_for_output_pass = prepare_for_output_pass;
   master->pub.finish_output_pass = finish_output_pass;
 
