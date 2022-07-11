@@ -12,7 +12,7 @@ namespace
     template<typename R>
     void test_cyl_bessel_i()
     {
-        constexpr R tol = std::is_same<R,float>::value ? 1e-3 : 1e-12;
+        constexpr R tol = std::is_same<R,float>::value ? 1e-3 : 1e-9;
 
         DLIB_TEST(std::abs(dlib::cyl_bessel_i<R,R>(0,0.0) - 1.0) < tol);
         DLIB_TEST(std::abs(dlib::cyl_bessel_i<R,R>(0,9.5367431640625e-7) - 1.00000000000022737367544324498417583090700894607432256476338) < tol);
@@ -58,44 +58,47 @@ namespace
         DLIB_TEST(std::abs(dlib::cyl_bessel_i<R,R>(5.0,10.0) - 777.188286403259959907293484802339632852674154572666041953297) < tol);
     }
 
+    template<typename R>
     void test_cyl_bessel_j()
     {
-        constexpr float tol = 1e-3;
+        constexpr R tol = std::is_same<R,float>::value ? 1e-3 : 1e-7;
+        
         // check case when nu=0
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(0.0f,0.0f) -  1.000000000000000) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(0.0f,0.1f) -  0.997501562066040) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(0.0f,0.2f) -  0.990024972239576) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(0.0f,0.5f) -  0.938469807240813) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(0.0f,1.0f) -  0.765197686557967) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(0.0f,2.0f) -  0.223890779141236) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(0.0f,3.0f) - -0.260051954901934) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(0.0f,4.0f) - -0.397149809863847) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(0.0f,6.0f) -  0.150645257250997) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(0.0f,8.0f) -  0.171650807137554) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (0.0f,0.0f) -  1.000000000000000) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (0.0f,1e-5) -  0.999999999975000000000156249999999565972) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (0.0f,0.1f) -  0.99750156206604012610) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (0.0f,0.2f) -  0.990024972239576) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (0.0f,0.5f) -  0.938469807240813) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (0.0f,1.0f) -  0.7651976865579665514497175261026632209093) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (0.0f,2.0f) -  0.2238907791412356680518274546499486258252) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (0.0f,3.0f) - -0.260051954901934) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (0.0f,4.0f) - -0.3971498098638473722865907684516980419756) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (0.0f,6.0f) -  0.150645257250997) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (0.0f,8.0f) -  0.1716508071375539060908694078519720010684) < tol);
 
         // check case when nu=0.5
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(0.5f,0.0f) -  0.000000000000000) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(0.5f,0.1f) -  0.251892940326001) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(0.5f,0.2f) -  0.354450744211402) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(0.5f,0.5f) -  0.540973789934529) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(0.5f,1.0f) -  0.671396707141804) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(0.5f,2.0f) -  0.513016136561828) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(0.5f,3.0f) -  0.065008182877376) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(0.5f,4.0f) - -0.301920513291637) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(0.5f,6.0f) - -0.091015409523068) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(0.5f,8.0f) -  0.279092808570990) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (0.5f,0.0f) -  0.000000000000000) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (0.5f,0.1f) -  0.251892940326001) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (0.5f,0.2f) -  0.354450744211402) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (0.5f,0.5f) -  0.540973789934529) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (0.5f,1.0f) -  0.671396707141804) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (0.5f,2.0f) -  0.513016136561828) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (0.5f,3.0f) -  0.065008182877376) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (0.5f,4.0f) - -0.301920513291637) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (0.5f,6.0f) - -0.091015409523068) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (0.5f,8.0f) -  0.279092808570990) < tol);
 
         // check case when nu=1.7
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(1.7f,0.0f) -  0.000000000000000) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(1.7f,0.1f) -  0.003971976455203) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(1.7f,0.2f) -  0.012869169735073) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(1.7f,0.5f) -  0.059920175825578) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(1.7f,1.0f) -  0.181417665056645) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(1.7f,2.0f) -  0.437811462130677) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(1.7f,3.0f) -  0.494432522734784) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(1.7f,4.0f) -  0.268439400467270) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(1.7f,6.0f) - -0.308175744215833) < tol);
-        DLIB_TEST(std::abs(dlib::cyl_bessel_j(1.7f,8.0f) - -0.001102600927987) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (1.7f,0.0f) -  0.000000000000000) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (1.7f,0.1f) -  0.003971976455203) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (1.7f,0.2f) -  0.012869169735073) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (1.7f,0.5f) -  0.059920175825578) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (1.7f,1.0f) -  0.181417665056645) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (1.7f,2.0f) -  0.437811462130677) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (1.7f,3.0f) -  0.494432522734784) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (1.7f,4.0f) -  0.268439400467270) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (1.7f,6.0f) - -0.308175744215833) < tol);
+        DLIB_TEST(std::abs(dlib::cyl_bessel_j<R,R> (1.7f,8.0f) - -0.001102600927987) < tol);
     }
 
     class math_tester : public tester
@@ -111,7 +114,8 @@ namespace
         {
             test_cyl_bessel_i<float>();
             test_cyl_bessel_i<double>();
-            test_cyl_bessel_j();
+            test_cyl_bessel_j<float>();
+            test_cyl_bessel_j<double>();
         }
     } a;
 }
