@@ -23,9 +23,9 @@ namespace dlib
         template<typename R>
         R cyl_bessel_i(R nu, R x)
         {
-            if (nu < R{0} || x < R{0})
-                throw std::runtime_error("Bad argument in cyl_bessel_i.");
-            else if (std::isnan(nu) || std::isnan(x))
+            DLIB_ASSERT(nu >= R{0} && x >= R{0}, "bad arguments. Contract preconditions are : nu >= 0 and x >= 0");
+
+            if (std::isnan(nu) || std::isnan(x))
                 return std::numeric_limits<R>::quiet_NaN();
 
             if(x == 0)
@@ -61,9 +61,9 @@ namespace dlib
         template<typename R>
         R cyl_bessel_j(R nu, R x)
         {
-            if (nu < R{0} || x < R{0})
-                throw std::runtime_error("Bad argument in cyl_bessel_j.");
-            else if (std::isnan(nu) || std::isnan(x))
+            DLIB_ASSERT(nu >= R{0} && x >= R{0}, "bad arguments. Contract preconditions are : nu >= 0 and x >= 0");
+
+            if (std::isnan(nu) || std::isnan(x))
                 return std::numeric_limits<R>::quiet_NaN();
 
             /*! Special case !*/

@@ -8,18 +8,31 @@
 namespace dlib
 {
     template<typename R>
-    inline R attenuation_to_beta(R attenuation)
+    inline R attenuation_to_beta(R attenuation_db)
+    /*!
+        This function converts a desired attenation value (on dB) to a beta value,
+        which can be passed to either kaiser_i() or kaiser_r().
+        This function is useful in filter design.
+    !*/
     {
         R beta{0};
-        if (attenuation > 50.0)
-            beta = 0.1102*(attenuation - 8.7);
-        else if (attenuation >= 21.0)
-            beta = 0.5842*std::pow(attenuation - 21, 0.4) + 0.07886*(attenuation - 21);
+        if (attenuation_db > 50.0)
+            beta = 0.1102*(attenuation_db - 8.7);
+        else if (attenuation_db >= 21.0)
+            beta = 0.5842*std::pow(attenuation_db - 21, 0.4) + 0.07886*(attenuation_db - 21);
         return beta;
     }
 
     template<typename R>
     inline R kaiser_r(R x, R L, R beta)
+    /*!
+        This computes the kaiser window function or kaiser-bessel window function.
+        See https://en.wikipedia.org/wiki/Kaiser_window
+
+        ensures
+            - returns the kaiser window function when |x| <= L/2 and L is the window length
+            - returns 0 otherwise
+    !*/
     {
         if (std::abs(x) <= L/R{2})
         {
@@ -36,6 +49,15 @@ namespace dlib
 
     template<typename R>
     inline R kaiser_i(std::size_t i, std::size_t N, R beta)
+    /*!
+        This computes the kaiser window function or kaiser-bessel window function.
+        See https://en.wikipedia.org/wiki/Kaiser_window
+        This variant is a short-cut for computing a window function and storing it
+        in an array of size N and 0 <= i < N is the array index.
+
+        ensures
+            - returns kaiser_r(i - (N-1)/2, N-1, beta)
+    !*/
     {
         return kaiser_r(R(i) - R(N-1) / R(2), R(N-1), beta);
     }
