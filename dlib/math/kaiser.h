@@ -10,7 +10,7 @@ namespace dlib
     template<typename R>
     inline R attenuation_to_beta(R attenuation_db)
     /*!
-        This function converts a desired attenation value (on dB) to a beta value,
+        This function converts a desired attenuation value (in dB) to a beta value,
         which can be passed to either kaiser_i() or kaiser_r().
         This function is useful in filter design.
     !*/
@@ -30,7 +30,7 @@ namespace dlib
         See https://en.wikipedia.org/wiki/Kaiser_window
 
         ensures
-            - returns the kaiser window function when |x| <= L/2 and L is the window length
+            - returns the kaiser window function when |x| <= L/2 where L is the window length
             - returns 0 otherwise
     !*/
     {
@@ -53,7 +53,7 @@ namespace dlib
         This computes the kaiser window function or kaiser-bessel window function.
         See https://en.wikipedia.org/wiki/Kaiser_window
         This variant is a short-cut for computing a window function and storing it
-        in an array of size N and 0 <= i < N is the array index.
+        in an array of size N where 0 <= i < N is the array index.
 
         ensures
             - returns kaiser_r(i - (N-1)/2, N-1, beta)
