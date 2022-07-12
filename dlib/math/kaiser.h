@@ -3,6 +3,7 @@
 #ifndef DLIB_MATH_KAISER
 #define DLIB_MATH_KAISER
 
+#include <type_traits>
 #include "bessel.h"
 
 namespace dlib
@@ -15,6 +16,8 @@ namespace dlib
         This function is useful in filter design.
     !*/
     {
+        static_assert(std::is_floating_point<R>::value, "template parameter must be a floating point type");
+
         R beta{0};
         if (attenuation_db > 50.0)
             beta = 0.1102*(attenuation_db - 8.7);
@@ -34,6 +37,8 @@ namespace dlib
             - returns 0 otherwise
     !*/
     {
+        static_assert(std::is_floating_point<R>::value, "template parameter must be a floating point type");
+
         if (std::abs(x) <= L/R{2})
         {
             const R r = 2*x/L;
@@ -59,6 +64,7 @@ namespace dlib
             - returns kaiser_r(i - (N-1)/2, N-1, beta)
     !*/
     {
+        static_assert(std::is_floating_point<R>::value, "template parameter must be a floating point type");
         return kaiser_r(R(i) - R(N-1) / R(2), R(N-1), beta);
     }
 }
