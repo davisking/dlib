@@ -9,7 +9,6 @@ import utils
 # Paths are relative to dlib root
 image_path = "examples/faces/Tom_Cruise_avp_2014_4.jpg"
 shape_path = "tools/python/test/shape.pkl"
-face_chip_path = "tools/python/test/test_face_chip.npy"
 
 def get_test_image_and_shape():
     img = dlib.load_rgb_image(image_path)
@@ -42,21 +41,6 @@ def test_partition_pixels():
     assert(dlib.partition_pixels(img[:,:,0].astype('uint16')) == 125)
     assert(dlib.partition_pixels(img[:,:,0].astype('uint32')) == 125)
 
-
-# The tests below will be skipped if Numpy is not installed
-@pytest.mark.skipif(not utils.is_numpy_installed(), reason="requires numpy")
-def test_get_face_chip():
-    import numpy
-    face_chip = get_test_face_chip()
-    expected = numpy.load(face_chip_path)
-    assert numpy.array_equal(face_chip, expected)
-
-@pytest.mark.skipif(not utils.is_numpy_installed(), reason="requires numpy")
-def test_get_face_chips():
-    import numpy
-    face_chips = get_test_face_chips()
-    expected = numpy.load(face_chip_path)
-    assert numpy.array_equal(face_chips[0], expected)
 
 @pytest.mark.skipif(not utils.is_numpy_installed(), reason="requires numpy")
 def test_regression_issue_1220_get_face_chip():
