@@ -16,11 +16,14 @@ jobs:
   Windows:    
     runs-on: 'windows-latest'
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+    - name: Install python deps 
+      run: pip install pytest numpy 
     - name: Build
       run: python setup.py build
     - name: Test
-      run: python setup.py test 
+      run: python -m pytest --ignore docs --ignore dlib 
 
   Ubuntu:    
     runs-on: 'ubuntu-latest'
