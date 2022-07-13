@@ -2,6 +2,7 @@
  * wrtarga.c
  *
  * Copyright (C) 1991-1996, Thomas G. Lane.
+ * Modified 2015-2019 by Guido Vollbeding.
  * This file is part of the Independent JPEG Group's software.
  * For conditions of distribution and use, see the accompanying README file.
  *
@@ -73,7 +74,7 @@ write_header (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo, int num_colors)
   targaheader[17] = 0x20;	/* Top-down, non-interlaced */
 
   if (cinfo->out_color_space == JCS_GRAYSCALE) {
-    targaheader[2] = 3;		/* image type = uncompressed gray-scale */
+    targaheader[2] = 3;		/* image type = uncompressed grayscale */
     targaheader[16] = 8;	/* bits per pixel */
   } else {			/* must be RGB */
     if (num_colors > 0) {
@@ -166,19 +167,20 @@ put_demapped_gray (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo,
 METHODDEF(void)
 start_output_tga (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
 {
-  tga_dest_ptr dest = (tga_dest_ptr) dinfo;
   int num_colors, i;
   FILE *outfile;
 
-  if (cinfo->out_color_space == JCS_GRAYSCALE) {
+  switch (cinfo->out_color_space) {
+  case JCS_GRAYSCALE:
     /* Targa doesn't have a mapped grayscale format, so we will */
     /* demap quantized gray output.  Never emit a colormap. */
     write_header(cinfo, dinfo, 0);
     if (cinfo->quantize_colors)
-      dest->pub.put_pixel_rows = put_demapped_gray;
+      dinfo->put_pixel_rows = put_demapped_gray;
     else
-      dest->pub.put_pixel_rows = put_gray_rows;
-  } else if (cinfo->out_color_space == JCS_RGB) {
+      dinfo->put_pixel_rows = put_gray_rows;
+    break;
+  case JCS_RGB:
     if (cinfo->quantize_colors) {
       /* We only support 8-bit colormap indexes, so only 256 colors */
       num_colors = cinfo->actual_number_of_colors;
@@ -186,18 +188,19 @@ start_output_tga (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
 	ERREXIT1(cinfo, JERR_TOO_MANY_COLORS, num_colors);
       write_header(cinfo, dinfo, num_colors);
       /* Write the colormap.  Note Targa uses BGR byte order */
-      outfile = dest->pub.output_file;
+      outfile = dinfo->output_file;
       for (i = 0; i < num_colors; i++) {
 	putc(GETJSAMPLE(cinfo->colormap[2][i]), outfile);
 	putc(GETJSAMPLE(cinfo->colormap[1][i]), outfile);
 	putc(GETJSAMPLE(cinfo->colormap[0][i]), outfile);
       }
-      dest->pub.put_pixel_rows = put_gray_rows;
+      dinfo->put_pixel_rows = put_gray_rows;
     } else {
       write_header(cinfo, dinfo, 0);
-      dest->pub.put_pixel_rows = put_pixel_rows;
+      dinfo->put_pixel_rows = put_pixel_rows;
     }
-  } else {
+    break;
+  default:
     ERREXIT(cinfo, JERR_TGA_COLORSPACE);
   }
 }
@@ -211,8 +214,8 @@ METHODDEF(void)
 finish_output_tga (j_decompress_ptr cinfo, djpeg_dest_ptr dinfo)
 {
   /* Make sure we wrote the output file OK */
-  fflush(dinfo->output_file);
-  if (ferror(dinfo->output_file))
+  JFFLUSH(dinfo->output_file);
+  if (JFERROR(dinfo->output_file))
     ERREXIT(cinfo, JERR_FILE_WRITE);
 }
 
@@ -227,9 +230,8 @@ jinit_write_targa (j_decompress_ptr cinfo)
   tga_dest_ptr dest;
 
   /* Create module interface object, fill in method pointers */
-  dest = (tga_dest_ptr)
-      (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-				  SIZEOF(tga_dest_struct));
+  dest = (tga_dest_ptr) (*cinfo->mem->alloc_small)
+    ((j_common_ptr) cinfo, JPOOL_IMAGE, SIZEOF(tga_dest_struct));
   dest->pub.start_output = start_output_tga;
   dest->pub.finish_output = finish_output_tga;
 
@@ -238,16 +240,15 @@ jinit_write_targa (j_decompress_ptr cinfo)
 
   /* Create I/O buffer.  Note we make this near on a PC. */
   dest->buffer_width = cinfo->output_width * cinfo->output_components;
-  dest->iobuffer = (char *)
-    (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-				(size_t) (dest->buffer_width * SIZEOF(char)));
+  dest->iobuffer = (char *) (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo,
+    JPOOL_IMAGE, (size_t) dest->buffer_width * SIZEOF(char));
 
   /* Create decompressor output buffer. */
-  dest->pub.buffer = (*cinfo->mem->alloc_sarray)
-    ((j_common_ptr) cinfo, JPOOL_IMAGE, dest->buffer_width, (JDIMENSION) 1);
+  dest->pub.buffer = (*cinfo->mem->alloc_sarray) ((j_common_ptr) cinfo,
+    JPOOL_IMAGE, dest->buffer_width, (JDIMENSION) 1);
   dest->pub.buffer_height = 1;
 
-  return (djpeg_dest_ptr) dest;
+  return &dest->pub;
 }
 
 #endif /* TARGA_SUPPORTED */

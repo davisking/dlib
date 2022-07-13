@@ -2,7 +2,7 @@
  * jpegint.h
  *
  * Copyright (C) 1991-1997, Thomas G. Lane.
- * Modified 1997-2011 by Guido Vollbeding.
+ * Modified 1997-2020 by Guido Vollbeding.
  * This file is part of the Independent JPEG Group's software.
  * For conditions of distribution and use, see the accompanying README file.
  *
@@ -103,8 +103,7 @@ struct jpeg_downsampler {
 typedef JMETHOD(void, forward_DCT_ptr,
 		(j_compress_ptr cinfo, jpeg_component_info * compptr,
 		 JSAMPARRAY sample_data, JBLOCKROW coef_blocks,
-		 JDIMENSION start_row, JDIMENSION start_col,
-		 JDIMENSION num_blocks));
+		 JDIMENSION start_col, JDIMENSION num_blocks));
 
 struct jpeg_forward_dct {
   JMETHOD(void, start_pass, (j_compress_ptr cinfo));
@@ -115,7 +114,7 @@ struct jpeg_forward_dct {
 /* Entropy encoding */
 struct jpeg_entropy_encoder {
   JMETHOD(void, start_pass, (j_compress_ptr cinfo, boolean gather_statistics));
-  JMETHOD(boolean, encode_mcu, (j_compress_ptr cinfo, JBLOCKROW *MCU_data));
+  JMETHOD(boolean, encode_mcu, (j_compress_ptr cinfo, JBLOCKARRAY MCU_data));
   JMETHOD(void, finish_pass, (j_compress_ptr cinfo));
 };
 
@@ -211,8 +210,8 @@ struct jpeg_marker_reader {
 /* Entropy decoding */
 struct jpeg_entropy_decoder {
   JMETHOD(void, start_pass, (j_decompress_ptr cinfo));
-  JMETHOD(boolean, decode_mcu, (j_decompress_ptr cinfo,
-				JBLOCKROW *MCU_data));
+  JMETHOD(boolean, decode_mcu, (j_decompress_ptr cinfo, JBLOCKARRAY MCU_data));
+  JMETHOD(void, finish_pass, (j_decompress_ptr cinfo));
 };
 
 /* Inverse DCT (also performs dequantization) */
@@ -260,6 +259,19 @@ struct jpeg_color_quantizer {
 };
 
 
+/* Definition of range extension bits for decompression processes.
+ * See the comments with prepare_range_limit_table (in jdmaster.c)
+ * for more info.
+ * The recommended default value for normal applications is 2.
+ * Applications with special requirements may use a different value.
+ * For example, Ghostscript wants to use 3 for proper handling of
+ * wacky images with oversize coefficient values.
+ */
+
+#define RANGE_BITS	2
+#define RANGE_CENTER	(CENTERJSAMPLE << RANGE_BITS)
+
+
 /* Miscellaneous useful macros */
 
 #undef MAX
@@ -288,6 +300,13 @@ struct jpeg_color_quantizer {
 #define SHIFT_TEMPS
 #define RIGHT_SHIFT(x,shft)	((x) >> (shft))
 #endif
+
+/* Descale and correctly round an INT32 value that's scaled by N bits.
+ * We assume RIGHT_SHIFT rounds towards minus infinity, so adding
+ * the fudge factor is correct for either sign of X.
+ */
+
+#define DESCALE(x,n)	RIGHT_SHIFT((x) + ((INT32) 1 << ((n)-1)), n)
 
 
 /* Short forms of external names for systems with brain-damaged linkers. */
@@ -396,8 +415,8 @@ EXTERN(void) jinit_memory_mgr JPP((j_common_ptr cinfo));
 /* Utility routines in jutils.c */
 EXTERN(long) jdiv_round_up JPP((long a, long b));
 EXTERN(long) jround_up JPP((long a, long b));
-EXTERN(void) jcopy_sample_rows JPP((JSAMPARRAY input_array, int source_row,
-				    JSAMPARRAY output_array, int dest_row,
+EXTERN(void) jcopy_sample_rows JPP((JSAMPARRAY input_array,
+				    JSAMPARRAY output_array,
 				    int num_rows, JDIMENSION num_cols));
 EXTERN(void) jcopy_block_row JPP((JBLOCKROW input_row, JBLOCKROW output_row,
 				  JDIMENSION num_blocks));

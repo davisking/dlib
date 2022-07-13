@@ -16,27 +16,42 @@ jobs:
   Windows:    
     runs-on: 'windows-latest'
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+    - name: Install python deps 
+      run: pip install pytest numpy 
     - name: Build
-      run: python setup.py build
+      run: |
+        python setup.py build
+        python setup.py install --user 
     - name: Test
-      run: python setup.py test 
+      run: python -m pytest --ignore docs --ignore dlib 
 
   Ubuntu:    
     runs-on: 'ubuntu-latest'
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+    - name: Install python deps 
+      run: pip install pytest numpy 
     - name: Build
-      run: python setup.py build
+      run: |
+        python setup.py build
+        python setup.py install --user 
     - name: Test
-      run: python setup.py test 
+      run: python -m pytest --ignore docs --ignore dlib 
 
-  # we don't run python setup.py test on MacOS because there is some system
-  # issue that prevents it from running at all.
   MacOS:    
     runs-on: 'macos-latest'
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+    - name: Install python deps 
+      run: pip install pytest
     - name: Build
-      run: python setup.py build
+      run: |
+        python setup.py build
+        python setup.py install --user 
+    - name: Test
+      run: python -m pytest --ignore docs --ignore dlib 
 

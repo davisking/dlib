@@ -12,6 +12,8 @@
 
 <current>
 New Features and Improvements:
+   - Use std::chrono in console_progress_indicator to display mixed time units.
+   - Add a finish method to console_progress_indicator that will display the elapsed time.
 
 Non-Backwards Compatible Changes:
 
