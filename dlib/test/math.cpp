@@ -161,8 +161,8 @@ namespace
 
         for (size_t i = 0 ; i < 100 ; ++i)
         {
-            DLIB_TEST(std::abs(dlib::kaiser_i<R>(i, 100, 10.0) - KAISER_DATA_N_100_BETA_10[i]) < tol);
-            DLIB_TEST(std::abs(dlib::kaiser_i<R>(i, 100, attenuation_to_beta(60.0)) - KAISER_DATA_N_100_ATT_60[i]) < tol);
+            DLIB_TEST(std::abs(dlib::kaiser<R>(index_t{i}, window_length{100}, beta_t{10.0}) - KAISER_DATA_N_100_BETA_10[i]) < tol);
+            DLIB_TEST(std::abs(dlib::kaiser<R>(index_t{i}, window_length{100}, attenuation_t{60.0}) - KAISER_DATA_N_100_ATT_60[i]) < tol);
         }
     }
 

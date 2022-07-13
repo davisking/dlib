@@ -8,42 +8,87 @@
 
 namespace dlib
 {
-    template<typename R>
-    inline R attenuation_to_beta(R attenuation_db)
+    /*! Strong types !*/
+
+    struct attenuation_t
     /*!
-        This function converts a desired attenuation value (in dB) to a beta value,
-        which can be passed to either kaiser_i() or kaiser_r().
-        This function is useful in filter design.
+        This object represents a desired attenuation in dB.
+        This is automatically converted into a beta_t value suitable
+        for constructing a kaiser window.
+        See https://www.mathworks.com/help/signal/ug/kaiser-window.html on
+        filter design
     !*/
     {
-        static_assert(std::is_floating_point<R>::value, "template parameter must be a floating point type");
+        explicit attenuation_t(double attenuation_db) : v{attenuation_db} {}
+        double v = 0.0;
+    };
 
-        R beta{0};
-        if (attenuation_db > 50.0)
-            beta = 0.1102*(attenuation_db - 8.7);
-        else if (attenuation_db >= 21.0)
-            beta = 0.5842*std::pow(attenuation_db - 21, 0.4) + 0.07886*(attenuation_db - 21);
-        return beta;
-    }
+    struct beta_t
+    /*!
+        This value determines the shape of the kaiser window.
+        See https://en.wikipedia.org/wiki/Kaiser_window#Definition for more details
+    !*/
+    {
+        explicit beta_t(double beta) : v{beta} {}
+        beta_t(attenuation_t attenuation_db)
+        {
+            if (attenuation_db.v > 50.0)
+                v = 0.1102*(attenuation_db.v - 8.7);
+            else if (attenuation_db.v >= 21.0)
+                v = 0.5842*std::pow(attenuation_db.v - 21, 0.4) + 0.07886*(attenuation_db.v - 21);
+        }
+        double v = 0.0;
+    };
+
+    struct index_t
+    /*!
+        This object is a strong type representing an array index.
+        It is suitable for distinguishing which overload of the kaiser()
+        function should be used.
+    !*/
+    {
+        explicit index_t(std::size_t i_) : i{i_} {}
+        std::size_t i = 0;
+    };
+
+    struct window_duration
+    /*!
+        This ojbect is a strong type representing the window duration of a kaiser window.
+        See https://en.wikipedia.org/wiki/Kaiser_window.
+    !*/
+    {
+        explicit window_duration(double L_) : L{L_} {}
+        double L = 0.0;
+    };
+
+    struct window_length
+    /*!
+        This ojbect is a strong type representing the window length of a kaiser window.
+        See https://en.wikipedia.org/wiki/Kaiser_window.
+    !*/
+    {
+        explicit window_length(std::size_t N_) : N{N_} {}
+        std::size_t N = 0;
+    };
 
     template<typename R>
-    inline R kaiser_r(R x, R L, R beta)
+    inline R kaiser(R x, window_duration L, beta_t beta)
     /*!
         This computes the kaiser window function or kaiser-bessel window function.
         See https://en.wikipedia.org/wiki/Kaiser_window
 
         ensures
-            - returns the kaiser window function when |x| <= L/2 where L is the window length
+            - returns the kaiser window function when |x| <= L/2 where L is the window duration
             - returns 0 otherwise
     !*/
     {
         static_assert(std::is_floating_point<R>::value, "template parameter must be a floating point type");
 
-        if (std::abs(x) <= L/R{2})
+        if (std::abs(x) <= L.L/R{2})
         {
-            const R r = 2*x/L;
-            const R a = dlib::cyl_bessel_i(0, beta*sqrt(1-r*r));
-            const R b = dlib::cyl_bessel_i(0, beta);
+            const R r = 2*x/L.L;
+            const R a = dlib::cyl_bessel_i(0, beta.v*sqrt(1-r*r));
+            const R b = dlib::cyl_bessel_i(0, beta.v);
             return a / b;
         }
         else
@@ -53,7 +98,7 @@ namespace dlib
     }
 
     template<typename R>
-    inline R kaiser_i(std::size_t i, std::size_t N, R beta)
+    inline R kaiser(index_t i, window_length N, beta_t beta)
     /*!
         This computes the kaiser window function or kaiser-bessel window function.
         See https://en.wikipedia.org/wiki/Kaiser_window
@@ -65,7 +110,7 @@ namespace dlib
     !*/
     {
         static_assert(std::is_floating_point<R>::value, "template parameter must be a floating point type");
-        return kaiser_r(R(i) - R(N-1) / R(2), R(N-1), beta);
+        return kaiser(R(i.i) - R(N.N-1) / R(2), window_duration{R(N.N-1)}, beta);
     }
 }
 
