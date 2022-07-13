@@ -22,7 +22,7 @@
           representations as: C = trans(ZA) * ZB.
         - make C as close as possible to the identity matrix.
 
-    This removes the redundancy of the feature representations, by maximizing the
+    This removes the redundancy of the feature representations by maximizing the
     encoded information about the images themselves, while minimizing the information
     about the transforms and data augmentations used to obtain the representations.
 
