@@ -4,6 +4,6 @@
 #define DLIB_MATH
 
 #include "math/bessel.h"
-#include "math/kaiser.h"
+#include "math/windows.h"
 
 #endif //DLIB_MATH
