@@ -32,6 +32,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
+    - name: Install python deps 
+      run: pip install pytest numpy 
     - name: Build
       run: |
         python setup.py build
@@ -44,6 +46,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
+    - name: Install python deps 
+      run: pip install pytest
     - name: Build
       run: |
         python setup.py build
