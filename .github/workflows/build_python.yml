@@ -21,7 +21,9 @@ jobs:
     - name: Install python deps 
       run: pip install pytest numpy 
     - name: Build
-      run: python setup.py build
+      run: |
+        python setup.py build
+        python setup.py install --user 
     - name: Test
       run: python -m pytest --ignore docs --ignore dlib 
 
