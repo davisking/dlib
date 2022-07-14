@@ -28,8 +28,8 @@ namespace dlib
         const_ret_type apply(long r, long c) const                                              \
         {                                                                                       \
             const type win = is_symmetric ?                                                     \
-                   hann<type>(index_t{std::size_t(r*this->m.nc()+c)}, window_length{(std::size_t)this->m.size()}, symmetric_t{}) : \
-                   hann<type>(index_t{std::size_t(r*this->m.nc()+c)}, window_length{(std::size_t)this->m.size()}, periodic_t{})  ; \
+                   function<type>(index_t{std::size_t(r*this->m.nc()+c)}, window_length{(std::size_t)this->m.size()}, symmetric_t{}) : \
+                   function<type>(index_t{std::size_t(r*this->m.nc()+c)}, window_length{(std::size_t)this->m.size()}, periodic_t{})  ; \
             return win * this->m(r,c);                                                          \
         }                                                                                       \
     };                                                                                          \

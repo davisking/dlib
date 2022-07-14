@@ -93,6 +93,7 @@ set (tests
    matrix_eig.cpp
    matrix_lu.cpp
    matrix_qr.cpp
+   matrix_windows.cpp
    max_cost_assignment.cpp
    max_sum_submatrix.cpp
    md5.cpp
