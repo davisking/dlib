@@ -243,7 +243,7 @@ namespace dlib
     // ----------------------------------------------------------------------------------------
 
     template<typename R>
-    R blackman_nutall(index_t i, window_length N, symmetric_t)
+    R blackman_nuttall(index_t i, window_length N, symmetric_t)
     /*!
         This computes the Blackman-Nuttall window function.
         See https://en.wikipedia.org/wiki/Window_function#Blackman%E2%80%93Nuttall_window.
@@ -264,7 +264,7 @@ namespace dlib
     }
 
     template<typename R>
-    R blackman_nutall(index_t i, window_length N, periodic_t)
+    R blackman_nuttall(index_t i, window_length N, periodic_t)
     /*!
         This computes the Blackman-Nuttall window function.
         See https://en.wikipedia.org/wiki/Window_function#Blackman%E2%80%93Nuttall_window.
@@ -275,7 +275,7 @@ namespace dlib
             - 0 <= i < N
     !*/
     {
-        return blackman_nutall<R>(i, window_length{N.N+1}, symmetric_t{});
+        return blackman_nuttall<R>(i, window_length{N.N+1}, symmetric_t{});
     }
 
     // ----------------------------------------------------------------------------------------

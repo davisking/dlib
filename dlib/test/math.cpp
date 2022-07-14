@@ -392,8 +392,8 @@ namespace
 
         for (size_t i = 0 ; i < 100 ; ++i)
         {
-            DLIB_TEST(std::abs(dlib::blackman_nutall<R>(index_t{i}, window_length{100}, symmetric_t{}) - NUTTALL_SYMMETRIC[i]) < tol);
-            DLIB_TEST(std::abs(dlib::blackman_nutall<R>(index_t{i}, window_length{100}, periodic_t{}) - NUTTALL_PERIODIC[i]) < tol);
+            DLIB_TEST(std::abs(dlib::blackman_nuttall<R>(index_t{i}, window_length{100}, symmetric_t{}) - NUTTALL_SYMMETRIC[i]) < tol);
+            DLIB_TEST(std::abs(dlib::blackman_nuttall<R>(index_t{i}, window_length{100}, periodic_t{}) - NUTTALL_PERIODIC[i]) < tol);
         }
     }
 
