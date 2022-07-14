@@ -171,6 +171,41 @@ namespace dlib
     // ----------------------------------------------------------------------------------------
 
     template<typename R>
+    R hann(index_t i, window_length N, symmetric_t)
+    /*!
+        This computes the hann window function.
+        See https://en.wikipedia.org/wiki/Window_function#Hann_and_Hamming_windows.
+        This variant computes a symmetric window.
+
+        requires
+            - R is float, double, or long double
+            - 0 <= i < N
+    !*/
+    {
+        static_assert(std::is_floating_point<R>::value, "template parameter must be a floating point type");
+        DLIB_ASSERT(i.i < N.N, "index out of range");
+        const R phi = (2.0 * pi * i.i) / (N.N - 1);
+        return 0.5 - 0.5 * std::cos(phi);
+    }
+
+    template<typename R>
+    R hann(index_t i, window_length N, periodic_t)
+    /*!
+        This computes the hann window function.
+        See https://en.wikipedia.org/wiki/Window_function#Hann_and_Hamming_windows.
+        This variant computes a periodic window.
+
+        requires
+            - R is float, double, or long double
+            - 0 <= i < N
+    !*/
+    {
+        return hann<R>(i, window_length{N.N+1}, symmetric_t{});
+    }
+
+    // ----------------------------------------------------------------------------------------
+
+    template<typename R>
     R blackman(index_t i, window_length N, symmetric_t)
     /*!
         This computes the Blackman window function.
