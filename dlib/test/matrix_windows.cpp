@@ -32,6 +32,21 @@ namespace
     DLIB_DEFINE_WINDOW_TEST(blackman_harris)
     DLIB_DEFINE_WINDOW_TEST(blackman_harris7)
 
+    template<typename R>
+    void test_kaiser()
+    {
+        matrix<R> win1 = kaiser(ones_matrix<R>(1, 100), attenuation_t{60.0}, symmetric_t{});
+        matrix<R> win2(1, 100);
+        for (long i = 0; i < win2.size() ; ++i)
+            win2(0, i) = kaiser<R>(index_t{std::size_t(i)}, window_length{std::size_t(win2.size())}, attenuation_t{60.0}, symmetric_t{});
+        DLIB_TEST(win1 == win2);
+
+        win1 = kaiser(ones_matrix<R>(1, 100), attenuation_t{60.0}, periodic_t{});
+        for (long i = 0; i < win2.size() ; ++i)
+            win2(0, i) = kaiser<R>(index_t{std::size_t(i)}, window_length{std::size_t(win2.size())}, attenuation_t{60.0}, periodic_t{});
+        DLIB_TEST(win1 == win2);
+    };
+
     class matrix_window_tester : public tester
     {
     public:
@@ -42,8 +57,8 @@ namespace
         void perform_test (
         )
         {
-//            test_kaiser<float>();
-//            test_kaiser<double>();
+            test_kaiser<float>();
+            test_kaiser<double>();
             test_hann<float>();
             test_hann<double>();
             test_blackman<float>();

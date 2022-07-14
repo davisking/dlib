@@ -120,7 +120,7 @@ namespace dlib
         if (std::abs(x) <= L.L/R{2})
         {
             const R r = 2*x/L.L;
-            const R a = dlib::cyl_bessel_i(0, beta.v*sqrt(1-r*r));
+            const R a = dlib::cyl_bessel_i(0, beta.v*std::sqrt(1-r*r));
             const R b = dlib::cyl_bessel_i(0, beta.v);
             return a / b;
         }
