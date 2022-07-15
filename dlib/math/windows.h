@@ -46,7 +46,7 @@ namespace dlib
         double v = 0.0;
     };
 
-    enum WindowType
+    enum WindowSymmetry
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -90,7 +90,7 @@ namespace dlib
     }
 
     template<typename R>
-    R kaiser(std::size_t i, std::size_t N, beta_t beta, WindowType type)
+    R kaiser(std::size_t i, std::size_t N, beta_t beta, WindowSymmetry type)
     /*!
         This computes the kaiser window function or kaiser-bessel window function.
         See https://en.wikipedia.org/wiki/Kaiser_window
@@ -113,7 +113,7 @@ namespace dlib
     // ----------------------------------------------------------------------------------------
 
     template<typename R>
-    R hann(std::size_t i, std::size_t N, WindowType type)
+    R hann(std::size_t i, std::size_t N, WindowSymmetry type)
     /*!
         This computes the hann window function.
         See https://en.wikipedia.org/wiki/Window_function#Hann_and_Hamming_windows.
@@ -133,7 +133,7 @@ namespace dlib
     // ----------------------------------------------------------------------------------------
 
     template<typename R>
-    R blackman(std::size_t i, std::size_t N, WindowType type)
+    R blackman(std::size_t i, std::size_t N, WindowSymmetry type)
     /*!
         This computes the Blackman window function.
         See https://en.wikipedia.org/wiki/Window_function#Blackman_window and
@@ -156,7 +156,7 @@ namespace dlib
     // ----------------------------------------------------------------------------------------
 
     template<typename R>
-    R blackman_nuttall(std::size_t i, std::size_t N, WindowType type)
+    R blackman_nuttall(std::size_t i, std::size_t N, WindowSymmetry type)
     /*!
         This computes the Blackman-Nuttall window function.
         See https://en.wikipedia.org/wiki/Window_function#Blackman%E2%80%93Nuttall_window.
@@ -179,7 +179,7 @@ namespace dlib
     // ----------------------------------------------------------------------------------------
 
     template<typename R>
-    R blackman_harris(std::size_t i, std::size_t N, WindowType type)
+    R blackman_harris(std::size_t i, std::size_t N, WindowSymmetry type)
     /*!
         This computes the Blackman-Harris window function.
         See https://en.wikipedia.org/wiki/Window_function#Blackman%E2%80%93Harris_window.
@@ -202,7 +202,7 @@ namespace dlib
     // ----------------------------------------------------------------------------------------
 
     template<typename R>
-    R blackman_harris7(std::size_t i, std::size_t N, WindowType type)
+    R blackman_harris7(std::size_t i, std::size_t N, WindowSymmetry type)
     /*!
         This computes the 7-order Blackman-Harris window function.
 
@@ -226,7 +226,7 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-    enum Window
+    enum WindowType
     {
         HANN,
         BLACKMAN,
@@ -244,7 +244,7 @@ namespace dlib
     };
 
     template<typename R>
-    R window(std::size_t i, std::size_t N, Window w, WindowType type, window_args args)
+    R window(std::size_t i, std::size_t N, WindowType w, WindowSymmetry type, window_args args)
     {
         switch(w)
         {
