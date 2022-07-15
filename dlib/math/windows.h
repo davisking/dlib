@@ -22,6 +22,7 @@ namespace dlib
                 See https://www.mathworks.com/help/signal/ug/kaiser-window.html on
                 filter design.
         !*/
+        attenuation_t() = default;
         explicit attenuation_t(double attenuation_db) : v{attenuation_db} {}
         double v = 0.0;
     };
@@ -33,6 +34,7 @@ namespace dlib
                 This value determines the shape of the kaiser window.
                 See https://en.wikipedia.org/wiki/Kaiser_window#Definition for more details.
         !*/
+        beta_t() = default;
         explicit beta_t(double beta) : v{beta} {}
         beta_t(attenuation_t attenuation_db)
         {
@@ -44,66 +46,23 @@ namespace dlib
         double v = 0.0;
     };
 
-    struct index_t
+    enum WindowType
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object is a strong type representing an array index.
-                It is suitable for distinguishing which overload of the kaiser()
-                function should be used.
-        !*/
-        explicit index_t(std::size_t i_) : i{i_} {}
-        std::size_t i = 0;
-    };
-
-    struct window_duration
-    {
-        /*!
-            WHAT THIS OBJECT REPRESENTS
-                This ojbect is a strong type representing the window duration of a kaiser window.
-                See https://en.wikipedia.org/wiki/Kaiser_window.
-        !*/
-        explicit window_duration(double L_) : L{L_} {}
-        double L = 0.0;
-    };
-
-    struct window_length
-    {
-        /*!
-            WHAT THIS OBJECT REPRESENTS
-                This ojbect is a strong type representing the window length of a kaiser window.
-                See https://en.wikipedia.org/wiki/Kaiser_window.
-        !*/
-        explicit window_length(std::size_t N_) : N{N_} {}
-        std::size_t N = 0;
-    };
-
-    struct symmetric_t
-    {
-        /*!
-            WHAT THIS OBJECT REPRESENTS
-                This object is a strong type that signifies that the window is a symmetric window.
+                This enum controls whether the window is a symmetric or periodic window.
                 See https://en.wikipedia.org/wiki/Window_function#Symmetry for a discussion on
                 symmetric vs periodic windows. This is using the same nomenclature as Matlab and Scipy
                 when describing windows as either symmetric or periodic.
         !*/
-    };
-
-    struct periodic_t
-    {
-        /*!
-            WHAT THIS OBJECT REPRESENTS
-                This object is a strong type that signifies that the window is a periodic window.
-                See https://en.wikipedia.org/wiki/Window_function#Symmetry for a discussion on
-                symmetric vs periodic windows. This is using the same nomenclature as Matlab and Scipy
-                when describing windows as either symmetric or periodic.
-        !*/
+        SYMMETRIC,
+        PERIODIC
     };
 
     // ----------------------------------------------------------------------------------------
 
     template<typename R>
-    R kaiser(R x, window_duration L, beta_t beta)
+    R kaiser(R x, R L, beta_t beta)
     /*!
         This computes the kaiser window function or kaiser-bessel window function.
         See https://en.wikipedia.org/wiki/Kaiser_window.
@@ -117,9 +76,9 @@ namespace dlib
     {
         static_assert(std::is_floating_point<R>::value, "template parameter must be a floating point type");
 
-        if (std::abs(x) <= L.L/R{2})
+        if (std::abs(x) <= L/R{2})
         {
-            const R r = 2*x/L.L;
+            const R r = 2*x/L;
             const R a = dlib::cyl_bessel_i(0, beta.v*std::sqrt(1-r*r));
             const R b = dlib::cyl_bessel_i(0, beta.v);
             return a / b;
@@ -131,51 +90,33 @@ namespace dlib
     }
 
     template<typename R>
-    R kaiser(index_t i, window_length N, beta_t beta, symmetric_t)
+    R kaiser(std::size_t i, std::size_t N, beta_t beta, WindowType type)
     /*!
         This computes the kaiser window function or kaiser-bessel window function.
         See https://en.wikipedia.org/wiki/Kaiser_window
         This variant is a short-cut for computing a window function and storing it
         in an array of size N where 0 <= i < N is the array index.
-        This is the symmetric version.
 
         requires
             - R is float, double, or long double
             - 0 <= i < N
         ensures
-            - returns kaiser(i - (N-1)/2, window_duration{N.N-1}, beta)
+            - returns kaiser(i - (N-1)/2, window_duration{N-1}, beta)
     !*/
     {
         static_assert(std::is_floating_point<R>::value, "template parameter must be a floating point type");
-        DLIB_ASSERT(i.i < N.N, "index out of range");
-        return kaiser(R(i.i) - R(N.N-1) / R(2), window_duration{R(N.N-1)}, beta);
-    }
-
-    template<typename R>
-    R kaiser(index_t i, window_length N, beta_t beta, periodic_t)
-    /*!
-        This computes the kaiser window function or kaiser-bessel window function.
-        See https://en.wikipedia.org/wiki/Kaiser_window
-        This variant is a short-cut for computing a window function and storing it
-        in an array of size N where 0 <= i < N is the array index.
-        This is the periodic version.
-
-        requires
-            - R is float, double, or long double
-            - 0 <= i < N
-    !*/
-    {
-        return kaiser<R>(i, window_length{N.N+1}, beta, symmetric_t{});
+        DLIB_ASSERT(i < N, "index out of range");
+        const std::size_t size = type == SYMMETRIC ? N-1 : N;
+        return kaiser(R(i) - R(size) / R(2), R(size), beta);
     }
 
     // ----------------------------------------------------------------------------------------
 
     template<typename R>
-    R hann(index_t i, window_length N, symmetric_t)
+    R hann(std::size_t i, std::size_t N, WindowType type)
     /*!
         This computes the hann window function.
         See https://en.wikipedia.org/wiki/Window_function#Hann_and_Hamming_windows.
-        This variant computes a symmetric window.
 
         requires
             - R is float, double, or long double
@@ -183,35 +124,20 @@ namespace dlib
     !*/
     {
         static_assert(std::is_floating_point<R>::value, "template parameter must be a floating point type");
-        DLIB_ASSERT(i.i < N.N, "index out of range");
-        const R phi = (2.0 * pi * i.i) / (N.N - 1);
+        DLIB_ASSERT(i < N, "index out of range");
+        const std::size_t size = type == SYMMETRIC ? N-1 : N;
+        const R phi = (2.0 * pi * i) / size;
         return 0.5 - 0.5 * std::cos(phi);
     }
 
-    template<typename R>
-    R hann(index_t i, window_length N, periodic_t)
-    /*!
-        This computes the hann window function.
-        See https://en.wikipedia.org/wiki/Window_function#Hann_and_Hamming_windows.
-        This variant computes a periodic window.
-
-        requires
-            - R is float, double, or long double
-            - 0 <= i < N
-    !*/
-    {
-        return hann<R>(i, window_length{N.N+1}, symmetric_t{});
-    }
-
     // ----------------------------------------------------------------------------------------
 
     template<typename R>
-    R blackman(index_t i, window_length N, symmetric_t)
+    R blackman(std::size_t i, std::size_t N, WindowType type)
     /*!
         This computes the Blackman window function.
         See https://en.wikipedia.org/wiki/Window_function#Blackman_window and
         https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.windows.blackman.html.
-        This variant computes a symmetric window.
 
         requires
             - R is float, double, or long double
@@ -219,35 +145,21 @@ namespace dlib
     !*/
     {
         static_assert(std::is_floating_point<R>::value, "template parameter must be a floating point type");
-        DLIB_ASSERT(i.i < N.N, "index out of range");
-        const R phi = (2.0 * pi * i.i) / (N.N - 1);
+        DLIB_ASSERT(i < N, "index out of range");
+        const std::size_t size = type == SYMMETRIC ? N-1 : N;
+        const R phi = (2.0 * pi * i) / size;
         return 0.42 -
                0.5 * std::cos(phi) +
                0.08 * std::cos(2.0 * phi);
     }
 
-    template<typename R>
-    R blackman(index_t i, window_length N, periodic_t)
-    /*!
-        This computes the Blackman window function.
-        This variant computes a periodic window.
-
-        requires
-            - R is float, double, or long double
-            - 0 <= i < N
-    !*/
-    {
-        return blackman<R>(i, window_length{N.N+1}, symmetric_t{});
-    }
-
     // ----------------------------------------------------------------------------------------
 
     template<typename R>
-    R blackman_nuttall(index_t i, window_length N, symmetric_t)
+    R blackman_nuttall(std::size_t i, std::size_t N, WindowType type)
     /*!
         This computes the Blackman-Nuttall window function.
         See https://en.wikipedia.org/wiki/Window_function#Blackman%E2%80%93Nuttall_window.
-        This is the symmetric version.
 
         requires
             - R is float, double, or long double
@@ -255,37 +167,22 @@ namespace dlib
     !*/
     {
         static_assert(std::is_floating_point<R>::value, "template parameter must be a floating point type");
-        DLIB_ASSERT(i.i < N.N, "index out of range");
-        const R phi = (2.0 * pi * i.i) / (N.N - 1);
+        DLIB_ASSERT(i < N, "index out of range");
+        const std::size_t size = type == SYMMETRIC ? N-1 : N;
+        const R phi = (2.0 * pi * i) / size;
         return 0.3635819 -
                0.4891775 * std::cos(phi) +
                0.1365995 * std::cos(2*phi) -
                0.0106411 * std::cos(3*phi);
     }
 
-    template<typename R>
-    R blackman_nuttall(index_t i, window_length N, periodic_t)
-    /*!
-        This computes the Blackman-Nuttall window function.
-        See https://en.wikipedia.org/wiki/Window_function#Blackman%E2%80%93Nuttall_window.
-        This is the periodic version.
-
-        requires
-            - R is float, double, or long double
-            - 0 <= i < N
-    !*/
-    {
-        return blackman_nuttall<R>(i, window_length{N.N+1}, symmetric_t{});
-    }
-
     // ----------------------------------------------------------------------------------------
 
     template<typename R>
-    R blackman_harris(index_t i, window_length N, symmetric_t)
+    R blackman_harris(std::size_t i, std::size_t N, WindowType type)
     /*!
         This computes the Blackman-Harris window function.
         See https://en.wikipedia.org/wiki/Window_function#Blackman%E2%80%93Harris_window.
-        This is the symmetric version.
 
         requires
             - R is float, double, or long double
@@ -293,36 +190,21 @@ namespace dlib
     !*/
     {
         static_assert(std::is_floating_point<R>::value, "template parameter must be a floating point type");
-        DLIB_ASSERT(i.i < N.N, "index out of range");
-        const R phi = (2.0 * pi * i.i) / (N.N - 1);
+        DLIB_ASSERT(i < N, "index out of range");
+        const std::size_t size = type == SYMMETRIC ? N-1 : N;
+        const R phi = (2.0 * pi * i) / size;
         return 0.35875 -
                0.48829 * std::cos(phi) +
                0.14128 * std::cos(2*phi) -
                0.01168 * std::cos(3*phi);
     }
 
-    template<typename R>
-    R blackman_harris(index_t i, window_length N, periodic_t)
-    /*!
-        This computes the Blackman-Harris window function.
-        See https://en.wikipedia.org/wiki/Window_function#Blackman%E2%80%93Harris_window.
-        This is the periodic version.
-
-        requires
-            - R is float, double, or long double
-            - 0 <= i < N
-    !*/
-    {
-        return blackman_harris<R>(i, window_length{N.N+1}, symmetric_t{});
-    }
-
     // ----------------------------------------------------------------------------------------
 
     template<typename R>
-    R blackman_harris7(index_t i, window_length N, symmetric_t)
+    R blackman_harris7(std::size_t i, std::size_t N, WindowType type)
     /*!
         This computes the 7-order Blackman-Harris window function.
-        This is the symmetric version.
 
         requires
             - R is float, double, or long double
@@ -330,8 +212,9 @@ namespace dlib
     !*/
     {
         static_assert(std::is_floating_point<R>::value, "template parameter must be a floating point type");
-        DLIB_ASSERT(i.i < N.N, "index out of range");
-        const R phi = (2.0 * pi * i.i) / (N.N - 1);
+        DLIB_ASSERT(i < N, "index out of range");
+        const std::size_t size = type == SYMMETRIC ? N-1 : N;
+        const R phi = (2.0 * pi * i) / size;
         return 0.27105 -
                0.43329 * std::cos(phi) +
                0.21812 * std::cos(2*phi) -
@@ -341,18 +224,38 @@ namespace dlib
                0.00001 * std::cos(6*phi);
     }
 
-    template<typename R>
-    R blackman_harris7(index_t i, window_length N, periodic_t)
-    /*!
-        This computes the 7-order Blackman-Harris window function.
-        This is the periodic version.
+    // ----------------------------------------------------------------------------------------
 
-        requires
-            - R is float, double, or long double
-            - 0 <= i < N
-    !*/
+    enum Window
     {
-        return blackman_harris7<R>(i, window_length{N.N+1}, symmetric_t{});
+        HANN,
+        BLACKMAN,
+        BLACKMAN_NUTTALL,
+        BLACKMAN_HARRIS,
+        BLACKMAN_HARRIS7,
+        KAISER
+        //GAUSSIAN
+    };
+
+    struct window_args
+    {
+        beta_t beta;
+        //sigma_t sigma; //for GAUSSIAN
+    };
+
+    template<typename R>
+    R window(std::size_t i, std::size_t N, Window w, WindowType type, window_args args)
+    {
+        switch(w)
+        {
+            case HANN:              return hann<R>(i, N, type);
+            case BLACKMAN:          return blackman<R>(i, N, type);
+            case BLACKMAN_NUTTALL:  return blackman_nuttall<R>(i, N, type);
+            case BLACKMAN_HARRIS:   return blackman_harris<R>(i, N, type);
+            case BLACKMAN_HARRIS7:  return blackman_harris7<R>(i, N, type);
+            case KAISER:            return kaiser<R>(i, N, args.beta, type);
+        }
+        return R{};
     }
 
     // ----------------------------------------------------------------------------------------

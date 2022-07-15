@@ -185,9 +185,9 @@ namespace
 
         for (size_t i = 0 ; i < 100 ; ++i)
         {
-            DLIB_TEST(std::abs(dlib::kaiser<R>(index_t{i}, window_length{100}, beta_t{10.0}, symmetric_t{}) - KAISER_DATA_N_100_BETA_10[i]) < tol);
-            DLIB_TEST(std::abs(dlib::kaiser<R>(index_t{i}, window_length{100}, attenuation_t{60.0}, symmetric_t{}) - KAISER_DATA_N_100_ATT_60_SYMMETRIC[i]) < tol);
-            DLIB_TEST(std::abs(dlib::kaiser<R>(index_t{i}, window_length{100}, attenuation_t{60.0}, periodic_t{}) - KAISER_DATA_N_100_ATT_60_PERIODIC[i]) < tol);
+            DLIB_TEST(std::abs(dlib::kaiser<R>(i, 100, beta_t{10.0}, SYMMETRIC) - KAISER_DATA_N_100_BETA_10[i]) < tol);
+            DLIB_TEST(std::abs(dlib::kaiser<R>(i, 100, attenuation_t{60.0}, SYMMETRIC) - KAISER_DATA_N_100_ATT_60_SYMMETRIC[i]) < tol);
+            DLIB_TEST(std::abs(dlib::kaiser<R>(i, 100, attenuation_t{60.0}, PERIODIC) - KAISER_DATA_N_100_ATT_60_PERIODIC[i]) < tol);
         }
     }
 
@@ -251,8 +251,8 @@ namespace
 
         for (size_t i = 0 ; i < 100 ; ++i)
         {
-            DLIB_TEST(std::abs(dlib::hann<R>(index_t{i}, window_length{100}, symmetric_t{}) - HANN_SYMMETRIC[i]) < tol);
-            DLIB_TEST(std::abs(dlib::hann<R>(index_t{i}, window_length{100}, periodic_t{}) - HANN_PERIODIC[i]) < tol);
+            DLIB_TEST(std::abs(dlib::hann<R>(i, 100, SYMMETRIC) - HANN_SYMMETRIC[i]) < tol);
+            DLIB_TEST(std::abs(dlib::hann<R>(i, 100, PERIODIC) - HANN_PERIODIC[i]) < tol);
         }
     }
 
@@ -322,8 +322,8 @@ namespace
 
         for (size_t i = 0 ; i < 100 ; ++i)
         {
-            DLIB_TEST(std::abs(dlib::blackman<R>(index_t{i}, window_length{100}, symmetric_t{}) - BLACKMAN_SYMMETRIC[i]) < tol);
-            DLIB_TEST(std::abs(dlib::blackman<R>(index_t{i}, window_length{100}, periodic_t{}) - BLACKMAN_PERIODIC[i]) < tol);
+            DLIB_TEST(std::abs(dlib::blackman<R>(i, 100, SYMMETRIC) - BLACKMAN_SYMMETRIC[i]) < tol);
+            DLIB_TEST(std::abs(dlib::blackman<R>(i, 100, PERIODIC) - BLACKMAN_PERIODIC[i]) < tol);
         }
     }
 
@@ -392,8 +392,8 @@ namespace
 
         for (size_t i = 0 ; i < 100 ; ++i)
         {
-            DLIB_TEST(std::abs(dlib::blackman_nuttall<R>(index_t{i}, window_length{100}, symmetric_t{}) - NUTTALL_SYMMETRIC[i]) < tol);
-            DLIB_TEST(std::abs(dlib::blackman_nuttall<R>(index_t{i}, window_length{100}, periodic_t{}) - NUTTALL_PERIODIC[i]) < tol);
+            DLIB_TEST(std::abs(dlib::blackman_nuttall<R>(i, 100, SYMMETRIC) - NUTTALL_SYMMETRIC[i]) < tol);
+            DLIB_TEST(std::abs(dlib::blackman_nuttall<R>(i, 100, PERIODIC) - NUTTALL_PERIODIC[i]) < tol);
         }
     }
 
@@ -462,8 +462,8 @@ namespace
 
         for (size_t i = 0 ; i < 100 ; ++i)
         {
-            DLIB_TEST(std::abs(dlib::blackman_harris<R>(index_t{i}, window_length{100}, symmetric_t{}) - BLACKHARRIS_SYMMETRIC[i]) < tol);
-            DLIB_TEST(std::abs(dlib::blackman_harris<R>(index_t{i}, window_length{100}, periodic_t{}) - BLACKHARRIS_PERIODIC[i]) < tol);
+            DLIB_TEST(std::abs(dlib::blackman_harris<R>(i, 100, SYMMETRIC) - BLACKHARRIS_SYMMETRIC[i]) < tol);
+            DLIB_TEST(std::abs(dlib::blackman_harris<R>(i, 100, PERIODIC) - BLACKHARRIS_PERIODIC[i]) < tol);
         }
     }
 
