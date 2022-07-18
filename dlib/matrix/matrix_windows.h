@@ -16,7 +16,8 @@ namespace dlib
     template <typename M>                                                                       \
     struct op_##function: basic_op_m<M>                                                         \
     {                                                                                           \
-        typedef typename M::type type;                                                          \
+        using type = typename M::type;                                                          \
+        using R    = remove_complex_t<type>;                                                    \
                                                                                                 \
         op_##function(const M& m_, WindowSymmetry type_) : basic_op_m<M>(m_), t{type_}          \
         {DLIB_ASSERT(is_vector(m_), "matrix expression must be a vector");}                     \
@@ -27,7 +28,7 @@ namespace dlib
         typedef type const_ret_type;                                                            \
         const_ret_type apply(long r, long c) const                                              \
         {                                                                                       \
-            return function<type>(std::size_t(r*this->m.nc()+c), (std::size_t)this->m.size(), t) * this->m(r,c); \
+            return function<R>(std::size_t(r*this->m.nc()+c), (std::size_t)this->m.size(), t) * this->m(r,c); \
         }                                                                                       \
     };                                                                                          \
                                                                                                 \
@@ -54,7 +55,8 @@ namespace dlib
     template <typename M>
     struct op_kaiser : basic_op_m<M>
     {
-        typedef typename M::type type;
+        using type = typename M::type;
+        using R    = remove_complex_t<type>;
 
         op_kaiser(const M& m_, beta_t beta_, WindowSymmetry type_) : basic_op_m<M>(m_), beta{beta_}, t{type_}
         {DLIB_ASSERT(is_vector(m_), "matrix expression must be a vector");}
@@ -66,7 +68,7 @@ namespace dlib
         typedef type const_ret_type;
         const_ret_type apply(long r, long c) const
         {
-            return kaiser<type>(std::size_t(r*this->m.nc()+c), (std::size_t)this->m.size(), beta, t) * this->m(r,c);
+            return kaiser<R>(std::size_t(r*this->m.nc()+c), (std::size_t)this->m.size(), beta, t) * this->m(r,c);
         }
     };
 
@@ -86,7 +88,8 @@ namespace dlib
     template <typename M>
     struct op_window : basic_op_m<M>
     {
-        typedef typename M::type type;
+        using type = typename M::type;
+        using R    = remove_complex_t<type>;
 
         op_window(const M& m_, WindowType w_, WindowSymmetry type_, window_args args_) : basic_op_m<M>(m_), w{w_}, t{type_}, args{args_}
         {DLIB_ASSERT(is_vector(m_), "matrix expression must be a vector");}
@@ -99,7 +102,7 @@ namespace dlib
         typedef type const_ret_type;
         const_ret_type apply(long r, long c) const
         {
-            return window<type>(std::size_t(r*this->m.nc()+c), (std::size_t)this->m.size(), w, t, args) * this->m(r,c);
+            return window<R>(std::size_t(r*this->m.nc()+c), (std::size_t)this->m.size(), w, t, args) * this->m(r,c);
         }
     };
 
