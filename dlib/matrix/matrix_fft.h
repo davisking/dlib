@@ -165,7 +165,7 @@ namespace dlib
         //real FFT for expression template
         static_assert(std::is_floating_point<typename EXP::type>::value, "input should be real");
         matrix<typename EXP::type> in(data);
-        return fft(in);
+        return fftr(in);
     }
     
 // ----------------------------------------------------------------------------------------
