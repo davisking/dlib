@@ -590,9 +590,36 @@ namespace
             for (long i = 0 ; i < tone.nc() ; ++i)
                 DLIB_TEST(abs(tone(0,i) - tone2(0, i)) < tol);
         }
+
+        {
+            matrix<complex<R>> m_stftr = stftr(tone, HANN, 128, 64, 64/2);
+            DLIB_TEST(m_stftr.nr() == 17 && m_stftr.nc() == 65);
+            for (long i = 0 ; i < m_stftr.nr() ; ++i)
+                for (long j = 0 ; j < m_stftr.nc() ; ++j)
+                    DLIB_TEST(std::abs(m_stftr(i,j) - complex_cast<R>(STFT_FFT_128_WLEN_64_TONE_512[i][j])) < tol);
+
+            matrix<R> tone2 = istftr(m_stftr, HANN, 64, 64/2);
+            DLIB_TEST(tone.nc() == tone2.nc());
+            DLIB_TEST(tone.nr() == tone2.nr());
+            for (long i = 0 ; i < tone.nc() ; ++i)
+                DLIB_TEST(abs(tone(0,i) - tone2(0, i)) < tol);
+        }
+
+        {
+            matrix<complex<R>> m_stftr = stftr(tone, HANN, 64, 64, 64/2);
+            DLIB_TEST(m_stftr.nr() == 17 && m_stftr.nc() == 33);
+            for (long i = 0 ; i < m_stftr.nr() ; ++i)
+                for (long j = 0 ; j < m_stftr.nc() ; ++j)
+                    DLIB_TEST(std::abs(m_stftr(i,j) - complex_cast<R>(STFT_FFT_64_WLEN_64_TONE_512[i][j])) < tol);
+
+            matrix<R> tone2 = istftr(m_stftr, HANN, 64, 64/2);
+            DLIB_TEST(tone.nc() == tone2.nc());
+            DLIB_TEST(tone.nr() == tone2.nr());
+            for (long i = 0 ; i < tone.nc() ; ++i)
+                DLIB_TEST(abs(tone(0,i) - tone2(0, i)) < tol);
+        }
     }
 
-    
     class test_fft : public tester
     {
     public:

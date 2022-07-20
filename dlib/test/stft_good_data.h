@@ -24,11 +24,11 @@ constexpr std::complex<double> operator "" _i (long double imag)
         win     = scipy.signal.get_window('hann', wlen)
         scale   = win.sum()
 
-        f, t, Z3 = scipy.signal.stft(tone,
+        f, t, Z = scipy.signal.stft(tone,
                         nfft=fftsize, nperseg=wlen, noverlap=wlen//2,
                         window=win, return_onesided=onesided)
 
-        print(repr(Z3.T * scale)
+        print(repr(Z.T * scale)
 !*/
 static const std::complex<double> STFT_FFT_128_WLEN_64_TONE_512[17][128] =
 {{ 1.856183030701e+00+0.000000000000e+00_i, -1.123124839061e+00-1.364714058946e+00_i, -2.993883340661e-01+1.490769378266e+00_i,  1.038679802113e+00-5.338401272750e-01_i,
@@ -592,11 +592,11 @@ static const std::complex<double> STFT_FFT_128_WLEN_64_TONE_512[17][128] =
         win     = scipy.signal.get_window('hann', wlen)
         scale   = win.sum()
 
-        f, t, Z3 = scipy.signal.stft(tone,
+        f, t, Z = scipy.signal.stft(tone,
                         nfft=fftsize, nperseg=wlen, noverlap=wlen//2,
                         window=win, return_onesided=onesided)
 
-        print(repr(Z3.T * scale)
+        print(repr(Z.T * scale)
 !*/
 static const std::complex<double> STFT_FFT_64_WLEN_64_TONE_512[17][64] =
 {{ 1.856183030701e+00+0.000000000000e+00_i, -2.993883340661e-01+1.490769378266e+00_i, -7.034595725871e-01-3.370418267981e-01_i,  1.449475157842e-01-8.222473873107e-02_i,
