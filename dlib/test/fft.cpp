@@ -552,35 +552,44 @@ namespace
         func(131);  print_spinner();
     }
 
+    template<typename R1, typename R2>
+    std::complex<R1> complex_cast(const std::complex<R2> &c) {
+        return { static_cast<R1>(c.real()), static_cast<R1>(c.imag()) };
+    }
+
+    template<typename R>
     void test_stft()
     {
-        matrix<double> tone = sin(2 * pi * matrix_cast<double>(range(0, 511)) / 512.0f);
+        constexpr R tol = std::is_same<R,float>::value ? 1e-4 : 1e-7;
+        matrix<R> tone = sin(2 * pi * matrix_cast<R>(range(0, 511)) / 512.0f);
 
         {
-            matrix<complex<double>> m_stft = stft(tone, HANN, 128, 64, 64/2);
-            DLIB_ASSERT(m_stft.nr() == 17 && m_stft.nc() == 128);
+            matrix<complex<R>> m_stft = stft(tone, HANN, 128, 64, 64/2);
+            DLIB_TEST(m_stft.nr() == 17 && m_stft.nc() == 128);
             for (long i = 0 ; i < m_stft.nr() ; ++i)
                 for (long j = 0 ; j < m_stft.nc() ; ++j)
-                    DLIB_ASSERT(std::abs(m_stft(i,j) - STFT_FFT_128_WLEN_64_TONE_512[i][j]) < 1e-7);
+                    DLIB_TEST(std::abs(m_stft(i,j) - complex_cast<R>(STFT_FFT_128_WLEN_64_TONE_512[i][j])) < tol);
 
-            matrix<complex<double>> tone2 = istft(m_stft, HANN, 64, 64/2);
-            DLIB_ASSERT(tone.nc() == tone2.nc());
-            DLIB_ASSERT(tone.nr() == tone2.nr());
+            matrix<complex<R>> tone2 = istft(m_stft, HANN, 64, 64/2);
+            DLIB_TEST(tone.nc() == tone2.nc());
+            DLIB_TEST(tone.nr() == tone2.nr());
             for (long i = 0 ; i < tone.nc() ; ++i)
-                DLIB_ASSERT(abs(tone(0,i) - tone2(0, i)) < 1e-4);
+                DLIB_TEST(abs(tone(0,i) - tone2(0, i)) < tol);
         }
 
-//        {
-//            matrix<complex<double>> m_stft = stft(tone, HANN, 64, 64, 64/2);
-//            DLIB_ASSERT(m_stft.nr() == 17 && m_stft.nc() == 64);
-//            for (long i = 0 ; i < m_stft.nr() ; ++i)
-//                for (long j = 0 ; j < m_stft.nc() ; ++j)
-//                DLIB_ASSERT(std::abs(m_stft(i,j) - STFT_FFT_64_WLEN_64_TONE_512[i][j]) < 1e-4, m_stft(i,j) << " " << STFT_FFT_64_WLEN_64_TONE_512[i][j]);
-//
-//            matrix<complex<double>> tone2 = istft(m_stft, HANN, 64, 64/2);
-//            for (long i = 0 ; i < std::min(tone.nc(), tone2.nc()) ; ++i)
-//            DLIB_ASSERT(abs(tone(0,i) - tone2(0, i)) < 1e-4);
-//        }
+        {
+            matrix<complex<R>> m_stft = stft(tone, HANN, 64, 64, 64/2);
+            DLIB_TEST(m_stft.nr() == 17 && m_stft.nc() == 64);
+            for (long i = 0 ; i < m_stft.nr() ; ++i)
+                for (long j = 0 ; j < m_stft.nc() ; ++j)
+                    DLIB_TEST(std::abs(m_stft(i,j) - complex_cast<R>(STFT_FFT_64_WLEN_64_TONE_512[i][j])) < tol);
+
+            matrix<complex<R>> tone2 = istft(m_stft, HANN, 64, 64/2);
+            DLIB_TEST(tone.nc() == tone2.nc());
+            DLIB_TEST(tone.nr() == tone2.nr());
+            for (long i = 0 ; i < tone.nc() ; ++i)
+                DLIB_TEST(abs(tone(0,i) - tone2(0, i)) < tol);
+        }
     }
 
     
@@ -618,7 +627,8 @@ namespace
             test_vector_overload_outplace<double>();
             test_vector_overload_inplace<float>();
             test_vector_overload_inplace<double>();
-            test_stft();
+            test_stft<float>();
+            test_stft<double>();
         }
     } a;
 
