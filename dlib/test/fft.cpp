@@ -17,6 +17,7 @@
 #endif
 #include "tester.h"
 #include "fftr_good_data.h"
+#include "stft_good_data.h"
 
 namespace  
 {
@@ -550,6 +551,38 @@ namespace
         func(123); print_spinner();
         func(131);  print_spinner();
     }
+
+    void test_stft()
+    {
+        matrix<double> tone = sin(2 * pi * matrix_cast<double>(range(0, 511)) / 512.0f);
+
+        {
+            matrix<complex<double>> m_stft = stft(tone, HANN, 128, 64, 64/2);
+            DLIB_ASSERT(m_stft.nr() == 17 && m_stft.nc() == 128);
+            for (long i = 0 ; i < m_stft.nr() ; ++i)
+                for (long j = 0 ; j < m_stft.nc() ; ++j)
+                    DLIB_ASSERT(std::abs(m_stft(i,j) - STFT_FFT_128_WLEN_64_TONE_512[i][j]) < 1e-7);
+
+            matrix<complex<double>> tone2 = istft(m_stft, HANN, 64, 64/2);
+            DLIB_ASSERT(tone.nc() == tone2.nc());
+            DLIB_ASSERT(tone.nr() == tone2.nr());
+            for (long i = 0 ; i < tone.nc() ; ++i)
+                DLIB_ASSERT(abs(tone(0,i) - tone2(0, i)) < 1e-4);
+        }
+
+//        {
+//            matrix<complex<double>> m_stft = stft(tone, HANN, 64, 64, 64/2);
+//            DLIB_ASSERT(m_stft.nr() == 17 && m_stft.nc() == 64);
+//            for (long i = 0 ; i < m_stft.nr() ; ++i)
+//                for (long j = 0 ; j < m_stft.nc() ; ++j)
+//                DLIB_ASSERT(std::abs(m_stft(i,j) - STFT_FFT_64_WLEN_64_TONE_512[i][j]) < 1e-4, m_stft(i,j) << " " << STFT_FFT_64_WLEN_64_TONE_512[i][j]);
+//
+//            matrix<complex<double>> tone2 = istft(m_stft, HANN, 64, 64/2);
+//            for (long i = 0 ; i < std::min(tone.nc(), tone2.nc()) ; ++i)
+//            DLIB_ASSERT(abs(tone(0,i) - tone2(0, i)) < 1e-4);
+//        }
+    }
+
     
     class test_fft : public tester
     {
@@ -585,6 +618,7 @@ namespace
             test_vector_overload_outplace<double>();
             test_vector_overload_inplace<float>();
             test_vector_overload_inplace<double>();
+            test_stft();
         }
     } a;
 
