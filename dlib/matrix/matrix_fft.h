@@ -318,6 +318,8 @@ namespace dlib
             static_assert(std::is_floating_point<R>::value, "underlying type must be real or complex floating point type");
             DLIB_ASSERT(is_vector(signal), "input must be a vector type");
             DLIB_ASSERT(signal.size() >= (long)wlen, "signal.size() >= wlen not satisfied");
+            DLIB_ASSERT(fftsize >= wlen, "fftsize >= wlen not satisfied");
+            DLIB_ASSERT(wlen >= hoplen, "wlen >= hoplen not satisfied");
 
             /*! Input is left-padded by wlen/2 and right-padded wlen/2 !*/
             const std::size_t total_padding = wlen;
@@ -362,6 +364,8 @@ namespace dlib
             static_assert(is_complex<T>::value, "matrix type must be complex");
             static_assert(std::is_floating_point<R>::value, "underlying type must be complex floating point type");
             DLIB_ASSERT(stft.nc() > 0 && stft.nr() > 0, "stft must be non-empty");
+            DLIB_ASSERT(stft.nc() >= wlen, "fftsize >= wlen not satisfied");
+            DLIB_ASSERT(wlen >= hoplen, "wlen >= hoplen not satisfied");
 
             const size_t ntime = (stft.nr() - 1) * hoplen + wlen;
             matrix<ReturnType> signal = zeros_matrix<ReturnType>(1, ntime);

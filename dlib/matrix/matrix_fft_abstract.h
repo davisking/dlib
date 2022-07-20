@@ -232,6 +232,155 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
+
+    template <typename EXP>
+    auto stft (
+        const matrix_exp<EXP>& signal,
+        WindowType w,
+        std::size_t fftsize,
+        std::size_t wlen,
+        std::size_t hoplen
+    );
+    /*!
+        requires
+            - is_vector(signal) == true, i.e. signal has rank 1
+            - signal.size() >= wlen
+            - fftsize >= wlen
+            - wlen >= hoplen
+            - EXP::type is a floating point type (float, double or long double), real or complex
+
+        ensures
+            - Performs a Short-Time-Fourier-Transform (STFT) on 1D data.
+            - Returns a matrix D where first dimension correponds to time and second dimension corresponds to frequency.
+            - Dimensions of D are:
+                - D.nr() == (signal.size() + hoplen) / hoplen and corresponds to the number of time frames.
+                - D.nc() == fftsize
+            - The type of D is add_complex_t<EXP::type>
+            - Each time frame t (equivalently, each row t) is centered on t*hoplen
+            - This is equivalent to calling the following in python
+              (provided w is converted into a string representation which scipy can interpret)
+                win     = scipy.signal.get_window(w, wlen)
+                scale   = win.sum()
+                _, _, Z = scipy.signal.stft(signal, nfft=fftsize, nperseg=wlen, noverlap=(wlen-hoplen), window=win, return_onesided=False)
+                Z       *= scale
+
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, typename Alloc>
+    auto stft (
+        const std::vector<T, Alloc>& signal,
+        WindowType w,
+        std::size_t fftsize,
+        std::size_t wlen,
+        std::size_t hoplen
+    );
+    /*!
+        ensures
+            - This is a shortcut to calling stft(dlib::mat(signal, w, fftsize, wlen, hoplen)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename EXP>
+    auto istft (
+        const matrix_exp<EXP>& m,
+        WindowType w,
+        std::size_t wlen,
+        std::size_t hoplen
+    );
+    /*!
+        requires
+            - m has rank 2 where 1st dimension corresponds to time and second dimension corresponds to frequency
+            - wlen >= hoplen
+            - EXP::type is a complex floating point type (complex<float>, complex<double> or complex<long double>)
+            - If you wish to satisfy istft(stft(x, ...), ...) == x then:
+                - w is the same as what was used with stft()
+                - wlen is the same as what was used with stft()
+                - hoplen is the same as what was used with stft()
+
+        ensures
+            - Performs an inverse Short-Time-Fourier-Transform (STFT)
+            - istft(stft(x, w, wlen, wlen, hoplen), w, wlen, hoplen)) == x
+            - istft(stft(x, w, fftsize, wlen, hoplen), w, wlen, hoplen)) == x
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename EXP>
+    auto stftr (
+        const matrix_exp<EXP>& signal,
+        WindowType w,
+        std::size_t fftsize,
+        std::size_t wlen,
+        std::size_t hoplen
+    );
+    /*!
+        requires
+            - is_vector(signal) == true, i.e. signal has rank 1
+            - signal.size() >= wlen
+            - fftsize >= wlen
+            - wlen >= hoplen
+            - EXP::type is a floating point type (float, double or long double) and must be real
+
+        ensures
+            - Performs a real Short-Time-Fourier-Transform (STFTr) on 1D data.
+            - Returns a matrix D where first dimension correponds to time and second dimension corresponds to frequency.
+            - Dimensions of D are:
+                - D.nr() == (signal.size() + hoplen) / hoplen and corresponds to the number of time frames.
+                - D.nc() == fftsize/2 + 1
+            - The type of D is add_complex_t<EXP::type>
+            - Each time frame t (equivalently each row t) is centered on t*hoplen
+            - This is equivalent to calling the follwoing in python
+              (provided w is converted into a string representation which scipy can interpret)
+                win     = scipy.signal.get_window(w, wlen)
+                scale   = win.sum()
+                _, _, Z = scipy.signal.stft(signal, nfft=fftsize, nperseg=wlen, noverlap=(wlen-hoplen), window=win, return_onesided=True)
+                Z       *= scale
+
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, typename Alloc>
+    auto stftr (
+        const std::vector<T, Alloc>& signal,
+        WindowType w,
+        std::size_t fftsize,
+        std::size_t wlen,
+        std::size_t hoplen
+    );
+    /*!
+        ensures
+            - This is a shortcut to calling istft(dlib::mat(signal, w, wlen, hoplen)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename EXP, typename T = typename EXP::type, typename R = remove_complex_t<T>>
+    auto istftr (
+        const matrix_exp<EXP>& stft,
+        WindowType w,
+        std::size_t wlen,
+        std::size_t hoplen
+    );
+    /*!
+        requires
+            - m has rank 2 where 1st dimension corresponds to time and second dimension corresponds to frequency
+            - wlen >= hoplen
+            - EXP::type is a complex floating point type (complex<float>, complex<double> or complex<long double>)
+            - If you wish to satisfy istftr(stftr(x, ...), ...) == x then:
+                - w is the same as what was used with stft()
+                - wlen is the same as what was used with stft()
+                - hoplen is the same as what was used with stft()
+
+        ensures
+            - Performs an inverse Short-Time-Fourier-Transform (STFT)
+            - istftr(stftr(x, w, wlen, wlen, hoplen), w, wlen, hoplen)) == x
+            - istftr(stftr(x, w, fftsize, wlen, hoplen), w, wlen, hoplen)) == x
+    !*/
+// ----------------------------------------------------------------------------------------
 }
 
 #endif // DLIB_FFt_ABSTRACT_Hh_
