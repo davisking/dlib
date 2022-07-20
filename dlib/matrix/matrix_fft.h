@@ -317,7 +317,7 @@ namespace dlib
         {
             static_assert(std::is_floating_point<R>::value, "underlying type must be real or complex floating point type");
             DLIB_ASSERT(is_vector(signal), "input must be a vector type");
-            DLIB_ASSERT(signal.size() >= wlen, "signal.size() >= wlen not satisfied");
+            DLIB_ASSERT(signal.size() >= (long)wlen, "signal.size() >= wlen not satisfied");
 
             /*! Input is left-padded by wlen/2 and right-padded wlen/2 !*/
             const std::size_t total_padding = wlen;
