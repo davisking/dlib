@@ -364,7 +364,7 @@ namespace dlib
             static_assert(is_complex<T>::value, "matrix type must be complex");
             static_assert(std::is_floating_point<R>::value, "underlying type must be complex floating point type");
             DLIB_ASSERT(stft.nc() > 0 && stft.nr() > 0, "stft must be non-empty");
-            DLIB_ASSERT(stft.nc() >= wlen, "fftsize >= wlen not satisfied");
+            DLIB_ASSERT(stft.nc() >= (long)wlen, "fftsize >= wlen not satisfied");
             DLIB_ASSERT(wlen >= hoplen, "wlen >= hoplen not satisfied");
 
             const size_t ntime = (stft.nr() - 1) * hoplen + wlen;
