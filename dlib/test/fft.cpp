@@ -577,6 +577,8 @@ namespace
                 DLIB_TEST(abs(tone(0,i) - tone2(0, i)) < tol);
         }
 
+        print_spinner();
+
         {
             matrix<complex<R>> m_stft = stft(tone, HANN, 64, 64, 64/2);
             DLIB_TEST(m_stft.nr() == 17 && m_stft.nc() == 64);
@@ -590,6 +592,8 @@ namespace
             for (long i = 0 ; i < tone.nc() ; ++i)
                 DLIB_TEST(abs(tone(0,i) - tone2(0, i)) < tol);
         }
+
+        print_spinner();
 
         {
             matrix<complex<R>> m_stftr = stftr(tone, HANN, 128, 64, 64/2);
@@ -605,6 +609,8 @@ namespace
                 DLIB_TEST(abs(tone(0,i) - tone2(0, i)) < tol);
         }
 
+        print_spinner();
+
         {
             matrix<complex<R>> m_stftr = stftr(tone, HANN, 64, 64, 64/2);
             DLIB_TEST(m_stftr.nr() == 17 && m_stftr.nc() == 33);
@@ -618,6 +624,65 @@ namespace
             for (long i = 0 ; i < tone.nc() ; ++i)
                 DLIB_TEST(abs(tone(0,i) - tone2(0, i)) < tol);
         }
+
+        print_spinner();
+    }
+
+    template<typename R>
+    void test_random_stfts()
+    {
+        constexpr R tol = std::is_same<R,float>::value ? 1e-4 : 1e-7;
+
+        std::size_t fftsize = 256;
+        std::size_t wlen    = 128;
+
+        int test = 0;
+
+        for (int run = 0 ; run < 10 ; ++run)
+        {
+            for (long nsamples = 512 ; nsamples < 1024 ; ++nsamples)
+            {
+                matrix<R>           samples1 = matrix_cast<R>(randm(1, nsamples));
+                matrix<complex<R>>  samples2 = istft(stft(samples1, HANN, fftsize, wlen, wlen/2), HANN, wlen, wlen/2);
+
+                const long minsamples = std::min(samples1.nc(), samples2.nc());
+                DLIB_TEST(max(abs(imag(samples2))) < tol);
+                DLIB_TEST(max(abs(subm(samples1, 0, 0, 1, minsamples) - subm(real(samples2), 0, 0, 1, minsamples))) < tol);
+
+                if (test++ % 10 == 0)
+                    print_spinner();
+            }
+        }
+
+        print_spinner();
+    }
+
+    template<typename R>
+    void test_random_stftrs()
+    {
+        constexpr R tol = std::is_same<R,float>::value ? 1e-4 : 1e-7;
+
+        std::size_t fftsize = 256;
+        std::size_t wlen    = 128;
+
+        int test = 0;
+
+        for (int run = 0 ; run < 10 ; ++run)
+        {
+            for (long nsamples = 512 ; nsamples < 1024 ; ++nsamples)
+            {
+                matrix<R> samples1 = matrix_cast<R>(randm(1, nsamples));
+                matrix<R> samples2 = istftr(stftr(samples1, HANN, fftsize, wlen, wlen/2), HANN, wlen, wlen/2);
+
+                const long minsamples = std::min(samples1.nc(), samples2.nc());
+                DLIB_TEST(max(abs(subm(samples1, 0, 0, 1, minsamples) - subm(samples2, 0, 0, 1, minsamples))) < tol);
+
+                if (test++ % 10 == 0)
+                    print_spinner();
+            }
+        }
+
+        print_spinner();
     }
 
     class test_fft : public tester
@@ -656,6 +721,10 @@ namespace
             test_vector_overload_inplace<double>();
             test_stft<float>();
             test_stft<double>();
+            test_random_stfts<float>();
+            test_random_stfts<double>();
+            test_random_stftrs<float>();
+            test_random_stftrs<double>();
         }
     } a;
 
