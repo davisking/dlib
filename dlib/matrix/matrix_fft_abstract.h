@@ -234,7 +234,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename EXP>
-    auto stft (
+    matrix<complex_type> stft (
         const matrix_exp<EXP>& signal,
         WindowType w,
         std::size_t fftsize,
@@ -269,7 +269,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T, typename Alloc>
-    auto stft (
+    matrix<complex_type> stft (
         const std::vector<T, Alloc>& signal,
         WindowType w,
         std::size_t fftsize,
@@ -284,7 +284,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename EXP>
-    auto istft (
+    matrix<complex_type> istft (
         const matrix_exp<EXP>& m,
         WindowType w,
         std::size_t wlen,
@@ -309,7 +309,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename EXP>
-    auto stftr (
+    matrix<complex_type> stftr (
         const matrix_exp<EXP>& signal,
         WindowType w,
         std::size_t fftsize,
@@ -344,7 +344,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T, typename Alloc>
-    auto stftr (
+    matrix<complex_type> stftr (
         const std::vector<T, Alloc>& signal,
         WindowType w,
         std::size_t fftsize,
@@ -358,8 +358,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename EXP, typename T = typename EXP::type, typename R = remove_complex_t<T>>
-    auto istftr (
+    template <typename EXP>
+    matrix<real_type> istftr (
         const matrix_exp<EXP>& stft,
         WindowType w,
         std::size_t wlen,
