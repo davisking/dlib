@@ -248,7 +248,6 @@ namespace dlib
             - fftsize >= wlen
             - wlen >= hoplen
             - EXP::type is a floating point type (float, double or long double), real or complex
-
         ensures
             - Performs a Short-Time-Fourier-Transform (STFT) on 1D data.
             - Returns a matrix D where first dimension correponds to time and second dimension corresponds to frequency.
@@ -299,7 +298,6 @@ namespace dlib
                 - w is the same as what was used with stft()
                 - wlen is the same as what was used with stft()
                 - hoplen is the same as what was used with stft()
-
         ensures
             - Performs an inverse Short-Time-Fourier-Transform (STFT)
             - istft(stft(x, w, wlen, wlen, hoplen), w, wlen, hoplen)) == x
@@ -323,7 +321,6 @@ namespace dlib
             - fftsize >= wlen
             - wlen >= hoplen
             - EXP::type is a floating point type (float, double or long double) and must be real
-
         ensures
             - Performs a real Short-Time-Fourier-Transform (STFTr) on 1D data.
             - Returns a matrix D where first dimension correponds to time and second dimension corresponds to frequency.
@@ -374,7 +371,6 @@ namespace dlib
                 - w is the same as what was used with stft()
                 - wlen is the same as what was used with stft()
                 - hoplen is the same as what was used with stft()
-
         ensures
             - Performs an inverse Short-Time-Fourier-Transform (STFT)
             - istftr(stftr(x, w, wlen, wlen, hoplen), w, wlen, hoplen)) == x
