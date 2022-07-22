@@ -560,7 +560,7 @@ namespace
     template<typename R>
     void test_stft()
     {
-        constexpr R tol = std::is_same<R,float>::value ? 1e-4 : 1e-7;
+        constexpr R tol = std::is_same<R,float>::value ? 1e-5 : 1e-14;
         matrix<R> tone = sin(2 * pi * matrix_cast<R>(range(0, 511)) / 512.0f);
 
         {
@@ -631,7 +631,7 @@ namespace
     template<typename R>
     void test_random_stfts()
     {
-        constexpr R tol = std::is_same<R,float>::value ? 1e-4 : 1e-7;
+        constexpr R tol = std::is_same<R,float>::value ? 1e-5 : 1e-14;
 
         std::size_t fftsize = 256;
         std::size_t wlen    = 128;
@@ -660,7 +660,7 @@ namespace
     template<typename R>
     void test_random_stftrs()
     {
-        constexpr R tol = std::is_same<R,float>::value ? 1e-4 : 1e-7;
+        constexpr R tol = std::is_same<R,float>::value ? 1e-5 : 1e-14;
 
         std::size_t fftsize = 256;
         std::size_t wlen    = 128;
