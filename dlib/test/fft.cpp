@@ -558,7 +558,7 @@ namespace
     }
 
     template<typename R>
-    void test_stft()
+    void test_good_stft()
     {
         constexpr R tol = std::is_same<R,float>::value ? 1e-5 : 1e-14;
         matrix<R> tone = sin(2 * pi * matrix_cast<R>(range(0, 511)) / 512.0f);
@@ -633,26 +633,39 @@ namespace
     {
         constexpr R tol = std::is_same<R,float>::value ? 1e-5 : 1e-14;
 
-        std::size_t fftsize = 256;
-        std::size_t wlen    = 128;
-
-        int test = 0;
-
-        for (int run = 0 ; run < 10 ; ++run)
+        auto test = [](WindowType w, std::size_t fftsize, std::size_t wlen)
         {
-            for (long nsamples = 512 ; nsamples < 1024 ; ++nsamples)
+            int test = 0;
+
+            for (int run = 0 ; run < 10 ; ++run)
             {
-                matrix<R>           samples1 = matrix_cast<R>(randm(1, nsamples));
-                matrix<complex<R>>  samples2 = istft(stft(samples1, HANN, fftsize, wlen, wlen/2), HANN, wlen, wlen/2);
+                for (long nsamples = 512 ; nsamples < 1024 ; ++nsamples)
+                {
+                    matrix<R>           samples1 = matrix_cast<R>(randm(1, nsamples));
+                    matrix<complex<R>>  samples2 = istft(stft(samples1, w, fftsize, wlen, wlen/2), w, wlen, wlen/2);
 
-                const long minsamples = std::min(samples1.nc(), samples2.nc());
-                DLIB_TEST(max(abs(imag(samples2))) < tol);
-                DLIB_TEST(max(abs(subm(samples1, 0, 0, 1, minsamples) - subm(real(samples2), 0, 0, 1, minsamples))) < tol);
+                    const long minsamples = std::min(samples1.nc(), samples2.nc());
+                    DLIB_TEST(max(abs(imag(samples2))) < tol);
+                    DLIB_TEST(max(abs(subm(samples1, 0, 0, 1, minsamples) - subm(real(samples2), 0, 0, 1, minsamples))) < tol);
 
-                if (test++ % 10 == 0)
-                    print_spinner();
+                    if (test++ % 10 == 0)
+                        print_spinner();
+                }
             }
-        }
+        };
+
+        test(HANN, 256, 128);
+        test(HANN, 128, 128);
+        test(BLACKMAN, 256, 128);
+        test(BLACKMAN, 128, 128);
+        test(BLACKMAN_NUTTALL, 256, 128);
+        test(BLACKMAN_NUTTALL, 128, 128);
+        test(BLACKMAN_HARRIS, 256, 128);
+        test(BLACKMAN_HARRIS, 128, 128);
+        test(BLACKMAN_HARRIS7, 256, 128);
+        test(BLACKMAN_HARRIS7, 128, 128);
+        test(KAISER, 256, 128);
+        test(KAISER, 128, 128);
 
         print_spinner();
     }
@@ -719,8 +732,8 @@ namespace
             test_vector_overload_outplace<double>();
             test_vector_overload_inplace<float>();
             test_vector_overload_inplace<double>();
-            test_stft<float>();
-            test_stft<double>();
+            test_good_stft<float>();
+            test_good_stft<double>();
             test_random_stfts<float>();
             test_random_stfts<double>();
             test_random_stftrs<float>();
