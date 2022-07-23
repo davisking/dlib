@@ -1928,21 +1928,35 @@ namespace dlib
         // When computing the YOLO loss (objectness + bounding box regression + classification),
         // the best match between a truth and an anchor is always used, regardless of the IoU.
         // However, if other anchors have an IoU with a truth box above iou_anchor_threshold, they
-        // will also experience loss against that truth box as well.  Setting iou_anchor_threshold to 1 will
-        // make the model use only the best anchor for each ground truth, so other anchors can be
-        // used for other ground truth boxes in the same cell (useful for detecting objects in crowds).
-        // This setting is meant to be used with "high capacity" models, not small ones.
+        // will also experience loss against that truth box as well.  Setting iou_anchor_threshold
+        // to 1 will make the model use only the best anchor for each ground truth, so other
+        // anchors can be used for other ground truth boxes in the same cell (useful for detecting
+        // objects in crowds).  This setting is meant to be used with "high capacity" models, not
+        // small ones.  Additionaly, when this value is set to 0, it will adaptively compute the
+        // IOU threshold based on the statistics of the IOUS from all anchors with the current
+        // target truth box. In particular, it follows the adaptive training sample selection
+        // (ATSS) from the paper: "Bridging the Gap Between Anchor-based and Anchor-free Detection
+        // via Adaptive Training Sample Selection" by Shifeng Zhang, et al.
+        // (https://arxiv.org/abs/1912.02424)
         double iou_anchor_threshold = 1.0;
         // When doing non-max suppression, we use overlaps_nms to decide if a box overlaps
         // an already output detection and should therefore be thrown out.
         test_box_overlap overlaps_nms = test_box_overlap(0.45, 1.0);
         // When set to true, NMS will only be applied between objects with the same class label.
         bool classwise_nms = true;
-        // These parameters control how we penalize different kinds of mistakes: notably the objectness loss,
-        // the box (bounding box regression) loss, and the classification loss.
+        // These parameters control how we penalize different kinds of mistakes: notably the
+        // objectness loss, the box (bounding box regression) loss, and the classification loss.
         double lambda_obj = 1.0;
         double lambda_box = 1.0;
         double lambda_cls = 1.0;
+        // This parameter makes YOLO behave like the Focal loss, presented in the paper:
+        // "Focal Loss for Dense Object Detection", by Tsung-Yi Lin, et al.
+        // (https://arxiv.org/abs/1708.02002)
+        // The gamma_obj and gamma_cls act as a modulating factor to the cross-entropy layers of
+        // objectness and classification by reducing the relative loss for well-classified
+        // examples, and focusing on the difficult ones.
+        double gamma_obj = 0.0;
+        double gamma_cls = 0.0;
 
     };
 
