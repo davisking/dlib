@@ -633,7 +633,7 @@ namespace
     {
         constexpr R tol = std::is_same<R,float>::value ? 1e-5 : 1e-12;
 
-        auto test = [=](WindowType w, std::size_t fftsize, std::size_t wlen)
+        auto test = [=](window_type w, std::size_t fftsize, std::size_t wlen)
         {
             int test = 0;
 

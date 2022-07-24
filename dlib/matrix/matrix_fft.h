@@ -308,7 +308,7 @@ namespace dlib
         >
         matrix<C> stft_impl (
             const matrix_exp<EXP>& signal,
-            WindowType  w,
+            window_type  w,
             std::size_t fftsize,
             std::size_t wlen,
             std::size_t hoplen,
@@ -355,7 +355,7 @@ namespace dlib
         >
         matrix<ReturnType> istft_impl (
             const matrix_exp<EXP>& stft,
-            WindowType w,
+            window_type w,
             std::size_t wlen,
             std::size_t hoplen,
             const IFFT_FUNC& ifft_obj
@@ -393,7 +393,7 @@ namespace dlib
     template <typename EXP>
     auto stft (
         const matrix_exp<EXP>& signal,
-        WindowType w,
+        window_type w,
         std::size_t fftsize,
         std::size_t wlen,
         std::size_t hoplen
@@ -406,7 +406,7 @@ namespace dlib
     template <typename T, typename Alloc>
     auto stft (
         const std::vector<T, Alloc>& signal,
-        WindowType w,
+        window_type w,
         std::size_t fftsize,
         std::size_t wlen,
         std::size_t hoplen
@@ -420,7 +420,7 @@ namespace dlib
     template <typename EXP, typename T = typename EXP::type>
     auto istft (
         const matrix_exp<EXP>& stft,
-        WindowType w,
+        window_type w,
         std::size_t wlen,
         std::size_t hoplen
     ) -> decltype(details::istft_impl<T>(stft, w, wlen, hoplen, details::ifft_func{})) {
@@ -432,7 +432,7 @@ namespace dlib
     template <typename EXP>
     auto stftr (
         const matrix_exp<EXP>& signal,
-        WindowType w,
+        window_type w,
         std::size_t fftsize,
         std::size_t wlen,
         std::size_t hoplen
@@ -445,7 +445,7 @@ namespace dlib
     template <typename T, typename Alloc>
     auto stftr (
         const std::vector<T, Alloc>& signal,
-        WindowType w,
+        window_type w,
         std::size_t fftsize,
         std::size_t wlen,
         std::size_t hoplen
@@ -459,7 +459,7 @@ namespace dlib
     template <typename EXP, typename T = typename EXP::type, typename R = remove_complex_t<T>>
     auto istftr (
         const matrix_exp<EXP>& stft,
-        WindowType w,
+        window_type w,
         std::size_t wlen,
         std::size_t hoplen
     ) ->decltype(details::istft_impl<R>(stft, w, wlen, hoplen, details::ifftr_func{})){

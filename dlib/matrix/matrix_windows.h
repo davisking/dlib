@@ -19,10 +19,10 @@ namespace dlib
         using type = typename M::type;                                                          \
         using R    = remove_complex_t<type>;                                                    \
                                                                                                 \
-        op_##function(const M& m_, WindowSymmetry type_) : basic_op_m<M>(m_), t{type_}          \
+        op_##function(const M& m_, window_symmetry type_) : basic_op_m<M>(m_), t{type_}         \
         {DLIB_ASSERT(is_vector(m_), "matrix expression must be a vector");}                     \
                                                                                                 \
-        WindowSymmetry t;                                                                       \
+        window_symmetry t;                                                                      \
                                                                                                 \
         const static long cost = M::cost + 7;                                                   \
         typedef type const_ret_type;                                                            \
@@ -35,7 +35,7 @@ namespace dlib
     template <typename EXP>                                                                     \
     const matrix_op<op_##function<EXP> > function (                                             \
         const matrix_exp<EXP>& m,                                                               \
-        WindowSymmetry type                                                                         \
+        window_symmetry type                                                                    \
     )                                                                                           \
     {                                                                                           \
         using op = op_##function<EXP>;                                                          \
@@ -58,11 +58,11 @@ namespace dlib
         using type = typename M::type;
         using R    = remove_complex_t<type>;
 
-        op_kaiser(const M& m_, beta_t beta_, WindowSymmetry type_) : basic_op_m<M>(m_), beta{beta_}, t{type_}
+        op_kaiser(const M& m_, beta_t beta_, window_symmetry type_) : basic_op_m<M>(m_), beta{beta_}, t{type_}
         {DLIB_ASSERT(is_vector(m_), "matrix expression must be a vector");}
 
         beta_t beta;
-        WindowSymmetry t;
+        window_symmetry t;
 
         const static long cost = M::cost + 7;
         typedef type const_ret_type;
@@ -76,7 +76,7 @@ namespace dlib
     const matrix_op<op_kaiser<EXP> > kaiser (
         const matrix_exp<EXP>& m,
         beta_t beta,
-        WindowSymmetry type
+        window_symmetry type
     )
     {
         using op = op_kaiser<EXP>;
@@ -91,11 +91,11 @@ namespace dlib
         using type = typename M::type;
         using R    = remove_complex_t<type>;
 
-        op_window(const M& m_, WindowType w_, WindowSymmetry type_, window_args args_) : basic_op_m<M>(m_), w{w_}, t{type_}, args{args_}
+        op_window(const M& m_, window_type w_, window_symmetry type_, window_args args_) : basic_op_m<M>(m_), w{w_}, t{type_}, args{args_}
         {DLIB_ASSERT(is_vector(m_), "matrix expression must be a vector");}
 
-        WindowType w;
-        WindowSymmetry t;
+        window_type w;
+        window_symmetry t;
         window_args args;
 
         const static long cost = M::cost + 7;
@@ -109,8 +109,8 @@ namespace dlib
     template <typename EXP>
     const matrix_op<op_window<EXP> > window (
         const matrix_exp<EXP>& m,
-        WindowType w,
-        WindowSymmetry type,
+        window_type w,
+        window_symmetry type,
         window_args args
     )
     {
