@@ -255,7 +255,7 @@ namespace dlib
                 - D.nr() == (signal.size() + hoplen) / hoplen and corresponds to the number of time frames.
                 - D.nc() == fftsize
             - The type of D is add_complex_t<EXP::type>
-            - Each time frame t (equivalently, each row t) is centered on t*hoplen
+            - Each time frame t (equivalently, each row t) is centered on signal(t*hoplen)
             - This is equivalent to calling the following in python
               (provided w is converted into a string representation which scipy can interpret)
                 win     = scipy.signal.get_window(w, wlen)
@@ -328,7 +328,7 @@ namespace dlib
                 - D.nr() == (signal.size() + hoplen) / hoplen and corresponds to the number of time frames.
                 - D.nc() == fftsize/2 + 1
             - The type of D is add_complex_t<EXP::type>
-            - Each time frame t (equivalently each row t) is centered on t*hoplen
+            - Each time frame t (equivalently each row t) is centered on signal(t*hoplen)
             - This is equivalent to calling the follwoing in python
               (provided w is converted into a string representation which scipy can interpret)
                 win     = scipy.signal.get_window(w, wlen)
