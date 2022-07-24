@@ -234,13 +234,11 @@ namespace dlib
         BLACKMAN_HARRIS,
         BLACKMAN_HARRIS7,
         KAISER
-        //GAUSSIAN
     };
 
     struct window_args
     {
         beta_t beta;
-        //sigma_t sigma; //for GAUSSIAN
     };
 
     template<typename R>
@@ -255,6 +253,7 @@ namespace dlib
             case BLACKMAN_HARRIS7:  return blackman_harris7<R>(i, N, type);
             case KAISER:            return kaiser<R>(i, N, args.beta, type);
         }
+        DLIB_CASSERT(false, "This should never happen");
         return R{};
     }
 
