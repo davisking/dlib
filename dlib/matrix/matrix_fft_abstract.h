@@ -277,7 +277,7 @@ namespace dlib
     );
     /*!
         ensures
-            - This is a shortcut to calling stft(dlib::mat(signal, w, fftsize, wlen, hoplen)
+            - This is a shortcut to calling stft(dlib::mat(signal), w, fftsize, wlen, hoplen)
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -350,7 +350,7 @@ namespace dlib
     );
     /*!
         ensures
-            - This is a shortcut to calling istft(dlib::mat(signal, w, wlen, hoplen)
+            - This is a shortcut to calling istft(dlib::mat(signal), w, wlen, hoplen)
     !*/
 
 // ----------------------------------------------------------------------------------------
