@@ -628,44 +628,46 @@ namespace
         print_spinner();
     }
 
-    template<typename R>
-    void test_random_stfts()
+    template<typename R, typename WINDOW>
+    void test_random_stfts_impl(const WINDOW& w, std::size_t fftsize, std::size_t wlen)
     {
         constexpr R tol = std::is_same<R,float>::value ? 1e-5 : 1e-12;
 
-        auto test = [=](auto&& w, std::size_t fftsize, std::size_t wlen)
+        //printf("%s - %i\n", __PRETTY_FUNCTION__, __LINE__);
+        int test = 0;
+
+        for (int run = 0 ; run < 10 ; ++run)
         {
-            int test = 0;
-
-            for (int run = 0 ; run < 10 ; ++run)
+            for (long nsamples = 512 ; nsamples < 1024 ; ++nsamples)
             {
-                for (long nsamples = 512 ; nsamples < 1024 ; ++nsamples)
-                {
-                    matrix<R>           samples1 = matrix_cast<R>(randm(1, nsamples));
-                    matrix<complex<R>>  samples2 = istft(stft(samples1, w, fftsize, wlen, wlen/2), w, wlen, wlen/2);
+                matrix<R>           samples1 = matrix_cast<R>(randm(1, nsamples));
+                matrix<complex<R>>  samples2 = istft(stft(samples1, w, fftsize, wlen, wlen/2), w, wlen, wlen/2);
 
-                    const long minsamples = std::min(samples1.nc(), samples2.nc());
-                    DLIB_TEST(max(abs(imag(samples2))) < tol);
-                    DLIB_TEST(max(abs(subm(samples1, 0, 0, 1, minsamples) - subm(real(samples2), 0, 0, 1, minsamples))) < tol);
+                const long minsamples = std::min(samples1.nc(), samples2.nc());
+                DLIB_TEST(max(abs(imag(samples2))) < tol);
+                DLIB_TEST(max(abs(subm(samples1, 0, 0, 1, minsamples) - subm(real(samples2), 0, 0, 1, minsamples))) < tol);
 
-                    if (test++ % 10 == 0)
-                        print_spinner();
-                }
+                if (test++ % 10 == 0)
+                    print_spinner();
             }
-        };
+        }
+    }
 
-        test(hann_window{}, 256, 128);
-        test(hann_window{}, 128, 128);
-        test(blackman_window{}, 256, 128);
-        test(blackman_window{}, 128, 128);
-        test(blackman_nuttall_window{}, 256, 128);
-        test(blackman_nuttall_window{}, 128, 128);
-        test(blackman_harris_window{}, 256, 128);
-        test(blackman_harris_window{}, 128, 128);
-        test(blackman_harris7_window{}, 256, 128);
-        test(blackman_harris7_window{}, 128, 128);
-        test(kaiser_window{attenuation_t{60.0}}, 256, 128);
-        test(kaiser_window{attenuation_t{60.0}}, 128, 128);
+    template<typename R>
+    void test_random_stfts()
+    {
+        test_random_stfts_impl<R>(hann_window{}, 256, 128);
+        test_random_stfts_impl<R>(hann_window{}, 128, 128);
+        test_random_stfts_impl<R>(blackman_window{}, 256, 128);
+        test_random_stfts_impl<R>(blackman_window{}, 128, 128);
+        test_random_stfts_impl<R>(blackman_nuttall_window{}, 256, 128);
+        test_random_stfts_impl<R>(blackman_nuttall_window{}, 128, 128);
+        test_random_stfts_impl<R>(blackman_harris_window{}, 256, 128);
+        test_random_stfts_impl<R>(blackman_harris_window{}, 128, 128);
+        test_random_stfts_impl<R>(blackman_harris7_window{}, 256, 128);
+        test_random_stfts_impl<R>(blackman_harris7_window{}, 128, 128);
+        test_random_stfts_impl<R>(kaiser_window{attenuation_t{60.0}}, 256, 128);
+        test_random_stfts_impl<R>(kaiser_window{attenuation_t{60.0}}, 128, 128);
 
         print_spinner();
     }
