@@ -633,23 +633,20 @@ namespace
     {
         constexpr R tol = std::is_same<R,float>::value ? 1e-5 : 1e-12;
 
-        //printf("%s - %i\n", __PRETTY_FUNCTION__, __LINE__);
+//        printf("%s - %i\n", __PRETTY_FUNCTION__, __LINE__);
         int test = 0;
 
-        for (int run = 0 ; run < 10 ; ++run)
+        for (long nsamples = 512 ; nsamples < 1024 ; ++nsamples)
         {
-            for (long nsamples = 512 ; nsamples < 1024 ; ++nsamples)
-            {
-                matrix<R>           samples1 = matrix_cast<R>(randm(1, nsamples));
-                matrix<complex<R>>  samples2 = istft(stft(samples1, w, fftsize, wlen, wlen/2), w, wlen, wlen/2);
+            matrix<R>           samples1 = matrix_cast<R>(randm(1, nsamples));
+            matrix<complex<R>>  samples2 = istft(stft(samples1, w, fftsize, wlen, wlen/2), w, wlen, wlen/2);
 
-                const long minsamples = std::min(samples1.nc(), samples2.nc());
-                DLIB_TEST(max(abs(imag(samples2))) < tol);
-                DLIB_TEST(max(abs(subm(samples1, 0, 0, 1, minsamples) - subm(real(samples2), 0, 0, 1, minsamples))) < tol);
+            const long minsamples = std::min(samples1.nc(), samples2.nc());
+            DLIB_TEST(max(abs(imag(samples2))) < tol);
+            DLIB_TEST(max(abs(subm(samples1, 0, 0, 1, minsamples) - subm(real(samples2), 0, 0, 1, minsamples))) < tol);
 
-                if (test++ % 10 == 0)
-                    print_spinner();
-            }
+            if (test++ % 10 == 0)
+                print_spinner();
         }
     }
 
@@ -682,19 +679,16 @@ namespace
 
         int test = 0;
 
-        for (int run = 0 ; run < 10 ; ++run)
+        for (long nsamples = 512 ; nsamples < 1024 ; ++nsamples)
         {
-            for (long nsamples = 512 ; nsamples < 1024 ; ++nsamples)
-            {
-                matrix<R> samples1 = matrix_cast<R>(randm(1, nsamples));
-                matrix<R> samples2 = istftr(stftr(samples1, hann_window{}, fftsize, wlen, wlen/2), hann_window{}, wlen, wlen/2);
+            matrix<R> samples1 = matrix_cast<R>(randm(1, nsamples));
+            matrix<R> samples2 = istftr(stftr(samples1, hann_window{}, fftsize, wlen, wlen/2), hann_window{}, wlen, wlen/2);
 
-                const long minsamples = std::min(samples1.nc(), samples2.nc());
-                DLIB_TEST(max(abs(subm(samples1, 0, 0, 1, minsamples) - subm(samples2, 0, 0, 1, minsamples))) < tol);
+            const long minsamples = std::min(samples1.nc(), samples2.nc());
+            DLIB_TEST(max(abs(subm(samples1, 0, 0, 1, minsamples) - subm(samples2, 0, 0, 1, minsamples))) < tol);
 
-                if (test++ % 10 == 0)
-                    print_spinner();
-            }
+            if (test++ % 10 == 0)
+                print_spinner();
         }
 
         print_spinner();
