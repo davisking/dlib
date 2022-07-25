@@ -90,22 +90,4 @@
 
 // ----------------------------------------------------------------------------------------
 
-    const matrix_exp window (
-        const matrix_exp& m,
-        window_type w,
-        window_symmetry type,
-        window_args args
-    );
-    /*!
-        requires
-            - is_vector(m) == true
-              (i.e. m is a row or column matrix)
-        ensures
-            - returns another vector M with a window function pointwise multiplied with m. The window function
-              is defined by w, the symmetry by type and any window arguments (such as beta_t for kaiser) are stored in args.
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-
 #endif //DLIB_MATRIX_WINDOWS_ABSTRACT_H
