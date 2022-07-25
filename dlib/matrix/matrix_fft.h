@@ -266,6 +266,18 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template<typename R>
+    struct type_t
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This simply "stores" a type. This is useful for function overloading.
+        !*/
+        using type = R;
+    };
+
+// ----------------------------------------------------------------------------------------
+
     namespace details
     {
         struct fft_func
@@ -301,6 +313,7 @@ namespace dlib
 
         template <
             typename EXP,
+            typename WINDOW,
             typename FFT_FUNC,
             typename T = typename EXP::type,
             typename R = dlib::remove_complex_t<T>,
@@ -308,7 +321,7 @@ namespace dlib
         >
         matrix<C> stft_impl (
             const matrix_exp<EXP>& signal,
-            window_type  w,
+            const WINDOW& w,
             std::size_t fftsize,
             std::size_t wlen,
             std::size_t hoplen,
@@ -327,6 +340,9 @@ namespace dlib
             const std::size_t nframes       = (signal.size() + total_padding - overlap) / hoplen;
             matrix<C> stft = zeros_matrix<C>(nframes,
                                              FFT_FUNC::freqsize(fftsize));
+            matrix<R> win(1,wlen);
+            for (std::size_t i = 0 ; i < wlen ; ++i)
+                win(0, i) = w(i, wlen, type_t<R>{});
 
             /*! TODO: reduce extra buffers, e.g. padded !*/
             matrix<T> padded;
@@ -338,7 +354,7 @@ namespace dlib
 
             for (long i = 0 ; i < stft.nr() ; ++i)
             {
-                set_rowm(stft, i) = fft_obj(join_rows(window(subm(padded, 0, i*hoplen, 1, wlen), w, PERIODIC, {}),
+                set_rowm(stft, i) = fft_obj(join_rows(pointwise_multiply(win, subm(padded, 0, i*hoplen, 1, wlen)),
                                                       zeros_matrix<T>(1, fftsize - wlen)));
             }
 
@@ -348,6 +364,7 @@ namespace dlib
         template <
             typename ReturnType,
             typename EXP,
+            typename WINDOW,
             typename IFFT_FUNC,
             typename T = typename EXP::type,
             typename R = dlib::remove_complex_t<T>,
@@ -355,7 +372,7 @@ namespace dlib
         >
         matrix<ReturnType> istft_impl (
             const matrix_exp<EXP>& stft,
-            window_type w,
+            const WINDOW& w,
             std::size_t wlen,
             std::size_t hoplen,
             const IFFT_FUNC& ifft_obj
@@ -369,9 +386,13 @@ namespace dlib
 
             const size_t ntime = (stft.nr() - 1) * hoplen + wlen;
             matrix<ReturnType> signal = zeros_matrix<ReturnType>(1, ntime);
-            matrix<R> norm   = zeros_matrix<R>(1, ntime);
-            matrix<R> win    = window(ones_matrix<R>(1, wlen), w, PERIODIC, {});
-            matrix<R> win2   = squared(win);
+            matrix<R> norm = zeros_matrix<R>(1, ntime);
+            matrix<R> win(1, wlen);
+            matrix<R> win2(1, wlen);
+            for (std::size_t i = 0 ; i < wlen ; ++i) {
+                win(0, i)   = w(i, wlen, type_t<R>{});
+                win2(0, i)  = win(0, i) * win(0, i);
+            }
 
             for (long t = 0 ; t < stft.nr() ; ++t)
             {
@@ -379,10 +400,10 @@ namespace dlib
                 set_subm(norm,   0, t*hoplen, 1, wlen) += win2;
             }
 
-            /*! Remove padding of wlen/2 and wlen on either end !*/
-            norm = subm(norm, 0, wlen/2, 1, ntime - wlen);
-            DLIB_ASSERT(sum(norm < 1e-13) == 0, "NOLA constraint not satisfied");
-            signal = pointwise_divide(subm(signal, 0, wlen/2, 1, ntime - wlen), norm);
+            /*! Remove padding of wlen/2 and wlen/2 on either end !*/
+            DLIB_ASSERT(sum(subm(norm, 0, wlen/2, 1, ntime - wlen) < 1e-13) == 0, "NOLA constraint not satisfied");
+            signal = pointwise_divide(subm(signal, 0, wlen/2, 1, ntime - wlen),
+                                      subm(norm,   0, wlen/2, 1, ntime - wlen));
 
             return signal;
         }
@@ -390,10 +411,117 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename EXP>
+    struct hann_window
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This returns a function object with signature R(size_t i, size_t N) which computes
+                a periodic Hann window which can be passed to the STFT family of functions.
+        !*/
+
+        template<typename R>
+        R operator()(std::size_t i, std::size_t N, type_t<R>) const
+        /*!
+            requires
+                - R is float, double, or long double
+        !*/
+        { return hann<R>(i, N, PERIODIC);};
+    };
+
+    struct blackman_window
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This returns a function object with signature R(size_t i, size_t N) which computes
+                a periodic Blackman window which can be passed to the STFT family of functions.
+        !*/
+
+        template<typename R>
+        R operator()(std::size_t i, std::size_t N, type_t<R>) const
+        /*!
+            requires
+                - R is float, double, or long double
+        !*/
+        { return blackman<R>(i, N, PERIODIC);};
+    };
+
+    struct blackman_nuttall_window
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This returns a function object with signature R(size_t i, size_t N) which computes
+                a periodic Blackman-Nuttall window which can be passed to the STFT family of functions.
+        !*/
+
+        template<typename R>
+        R operator()(std::size_t i, std::size_t N, type_t<R>) const
+        /*!
+            requires
+                - R is float, double, or long double
+        !*/
+        { return blackman_nuttall<R>(i, N, PERIODIC);};
+    };
+
+    struct blackman_harris_window
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This returns a function object with signature R(size_t i, size_t N) which computes
+                a periodic Blackman-Harris window which can be passed to the STFT family of functions.
+        !*/
+
+        template<typename R>
+        R operator()(std::size_t i, std::size_t N, type_t<R>) const
+        /*!
+            requires
+                - R is float, double, or long double
+        !*/
+        { return blackman_harris<R>(i, N, PERIODIC);};
+    };
+
+    struct blackman_harris7_window
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This returns a function object with signature R(size_t i, size_t N) which computes
+                a periodic 7th order Blackman-Harris window which can be passed to the STFT family of functions.
+        !*/
+
+        template<typename R>
+        R operator()(std::size_t i, std::size_t N, type_t<R>) const
+        /*!
+            requires
+                - R is float, double, or long double
+        !*/
+        { return blackman_harris7<R>(i, N, PERIODIC);};
+    };
+
+    struct kaiser_window
+    {
+        kaiser_window(beta_t beta_) : beta{beta_} {}
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This returns a function object with signature R(size_t i, size_t N) which computes
+                a periodic Kaiser window which can be passed to the STFT family of functions.
+        !*/
+
+        template<typename R>
+        R operator()(std::size_t i, std::size_t N, type_t<R>) const
+        /*!
+            requires
+                - R is float, double, or long double
+        !*/
+        { return kaiser<R>(i, N, beta, PERIODIC);};
+
+        beta_t beta;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename EXP, typename WINDOW>
     auto stft (
         const matrix_exp<EXP>& signal,
-        window_type w,
+        const WINDOW& w,
         std::size_t fftsize,
         std::size_t wlen,
         std::size_t hoplen
@@ -403,10 +531,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename T, typename Alloc>
+    template <typename T, typename Alloc, typename WINDOW>
     auto stft (
         const std::vector<T, Alloc>& signal,
-        window_type w,
+        const WINDOW& w,
         std::size_t fftsize,
         std::size_t wlen,
         std::size_t hoplen
@@ -417,10 +545,14 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename EXP, typename T = typename EXP::type>
+    template <
+        typename EXP,
+        typename WINDOW,
+        typename T = typename EXP::type
+    >
     auto istft (
         const matrix_exp<EXP>& stft,
-        window_type w,
+        const WINDOW& w,
         std::size_t wlen,
         std::size_t hoplen
     ) -> decltype(details::istft_impl<T>(stft, w, wlen, hoplen, details::ifft_func{})) {
@@ -429,10 +561,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename EXP>
+    template <typename EXP, typename WINDOW>
     auto stftr (
         const matrix_exp<EXP>& signal,
-        window_type w,
+        const WINDOW& w,
         std::size_t fftsize,
         std::size_t wlen,
         std::size_t hoplen
@@ -442,10 +574,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename T, typename Alloc>
+    template <typename T, typename Alloc, typename WINDOW>
     auto stftr (
         const std::vector<T, Alloc>& signal,
-        window_type w,
+        const WINDOW& w,
         std::size_t fftsize,
         std::size_t wlen,
         std::size_t hoplen
@@ -456,10 +588,15 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename EXP, typename T = typename EXP::type, typename R = remove_complex_t<T>>
+    template <
+        typename EXP,
+        typename WINDOW,
+        typename T = typename EXP::type,
+        typename R = remove_complex_t<T>
+    >
     auto istftr (
         const matrix_exp<EXP>& stft,
-        window_type w,
+        const WINDOW& w,
         std::size_t wlen,
         std::size_t hoplen
     ) ->decltype(details::istft_impl<R>(stft, w, wlen, hoplen, details::ifftr_func{})){
