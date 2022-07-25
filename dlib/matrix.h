@@ -14,7 +14,6 @@
 #include "matrix/matrix_read_from_istream.h"
 #include "matrix/matrix_fft.h"
 #include "matrix/matrix_generic_image.h"
-#include "matrix/matrix_windows.h"
 
 #ifdef DLIB_USE_BLAS
 #include "matrix/matrix_blas_bindings.h"
