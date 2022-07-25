@@ -498,7 +498,7 @@ namespace dlib
 
     struct kaiser_window
     {
-        kaiser_window(beta_t beta_) : beta{beta_} {}
+        kaiser_window(beta_t beta_) : beta{std::move(beta_)} {}
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This returns a function object with signature R(size_t i, size_t N) which computes
