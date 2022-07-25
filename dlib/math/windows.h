@@ -225,39 +225,6 @@ namespace dlib
     }
 
     // ----------------------------------------------------------------------------------------
-
-    enum window_type
-    {
-        HANN,
-        BLACKMAN,
-        BLACKMAN_NUTTALL,
-        BLACKMAN_HARRIS,
-        BLACKMAN_HARRIS7,
-        KAISER
-    };
-
-    struct window_args
-    {
-        beta_t beta;
-    };
-
-    template<typename R>
-    R window(std::size_t i, std::size_t N, window_type w, window_symmetry type, window_args args)
-    {
-        switch(w)
-        {
-            case HANN:              return hann<R>(i, N, type);
-            case BLACKMAN:          return blackman<R>(i, N, type);
-            case BLACKMAN_NUTTALL:  return blackman_nuttall<R>(i, N, type);
-            case BLACKMAN_HARRIS:   return blackman_harris<R>(i, N, type);
-            case BLACKMAN_HARRIS7:  return blackman_harris7<R>(i, N, type);
-            case KAISER:            return kaiser<R>(i, N, args.beta, type);
-        }
-        DLIB_CASSERT(false, "This should never happen");
-        return R{};
-    }
-
-    // ----------------------------------------------------------------------------------------
 }
 
 #endif //DLIB_MATH_WINDOWS
