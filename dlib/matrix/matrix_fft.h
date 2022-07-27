@@ -266,18 +266,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template<typename R>
-    struct type_t
-    {
-        /*!
-            WHAT THIS OBJECT REPRESENTS
-                This simply "stores" a type. This is useful for function overloading.
-        !*/
-        using type = R;
-    };
-
-// ----------------------------------------------------------------------------------------
-
     namespace details
     {
         struct fft_func
@@ -342,7 +330,7 @@ namespace dlib
                                              FFT_FUNC::freqsize(fftsize));
             matrix<R> win(1,wlen);
             for (std::size_t i = 0 ; i < wlen ; ++i)
-                win(0, i) = w(i, wlen, type_t<R>{});
+                win(0, i) = w(i, wlen);
 
             /*! TODO: reduce extra buffers, e.g. padded !*/
             matrix<T> padded;
@@ -390,7 +378,7 @@ namespace dlib
             matrix<R> win(1, wlen);
             matrix<R> win2(1, wlen);
             for (std::size_t i = 0 ; i < wlen ; ++i) {
-                win(0, i)   = w(i, wlen, type_t<R>{});
+                win(0, i)   = w(i, wlen);
                 win2(0, i)  = win(0, i) * win(0, i);
             }
 
@@ -411,110 +399,67 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    struct hann_window
+    const auto hann_window = [](std::size_t i, std::size_t N) 
+    /*!
+        WHAT THIS OBJECT REPRESENTS
+            This returns a function object with signature double(size_t i, size_t N) which computes
+            a periodic Hann window which can be passed to the STFT family of functions.
+    !*/
     {
-        /*!
-            WHAT THIS OBJECT REPRESENTS
-                This returns a function object with signature R(size_t i, size_t N) which computes
-                a periodic Hann window which can be passed to the STFT family of functions.
-        !*/
-
-        template<typename R>
-        R operator()(std::size_t i, std::size_t N, type_t<R>) const
-        /*!
-            requires
-                - R is float, double, or long double
-        !*/
-        { return hann<R>(i, N, PERIODIC);};
+        return hann(i, N, PERIODIC);
     };
 
-    struct blackman_window
+    const auto blackman_window = [](std::size_t i, std::size_t N) 
+    /*!
+        WHAT THIS OBJECT REPRESENTS
+            This returns a function object with signature double(size_t i, size_t N) which computes
+            a periodic Blackman window which can be passed to the STFT family of functions.
+    !*/
     {
-        /*!
-            WHAT THIS OBJECT REPRESENTS
-                This returns a function object with signature R(size_t i, size_t N) which computes
-                a periodic Blackman window which can be passed to the STFT family of functions.
-        !*/
-
-        template<typename R>
-        R operator()(std::size_t i, std::size_t N, type_t<R>) const
-        /*!
-            requires
-                - R is float, double, or long double
-        !*/
-        { return blackman<R>(i, N, PERIODIC);};
+        return blackman(i, N, PERIODIC);
+    };
+    
+    const auto blackman_nuttall_window = [](std::size_t i, std::size_t N) 
+    /*!
+        WHAT THIS OBJECT REPRESENTS
+            This returns a function object with signature double(size_t i, size_t N) which computes
+            a periodic Blackman-Nuttall window which can be passed to the STFT family of functions.
+    !*/
+    {
+        return blackman_nuttall(i, N, PERIODIC);
     };
 
-    struct blackman_nuttall_window
+    const auto blackman_harris_window = [](std::size_t i, std::size_t N) 
+    /*!
+        WHAT THIS OBJECT REPRESENTS
+            This returns a function object with signature double(size_t i, size_t N) which computes
+            a periodic Blackman-Harris window which can be passed to the STFT family of functions.
+    !*/
     {
-        /*!
-            WHAT THIS OBJECT REPRESENTS
-                This returns a function object with signature R(size_t i, size_t N) which computes
-                a periodic Blackman-Nuttall window which can be passed to the STFT family of functions.
-        !*/
-
-        template<typename R>
-        R operator()(std::size_t i, std::size_t N, type_t<R>) const
-        /*!
-            requires
-                - R is float, double, or long double
-        !*/
-        { return blackman_nuttall<R>(i, N, PERIODIC);};
+        return blackman_harris(i, N, PERIODIC);
     };
 
-    struct blackman_harris_window
+    const auto blackman_harris7_window = [](std::size_t i, std::size_t N) 
+    /*!
+        WHAT THIS OBJECT REPRESENTS
+            This returns a function object with signature double(size_t i, size_t N) which computes
+            a periodic 7th order Blackman-Harris window which can be passed to the STFT family of functions.
+    !*/
     {
-        /*!
-            WHAT THIS OBJECT REPRESENTS
-                This returns a function object with signature R(size_t i, size_t N) which computes
-                a periodic Blackman-Harris window which can be passed to the STFT family of functions.
-        !*/
-
-        template<typename R>
-        R operator()(std::size_t i, std::size_t N, type_t<R>) const
-        /*!
-            requires
-                - R is float, double, or long double
-        !*/
-        { return blackman_harris<R>(i, N, PERIODIC);};
+        return blackman_harris7(i, N, PERIODIC);
     };
 
-    struct blackman_harris7_window
+    inline auto kaiser_window(beta_t beta)
+    /*!
+        ensures:
+            - This returns a function object with signature double(size_t i, size_t N) which computes
+              a periodic Kaiser window which can be passed to the STFT family of functions.
+    !*/
     {
-        /*!
-            WHAT THIS OBJECT REPRESENTS
-                This returns a function object with signature R(size_t i, size_t N) which computes
-                a periodic 7th order Blackman-Harris window which can be passed to the STFT family of functions.
-        !*/
-
-        template<typename R>
-        R operator()(std::size_t i, std::size_t N, type_t<R>) const
-        /*!
-            requires
-                - R is float, double, or long double
-        !*/
-        { return blackman_harris7<R>(i, N, PERIODIC);};
-    };
-
-    struct kaiser_window
-    {
-        kaiser_window(beta_t beta_) : beta{std::move(beta_)} {}
-        /*!
-            WHAT THIS OBJECT REPRESENTS
-                This returns a function object with signature R(size_t i, size_t N) which computes
-                a periodic Kaiser window which can be passed to the STFT family of functions.
-        !*/
-
-        template<typename R>
-        R operator()(std::size_t i, std::size_t N, type_t<R>) const
-        /*!
-            requires
-                - R is float, double, or long double
-        !*/
-        { return kaiser<R>(i, N, beta, PERIODIC);};
-
-        beta_t beta;
-    };
+        return [=](std::size_t i, std::size_t N) {
+            return kaiser(i, N, beta, PERIODIC);
+        };
+    }
 
 // ----------------------------------------------------------------------------------------
 

@@ -564,13 +564,13 @@ namespace
         matrix<R> tone = sin(2 * pi * matrix_cast<R>(range(0, 511)) / 512.0f);
 
         {
-            matrix<complex<R>> m_stft = stft(tone, hann_window{}, 128, 64, 64/2);
+            matrix<complex<R>> m_stft = stft(tone, hann_window, 128, 64, 64/2);
             DLIB_TEST(m_stft.nr() == 17 && m_stft.nc() == 128);
             for (long i = 0 ; i < m_stft.nr() ; ++i)
                 for (long j = 0 ; j < m_stft.nc() ; ++j)
                     DLIB_TEST(std::abs(m_stft(i,j) - complex_cast<R>(STFT_FFT_128_WLEN_64_TONE_512[i][j])) < tol);
 
-            matrix<complex<R>> tone2 = istft(m_stft, hann_window{}, 64, 64/2);
+            matrix<complex<R>> tone2 = istft(m_stft, hann_window, 64, 64/2);
             DLIB_TEST(tone.nc() == tone2.nc());
             DLIB_TEST(tone.nr() == tone2.nr());
             for (long i = 0 ; i < tone.nc() ; ++i)
@@ -580,13 +580,13 @@ namespace
         print_spinner();
 
         {
-            matrix<complex<R>> m_stft = stft(tone, hann_window{}, 64, 64, 64/2);
+            matrix<complex<R>> m_stft = stft(tone, hann_window, 64, 64, 64/2);
             DLIB_TEST(m_stft.nr() == 17 && m_stft.nc() == 64);
             for (long i = 0 ; i < m_stft.nr() ; ++i)
                 for (long j = 0 ; j < m_stft.nc() ; ++j)
                     DLIB_TEST(std::abs(m_stft(i,j) - complex_cast<R>(STFT_FFT_64_WLEN_64_TONE_512[i][j])) < tol);
 
-            matrix<complex<R>> tone2 = istft(m_stft, hann_window{}, 64, 64/2);
+            matrix<complex<R>> tone2 = istft(m_stft, hann_window, 64, 64/2);
             DLIB_TEST(tone.nc() == tone2.nc());
             DLIB_TEST(tone.nr() == tone2.nr());
             for (long i = 0 ; i < tone.nc() ; ++i)
@@ -596,13 +596,13 @@ namespace
         print_spinner();
 
         {
-            matrix<complex<R>> m_stftr = stftr(tone, hann_window{}, 128, 64, 64/2);
+            matrix<complex<R>> m_stftr = stftr(tone, hann_window, 128, 64, 64/2);
             DLIB_TEST(m_stftr.nr() == 17 && m_stftr.nc() == 65);
             for (long i = 0 ; i < m_stftr.nr() ; ++i)
                 for (long j = 0 ; j < m_stftr.nc() ; ++j)
                     DLIB_TEST(std::abs(m_stftr(i,j) - complex_cast<R>(STFT_FFT_128_WLEN_64_TONE_512[i][j])) < tol);
 
-            matrix<R> tone2 = istftr(m_stftr, hann_window{}, 64, 64/2);
+            matrix<R> tone2 = istftr(m_stftr, hann_window, 64, 64/2);
             DLIB_TEST(tone.nc() == tone2.nc());
             DLIB_TEST(tone.nr() == tone2.nr());
             for (long i = 0 ; i < tone.nc() ; ++i)
@@ -612,13 +612,13 @@ namespace
         print_spinner();
 
         {
-            matrix<complex<R>> m_stftr = stftr(tone, hann_window{}, 64, 64, 64/2);
+            matrix<complex<R>> m_stftr = stftr(tone, hann_window, 64, 64, 64/2);
             DLIB_TEST(m_stftr.nr() == 17 && m_stftr.nc() == 33);
             for (long i = 0 ; i < m_stftr.nr() ; ++i)
                 for (long j = 0 ; j < m_stftr.nc() ; ++j)
                     DLIB_TEST(std::abs(m_stftr(i,j) - complex_cast<R>(STFT_FFT_64_WLEN_64_TONE_512[i][j])) < tol);
 
-            matrix<R> tone2 = istftr(m_stftr, hann_window{}, 64, 64/2);
+            matrix<R> tone2 = istftr(m_stftr, hann_window, 64, 64/2);
             DLIB_TEST(tone.nc() == tone2.nc());
             DLIB_TEST(tone.nr() == tone2.nr());
             for (long i = 0 ; i < tone.nc() ; ++i)
@@ -653,18 +653,18 @@ namespace
     template<typename R>
     void test_random_stfts()
     {
-        test_random_stfts_impl<R>(hann_window{}, 256, 128);
-        test_random_stfts_impl<R>(hann_window{}, 128, 128);
-        test_random_stfts_impl<R>(blackman_window{}, 256, 128);
-        test_random_stfts_impl<R>(blackman_window{}, 128, 128);
-        test_random_stfts_impl<R>(blackman_nuttall_window{}, 256, 128);
-        test_random_stfts_impl<R>(blackman_nuttall_window{}, 128, 128);
-        test_random_stfts_impl<R>(blackman_harris_window{}, 256, 128);
-        test_random_stfts_impl<R>(blackman_harris_window{}, 128, 128);
-        test_random_stfts_impl<R>(blackman_harris7_window{}, 256, 128);
-        test_random_stfts_impl<R>(blackman_harris7_window{}, 128, 128);
-        test_random_stfts_impl<R>(kaiser_window{attenuation_t{60.0}}, 256, 128);
-        test_random_stfts_impl<R>(kaiser_window{attenuation_t{60.0}}, 128, 128);
+        test_random_stfts_impl<R>(hann_window, 256, 128);
+        test_random_stfts_impl<R>(hann_window, 128, 128);
+        test_random_stfts_impl<R>(blackman_window, 256, 128);
+        test_random_stfts_impl<R>(blackman_window, 128, 128);
+        test_random_stfts_impl<R>(blackman_nuttall_window, 256, 128);
+        test_random_stfts_impl<R>(blackman_nuttall_window, 128, 128);
+        test_random_stfts_impl<R>(blackman_harris_window, 256, 128);
+        test_random_stfts_impl<R>(blackman_harris_window, 128, 128);
+        test_random_stfts_impl<R>(blackman_harris7_window, 256, 128);
+        test_random_stfts_impl<R>(blackman_harris7_window, 128, 128);
+        test_random_stfts_impl<R>(kaiser_window(attenuation_t{60.0}), 256, 128);
+        test_random_stfts_impl<R>(kaiser_window(attenuation_t{60.0}), 128, 128);
 
         print_spinner();
     }
@@ -682,7 +682,7 @@ namespace
         for (long nsamples = 512 ; nsamples < 1024 ; ++nsamples)
         {
             matrix<R> samples1 = matrix_cast<R>(randm(1, nsamples));
-            matrix<R> samples2 = istftr(stftr(samples1, hann_window{}, fftsize, wlen, wlen/2), hann_window{}, wlen, wlen/2);
+            matrix<R> samples2 = istftr(stftr(samples1, hann_window, fftsize, wlen, wlen/2), hann_window, wlen, wlen/2);
 
             const long minsamples = std::min(samples1.nc(), samples2.nc());
             DLIB_TEST(max(abs(subm(samples1, 0, 0, 1, minsamples) - subm(samples2, 0, 0, 1, minsamples))) < tol);

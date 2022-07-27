@@ -61,36 +61,30 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-    template<typename R>
-    R kaiser(R x, R L, beta_t beta)
+    inline double kaiser(double x, double L, beta_t beta)
     /*!
         This computes the kaiser window function or kaiser-bessel window function.
         See https://en.wikipedia.org/wiki/Kaiser_window.
 
-        requires
-            - R is float, double, or long double
         ensures
             - returns the kaiser window function when |x| <= L/2 where L is the window duration
             - returns 0 otherwise
     !*/
     {
-        static_assert(std::is_floating_point<R>::value, "template parameter must be a floating point type");
-
-        if (std::abs(x) <= L/R{2})
+        if (std::abs(x) <= L/2.0)
         {
-            const R r = 2*x/L;
-            const R a = dlib::cyl_bessel_i(0, beta.v*std::sqrt(1-r*r));
-            const R b = dlib::cyl_bessel_i(0, beta.v);
+            const double r = 2*x/L;
+            const double a = dlib::cyl_bessel_i(0, beta.v*std::sqrt(1-r*r));
+            const double b = dlib::cyl_bessel_i(0, beta.v);
             return a / b;
         }
         else
         {
-            return R{0};
+            return 0.0;
         }
     }
 
-    template<typename R>
-    R kaiser(std::size_t i, std::size_t N, beta_t beta, window_symmetry type)
+    inline double kaiser(std::size_t i, std::size_t N, beta_t beta, window_symmetry type)
     /*!
         This computes the kaiser window function or kaiser-bessel window function.
         See https://en.wikipedia.org/wiki/Kaiser_window
@@ -98,56 +92,48 @@ namespace dlib
         in an array of size N where 0 <= i < N is the array index.
 
         requires
-            - R is float, double, or long double
             - 0 <= i < N
         ensures
             - returns kaiser(i - (N-1)/2, window_duration{N-1}, beta)
     !*/
     {
-        static_assert(std::is_floating_point<R>::value, "template parameter must be a floating point type");
         DLIB_ASSERT(i < N, "index out of range");
         const std::size_t size = type == SYMMETRIC ? N-1 : N;
-        return kaiser(R(i) - R(size) / R(2), R(size), beta);
+        return kaiser(i - size / 2.0, size, beta);
     }
 
     // ----------------------------------------------------------------------------------------
 
-    template<typename R>
-    R hann(std::size_t i, std::size_t N, window_symmetry type)
+    inline double hann(std::size_t i, std::size_t N, window_symmetry type)
     /*!
         This computes the hann window function.
         See https://en.wikipedia.org/wiki/Window_function#Hann_and_Hamming_windows.
 
         requires
-            - R is float, double, or long double
             - 0 <= i < N
     !*/
     {
-        static_assert(std::is_floating_point<R>::value, "template parameter must be a floating point type");
         DLIB_ASSERT(i < N, "index out of range");
         const std::size_t size = type == SYMMETRIC ? N-1 : N;
-        const R phi = (2.0 * pi * i) / size;
+        const double phi = (2.0 * pi * i) / size;
         return 0.5 - 0.5 * std::cos(phi);
     }
 
     // ----------------------------------------------------------------------------------------
 
-    template<typename R>
-    R blackman(std::size_t i, std::size_t N, window_symmetry type)
+    inline double blackman(std::size_t i, std::size_t N, window_symmetry type)
     /*!
         This computes the Blackman window function.
         See https://en.wikipedia.org/wiki/Window_function#Blackman_window and
         https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.windows.blackman.html.
 
         requires
-            - R is float, double, or long double
             - 0 <= i < N
     !*/
     {
-        static_assert(std::is_floating_point<R>::value, "template parameter must be a floating point type");
         DLIB_ASSERT(i < N, "index out of range");
         const std::size_t size = type == SYMMETRIC ? N-1 : N;
-        const R phi = (2.0 * pi * i) / size;
+        const double phi = (2.0 * pi * i) / size;
         return 0.42 -
                0.5 * std::cos(phi) +
                0.08 * std::cos(2.0 * phi);
@@ -155,21 +141,18 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-    template<typename R>
-    R blackman_nuttall(std::size_t i, std::size_t N, window_symmetry type)
+    inline double blackman_nuttall(std::size_t i, std::size_t N, window_symmetry type)
     /*!
         This computes the Blackman-Nuttall window function.
         See https://en.wikipedia.org/wiki/Window_function#Blackman%E2%80%93Nuttall_window.
 
         requires
-            - R is float, double, or long double
             - 0 <= i < N
     !*/
     {
-        static_assert(std::is_floating_point<R>::value, "template parameter must be a floating point type");
         DLIB_ASSERT(i < N, "index out of range");
         const std::size_t size = type == SYMMETRIC ? N-1 : N;
-        const R phi = (2.0 * pi * i) / size;
+        const double phi = (2.0 * pi * i) / size;
         return 0.3635819 -
                0.4891775 * std::cos(phi) +
                0.1365995 * std::cos(2*phi) -
@@ -178,8 +161,7 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-    template<typename R>
-    R blackman_harris(std::size_t i, std::size_t N, window_symmetry type)
+    inline double blackman_harris(std::size_t i, std::size_t N, window_symmetry type)
     /*!
         This computes the Blackman-Harris window function.
         See https://en.wikipedia.org/wiki/Window_function#Blackman%E2%80%93Harris_window.
@@ -189,10 +171,9 @@ namespace dlib
             - 0 <= i < N
     !*/
     {
-        static_assert(std::is_floating_point<R>::value, "template parameter must be a floating point type");
         DLIB_ASSERT(i < N, "index out of range");
         const std::size_t size = type == SYMMETRIC ? N-1 : N;
-        const R phi = (2.0 * pi * i) / size;
+        const double phi = (2.0 * pi * i) / size;
         return 0.35875 -
                0.48829 * std::cos(phi) +
                0.14128 * std::cos(2*phi) -
@@ -201,8 +182,7 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-    template<typename R>
-    R blackman_harris7(std::size_t i, std::size_t N, window_symmetry type)
+    inline double blackman_harris7(std::size_t i, std::size_t N, window_symmetry type)
     /*!
         This computes the 7-order Blackman-Harris window function.
 
@@ -211,10 +191,9 @@ namespace dlib
             - 0 <= i < N
     !*/
     {
-        static_assert(std::is_floating_point<R>::value, "template parameter must be a floating point type");
         DLIB_ASSERT(i < N, "index out of range");
         const std::size_t size = type == SYMMETRIC ? N-1 : N;
-        const R phi = (2.0 * pi * i) / size;
+        const double phi = (2.0 * pi * i) / size;
         return 0.27105 -
                0.43329 * std::cos(phi) +
                0.21812 * std::cos(2*phi) -

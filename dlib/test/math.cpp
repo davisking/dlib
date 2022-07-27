@@ -159,16 +159,15 @@ namespace
         0.06526578, 0.05421678, 0.0442408 , 0.03530386, 0.02736726
     };
 
-    template<typename R>
     void test_kaiser()
     {
-        constexpr R tol = std::is_same<R,float>::value ? 1e-3 : 1e-7;
+        constexpr double tol = 1e-7;
 
         for (size_t i = 0 ; i < 100 ; ++i)
         {
-            DLIB_TEST(std::abs(dlib::kaiser<R>(i, 100, beta_t{10.0}, SYMMETRIC) - KAISER_DATA_N_100_BETA_10[i]) < tol);
-            DLIB_TEST(std::abs(dlib::kaiser<R>(i, 100, attenuation_t{60.0}, SYMMETRIC) - KAISER_DATA_N_100_ATT_60_SYMMETRIC[i]) < tol);
-            DLIB_TEST(std::abs(dlib::kaiser<R>(i, 100, attenuation_t{60.0}, PERIODIC) - KAISER_DATA_N_100_ATT_60_PERIODIC[i]) < tol);
+            DLIB_TEST(std::abs(dlib::kaiser(i, 100, beta_t{10.0}, SYMMETRIC) -  KAISER_DATA_N_100_BETA_10[i]) < tol);
+            DLIB_TEST(std::abs(dlib::kaiser(i, 100, attenuation_t{60.0}, SYMMETRIC) - KAISER_DATA_N_100_ATT_60_SYMMETRIC[i]) < tol);
+            DLIB_TEST(std::abs(dlib::kaiser(i, 100, attenuation_t{60.0}, PERIODIC) - KAISER_DATA_N_100_ATT_60_PERIODIC[i]) < tol);
         }
     }
 
@@ -206,15 +205,14 @@ namespace
             1.5708419435684406e-02, 8.8563746356556394e-03, 3.9426493427610620e-03, 9.8663578586422052e-04
     };
 
-    template<typename R>
     void test_hann()
     {
-        constexpr R tol = std::is_same<R,float>::value ? 1e-5 : 1e-12;
+        constexpr double tol = 1e-12;
 
         for (size_t i = 0 ; i < 100 ; ++i)
         {
-            DLIB_TEST(std::abs(dlib::hann<R>(i, 100, SYMMETRIC) - HANN_SYMMETRIC[i]) < tol);
-            DLIB_TEST(std::abs(dlib::hann<R>(i, 100, PERIODIC) - HANN_PERIODIC[i]) < tol);
+            DLIB_TEST(std::abs(dlib::hann(i, 100, SYMMETRIC) - HANN_SYMMETRIC[i]) < tol);
+            DLIB_TEST(std::abs(dlib::hann(i, 100, PERIODIC) - HANN_PERIODIC[i]) < tol);
         }
     }
 
@@ -257,15 +255,14 @@ namespace
             1.4293022330515576e-03,  3.5581189102243393e-04
     };
 
-    template<typename R>
     void test_blackman()
     {
-        constexpr R tol = std::is_same<R,float>::value ? 1e-5 : 1e-12;
+        constexpr double tol = 1e-12;
 
         for (size_t i = 0 ; i < 100 ; ++i)
         {
-            DLIB_TEST(std::abs(dlib::blackman<R>(i, 100, SYMMETRIC) - BLACKMAN_SYMMETRIC[i]) < tol);
-            DLIB_TEST(std::abs(dlib::blackman<R>(i, 100, PERIODIC) - BLACKMAN_PERIODIC[i]) < tol);
+            DLIB_TEST(std::abs(dlib::blackman(i, 100, SYMMETRIC) - BLACKMAN_SYMMETRIC[i]) < tol);
+            DLIB_TEST(std::abs(dlib::blackman(i, 100, PERIODIC) - BLACKMAN_PERIODIC[i]) < tol);
         }
     }
 
@@ -303,15 +300,14 @@ namespace
        1.7188369763968692e-03, 1.0915036026995974e-03, 6.7584165234202756e-04, 4.3943533275720564e-04
     };
 
-    template<typename R>
     void test_blackman_nutall()
     {
-        constexpr R tol = std::is_same<R,float>::value ? 1e-5 : 1e-12;
+        constexpr double tol = 1e-12;
 
         for (size_t i = 0 ; i < 100 ; ++i)
         {
-            DLIB_TEST(std::abs(dlib::blackman_nuttall<R>(i, 100, SYMMETRIC) - NUTTALL_SYMMETRIC[i]) < tol);
-            DLIB_TEST(std::abs(dlib::blackman_nuttall<R>(i, 100, PERIODIC) - NUTTALL_PERIODIC[i]) < tol);
+            DLIB_TEST(std::abs(dlib::blackman_nuttall(i, 100, SYMMETRIC) - NUTTALL_SYMMETRIC[i]) < tol);
+            DLIB_TEST(std::abs(dlib::blackman_nuttall(i, 100, PERIODIC) - NUTTALL_PERIODIC[i]) < tol);
         }
     }
 
@@ -349,15 +345,14 @@ namespace
             1.0907824408156758e-03, 6.0603009811725436e-04, 2.9195214423186414e-04, 1.1637868895762217e-04
     };
 
-    template<typename R>
     void test_blackman_harris()
     {
-        constexpr R tol = std::is_same<R,float>::value ? 1e-5 : 1e-12;
+        constexpr double tol = 1e-12;
 
         for (size_t i = 0 ; i < 100 ; ++i)
         {
-            DLIB_TEST(std::abs(dlib::blackman_harris<R>(i, 100, SYMMETRIC) - BLACKHARRIS_SYMMETRIC[i]) < tol);
-            DLIB_TEST(std::abs(dlib::blackman_harris<R>(i, 100, PERIODIC) - BLACKHARRIS_PERIODIC[i]) < tol);
+            DLIB_TEST(std::abs(dlib::blackman_harris(i, 100, SYMMETRIC) - BLACKHARRIS_SYMMETRIC[i]) < tol);
+            DLIB_TEST(std::abs(dlib::blackman_harris(i, 100, PERIODIC) - BLACKHARRIS_PERIODIC[i]) < tol);
         }
     }
 
@@ -376,16 +371,11 @@ namespace
             test_cyl_bessel_i<double>();
             test_cyl_bessel_j<float>();
             test_cyl_bessel_j<double>();
-            test_kaiser<float>();
-            test_kaiser<double>();
-            test_hann<float>();
-            test_hann<double>();
-            test_blackman<float>();
-            test_blackman<double>();
-            test_blackman_nutall<float>();
-            test_blackman_nutall<double>();
-            test_blackman_harris<float>();
-            test_blackman_harris<double>();
+            test_kaiser();
+            test_hann();
+            test_blackman();
+            test_blackman_nutall();
+            test_blackman_harris();
         }
     } a;
 }

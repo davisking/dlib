@@ -7,6 +7,7 @@
 #include <cmath>
 #include <limits>
 #include <stdexcept>
+#include <type_traits>
 #include "../../numeric_constants.h"
 #include "../../assert.h"
 
@@ -23,6 +24,7 @@ namespace dlib
         template<typename R>
         R cyl_bessel_i(R nu, R x)
         {
+            static_assert(std::is_floating_point<R>::value, "template parameter must be a floating point type");
             DLIB_ASSERT(nu >= R{0} && x >= R{0}, "bad arguments. Contract preconditions are : nu >= 0 and x >= 0");
 
             if (std::isnan(nu) || std::isnan(x))
@@ -61,6 +63,7 @@ namespace dlib
         template<typename R>
         R cyl_bessel_j(R nu, R x)
         {
+            static_assert(std::is_floating_point<R>::value, "template parameter must be a floating point type");
             DLIB_ASSERT(nu >= R{0} && x >= R{0}, "bad arguments. Contract preconditions are : nu >= 0 and x >= 0");
 
             if (std::isnan(nu) || std::isnan(x))
