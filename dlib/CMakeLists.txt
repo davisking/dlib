@@ -47,7 +47,15 @@ endif()
 
 # default to a Release build (except if CMAKE_BUILD_TYPE is set)
 include(cmake_utils/release_build_by_default)
-include(cmake_utils/use_cpp_11.cmake)
+
+function(enable_cpp14_for_target target_name)
+   set_target_properties(${target_name} PROPERTIES
+      CXX_STANDARD 17
+      CXX_STANDARD_REQUIRED ON
+   )
+endfunction()
+
+# include(cmake_utils/use_cpp_11.cmake)
 
 # Set DLIB_VERSION in the including CMake file so they can use it to do whatever they want. 
 get_directory_property(has_parent PARENT_DIRECTORY)
@@ -889,10 +897,10 @@ if (NOT TARGET dlib)
       add_library(dlib_all_source_cpp STATIC all/source.cpp) 
       target_link_libraries(dlib_all_source_cpp dlib)
       target_compile_options(dlib_all_source_cpp PUBLIC ${active_preprocessor_switches})
-      enable_cpp11_for_target(dlib_all_source_cpp)
+      enable_cpp14_for_target(dlib_all_source_cpp)
    endif()
 
-   enable_cpp11_for_target(dlib)
+   enable_cpp14_for_target(dlib)
    if((MSVC AND CMAKE_VERSION VERSION_LESS 3.11) OR CMAKE_VERSION VERSION_LESS 3.3)
       target_compile_options(dlib PUBLIC ${active_compile_opts})
       target_compile_options(dlib PRIVATE ${active_compile_opts_private})
