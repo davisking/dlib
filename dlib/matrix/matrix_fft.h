@@ -271,10 +271,10 @@ namespace dlib
         struct fft_func
         {
             template<typename MAT, typename T = typename MAT::type, typename std::enable_if<is_complex<T>::value, bool>::type = true>
-            auto operator()(const MAT& mat) const -> decltype(dlib::fft(mat)) { return dlib::fft(mat); }
+            auto operator()(const MAT& mat) const { return dlib::fft(mat); }
 
             template<typename MAT, typename T = typename MAT::type, typename std::enable_if<!is_complex<T>::value, bool>::type = true>
-            auto operator()(const MAT& mat) const -> decltype(dlib::fft(dlib::complex_matrix(mat))) { return dlib::fft(dlib::complex_matrix(mat)); }
+            auto operator()(const MAT& mat) const { return dlib::fft(dlib::complex_matrix(mat)); }
 
             static constexpr std::size_t freqsize(std::size_t fftsize) { return fftsize; }
         };
@@ -282,7 +282,7 @@ namespace dlib
         struct fftr_func
         {
             template<typename MAT>
-            auto operator()(const MAT& mat) const -> decltype(dlib::fftr(mat)) { return dlib::fftr(mat); }
+            auto operator()(const MAT& mat) const { return dlib::fftr(mat); }
 
             static constexpr std::size_t freqsize(std::size_t fftsize) { return dlib::fftr_nc_size(fftsize); }
         };
@@ -290,24 +290,21 @@ namespace dlib
         struct ifft_func
         {
             template<typename MAT>
-            auto operator()(const MAT& mat) const -> decltype(dlib::ifft(mat)) { return dlib::ifft(mat); }
+            auto operator()(const MAT& mat) const { return dlib::ifft(mat); }
         };
 
         struct ifftr_func
         {
             template<typename MAT>
-            auto operator()(const MAT& mat) const -> decltype(dlib::ifftr(mat)) { return dlib::ifftr(mat); }
+            auto operator()(const MAT& mat) const { return dlib::ifftr(mat); }
         };
 
         template <
             typename EXP,
             typename WINDOW,
-            typename FFT_FUNC,
-            typename T = typename EXP::type,
-            typename R = dlib::remove_complex_t<T>,
-            typename C = dlib::add_complex_t<T>
+            typename FFT_FUNC
         >
-        matrix<C> stft_impl (
+        auto stft_impl (
             const matrix_exp<EXP>& signal,
             const WINDOW& w,
             std::size_t fftsize,
@@ -316,6 +313,10 @@ namespace dlib
             const FFT_FUNC& fft_obj
         )
         {
+            using T = typename EXP::type;
+            using R = remove_complex_t<T>;
+            using C = add_complex_t<T>;
+
             static_assert(std::is_floating_point<R>::value, "underlying type must be real or complex floating point type");
             DLIB_ASSERT(is_vector(signal), "input must be a vector type");
             DLIB_ASSERT(signal.size() >= (long)wlen, "signal.size() >= wlen not satisfied");
@@ -353,12 +354,9 @@ namespace dlib
             typename ReturnType,
             typename EXP,
             typename WINDOW,
-            typename IFFT_FUNC,
-            typename T = typename EXP::type,
-            typename R = dlib::remove_complex_t<T>,
-            typename C = dlib::add_complex_t<T>
+            typename IFFT_FUNC
         >
-        matrix<ReturnType> istft_impl (
+        auto istft_impl (
             const matrix_exp<EXP>& stft,
             const WINDOW& w,
             std::size_t wlen,
@@ -366,6 +364,9 @@ namespace dlib
             const IFFT_FUNC& ifft_obj
         )
         {
+            using T = typename EXP::type;
+            using R = remove_complex_t<T>;
+
             static_assert(is_complex<T>::value, "matrix type must be complex");
             static_assert(std::is_floating_point<R>::value, "underlying type must be complex floating point type");
             DLIB_ASSERT(stft.nc() > 0 && stft.nr() > 0, "stft must be non-empty");
@@ -376,11 +377,9 @@ namespace dlib
             matrix<ReturnType> signal = zeros_matrix<ReturnType>(1, ntime);
             matrix<R> norm = zeros_matrix<R>(1, ntime);
             matrix<R> win(1, wlen);
-            matrix<R> win2(1, wlen);
-            for (std::size_t i = 0 ; i < wlen ; ++i) {
-                win(0, i)   = w(i, wlen);
-                win2(0, i)  = win(0, i) * win(0, i);
-            }
+            for (std::size_t i = 0 ; i < wlen ; ++i)
+                win(0, i) = w(i, wlen);
+            matrix<R> win2 = squared(win);
 
             for (long t = 0 ; t < stft.nr() ; ++t)
             {
@@ -456,9 +455,7 @@ namespace dlib
               a periodic Kaiser window which can be passed to the STFT family of functions.
     !*/
     {
-        return [=](std::size_t i, std::size_t N) {
-            return kaiser(i, N, beta, PERIODIC);
-        };
+        return [=](std::size_t i, std::size_t N){return kaiser(i, N, beta, PERIODIC);};
     }
 
 // ----------------------------------------------------------------------------------------
@@ -470,7 +467,8 @@ namespace dlib
         std::size_t fftsize,
         std::size_t wlen,
         std::size_t hoplen
-    ) -> decltype(details::stft_impl(signal, w, fftsize, wlen, hoplen, details::fft_func{})) {
+    )
+    {
         return details::stft_impl(signal, w, fftsize, wlen, hoplen, details::fft_func{});
     }
 
@@ -484,7 +482,7 @@ namespace dlib
         std::size_t wlen,
         std::size_t hoplen
     )
-    -> decltype(stft(dlib::mat(signal), w, fftsize, wlen, hoplen)) {
+    {
         return stft(dlib::mat(signal), w, fftsize, wlen, hoplen);
     }
 
@@ -500,7 +498,8 @@ namespace dlib
         const WINDOW& w,
         std::size_t wlen,
         std::size_t hoplen
-    ) -> decltype(details::istft_impl<T>(stft, w, wlen, hoplen, details::ifft_func{})) {
+    )
+    {
         return details::istft_impl<T>(stft, w, wlen, hoplen, details::ifft_func{});
     }
 
@@ -513,7 +512,8 @@ namespace dlib
         std::size_t fftsize,
         std::size_t wlen,
         std::size_t hoplen
-    ) -> decltype(details::stft_impl(signal, w, fftsize, wlen, hoplen, details::fftr_func{})) {
+    )
+    {
         return details::stft_impl(signal, w, fftsize, wlen, hoplen, details::fftr_func{});
     }
 
@@ -527,7 +527,7 @@ namespace dlib
         std::size_t wlen,
         std::size_t hoplen
     )
-    -> decltype(stftr(dlib::mat(signal), w, fftsize, wlen, hoplen)) {
+    {
         return stftr(dlib::mat(signal), w, fftsize, wlen, hoplen);
     }
 
@@ -544,7 +544,8 @@ namespace dlib
         const WINDOW& w,
         std::size_t wlen,
         std::size_t hoplen
-    ) ->decltype(details::istft_impl<R>(stft, w, wlen, hoplen, details::ifftr_func{})){
+    )
+    {
         return details::istft_impl<R>(stft, w, wlen, hoplen, details::ifftr_func{});
     }
 
