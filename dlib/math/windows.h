@@ -98,8 +98,8 @@ namespace dlib
     !*/
     {
         DLIB_ASSERT(i < N, "index out of range");
-        const std::size_t size = type == SYMMETRIC ? N-1 : N;
-        return kaiser(i - size / 2.0, size, beta);
+        const double L = type == SYMMETRIC ? N-1 : N;
+        return kaiser(i - L / 2.0, L, beta);
     }
 
     // ----------------------------------------------------------------------------------------
