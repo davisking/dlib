@@ -49,10 +49,16 @@ endif()
 include(cmake_utils/release_build_by_default)
 
 function(enable_cpp14_for_target target_name)
-   set_target_properties(${target_name} PROPERTIES
-      CXX_STANDARD 17
-      CXX_STANDARD_REQUIRED ON
-   )
+
+   # Option 1
+   target_compile_features(${target_name} PUBLIC cxx_std_14)
+   set_target_properties(${target_name} PROPERTIES CXX_STANDARD_REQUIRED ON)
+
+   # # Option 2
+   # set_target_properties(${target_name} PROPERTIES
+   #    CXX_STANDARD 14
+   #    CXX_STANDARD_REQUIRED ON
+   # )
 endfunction()
 
 # include(cmake_utils/use_cpp_11.cmake)

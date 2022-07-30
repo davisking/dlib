@@ -166,6 +166,7 @@ set (tests
 # add all the cpp files we want to compile to this list.  This tells
 # cmake that they are part of our target (which is the executable named dtest)
 ADD_EXECUTABLE(${target_name} main.cpp tester.cpp ${tests})
+enable_cpp14_for_target(${target_name})
 
 if (CMAKE_COMPILER_IS_GNUCXX)
    # Turn on all warnings, and treat them as errors.
