@@ -2,10 +2,7 @@
 # Including this cmake script into your cmake project will cause visual studio
 # to build your project against the static C runtime.
 
-cmake_minimum_required(VERSION 2.8.12)
-if (POLICY CMP0054)
-   cmake_policy(SET CMP0054 NEW)
-endif()
+cmake_minimum_required(VERSION 3.8.0)
 
 if (MSVC OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
    option (DLIB_FORCE_MSVC_STATIC_RUNTIME "use static runtime" ON)

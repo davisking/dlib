@@ -5,19 +5,9 @@
 # All rights reserved. Use of this source code is governed by a
 # BSD-style license that can be found in the LICENSE file.
 
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.8.0)
 
-if (POLICY CMP0048)
-  # cmake warns if loaded from a min-3.0-required parent dir, so silence the warning:
-  cmake_policy(SET CMP0048 NEW)
-endif()
-
-# CMake versions < 3.4.0 do not support try_compile/pthread checks without C as active language.
-if(CMAKE_VERSION VERSION_LESS 3.4.0)
-  project(pybind11)
-else()
-  project(pybind11 CXX)
-endif()
+project(pybind11 CXX)
 
 # Check if pybind11 is being used directly or via add_subdirectory
 set(PYBIND11_MASTER_PROJECT OFF)

@@ -1,10 +1,5 @@
 
-cmake_minimum_required(VERSION 2.8.12)
-
-if (POLICY CMP0054)
-   cmake_policy(SET CMP0054 NEW)
-endif()
-
+cmake_minimum_required(VERSION 3.8.0)
 
 
 # Check if we are being built as part of a pybind11 module. 
@@ -24,40 +19,6 @@ if (COMMAND pybind11_add_module)
    endif()
 endif()
 
-
-
-set(USING_OLD_VISUAL_STUDIO_COMPILER 0)
-if(MSVC AND MSVC_VERSION VERSION_LESS 1900)
-   message(FATAL_ERROR "C++11 is required to use dlib, but the version of Visual Studio you are using is too old and doesn't support C++11.  You need Visual Studio 2015 or newer. ")
-elseif(MSVC AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.0.24210.0 AND "MSVC" MATCHES ${CMAKE_CXX_COMPILER_ID})
-   message(STATUS "NOTE: Visual Studio didn't have good enough C++11 support until Visual Studio 2015 update 3 (v19.0.24210.0)")
-   message(STATUS "So we aren't enabling things that require full C++11 support (e.g. the deep learning tools).")
-   message(STATUS "Also, be aware that Visual Studio's version naming is confusing, in particular, there are multiple versions of 'update 3'")
-   message(STATUS "So if you are getting this message you need to update to the newer version of Visual Studio to use full C++11.")
-   set(USING_OLD_VISUAL_STUDIO_COMPILER 1)
-elseif(MSVC AND (MSVC_VERSION EQUAL 1911 OR MSVC_VERSION EQUAL 1910))
-   message(STATUS "******************************************************************************************")
-   message(STATUS "Your version of Visual Studio has incomplete C++11 support and is unable to compile the ")
-   message(STATUS "DNN examples. So we are disabling the deep learning tools.  If you want to use the DNN ")
-   message(STATUS "tools in dlib then update your copy of Visual Studio.")
-   message(STATUS "******************************************************************************************")
-   set(USING_OLD_VISUAL_STUDIO_COMPILER 1)
-endif()
-
-if(CMAKE_COMPILER_IS_GNUCXX)
-   execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-   if (GCC_VERSION VERSION_LESS 4.9)
-      message(FATAL_ERROR "C++11 is required to use dlib, but the version of GCC you are using is too old and doesn't support C++11.  You need GCC 4.9 or newer. ")
-   endif()
-endif()
-
-
-# push USING_OLD_VISUAL_STUDIO_COMPILER to the parent so we can use it in the
-# examples CMakeLists.txt file.
-get_directory_property(has_parent PARENT_DIRECTORY)
-if(has_parent)
-   set(USING_OLD_VISUAL_STUDIO_COMPILER ${USING_OLD_VISUAL_STUDIO_COMPILER} PARENT_SCOPE)
-endif()
 
 
 

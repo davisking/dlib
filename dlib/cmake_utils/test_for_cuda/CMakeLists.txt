@@ -1,5 +1,5 @@
 
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.8.0)
 project(cuda_test)
 
 include_directories(../../cuda)
@@ -9,6 +9,6 @@ add_definitions(-DDLIB_USE_CUDA)
 option(CUDA_PROPAGATE_HOST_FLAGS "Propage C/CXX_FLAGS and friends to the host compiler via -Xcompile" OFF)
 find_package(CUDA 7.5 REQUIRED)
 set(CUDA_HOST_COMPILATION_CPP ON)
-list(APPEND CUDA_NVCC_FLAGS "-arch=sm_50;-std=c++11;-D__STRICT_ANSI__;-D_MWAITXINTRIN_H_INCLUDED;-D_FORCE_INLINES")
+list(APPEND CUDA_NVCC_FLAGS "-arch=sm_50;-std=c++14;-D__STRICT_ANSI__;-D_MWAITXINTRIN_H_INCLUDED;-D_FORCE_INLINES")
 
 cuda_add_library(cuda_test STATIC cuda_test.cu )
