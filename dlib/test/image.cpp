@@ -2307,27 +2307,30 @@ namespace
     }
 
     template <typename pixel_type>
-    double psnr(const matrix<pixel_type>& img1, const matrix<pixel_type>& img2)
+    double avg_pixel_delta(const matrix<pixel_type>& img1, const matrix<pixel_type>& img2)
     {
         DLIB_TEST(have_same_dimensions(img1, img2));
-        double mse = 0;
-        const long nk = width_step(img1) / img1.nc();
-        const long data_size = img1.size() * nk;
-        const bool has_alpha = nk == 4;
-        auto data1 = reinterpret_cast<const uint8_t*>(image_data(img1));
-        auto data2 = reinterpret_cast<const uint8_t*>(image_data(img2));
-        for (long i = 0; i < data_size; i += nk)
+
+        double delta = 0;
+        double size = 0;
+        for (long r = 0; r < img1.nr(); ++r) 
         {
-            // We are using the default WebP settings, which means 'exact' is disabled.
-            // RGB values in transparent areas will be modified to improve compression.
-            // As a result, we skip matching transparent pixels.
-            if (has_alpha && data1[i + 3] == 0 && data2[i + 3] == 0)
-                    continue;
-            for (long k = 0; k < nk; ++k)
-                mse += std::pow(static_cast<double>(data1[i + k]) - static_cast<double>(data2[i + k]), 2);
+            for (long c = 0; c < img1.nc(); ++c) 
+            {
+                const auto p1 = pixel_to_vector<double>(img1(r,c));
+                const auto p2 = pixel_to_vector<double>(img2(r,c));
+
+                const bool has_alpha = p1.size() == 4;
+                // We are using the default WebP settings, which means 'exact' is disabled.
+                // RGB values in transparent areas will be modified to improve compression.
+                // As a result, we skip matching transparent pixels.
+                if (has_alpha && p1(3) == 0 && p2(3) == 0) continue;
+
+                delta += sum(abs(p1-p2));
+                size += p1.size();
+            }
         }
-        mse /= data_size;
-        return 20 * std::log10(pixel_traits<pixel_type>::max()) - 10 * std::log10(mse);
+        return delta / size;
     }
 
     void test_webp()
@@ -2385,36 +2388,35 @@ namespace
             save_webp(rgba_img, "test_rgba.webp", quality);
             load_webp(rgba_dec, "test_rgba.webp");
             if (quality > 100)
-                DLIB_TEST(psnr(rgba_img, rgba_dec) == std::numeric_limits<double>::infinity());
+                DLIB_TEST(avg_pixel_delta(rgba_img, rgba_dec) == 0);
             else
-                DLIB_TEST(psnr(rgba_img, rgba_dec) > 30);
+                DLIB_TEST(avg_pixel_delta(rgba_img, rgba_dec) < 7);
 
             assign_image(bgra_img, rgba_img);
             save_webp(bgra_img, "test_bgra.webp", quality);
             load_webp(bgra_dec, "test_bgra.webp");
             if (quality > 100)
-                DLIB_TEST(psnr(bgra_img, bgra_dec) == std::numeric_limits<double>::infinity());
+                DLIB_TEST(avg_pixel_delta(bgra_img, bgra_dec) == 0);
             else
-                DLIB_TEST(psnr(bgra_img, bgra_dec) > 30);
+                DLIB_TEST(avg_pixel_delta(bgra_img, bgra_dec) < 7);
 
-            // Here we assign an image with an alpha channel to an image without an alpha channel.
-            // Since we are not using the exact mode in WebP, the PSNR will be quite low, since
-            // pixels in transparent areas will have different values.
+            rgb_img.set_size(rgba_img.nr(), rgba_img.nc());
+            rgb_img = rgb_pixel(0,0,0);
             assign_image(rgb_img, rgba_img);
             save_webp(rgb_img, "test_rgb.webp", quality);
             load_webp(rgb_dec, "test_rgb.webp");
             if (quality > 100)
-                DLIB_TEST(psnr(rgb_img, rgb_dec) == std::numeric_limits<double>::infinity());
+                DLIB_TEST(avg_pixel_delta(rgb_img, rgb_dec) == 0);
             else
-                DLIB_TEST(psnr(rgb_img, rgb_dec) > 15);
+                DLIB_TEST(avg_pixel_delta(rgb_img, rgb_dec) < 7);
 
             assign_image(bgr_img, rgb_img);
             save_webp(bgr_img, "test_bgr.webp", quality);
             load_webp(bgr_dec, "test_bgr.webp");
             if (quality > 100)
-                DLIB_TEST(psnr(bgr_img, bgr_dec) == std::numeric_limits<double>::infinity());
+                DLIB_TEST(avg_pixel_delta(bgr_img, bgr_dec) == 0);
             else
-                DLIB_TEST(psnr(bgr_img, bgr_dec) > 15);
+                DLIB_TEST(avg_pixel_delta(bgr_img, bgr_dec) < 7);
         }
 #endif
     }
