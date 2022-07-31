@@ -114,8 +114,8 @@ jobs:
     - name: Build ancillary tools
       run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --target imglab htmlify dtoc --parallel 4
 
-  windows-2016:
-    runs-on: 'windows-2016'
+  windows-2019:
+    runs-on: 'windows-2019'
     steps:
     - uses: actions/checkout@v2
     - name: Configure
