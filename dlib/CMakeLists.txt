@@ -6,12 +6,12 @@ set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 ### General stuff ###########################################################################################
 
 ### Policies ################################################################################################
-if(POLICY CMP0048)
-   cmake_policy(SET CMP0048 NEW)
-endif()
+if (POLICY CMP0048)
+   cmake_policy( SET CMP0048 NEW )
+endif (POLICY CMP0048)
 if(POLICY CMP0077)
    cmake_policy(SET CMP0077 NEW)
-endif()
+endif(POLICY CMP0077)
 ### Policies ################################################################################################
 
 project(dlib 
@@ -19,36 +19,34 @@ project(dlib
    DESCRIPTION    "Dlib is a modern C++ toolkit containing machine learning algorithms and tools for creating
                    complex software in C++ to solve real world problems."
    HOMEPAGE_URL   http://dlib.net/
-   LANGUAGES      C CXX CUDA ASM)
+   LANGUAGES      C CXX) # CUDA ASM)
 
 ### Dependencies ############################################################################################ 
-include(FetchContent) 
+include(CMakeDependentOption)
+include(CMakePackageConfigHelpers)
 find_package(Threads REQUIRED)
-find_package(X11 QUIET)
-find_package(CUDAToolkit)
+find_package(X11)
+# find_package(CUDAToolkit)
 find_package(GIF)
-find_package(PNG QUIET)
-find_package(JPEG QUIET)
+find_package(PNG)
+find_package(JPEG)
+find_package(SQLite3)
+if (DLIB_USE_MKL_WITH_TBB)
+   set(BLA_VENDOR Intel10_64lp)
+elseif(DLIB_USE_MKL_SEQUENTIAL)
+   set(BLA_VENDOR Intel10_64lp_seq)
+endif()
 find_package(BLAS)
 find_package(LAPACK)
-find_package(SQLITE3)
-find_package(MKL)
-
-FetchContent_Declare(
-   pybind11
-   GIT_REPOSITORY https://github.com/pybind/pybind11.git
-   GIT_TAG v2.10.0
-)
-FetchContent_MakeAvailable(pybind11)
 ### Dependencies ############################################################################################
 
-### Compiler options ########################################################################################
+### Additional helper scripts ###############################################################################
 include(cmake_utils/check_if_neon_available.cmake)
 include(cmake_utils/check_if_avx_instructions_executable_on_host.cmake)
 include(cmake_utils/check_if_sse4_instructions_executable_on_host.cmake)
 include(cmake_utils/find_libwebp.cmake)
-include(cmake_utils/find_cudnn.cmake)
-### Compiler options ########################################################################################
+# include(cmake_utils/find_cudnn.cmake)
+### Additional helper scripts ###############################################################################
 
 ### Options #################################################################################################
 option(DLIB_ENABLE_ASSERTS       
@@ -57,8 +55,8 @@ option(DLIB_ENABLE_STACK_TRACE
    "Enable this if you want to turn on the DLIB_STACK_TRACE macros")
 option(DLIB_ISO_CPP_ONLY         
    "Enable this if you don't want to compile any non-ISO C++ code (i.e. you don't use any of the API Wrappers)")
-option(DLIB_NO_GUI_SUPPORT       
-   "Enable this if you don't want to compile any of the dlib GUI code")
+cmake_dependent_option(DLIB_NO_GUI_SUPPORT       
+   "Enable this if you don't want to compile any of the dlib GUI code" OFF "X11_FOUND" ON)
 cmake_dependent_option(USE_SSE4_INSTRUCTIONS 
    "Compile your program with SSE4 instructions" ON "SSE4_IS_AVAILABLE_ON_HOST" OFF)
 cmake_dependent_option(USE_AVX_INSTRUCTIONS  
@@ -147,6 +145,8 @@ if (NOT DLIB_ISO_CPP_ONLY)
       global_optimization/global_function_search.cpp
       filtering/kalman_filter.cpp
       svm/auto.cpp)
+
+   target_link_libraries(dlib PUBLIC Threads::Threads)
 endif()
 
 if (NOT DLIB_NO_GUI_SUPPORT AND X11_FOUND)
@@ -307,12 +307,6 @@ if (DLIB_USE_LAPACK)
 endif()
 
 if (DLIB_USE_BLAS OR DLIB_USE_LAPACK OR DLIB_USE_MKL_FFT)
-
-   if (DLIB_USE_MKL_WITH_TBB AND DLIB_USE_MKL_SEQUENTIAL)
-      set(DLIB_USE_MKL_SEQUENTIAL OFF CACHE STRING ${DLIB_USE_MKL_SEQUENTIAL_STR} FORCE )
-      message(STATUS "Disabling DLIB_USE_MKL_SEQUENTIAL. It cannot be used simultaneously with DLIB_USE_MKL_WITH_TBB.")
-   endif()
-
    if (DLIB_USE_MKL_WITH_TBB)
       target_compile_definitions(dlib PRIVATE DLIB_USE_MKL_WITH_TBB)
    endif()
@@ -326,31 +320,31 @@ if (DLIB_USE_BLAS OR DLIB_USE_LAPACK OR DLIB_USE_MKL_FFT)
    endif()
 endif()
 
-if (DLIB_USE_CUDA)
-   set(CUDA_HOST_COMPILATION_CPP ON)
+# if (DLIB_USE_CUDA)
+#    set(CUDA_HOST_COMPILATION_CPP ON)
    
-   # list(APPEND CUDA_NVCC_FLAGS "-D__STRICT_ANSI__;-D_MWAITXINTRIN_H_INCLUDED;-D_FORCE_INLINES;${FLAGS_FOR_NVCC}")
-   # list(APPEND CUDA_NVCC_FLAGS ${active_preprocessor_switches})
-   # if (NOT DLIB_IN_PROJECT_BUILD)
-   #    LIST(APPEND CUDA_NVCC_FLAGS -DDLIB__CMAKE_GENERATED_A_CONFIG_H_FILE)
-   # endif()
+#    # list(APPEND CUDA_NVCC_FLAGS "-D__STRICT_ANSI__;-D_MWAITXINTRIN_H_INCLUDED;-D_FORCE_INLINES;${FLAGS_FOR_NVCC}")
+#    # list(APPEND CUDA_NVCC_FLAGS ${active_preprocessor_switches})
+#    # if (NOT DLIB_IN_PROJECT_BUILD)
+#    #    LIST(APPEND CUDA_NVCC_FLAGS -DDLIB__CMAKE_GENERATED_A_CONFIG_H_FILE)
+#    # endif()
 
-   target_sources(dlib PRIVATE 
-      cuda/cuda_dlib.cu 
-      cuda/cudnn_dlibapi.cpp
-      cuda/cublas_dlibapi.cpp
-      cuda/cusolver_dlibapi.cu
-      cuda/curand_dlibapi.cpp
-      cuda/cuda_data_ptr.cpp
-      cuda/gpu_data.cpp)
+#    target_sources(dlib PRIVATE 
+#       cuda/cuda_dlib.cu 
+#       cuda/cudnn_dlibapi.cpp
+#       cuda/cublas_dlibapi.cpp
+#       cuda/cusolver_dlibapi.cu
+#       cuda/curand_dlibapi.cpp
+#       cuda/cuda_data_ptr.cpp
+#       cuda/gpu_data.cpp)
 
-   target_link_libraries(dlib PUBLIC CUDA::cudart CUDA::curand CUDA::cusolver CUDA::cublas)
-   target_link_libraries(dlib PUBLIC ${CUDNN_LIBRARIES})
-   target_include_directories(dlib PRIVATE ${CUDNN_INCLUDE_DIRS})
-   target_compile_definitions(dlib PRIVATE ${CUDNN_DEFINITIONS})
-   target_compile_definitions(dlib PRIVATE DLIB_USE_CUDA)
-   set_target_properties(dlib PROPERTIES CUDA_ARCHITECTURES ${DLIB_USE_CUDA_COMPUTE_CAPABILITIES})
-endif()
+#    target_link_libraries(dlib PUBLIC CUDA::cudart CUDA::curand CUDA::cusolver CUDA::cublas)
+#    target_link_libraries(dlib PUBLIC ${CUDNN_LIBRARIES})
+#    target_include_directories(dlib PRIVATE ${CUDNN_INCLUDE_DIRS})
+#    target_compile_definitions(dlib PRIVATE ${CUDNN_DEFINITIONS})
+#    target_compile_definitions(dlib PRIVATE DLIB_USE_CUDA)
+#    set_target_properties(dlib PROPERTIES CUDA_ARCHITECTURES ${DLIB_USE_CUDA_COMPUTE_CAPABILITIES})
+# endif()
 
 if (DLIB_ENABLE_ASSERTS)
    # Used by config.h.in
@@ -364,56 +358,14 @@ endif()
 
 # target_compile_features(dlib PUBLIC cxx_std_14)
 set_target_properties(dlib PROPERTIES 
-   VERSION ${VERSION}
+   VERSION ${PROJECT_VERSION}
    CXX_STANDARD 14
    CXX_STANDARD_REQUIRED ON
-   POSITION_INDEPENDENT_CODE ON
-   CXX_VISIBILITY_PRESET  "hidden"
-   CUDA_VISIBILITY_PRESET "hidden")
-
-target_link_libraries(dlib PUBLIC Threads::Threads)
+   POSITION_INDEPENDENT_CODE ON)
+   # CXX_VISIBILITY_PRESET  "hidden"
+   # CUDA_VISIBILITY_PRESET "hidden")
 
 add_library(dlib::dlib ALIAS dlib)
-
-pybind11_add_module(_dlib_pybind11
-   tools/python/src/dlib.cpp
-   tools/python/src/matrix.cpp
-   tools/python/src/vector.cpp
-   tools/python/src/svm_c_trainer.cpp
-   tools/python/src/svm_rank_trainer.cpp
-   tools/python/src/decision_functions.cpp
-   tools/python/src/other.cpp
-   tools/python/src/basic.cpp
-   tools/python/src/cca.cpp
-   tools/python/src/sequence_segmenter.cpp
-   tools/python/src/svm_struct.cpp
-   tools/python/src/image.cpp
-   tools/python/src/image2.cpp
-   tools/python/src/image3.cpp
-   tools/python/src/image4.cpp
-   tools/python/src/rectangles.cpp
-   tools/python/src/object_detection.cpp
-   tools/python/src/shape_predictor.cpp
-   tools/python/src/correlation_tracker.cpp
-   tools/python/src/face_recognition.cpp
-   tools/python/src/cnn_face_detector.cpp
-   tools/python/src/global_optimization.cpp
-   tools/python/src/image_dataset_metadata.cpp
-   tools/python/src/numpy_returns.cpp
-   tools/python/src/line.cpp)
-
-if (NOT DLIB_NO_GUI_SUPPORT)
-   target_sources(_dlib_pybind11 PRIVATE tools/python/src/gui.cpp)
-endif()
-
-target_link_libraries(_dlib_pybind11 PRIVATE dlib::dlib)
-
-# When invoked from setup.py CMAKE_LIBRARY_OUTPUT_DIRECTORY will be set.  But when you are just building via say
-# `cd dlib/tools/python; mkdir build; cd build; cmake ..` it won't be set.  It only matters for building the actual
-# distribution.  So skip this for people building directly with cmake (which they might do when testing stuff).
-if (CMAKE_LIBRARY_OUTPUT_DIRECTORY) 
-   configure_file(${PROJECT_SOURCE_DIR}/dlib/__init__.py.in ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/dlib/__init__.py)
-endif()
 
 ### Libraries and executables ###############################################################################
 
@@ -443,33 +395,32 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${CMAKE_INSTALL_INCLU
    PATTERN "sstream"
    REGEX "${CMAKE_CURRENT_BINARY_DIR}" EXCLUDE)
 
-configure_file(${PROJECT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
-# overwrite config.h with the configured one
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib)
-
+configure_file(${PROJECT_SOURCE_DIR}/config.h.in   ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 configure_file(${PROJECT_SOURCE_DIR}/revision.h.in ${CMAKE_CURRENT_BINARY_DIR}/revision.h)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/revision.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib)
+configure_file(cmake_utils/dlibConfig.cmake.in     ${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake @ONLY)
+configure_file(cmake_utils/dlib.pc.in              dlib-1.pc @ONLY)
+
+install(FILES 
+   ${CMAKE_CURRENT_BINARY_DIR}/config.h
+   ${CMAKE_CURRENT_BINARY_DIR}/revision.h
+   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib)
+   
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/dlib-1.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
 set(ConfigPackageLocation "${CMAKE_INSTALL_LIBDIR}/cmake/dlib")
 install(EXPORT dlib
    NAMESPACE dlib::
    DESTINATION ${ConfigPackageLocation})
 
-configure_file(cmake_utils/dlibConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" @ONLY)
-
-include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
    "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake"
    VERSION ${VERSION}
    COMPATIBILITY AnyNewerVersion)
 
 install(FILES 
-   "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" 
-   "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake" 
+   ${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake
+   ${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake
    DESTINATION ${ConfigPackageLocation})
-
-configure_file("cmake_utils/dlib.pc.in" "dlib-1.pc" @ONLY)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/dlib-1.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
 include(CPack)
 
