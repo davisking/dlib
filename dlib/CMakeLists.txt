@@ -4,14 +4,11 @@
 #
 
 
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.8.0)
 
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
-if(POLICY CMP0048)
-   cmake_policy(SET CMP0048 NEW)
-endif()
 if(POLICY CMP0077)
    cmake_policy(SET CMP0077 NEW)
 endif()
@@ -36,32 +33,12 @@ include(cmake_utils/set_compiler_specific_options.cmake)
 # Adhere to GNU filesystem layout conventions
 include(GNUInstallDirs)
 
-if (POLICY CMP0063)
-   # This policy tells cmake to really honor CXX_VISIBILITY_PRESET rather than
-   # ignore it for backwards compatibility.
-   cmake_policy(SET CMP0063 NEW)
-endif()
 if (POLICY CMP0075)
    cmake_policy(SET CMP0075 NEW)
 endif()
 
 # default to a Release build (except if CMAKE_BUILD_TYPE is set)
 include(cmake_utils/release_build_by_default)
-
-function(enable_cpp14_for_target target_name)
-
-   # Option 1
-   target_compile_features(${target_name} PUBLIC cxx_std_14)
-   set_target_properties(${target_name} PROPERTIES CXX_STANDARD_REQUIRED ON)
-
-   # # Option 2
-   # set_target_properties(${target_name} PROPERTIES
-   #    CXX_STANDARD 14
-   #    CXX_STANDARD_REQUIRED ON
-   # )
-endfunction()
-
-# include(cmake_utils/use_cpp_11.cmake)
 
 # Set DLIB_VERSION in the including CMake file so they can use it to do whatever they want. 
 get_directory_property(has_parent PARENT_DIRECTORY)
@@ -658,7 +635,7 @@ if (NOT TARGET dlib)
             set(CUDA_FOUND 0)
          endif()
 
-         if (CUDA_FOUND AND (NOT USING_OLD_VISUAL_STUDIO_COMPILER))
+         if (CUDA_FOUND)
 
             # There is some bug in cmake that causes it to mess up the
             # -std=c++11 option if you let it propagate it to nvcc in some
@@ -690,7 +667,7 @@ if (NOT TARGET dlib)
                LIST(APPEND CUDA_NVCC_FLAGS -DDLIB__CMAKE_GENERATED_A_CONFIG_H_FILE)
             endif()
             if (NOT MSVC)
-               list(APPEND CUDA_NVCC_FLAGS "-std=c++11")
+               list(APPEND CUDA_NVCC_FLAGS "-std=c++14")
             endif()
             if (CMAKE_POSITION_INDEPENDENT_CODE)
                # sometimes this setting isn't propagated to NVCC, which then causes the
@@ -790,7 +767,7 @@ if (NOT TARGET dlib)
             endif()
          endif()
 
-         if (CUDA_FOUND AND cudnn AND (NOT USING_OLD_VISUAL_STUDIO_COMPILER) AND cuda_test_compile_worked AND cudnn_test_compile_worked AND cudnn_include)
+         if (CUDA_FOUND AND cudnn AND cuda_test_compile_worked AND cudnn_test_compile_worked AND cudnn_include)
             set(source_files ${source_files} 
                cuda/cuda_dlib.cu 
                cuda/cudnn_dlibapi.cpp
@@ -816,9 +793,6 @@ if (NOT TARGET dlib)
          else()
             set(DLIB_USE_CUDA OFF CACHE STRING ${DLIB_USE_BLAS_STR} FORCE )
             toggle_preprocessor_switch(DLIB_USE_CUDA)
-            if (USING_OLD_VISUAL_STUDIO_COMPILER)
-               message(STATUS "*** Dlib CUDA support requires C++11 but your compiler doesn't support it. ***")
-            endif()
             if (NOT CUDA_FOUND)
                message(STATUS "DID NOT FIND CUDA")
             endif()
@@ -903,11 +877,11 @@ if (NOT TARGET dlib)
       add_library(dlib_all_source_cpp STATIC all/source.cpp) 
       target_link_libraries(dlib_all_source_cpp dlib)
       target_compile_options(dlib_all_source_cpp PUBLIC ${active_preprocessor_switches})
-      enable_cpp14_for_target(dlib_all_source_cpp)
+      target_compile_features(dlib_all_source_cpp PUBLIC cxx_std_14)
    endif()
 
-   enable_cpp14_for_target(dlib)
-   if((MSVC AND CMAKE_VERSION VERSION_LESS 3.11) OR CMAKE_VERSION VERSION_LESS 3.3)
+   target_compile_features(dlib PUBLIC cxx_std_14)
+   if((MSVC AND CMAKE_VERSION VERSION_LESS 3.11))
       target_compile_options(dlib PUBLIC ${active_compile_opts})
       target_compile_options(dlib PRIVATE ${active_compile_opts_private})
    else()

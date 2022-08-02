@@ -3,7 +3,7 @@
 # information about it at http://www.cmake.org
 #
 
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.8.0)
 
 # This variable contains a list of all the tests we are building
 # into the regression test suite.

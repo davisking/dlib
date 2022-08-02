@@ -2,7 +2,7 @@
 # it by defining some CMake variables and then include(cmake_swig_jni).  You
 # would make a CMakeLists.txt file that looks like the following:
 #
-#   cmake_minimum_required (VERSION 2.8.12)
+#   cmake_minimum_required (VERSION 3.8.0)
 #   project (example)
 #   set(java_package_name "org.mycompany")
 #   set(source_files
@@ -40,9 +40,7 @@
 ################################################################################
 ################################################################################
 
-cmake_minimum_required (VERSION 2.8.12)
-
-include(${CMAKE_CURRENT_LIST_DIR}/../cmake_utils/use_cpp_11.cmake)
+cmake_minimum_required (VERSION 3.8.0)
 
 # This block of code tries to figure out what the JAVA_HOME environment
 # variable should be by looking at the folder that contains the java
@@ -180,7 +178,7 @@ FILE(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${binary_dir_name}")
 
 set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/swig.i PROPERTIES CPLUSPLUS ON)
 swig_add_module(${output_library_name} java ${CMAKE_CURRENT_BINARY_DIR}/swig.i ${source_files})
-enable_cpp11_for_target(${output_library_name})
+target_compile_features(${output_library_name} PUBLIC cxx_std_14)
 
 include_directories(${JNI_INCLUDE_DIRS})
 swig_link_libraries(${output_library_name}  ${additional_link_libraries})

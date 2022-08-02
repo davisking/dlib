@@ -1,5 +1,5 @@
 
-cmake_minimum_required (VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.8.0)
 project (myproject)
 set(java_package_name net.dlib)
 set(source_files
