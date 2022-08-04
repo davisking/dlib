@@ -179,8 +179,8 @@ namespace dlib
         typedef typename M::type type;
         typedef const typename M::type const_ret_type;
         const_ret_type apply (long r, long c) const
-        { 
-            return static_cast<type>(std::floor(this->m(r,c)+0.5)); 
+        {
+            return static_cast<type>(std::round(this->m(r,c)));
         }
     };
 

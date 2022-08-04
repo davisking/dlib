@@ -92,7 +92,7 @@ namespace dlib
         std::vector<double> ang;
         std::vector<dlib::vector<double,2> > samples;
 
-        const long sc = static_cast<long>(scale+0.5);
+        const long sc = std::lround(scale);
 
         // accumulate a bunch of angle and vector samples
         dlib::vector<double,2> vect;
@@ -176,7 +176,7 @@ namespace dlib
         point_rotator rot(angle);
         point_rotator inv_rot(-angle);
 
-        const long sc = static_cast<long>(scale+0.5);
+        const long sc = std::lround(scale);
         long count = 0;
 
         // loop over the 4x4 grid of histogram buckets 

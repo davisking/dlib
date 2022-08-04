@@ -481,7 +481,7 @@ namespace dlib
 
             long top, bottom;
 
-            top = static_cast<long>(sqrt(std::max(rs - (first_x-x-0.5)*(first_x-x-0.5),0.0))+0.5);
+            top = std::lround(sqrt(std::max(rs - (first_x-x-0.5)*(first_x-x-0.5),0.0)));
             top += y;
             long last = top;
 
@@ -491,7 +491,7 @@ namespace dlib
             {
                 double a = i - x + 0.5;
                 // find the top of the arc
-                top = static_cast<long>(sqrt(std::max(rs - a*a,0.0))+0.5);
+                top = std::lround(sqrt(std::max(rs - a*a,0.0)));
                 top += y;
                 long temp = top;
 
@@ -506,7 +506,7 @@ namespace dlib
             }
 
             middle = std::max(cp.x(),first_x);
-            top = static_cast<long>(sqrt(std::max(rs - (last_x-x+0.5)*(last_x-x+0.5),0.0))+0.5);
+            top = std::lround(sqrt(std::max(rs - (last_x-x+0.5)*(last_x-x+0.5),0.0)));
             top += y;
             last = top;
             // draw the right half of the circle
@@ -514,7 +514,7 @@ namespace dlib
             {
                 double a = i - x - 0.5;
                 // find the top of the arc
-                top = static_cast<long>(sqrt(std::max(rs - a*a,0.0))+0.5);
+                top = std::lround(sqrt(std::max(rs - a*a,0.0)));
                 top += y;
                 long temp = top;
 
