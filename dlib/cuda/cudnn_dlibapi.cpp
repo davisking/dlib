@@ -788,7 +788,7 @@ namespace dlib
         select_best_algorithms (
             const tensor& data,
             const tensor_descriptor& dest_desc,
-            allow_cache_use allow_cache_use
+            allow_cache_use allow_cache_use_
         ) 
         {
             // Calling the cuDNN "find the best algorithm" functions is really slow.  So we keep a
@@ -800,7 +800,7 @@ namespace dlib
             // the cache.
             const auto cache_key = std::make_tuple(stride_y, stride_x, padding_y, padding_x, filters_nr, filters_nc);
             const auto iter = config_to_algo_cache.find(cache_key);
-            if (iter != config_to_algo_cache.end() && allow_cache_use == allow_cache_use::yes)
+            if (iter != config_to_algo_cache.end() && allow_cache_use_ == allow_cache_use::yes)
             {
                 std::tie(forward_algo, backward_data_algo, backward_filters_algo) = iter->second;
                 return;
