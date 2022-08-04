@@ -64,10 +64,10 @@ namespace dlib
         operator rectangle (
         ) const
         {
-            return rectangle((long)std::floor(l+0.5), 
-                             (long)std::floor(t+0.5),
-                             (long)std::floor(r+0.5),
-                             (long)std::floor(b+0.5));
+            return rectangle(std::lround(l),
+                             std::lround(t),
+                             std::lround(r),
+                             std::lround(b));
         }
 
         double left()   const { return l; }
