@@ -123,7 +123,7 @@ namespace dlib
                 for (long i = 0; i < num_intervals; ++i)
                 {
                     const long border_size = get_border_size(i)*step_size;
-                    const long lobe_size = static_cast<long>(std::pow(2.0, o+1.0)+0.5)*(i+1) + 1;
+                    const long lobe_size = std::lround(std::pow(2.0, o+1.0))*(i+1) + 1;
                     const double area_inv = 1.0/std::pow(3.0*lobe_size, 2.0);
 
                     const long lobe_offset = lobe_size/2+1;
@@ -206,7 +206,7 @@ namespace dlib
                 << "\n\t octave: " << octave 
             );
 
-            return initial_step_size*static_cast<long>(std::pow(2.0, (double)octave)+0.5);
+            return initial_step_size*std::lround(std::pow(2.0, (double)octave));
         }
 
         long nr (
