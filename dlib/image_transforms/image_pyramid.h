@@ -941,7 +941,7 @@ namespace dlib
             COMPILE_TIME_ASSERT( pixel_traits<out_pixel_type>::has_alpha == false );
 
 
-            set_image_size(down, (std::lround((N-1)*num_rows(original))/N), std::lround(((N-1)*num_columns(original))/N+0.5));
+            set_image_size(down, std::lround(((N-1)*num_rows(original))/N), std::lround(((N-1)*num_columns(original))/N));
             resize_image(original, down);
         }
 
