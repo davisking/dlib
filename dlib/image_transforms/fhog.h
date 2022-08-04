@@ -814,14 +814,14 @@ namespace dlib
             const int padding_cols_offset = (filter_cols_padding-1)/2;
             init_hog(hog, hog_nr, hog_nc, filter_rows_padding, filter_cols_padding);
 
-            const int visible_nr = std::min((long)cells_nr*cell_size,img.nr())-1;
-            const int visible_nc = std::min((long)cells_nc*cell_size,img.nc())-1;
+            const int visible_nr = std::min(cells_nr*cell_size,static_cast<int>(img.nr()))-1;
+            const int visible_nc = std::min(cells_nc*cell_size,static_cast<int>(img.nc()))-1;
 
             // First populate the gradient histograms
             for (int y = 1; y < visible_nr; y++) 
             {
-                const float yp = ((float)y+0.5)/(float)cell_size - 0.5;
-                const int iyp = (int)std::floor(yp);
+                const float yp = (y + 0.5) / static_cast<float>(cell_size) - 0.5;
+                const int iyp = static_cast<int>(std::floor(yp));
                 const float vy0 = yp - iyp;
                 const float vy1 = 1.0 - vy0;
                 int x;
@@ -835,7 +835,7 @@ namespace dlib
                     // We will use bilinear interpolation to add into the histogram bins.
                     // So first we precompute the values needed to determine how much each
                     // pixel votes into each bin.
-                    simd8f xp = (xx + 0.5) / (float)cell_size + 0.5;
+                    simd8f xp = (xx + 0.5) / static_cast<float>(cell_size) + 0.5;
                     simd8i ixp = simd8i(xp);
                     simd8f vx0 = xp - ixp;
                     simd8f vx1 = 1.0f - vx0;
@@ -943,8 +943,8 @@ namespace dlib
 
                     v = std::sqrt(v);
                     // add to 4 histograms around pixel using bilinear interpolation
-                    const float xp = ((double)x + 0.5) / (double)cell_size - 0.5;
-                    const int ixp = (int)std::floor(xp);
+                    const float xp = (x + 0.5) / static_cast<double>(cell_size) - 0.5;
+                    const int ixp = static_cast<int>(std::floor(xp));
                     const float vx0 = xp - ixp;
                     const float vx1 = 1.0 - vx0;
 

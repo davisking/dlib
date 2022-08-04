@@ -941,7 +941,7 @@ namespace dlib
             COMPILE_TIME_ASSERT( pixel_traits<out_pixel_type>::has_alpha == false );
 
 
-            set_image_size(down, ((N-1)*num_rows(original))/N+0.5, ((N-1)*num_columns(original))/N+0.5);
+            set_image_size(down, (std::lround((N-1)*num_rows(original))/N), std::lround(((N-1)*num_columns(original))/N+0.5);
             resize_image(original, down);
         }
 
@@ -1168,7 +1168,7 @@ namespace dlib
         DLIB_CASSERT(0 < scale && scale <= 1);
         pyramid_type pyr;
         // This scale factor maps this many levels down the pyramid
-        long pyramid_down_iter = static_cast<long>(std::log(scale)/std::log(pyramid_rate(pyr))+0.5);
+        long pyramid_down_iter = std::lround(std::log(scale)/std::log(pyramid_rate(pyr)));
         pyramid_down_iter = put_in_range(0, (long)rects.size()-1, pyramid_down_iter);
 
         return rects[pyramid_down_iter].tl_corner() + pyr.point_down(p, pyramid_down_iter);
