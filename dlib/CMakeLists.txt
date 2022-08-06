@@ -55,7 +55,7 @@ cmake_dependent_option(USE_AVX_INSTRUCTIONS
 cmake_dependent_option(USE_NEON_INSTRUCTIONS 
    "Compile your program with ARM-NEON instructions" ON "ARM_NEON_IS_AVAILABLE" OFF)
 cmake_dependent_option(DLIB_NO_GUI_SUPPORT
-   "Enable this if you don't want to compile any of the dlib GUI code" OFF "DLIB_ISO_CPP_ONLY;X11_FOUND" ON)
+   "Enable this if you don't want to compile any of the dlib GUI code" OFF "NOT DLIB_ISO_CPP_ONLY;X11_FOUND" ON)
 cmake_dependent_option(DLIB_PNG_SUPPORT         
    "Disable this if you don't want to link against libpng"  ON "NOT DLIB_ISO_CPP_ONLY" OFF)
 cmake_dependent_option(DLIB_JPEG_SUPPORT        
