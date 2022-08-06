@@ -32,7 +32,7 @@
 #
 
 
-cmake_minimum_required(VERSION 3.8.0)
+cmake_minimum_required(VERSION 3.17)
 # Every project needs a name.  We call this the "examples" project.
 project(examples)
 
@@ -113,6 +113,7 @@ macro(add_gui_example name)
    if (DLIB_NO_GUI_SUPPORT)
       message("No GUI support, so we won't build the ${name} example.")
    else()
+      message(STATUS "building with GUI support")
       add_example(${name})
    endif()
 endmacro()
