@@ -1528,7 +1528,7 @@ namespace dlib
             const uint32 len = lhs->digits_used + rhs->digits_used;
             for (unsigned long i = 0; i < len; ++i)
             {
-                uint64 num1 = static_cast<uint64>(std::floor(a[i*2].real()+0.5));
+                uint64 num1 = static_cast<uint64>(std::round(a[i*2].real()));
                 num1 += carry;
                 carry = 0;
                 if (num1 > 255)
@@ -1537,7 +1537,7 @@ namespace dlib
                     num1 = (num1&0xFF);
                 }
 
-                uint64 num2 = static_cast<uint64>(std::floor(a[i*2+1].real()+0.5));
+                uint64 num2 = static_cast<uint64>(std::round(a[i*2+1].real()));
                 num2 += carry;
                 carry = 0;
                 if (num2 > 255)

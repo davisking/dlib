@@ -1658,7 +1658,7 @@ namespace dlib
         chip_details() : angle(0), rows(0), cols(0) {}
         chip_details(const rectangle& rect_) : rect(rect_),angle(0), rows(rect_.height()), cols(rect_.width()) {}
         chip_details(const drectangle& rect_) : rect(rect_),angle(0), 
-          rows((unsigned long)(rect_.height()+0.5)), cols((unsigned long)(rect_.width()+0.5)) {}
+          rows(std::lround(rect_.height())), cols(std::lround(rect_.width())) {}
         chip_details(const drectangle& rect_, unsigned long size) : rect(rect_),angle(0) 
         { compute_dims_from_size(size); }
         chip_details(const drectangle& rect_, unsigned long size, double angle_) : rect(rect_),angle(angle_) 

@@ -80,7 +80,7 @@ namespace resnet50
             repeat<2, res_64,  transition<64, 1,
             relu<BN<conv<64, 3, 1,INPUT>>>>>>>>>>>>;
     };
-};
+}
 
 // This model namespace contains the definitions for:
 // - SSL model using the Barlow Twins loss, a projector head and an input_rgb_image_pair.

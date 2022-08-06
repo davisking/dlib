@@ -163,20 +163,21 @@ ADD_EXECUTABLE(${target_name} main.cpp tester.cpp ${tests})
 
 if (CMAKE_COMPILER_IS_GNUCXX)
    # Turn on all warnings, and treat them as errors.
-   add_definitions("-W -Wall -Wextra -Werror")
+   add_compile_options(-W -Wall -Wextra -Wpedantic -Werror)
+   add_compile_options(-fdiagnostics-color=always)
    # I don't care about unused testing functions though.  I like to keep them
    # around.  Don't warn about it.
-   add_definitions("-Wno-unused-function")
-   add_definitions("-Wno-strict-overflow")
-   add_definitions("-Wno-maybe-uninitialized")
+   add_compile_options(-Wno-unused-function)
+   add_compile_options(-Wno-strict-overflow)
+   add_compile_options(-Wno-maybe-uninitialized)
 elseif (MSVC)
    # Treat warnings as errors.
-   add_definitions("/WX")
+   add_compile_options(/WX)
 else() # basically Clang
    # Treat warnings as errors, but do not turn on all warnings.
-   add_definitions("-W -Werror")
+   add_compile_options(-W -Werror)
    # This is for the comment in face_detection_ex.cpp that says "faces/*.jpg"
-   add_definitions("-Wno-comment")
+   add_compile_options(-Wno-comment)
 endif()
 
 

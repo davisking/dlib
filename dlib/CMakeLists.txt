@@ -82,6 +82,7 @@ cmake_dependent_option(DLIB_USE_CUDA
 if (DLIB_USE_CUDA)
    set(DLIB_USE_CUDA_COMPUTE_CAPABILITIES 50 CACHE STRING ${DLIB_USE_CUDA_COMPUTE_CAPABILITIES_STR})
 endif()
+### Options #################################################################################################
 
 if(NOT CMAKE_BUILD_TYPE)
    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)

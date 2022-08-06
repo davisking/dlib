@@ -46,11 +46,6 @@ endif()
 
 add_subdirectory(../../dlib dlib_build)
 
-if (USING_OLD_VISUAL_STUDIO_COMPILER)
-   message(FATAL_ERROR "You have to use a version of Visual Studio that supports C++11.  As of December 2017, the only versions that have good enough C++11 support to compile the dlib Python API is a fully updated Visual Studio 2015 or a fully updated Visual Studio 2017.  Older versions of either of these compilers have bad C++11 support and will fail to compile the Python extension. ***SO UPDATE YOUR VISUAL STUDIO TO MAKE THIS ERROR GO AWAY***")
-endif()
-
-
 add_definitions(-DDLIB_VERSION=${DLIB_VERSION})
 
 # Tell cmake to compile all these cpp files into a dlib python module.

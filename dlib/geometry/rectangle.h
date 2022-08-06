@@ -650,10 +650,10 @@ namespace dlib
     {
         DLIB_ASSERT(scale > 0, "scale factor must be > 0");
 
-        long l = (long)std::round(rect.left()*scale);
-        long t = (long)std::round(rect.top()*scale);
-        long r = (long)std::round(rect.right()*scale);
-        long b = (long)std::round(rect.bottom()*scale);
+        const long l = std::lround(rect.left()*scale);
+        const long t = std::lround(rect.top()*scale);
+        const long r = std::lround(rect.right()*scale);
+        const long b = std::lround(rect.bottom()*scale);
         return rectangle(l, t, r, b);
     }
 
@@ -770,8 +770,8 @@ namespace dlib
         }
         else
         {
-            double scale = std::sqrt(area/(double)rect.area());
-            return centered_rect(rect, (long)std::round(rect.width()*scale), (long)std::round(rect.height()*scale));
+            const double scale = std::sqrt(area/static_cast<double>(rect.area()));
+            return centered_rect(rect, std::lround(rect.width()*scale), std::lround(rect.height()*scale));
         }
     }
 #if defined (_MSC_VER)

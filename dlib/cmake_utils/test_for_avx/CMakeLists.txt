@@ -1,5 +1,5 @@
 
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.8.0)
 project(avx_test)
 
 set(USE_AVX_INSTRUCTIONS ON CACHE BOOL "Use AVX instructions")
