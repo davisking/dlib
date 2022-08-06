@@ -8,24 +8,24 @@
 # attempts to find some other BLAS and LAPACK libraries if you don't have 
 # the Intel MKL.
 #
-#  blas_found               - True if BLAS is available
-#  lapack_found             - True if LAPACK is available
-#  found_intel_mkl          - True if the Intel MKL library is available
-#  found_intel_mkl_headers  - True if Intel MKL headers are available
-#  blas_libraries           - link against these to use BLAS library 
-#  lapack_libraries         - link against these to use LAPACK library 
-#  mkl_libraries            - link against these to use the MKL library
-#  mkl_include_dir          - add to the include path to use the MKL library
-#  openmp_libraries         - Set to Intel's OpenMP library if and only if we
+#  BLAS_FOUND               - True if BLAS is available
+#  LAPACK_FOUND             - True if LAPACK is available
+#  INTEL_MKL_FOUND          - True if the Intel MKL library is available
+#  INTEL_MKL_HEADERS_FOUND  - True if Intel MKL headers are available
+#  BLAS_LIBRARIES           - link against these to use BLAS library 
+#  LAPACK_LIBRARIES         - link against these to use LAPACK library 
+#  MKL_LIBRARIES            - link against these to use the MKL library
+#  MKL_INCLUDE_DIR          - add to the include path to use the MKL library
+#  OPENMPL_LIBRARIES         - Set to Intel's OpenMP library if and only if we
 #                             find the MKL.
 
 # setting this makes CMake allow normal looking if else statements
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
-SET(blas_found 0)
-SET(lapack_found 0)
-SET(found_intel_mkl 0)
-SET(found_intel_mkl_headers 0)
+SET(BLAS_FOUND 0)
+SET(LAPACK_FOUND 0)
+SET(INTEL_MKL_FOUND 0)
+SET(INTEL_MKL_HEADERS_FOUND 0)
 SET(lapack_with_underscore 0)
 SET(lapack_without_underscore 0)
 
@@ -42,18 +42,18 @@ if (UNIX OR MINGW)
       #find_library(MATLAB_LAPACK_LIBRARY mwlapack  PATHS ${MATLAB_LIB_FOLDERS} )
       #if (MATLAB_BLAS_LIBRARY AND MATLAB_LAPACK_LIBRARY)
       #    add_subdirectory(external/cblas)
-      #    set(blas_libraries  ${MATLAB_BLAS_LIBRARY} cblas  )
-      #    set(lapack_libraries  ${MATLAB_LAPACK_LIBRARY} )
-      #    set(blas_found 1)
-      #    set(lapack_found 1)
+      #    set(BLAS_LIBRARIES  ${MATLAB_BLAS_LIBRARY} cblas  )
+      #    set(LAPACK_LIBRARIES  ${MATLAB_LAPACK_LIBRARY} )
+      #    set(BLAS_FOUND 1)
+      #    set(LAPACK_FOUND 1)
       #    message(STATUS "Found MATLAB's BLAS and LAPACK libraries")
       #endif()
 
       # We need cblas since MATLAB doesn't provide cblas symbols.
       add_subdirectory(external/cblas)
-      set(blas_libraries  cblas  )
-      set(blas_found 1)
-      set(lapack_found 1)
+      set(BLAS_LIBRARIES  cblas  )
+      set(BLAS_FOUND 1)
+      set(LAPACK_FOUND 1)
       message(STATUS "Will link with MATLAB's BLAS and LAPACK at runtime (hopefully!)")
 
 
@@ -72,10 +72,10 @@ if (UNIX OR MINGW)
    SET(CMAKE_REQUIRED_LIBRARIES "${BLAS_REFERENCE_LDFLAGS}")   
    CHECK_FUNCTION_EXISTS(cblas_ddot PKGCFG_HAVE_CBLAS)
    if (BLAS_REFERENCE_FOUND AND LAPACK_REFERENCE_FOUND AND PKGCFG_HAVE_CBLAS)
-      set(blas_libraries "${BLAS_REFERENCE_LDFLAGS}")
-      set(lapack_libraries "${LAPACK_REFERENCE_LDFLAGS}")
-      set(blas_found 1)
-      set(lapack_found 1)
+      set(BLAS_LIBRARIES "${BLAS_REFERENCE_LDFLAGS}")
+      set(LAPACK_LIBRARIES "${LAPACK_REFERENCE_LDFLAGS}")
+      set(BLAS_FOUND 1)
+      set(LAPACK_FOUND 1)
       set(REQUIRES_LIBS "${REQUIRES_LIBS} cblas lapack")
       message(STATUS "Found BLAS and LAPACK via pkg-config")
       return()
@@ -114,35 +114,35 @@ if (UNIX OR MINGW)
 
    include(CheckLibraryExists)
 
-   # Get mkl_include_dir
+   # Get MKL_INCLUDE_DIR
    set(mkl_include_search_path
       /opt/intel/oneapi/mkl/latest/include
       /opt/intel/mkl/include
       /opt/intel/include
       )
-   find_path(mkl_include_dir mkl_version.h ${mkl_include_search_path})
-   mark_as_advanced(mkl_include_dir)
+   find_path(MKL_INCLUDE_DIR mkl_version.h ${mkl_include_search_path})
+   mark_as_advanced(MKL_INCLUDE_DIR)
 
    if(NOT DLIB_USE_MKL_SEQUENTIAL AND NOT DLIB_USE_MKL_WITH_TBB)
       # Search for the needed libraries from the MKL.  We will try to link against the mkl_rt
       # file first since this way avoids linking bugs in some cases.
       find_library(mkl_rt mkl_rt ${mkl_search_path})
-      find_library(openmp_libraries iomp5 ${mkl_search_path}) 
-      mark_as_advanced(mkl_rt  openmp_libraries)
+      find_library(OPENMPL_LIBRARIES iomp5 ${mkl_search_path}) 
+      mark_as_advanced(mkl_rt  OPENMPL_LIBRARIES)
       # if we found the MKL 
       if (mkl_rt)
-         set(mkl_libraries  ${mkl_rt} )
-         set(blas_libraries  ${mkl_rt} )
-         set(lapack_libraries  ${mkl_rt} )
-         set(blas_found 1)
-         set(lapack_found 1)
-         set(found_intel_mkl 1)
+         set(MKL_LIBRARIES  ${mkl_rt} )
+         set(BLAS_LIBRARIES  ${mkl_rt} )
+         set(LAPACK_LIBRARIES  ${mkl_rt} )
+         set(BLAS_FOUND 1)
+         set(LAPACK_FOUND 1)
+         set(INTEL_MKL_FOUND 1)
          message(STATUS "Found Intel MKL BLAS/LAPACK library")
       endif()
    endif()
    
 
-   if (NOT found_intel_mkl)
+   if (NOT INTEL_MKL_FOUND)
       # Search for the needed libraries from the MKL.  This time try looking for a different
       # set of MKL files and try to link against those.
       find_library(mkl_core mkl_core ${mkl_search_path})
@@ -168,18 +168,18 @@ if (UNIX OR MINGW)
    
       # If we found the MKL 
       if (mkl_intel AND mkl_core AND ((mkl_tbb_thread AND mkl_tbb) OR (mkl_thread AND mkl_iomp AND mkl_pthread) OR mkl_sequential))
-         set(mkl_libraries ${mkl_libs})
-         set(blas_libraries ${mkl_libs})
-         set(lapack_libraries ${mkl_libs})
-         set(blas_found 1)
-         set(lapack_found 1)
-         set(found_intel_mkl 1)
+         set(MKL_LIBRARIES ${mkl_libs})
+         set(BLAS_LIBRARIES ${mkl_libs})
+         set(LAPACK_LIBRARIES ${mkl_libs})
+         set(BLAS_FOUND 1)
+         set(LAPACK_FOUND 1)
+         set(INTEL_MKL_FOUND 1)
          message(STATUS "Found Intel MKL BLAS/LAPACK library")
       endif()
    endif()
 
-   if (found_intel_mkl AND mkl_include_dir)
-      set(found_intel_mkl_headers 1)
+   if (INTEL_MKL_FOUND AND MKL_INCLUDE_DIR)
+      set(INTEL_MKL_HEADERS_FOUND 1)
    endif()
 
    # try to find some other LAPACK libraries if we didn't find the MKL
@@ -197,32 +197,32 @@ if (UNIX OR MINGW)
       $ENV{OPENBLAS_HOME}/lib
       )
 
-   if (NOT blas_found)
+   if (NOT BLAS_FOUND)
       find_library(cblas_lib NAMES openblasp openblas PATHS ${extra_paths})
       if (cblas_lib)
-         set(blas_libraries ${cblas_lib})
-         set(blas_found 1)
+         set(BLAS_LIBRARIES ${cblas_lib})
+         set(BLAS_FOUND 1)
          message(STATUS "Found OpenBLAS library")
-         set(CMAKE_REQUIRED_LIBRARIES ${blas_libraries})
+         set(CMAKE_REQUIRED_LIBRARIES ${BLAS_LIBRARIES})
          # If you compiled OpenBLAS with LAPACK in it then it should have the
          # sgetrf_single function in it.  So if we find that function in
          # OpenBLAS then just use OpenBLAS's LAPACK. 
          CHECK_FUNCTION_EXISTS(sgetrf_single OPENBLAS_HAS_LAPACK)
          if (OPENBLAS_HAS_LAPACK)
             message(STATUS "Using OpenBLAS's built in LAPACK")
-            # set(lapack_libraries gfortran) 
-            set(lapack_found 1)
+            # set(LAPACK_LIBRARIES gfortran) 
+            set(LAPACK_FOUND 1)
          endif()
       endif()
       mark_as_advanced( cblas_lib)
    endif()
 
 
-   if (NOT lapack_found)
+   if (NOT LAPACK_FOUND)
       find_library(lapack_lib NAMES lapack lapack-3 PATHS ${extra_paths})
       if (lapack_lib)
-         set(lapack_libraries ${lapack_lib})
-         set(lapack_found 1)
+         set(LAPACK_LIBRARIES ${lapack_lib})
+         set(LAPACK_FOUND 1)
          message(STATUS "Found LAPACK library")
       endif()
       mark_as_advanced( lapack_lib)
@@ -231,46 +231,46 @@ if (UNIX OR MINGW)
 
    # try to find some other BLAS libraries if we didn't find the MKL
 
-   if (NOT blas_found)
+   if (NOT BLAS_FOUND)
       find_library(atlas_lib atlas PATHS ${extra_paths})
       find_library(cblas_lib cblas PATHS ${extra_paths})
       if (atlas_lib AND cblas_lib)
-         set(blas_libraries ${atlas_lib} ${cblas_lib})
-         set(blas_found 1)
+         set(BLAS_LIBRARIES ${atlas_lib} ${cblas_lib})
+         set(BLAS_FOUND 1)
          message(STATUS "Found ATLAS BLAS library")
       endif()
       mark_as_advanced( atlas_lib cblas_lib)
    endif()
 
    # CentOS 7 atlas
-   if (NOT blas_found)
+   if (NOT BLAS_FOUND)
       find_library(tatlas_lib tatlas PATHS ${extra_paths})
       find_library(satlas_lib satlas PATHS ${extra_paths})
       if (tatlas_lib AND satlas_lib )
-         set(blas_libraries ${tatlas_lib} ${satlas_lib})
-         set(blas_found 1)
+         set(BLAS_LIBRARIES ${tatlas_lib} ${satlas_lib})
+         set(BLAS_FOUND 1)
          message(STATUS "Found ATLAS BLAS library")
       endif()
       mark_as_advanced( tatlas_lib satlas_lib)
    endif()
 
 
-   if (NOT blas_found)
+   if (NOT BLAS_FOUND)
       find_library(cblas_lib cblas PATHS ${extra_paths})
       if (cblas_lib)
-         set(blas_libraries ${cblas_lib})
-         set(blas_found 1)
+         set(BLAS_LIBRARIES ${cblas_lib})
+         set(BLAS_FOUND 1)
          message(STATUS "Found CBLAS library")
       endif()
       mark_as_advanced( cblas_lib)
    endif()
 
 
-   if (NOT blas_found)
+   if (NOT BLAS_FOUND)
       find_library(generic_blas blas PATHS ${extra_paths})
       if (generic_blas)
-         set(blas_libraries ${generic_blas})
-         set(blas_found 1)
+         set(BLAS_LIBRARIES ${generic_blas})
+         set(BLAS_FOUND 1)
          message(STATUS "Found BLAS library")
       endif()
       mark_as_advanced( generic_blas)
@@ -284,13 +284,13 @@ if (UNIX OR MINGW)
    # and assume everything is good if it is. Note that we don't do this check if
    # we found the Intel MKL since for some reason CHECK_FUNCTION_EXISTS doesn't work
    # with it.  But it's fine since the MKL should always have cblas.
-   if (blas_found AND NOT found_intel_mkl)
-      set(CMAKE_REQUIRED_LIBRARIES ${blas_libraries})
+   if (BLAS_FOUND AND NOT INTEL_MKL_FOUND)
+      set(CMAKE_REQUIRED_LIBRARIES ${BLAS_LIBRARIES})
       CHECK_FUNCTION_EXISTS(cblas_ddot FOUND_BLAS_HAS_CBLAS)
       if (NOT FOUND_BLAS_HAS_CBLAS)
          message(STATUS "BLAS library does not have cblas symbols, so dlib will not use BLAS or LAPACK")
-         set(blas_found 0)
-         set(lapack_found 0)
+         set(BLAS_FOUND 0)
+         set(LAPACK_FOUND 0)
       endif()
    endif()
 
@@ -351,7 +351,7 @@ elseif(WIN32 AND NOT MINGW)
    endif()
 
 
-   # Get mkl_include_dir
+   # Get MKL_INCLUDE_DIR
    set(mkl_include_search_path
       "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/mkl/include"
       "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/compiler/include"
@@ -363,8 +363,8 @@ elseif(WIN32 AND NOT MINGW)
       "C:/Program Files/Intel/Composer XE/compiler/include"
       "C:/Program Files (x86)/Intel/oneAPI/mkl/*/include"
       )
-   find_path(mkl_include_dir mkl_version.h ${mkl_include_search_path})
-   mark_as_advanced(mkl_include_dir)
+   find_path(MKL_INCLUDE_DIR mkl_version.h ${mkl_include_search_path})
+   mark_as_advanced(MKL_INCLUDE_DIR)
 
    # Search for the needed libraries from the MKL.  
    find_library(mkl_core mkl_core ${mkl_search_path})
@@ -400,43 +400,43 @@ elseif(WIN32 AND NOT MINGW)
 
    # If we found the MKL 
    if (mkl_intel AND mkl_core AND ((mkl_tbb_thread AND mkl_tbb) OR mkl_sequential OR (mkl_thread AND mkl_iomp)))
-      set(blas_libraries ${mkl_libs})
-      set(lapack_libraries ${mkl_libs})
-      set(blas_found 1)
-      set(lapack_found 1)
-      set(found_intel_mkl 1)
+      set(BLAS_LIBRARIES ${mkl_libs})
+      set(LAPACK_LIBRARIES ${mkl_libs})
+      set(BLAS_FOUND 1)
+      set(LAPACK_FOUND 1)
+      set(INTEL_MKL_FOUND 1)
       message(STATUS "Found Intel MKL BLAS/LAPACK library")
 
       # Make sure the version of the Intel MKL we found is compatible with
       # the compiler we are using.  One way to do this check is to see if we can
       # link to it right now.
-      set(CMAKE_REQUIRED_LIBRARIES ${blas_libraries})
+      set(CMAKE_REQUIRED_LIBRARIES ${BLAS_LIBRARIES})
       CHECK_FUNCTION_EXISTS(cblas_ddot MKL_HAS_CBLAS)
       if (NOT MKL_HAS_CBLAS)
          message("BLAS library does not have cblas symbols, so dlib will not use BLAS or LAPACK")
-         set(blas_found 0)
-         set(lapack_found 0)
+         set(BLAS_FOUND 0)
+         set(LAPACK_FOUND 0)
       endif()
    endif()
 
-   if (found_intel_mkl AND mkl_include_dir)
-      set(found_intel_mkl_headers 1)
+   if (INTEL_MKL_FOUND AND MKL_INCLUDE_DIR)
+      set(INTEL_MKL_HEADERS_FOUND 1)
    endif()
 
 endif()
 
 
 # When all else fails use CMake's built in functions to find BLAS and LAPACK
-if (NOT blas_found)
+if (NOT BLAS_FOUND)
    find_package(BLAS QUIET)
    if (${BLAS_FOUND})
-      set(blas_libraries ${BLAS_LIBRARIES})      
-      set(blas_found 1)
-      if (NOT lapack_found)
+      set(BLAS_LIBRARIES ${BLAS_LIBRARIES})      
+      set(BLAS_FOUND 1)
+      if (NOT LAPACK_FOUND)
          find_package(LAPACK QUIET)
          if (${LAPACK_FOUND})
-            set(lapack_libraries ${LAPACK_LIBRARIES})
-            set(lapack_found 1)
+            set(LAPACK_LIBRARIES ${LAPACK_LIBRARIES})
+            set(LAPACK_FOUND 1)
          endif()
       endif()
    endif()
@@ -444,9 +444,9 @@ endif()
 
 
 # If using lapack, determine whether to mangle functions
-if (lapack_found)
+if (LAPACK_FOUND)
    include(CheckFortranFunctionExists)
-   set(CMAKE_REQUIRED_LIBRARIES ${lapack_libraries})
+   set(CMAKE_REQUIRED_LIBRARIES ${LAPACK_LIBRARIES})
 
    check_function_exists("sgesv" LAPACK_FOUND_C_UNMANGLED)
    check_function_exists("sgesv_" LAPACK_FOUND_C_MANGLED)
@@ -463,7 +463,7 @@ endif()
 
 
 if (UNIX OR MINGW)
-   if (NOT blas_found)
+   if (NOT BLAS_FOUND)
       message(" *****************************************************************************")
       message(" *** No BLAS library found so using dlib's built in BLAS.  However, if you ***")
       message(" *** install an optimized BLAS such as OpenBLAS or the Intel MKL your code ***")

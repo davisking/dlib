@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.17)
 
 ### General stuff ###########################################################################################
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
@@ -12,41 +12,34 @@ endif (POLICY CMP0048)
 if(POLICY CMP0077)
    cmake_policy(SET CMP0077 NEW)
 endif(POLICY CMP0077)
+if (POLICY CMP0075)
+   cmake_policy(SET CMP0075 NEW)
+endif()
 ### Policies ################################################################################################
 
 project(dlib 
    VERSION        19.24.99
-   DESCRIPTION    "Dlib is a modern C++ toolkit containing machine learning algorithms and tools for creating
-                   complex software in C++ to solve real world problems."
+   DESCRIPTION    "Dlib is a modern C++ toolkit containing machine learning algorithms and tools for creating complex software in C++ to solve real world problems."
    HOMEPAGE_URL   http://dlib.net/
-   LANGUAGES      C CXX) # CUDA ASM)
+   LANGUAGES      C CXX) #CUDA
 
 ### Dependencies ############################################################################################ 
 include(CMakeDependentOption)
 include(CMakePackageConfigHelpers)
+include(cmake_utils/check_if_neon_available.cmake)
+include(cmake_utils/check_if_avx_instructions_executable_on_host.cmake)
+include(cmake_utils/check_if_sse4_instructions_executable_on_host.cmake)
 find_package(Threads REQUIRED)
 find_package(X11)
-# find_package(CUDAToolkit)
+#find_package(CUDAToolkit)
 find_package(GIF)
 find_package(PNG)
 find_package(JPEG)
 find_package(SQLite3)
-if (DLIB_USE_MKL_WITH_TBB)
-   set(BLA_VENDOR Intel10_64lp)
-elseif(DLIB_USE_MKL_SEQUENTIAL)
-   set(BLA_VENDOR Intel10_64lp_seq)
-endif()
-find_package(BLAS)
-find_package(LAPACK)
-### Dependencies ############################################################################################
-
-### Additional helper scripts ###############################################################################
-include(cmake_utils/check_if_neon_available.cmake)
-include(cmake_utils/check_if_avx_instructions_executable_on_host.cmake)
-include(cmake_utils/check_if_sse4_instructions_executable_on_host.cmake)
 include(cmake_utils/find_libwebp.cmake)
+include(cmake_utils/find_blas.cmake)
 # include(cmake_utils/find_cudnn.cmake)
-### Additional helper scripts ###############################################################################
+### Dependencies ############################################################################################
 
 ### Options #################################################################################################
 option(DLIB_ENABLE_ASSERTS       
@@ -74,11 +67,11 @@ cmake_dependent_option(DLIB_GIF_SUPPORT
 cmake_dependent_option(DLIB_LINK_WITH_SQLITE3   
    "Disable this if you don't want to link against sqlite3" ON "NOT DLIB_ISO_CPP_ONLY;SQLite3_FOUND" OFF)
 cmake_dependent_option(DLIB_USE_MKL_FFT         
-   "Disable this is you don't want to use the MKL DFTI FFT implementation" ON "NOT DLIB_ISO_CPP_ONLY" OFF)
+   "Disable this is you don't want to use the MKL DFTI FFT implementation" ON "NOT DLIB_ISO_CPP_ONLY;INTEL_MKL_FOUND" OFF)
 cmake_dependent_option(DLIB_USE_MKL_SEQUENTIAL  
-   "Enable this if you have MKL installed and want to use the sequential version instead of the multi-core version." OFF "NOT DLIB_ISO_CPP_ONLY" OFF)
+   "Enable this if you have MKL installed and want to use the sequential version instead of the multi-core version." OFF "NOT DLIB_ISO_CPP_ONLY;INTEL_MKL_FOUND" OFF)
 cmake_dependent_option(DLIB_USE_MKL_WITH_TBB   
-   "Enable this if you have MKL installed and want to use the tbb version instead of the openmp version." OFF "NOT DLIB_ISO_CPP_ONLY" OFF)
+   "Enable this if you have MKL installed and want to use the tbb version instead of the openmp version." OFF "NOT DLIB_ISO_CPP_ONLY;INTEL_MKL_FOUND" OFF)
 cmake_dependent_option(DLIB_USE_BLAS            
    "Disable this if you don't want to use a BLAS library"   ON "NOT DLIB_ISO_CPP_ONLY;BLAS_FOUND" OFF)
 cmake_dependent_option(DLIB_USE_LAPACK          
@@ -149,7 +142,7 @@ if (NOT DLIB_ISO_CPP_ONLY)
    target_link_libraries(dlib PUBLIC Threads::Threads)
 endif()
 
-if (NOT DLIB_NO_GUI_SUPPORT AND X11_FOUND)
+if (NOT DLIB_NO_GUI_SUPPORT)
    target_sources(dlib PRIVATE
       gui_widgets/widgets.cpp
       gui_widgets/drawable.cpp
@@ -158,9 +151,8 @@ if (NOT DLIB_NO_GUI_SUPPORT AND X11_FOUND)
       gui_widgets/base_widgets.cpp
       gui_core/gui_core_kernel_1.cpp
       gui_core/gui_core_kernel_2.cpp)
-   
-   target_include_directories(dlib PRIVATE ${X11_INCLUDE_DIR})
-   target_link_libraries(dlib PUBLIC ${X11_LIBRARIES})
+
+   target_link_libraries(dlib PUBLIC X11::X11)
 endif()
 
 if (DLIB_PNG_SUPPORT)
@@ -168,7 +160,7 @@ if (DLIB_PNG_SUPPORT)
       image_loader/png_loader.cpp
       image_saver/save_png.cpp)
 
-   target_compile_definitions(dlib PRIVATE DLIB_PNG_SUPPORT)
+   target_compile_definitions(dlib PUBLIC DLIB_PNG_SUPPORT)
 
    if (PNG_FOUND)
       target_link_libraries(dlib PUBLIC PNG::PNG)
@@ -223,7 +215,7 @@ if (DLIB_JPEG_SUPPORT)
       image_loader/jpeg_loader.cpp
       image_saver/save_jpeg.cpp)
 
-   target_compile_definitions(dlib PRIVATE DLIB_JPEG_SUPPORT)
+   target_compile_definitions(dlib PUBLIC DLIB_JPEG_SUPPORT)
 
    if (JPEG_FOUND)
       target_link_libraries(dlib PUBLIC JPEG::JPEG)
@@ -284,11 +276,11 @@ if (DLIB_WEBP_SUPPORT)
       image_saver/save_webp.cpp)
    target_link_libraries(dlib PUBLIC ${WEBP_LIBRARIES})
    target_include_directories(dlib PRIVATE ${WEBP_INCLUDE_DIRS})
-   target_compile_definitions(dlib PRIVATE DLIB_WEBP_SUPPORT)
+   target_compile_definitions(dlib PUBLIC DLIB_WEBP_SUPPORT)
 endif()
 
 if (DLIB_GIF_SUPPORT)
-   target_compile_definitions(dlib PRIVATE DLIB_GIF_SUPPORT)
+   target_compile_definitions(dlib PUBLIC DLIB_GIF_SUPPORT)
    target_link_libraries(dlib PUBLIC GIF::GIF)
 endif()
 
@@ -297,26 +289,28 @@ if (DLIB_LINK_WITH_SQLITE3)
 endif()
 
 if (DLIB_USE_BLAS)
-   target_compile_definitions(dlib PRIVATE DLIB_USE_BLAS)
-   target_link_libraries(dlib PUBLIC BLAS::BLAS)
+   target_compile_definitions(dlib PUBLIC DLIB_USE_BLAS)
+   target_link_libraries(dlib PUBLIC ${BLAS_LIBRARIES})
 endif()
 
 if (DLIB_USE_LAPACK)
-   target_compile_definitions(dlib PRIVATE DLIB_USE_LAPACK)
-   target_link_libraries(dlib PUBLIC LAPACK::LAPACK)
+   target_compile_definitions(dlib PUBLIC DLIB_USE_LAPACK)
+   target_link_libraries(dlib PUBLIC ${LAPACK_LIBRARIES})
+endif()
+
+if (DLIB_USE_MKL_FFT)
+   target_compile_definitions(dlib PUBLIC DLIB_USE_MKL_FFT)
+   target_include_directories(dlib PUBLIC ${MKL_INCLUDE_DIR})
+   target_link_libraries(dlib PUBLIC ${MKL_LIBRARIES})
 endif()
 
 if (DLIB_USE_BLAS OR DLIB_USE_LAPACK OR DLIB_USE_MKL_FFT)
    if (DLIB_USE_MKL_WITH_TBB)
-      target_compile_definitions(dlib PRIVATE DLIB_USE_MKL_WITH_TBB)
+      target_compile_definitions(dlib PUBLIC DLIB_USE_MKL_WITH_TBB)
    endif()
 
    if (DLIB_USE_MKL_SEQUENTIAL)
-      target_compile_definitions(dlib PRIVATE DLIB_USE_MKL_SEQUENTIAL)
-   endif()
-      
-   if (DLIB_USE_MKL_FFT)
-      target_compile_definitions(dlib PRIVATE DLIB_USE_MKL_FFT)
+      target_compile_definitions(dlib PUBLIC DLIB_USE_MKL_SEQUENTIAL)
    endif()
 endif()
 
@@ -350,7 +344,7 @@ if (DLIB_ENABLE_ASSERTS)
    # Used by config.h.in
    set (DLIB_DISABLE_ASSERTS false)
    set (ENABLE_ASSERTS true) 
-   target_compile_definitions(ENABLE_ASSERTS)
+   target_compile_definitions(dlib PUBLIC ENABLE_ASSERTS)
 else()
    set (DLIB_DISABLE_ASSERTS true)
    set (ENABLE_ASSERTS false) 
