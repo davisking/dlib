@@ -1,5 +1,5 @@
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.17)
 
 if (WIN32 AND NOT "${CMAKE_GENERATOR}" MATCHES "Visual Studio") 
    message(FATAL_ERROR "\n"
@@ -12,6 +12,15 @@ if (WIN32 AND NOT "${CMAKE_GENERATOR}" MATCHES "Visual Studio")
 endif()
 
 project(dlib_python_bindings)
+
+include(FetchContent) 
+
+FetchContent_Declare(
+   pybind11
+   GIT_REPOSITORY https://github.com/pybind/pybind11.git
+   GIT_TAG v2.10.0
+)
+FetchContent_MakeAvailable(pybind11)
 
 # Pybind11's cmake scripts enable link time optimization by default.  However,
 # it makes linking take a really long time and doesn't seem to substantively
@@ -35,7 +44,6 @@ if (MSVC)
     include(${CMAKE_CURRENT_LIST_DIR}/../../dlib/cmake_utils/tell_visual_studio_to_use_static_runtime.cmake)
 endif()
 
-add_subdirectory(../../dlib/external/pybind11 pybind11_build)
 add_subdirectory(../../dlib dlib_build)
 
 if (USING_OLD_VISUAL_STUDIO_COMPILER)

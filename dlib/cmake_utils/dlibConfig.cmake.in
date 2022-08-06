@@ -12,8 +12,8 @@
 # ===================================================================================
 
 
+@PACKAGE_INIT@
 
- 
 # Our library dependencies (contains definitions for IMPORTED targets)
 if(NOT TARGET dlib-shared AND NOT dlib_BINARY_DIR)
    # Compute paths
@@ -31,23 +31,11 @@ if(NOT TARGET dlib-shared AND NOT dlib_BINARY_DIR)
    unset(dlib_deps_threads_check)
 endif()
 
-set(dlib_LIBRARIES dlib::dlib)
-set(dlib_LIBS      dlib::dlib)
-set(dlib_INCLUDE_DIRS "@CMAKE_INSTALL_FULL_INCLUDEDIR@" "@dlib_needed_includes@")
+set_and_check(dlib_LIBRARIES dlib::dlib)
+set_and_check(dlib_LIBS      dlib::dlib)
+#set_and_check(dlib_INCLUDE_DIRS "@PACKAGE_INCLUDE_INSTALL_DIR@")
 
-mark_as_advanced(dlib_LIBRARIES)
-mark_as_advanced(dlib_LIBS)
-mark_as_advanced(dlib_INCLUDE_DIRS)
-
-# Mark these variables above as deprecated.
-function(__deprecated_var var access)
-   if(access STREQUAL "READ_ACCESS")
-      message(WARNING "The variable '${var}' is deprecated!  Instead, simply use target_link_libraries(your_app dlib::dlib).  See http://dlib.net/examples/CMakeLists.txt.html for an example.")
-   endif()
-endfunction()
-variable_watch(dlib_LIBRARIES __deprecated_var)
-variable_watch(dlib_LIBS __deprecated_var)
-variable_watch(dlib_INCLUDE_DIRS __deprecated_var)
+check_required_components(dlib)
 
 
 
