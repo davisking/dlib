@@ -7,7 +7,7 @@ set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
 ### Policies ################################################################################################
 if (POLICY CMP0048)
-   cmake_policy( SET CMP0048 NEW )
+   cmake_policy(SET CMP0048 NEW)
 endif (POLICY CMP0048)
 if(POLICY CMP0077)
    cmake_policy(SET CMP0077 NEW)
@@ -48,14 +48,14 @@ option(DLIB_ENABLE_STACK_TRACE
    "Enable this if you want to turn on the DLIB_STACK_TRACE macros")
 option(DLIB_ISO_CPP_ONLY         
    "Enable this if you don't want to compile any non-ISO C++ code (i.e. you don't use any of the API Wrappers)")
-cmake_dependent_option(DLIB_NO_GUI_SUPPORT       
-   "Enable this if you don't want to compile any of the dlib GUI code" OFF "X11_FOUND" ON)
 cmake_dependent_option(USE_SSE4_INSTRUCTIONS 
    "Compile your program with SSE4 instructions" ON "SSE4_IS_AVAILABLE_ON_HOST" OFF)
 cmake_dependent_option(USE_AVX_INSTRUCTIONS  
    "Compile your program with AVX instructions" ON "AVX_IS_AVAILABLE_ON_HOST" OFF)
 cmake_dependent_option(USE_NEON_INSTRUCTIONS 
    "Compile your program with ARM-NEON instructions" ON "ARM_NEON_IS_AVAILABLE" OFF)
+cmake_dependent_option(DLIB_NO_GUI_SUPPORT
+   "Enable this if you don't want to compile any of the dlib GUI code" OFF "DLIB_ISO_CPP_ONLY;X11_FOUND" ON)
 cmake_dependent_option(DLIB_PNG_SUPPORT         
    "Disable this if you don't want to link against libpng"  ON "NOT DLIB_ISO_CPP_ONLY" OFF)
 cmake_dependent_option(DLIB_JPEG_SUPPORT        
@@ -83,6 +83,9 @@ if (DLIB_USE_CUDA)
    set(DLIB_USE_CUDA_COMPUTE_CAPABILITIES 50 CACHE STRING ${DLIB_USE_CUDA_COMPUTE_CAPABILITIES_STR})
 endif()
 
+if(NOT CMAKE_BUILD_TYPE)
+   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
+endif()
 ### Options #################################################################################################
 
 ### Libraries and executables ###############################################################################
@@ -100,7 +103,9 @@ add_library(dlib
    unicode/unicode.cpp
    test_for_odr_violations.cpp)
 
-if (NOT DLIB_ISO_CPP_ONLY)
+if (DLIB_ISO_CPP_ONLY)
+   target_compile_definitions(dlib PUBLIC DLIB_ISO_CPP_ONLY)
+else()
    target_sources(dlib PRIVATE
       sockets/sockets_kernel_1.cpp
       bsp/bsp.cpp
@@ -142,7 +147,9 @@ if (NOT DLIB_ISO_CPP_ONLY)
    target_link_libraries(dlib PUBLIC Threads::Threads)
 endif()
 
-if (NOT DLIB_NO_GUI_SUPPORT)
+if (DLIB_NO_GUI_SUPPORT)
+   target_compile_definitions(dlib PUBLIC DLIB_NO_GUI_SUPPORT)
+else()
    target_sources(dlib PRIVATE
       gui_widgets/widgets.cpp
       gui_widgets/drawable.cpp
@@ -285,6 +292,7 @@ if (DLIB_GIF_SUPPORT)
 endif()
 
 if (DLIB_LINK_WITH_SQLITE3)
+   target_compile_definitions(dlib PUBLIC DLIB_LINK_WITH_SQLITE3)
    target_link_libraries(dlib PUBLIC SQLite::SQLite3)
 endif()
 
@@ -340,15 +348,25 @@ endif()
 #    set_target_properties(dlib PROPERTIES CUDA_ARCHITECTURES ${DLIB_USE_CUDA_COMPUTE_CAPABILITIES})
 # endif()
 
+# Used by config.h.in
 if (DLIB_ENABLE_ASSERTS)
-   # Used by config.h.in
-   set (DLIB_DISABLE_ASSERTS false)
-   set (ENABLE_ASSERTS true) 
    target_compile_definitions(dlib PUBLIC ENABLE_ASSERTS)
 else()
-   set (DLIB_DISABLE_ASSERTS true)
-   set (ENABLE_ASSERTS false) 
+   target_compile_definitions(dlib PUBLIC DLIB_DISABLE_ASSERTS)
 endif()
+
+if (DLIB_ENABLE_STACK_TRACE)
+   target_compile_definitions(dlib PUBLIC DLIB_ENABLE_STACK_TRACE)
+endif()
+
+#target_compile_definitions(dlib PUBLIC
+#        DLIB_ENABLE_ASSERTS=${DLIB_ENABLE_ASSERTS}
+#        DLIB_DISABLE_ASSERTS=${NOT DLIB_ENABLE_ASSERTS}
+#        ENABLE_ASSERTS=${DLIB_ENABLE_ASSERTS})
+
+target_include_directories(dlib PUBLIC
+        INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
+        INTERFACE $<INSTALL_INTERFACE:include>)
 
 # target_compile_features(dlib PUBLIC cxx_std_14)
 set_target_properties(dlib PROPERTIES 
@@ -364,58 +382,68 @@ add_library(dlib::dlib ALIAS dlib)
 ### Libraries and executables ###############################################################################
 
 ### Installation ############################################################################################
-include(GNUInstallDirs)
 
-install(TARGETS dlib
-   EXPORT dlib 
-   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # Windows considers .dll to be runtime artifacts
-   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+get_directory_property(has_parent PARENT_DIRECTORY)
 
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib
-   FILES_MATCHING 
-   PATTERN "*.h" 
-   PATTERN "*.cmake"
-   PATTERN "*_tutorial.txt"
-   PATTERN "cassert"
-   PATTERN "cstring"
-   PATTERN "fstream"
-   PATTERN "iomanip"
-   PATTERN "iosfwd"
-   PATTERN "iostream"
-   PATTERN "istream"
-   PATTERN "locale"
-   PATTERN "ostream"
-   PATTERN "sstream"
-   REGEX "${CMAKE_CURRENT_BINARY_DIR}" EXCLUDE)
+if (NOT has_parent)
+   include(GNUInstallDirs)
 
-configure_file(${PROJECT_SOURCE_DIR}/config.h.in   ${CMAKE_CURRENT_BINARY_DIR}/config.h)
-configure_file(${PROJECT_SOURCE_DIR}/revision.h.in ${CMAKE_CURRENT_BINARY_DIR}/revision.h)
-configure_file(cmake_utils/dlibConfig.cmake.in     ${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake @ONLY)
-configure_file(cmake_utils/dlib.pc.in              dlib-1.pc @ONLY)
+   install(TARGETS dlib
+      EXPORT dlib
+      FILE_SET HEADERS
+      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # Windows considers .dll to be runtime artifacts
+      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+      INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-install(FILES 
-   ${CMAKE_CURRENT_BINARY_DIR}/config.h
-   ${CMAKE_CURRENT_BINARY_DIR}/revision.h
-   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib)
-   
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/dlib-1.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+   install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib
+      FILES_MATCHING
+      PATTERN "*.h"
+      PATTERN "*.cmake"
+      PATTERN "*_tutorial.txt"
+      PATTERN "cassert"
+      PATTERN "cstring"
+      PATTERN "fstream"
+      PATTERN "iomanip"
+      PATTERN "iosfwd"
+      PATTERN "iostream"
+      PATTERN "istream"
+      PATTERN "locale"
+      PATTERN "ostream"
+      PATTERN "sstream"
+      REGEX "${CMAKE_CURRENT_BINARY_DIR}" EXCLUDE)
 
-set(ConfigPackageLocation "${CMAKE_INSTALL_LIBDIR}/cmake/dlib")
-install(EXPORT dlib
-   NAMESPACE dlib::
-   DESTINATION ${ConfigPackageLocation})
+   configure_file(${PROJECT_SOURCE_DIR}/config.h.in   ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+   configure_file(${PROJECT_SOURCE_DIR}/revision.h.in ${CMAKE_CURRENT_BINARY_DIR}/revision.h)
+   configure_file(cmake_utils/dlib.pc.in              dlib-1.pc @ONLY)
 
-write_basic_package_version_file(
-   "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake"
-   VERSION ${VERSION}
-   COMPATIBILITY AnyNewerVersion)
+   configure_package_config_file(cmake_utils/dlibConfig.cmake.in
+           ${CMAKE_CURRENT_BINARY_DIR}/config/FooConfig.cmake
+           INSTALL_DESTINATION ${LIB_INSTALL_DIR}/dlib/cmake)
 
-install(FILES 
-   ${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake
-   ${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake
-   DESTINATION ${ConfigPackageLocation})
+   install(FILES
+      ${CMAKE_CURRENT_BINARY_DIR}/config.h
+      ${CMAKE_CURRENT_BINARY_DIR}/revision.h
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib)
 
-include(CPack)
+   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/dlib-1.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
+   set(ConfigPackageLocation "${CMAKE_INSTALL_LIBDIR}/cmake/dlib")
+   install(EXPORT dlib
+      FILE dlib.cmake
+      NAMESPACE dlib::
+      DESTINATION ${ConfigPackageLocation})
+
+   write_basic_package_version_file(
+      "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake"
+      VERSION ${VERSION}
+      COMPATIBILITY AnyNewerVersion)
+
+   install(FILES
+      ${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake
+      ${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake
+      DESTINATION ${ConfigPackageLocation})
+
+   include(CPack)
+endif()
 ### Installation ############################################################################################
