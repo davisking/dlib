@@ -8,12 +8,15 @@ set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 ### Policies ################################################################################################
 if (POLICY CMP0048)
    cmake_policy(SET CMP0048 NEW)
-endif (POLICY CMP0048)
+endif ()
 if(POLICY CMP0077)
    cmake_policy(SET CMP0077 NEW)
-endif(POLICY CMP0077)
+endif()
 if (POLICY CMP0075)
    cmake_policy(SET CMP0075 NEW)
+endif()
+if (POLICY CMP0042)
+   cmake_policy(SET CMP0042 NEW)
 endif()
 ### Policies ################################################################################################
 
@@ -22,7 +25,7 @@ project(dlib
    VERSION        19.24.99
    DESCRIPTION    "Dlib is a modern C++ toolkit containing machine learning algorithms and tools for creating complex software in C++ to solve real world problems."
    HOMEPAGE_URL   http://dlib.net/
-   LANGUAGES      C CXX) #CUDA
+   LANGUAGES      C CXX Fortran) #CUDA
 
 set(DLIB_CHECK_FOR_VERSION_MISMATCH
         DLIB_VERSION_MISMATCH_CHECK__EXPECTED_VERSION_${PROJECT_VERSION_MAJOR}_${PROJECT_VERSION_MINOR}_${PROJECT_VERSION_PATCH})
@@ -46,6 +49,7 @@ find_package(OpenCV QUIET)
 include(cmake_utils/find_libwebp.cmake)
 include(cmake_utils/find_blas.cmake)
 # include(cmake_utils/find_cudnn.cmake)
+include(cmake_utils/tell_visual_studio_to_use_static_runtime.cmake)
 
 # If you update this to 2.3.0 or later (latest is 2.10.0), it doesn't recognise PYBIND11_DESCR. TODO: fix
 # TODO: use nanobind instead of pybind. According to author, it's better.
@@ -200,38 +204,17 @@ if (DLIB_PNG_SUPPORT)
    else()
       target_include_directories(dlib PRIVATE external/libpng external/zlib)
       target_sources(dlib PRIVATE
-         external/libpng/arm/arm_init.c
-         external/libpng/arm/filter_neon_intrinsics.c
-         external/libpng/png.c
-         external/libpng/pngerror.c
-         external/libpng/pngget.c
-         external/libpng/pngmem.c
-         external/libpng/pngpread.c
-         external/libpng/pngread.c
-         external/libpng/pngrio.c
-         external/libpng/pngrtran.c
-         external/libpng/pngrutil.c
-         external/libpng/pngset.c
-         external/libpng/pngtrans.c
-         external/libpng/pngwio.c
-         external/libpng/pngwrite.c
-         external/libpng/pngwtran.c
-         external/libpng/pngwutil.c
-         external/zlib/adler32.c
-         external/zlib/compress.c
-         external/zlib/crc32.c
-         external/zlib/deflate.c
-         external/zlib/gzclose.c
-         external/zlib/gzlib.c
-         external/zlib/gzread.c
-         external/zlib/gzwrite.c
-         external/zlib/infback.c
-         external/zlib/inffast.c
-         external/zlib/inflate.c
-         external/zlib/inftrees.c
-         external/zlib/trees.c
-         external/zlib/uncompr.c
-         external/zlib/zutil.c)
+         external/libpng/arm/arm_init.c external/libpng/arm/filter_neon_intrinsics.c external/libpng/png.c
+         external/libpng/pngerror.c external/libpng/pngget.c   external/libpng/pngmem.c
+         external/libpng/pngpread.c external/libpng/pngread.c  external/libpng/pngrio.c
+         external/libpng/pngrtran.c external/libpng/pngrutil.c external/libpng/pngset.c
+         external/libpng/pngtrans.c external/libpng/pngwio.c   external/libpng/pngwrite.c
+         external/libpng/pngwtran.c external/libpng/pngwutil.c
+         external/zlib/adler32.c external/zlib/compress.c external/zlib/crc32.c
+         external/zlib/deflate.c external/zlib/gzclose.c  external/zlib/gzlib.c
+         external/zlib/gzread.c  external/zlib/gzwrite.c  external/zlib/infback.c
+         external/zlib/inffast.c external/zlib/inflate.c  external/zlib/inftrees.c
+         external/zlib/trees.c   external/zlib/uncompr.c  external/zlib/zutil.c)
       
       if (USE_NEON_INSTRUCTIONS)
          target_sources(dlib PRIVATE
@@ -255,50 +238,21 @@ if (DLIB_JPEG_SUPPORT)
    else()
       target_compile_definitions(dlib PRIVATE DLIB_JPEG_STATIC)
       target_sources(dlib PRIVATE
-         external/libjpeg/jaricom.c
-         external/libjpeg/jcapimin.c
-         external/libjpeg/jcapistd.c
-         external/libjpeg/jcarith.c
-         external/libjpeg/jccoefct.c
-         external/libjpeg/jccolor.c
-         external/libjpeg/jcdctmgr.c
-         external/libjpeg/jchuff.c
-         external/libjpeg/jcinit.c
-         external/libjpeg/jcmainct.c
-         external/libjpeg/jcmarker.c
-         external/libjpeg/jcmaster.c
-         external/libjpeg/jcomapi.c
-         external/libjpeg/jcparam.c
-         external/libjpeg/jcprepct.c
-         external/libjpeg/jcsample.c
-         external/libjpeg/jdapimin.c
-         external/libjpeg/jdapistd.c
-         external/libjpeg/jdarith.c
-         external/libjpeg/jdatadst.c
-         external/libjpeg/jdatasrc.c
-         external/libjpeg/jdcoefct.c
-         external/libjpeg/jdcolor.c
-         external/libjpeg/jddctmgr.c
-         external/libjpeg/jdhuff.c
-         external/libjpeg/jdinput.c
-         external/libjpeg/jdmainct.c
-         external/libjpeg/jdmarker.c
-         external/libjpeg/jdmaster.c
-         external/libjpeg/jdmerge.c
-         external/libjpeg/jdpostct.c
-         external/libjpeg/jdsample.c
-         external/libjpeg/jerror.c
-         external/libjpeg/jfdctflt.c
-         external/libjpeg/jfdctfst.c
-         external/libjpeg/jfdctint.c
-         external/libjpeg/jidctflt.c
-         external/libjpeg/jidctfst.c
-         external/libjpeg/jidctint.c
-         external/libjpeg/jmemmgr.c
-         external/libjpeg/jmemnobs.c
-         external/libjpeg/jquant1.c
-         external/libjpeg/jquant2.c
-         external/libjpeg/jutils.c)
+         external/libjpeg/jaricom.c  external/libjpeg/jcapimin.c external/libjpeg/jcapistd.c
+         external/libjpeg/jcarith.c  external/libjpeg/jccoefct.c external/libjpeg/jccolor.c
+         external/libjpeg/jcdctmgr.c external/libjpeg/jchuff.c   external/libjpeg/jcinit.c
+         external/libjpeg/jcmainct.c external/libjpeg/jcmarker.c external/libjpeg/jcmaster.c
+         external/libjpeg/jcomapi.c  external/libjpeg/jcparam.c  external/libjpeg/jcprepct.c
+         external/libjpeg/jcsample.c external/libjpeg/jdapimin.c external/libjpeg/jdapistd.c
+         external/libjpeg/jdarith.c  external/libjpeg/jdatadst.c external/libjpeg/jdatasrc.c
+         external/libjpeg/jdcoefct.c external/libjpeg/jdcolor.c  external/libjpeg/jddctmgr.c
+         external/libjpeg/jdhuff.c   external/libjpeg/jdinput.c  external/libjpeg/jdmainct.c
+         external/libjpeg/jdmarker.c external/libjpeg/jdmaster.c external/libjpeg/jdmerge.c
+         external/libjpeg/jdpostct.c external/libjpeg/jdsample.c external/libjpeg/jerror.c
+         external/libjpeg/jfdctflt.c external/libjpeg/jfdctfst.c external/libjpeg/jfdctint.c
+         external/libjpeg/jidctflt.c external/libjpeg/jidctfst.c external/libjpeg/jidctint.c
+         external/libjpeg/jmemmgr.c  external/libjpeg/jmemnobs.c external/libjpeg/jquant1.c
+         external/libjpeg/jquant2.c  external/libjpeg/jutils.c)
    endif()
 endif()
 
@@ -323,7 +277,25 @@ endif()
 
 if (DLIB_USE_BLAS)
    target_compile_definitions(dlib PUBLIC DLIB_USE_BLAS)
-   target_link_libraries(dlib PUBLIC ${BLAS_LIBRARIES})
+
+   if (BLAS_FOUND)
+      target_link_libraries(dlib PUBLIC ${BLAS_LIBRARIES})
+   else()
+      target_sources(dlib PRIVATE
+         cblas_caxpy.c  cblas_cdotc_sub.c cblas_cdotu_sub.c
+         cblas_cgemm.c  cblas_cgemv.c     cblas_cgerc.c     cblas_cgeru.c
+         cblas_cscal.c  cblas_ctrsm.c     cblas_daxpy.c     cblas_ddot.c
+         cblas_dgemm.c  cblas_dgemv.c     cblas_dger.c      cblas_dscal.c
+         cblas_dtrsm.c  cblas_saxpy.c     cblas_sdot.c      cblas_sgemm.c
+         cblas_sgemv.c  cblas_sger.c      cblas_sscal.c     cblas_strsm.c
+         cblas_xerbla.c cblas_zaxpy.c     cblas_zdotc_sub.c cblas_zdotu_sub.c
+         cblas_zgemm.c  cblas_zgemv.c     cblas_zgerc.c     cblas_zgeru.c
+         cblas_zscal.c  cblas_ztrsm.c
+         cdotcsub.f  cdotusub.f  dasumsub.f  ddotsub.f   dnrm2sub.f  dsdotsub.f dzasumsub.f
+         dznrm2sub.f icamaxsub.f idamaxsub.f isamaxsub.f izamaxsub.f sasumsub.f scasumsub.f
+         scnrm2sub.f sdotsub.f   sdsdotsub.f snrm2sub.f  zdotcsub.f  zdotusub.f)
+      target_compile_definitions(dlib PRIVATE DADD_ DF77_INT=ptrdiff_t)
+   endif()
 endif()
 
 if (DLIB_USE_LAPACK)
@@ -389,8 +361,7 @@ target_include_directories(dlib PUBLIC
         INTERFACE $<INSTALL_INTERFACE:include>)
 
 target_compile_definitions(dlib PUBLIC DLIB_CHECK_FOR_VERSION_MISMATCH=${DLIB_CHECK_FOR_VERSION_MISMATCH})
-
-# target_compile_features(dlib PUBLIC cxx_std_14)
+target_compile_features(dlib PUBLIC cxx_std_14)
 set_target_properties(dlib PROPERTIES 
    VERSION ${PROJECT_VERSION}
    CXX_STANDARD 14
@@ -434,7 +405,15 @@ if (DLIB_BUILD_PYTHON)
          ../tools/python/src/gui.cpp)
    endif()
 
+   target_compile_definitions(_dlib_pybind11 PRIVATE DDLIB_VERSION=${PROJECT_VERSION})
    target_link_libraries(_dlib_pybind11 PRIVATE dlib::dlib)
+
+   # When invoked from setup.py CMAKE_LIBRARY_OUTPUT_DIRECTORY will be set.  But when you are just building via say
+   # `cd dlib/tools/python; mkdir build; cd build; cmake ..` it won't be set.  It only matters for building the actual
+   # distribution.  So skip this for people building directly with cmake (which they might do when testing stuff).
+   if (CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+      configure_file(${PROJECT_SOURCE_DIR}/dlib/__init__.py.in ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/dlib/__init__.py)
+   endif()
 endif()
 
 if (DLIB_BUILD_TESTS)
@@ -766,8 +745,14 @@ endif()
 
 ### Installation ############################################################################################
 get_directory_property(has_parent PARENT_DIRECTORY)
+if(has_parent)
+   set(DLIB_VERSION ${PROJECT_VERSION} PARENT_SCOPE)
+   if (NOT DEFINED DLIB_IN_PROJECT_BUILD)
+      set(DLIB_IN_PROJECT_BUILD true)
+   endif()
+endif()
 
-if (NOT has_parent)
+if (NOT DLIB_IN_PROJECT_BUILD)
    include(GNUInstallDirs)
 
    install(TARGETS dlib
@@ -779,8 +764,12 @@ if (NOT has_parent)
       INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
    if (DLIB_BUILD_TOOLS)
-      install(TARGETS imglab dtoc train_face_5point_model RUNTIME DESTINATION bin)
+      install(TARGETS dtoc train_face_5point_model RUNTIME DESTINATION bin)
       install(PROGRAMS ../tools/imglab/convert_imglab_paths_to_relative ../tools/imglab/copy_imglab_dataset DESTINATION bin)
+
+      if (NOT DLIB_NO_GUI_SUPPORT)
+         install(TARGETS imglab RUNTIME DESTINATION bin)
+      endif()
    endif()
 
    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib
@@ -805,7 +794,7 @@ if (NOT has_parent)
    configure_file(cmake_utils/dlib.pc.in              dlib-1.pc @ONLY)
 
    configure_package_config_file(cmake_utils/dlibConfig.cmake.in
-           ${CMAKE_CURRENT_BINARY_DIR}/config/FooConfig.cmake
+           ${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake
            INSTALL_DESTINATION ${LIB_INSTALL_DIR}/dlib/cmake)
 
    install(FILES
