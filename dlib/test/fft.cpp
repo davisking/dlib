@@ -633,7 +633,6 @@ namespace
     {
         constexpr R tol = std::is_same<R,float>::value ? 1e-5 : 1e-12;
 
-//        printf("%s - %i\n", __PRETTY_FUNCTION__, __LINE__);
         int test = 0;
 
         for (long nsamples = 512 ; nsamples < 1024 ; ++nsamples)
