@@ -31,6 +31,7 @@ set(DLIB_CHECK_FOR_VERSION_MISMATCH
 ### Dependencies ############################################################################################ 
 include(CMakeDependentOption)
 include(CMakePackageConfigHelpers)
+include(FetchContent)
 include(cmake_utils/check_if_neon_available.cmake)
 include(cmake_utils/check_if_avx_instructions_executable_on_host.cmake)
 include(cmake_utils/check_if_sse4_instructions_executable_on_host.cmake)
@@ -45,6 +46,15 @@ find_package(OpenCV QUIET)
 include(cmake_utils/find_libwebp.cmake)
 include(cmake_utils/find_blas.cmake)
 # include(cmake_utils/find_cudnn.cmake)
+
+# If you update this to 2.3.0 or later (latest is 2.10.0), it doesn't recognise PYBIND11_DESCR. TODO: fix
+# TODO: use nanobind instead of pybind. According to author, it's better.
+FetchContent_Declare(
+     pybind11
+     GIT_REPOSITORY https://github.com/pybind/pybind11.git
+     GIT_TAG v2.2.3
+)
+FetchContent_MakeAvailable(pybind11)
 ### Dependencies ############################################################################################
 
 ### Options #################################################################################################
@@ -60,6 +70,8 @@ option(DLIB_BUILD_EXAMPLES
    "Build dlib examples")
 option(DLIB_BUILD_TOOLS
    "Build dlib tools")
+option(DLIB_BUILD_PYTHON
+   "Build python bindings")
 cmake_dependent_option(USE_SSE4_INSTRUCTIONS 
    "Compile your program with SSE4 instructions" ON "SSE4_IS_AVAILABLE_ON_HOST" OFF)
 cmake_dependent_option(USE_AVX_INSTRUCTIONS  
@@ -389,6 +401,42 @@ set_target_properties(dlib PROPERTIES
 
 add_library(dlib::dlib ALIAS dlib)
 
+if (DLIB_BUILD_PYTHON)
+   pybind11_add_module(_dlib_pybind11
+      ../tools/python/src/dlib.cpp
+      ../tools/python/src/matrix.cpp
+      ../tools/python/src/vector.cpp
+      ../tools/python/src/svm_c_trainer.cpp
+      ../tools/python/src/svm_rank_trainer.cpp
+      ../tools/python/src/decision_functions.cpp
+      ../tools/python/src/other.cpp
+      ../tools/python/src/basic.cpp
+      ../tools/python/src/cca.cpp
+      ../tools/python/src/sequence_segmenter.cpp
+      ../tools/python/src/svm_struct.cpp
+      ../tools/python/src/image.cpp
+      ../tools/python/src/image2.cpp
+      ../tools/python/src/image3.cpp
+      ../tools/python/src/image4.cpp
+      ../tools/python/src/rectangles.cpp
+      ../tools/python/src/object_detection.cpp
+      ../tools/python/src/shape_predictor.cpp
+      ../tools/python/src/correlation_tracker.cpp
+      ../tools/python/src/face_recognition.cpp
+      ../tools/python/src/cnn_face_detector.cpp
+      ../tools/python/src/global_optimization.cpp
+      ../tools/python/src/image_dataset_metadata.cpp
+      ../tools/python/src/numpy_returns.cpp
+      ../tools/python/src/line.cpp)
+
+   if (NOT DLIB_NO_GUI_SUPPORT)
+      target_sources(_dlib_pybind11 PRIVATE
+         ../tools/python/src/gui.cpp)
+   endif()
+
+   target_link_libraries(_dlib_pybind11 PRIVATE dlib::dlib)
+endif()
+
 if (DLIB_BUILD_TESTS)
    add_executable(dtest test/main.cpp test/tester.cpp test/tester.h
       test/example.cpp
@@ -549,15 +597,15 @@ if (DLIB_BUILD_TESTS)
    # Treat warnings as errors.
    # Unused functions are ok though.
    if (CMAKE_COMPILER_IS_GNUCXX)
-      target_compile_options(dtest PRIVATE -W -Wall -Wextra -Wpedantic -Werror -fdiagnostics-color=always)
+      target_compile_options(dtest PRIVATE -W -Werror -Wall -Wextra -Wpedantic -fdiagnostics-color=always)
       target_compile_options(dtest PRIVATE -Wno-unused-function -Wno-strict-overflow -Wno-maybe-uninitialized)
    elseif (MSVC)
       target_compile_options(dtest PRIVATE /WX)
    else() # basically Clang
-      target_compile_options(dtest PRIVATE -W -Werror)
-      target_compile_options(dtest PRIVATE -Wno-comment)
+      target_compile_options(dtest PRIVATE -W -Werror -Wno-comment)
    endif()
 
+   target_compile_features(dtest PUBLIC cxx_std_14)
    target_link_libraries(dtest PRIVATE dlib::dlib)
 endif()
 
@@ -565,6 +613,7 @@ if (DLIB_BUILD_EXAMPLES)
    macro(add_example name)
       add_executable(${name} ../examples/${name}.cpp)
       target_link_libraries(${name} PRIVATE dlib::dlib)
+      target_compile_features(${name} PUBLIC cxx_std_14)
    endmacro()
 
    add_example(bayes_net_ex)
@@ -688,12 +737,15 @@ endif()
 
 if (DLIB_BUILD_TOOLS)
    add_executable(htmlify ../tools/htmlify/htmlify.cpp ../tools/htmlify/to_xml.cpp)
+   target_compile_features(htmlify PUBLIC cxx_std_14)
    target_link_libraries(htmlify PRIVATE dlib::dlib)
 
    add_executable(dtoc ../tools/convert_dlib_nets_to_caffe/main.cpp)
+   target_compile_features(dtoc PUBLIC cxx_std_14)
    target_link_libraries(dtoc PRIVATE dlib::dlib)
 
    add_executable(train_face_5point_model ../tools/archive/train_face_5point_model.cpp)
+   target_compile_features(train_face_5point_model PUBLIC cxx_std_14)
    target_link_libraries(train_face_5point_model dlib::dlib)
 
    if (NOT DLIB_NO_GUI_SUPPORT)
@@ -706,6 +758,7 @@ if (DLIB_BUILD_TOOLS)
          ../tools/imglab/src/common.cpp
          ../tools/imglab/src/cluster.cpp
          ../tools/imglab/src/flip_dataset.cpp)
+      target_compile_features(imglab PUBLIC cxx_std_14)
       target_link_libraries(imglab PRIVATE dlib::dlib)
    endif()
 endif()
