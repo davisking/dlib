@@ -323,7 +323,7 @@ namespace dlib
             DLIB_ASSERT(fftsize >= wlen, "fftsize >= wlen not satisfied");
             DLIB_ASSERT(wlen >= hoplen, "wlen >= hoplen not satisfied");
 
-            /*! Input is left-padded by wlen/2 and right-padded wlen/2 !*/
+            // Input is left-padded by wlen/2 and right-padded wlen/2
             const std::size_t total_padding = wlen;
             const std::size_t overlap       = wlen - hoplen;
             const std::size_t nframes       = (signal.size() + total_padding - overlap) / hoplen;
@@ -333,7 +333,7 @@ namespace dlib
             for (std::size_t i = 0 ; i < wlen ; ++i)
                 win(0, i) = w(i, wlen);
 
-            /*! TODO: reduce extra buffers, e.g. padded !*/
+            // TODO: reduce extra buffers, e.g. padded
             matrix<T> padded;
 
             if (is_row_vector(signal))
@@ -387,7 +387,7 @@ namespace dlib
                 set_subm(norm,   0, t*hoplen, 1, wlen) += win2;
             }
 
-            /*! Remove padding of wlen/2 and wlen/2 on either end !*/
+            // Remove padding of wlen/2 and wlen/2 on either end
             DLIB_ASSERT(sum(subm(norm, 0, wlen/2, 1, ntime - wlen) < 1e-13) == 0, "NOLA constraint not satisfied");
             signal = pointwise_divide(subm(signal, 0, wlen/2, 1, ntime - wlen),
                                       subm(norm,   0, wlen/2, 1, ntime - wlen));
@@ -398,62 +398,32 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    const auto hann_window = [](std::size_t i, std::size_t N) 
-    /*!
-        WHAT THIS OBJECT REPRESENTS
-            This returns a function object with signature double(size_t i, size_t N) which computes
-            a periodic Hann window which can be passed to the STFT family of functions.
-    !*/
+    const auto hann_window = [](std::size_t i, std::size_t N)
     {
         return hann(i, N, PERIODIC);
     };
 
-    const auto blackman_window = [](std::size_t i, std::size_t N) 
-    /*!
-        WHAT THIS OBJECT REPRESENTS
-            This returns a function object with signature double(size_t i, size_t N) which computes
-            a periodic Blackman window which can be passed to the STFT family of functions.
-    !*/
+    const auto blackman_window = [](std::size_t i, std::size_t N)
     {
         return blackman(i, N, PERIODIC);
     };
     
-    const auto blackman_nuttall_window = [](std::size_t i, std::size_t N) 
-    /*!
-        WHAT THIS OBJECT REPRESENTS
-            This returns a function object with signature double(size_t i, size_t N) which computes
-            a periodic Blackman-Nuttall window which can be passed to the STFT family of functions.
-    !*/
+    const auto blackman_nuttall_window = [](std::size_t i, std::size_t N)
     {
         return blackman_nuttall(i, N, PERIODIC);
     };
 
-    const auto blackman_harris_window = [](std::size_t i, std::size_t N) 
-    /*!
-        WHAT THIS OBJECT REPRESENTS
-            This returns a function object with signature double(size_t i, size_t N) which computes
-            a periodic Blackman-Harris window which can be passed to the STFT family of functions.
-    !*/
+    const auto blackman_harris_window = [](std::size_t i, std::size_t N)
     {
         return blackman_harris(i, N, PERIODIC);
     };
 
-    const auto blackman_harris7_window = [](std::size_t i, std::size_t N) 
-    /*!
-        WHAT THIS OBJECT REPRESENTS
-            This returns a function object with signature double(size_t i, size_t N) which computes
-            a periodic 7th order Blackman-Harris window which can be passed to the STFT family of functions.
-    !*/
+    const auto blackman_harris7_window = [](std::size_t i, std::size_t N)
     {
         return blackman_harris7(i, N, PERIODIC);
     };
 
     inline auto kaiser_window(beta_t beta)
-    /*!
-        ensures:
-            - This returns a function object with signature double(size_t i, size_t N) which computes
-              a periodic Kaiser window which can be passed to the STFT family of functions.
-    !*/
     {
         return [=](std::size_t i, std::size_t N){return kaiser(i, N, beta, PERIODIC);};
     }
@@ -488,11 +458,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename EXP,
-        typename WINDOW,
-        typename T = typename EXP::type
-    >
+    template <typename EXP,typename WINDOW>
     auto istft (
         const matrix_exp<EXP>& stft,
         const WINDOW& w,
@@ -500,6 +466,7 @@ namespace dlib
         std::size_t hoplen
     )
     {
+        using T = typename EXP::type;
         return details::istft_impl<T>(stft, w, wlen, hoplen, details::ifft_func{});
     }
 
@@ -533,12 +500,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename EXP,
-        typename WINDOW,
-        typename T = typename EXP::type,
-        typename R = remove_complex_t<T>
-    >
+    template <typename EXP, typename WINDOW>
     auto istftr (
         const matrix_exp<EXP>& stft,
         const WINDOW& w,
@@ -546,6 +508,7 @@ namespace dlib
         std::size_t hoplen
     )
     {
+        using R = remove_complex_t<typename EXP::type>;
         return details::istft_impl<R>(stft, w, wlen, hoplen, details::ifftr_func{});
     }
 

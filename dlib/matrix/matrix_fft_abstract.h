@@ -233,6 +233,18 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    // These are function objects with signature double(size_t i, size_t wlen)
+    // defining PERIODIC window functions suitable for passing to STFT functions
+
+    const function_object hann_window;
+    const function_object blackman_window;
+    const function_object blackman_nuttall_window;
+    const function_object blackman_harris_window;
+    const function_object blackman_harris7_window;
+    inline function_object kaiser_window(beta_t beta);
+
+// ----------------------------------------------------------------------------------------
+
     template <typename EXP, typename WINDOW>
     matrix<complex_type> stft (
         const matrix_exp<EXP>& signal,
