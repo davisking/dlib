@@ -17,11 +17,16 @@ if (POLICY CMP0075)
 endif()
 ### Policies ################################################################################################
 
+### Summary and versioning ##################################################################################
 project(dlib 
    VERSION        19.24.99
    DESCRIPTION    "Dlib is a modern C++ toolkit containing machine learning algorithms and tools for creating complex software in C++ to solve real world problems."
    HOMEPAGE_URL   http://dlib.net/
    LANGUAGES      C CXX) #CUDA
+
+set(DLIB_CHECK_FOR_VERSION_MISMATCH
+        DLIB_VERSION_MISMATCH_CHECK__EXPECTED_VERSION_${PROJECT_VERSION_MAJOR}_${PROJECT_VERSION_MINOR}_${PROJECT_VERSION_PATCH})
+### Summary and versioning ##################################################################################
 
 ### Dependencies ############################################################################################ 
 include(CMakeDependentOption)
@@ -36,6 +41,7 @@ find_package(GIF)
 find_package(PNG)
 find_package(JPEG)
 find_package(SQLite3)
+find_package(OpenCV QUIET)
 include(cmake_utils/find_libwebp.cmake)
 include(cmake_utils/find_blas.cmake)
 # include(cmake_utils/find_cudnn.cmake)
@@ -48,6 +54,12 @@ option(DLIB_ENABLE_STACK_TRACE
    "Enable this if you want to turn on the DLIB_STACK_TRACE macros")
 option(DLIB_ISO_CPP_ONLY         
    "Enable this if you don't want to compile any non-ISO C++ code (i.e. you don't use any of the API Wrappers)")
+option(DLIB_BUILD_TESTS
+   "Build unit tests")
+option(DLIB_BUILD_EXAMPLES
+   "Build dlib examples")
+option(DLIB_BUILD_TOOLS
+   "Build dlib tools")
 cmake_dependent_option(USE_SSE4_INSTRUCTIONS 
    "Compile your program with SSE4 instructions" ON "SSE4_IS_AVAILABLE_ON_HOST" OFF)
 cmake_dependent_option(USE_AVX_INSTRUCTIONS  
@@ -364,8 +376,6 @@ target_include_directories(dlib PUBLIC
         INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
         INTERFACE $<INSTALL_INTERFACE:include>)
 
-set(DLIB_CHECK_FOR_VERSION_MISMATCH
-        DLIB_VERSION_MISMATCH_CHECK__EXPECTED_VERSION_${PROJECT_VERSION_MAJOR}_${PROJECT_VERSION_MINOR}_${PROJECT_VERSION_PATCH})
 target_compile_definitions(dlib PUBLIC DLIB_CHECK_FOR_VERSION_MISMATCH=${DLIB_CHECK_FOR_VERSION_MISMATCH})
 
 # target_compile_features(dlib PUBLIC cxx_std_14)
@@ -379,10 +389,329 @@ set_target_properties(dlib PROPERTIES
 
 add_library(dlib::dlib ALIAS dlib)
 
+if (DLIB_BUILD_TESTS)
+   add_executable(dtest test/main.cpp test/tester.cpp test/tester.h
+      test/example.cpp
+      test/active_learning.cpp
+      test/any.cpp
+      test/any_function.cpp
+      test/array2d.cpp
+      test/array.cpp
+      test/assignment_learning.cpp
+      test/base64.cpp
+      test/bayes_nets.cpp
+      test/bigint.cpp
+      test/binary_search_tree_kernel_1a.cpp
+      test/binary_search_tree_kernel_2a.cpp
+      test/binary_search_tree_mm1.cpp
+      test/binary_search_tree_mm2.cpp
+      test/bridge.cpp
+      test/bsp.cpp
+      test/byte_orderer.cpp
+      test/cca.cpp
+      test/clustering.cpp
+      test/cmd_line_parser.cpp
+      test/cmd_line_parser_wchar_t.cpp
+      test/compress_stream.cpp
+      test/conditioning_class_c.cpp
+      test/conditioning_class.cpp
+      test/config_reader.cpp
+      test/correlation_tracker.cpp
+      test/crc32.cpp
+      test/create_iris_datafile.cpp
+      test/data_io.cpp
+      test/directed_graph.cpp
+      test/discriminant_pca.cpp
+      test/disjoint_subsets.cpp
+      test/disjoint_subsets_sized.cpp
+      test/ekm_and_lisf.cpp
+      test/empirical_kernel_map.cpp
+      test/entropy_coder.cpp
+      test/entropy_encoder_model.cpp
+      test/example_args.cpp
+      test/face.cpp
+      test/fft.cpp
+      test/fhog.cpp
+      test/filtering.cpp
+      test/find_max_factor_graph_nmplp.cpp
+      test/find_max_factor_graph_viterbi.cpp
+      test/geometry.cpp
+      test/graph.cpp
+      test/graph_cuts.cpp
+      test/graph_labeler.cpp
+      test/hash.cpp
+      test/hash_map.cpp
+      test/hash_set.cpp
+      test/hash_table.cpp
+      test/hog_image.cpp
+      test/image.cpp
+      test/invoke.cpp
+      test/iosockstream.cpp
+      test/is_same_object.cpp
+      test/isotonic_regression.cpp
+      test/kcentroid.cpp
+      test/kernel_matrix.cpp
+      test/kmeans.cpp
+      test/learning_to_track.cpp
+      test/least_squares.cpp
+      test/linear_manifold_regularizer.cpp
+      test/lspi.cpp
+      test/lz77_buffer.cpp
+      test/map.cpp
+      test/matrix2.cpp
+      test/matrix3.cpp
+      test/matrix4.cpp
+      test/matrix_chol.cpp
+      test/matrix.cpp
+      test/matrix_eig.cpp
+      test/matrix_lu.cpp
+      test/matrix_qr.cpp
+      test/max_cost_assignment.cpp
+      test/max_sum_submatrix.cpp
+      test/md5.cpp
+      test/member_function_pointer.cpp
+      test/metaprogramming.cpp
+      test/mpc.cpp
+      test/multithreaded_object.cpp
+      test/numerical_integration.cpp
+      test/object_detector.cpp
+      test/oca.cpp
+      test/one_vs_all_trainer.cpp
+      test/one_vs_one_trainer.cpp
+      test/optimization.cpp
+      test/optimization_test_functions.cpp
+      test/global_optimization.cpp
+      test/opt_qp_solver.cpp
+      test/parallel_for.cpp
+      test/parse.cpp
+      test/pipe.cpp
+      test/pixel.cpp
+      test/probabilistic.cpp
+      test/pyramid_down.cpp
+      test/queue.cpp
+      test/rand.cpp
+      test/ranking.cpp
+      test/read_write_mutex.cpp
+      test/reference_counter.cpp
+      test/rls.cpp
+      test/random_forest.cpp
+      test/sammon.cpp
+      test/scan_image.cpp
+      test/sequence.cpp
+      test/sequence_labeler.cpp
+      test/sequence_segmenter.cpp
+      test/serialize.cpp
+      test/set.cpp
+      test/sldf.cpp
+      test/sliding_buffer.cpp
+      test/sockets2.cpp
+      test/sockets.cpp
+      test/sockstreambuf.cpp
+      test/sparse_vector.cpp
+      test/stack.cpp
+      test/static_map.cpp
+      test/static_set.cpp
+      test/statistics.cpp
+      test/std_vector_c.cpp
+      test/string.cpp
+      test/svm_c_linear.cpp
+      test/svm_c_linear_dcd.cpp
+      test/svm.cpp
+      test/svm_multiclass_linear.cpp
+      test/svm_struct.cpp
+      test/svr_linear_trainer.cpp
+      test/symmetric_matrix_cache.cpp
+      test/thread_pool.cpp
+      test/threads.cpp
+      test/timer.cpp
+      test/tokenizer.cpp
+      test/trust_region.cpp
+      test/tuple.cpp
+      test/type_safe_union.cpp
+      test/vectorstream.cpp
+      test/dnn.cpp
+      test/cublas.cpp
+      test/find_optimal_parameters.cpp
+      test/elastic_net.cpp)
+
+   if (DLIB_USE_BLAS)
+      target_sources(dtest PRIVATE
+         test/blas_bindings/blas_bindings_dot.cpp
+         test/blas_bindings/blas_bindings_gemm.cpp
+         test/blas_bindings/blas_bindings_gemv.cpp
+         test/blas_bindings/blas_bindings_ger.cpp
+         test/blas_bindings/blas_bindings_scal_axpy.cpp
+         test/blas_bindings/vector.cpp)
+
+      target_compile_definitions(dtest PRIVATE DLIB_TEST_BLAS_BINDINGS)
+   endif()
+
+   # Treat warnings as errors.
+   # Unused functions are ok though.
+   if (CMAKE_COMPILER_IS_GNUCXX)
+      target_compile_options(dtest PRIVATE -W -Wall -Wextra -Wpedantic -Werror -fdiagnostics-color=always)
+      target_compile_options(dtest PRIVATE -Wno-unused-function -Wno-strict-overflow -Wno-maybe-uninitialized)
+   elseif (MSVC)
+      target_compile_options(dtest PRIVATE /WX)
+   else() # basically Clang
+      target_compile_options(dtest PRIVATE -W -Werror)
+      target_compile_options(dtest PRIVATE -Wno-comment)
+   endif()
+
+   target_link_libraries(dtest PRIVATE dlib::dlib)
+endif()
+
+if (DLIB_BUILD_EXAMPLES)
+   macro(add_example name)
+      add_executable(${name} ../examples/${name}.cpp)
+      target_link_libraries(${name} PRIVATE dlib::dlib)
+   endmacro()
+
+   add_example(bayes_net_ex)
+   add_example(bayes_net_from_disk_ex)
+   add_example(bridge_ex)
+   add_example(bsp_ex)
+   add_example(compress_stream_ex)
+   add_example(config_reader_ex)
+   add_example(custom_trainer_ex)
+   add_example(dnn_metric_learning_ex)
+   add_example(dnn_introduction_ex)
+   add_example(dnn_introduction2_ex)
+   add_example(dnn_introduction3_ex)
+   add_example(dnn_inception_ex)
+   add_example(dnn_mmod_train_find_cars_ex)
+   add_example(dnn_imagenet_train_ex)
+   add_example(dnn_semantic_segmentation_train_ex)
+   add_example(dnn_instance_segmentation_train_ex)
+   add_example(dnn_metric_learning_on_images_ex)
+   add_example(dir_nav_ex)
+   add_example(empirical_kernel_map_ex)
+   add_example(file_to_code_ex)
+   add_example(graph_labeling_ex)
+   add_example(integrate_function_adapt_simp_ex)
+   add_example(iosockstream_ex)
+   add_example(kcentroid_ex)
+   add_example(kkmeans_ex)
+   add_example(krls_ex)
+   add_example(krls_filter_ex)
+   add_example(krr_classification_ex)
+   add_example(krr_regression_ex)
+   add_example(learning_to_track_ex)
+   add_example(least_squares_ex)
+   add_example(linear_manifold_regularizer_ex)
+   add_example(logger_custom_output_ex)
+   add_example(logger_ex)
+   add_example(logger_ex_2)
+   add_example(matrix_ex)
+   add_example(matrix_expressions_ex)
+   add_example(max_cost_assignment_ex)
+   add_example(member_function_pointer_ex)
+   add_example(mlp_ex)
+   add_example(model_selection_ex)
+   add_example(multiclass_classification_ex)
+   add_example(multithreaded_object_ex)
+   add_example(optimization_ex)
+   add_example(parallel_for_ex)
+   add_example(pipe_ex)
+   add_example(pipe_ex_2)
+   add_example(quantum_computing_ex)
+   add_example(queue_ex)
+   add_example(rank_features_ex)
+   add_example(running_stats_ex)
+   add_example(rvm_ex)
+   add_example(rvm_regression_ex)
+   add_example(sequence_labeler_ex)
+   add_example(sequence_segmenter_ex)
+   add_example(server_http_ex)
+   add_example(server_iostream_ex)
+   add_example(sockets_ex)
+   add_example(sockstreambuf_ex)
+   add_example(std_allocator_ex)
+   add_example(svm_c_ex)
+   add_example(svm_ex)
+   add_example(svm_pegasos_ex)
+   add_example(svm_rank_ex)
+   add_example(svm_sparse_ex)
+   add_example(svm_struct_ex)
+   add_example(svr_ex)
+   add_example(thread_function_ex)
+   add_example(thread_pool_ex)
+   add_example(threaded_object_ex)
+   add_example(threads_ex)
+   add_example(timer_ex)
+   add_example(train_shape_predictor_ex)
+   add_example(using_custom_kernels_ex)
+   add_example(xml_parser_ex)
+
+   if (NOT DLIB_NO_GUI_SUPPORT)
+      add_example(bayes_net_gui_ex)
+      add_example(dnn_face_recognition_ex)
+      add_example(dnn_mmod_ex)
+      add_example(dnn_mmod_face_detection_ex)
+      add_example(dnn_mmod_dog_hipsterizer)
+      add_example(dnn_imagenet_ex)
+      add_example(dnn_mmod_find_cars_ex)
+      add_example(dnn_mmod_find_cars2_ex)
+      add_example(dnn_semantic_segmentation_ex)
+      add_example(dnn_instance_segmentation_ex)
+      add_example(dnn_dcgan_train_ex)
+      add_example(dnn_yolo_train_ex)
+      add_example(dnn_self_supervised_learning_ex)
+      add_example(face_detection_ex)
+      add_example(face_landmark_detection_ex)
+      add_example(fhog_ex)
+      add_example(fhog_object_detector_ex)
+      add_example(gui_api_ex)
+      add_example(hough_transform_ex)
+      add_example(image_ex)
+      add_example(mpc_ex)
+      add_example(object_detector_advanced_ex)
+      add_example(object_detector_ex)
+      add_example(one_class_classifiers_ex)
+      add_example(random_cropper_ex)
+      add_example(surf_ex)
+      add_example(train_object_detector)
+      add_example(video_tracking_ex)
+      add_example(3d_point_cloud_ex)
+   else()
+      if (OpenCV_FOUND)
+         add_example(webcam_face_pose_ex)
+         target_include_directories(webcam_face_pose_ex PRIVATE ${OpenCV_INCLUDE_DIRS})
+         target_link_libraries(webcam_face_pose_ex PRIVATE ${OpenCV_LIBS})
+      endif()
+   endif()
+
+   if (DLIB_LINK_WITH_SQLITE3)
+      add_example(sqlite_ex)
+   endif()
+endif()
+
+if (DLIB_BUILD_TOOLS)
+   add_executable(htmlify ../tools/htmlify/htmlify.cpp ../tools/htmlify/to_xml.cpp)
+   target_link_libraries(htmlify PRIVATE dlib::dlib)
+
+   add_executable(dtoc ../tools/convert_dlib_nets_to_caffe/main.cpp)
+   target_link_libraries(dtoc PRIVATE dlib::dlib)
+
+   add_executable(train_face_5point_model ../tools/archive/train_face_5point_model.cpp)
+   target_link_libraries(train_face_5point_model dlib::dlib)
+
+   if (NOT DLIB_NO_GUI_SUPPORT)
+      add_executable(imglab
+         ../tools/imglab/src/main.cpp
+         ../tools/imglab/src/metadata_editor.cpp
+         ../tools/imglab/src/convert_pascal_xml.cpp
+         ../tools/imglab/src/convert_pascal_v1.cpp
+         ../tools/imglab/src/convert_idl.cpp
+         ../tools/imglab/src/common.cpp
+         ../tools/imglab/src/cluster.cpp
+         ../tools/imglab/src/flip_dataset.cpp)
+      target_link_libraries(imglab PRIVATE dlib::dlib)
+   endif()
+endif()
 ### Libraries and executables ###############################################################################
 
 ### Installation ############################################################################################
-
 get_directory_property(has_parent PARENT_DIRECTORY)
 
 if (NOT has_parent)
@@ -395,6 +724,11 @@ if (NOT has_parent)
       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
       ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
       INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+   if (DLIB_BUILD_TOOLS)
+      install(TARGETS imglab dtoc train_face_5point_model RUNTIME DESTINATION bin)
+      install(PROGRAMS ../tools/imglab/convert_imglab_paths_to_relative ../tools/imglab/copy_imglab_dataset DESTINATION bin)
+   endif()
 
    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib
       FILES_MATCHING
