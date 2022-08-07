@@ -31,7 +31,7 @@ jobs:
     - name: Build everything
       run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --parallel 4
     - name: Test
-      run: ${{ env.build_dir }}/dtest --runall -q
+      run: ${{ env.build_dir }}/dlib/dtest --runall -q
 
   ubuntu-latest-gcc-11:
     runs-on: 'ubuntu-latest'
@@ -50,7 +50,7 @@ jobs:
     - name: Build everything
       run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --parallel 4
     - name: Test
-      run: ${{ env.build_dir }}/dtest --runall -q
+      run: ${{ env.build_dir }}/dlib/dtest --runall -q
 
   ubuntu-latest-clang-default:
     runs-on: 'ubuntu-latest'
@@ -68,7 +68,7 @@ jobs:
     - name: Build everything
       run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --parallel 4
     - name: Test
-      run: ${{ env.build_dir }}/dtest --runall -q
+      run: ${{ env.build_dir }}/dlib/dtest --runall -q
 
   ubuntu-latest-clang-13:
     runs-on: 'ubuntu-latest'
@@ -91,7 +91,7 @@ jobs:
     - name: Build everything
       run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --parallel 4
     - name: Test
-      run: ${{ env.build_dir }}/dtest --runall -q
+      run: ${{ env.build_dir }}/dlib/dtest --runall -q
 
   windows-latest:
     runs-on: 'windows-latest'
@@ -123,4 +123,4 @@ jobs:
     - name: Build everything
       run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --parallel 4
     - name: Test
-      run: ${{ env.build_dir }}/dtest --runall --no_test_timer -q
+      run: ${{ env.build_dir }}/dlib/dtest --runall --no_test_timer -q
