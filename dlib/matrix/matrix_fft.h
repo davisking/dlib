@@ -333,7 +333,7 @@ namespace dlib
             for (std::size_t i = 0 ; i < wlen ; ++i)
                 win(0, i) = w(i, wlen);
 
-            /*! TODO: reduce extra buffers, e.g. padded !*/
+            // TODO: reduce extra buffers, e.g. padded
             matrix<T> padded;
 
             if (is_row_vector(signal))
