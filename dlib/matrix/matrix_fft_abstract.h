@@ -233,10 +233,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename EXP>
+    template <typename EXP, typename WINDOW>
     matrix<complex_type> stft (
         const matrix_exp<EXP>& signal,
-        WindowType w,
+        const WINDOW& w,
         std::size_t fftsize,
         std::size_t wlen,
         std::size_t hoplen
@@ -245,6 +245,8 @@ namespace dlib
         requires
             - is_vector(signal) == true, i.e. signal has rank 1
             - signal.size() >= wlen
+            - w is a function object with signature double(size_t i, size_t wlen) that defines a PERIODIC window,
+              e.g. hann_window.
             - fftsize >= wlen
             - wlen >= hoplen
             - EXP::type is a floating point type (float, double or long double), real or complex
@@ -267,10 +269,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename T, typename Alloc>
+    template <typename T, typename Alloc, typename WINDOW>
     matrix<complex_type> stft (
         const std::vector<T, Alloc>& signal,
-        WindowType w,
+        const WINDOW& w,
         std::size_t fftsize,
         std::size_t wlen,
         std::size_t hoplen
@@ -282,16 +284,18 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename EXP>
+    template <typename EXP,typename WINDOW>
     matrix<complex_type> istft (
-        const matrix_exp<EXP>& m,
-        WindowType w,
+        const matrix_exp<EXP>& stft,
+        const WINDOW& w,
         std::size_t wlen,
         std::size_t hoplen
     );
     /*!
         requires
             - m has rank 2 where 1st dimension corresponds to time and second dimension corresponds to frequency
+            - w is a function object with signature double(size_t i, size_t wlen) that defines a PERIODIC window,
+              e.g. hann_window.
             - wlen >= hoplen
             - EXP::type is a complex floating point type (complex<float>, complex<double> or complex<long double>)
             - If you wish to satisfy istft(stft(x, ...), ...) == x then:
@@ -306,10 +310,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename EXP>
+    template <typename EXP, typename WINDOW>
     matrix<complex_type> stftr (
         const matrix_exp<EXP>& signal,
-        WindowType w,
+        const WINDOW& w,
         std::size_t fftsize,
         std::size_t wlen,
         std::size_t hoplen
@@ -318,6 +322,8 @@ namespace dlib
         requires
             - is_vector(signal) == true, i.e. signal has rank 1
             - signal.size() >= wlen
+            - w is a function object with signature double(size_t i, size_t wlen) that defines a PERIODIC window,
+              e.g. hann_window.
             - fftsize >= wlen
             - wlen >= hoplen
             - EXP::type is a floating point type (float, double or long double) and must be real
@@ -340,10 +346,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename T, typename Alloc>
+    template <typename T, typename Alloc, typename WINDOW>
     matrix<complex_type> stftr (
         const std::vector<T, Alloc>& signal,
-        WindowType w,
+        const WINDOW& w,
         std::size_t fftsize,
         std::size_t wlen,
         std::size_t hoplen
@@ -355,16 +361,18 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename EXP>
+    template <typename EXP, typename WINDOW>
     matrix<real_type> istftr (
         const matrix_exp<EXP>& stft,
-        WindowType w,
+        const WINDOW& w,
         std::size_t wlen,
         std::size_t hoplen
     );
     /*!
         requires
             - m has rank 2 where 1st dimension corresponds to time and second dimension corresponds to frequency
+            - w is a function object with signature double(size_t i, size_t wlen) that defines a PERIODIC window,
+              e.g. hann_window.
             - wlen >= hoplen
             - EXP::type is a complex floating point type (complex<float>, complex<double> or complex<long double>)
             - If you wish to satisfy istftr(stftr(x, ...), ...) == x then:
