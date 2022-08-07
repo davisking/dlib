@@ -98,7 +98,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Configure
-      run: cmake ${{ github.workspace }} -DDLIB_BUILD_TESTS=ON -DDLIB_BUILD_TOOLS=ON -B ${{ env.build_dir }}
+      run: cmake -DDLIB_BUILD_TESTS=ON -DDLIB_BUILD_TOOLS=ON -B ${{ env.build_dir }}
     - name: Build everything
       run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --parallel 4
     - name: Test
@@ -109,7 +109,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Configure
-      run: cmake ${{ github.workspace }} -DDLIB_BUILD_TESTS=ON -DDLIB_BUILD_TOOLS=ON -B ${{ env.build_dir }}
+      run: cmake -DDLIB_BUILD_TESTS=ON -DDLIB_BUILD_TOOLS=ON -B ${{ env.build_dir }}
     - name: Build everything
       run: cmake --build ${{ env.build_dir }} --config Debug --parallel 4
 
