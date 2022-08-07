@@ -101,7 +101,7 @@ cmake_dependent_option(DLIB_USE_MKL_SEQUENTIAL
 cmake_dependent_option(DLIB_USE_MKL_WITH_TBB   
    "Enable this if you have MKL installed and want to use the tbb version instead of the openmp version." OFF "NOT DLIB_ISO_CPP_ONLY;INTEL_MKL_FOUND" OFF)
 cmake_dependent_option(DLIB_USE_BLAS            
-   "Disable this if you don't want to use a BLAS library"   ON "NOT DLIB_ISO_CPP_ONLY;BLAS_FOUND" OFF)
+   "Disable this if you don't want to use a BLAS library"   ON "NOT DLIB_ISO_CPP_ONLY" OFF)
 cmake_dependent_option(DLIB_USE_LAPACK          
    "Disable this if you don't want to use a LAPACK library" ON "NOT DLIB_ISO_CPP_ONLY;LAPACK_FOUND" OFF)
 cmake_dependent_option(DLIB_USE_CUDA            
