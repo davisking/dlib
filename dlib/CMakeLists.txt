@@ -25,7 +25,7 @@ project(dlib
    VERSION        19.24.99
    DESCRIPTION    "Dlib is a modern C++ toolkit containing machine learning algorithms and tools for creating complex software in C++ to solve real world problems."
    HOMEPAGE_URL   http://dlib.net/
-   LANGUAGES      C CXX Fortran) #CUDA
+   LANGUAGES      C CXX) #CUDA
 
 set(DLIB_CHECK_FOR_VERSION_MISMATCH
         DLIB_VERSION_MISMATCH_CHECK__EXPECTED_VERSION_${PROJECT_VERSION_MAJOR}_${PROJECT_VERSION_MINOR}_${PROJECT_VERSION_PATCH})
@@ -281,6 +281,7 @@ if (DLIB_USE_BLAS)
    if (BLAS_FOUND)
       target_link_libraries(dlib PUBLIC ${BLAS_LIBRARIES})
    else()
+      enable_language(Fortran)
       target_sources(dlib PRIVATE
          cblas_caxpy.c  cblas_cdotc_sub.c cblas_cdotu_sub.c
          cblas_cgemm.c  cblas_cgemv.c     cblas_cgerc.c     cblas_cgeru.c
