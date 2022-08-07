@@ -15,7 +15,7 @@ env:
 defaults:
   run:
     shell: bash
-    working-directory: dlib/test
+    working-directory: dlib
 
 jobs:
   ubuntu-latest-gcc-default:
