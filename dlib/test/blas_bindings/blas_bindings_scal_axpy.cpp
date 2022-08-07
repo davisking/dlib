@@ -173,7 +173,7 @@ namespace
                 DLIB_TEST(max(abs(m2 - 7)) == 0);
                 DLIB_TEST(counter_axpy() == 1);
             }
-
+            (void)val;
         }
 
 

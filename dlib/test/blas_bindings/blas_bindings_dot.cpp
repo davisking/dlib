@@ -189,6 +189,7 @@ namespace
             counter_dot() = 0;
             val = trans(cv)*m*trans(m)*trans(rv);
             DLIB_TEST_MSG(counter_dot() == 1, counter_dot());
+            (void)val;
         }
 
 
