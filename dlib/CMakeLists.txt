@@ -253,7 +253,7 @@ if (DLIB_JPEG_SUPPORT)
       target_link_libraries(dlib PUBLIC JPEG::JPEG)
 
    else()
-      target_compile_definitions(DLIB_JPEG_STATIC)
+      target_compile_definitions(dlib PRIVATE DLIB_JPEG_STATIC)
       target_sources(dlib PRIVATE
          external/libjpeg/jaricom.c
          external/libjpeg/jcapimin.c
