@@ -105,7 +105,7 @@ cmake_dependent_option(DLIB_USE_MKL_SEQUENTIAL
 cmake_dependent_option(DLIB_USE_MKL_WITH_TBB   
    "Enable this if you have MKL installed and want to use the tbb version instead of the openmp version." OFF "NOT DLIB_ISO_CPP_ONLY;INTEL_MKL_FOUND" OFF)
 cmake_dependent_option(DLIB_USE_BLAS            
-   "Disable this if you don't want to use a BLAS library"   ON "NOT DLIB_ISO_CPP_ONLY" OFF)
+   "Disable this if you don't want to use a BLAS library"   ON "NOT DLIB_ISO_CPP_ONLY;BLAS_FOUND OR CMAKE_Fortran_COMPILER" OFF)
 cmake_dependent_option(DLIB_USE_LAPACK          
    "Disable this if you don't want to use a LAPACK library" ON "NOT DLIB_ISO_CPP_ONLY;LAPACK_FOUND" OFF)
 cmake_dependent_option(DLIB_USE_CUDA            
@@ -280,8 +280,7 @@ if (DLIB_LINK_WITH_SQLITE3)
 endif()
 
 if (DLIB_USE_BLAS)
-   if (BLAS_FOUND OR CMAKE_Fortran_COMPILER)
-      target_compile_definitions(dlib PUBLIC DLIB_USE_BLAS)
+   target_compile_definitions(dlib PUBLIC DLIB_USE_BLAS)
 
    if (BLAS_FOUND)
       target_link_libraries(dlib PUBLIC ${BLAS_LIBRARIES})
@@ -307,7 +306,6 @@ if (DLIB_USE_BLAS)
          external/cblas/sdotsub.f      external/cblas/sdsdotsub.f       external/cblas/snrm2sub.f
          external/cblas/zdotcsub.f     external/cblas/zdotusub.f)
       target_compile_definitions(dlib PRIVATE DADD_ DF77_INT=ptrdiff_t)
-      endif()
    endif()
 endif()
 
