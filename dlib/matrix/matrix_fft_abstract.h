@@ -233,15 +233,15 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    // These are function objects with signature double(size_t i, size_t wlen)
+    // These return function objects with signature double(size_t i, size_t wlen)
     // defining PERIODIC window functions suitable for passing to STFT functions
 
-    const function_object hann_window;
-    const function_object blackman_window;
-    const function_object blackman_nuttall_window;
-    const function_object blackman_harris_window;
-    const function_object blackman_harris7_window;
-    inline function_object kaiser_window(beta_t beta);
+    inline function_object make_hann();
+    inline function_object make_blackman();
+    inline function_object make_blackman_nuttall();
+    inline function_object make_blackman_harris();
+    inline function_object make_blackman_harris7();
+    inline function_object make_kaiser(beta_t beta);
 
 // ----------------------------------------------------------------------------------------
 

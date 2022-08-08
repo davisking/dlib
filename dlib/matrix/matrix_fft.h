@@ -398,32 +398,32 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    const auto hann_window = [](std::size_t i, std::size_t N)
+    inline auto make_hann()
     {
-        return hann(i, N, PERIODIC);
-    };
+        return [](std::size_t i, std::size_t N) {return hann(i, N, PERIODIC); };
+    }
 
-    const auto blackman_window = [](std::size_t i, std::size_t N)
+    inline auto make_blackman()
     {
-        return blackman(i, N, PERIODIC);
-    };
-    
-    const auto blackman_nuttall_window = [](std::size_t i, std::size_t N)
-    {
-        return blackman_nuttall(i, N, PERIODIC);
-    };
+        return [](std::size_t i, std::size_t N) {return blackman(i, N, PERIODIC);};
+    }
 
-    const auto blackman_harris_window = [](std::size_t i, std::size_t N)
+    inline auto make_blackman_nuttall()
     {
-        return blackman_harris(i, N, PERIODIC);
-    };
+        return [](std::size_t i, std::size_t N) {return blackman_nuttall(i, N, PERIODIC);};
+    }
 
-    const auto blackman_harris7_window = [](std::size_t i, std::size_t N)
+    inline auto make_blackman_harris()
     {
-        return blackman_harris7(i, N, PERIODIC);
-    };
+        return [](std::size_t i, std::size_t N) { return blackman_harris(i, N, PERIODIC); };
+    }
 
-    inline auto kaiser_window(beta_t beta)
+    inline auto make_blackman_harris7()
+    {
+        return [](std::size_t i, std::size_t N) { return blackman_harris7(i, N, PERIODIC); };
+    }
+
+    inline auto make_kaiser(beta_t beta)
     {
         return [=](std::size_t i, std::size_t N){return kaiser(i, N, beta, PERIODIC);};
     }
