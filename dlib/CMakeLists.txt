@@ -372,7 +372,7 @@ target_include_directories(dlib PUBLIC
         INTERFACE $<INSTALL_INTERFACE:include>)
 
 if (MSVC)
-   target_compile_options(dtest PUBLIC /bigobj)
+   target_compile_options(dlib PUBLIC /bigobj)
 endif()
 
 target_compile_definitions(dlib PUBLIC DLIB_CHECK_FOR_VERSION_MISMATCH=${DLIB_CHECK_FOR_VERSION_MISMATCH})
