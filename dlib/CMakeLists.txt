@@ -371,6 +371,10 @@ target_include_directories(dlib PUBLIC
         INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
         INTERFACE $<INSTALL_INTERFACE:include>)
 
+if (MSVC)
+   target_compile_options(dtest PUBLIC /bigobj)
+endif()
+
 target_compile_definitions(dlib PUBLIC DLIB_CHECK_FOR_VERSION_MISMATCH=${DLIB_CHECK_FOR_VERSION_MISMATCH})
 target_compile_features(dlib PUBLIC cxx_std_14)
 set_target_properties(dlib PROPERTIES 
