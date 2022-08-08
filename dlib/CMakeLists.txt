@@ -25,7 +25,7 @@ project(dlib
    VERSION        19.24.99
    DESCRIPTION    "Dlib is a modern C++ toolkit containing machine learning algorithms and tools for creating complex software in C++ to solve real world problems."
    HOMEPAGE_URL   http://dlib.net/
-   LANGUAGES      C CXX) #CUDA
+   LANGUAGES      C CXX)
 
 set(DLIB_CHECK_FOR_VERSION_MISMATCH
         DLIB_VERSION_MISMATCH_CHECK__EXPECTED_VERSION_${PROJECT_VERSION_MAJOR}_${PROJECT_VERSION_MINOR}_${PROJECT_VERSION_PATCH})
@@ -34,6 +34,7 @@ set(DLIB_CHECK_FOR_VERSION_MISMATCH
 ### Dependencies ############################################################################################ 
 include(CMakeDependentOption)
 include(CMakePackageConfigHelpers)
+include(CheckLanguage)
 include(FetchContent)
 include(cmake_utils/check_if_neon_available.cmake)
 include(cmake_utils/check_if_avx_instructions_executable_on_host.cmake)
@@ -59,6 +60,9 @@ FetchContent_Declare(
      GIT_TAG v2.2.3
 )
 FetchContent_MakeAvailable(pybind11)
+
+check_language(Fortran)
+check_language(CUDA)
 ### Dependencies ############################################################################################
 
 ### Options #################################################################################################
@@ -276,26 +280,34 @@ if (DLIB_LINK_WITH_SQLITE3)
 endif()
 
 if (DLIB_USE_BLAS)
-   target_compile_definitions(dlib PUBLIC DLIB_USE_BLAS)
+   if (BLAS_FOUND OR CMAKE_Fortran_COMPILER)
+      target_compile_definitions(dlib PUBLIC DLIB_USE_BLAS)
 
    if (BLAS_FOUND)
       target_link_libraries(dlib PUBLIC ${BLAS_LIBRARIES})
    else()
       enable_language(Fortran)
       target_sources(dlib PRIVATE
-         cblas_caxpy.c  cblas_cdotc_sub.c cblas_cdotu_sub.c
-         cblas_cgemm.c  cblas_cgemv.c     cblas_cgerc.c     cblas_cgeru.c
-         cblas_cscal.c  cblas_ctrsm.c     cblas_daxpy.c     cblas_ddot.c
-         cblas_dgemm.c  cblas_dgemv.c     cblas_dger.c      cblas_dscal.c
-         cblas_dtrsm.c  cblas_saxpy.c     cblas_sdot.c      cblas_sgemm.c
-         cblas_sgemv.c  cblas_sger.c      cblas_sscal.c     cblas_strsm.c
-         cblas_xerbla.c cblas_zaxpy.c     cblas_zdotc_sub.c cblas_zdotu_sub.c
-         cblas_zgemm.c  cblas_zgemv.c     cblas_zgerc.c     cblas_zgeru.c
-         cblas_zscal.c  cblas_ztrsm.c
-         cdotcsub.f  cdotusub.f  dasumsub.f  ddotsub.f   dnrm2sub.f  dsdotsub.f dzasumsub.f
-         dznrm2sub.f icamaxsub.f idamaxsub.f isamaxsub.f izamaxsub.f sasumsub.f scasumsub.f
-         scnrm2sub.f sdotsub.f   sdsdotsub.f snrm2sub.f  zdotcsub.f  zdotusub.f)
+         external/cblas/cblas_caxpy.c  external/cblas/cblas_cdotc_sub.c external/cblas/cblas_cdotu_sub.c
+         external/cblas/cblas_cgemm.c  external/cblas/cblas_cgemv.c     external/cblas/cblas_cgerc.c
+         external/cblas/cblas_cgeru.c  external/cblas/cblas_cscal.c     external/cblas/cblas_ctrsm.c
+         external/cblas/cblas_daxpy.c  external/cblas/cblas_ddot.c      external/cblas/cblas_dgemm.c
+         external/cblas/cblas_dgemv.c  external/cblas/cblas_dger.c      external/cblas/cblas_dscal.c
+         external/cblas/cblas_dtrsm.c  external/cblas/cblas_saxpy.c     external/cblas/cblas_sdot.c
+         external/cblas/cblas_sgemm.c  external/cblas/cblas_sgemv.c     external/cblas/cblas_sger.c
+         external/cblas/cblas_sscal.c  external/cblas/cblas_strsm.c     external/cblas/cblas_xerbla.c
+         external/cblas/cblas_zaxpy.c  external/cblas/cblas_zdotc_sub.c external/cblas/cblas_zdotu_sub.c
+         external/cblas/cblas_zgemm.c  external/cblas/cblas_zgemv.c     external/cblas/cblas_zgerc.c
+         external/cblas/cblas_zgeru.c  external/cblas/cblas_zscal.c     external/cblas/cblas_ztrsm.c
+         external/cblas/cdotcsub.f     external/cblas/cdotusub.f        external/cblas/dasumsub.f
+         external/cblas/ddotsub.f      external/cblas/dnrm2sub.f        external/cblas/dsdotsub.f
+         external/cblas/dzasumsub.f    external/cblas/dznrm2sub.f       external/cblas/icamaxsub.f
+         external/cblas/idamaxsub.f    external/cblas/isamaxsub.f       external/cblas/izamaxsub.f
+         external/cblas/sasumsub.f     external/cblas/scasumsub.f       external/cblas/scnrm2sub.f
+         external/cblas/sdotsub.f      external/cblas/sdsdotsub.f       external/cblas/snrm2sub.f
+         external/cblas/zdotcsub.f     external/cblas/zdotusub.f)
       target_compile_definitions(dlib PRIVATE DADD_ DF77_INT=ptrdiff_t)
+      endif()
    endif()
 endif()
 
