@@ -17,6 +17,7 @@
 #endif
 #include "tester.h"
 #include "fftr_good_data.h"
+#include "stft_good_data.h"
 
 namespace  
 {
@@ -550,7 +551,148 @@ namespace
         func(123); print_spinner();
         func(131);  print_spinner();
     }
-    
+
+    template<typename R1, typename R2>
+    std::complex<R1> complex_cast(const std::complex<R2> &c) {
+        return { static_cast<R1>(c.real()), static_cast<R1>(c.imag()) };
+    }
+
+    template<typename R>
+    void test_good_stft()
+    {
+        constexpr R tol = std::is_same<R,float>::value ? 1e-5 : 1e-12;
+        matrix<R> tone = sin(2 * pi * matrix_cast<R>(range(0, 511)) / 512.0f);
+
+        {
+            matrix<complex<R>> m_stft = stft(tone, make_hann(), 128, 64, 64/2);
+            DLIB_TEST(m_stft.nr() == 17 && m_stft.nc() == 128);
+            for (long i = 0 ; i < m_stft.nr() ; ++i)
+                for (long j = 0 ; j < m_stft.nc() ; ++j)
+                    DLIB_TEST(std::abs(m_stft(i,j) - complex_cast<R>(STFT_FFT_128_WLEN_64_TONE_512[i][j])) < tol);
+
+            matrix<complex<R>> tone2 = istft(m_stft, make_hann(), 64, 64/2);
+            DLIB_TEST(tone.nc() == tone2.nc());
+            DLIB_TEST(tone.nr() == tone2.nr());
+            for (long i = 0 ; i < tone.nc() ; ++i)
+                DLIB_TEST(abs(tone(0,i) - tone2(0, i)) < tol);
+        }
+
+        print_spinner();
+
+        {
+            matrix<complex<R>> m_stft = stft(tone, make_hann(), 64, 64, 64/2);
+            DLIB_TEST(m_stft.nr() == 17 && m_stft.nc() == 64);
+            for (long i = 0 ; i < m_stft.nr() ; ++i)
+                for (long j = 0 ; j < m_stft.nc() ; ++j)
+                    DLIB_TEST(std::abs(m_stft(i,j) - complex_cast<R>(STFT_FFT_64_WLEN_64_TONE_512[i][j])) < tol);
+
+            matrix<complex<R>> tone2 = istft(m_stft, make_hann(), 64, 64/2);
+            DLIB_TEST(tone.nc() == tone2.nc());
+            DLIB_TEST(tone.nr() == tone2.nr());
+            for (long i = 0 ; i < tone.nc() ; ++i)
+                DLIB_TEST(abs(tone(0,i) - tone2(0, i)) < tol);
+        }
+
+        print_spinner();
+
+        {
+            matrix<complex<R>> m_stftr = stftr(tone, make_hann(), 128, 64, 64/2);
+            DLIB_TEST(m_stftr.nr() == 17 && m_stftr.nc() == 65);
+            for (long i = 0 ; i < m_stftr.nr() ; ++i)
+                for (long j = 0 ; j < m_stftr.nc() ; ++j)
+                    DLIB_TEST(std::abs(m_stftr(i,j) - complex_cast<R>(STFT_FFT_128_WLEN_64_TONE_512[i][j])) < tol);
+
+            matrix<R> tone2 = istftr(m_stftr, make_hann(), 64, 64/2);
+            DLIB_TEST(tone.nc() == tone2.nc());
+            DLIB_TEST(tone.nr() == tone2.nr());
+            for (long i = 0 ; i < tone.nc() ; ++i)
+                DLIB_TEST(abs(tone(0,i) - tone2(0, i)) < tol);
+        }
+
+        print_spinner();
+
+        {
+            matrix<complex<R>> m_stftr = stftr(tone, make_hann(), 64, 64, 64/2);
+            DLIB_TEST(m_stftr.nr() == 17 && m_stftr.nc() == 33);
+            for (long i = 0 ; i < m_stftr.nr() ; ++i)
+                for (long j = 0 ; j < m_stftr.nc() ; ++j)
+                    DLIB_TEST(std::abs(m_stftr(i,j) - complex_cast<R>(STFT_FFT_64_WLEN_64_TONE_512[i][j])) < tol);
+
+            matrix<R> tone2 = istftr(m_stftr, make_hann(), 64, 64/2);
+            DLIB_TEST(tone.nc() == tone2.nc());
+            DLIB_TEST(tone.nr() == tone2.nr());
+            for (long i = 0 ; i < tone.nc() ; ++i)
+                DLIB_TEST(abs(tone(0,i) - tone2(0, i)) < tol);
+        }
+
+        print_spinner();
+    }
+
+    template<typename R, typename WINDOW>
+    void test_random_stfts_impl(const WINDOW& w, std::size_t fftsize, std::size_t wlen)
+    {
+        constexpr R tol = std::is_same<R,float>::value ? 1e-5 : 1e-12;
+
+        int test = 0;
+
+        for (long nsamples = 512 ; nsamples < 1024 ; ++nsamples)
+        {
+            matrix<R>           samples1 = matrix_cast<R>(randm(1, nsamples));
+            matrix<complex<R>>  samples2 = istft(stft(samples1, w, fftsize, wlen, wlen/2), w, wlen, wlen/2);
+
+            const long minsamples = std::min(samples1.nc(), samples2.nc());
+            DLIB_TEST(max(abs(imag(samples2))) < tol);
+            DLIB_TEST(max(abs(subm(samples1, 0, 0, 1, minsamples) - subm(real(samples2), 0, 0, 1, minsamples))) < tol);
+
+            if (test++ % 10 == 0)
+                print_spinner();
+        }
+    }
+
+    template<typename R>
+    void test_random_stfts()
+    {
+        test_random_stfts_impl<R>(make_hann(), 256, 128);
+        test_random_stfts_impl<R>(make_hann(), 128, 128);
+        test_random_stfts_impl<R>(make_blackman(), 256, 128);
+        test_random_stfts_impl<R>(make_blackman(), 128, 128);
+        test_random_stfts_impl<R>(make_blackman_nuttall(), 256, 128);
+        test_random_stfts_impl<R>(make_blackman_nuttall(), 128, 128);
+        test_random_stfts_impl<R>(make_blackman_harris(), 256, 128);
+        test_random_stfts_impl<R>(make_blackman_harris(), 128, 128);
+        test_random_stfts_impl<R>(make_blackman_harris7(), 256, 128);
+        test_random_stfts_impl<R>(make_blackman_harris7(), 128, 128);
+        test_random_stfts_impl<R>(make_kaiser(attenuation_t{60.0}), 256, 128);
+        test_random_stfts_impl<R>(make_kaiser(attenuation_t{60.0}), 128, 128);
+
+        print_spinner();
+    }
+
+    template<typename R>
+    void test_random_stftrs()
+    {
+        constexpr R tol = std::is_same<R,float>::value ? 1e-5 : 1e-12;
+
+        std::size_t fftsize = 256;
+        std::size_t wlen    = 128;
+
+        int test = 0;
+
+        for (long nsamples = 512 ; nsamples < 1024 ; ++nsamples)
+        {
+            matrix<R> samples1 = matrix_cast<R>(randm(1, nsamples));
+            matrix<R> samples2 = istftr(stftr(samples1, make_hann(), fftsize, wlen, wlen/2), make_hann(), wlen, wlen/2);
+
+            const long minsamples = std::min(samples1.nc(), samples2.nc());
+            DLIB_TEST(max(abs(subm(samples1, 0, 0, 1, minsamples) - subm(samples2, 0, 0, 1, minsamples))) < tol);
+
+            if (test++ % 10 == 0)
+                print_spinner();
+        }
+
+        print_spinner();
+    }
+
     class test_fft : public tester
     {
     public:
@@ -585,6 +727,12 @@ namespace
             test_vector_overload_outplace<double>();
             test_vector_overload_inplace<float>();
             test_vector_overload_inplace<double>();
+            test_good_stft<float>();
+            test_good_stft<double>();
+            test_random_stfts<float>();
+            test_random_stfts<double>();
+            test_random_stftrs<float>();
+            test_random_stftrs<double>();
         }
     } a;
 
