@@ -307,7 +307,7 @@ namespace dlib
         requires
             - m has rank 2 where 1st dimension corresponds to time and second dimension corresponds to frequency
             - w is a function object with signature double(size_t i, size_t wlen) that defines a PERIODIC window,
-              e.g. hann_window.
+              e.g. the output of make_hann().
             - wlen >= hoplen
             - EXP::type is a complex floating point type (complex<float>, complex<double> or complex<long double>)
             - If you wish to satisfy istft(stft(x, ...), ...) == x then:
