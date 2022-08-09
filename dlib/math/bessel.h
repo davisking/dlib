@@ -17,7 +17,8 @@ namespace dlib
             - works with C++11 onwards
     !*/
     {
-        return detail::cyl_bessel_i<std::common_type_t<R1,R2>>(nu, x);
+        using R = std::common_type_t<R1,R2>;
+        return detail::cyl_bessel_i((R)nu, (R)x);
     }
 
     template<typename R1, typename R2>
@@ -30,7 +31,8 @@ namespace dlib
             - works with C++11 onwards
     !*/
     {
-        return detail::cyl_bessel_j<std::common_type_t<R1,R2>>(nu, x);
+        using R = std::common_type_t<R1,R2>;
+        return detail::cyl_bessel_j((R)nu, (R)x);
     }
 }
 
