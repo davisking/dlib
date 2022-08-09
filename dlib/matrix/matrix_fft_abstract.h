@@ -258,7 +258,7 @@ namespace dlib
             - is_vector(signal) == true, i.e. signal has rank 1
             - signal.size() >= wlen
             - w is a function object with signature double(size_t i, size_t wlen) that defines a PERIODIC window,
-              e.g. hann_window.
+              e.g. the output of make_hann().
             - fftsize >= wlen
             - wlen >= hoplen
             - EXP::type is a floating point type (float, double or long double), real or complex
