@@ -377,7 +377,7 @@ try
         cout << "  error rate: " << num_wrong / static_cast<double>(num_right + num_wrong) << endl;
     };
 
-    // Using 10% of the training labels should result in a training and testing accuracies of
+    // Using 10% of the training labels should result in training and testing accuracies of
     // around 92% and 87%, respectively.
     // Had we used all labels to train the multiclass SVM classifier, we would have gotten a
     // training accuracy of around 93% and a testing accuracy of around 89%, instead.
