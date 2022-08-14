@@ -43,10 +43,10 @@ namespace dlib
             samp = normalizer(samp);
 
 
-        normalized_function<decision_function<radial_basis_kernel<matrix<double,0,1>>>> df;
+        typedef radial_basis_kernel<matrix<double,0,1>> kernel_type;
+        normalized_function<decision_function<kernel_type>> df;
         df.normalizer = normalizer;
 
-        typedef radial_basis_kernel<matrix<double,0,1>> kernel_type;
 
         std::mutex m;
         auto cross_validation_score = [&](const double gamma, const double c1, const double c2) 
@@ -98,6 +98,83 @@ namespace dlib
             std::cout << "Training final classifier with best parameters..." << std::endl;
 
         df.function = trainer.train(x,y);
+
+        return df;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    normalized_function<multiclass_linear_decision_function<linear_kernel<matrix<float,0,1>>, unsigned long>>
+    auto_train_multiclass_svm_linear_classifier (
+        std::vector<matrix<float,0,1>> x,
+        std::vector<unsigned long> y,
+        const std::chrono::nanoseconds max_runtime,
+        bool be_verbose
+    )
+    {
+        const auto labels = select_all_distinct_labels(y);
+        for (const auto label : labels)
+        {
+            const auto num_samples = sum(mat(y) == label);
+            DLIB_CASSERT(num_samples >= 6,
+                "You must provide at least 6 examples of each class to this training routine, however, label "
+                << label << " has only " << num_samples << " examples.");
+        }
+        DLIB_ASSERT(is_learning_problem(x,y) == true);
+
+
+        randomize_samples(x, y);
+
+        vector_normalizer<matrix<float,0,1>> normalizer;
+        // let the normalizer learn the mean and standard deviation of the samples
+        normalizer.train(x);
+        for (auto& samp : x)
+            samp = normalizer(samp);
+
+
+        typedef linear_kernel<matrix<float,0,1>> kernel_type;
+        normalized_function<multiclass_linear_decision_function<kernel_type, unsigned long>> df;
+        df.normalizer = normalizer;
+
+        auto cross_validation_score = [&](const double c)
+        {
+            svm_multiclass_linear_trainer<kernel_type, unsigned long> trainer;
+            trainer.set_c(c);
+            trainer.set_epsilon(0.01);
+            trainer.set_max_iterations(100);
+            trainer.set_num_threads(std::thread::hardware_concurrency());
+
+            // Finally, perform 3-fold cross validation and then print and return the confusion matrix.
+            const auto cm = cross_validate_multiclass_trainer(trainer, x, y, 3);
+            const double accuracy = sum(diag(cm)) / sum(cm);
+            if (be_verbose)
+            {
+                std::cout << "C: " << c << " cross validation accuracy: " << accuracy << '\n';
+                std::cout << cm << std::endl;
+            }
+            return accuracy;
+        };
+
+        if (be_verbose)
+            std::cout << "Searching for best Multiclass linear SVM training parameters..." << std::endl;
+        const auto result = find_max_global(cross_validation_score, 1e-3, 1000, max_runtime);
+
+        const double best_c = result.x(0);
+
+        if (be_verbose)
+        {
+            std::cout << " best cross-validation score: " << result.y << std::endl;
+            std::cout << " best C: " << best_c << std::endl;
+        }
+
+        svm_multiclass_linear_trainer<kernel_type, unsigned long> trainer;
+        trainer.set_num_threads(std::thread::hardware_concurrency());
+        trainer.set_c(best_c);
+
+        if (be_verbose)
+            std::cout << "Training final classifier with best parameters..." << std::endl;
+
+        df.function = trainer.train(x, y);
 
         return df;
     }

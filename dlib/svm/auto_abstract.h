@@ -29,6 +29,28 @@ namespace dlib
             - The hyperparameter search will run for about max_runtime and will print
               messages to the screen as it runs if be_verbose==true.
     !*/
+
+// ----------------------------------------------------------------------------------------
+
+    normalized_function<multiclass_linear_decision_function<linear_kernel<matrix<float,0,1>>, unsigned long>>
+    auto_train_multiclass_svm_linear_classifier (
+        std::vector<matrix<float,0,1>> x,
+        std::vector<unsigned long> y,
+        const std::chrono::nanoseconds max_runtime,
+        bool be_verbose = true
+    );
+    /*!
+        requires
+            - is_learning_problem(x,y) == true
+            - y contains at least 6 examples of each class.
+        ensures
+            - This routine trains a linear multiclass SVM on the given classification training data.
+              It uses the svm_multiclass_linear_trainer to do this.  It also
+              uses find_max_global() and 3-fold cross-validation to automatically determine
+              the best setting of the SVM's hyper parameter C.
+            - The hyperparameter search will run for about max_runtime and will print
+              messages to the screen as it runs if be_verbose==true.
+    !*/
 }
 
 #endif // DLIB_AUTO_LEARnING_ABSTRACT_Hh_

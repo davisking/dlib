@@ -325,35 +325,8 @@ try
     std::vector<matrix<float, 0, 1>> features;
     cout << "Extracting features for linear classifier from " << training_images.size() << " samples..." << endl;
     features = fnet(training_images, 4 * batch_size);
-    vector_normalizer<matrix<float, 0, 1>> normalizer;
-    normalizer.train(features);
-    for (auto& feature : features)
-        feature = normalizer(feature);
 
-    // Find the most appropriate C setting using find_max_global.
-    auto cross_validation_score = [&](const double c)
-    {
-        svm_multiclass_linear_trainer<linear_kernel<matrix<float, 0, 1>>, unsigned long> trainer;
-        trainer.set_c(c);
-        trainer.set_epsilon(0.01);
-        trainer.set_max_iterations(100);
-        trainer.set_num_threads(std::thread::hardware_concurrency());
-        cout << "C: " << c << endl;
-        const auto cm = cross_validate_multiclass_trainer(trainer, features, training_labels, 3);
-        const double accuracy = sum(diag(cm)) / sum(cm);
-        cout << "cross validation accuracy: " << accuracy << endl;
-        cout << "confusion matrix:\n " << cm << endl;
-        return accuracy;
-    };
-    const auto result = find_max_global(cross_validation_score, 1e-3, 1000, max_function_calls(50));
-    cout << "Best C: " << result.x(0) << endl;
-
-    // Proceed to train the SVM classifier with the best C.
-    svm_multiclass_linear_trainer<linear_kernel<matrix<float, 0, 1>>, unsigned long> trainer;
-    trainer.set_num_threads(std::thread::hardware_concurrency());
-    trainer.set_c(result.x(0));
-    cout << "Training Multiclass SVM..." << endl;
-    const auto df = trainer.train(features, training_labels);
+    const auto df = auto_train_multiclass_svm_linear_classifier(features, training_labels, std::chrono::minutes(5));
     serialize("multiclass_svm_cifar_10.dat") << df;
 
     // Finally, we can compute the accuracy of the model on the CIFAR-10 train and test images.
@@ -385,8 +358,6 @@ try
     compute_accuracy(features, training_labels);
     cout << "\ntesting accuracy" << endl;
     features = fnet(testing_images, 4 * batch_size);
-    for (auto& feature : features)
-        feature = normalizer(feature);
     compute_accuracy(features, testing_labels);
     return EXIT_SUCCESS;
 }
