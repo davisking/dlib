@@ -186,7 +186,7 @@ namespace dlib
 
         auto df = auto_train_multiclass_svm_linear_classifier(samples, y, max_runtime, be_verbose);
         normalized_function<multiclass_linear_decision_function<linear_kernel<matrix<float,0,1>>, unsigned long>> dfloat;
-        dfloat.normalizer.train(x);;
+        dfloat.normalizer.train(x);
         dfloat.function.labels = df.function.labels;
         dfloat.function.weights = matrix_cast<float>(df.function.weights);
         dfloat.function.b = matrix_cast<float>(df.function.b);
