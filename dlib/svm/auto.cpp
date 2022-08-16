@@ -104,9 +104,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    normalized_function<multiclass_linear_decision_function<linear_kernel<matrix<float,0,1>>, unsigned long>>
+    normalized_function<multiclass_linear_decision_function<linear_kernel<matrix<double,0,1>>, unsigned long>>
     auto_train_multiclass_svm_linear_classifier (
-        std::vector<matrix<float,0,1>> x,
+        std::vector<matrix<double,0,1>> x,
         std::vector<unsigned long> y,
         const std::chrono::nanoseconds max_runtime,
         bool be_verbose
@@ -125,14 +125,14 @@ namespace dlib
 
         randomize_samples(x, y);
 
-        vector_normalizer<matrix<float,0,1>> normalizer;
+        vector_normalizer<matrix<double,0,1>> normalizer;
         // let the normalizer learn the mean and standard deviation of the samples
         normalizer.train(x);
         for (auto& samp : x)
             samp = normalizer(samp);
 
 
-        typedef linear_kernel<matrix<float,0,1>> kernel_type;
+        typedef linear_kernel<matrix<double,0,1>> kernel_type;
         normalized_function<multiclass_linear_decision_function<kernel_type, unsigned long>> df;
         df.normalizer = normalizer;
 
@@ -177,6 +177,27 @@ namespace dlib
         df.function = trainer.train(x, y);
 
         return df;
+    }
+
+    normalized_function<multiclass_linear_decision_function<linear_kernel<matrix<float,0,1>>, unsigned long>>
+    auto_train_multiclass_svm_linear_classifier (
+        const std::vector<matrix<float,0,1>>& x,
+        std::vector<unsigned long> y,
+        const std::chrono::nanoseconds max_runtime,
+        bool be_verbose
+    )
+    {
+        std::vector<matrix<double,0,1>> samples;
+        for (const auto& samp : x)
+            samples.push_back(matrix_cast<double>(samp));
+
+        auto df = auto_train_multiclass_svm_linear_classifier(samples, y, max_runtime, be_verbose);
+        normalized_function<multiclass_linear_decision_function<linear_kernel<matrix<float,0,1>>, unsigned long>> dfloat;
+        dfloat.normalizer.train(x);;
+        dfloat.function.labels = df.function.labels;
+        dfloat.function.weights = matrix_cast<float>(df.function.weights);
+        dfloat.function.b = matrix_cast<float>(df.function.b);
+        return dfloat;
     }
 }
 

@@ -24,9 +24,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    normalized_function<multiclass_linear_decision_function<linear_kernel<matrix<double,0,1>>, unsigned long>>
+    auto_train_multiclass_svm_linear_classifier (
+        std::vector<matrix<double,0,1>> x,
+        std::vector<unsigned long> y,
+        const std::chrono::nanoseconds max_runtime,
+        bool be_verbose = true
+    );
+
     normalized_function<multiclass_linear_decision_function<linear_kernel<matrix<float,0,1>>, unsigned long>>
     auto_train_multiclass_svm_linear_classifier (
-        std::vector<matrix<float,0,1>> x,
+        const std::vector<matrix<float,0,1>>& x,
         std::vector<unsigned long> y,
         const std::chrono::nanoseconds max_runtime,
         bool be_verbose = true

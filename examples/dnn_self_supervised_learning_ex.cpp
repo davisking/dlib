@@ -326,7 +326,7 @@ try
     cout << "Extracting features for linear classifier from " << training_images.size() << " samples..." << endl;
     features = fnet(training_images, 4 * batch_size);
 
-    const auto df = auto_train_multiclass_svm_linear_classifier(features, training_labels, std::chrono::minutes(5));
+    const auto df = auto_train_multiclass_svm_linear_classifier(features, training_labels, std::chrono::minutes(1));
     serialize("multiclass_svm_cifar_10.dat") << df;
 
     // Finally, we can compute the accuracy of the model on the CIFAR-10 train and test images.
