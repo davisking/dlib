@@ -36,16 +36,12 @@ namespace dlib
 
         randomize_samples(x,y);
 
-        vector_normalizer<matrix<double,0,1>> normalizer;
-        // let the normalizer learn the mean and standard deviation of the samples
-        normalizer.train(x);
-        for (auto& samp : x)
-            samp = normalizer(samp);
-
-
-        typedef radial_basis_kernel<matrix<double,0,1>> kernel_type;
+        using kernel_type = radial_basis_kernel<matrix<double,0,1>>;
         normalized_function<decision_function<kernel_type>> df;
-        df.normalizer = normalizer;
+        // let the normalizer learn the mean and standard deviation of the samples
+        df.normalizer.train(x);
+        for (auto& samp : x)
+            samp = df.normalizer(samp);
 
 
         std::mutex m;
@@ -125,16 +121,13 @@ namespace dlib
 
         randomize_samples(x, y);
 
-        vector_normalizer<matrix<double,0,1>> normalizer;
-        // let the normalizer learn the mean and standard deviation of the samples
-        normalizer.train(x);
-        for (auto& samp : x)
-            samp = normalizer(samp);
-
-
-        typedef linear_kernel<matrix<double,0,1>> kernel_type;
+        using kernel_type = linear_kernel<matrix<double,0,1>>;
         normalized_function<multiclass_linear_decision_function<kernel_type, unsigned long>> df;
-        df.normalizer = normalizer;
+        // let the normalizer learn the mean and standard deviation of the samples
+        df.normalizer.train(x);
+        for (auto& samp : x)
+            samp = df.normalizer(samp);
+
 
         auto cross_validation_score = [&](const double c)
         {
