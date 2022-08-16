@@ -184,13 +184,13 @@ namespace dlib
         for (const auto& samp : x)
             samples.push_back(matrix_cast<double>(samp));
 
-        auto df = auto_train_multiclass_svm_linear_classifier(samples, y, max_runtime, be_verbose);
-        normalized_function<multiclass_linear_decision_function<linear_kernel<matrix<float,0,1>>, unsigned long>> dfloat;
-        dfloat.normalizer.train(x);
-        dfloat.function.labels = df.function.labels;
-        dfloat.function.weights = matrix_cast<float>(df.function.weights);
-        dfloat.function.b = matrix_cast<float>(df.function.b);
-        return dfloat;
+        const auto temp = auto_train_multiclass_svm_linear_classifier(samples, y, max_runtime, be_verbose);
+        normalized_function<multiclass_linear_decision_function<linear_kernel<matrix<float,0,1>>, unsigned long>> df;
+        df.normalizer.train(x);
+        df.function.labels = temp.function.labels;
+        df.function.weights = matrix_cast<float>(temp.function.weights);
+        df.function.b = matrix_cast<float>(temp.function.b);
+        return df;
     }
 }
 
