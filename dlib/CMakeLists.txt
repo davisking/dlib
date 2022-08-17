@@ -112,9 +112,6 @@ cmake_dependent_option(DLIB_USE_LAPACK
    "Disable this if you don't want to use a LAPACK library" ON "NOT DLIB_ISO_CPP_ONLY;LAPACK_FOUND" OFF)
 cmake_dependent_option(DLIB_USE_CUDA            
    "Disable this if you don't want to use NVIDIA CUDA"      ON "NOT DLIB_ISO_CPP_ONLY;CUDAToolkit_FOUND;CUDNN_FOUND" OFF)
-if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
-   set(CMAKE_CUDA_ARCHITECTURES 50)
-endif()
 ### Options #################################################################################################
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -334,13 +331,6 @@ endif()
  if (DLIB_USE_CUDA)
     set(CMAKE_CUDA_COMPILER ${CUDAToolkit_NVCC_EXECUTABLE})
     enable_language(CUDA)
-#    set(CUDA_HOST_COMPILATION_CPP ON)
-   
-    # list(APPEND CUDA_NVCC_FLAGS "-D__STRICT_ANSI__;-D_MWAITXINTRIN_H_INCLUDED;-D_FORCE_INLINES;${FLAGS_FOR_NVCC}")
-    # list(APPEND CUDA_NVCC_FLAGS ${active_preprocessor_switches})
-    # if (NOT DLIB_IN_PROJECT_BUILD)
-    #    LIST(APPEND CUDA_NVCC_FLAGS -DDLIB__CMAKE_GENERATED_A_CONFIG_H_FILE)
-    # endif()
 
     target_compile_definitions(dlib PUBLIC DLIB_USE_CUDA)
     target_link_libraries(dlib PUBLIC CUDA::cublas CUDA::curand CUDA::cusolver CUDNN::CUDNN)
