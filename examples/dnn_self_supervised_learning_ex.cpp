@@ -2,14 +2,14 @@
 /*
     This is an example illustrating the use of the deep learning tools from the dlib C++
     Library.  I'm assuming you have already read the dnn_introduction_ex.cpp, the
-    dnn_introduction2_ex.cpp and the dnn_introduction3_ex.cpp examples.  In this example
-    program we are going to show how one can train a neural network using an unsupervised
-    loss function.  In particular, we will train the ResNet50 model from the paper
-    "Deep Residual Learning for Image Recognition" by Kaiming He, Xiangyu Zhang, Shaoqing
-    Ren, Jian Sun.
+    dnn_introduction2_ex.cpp and the dnn_introduction3_ex.cpp examples.  In this
+    example program we are going to show how one can train a neural network using an
+    unsupervised loss function.  In particular, we will train the ResNet50 model from
+    the paper "Deep Residual Learning for Image Recognition" by Kaiming He, Xiangyu
+    Zhang, Shaoqing Ren, Jian Sun.
 
-    To train the unsupervised loss, we will use the self-supervised learning (SSL) method
-    called Barlow Twins, introduced in this paper:
+    To train the unsupervised loss, we will use the self-supervised learning (SSL)
+    method called Barlow Twins, introduced in this paper:
     "Barlow Twins: Self-Supervised Learning via Redundancy Reduction" by Jure Zbontar,
     Li Jing, Ishan Misra, Yann LeCun, Stéphane Deny.
 
@@ -30,19 +30,18 @@
     are using CIFAR-10, so we will follow the recommendations of this paper, instead:
     "A Note on Connecting Barlow Twins with Negative-Sample-Free Contrastive Learning"
     by Yao-Hung Hubert Tsai, Shaojie Bai, Louis-Philippe Morency, Ruslan Salakhutdinov,
-    in which they experiment with Barlow Twins on CIFAR-10 and Tiny ImageNet.  Since
-    the CIFAR-10 contains relatively small images, we will define a ResNet50 architecture
-    that doesn't downsample the input in the first convolutional layer, and doesn't have
-    a max pooling layer afterwards, like the paper does.
+    in which they experiment with Barlow Twins on CIFAR-10 and Tiny ImageNet.  Since the
+    CIFAR-10 contains relatively small images, we will define a ResNet50 architecture
+    that doesn't downsample the input in the first convolutional layer, and doesn't
+    have a max pooling layer afterwards, like the paper does.
 
-    This example shows how to use the Barlow Twins loss for the this common scenario:
-    Let's imagine that we have collected some images but we don't have enough resources
-    to label it all, just a small fraction of it.
-    We can train a feature extractor using the Barlow Twins loss on all the available
-    training data (both labeled and unlabeled images) to learn meaningful representations
-    for the dataset.
-    Once the feature extractor is trained, we can train a multiclass SVM classifier on
-    top it using only the fraction of labeled data.
+    This example shows how to use the Barlow Twins loss for this common scenario:
+    Let's imagine that we have collected an image data set but we don't have enough
+    resources to label it all, just a small fraction of it.  We can use the Barlow
+    Twins loss on all the available training data (both labeled and unlabeled images)
+    to train a feature extractor and learn meaningful representations for the data set.
+    Once the feature extractor is trained, we proceed to train a linear multiclass
+    SVM classifier on top of it using only the fraction of labeled data.
 */
 
 #include <dlib/cmd_line_parser.h>
@@ -92,8 +91,8 @@ namespace resnet50
 }
 
 // This model namespace contains the definitions for:
-// - A SSL model using the Barlow Twins loss, a projector head and an input_rgb_image_pair.
-// - A feature extractor model using the loss_metric (to get the outputs) and an input_rgb_image.
+// - SSL model with the Barlow Twins loss, a projector head and an input_rgb_image_pair.
+// - Feature extractor with the loss_metric (to get the outputs) and an input_rgb_image.
 namespace model
 {
     template <typename SUBNET> using projector = fc<128, relu<bn_fc<fc<512, SUBNET>>>>;
@@ -215,8 +214,8 @@ try
     std::vector<unsigned long> training_labels, testing_labels;
     load_cifar_10_dataset(parser[0], training_images, training_labels, testing_images, testing_labels);
 
-    // Initialize the model with the specified projector dimensions and lambda.  According to the
-    // second paper, lambda = 1/dims works well on CIFAR-10.
+    // Initialize the model with the specified projector dimensions and lambda.
+    // According to the second paper, lambda = 1/dims works well on CIFAR-10.
     model::train net((loss_barlow_twins_(lambda)));
     layer<1>(net).layer_details().set_num_outputs(dims);
     disable_duplicative_biases(net);
@@ -224,7 +223,8 @@ try
     std::vector<int> gpus(num_gpus);
     std::iota(gpus.begin(), gpus.end(), 0);
 
-    // Train the feature extractor using the Barlow Twins method on all the training data.
+    // Train the feature extractor using the Barlow Twins method on all the training
+    // data.
     {
         dnn_trainer<model::train, adam> trainer(net, adam(1e-6, 0.9, 0.999), gpus);
         trainer.set_mini_batch_size(batch_size);
@@ -235,13 +235,13 @@ try
         trainer.be_verbose();
         cout << trainer << endl;
 
-        // During the training, we will compute the empirical cross-correlation matrix
-        // between the features of both versions of the augmented images.  This matrix
-        // should be getting close to the identity matrix as the training progresses.
-        // Note that this step is already done in the loss layer, and it's not necessary
-        // to do it here for the example to work.  However, it provides a nice
-        // visualization of the training progress: the closer to the identity matrix,
-        // the better.
+        // During the training, we will compute the empirical cross-correlation
+        // matrix between the features of both versions of the augmented images.
+        // This matrix should be getting close to the identity matrix as the training
+        // progresses.  Note that this step is already done in the loss layer, and it's
+        // not necessary to do it here for the example to work.  However, it provides
+        // a nice visualization of the training progress: the closer to the identity
+        // matrix, the better.
         resizable_tensor eccm;
         eccm.set_size(dims, dims);
         // Some tensors needed to perform batch normalization
@@ -272,9 +272,8 @@ try
                 // Get the output from the last fc layer
                 const auto& out = net.subnet().get_output();
                 // The trainer might have synchronized its state to the disk and cleaned
-                // the network state. If that happens, the output will be empty, in
-                // which case, we just skip the empirical cross-correlation matrix
-                // computation.
+                // the network state. If that happens, the output will be empty, in which
+                // case, we just skip the empirical cross-correlation matrix computation.
                 if (out.size() == 0)
                     continue;
                 // Separate both augmented versions of the images
@@ -301,7 +300,7 @@ try
         serialize("resnet50_self_supervised_cifar_10.net") << layer<5>(net);
     }
 
-    // Now, we initialize the feature extractor model with the backbone we have just learned.
+    // Now, we initialize the feature extractor with the backbone we have just learned.
     model::feats fnet(layer<5>(net));
 
     // Use only the specified fraction of training labels
@@ -320,8 +319,8 @@ try
         std::swap(sub_labels, training_labels);
     }
 
-    // Let's generate the features for those samples that have labels to train a multiclass
-    // SVM classifier.
+    // Let's generate the features for those samples that have labels to train a
+    // multiclass SVM classifier.
     std::vector<matrix<float, 0, 1>> features;
     cout << "Extracting features for linear classifier from " << training_images.size() << " samples..." << endl;
     features = fnet(training_images, 4 * batch_size);
@@ -329,7 +328,8 @@ try
     const auto df = auto_train_multiclass_svm_linear_classifier(features, training_labels, std::chrono::minutes(1));
     serialize("multiclass_svm_cifar_10.dat") << df;
 
-    // Finally, we can compute the accuracy of the model on the CIFAR-10 train and test images.
+    // Finally, we can compute the accuracy of the model on the CIFAR-10 train and
+    // test images.
     auto compute_accuracy = [&fnet, &df, batch_size](
         const std::vector<matrix<float, 0, 1>>& samples,
         const std::vector<unsigned long>& labels
@@ -350,10 +350,10 @@ try
         cout << "  error rate: " << num_wrong / static_cast<double>(num_right + num_wrong) << endl;
     };
 
-    // Using 10% of the training labels should result in training and testing accuracies of
-    // around 92% and 87%, respectively.
-    // Had we used all labels to train the multiclass SVM classifier, we would have gotten a
-    // training accuracy of around 93% and a testing accuracy of around 89%, instead.
+    // Using 10% of the training labels should result in training and testing accuracies
+    // of around 92% and 87%, respectively.
+    // Had we used all labels to train the multiclass SVM classifier, we would have got
+    // a training accuracy of around 93% and a testing accuracy of around 89%, instead.
     cout << "\ntraining accuracy" << endl;
     compute_accuracy(features, training_labels);
     cout << "\ntesting accuracy" << endl;
