@@ -5,6 +5,7 @@
 
 #include "svm_multiclass_linear_trainer_abstract.h"
 #include "structural_svm_problem_threaded.h"
+#include "multiclass_tools.h"
 #include <vector>
 #include "../optimization/optimization_oca.h"
 #include "../matrix.h"

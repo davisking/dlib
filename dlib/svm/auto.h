@@ -7,6 +7,8 @@
 #include "../algs.h"
 #include "function.h"
 #include "kernel.h"
+#include "svm_multiclass_linear_trainer.h"
+#include "cross_validate_multiclass_trainer.h"
 #include <chrono>
 #include <vector>
 
@@ -16,6 +18,24 @@ namespace dlib
     normalized_function<decision_function<radial_basis_kernel<matrix<double,0,1>>>> auto_train_rbf_classifier (
         std::vector<matrix<double,0,1>> x,
         std::vector<double> y,
+        const std::chrono::nanoseconds max_runtime,
+        bool be_verbose = true
+    );
+
+// ----------------------------------------------------------------------------------------
+
+    normalized_function<multiclass_linear_decision_function<linear_kernel<matrix<double,0,1>>, unsigned long>>
+    auto_train_multiclass_svm_linear_classifier (
+        std::vector<matrix<double,0,1>> x,
+        std::vector<unsigned long> y,
+        const std::chrono::nanoseconds max_runtime,
+        bool be_verbose = true
+    );
+
+    normalized_function<multiclass_linear_decision_function<linear_kernel<matrix<float,0,1>>, unsigned long>>
+    auto_train_multiclass_svm_linear_classifier (
+        const std::vector<matrix<float,0,1>>& x,
+        std::vector<unsigned long> y,
         const std::chrono::nanoseconds max_runtime,
         bool be_verbose = true
     );
