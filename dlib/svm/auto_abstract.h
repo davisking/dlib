@@ -62,7 +62,7 @@ namespace dlib
     /*!
         requires
             - is_learning_problem(x,y) == true
-            - y contains at least 6 examples of each class.
+            - y contains at least 3 examples of each class.
         ensures
             - This function is just an overload of the one defined immediately above.  It casts the
               input data from float to double, calls the above function, and casts the results back
