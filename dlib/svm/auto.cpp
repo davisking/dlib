@@ -112,8 +112,8 @@ namespace dlib
         for (const auto label : labels)
         {
             const auto num_samples = sum(mat(y) == label);
-            DLIB_CASSERT(num_samples >= 6,
-                "You must provide at least 6 examples of each class to this training routine, however, label "
+            DLIB_CASSERT(num_samples >= 3,
+                "You must provide at least 3 examples of each class to this training routine, however, label "
                 << label << " has only " << num_samples << " examples.");
         }
         DLIB_ASSERT(is_learning_problem(x,y) == true);
