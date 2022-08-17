@@ -329,7 +329,7 @@ try
 
     // Finally, we can compute the accuracy of the model on the CIFAR-10 train and
     // test images.
-    auto compute_accuracy = [&fnet, &df, batch_size](
+    auto compute_accuracy = [&df](
         const std::vector<matrix<float, 0, 1>>& samples,
         const std::vector<unsigned long>& labels
     )
