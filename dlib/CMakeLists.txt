@@ -18,6 +18,9 @@ endif()
 if (POLICY CMP0042)
    cmake_policy(SET CMP0042 NEW)
 endif()
+if (POLICY CMP0104)
+   cmake_policy(SET CMP0104 NEW)
+endif()
 ### Policies ################################################################################################
 
 ### Summary and versioning ##################################################################################
@@ -41,7 +44,7 @@ include(cmake_utils/check_if_avx_instructions_executable_on_host.cmake)
 include(cmake_utils/check_if_sse4_instructions_executable_on_host.cmake)
 find_package(Threads REQUIRED)
 find_package(X11)
-#find_package(CUDAToolkit)
+find_package(CUDAToolkit)
 find_package(GIF)
 find_package(PNG)
 find_package(JPEG)
@@ -49,7 +52,7 @@ find_package(SQLite3)
 find_package(OpenCV QUIET)
 include(cmake_utils/find_libwebp.cmake)
 include(cmake_utils/find_blas.cmake)
-# include(cmake_utils/find_cudnn.cmake)
+include(cmake_utils/find_cudnn.cmake)
 include(cmake_utils/tell_visual_studio_to_use_static_runtime.cmake)
 
 # If you update this to 2.3.0 or later (latest is 2.10.0), it doesn't recognise PYBIND11_DESCR. TODO: fix
@@ -62,7 +65,6 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(pybind11)
 
 check_language(Fortran)
-check_language(CUDA)
 ### Dependencies ############################################################################################
 
 ### Options #################################################################################################
@@ -110,9 +112,8 @@ cmake_dependent_option(DLIB_USE_LAPACK
    "Disable this if you don't want to use a LAPACK library" ON "NOT DLIB_ISO_CPP_ONLY;LAPACK_FOUND" OFF)
 cmake_dependent_option(DLIB_USE_CUDA            
    "Disable this if you don't want to use NVIDIA CUDA"      ON "NOT DLIB_ISO_CPP_ONLY;CUDAToolkit_FOUND;CUDNN_FOUND" OFF)
-
-if (DLIB_USE_CUDA)
-   set(DLIB_USE_CUDA_COMPUTE_CAPABILITIES 50 CACHE STRING ${DLIB_USE_CUDA_COMPUTE_CAPABILITIES_STR})
+if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+   set(CMAKE_CUDA_ARCHITECTURES 50)
 endif()
 ### Options #################################################################################################
 
@@ -330,31 +331,30 @@ if (DLIB_USE_BLAS OR DLIB_USE_LAPACK OR DLIB_USE_MKL_FFT)
    endif()
 endif()
 
-# if (DLIB_USE_CUDA)
+ if (DLIB_USE_CUDA)
+    set(CMAKE_CUDA_COMPILER ${CUDAToolkit_NVCC_EXECUTABLE})
+    enable_language(CUDA)
 #    set(CUDA_HOST_COMPILATION_CPP ON)
    
-#    # list(APPEND CUDA_NVCC_FLAGS "-D__STRICT_ANSI__;-D_MWAITXINTRIN_H_INCLUDED;-D_FORCE_INLINES;${FLAGS_FOR_NVCC}")
-#    # list(APPEND CUDA_NVCC_FLAGS ${active_preprocessor_switches})
-#    # if (NOT DLIB_IN_PROJECT_BUILD)
-#    #    LIST(APPEND CUDA_NVCC_FLAGS -DDLIB__CMAKE_GENERATED_A_CONFIG_H_FILE)
-#    # endif()
+    # list(APPEND CUDA_NVCC_FLAGS "-D__STRICT_ANSI__;-D_MWAITXINTRIN_H_INCLUDED;-D_FORCE_INLINES;${FLAGS_FOR_NVCC}")
+    # list(APPEND CUDA_NVCC_FLAGS ${active_preprocessor_switches})
+    # if (NOT DLIB_IN_PROJECT_BUILD)
+    #    LIST(APPEND CUDA_NVCC_FLAGS -DDLIB__CMAKE_GENERATED_A_CONFIG_H_FILE)
+    # endif()
 
-#    target_sources(dlib PRIVATE 
-#       cuda/cuda_dlib.cu 
-#       cuda/cudnn_dlibapi.cpp
-#       cuda/cublas_dlibapi.cpp
-#       cuda/cusolver_dlibapi.cu
-#       cuda/curand_dlibapi.cpp
-#       cuda/cuda_data_ptr.cpp
-#       cuda/gpu_data.cpp)
+    target_compile_definitions(dlib PUBLIC DLIB_USE_CUDA)
+    target_link_libraries(dlib PUBLIC CUDA::cublas CUDA::curand CUDA::cusolver CUDNN::CUDNN)
+    set_target_properties(dlib PROPERTIES CUDA_ARCHITECTURES all)
 
-#    target_link_libraries(dlib PUBLIC CUDA::cudart CUDA::curand CUDA::cusolver CUDA::cublas)
-#    target_link_libraries(dlib PUBLIC ${CUDNN_LIBRARIES})
-#    target_include_directories(dlib PRIVATE ${CUDNN_INCLUDE_DIRS})
-#    target_compile_definitions(dlib PRIVATE ${CUDNN_DEFINITIONS})
-#    target_compile_definitions(dlib PRIVATE DLIB_USE_CUDA)
-#    set_target_properties(dlib PROPERTIES CUDA_ARCHITECTURES ${DLIB_USE_CUDA_COMPUTE_CAPABILITIES})
-# endif()
+    target_sources(dlib PRIVATE
+       cuda/cuda_dlib.cu
+       cuda/cudnn_dlibapi.cpp
+       cuda/cublas_dlibapi.cpp
+       cuda/cusolver_dlibapi.cu
+       cuda/curand_dlibapi.cpp
+       cuda/cuda_data_ptr.cpp
+       cuda/gpu_data.cpp)
+ endif()
 
 # Used by config.h.in
 if (DLIB_ENABLE_ASSERTS)
