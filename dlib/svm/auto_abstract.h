@@ -42,7 +42,7 @@ namespace dlib
     /*!
         requires
             - is_learning_problem(x,y) == true
-            - y contains at least 6 examples of each class.
+            - y contains at least 3 examples of each class.
         ensures
             - This routine trains a linear multiclass SVM on the given classification training data.
               It uses the svm_multiclass_linear_trainer to do this.  It also
