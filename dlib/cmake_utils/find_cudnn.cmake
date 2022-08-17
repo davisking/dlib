@@ -1,5 +1,3 @@
-include(FindPackageHandleStandardArgs)
-
 set(CUDNN_FOUND False)
 
 if (CUDAToolkit_FOUND)
@@ -16,12 +14,10 @@ if (CUDAToolkit_FOUND)
     if (CUDNN_INCLUDE_DIR AND CUDNN_LIBRARY)
 #        message(STATUS "CUDNN_INCLUDE_DIR : ${CUDNN_INCLUDE_DIR} ; CUDNN_LIBRARY : ${CUDNN_LIBRARY}")
         mark_as_advanced(CUDNN_INCLUDE_DIR CUDNN_LIBRARY)
-
         add_library(cudnn SHARED IMPORTED)
         set_target_properties(cudnn PROPERTIES
                 IMPORTED_LOCATION ${CUDNN_LIBRARY}
                 INTERFACE_INCLUDE_DIRECTORIES ${CUDNN_INCLUDE_DIR})
-
         add_library(CUDNN::CUDNN ALIAS cudnn)
         set(CUDNN_FOUND True)
     endif()
