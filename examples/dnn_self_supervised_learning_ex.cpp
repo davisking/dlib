@@ -47,9 +47,8 @@
 #include <dlib/cmd_line_parser.h>
 #include <dlib/data_io.h>
 #include <dlib/dnn.h>
-#include <dlib/global_optimization.h>
 #include <dlib/gui_widgets.h>
-#include <dlib/svm_threaded.h>
+#include <dlib/svm.h>
 
 using namespace std;
 using namespace dlib;
