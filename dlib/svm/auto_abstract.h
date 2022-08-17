@@ -65,7 +65,7 @@ namespace dlib
             - y contains at least 6 examples of each class.
         ensures
             - This function is just an overload of the one defined immediately above.  It casts the
-              input data from double to float, calls the above function, and casts the results back
+              input data from float to double, calls the above function, and casts the results back
               to float.
             - This routine trains a linear multiclass SVM on the given classification training data.
               It uses the svm_multiclass_linear_trainer to do this.  It also
