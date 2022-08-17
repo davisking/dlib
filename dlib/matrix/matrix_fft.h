@@ -7,6 +7,7 @@
 #include "matrix_utilities.h"
 #include "../hash.h"
 #include "../algs.h"
+#include "../math.h"
 
 #ifdef DLIB_USE_MKL_FFT
 #include "mkl_fft.h"
@@ -261,6 +262,254 @@ namespace dlib
             kiss_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), true);
 #endif
         }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    namespace details
+    {
+        struct fft_func
+        {
+            template<typename MAT, typename T = typename MAT::type, typename std::enable_if<is_complex<T>::value, bool>::type = true>
+            auto operator()(const MAT& mat) const { return dlib::fft(mat); }
+
+            template<typename MAT, typename T = typename MAT::type, typename std::enable_if<!is_complex<T>::value, bool>::type = true>
+            auto operator()(const MAT& mat) const { return dlib::fft(dlib::complex_matrix(mat)); }
+
+            static constexpr std::size_t freqsize(std::size_t fftsize) { return fftsize; }
+        };
+
+        struct fftr_func
+        {
+            template<typename MAT>
+            auto operator()(const MAT& mat) const { return dlib::fftr(mat); }
+
+            static constexpr std::size_t freqsize(std::size_t fftsize) { return dlib::fftr_nc_size(fftsize); }
+        };
+
+        struct ifft_func
+        {
+            template<typename MAT>
+            auto operator()(const MAT& mat) const { return dlib::ifft(mat); }
+        };
+
+        struct ifftr_func
+        {
+            template<typename MAT>
+            auto operator()(const MAT& mat) const { return dlib::ifftr(mat); }
+        };
+
+        template <
+            typename EXP,
+            typename WINDOW,
+            typename FFT_FUNC
+        >
+        auto stft_impl (
+            const matrix_exp<EXP>& signal,
+            const WINDOW& w,
+            std::size_t fftsize,
+            std::size_t wlen,
+            std::size_t hoplen,
+            const FFT_FUNC& fft_obj
+        )
+        {
+            using T = typename EXP::type;
+            using R = remove_complex_t<T>;
+            using C = add_complex_t<T>;
+
+            static_assert(std::is_floating_point<R>::value, "underlying type must be real or complex floating point type");
+            DLIB_ASSERT(is_vector(signal), "input must be a vector type");
+            DLIB_ASSERT(signal.size() >= (long)wlen, "signal.size() >= wlen not satisfied");
+            DLIB_ASSERT(fftsize >= wlen, "fftsize >= wlen not satisfied");
+            DLIB_ASSERT(wlen >= hoplen, "wlen >= hoplen not satisfied");
+
+            // Input is left-padded by wlen/2 and right-padded wlen/2
+            const std::size_t total_padding = wlen;
+            const std::size_t overlap       = wlen - hoplen;
+            const std::size_t nframes       = (signal.size() + total_padding - overlap) / hoplen;
+            matrix<C> stft = zeros_matrix<C>(nframes,
+                                             FFT_FUNC::freqsize(fftsize));
+            matrix<R> win(1,wlen);
+            for (std::size_t i = 0 ; i < wlen ; ++i)
+                win(0, i) = w(i, wlen);
+
+            // TODO: reduce extra buffers, e.g. padded
+            matrix<T> padded;
+
+            if (is_row_vector(signal))
+                padded = join_rows(join_rows(zeros_matrix<T>(1, wlen/2), signal), zeros_matrix<T>(1, wlen/2));
+            else
+                padded = join_rows(join_rows(zeros_matrix<T>(1, wlen/2), trans(signal)), zeros_matrix<T>(1, wlen/2));
+
+            for (long i = 0 ; i < stft.nr() ; ++i)
+            {
+                set_rowm(stft, i) = fft_obj(join_rows(pointwise_multiply(win, subm(padded, 0, i*hoplen, 1, wlen)),
+                                                      zeros_matrix<T>(1, fftsize - wlen)));
+            }
+
+            return stft;
+        }
+
+        template <
+            typename ReturnType,
+            typename EXP,
+            typename WINDOW,
+            typename IFFT_FUNC
+        >
+        auto istft_impl (
+            const matrix_exp<EXP>& stft,
+            const WINDOW& w,
+            std::size_t wlen,
+            std::size_t hoplen,
+            const IFFT_FUNC& ifft_obj
+        )
+        {
+            using T = typename EXP::type;
+            using R = remove_complex_t<T>;
+
+            static_assert(is_complex<T>::value, "matrix type must be complex");
+            static_assert(std::is_floating_point<R>::value, "underlying type must be complex floating point type");
+            DLIB_ASSERT(stft.nc() > 0 && stft.nr() > 0, "stft must be non-empty");
+            DLIB_ASSERT(stft.nc() >= (long)wlen, "fftsize >= wlen not satisfied");
+            DLIB_ASSERT(wlen >= hoplen, "wlen >= hoplen not satisfied");
+
+            const size_t ntime = (stft.nr() - 1) * hoplen + wlen;
+            matrix<ReturnType> signal = zeros_matrix<ReturnType>(1, ntime);
+            matrix<R> norm = zeros_matrix<R>(1, ntime);
+            matrix<R> win(1, wlen);
+            for (std::size_t i = 0 ; i < wlen ; ++i)
+                win(0, i) = w(i, wlen);
+            matrix<R> win2 = squared(win);
+
+            for (long t = 0 ; t < stft.nr() ; ++t)
+            {
+                set_subm(signal, 0, t*hoplen, 1, wlen) += pointwise_multiply(win, subm(ifft_obj(rowm(stft, t)), 0, 0, 1, wlen));
+                set_subm(norm,   0, t*hoplen, 1, wlen) += win2;
+            }
+
+            // Remove padding of wlen/2 and wlen/2 on either end
+            DLIB_ASSERT(sum(subm(norm, 0, wlen/2, 1, ntime - wlen) < 1e-13) == 0, "NOLA constraint not satisfied");
+            signal = pointwise_divide(subm(signal, 0, wlen/2, 1, ntime - wlen),
+                                      subm(norm,   0, wlen/2, 1, ntime - wlen));
+
+            return signal;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline auto make_hann()
+    {
+        return [](std::size_t i, std::size_t N) {return hann(i, N, PERIODIC); };
+    }
+
+    inline auto make_blackman()
+    {
+        return [](std::size_t i, std::size_t N) {return blackman(i, N, PERIODIC);};
+    }
+
+    inline auto make_blackman_nuttall()
+    {
+        return [](std::size_t i, std::size_t N) {return blackman_nuttall(i, N, PERIODIC);};
+    }
+
+    inline auto make_blackman_harris()
+    {
+        return [](std::size_t i, std::size_t N) { return blackman_harris(i, N, PERIODIC); };
+    }
+
+    inline auto make_blackman_harris7()
+    {
+        return [](std::size_t i, std::size_t N) { return blackman_harris7(i, N, PERIODIC); };
+    }
+
+    inline auto make_kaiser(beta_t beta)
+    {
+        return [=](std::size_t i, std::size_t N){return kaiser(i, N, beta, PERIODIC);};
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename EXP, typename WINDOW>
+    auto stft (
+        const matrix_exp<EXP>& signal,
+        const WINDOW& w,
+        std::size_t fftsize,
+        std::size_t wlen,
+        std::size_t hoplen
+    )
+    {
+        return details::stft_impl(signal, w, fftsize, wlen, hoplen, details::fft_func{});
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, typename Alloc, typename WINDOW>
+    auto stft (
+        const std::vector<T, Alloc>& signal,
+        const WINDOW& w,
+        std::size_t fftsize,
+        std::size_t wlen,
+        std::size_t hoplen
+    )
+    {
+        return stft(dlib::mat(signal), w, fftsize, wlen, hoplen);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename EXP,typename WINDOW>
+    auto istft (
+        const matrix_exp<EXP>& stft,
+        const WINDOW& w,
+        std::size_t wlen,
+        std::size_t hoplen
+    )
+    {
+        using T = typename EXP::type;
+        return details::istft_impl<T>(stft, w, wlen, hoplen, details::ifft_func{});
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename EXP, typename WINDOW>
+    auto stftr (
+        const matrix_exp<EXP>& signal,
+        const WINDOW& w,
+        std::size_t fftsize,
+        std::size_t wlen,
+        std::size_t hoplen
+    )
+    {
+        return details::stft_impl(signal, w, fftsize, wlen, hoplen, details::fftr_func{});
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, typename Alloc, typename WINDOW>
+    auto stftr (
+        const std::vector<T, Alloc>& signal,
+        const WINDOW& w,
+        std::size_t fftsize,
+        std::size_t wlen,
+        std::size_t hoplen
+    )
+    {
+        return stftr(dlib::mat(signal), w, fftsize, wlen, hoplen);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename EXP, typename WINDOW>
+    auto istftr (
+        const matrix_exp<EXP>& stft,
+        const WINDOW& w,
+        std::size_t wlen,
+        std::size_t hoplen
+    )
+    {
+        using R = remove_complex_t<typename EXP::type>;
+        return details::istft_impl<R>(stft, w, wlen, hoplen, details::ifftr_func{});
     }
 
 // ----------------------------------------------------------------------------------------

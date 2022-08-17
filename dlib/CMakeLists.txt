@@ -490,6 +490,7 @@ if (DLIB_BUILD_TESTS)
       test/lspi.cpp
       test/lz77_buffer.cpp
       test/map.cpp
+      test/math.cpp
       test/matrix2.cpp
       test/matrix3.cpp
       test/matrix4.cpp
