@@ -19,13 +19,13 @@ jobs:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
     - name: Install python deps 
-      run: pip install pytest numpy 
+      run: pip3 install pytest numpy
     - name: Build
       run: |
-        python setup.py build
-        python setup.py install --user 
+        python3 setup.py build
+        python3 setup.py install --user
     - name: Test
-      run: python -m pytest --ignore docs --ignore dlib 
+      run: python3 -m pytest --ignore docs --ignore dlib
 
   Ubuntu:    
     runs-on: 'ubuntu-latest'
@@ -33,13 +33,13 @@ jobs:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
     - name: Install python deps 
-      run: pip install pytest numpy 
+      run: pip3 install pytest numpy
     - name: Build
       run: |
-        python setup.py build
-        python setup.py install --user 
+        python3 setup.py build
+        python3 setup.py install --user
     - name: Test
-      run: python -m pytest --ignore docs --ignore dlib 
+      run: python3 -m pytest --ignore docs --ignore dlib
 
   MacOS:    
     runs-on: 'macos-latest'
@@ -47,11 +47,11 @@ jobs:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
     - name: Install python deps 
-      run: pip install pytest
+      run: pip3 install pytest
     - name: Build
       run: |
-        python setup.py build
-        python setup.py install --user 
+        python3 setup.py build
+        python3 setup.py install --user
     - name: Test
-      run: python -m pytest --ignore docs --ignore dlib 
+      run: python3 -m pytest --ignore docs --ignore dlib
 
