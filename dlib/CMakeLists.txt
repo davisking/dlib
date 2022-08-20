@@ -369,12 +369,10 @@ set_target_properties(dlib PROPERTIES
 add_library(dlib::dlib ALIAS dlib)
 
 if (DLIB_BUILD_PYTHON)
-   # If you update this to 2.3.0 or later (latest is 2.10.0), it doesn't recognise PYBIND11_DESCR. TODO: fix
-   # TODO: use nanobind instead of pybind. According to author, it's better.
    FetchContent_Declare(
-           pybind11
-           GIT_REPOSITORY https://github.com/pybind/pybind11.git
-           GIT_TAG v2.2.3
+        pybind11
+        GIT_REPOSITORY https://github.com/pybind/pybind11.git
+        GIT_TAG v2.10.0
    )
    FetchContent_MakeAvailable(pybind11)
 
