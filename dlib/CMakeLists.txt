@@ -323,18 +323,18 @@ endif()
     set(CMAKE_CUDA_COMPILER ${CUDAToolkit_NVCC_EXECUTABLE})
     enable_language(CUDA)
 
-    target_compile_definitions(dlib PUBLIC DLIB_USE_CUDA)
+    target_sources(dlib PRIVATE
+         cuda/cuda_dlib.cu
+         cuda/cudnn_dlibapi.cpp
+         cuda/cublas_dlibapi.cpp
+         cuda/cusolver_dlibapi.cu
+         cuda/curand_dlibapi.cpp
+         cuda/cuda_data_ptr.cpp
+         cuda/gpu_data.cpp)
+
     target_link_libraries(dlib PUBLIC CUDA::cublas CUDA::curand CUDA::cusolver CUDNN::CUDNN)
     set_target_properties(dlib PROPERTIES CUDA_ARCHITECTURES all)
-
-    target_sources(dlib PRIVATE
-       cuda/cuda_dlib.cu
-       cuda/cudnn_dlibapi.cpp
-       cuda/cublas_dlibapi.cpp
-       cuda/cusolver_dlibapi.cu
-       cuda/curand_dlibapi.cpp
-       cuda/cuda_data_ptr.cpp
-       cuda/gpu_data.cpp)
+    target_compile_definitions(dlib PUBLIC DLIB_USE_CUDA)
  endif()
 
 # Used by config.h.in
@@ -377,46 +377,50 @@ if (DLIB_BUILD_PYTHON)
    FetchContent_MakeAvailable(pybind11)
 
    pybind11_add_module(_dlib_pybind11
-      ../tools/python/src/dlib.cpp
-      ../tools/python/src/matrix.cpp
-      ../tools/python/src/vector.cpp
-      ../tools/python/src/svm_c_trainer.cpp
-      ../tools/python/src/svm_rank_trainer.cpp
-      ../tools/python/src/decision_functions.cpp
-      ../tools/python/src/other.cpp
-      ../tools/python/src/basic.cpp
-      ../tools/python/src/cca.cpp
-      ../tools/python/src/sequence_segmenter.cpp
-      ../tools/python/src/svm_struct.cpp
-      ../tools/python/src/image.cpp
-      ../tools/python/src/image2.cpp
-      ../tools/python/src/image3.cpp
-      ../tools/python/src/image4.cpp
-      ../tools/python/src/rectangles.cpp
-      ../tools/python/src/object_detection.cpp
-      ../tools/python/src/shape_predictor.cpp
-      ../tools/python/src/correlation_tracker.cpp
-      ../tools/python/src/face_recognition.cpp
-      ../tools/python/src/cnn_face_detector.cpp
-      ../tools/python/src/global_optimization.cpp
-      ../tools/python/src/image_dataset_metadata.cpp
-      ../tools/python/src/numpy_returns.cpp
-      ../tools/python/src/line.cpp)
+      python/dlib.cpp
+      python/matrix.cpp
+      python/vector.cpp
+      python/svm_c_trainer.cpp
+      python/svm_rank_trainer.cpp
+      python/decision_functions.cpp
+      python/other.cpp
+      python/basic.cpp
+      python/cca.cpp
+      python/sequence_segmenter.cpp
+      python/svm_struct.cpp
+      python/image.cpp
+      python/image2.cpp
+      python/image3.cpp
+      python/image4.cpp
+      python/rectangles.cpp
+      python/object_detection.cpp
+      python/shape_predictor.cpp
+      python/correlation_tracker.cpp
+      python/face_recognition.cpp
+      python/cnn_face_detector.cpp
+      python/global_optimization.cpp
+      python/image_dataset_metadata.cpp
+      python/numpy_returns.cpp
+      python/line.cpp)
 
    if (NOT DLIB_NO_GUI_SUPPORT)
       target_sources(_dlib_pybind11 PRIVATE
-         ../tools/python/src/gui.cpp)
+         python/gui.cpp)
    endif()
 
    target_compile_definitions(_dlib_pybind11 PRIVATE DDLIB_VERSION=${PROJECT_VERSION})
    target_link_libraries(_dlib_pybind11 PRIVATE dlib::dlib)
 
-   # When invoked from setup.py CMAKE_LIBRARY_OUTPUT_DIRECTORY will be set.  But when you are just building via say
-   # `cd dlib/tools/python; mkdir build; cd build; cmake ..` it won't be set.  It only matters for building the actual
-   # distribution.  So skip this for people building directly with cmake (which they might do when testing stuff).
-#   if (CMAKE_LIBRARY_OUTPUT_DIRECTORY)
-#      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/tools/python/dlib/__init__.py.in ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/dlib/__init__.py)
-#   endif()
+   if (CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+      # The next line complains if you put CMAKE_LIBRARY_OUTPUT_DIRECTORY instead of CMAKE_CURRENT_BINARY_DIR.
+      # TODO: fix
+      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py.in ${CMAKE_CURRENT_BINARY_DIR}/dlib/__init__.py)
+      add_custom_command(
+              TARGET _dlib_pybind11 POST_BUILD
+              COMMAND ${CMAKE_COMMAND} -E copy
+              ${CMAKE_CURRENT_BINARY_DIR}/dlib/__init__.py
+              ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/dlib/__init__.py)
+   endif()
 endif()
 
 if (DLIB_BUILD_TESTS)
