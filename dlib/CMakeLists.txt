@@ -414,9 +414,9 @@ if (DLIB_BUILD_PYTHON)
    # When invoked from setup.py CMAKE_LIBRARY_OUTPUT_DIRECTORY will be set.  But when you are just building via say
    # `cd dlib/tools/python; mkdir build; cd build; cmake ..` it won't be set.  It only matters for building the actual
    # distribution.  So skip this for people building directly with cmake (which they might do when testing stuff).
-   if (CMAKE_LIBRARY_OUTPUT_DIRECTORY)
-      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/tools/python/dlib/__init__.py.in ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/dlib/__init__.py)
-   endif()
+#   if (CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+#      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/tools/python/dlib/__init__.py.in ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/dlib/__init__.py)
+#   endif()
 endif()
 
 if (DLIB_BUILD_TESTS)

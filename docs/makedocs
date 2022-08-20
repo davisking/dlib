@@ -156,8 +156,8 @@ makedocs ()
     cp docs/cache/dlib/test/makefile docs/web/dlib/test
     cp docs/cache/dlib/test/makefile docs/chm/docs/dlib/test
 
-    cp docs/cache/dlib/test/CMakeLists.txt docs/web/dlib/test
-    cp docs/cache/dlib/test/CMakeLists.txt docs/chm/docs/dlib/test
+#    cp docs/cache/dlib/test/CMakeLists.txt docs/web/dlib/test
+#    cp docs/cache/dlib/test/CMakeLists.txt docs/chm/docs/dlib/test
     cp docs/cache/dlib/CMakeLists.txt docs/web/dlib
     cp docs/cache/dlib/CMakeLists.txt docs/chm/docs/dlib
     mkdir docs/web/examples || report_failure
