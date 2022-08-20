@@ -55,15 +55,6 @@ include(cmake_utils/find_blas.cmake)
 include(cmake_utils/find_cudnn.cmake)
 include(cmake_utils/tell_visual_studio_to_use_static_runtime.cmake)
 
-# If you update this to 2.3.0 or later (latest is 2.10.0), it doesn't recognise PYBIND11_DESCR. TODO: fix
-# TODO: use nanobind instead of pybind. According to author, it's better.
-FetchContent_Declare(
-     pybind11
-     GIT_REPOSITORY https://github.com/pybind/pybind11.git
-     GIT_TAG v2.2.3
-)
-FetchContent_MakeAvailable(pybind11)
-
 check_language(Fortran)
 ### Dependencies ############################################################################################
 
@@ -378,6 +369,15 @@ set_target_properties(dlib PROPERTIES
 add_library(dlib::dlib ALIAS dlib)
 
 if (DLIB_BUILD_PYTHON)
+   # If you update this to 2.3.0 or later (latest is 2.10.0), it doesn't recognise PYBIND11_DESCR. TODO: fix
+   # TODO: use nanobind instead of pybind. According to author, it's better.
+   FetchContent_Declare(
+           pybind11
+           GIT_REPOSITORY https://github.com/pybind/pybind11.git
+           GIT_TAG v2.2.3
+   )
+   FetchContent_MakeAvailable(pybind11)
+
    pybind11_add_module(_dlib_pybind11
       ../tools/python/src/dlib.cpp
       ../tools/python/src/matrix.cpp
@@ -417,7 +417,7 @@ if (DLIB_BUILD_PYTHON)
    # `cd dlib/tools/python; mkdir build; cd build; cmake ..` it won't be set.  It only matters for building the actual
    # distribution.  So skip this for people building directly with cmake (which they might do when testing stuff).
    if (CMAKE_LIBRARY_OUTPUT_DIRECTORY)
-      configure_file(${PROJECT_SOURCE_DIR}/dlib/__init__.py.in ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/dlib/__init__.py)
+      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/tools/python/dlib/__init__.py.in ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/dlib/__init__.py)
    endif()
 endif()
 
