@@ -137,10 +137,9 @@ class CMakeBuild(build_ext):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
 
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
-                      '-DPYTHON_EXECUTABLE=' + sys.executable,
-                      '-DDLIB_BUILD_PYTHON=ON']
+                      '-DPYTHON_EXECUTABLE=' + sys.executable]
 
-        cmake_args += cmake_extra_options 
+        cmake_args += cmake_extra_options
 
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
@@ -150,7 +149,7 @@ class CMakeBuild(build_ext):
             if sys.maxsize > 2**32:
                 cmake_args += ['-A', 'x64']
             # Do a parallel build
-            build_args += ['--', '/m'] 
+            build_args += ['--', '/m']
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
             # Do a parallel build
@@ -178,11 +177,11 @@ def num_available_cpu_cores(ram_per_build_process_in_gb):
     if 'TRAVIS' in os.environ and os.environ['TRAVIS']=='true':
         # When building on travis-ci, just use 2 cores since travis-ci limits
         # you to that regardless of what the hardware might suggest.
-        return 2 
+        return 2
     try:
-        mem_bytes = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')  
+        mem_bytes = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
         mem_gib = mem_bytes/(1024.**3)
-        num_cores = multiprocessing.cpu_count() 
+        num_cores = multiprocessing.cpu_count()
         # make sure we have enough ram for each build process.
         mem_cores = int(floor(mem_gib/float(ram_per_build_process_in_gb)+0.5));
         # We are limited either by RAM or CPU cores.  So pick the limiting amount
@@ -208,9 +207,8 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 def read_version_from_cmakelists(cmake_file):
-    """Read version information
-    """
-    # TODO : fix
+    # """Read version information
+    # """
     # major = re.findall("set\(CPACK_PACKAGE_VERSION_MAJOR.*\"(.*)\"", open(cmake_file).read())[0]
     # minor = re.findall("set\(CPACK_PACKAGE_VERSION_MINOR.*\"(.*)\"", open(cmake_file).read())[0]
     # patch = re.findall("set\(CPACK_PACKAGE_VERSION_PATCH.*\"(.*)\"", open(cmake_file).read())[0]
@@ -231,14 +229,14 @@ setup(
     author_email='davis@dlib.net',
     url='https://github.com/davisking/dlib',
     license='Boost Software License',
-    ext_modules=[CMakeExtension('_dlib_pybind11')],
+    ext_modules=[CMakeExtension('_dlib_pybind11','tools/python')],
     cmdclass=dict(build_ext=CMakeBuild, test=PyTest),
     zip_safe=False,
     # We need an older more-itertools version because v6 broke pytest (for everyone, not just dlib)
     tests_require=['pytest==3.8', 'more-itertools<6.0.0'],
     #install_requires=['cmake'], # removed because the pip cmake package is busted, maybe someday it will be usable.
     packages=['dlib'],
-    # package_dir={'': 'tools/python'},
+    package_dir={'': 'tools/python'},
     keywords=['dlib', 'Computer Vision', 'Machine Learning'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',

@@ -363,8 +363,6 @@ set_target_properties(dlib PROPERTIES
    CXX_STANDARD 14
    CXX_STANDARD_REQUIRED ON
    POSITION_INDEPENDENT_CODE ON)
-   # CXX_VISIBILITY_PRESET  "hidden"
-   # CUDA_VISIBILITY_PRESET "hidden")
 
 add_library(dlib::dlib ALIAS dlib)
 
@@ -375,51 +373,58 @@ if (DLIB_BUILD_PYTHON)
         GIT_TAG v2.10.0
    )
    FetchContent_MakeAvailable(pybind11)
+   set(PYBIND11_LTO_CXX_FLAGS "") #Check this is required now that we set INTERPROCEDURAL_OPTIMIZATION on the target
 
    pybind11_add_module(_dlib_pybind11
-      python/dlib.cpp
-      python/matrix.cpp
-      python/vector.cpp
-      python/svm_c_trainer.cpp
-      python/svm_rank_trainer.cpp
-      python/decision_functions.cpp
-      python/other.cpp
-      python/basic.cpp
-      python/cca.cpp
-      python/sequence_segmenter.cpp
-      python/svm_struct.cpp
-      python/image.cpp
-      python/image2.cpp
-      python/image3.cpp
-      python/image4.cpp
-      python/rectangles.cpp
-      python/object_detection.cpp
-      python/shape_predictor.cpp
-      python/correlation_tracker.cpp
-      python/face_recognition.cpp
-      python/cnn_face_detector.cpp
-      python/global_optimization.cpp
-      python/image_dataset_metadata.cpp
-      python/numpy_returns.cpp
-      python/line.cpp)
+      ../tools/../tools/python/src/dlib.cpp
+      ../tools/python/src/matrix.cpp
+      ../tools/python/src/vector.cpp
+      ../tools/python/src/svm_c_trainer.cpp
+      ../tools/python/src/svm_rank_trainer.cpp
+      ../tools/python/src/decision_functions.cpp
+      ../tools/python/src/other.cpp
+      ../tools/python/src/basic.cpp
+      ../tools/python/src/cca.cpp
+      ../tools/python/src/sequence_segmenter.cpp
+      ../tools/python/src/svm_struct.cpp
+      ../tools/python/src/image.cpp
+      ../tools/python/src/image2.cpp
+      ../tools/python/src/image3.cpp
+      ../tools/python/src/image4.cpp
+      ../tools/python/src/rectangles.cpp
+      ../tools/python/src/object_detection.cpp
+      ../tools/python/src/shape_predictor.cpp
+      ../tools/python/src/correlation_tracker.cpp
+      ../tools/python/src/face_recognition.cpp
+      ../tools/python/src/cnn_face_detector.cpp
+      ../tools/python/src/global_optimization.cpp
+      ../tools/python/src/image_dataset_metadata.cpp
+      ../tools/python/src/numpy_returns.cpp
+      ../tools/python/src/line.cpp)
 
    if (NOT DLIB_NO_GUI_SUPPORT)
       target_sources(_dlib_pybind11 PRIVATE
-         python/gui.cpp)
+         ../tools/python/src/gui.cpp)
    endif()
 
    target_compile_definitions(_dlib_pybind11 PRIVATE DDLIB_VERSION=${PROJECT_VERSION})
    target_link_libraries(_dlib_pybind11 PRIVATE dlib::dlib)
+   set_target_properties(_dlib_pybind11 PROPERTIES CXX_VISIBILITY_PRESET "hidden"
+                                                   CUDA_VISIBILITY_PRESET "hidden"
+                                                   INTERPROCEDURAL_OPTIMIZATION OFF)
 
    if (CMAKE_LIBRARY_OUTPUT_DIRECTORY)
-      # The next line complains if you put CMAKE_LIBRARY_OUTPUT_DIRECTORY instead of CMAKE_CURRENT_BINARY_DIR.
-      # TODO: fix
-      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py.in ${CMAKE_CURRENT_BINARY_DIR}/dlib/__init__.py)
+      # TODO: fix. The next line complains if you put CMAKE_LIBRARY_OUTPUT_DIRECTORY instead of CMAKE_CURRENT_BINARY_DIR.
+      set(INIT_SRC ${CMAKE_CURRENT_SOURCE_DIR}/../tools/python/dlib/__init__.py.in)
+      set(INIT_DEST1 ${CMAKE_CURRENT_BINARY_DIR}/dlib/__init__.py)
+      set(INIT_DEST2 ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/dlib/__init__.py)
+#      message(STATUS "Copying ${INIT_SRC} to ${INIT_DEST1} to ${INIT_DEST2}")
+      configure_file(${INIT_SRC} ${INIT_DEST1})
       add_custom_command(
               TARGET _dlib_pybind11 POST_BUILD
               COMMAND ${CMAKE_COMMAND} -E copy
-              ${CMAKE_CURRENT_BINARY_DIR}/dlib/__init__.py
-              ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/dlib/__init__.py)
+              ${INIT_DEST1}
+              ${INIT_DEST2})
    endif()
 endif()
 
@@ -772,11 +777,11 @@ if (NOT DLIB_IN_PROJECT_BUILD)
       INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
    if (DLIB_BUILD_TOOLS)
-      install(TARGETS dtoc train_face_5point_model RUNTIME DESTINATION bin)
-      install(PROGRAMS ../tools/imglab/convert_imglab_paths_to_relative ../tools/imglab/copy_imglab_dataset DESTINATION bin)
+      install(TARGETS dtoc train_face_5point_model RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+      install(PROGRAMS ../tools/imglab/convert_imglab_paths_to_relative ../tools/imglab/copy_imglab_dataset DESTINATION ${CMAKE_INSTALL_BINDIR})
 
       if (NOT DLIB_NO_GUI_SUPPORT)
-         install(TARGETS imglab RUNTIME DESTINATION bin)
+         install(TARGETS imglab RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
       endif()
    endif()
 
