@@ -6,7 +6,6 @@
 #include "opaque_types.h"
 #include <dlib/python.h>
 #include <dlib/pixel.h>
-#include <dlib/python/numpy_image.h>
 
 using namespace dlib;
 using namespace std;
