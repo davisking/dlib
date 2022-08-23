@@ -3719,7 +3719,8 @@ namespace dlib
                 tensor& grad = layer<TAG_TYPE>(sub).get_gradient_input();
                 DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
                 DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
-                const rectangle input_rect(input_tensor.nr(), input_tensor.nc());
+                const drectangle input_rect = rectangle(input_tensor.nr(), input_tensor.nc());
+                const auto input_area = input_rect.area();
                 float* g = grad.host();
 
                 // Compute the objectness loss for all grid cells
@@ -3767,7 +3768,8 @@ namespace dlib
                 {
                     if (truth_box.ignore || !input_rect.contains(center(truth_box.rect)))
                         continue;
-                    const dpoint t_center = dcenter(truth_box);
+                    const auto truth_box_area = truth_box.rect.area();
+                    const auto t_center = center(truth_box.rect);
                     double best_iou = 0;
                     size_t best_a = 0;
                     size_t best_tag_id = 0;
@@ -3778,8 +3780,8 @@ namespace dlib
                         const auto details = item.second;
                         for (size_t a = 0; a < details.size(); ++a)
                         {
-                            const yolo_rect anchor(centered_drect(t_center, details[a].width, details[a].height));
-                            const double iou = box_intersection_over_union(truth_box.rect, anchor.rect);
+                            const auto anchor(centered_drect(t_center, details[a].width, details[a].height));
+                            const double iou = box_intersection_over_union(truth_box.rect, anchor);
                             if (iou > best_iou)
                             {
                                 best_iou = iou;
@@ -3797,15 +3799,16 @@ namespace dlib
 
                     for (size_t a = 0; a < anchors.size(); ++a)
                     {
-                        // Update best anchor if it's from the current stride, and optionally other anchors
-                        if ((best_tag_id == tag_id<TAG_TYPE>::id && best_a == a) || iou_anchor_threshold < 1)
+                        // Check if the best anchor is from the current stride.
+                        const bool is_best_anchor = best_tag_id == tag_id<TAG_TYPE>::id && best_a == a;
+                        // Update the best anchor unconditionally, and optionally other anchors.
+                        if (is_best_anchor || iou_anchor_threshold < 1)
                         {
-
-                            // do not update other anchors if they have low IoU
-                            if (!(best_tag_id == tag_id<TAG_TYPE>::id && best_a == a))
+                            // Do not update other anchors if they have low IOU.
+                            if (!is_best_anchor)
                             {
-                                const yolo_rect anchor(centered_drect(t_center, anchors[a].width, anchors[a].height));
-                                if (box_intersection_over_union(truth_box.rect, anchor.rect) < iou_anchor_threshold)
+                                const auto anchor(centered_drect(t_center, anchors[a].width, anchors[a].height));
+                                if (box_intersection_over_union(truth_box.rect, anchor) < iou_anchor_threshold)
                                     continue;
                             }
 
@@ -3820,7 +3823,7 @@ namespace dlib
                             const double th = truth_box.rect.height() / (anchors[a].height + truth_box.rect.height());
 
                             // Scale regression error according to the truth size
-                            const double scale_box = options.lambda_box * (2 - truth_box.rect.area() / input_rect.area());
+                            const double scale_box = options.lambda_box * (2.0 - truth_box_area / input_area);
 
                             // Compute the smoothed L1 gradient for the box coordinates
                             const auto x_idx = tensor_index(output_tensor, n, k + 0, r, c);
