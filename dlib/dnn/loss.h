@@ -3799,16 +3799,12 @@ namespace dlib
 
                     for (size_t a = 0; a < anchors.size(); ++a)
                     {
-                        // Check if the best anchor is from the current stride.
-                        const bool is_best_anchor = best_tag_id == tag_id<TAG_TYPE>::id && best_a == a;
-
-                        // Do nothing if it's not the best anchor and iou_ignore_threshold is disabled
-                        if (!is_best_anchor && iou_anchor_threshold == 1)
-                            continue;
-
-                        // Do not update other anchors if they have low IoU
-                        if (!is_best_anchor)
+                        // We will always backpropagate on the best anchor, regardless of its IOU.
+                        // For other anchors, only if they have an IOU >= iou_anchor_threshold.
+                        if (!(best_tag_id == tag_id<TAG_TYPE>::id && best_a == a))
                         {
+                            if (iou_anchor_threshold == 1)
+                                continue;
                             const auto anchor(centered_drect(t_center, anchors[a].width, anchors[a].height));
                             if (box_intersection_over_union(truth_box.rect, anchor) < iou_anchor_threshold)
                                 continue;
