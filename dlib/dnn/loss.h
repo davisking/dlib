@@ -3803,7 +3803,7 @@ namespace dlib
                         // For other anchors, only if they have an IOU >= iou_anchor_threshold.
                         if (!(best_tag_id == tag_id<TAG_TYPE>::id && best_a == a))
                         {
-                            if (iou_anchor_threshold == 1)
+                            if (iou_anchor_threshold >= 1)
                                 continue;
                             const auto anchor(centered_drect(t_center, anchors[a].width, anchors[a].height));
                             if (box_intersection_over_union(truth_box.rect, anchor) < iou_anchor_threshold)
