@@ -3,6 +3,7 @@
 
 #include <string>
 #include <dlib/constexpr_if.h>
+#include <dlib/invoke.h>
 #include "tester.h"
 
 namespace
@@ -106,6 +107,44 @@ namespace
             static_assert(std::is_same<decltype(ret), std::string>::value, "failed test");
             DLIB_TEST(ret == c.str);
         }
+    }
+
+    template <typename Func, typename... Args>
+    bool try_calling(Func&& f, Args&&... args)
+    {
+        return switch_(
+            case_<is_invocable<Func, Args...>::value>([&](auto _) {
+                _(std::forward<Func>(f))(std::forward<Args>(args)...);
+                return true;
+            }),
+            default_([](auto) {
+                return false;
+            })
+        );
+    }
+
+    void test_try_calling_example()
+    {
+        int value = 0;
+
+        auto foo = [&](int a, int b) { value += a + b; };
+        auto bar = [&](std::string) { value++; };
+        auto baz = [&]() { value++; };
+
+        DLIB_TEST(try_calling(baz));
+        DLIB_TEST(value == 1);
+        DLIB_TEST(!try_calling(foo));
+        DLIB_TEST(value == 1);
+        DLIB_TEST(!try_calling(bar));
+        DLIB_TEST(value == 1);
+        DLIB_TEST(try_calling(bar, "stuff"));
+        DLIB_TEST(value == 2);
+        DLIB_TEST(!try_calling(baz, "stuff"));
+        DLIB_TEST(value == 2);
+        DLIB_TEST(try_calling(foo, 3, 1));
+        DLIB_TEST(value == 6);
+        DLIB_TEST(!try_calling(bar, 3, 1));
+        DLIB_TEST(value == 6);
     }
 
     class constexpr_if_test : public tester
