@@ -9,7 +9,7 @@ namespace dlib
 {
     namespace detail
     {
-        const auto _ = [](auto&& arg) { return std::forward<decltype(arg)>(arg); }; // same as std::identity in C++20 but better
+        const auto _ = [](auto&& arg) -> decltype(auto){ return std::forward<decltype(arg)>(arg); }; // same as std::identity in C++20 but better
 
         template <
             bool     Force,
@@ -22,8 +22,7 @@ namespace dlib
             using type = Type;
             Case case_;
 
-            template<typename... Args>
-            constexpr decltype(auto) operator()(Args&& ...args) { return case_(_, std::forward<Args>(args)...); }
+            constexpr decltype(auto) operator()() { return case_(_); }
         };
 
         template<
@@ -126,6 +125,18 @@ namespace dlib
     {
         return switch_type_<std::true_type>(std::forward<Cases>(cases)...);
     }
+
+    namespace detail
+    {
+        template<typename Void, template <typename...> typename Op, typename... Args>
+        struct is_detected : std::false_type{};
+
+        template<template <typename...> typename Op, typename... Args>
+        struct is_detected<std::void_t<Op<Args...>>, Op, Args...> : std::true_type {};
+    }
+
+    template<template <typename...> typename Op, typename... Args>
+    using is_detected = detail::is_detected<void, Op, Args...>;
 }
 
 #endif //DLIB_IF_CONSTEXPR_H

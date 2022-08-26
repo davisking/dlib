@@ -28,6 +28,12 @@ namespace
         std::string str;
     };
 
+    struct D
+    {
+        int i;
+        void set_i(int j) {i = j;}
+    };
+
     template<typename T>
     auto handle_type_and_return1(T obj)
     {
@@ -110,7 +116,7 @@ namespace
     }
 
     template <typename Func, typename... Args>
-    bool try_calling(Func&& f, Args&&... args)
+    bool try_invoke(Func&& f, Args&&... args)
     {
         return switch_(
             case_<is_invocable<Func, Args...>::value>([&](auto _) {
@@ -123,28 +129,63 @@ namespace
         );
     }
 
-    void test_try_calling_example()
+    void test_try_invoke()
     {
         int value = 0;
 
-        auto foo = [&](int a, int b) { value += a + b; };
-        auto bar = [&](std::string) { value++; };
-        auto baz = [&]() { value++; };
+        auto foo = [&]{ value++; };
+        auto bar = [&](int i) { value += i; };
+        auto baz = [&](int i, int j) { value += (i+j); };
 
-        DLIB_TEST(try_calling(baz));
+        DLIB_TEST(try_invoke(foo));
         DLIB_TEST(value == 1);
-        DLIB_TEST(!try_calling(foo));
+        DLIB_TEST(!try_invoke(foo, 1));
         DLIB_TEST(value == 1);
-        DLIB_TEST(!try_calling(bar));
+        DLIB_TEST(!try_invoke(foo, 1, 2));
         DLIB_TEST(value == 1);
-        DLIB_TEST(try_calling(bar, "stuff"));
+
+        DLIB_TEST(!try_invoke(bar));
+        DLIB_TEST(value == 1);
+        DLIB_TEST(try_invoke(bar, 1));
         DLIB_TEST(value == 2);
-        DLIB_TEST(!try_calling(baz, "stuff"));
+        DLIB_TEST(!try_invoke(bar, 1, 2));
         DLIB_TEST(value == 2);
-        DLIB_TEST(try_calling(foo, 3, 1));
-        DLIB_TEST(value == 6);
-        DLIB_TEST(!try_calling(bar, 3, 1));
-        DLIB_TEST(value == 6);
+
+        DLIB_TEST(!try_invoke(baz));
+        DLIB_TEST(value == 2);
+        DLIB_TEST(!try_invoke(baz, 1));
+        DLIB_TEST(value == 2);
+        DLIB_TEST(try_invoke(baz, 1, 2));
+        DLIB_TEST(value == 5);
+    }
+
+    template<typename T>
+    using set_i_pred = decltype(std::declval<T>().set_i(int{}));
+
+    template<typename T>
+    bool try_set_i(T& obj, int i)
+    {
+        constexpr bool has_set_i = is_detected<set_i_pred, T>::value;
+
+        return switch_(
+            case_<has_set_i>([&](auto _) {
+                _(obj).set_i(i);
+                return true;
+            }),
+            default_([](auto){
+                return false;
+            })
+        );
+    }
+
+    void test_set_i()
+    {
+        A a{1};
+        D d{1};
+        DLIB_TEST(!try_set_i(a, 2));
+        DLIB_TEST(a.i == 1);
+        DLIB_TEST(try_set_i(d, 2));
+        DLIB_TEST(d.i == 2);
     }
 
     class constexpr_if_test : public tester
@@ -159,6 +200,8 @@ namespace
         )
         {
             test_switch_type();
+            test_try_invoke();
+            test_set_i();
         }
     } a;
 
