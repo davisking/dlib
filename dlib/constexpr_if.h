@@ -128,14 +128,14 @@ namespace dlib
 
     namespace detail
     {
-        template<typename Void, template <typename...> typename Op, typename... Args>
+        template<typename Void, template <class...> class Op, class... Args>
         struct is_detected : std::false_type{};
 
-        template<template <typename...> typename Op, typename... Args>
+        template<template <class...> class Op, class... Args>
         struct is_detected<std::void_t<Op<Args...>>, Op, Args...> : std::true_type {};
     }
 
-    template<template <typename...> typename Op, typename... Args>
+    template<template <class...> class Op, class... Args>
     using is_detected = detail::is_detected<void, Op, Args...>;
 }
 
