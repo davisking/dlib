@@ -36,6 +36,9 @@ namespace dlib
             typename Case
         >
         using not_valid_t = std::enable_if_t<!std::decay_t<Case>::force && !std::is_same<type, typename std::decay_t<Case>::type>::value, bool>;
+
+        template<typename... T>
+        using void_t = void;
     }
 
     template <
@@ -132,7 +135,7 @@ namespace dlib
         struct is_detected : std::false_type{};
 
         template<template <class...> class Op, class... Args>
-        struct is_detected<std::void_t<Op<Args...>>, Op, Args...> : std::true_type {};
+        struct is_detected<void_t<Op<Args...>>, Op, Args...> : std::true_type {};
     }
 
     template<template <class...> class Op, class... Args>
