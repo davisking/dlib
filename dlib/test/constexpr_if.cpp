@@ -118,7 +118,7 @@ namespace
     template <typename Func, typename... Args>
     bool try_invoke(Func&& f, Args&&... args)
     {
-        return switch_(bools_<is_invocable<Func, Args...>::value,
+        return switch_(types_<is_invocable<Func, Args...>>{},
             [&](bools_<true>, auto _) {
                 _(std::forward<Func>(f))(std::forward<Args>(args)...);
                 return true;
