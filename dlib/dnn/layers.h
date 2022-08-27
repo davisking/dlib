@@ -234,10 +234,15 @@ namespace dlib
                        padding_x_);
             if (use_bias)
             {
+                // For some reason, doing this is slower than a two separate calls
+                // conv(false, output,
+                //     sub.get_output(),
+                //     filters(params,0),
+                //     biases(params, filters.size()));
                 conv(false, output,
-                    sub.get_output(),
-                    filters(params,0),
-                    biases(params, filters.size()));
+                     sub.get_output(),
+                     filters(params,0));
+                tt::add(1,output,1,biases(params,filters.size()));
             }
             else
             {
