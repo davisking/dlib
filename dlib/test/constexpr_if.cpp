@@ -123,7 +123,7 @@ namespace
                 _(std::forward<Func>(f))(std::forward<Args>(args)...);
                 return true;
             },
-            [](auto...) {
+            [](bools_<false>, auto) {
                 return false;
             }
         );
