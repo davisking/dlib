@@ -37,38 +37,38 @@ namespace
     template<typename T>
     auto handle_type_and_return1(T obj)
     {
-        return switch_type_<T>(
-            case_type_<A>([&](auto _) {
+        return switch_(types_<T>{},
+            [&](types_<A>, auto _) {
                 return _(obj).i;
-            }),
-            case_type_<B>([&](auto _) {
+            },
+            [&](types_<B>, auto _) {
                 return _(obj).f;
-            }),
-            case_type_<C>([&](auto _) {
+            },
+            [&](types_<C>, auto _) {
                 return _(obj).str;
-            }),
-            default_([&](auto _) {
+            },
+            [&](auto...) {
                 printf("Don't know what this type is\n");
-            })
+            }
         );
     }
 
     template<typename T>
     auto handle_type_and_return2(T obj)
     {
-        return switch_(
-            case_<std::is_same<T,A>::value>([&](auto _) {
-                return _(obj).i;
-            }),
-            case_<std::is_same<T,B>::value>([&](auto _) {
-                return _(obj).f;
-            }),
-            case_<std::is_same<T,C>::value>([&](auto _) {
-                return _(obj).str;
-            }),
-            default_([&](auto _) {
-                printf("Don't know what this type is\n");
-            })
+        return switch_(bools_<std::is_same<T,A>::value, std::is_same<T,B>::value, std::is_same<T,C>::value>{},
+            [&](bools_<true,false,false>, auto _) {
+               return _(obj).i;
+            },
+            [&](bools_<false,true,false>, auto _) {
+               return _(obj).f;
+            },
+            [&](bools_<false,false,true>, auto _) {
+               return _(obj).str;
+            },
+            [&](auto...) {
+               printf("Don't know what this type is\n");
+            }
         );
     }
 
@@ -118,14 +118,14 @@ namespace
     template <typename Func, typename... Args>
     bool try_invoke(Func&& f, Args&&... args)
     {
-        return switch_(
-            case_<is_invocable<Func, Args...>::value>([&](auto _) {
+        return switch_(bools_<is_invocable<Func, Args...>::value,
+            [&](bools_<true>, auto _) {
                 _(std::forward<Func>(f))(std::forward<Args>(args)...);
                 return true;
-            }),
-            default_([](auto) {
+            },
+            [](auto...) {
                 return false;
-            })
+            }
         );
     }
 
@@ -167,14 +167,14 @@ namespace
     {
         constexpr bool has_set_i = is_detected<set_i_pred, T>::value;
 
-        return switch_(
-            case_<has_set_i>([&](auto _) {
+        return switch_(bools_<has_set_i>{},
+            [&](bools_<true>, auto _) {
                 _(obj).set_i(i);
                 return true;
-            }),
-            default_([](auto){
+            },
+            [](auto...){
                 return false;
-            })
+            }
         );
     }
 

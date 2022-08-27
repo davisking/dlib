@@ -448,9 +448,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template<typename... T>
-    overloaded_helper<typename std::decay<T>::type...> overloaded(T&&... t)
+    auto overloaded(T&&... t)
     {
-        return overloaded_helper<typename std::decay<T>::type...>{std::forward<T>(t)...};
+        return overloaded_helper<std::decay_t<T>...>{std::forward<T>(t)...};
     }
     /*!
         This is a helper function for passing many callable objects (usually lambdas)

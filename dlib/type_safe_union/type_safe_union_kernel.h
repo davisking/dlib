@@ -10,6 +10,7 @@
 #include <functional>
 #include "../serialize.h"
 #include "../utility.h"
+#include "../overloaded.h"
 
 namespace dlib
 {
@@ -637,50 +638,6 @@ namespace dlib
         {
             throw serialization_error(e.info + "\n   while deserializing an object of type type_safe_union");
         }
-    }
-
-#if __cplusplus >= 201703L
-
-    template<typename ...Base>
-    struct overloaded_helper : Base...
-    {
-        template<typename... T>
-        overloaded_helper(T&& ... t) : Base{std::forward<T>(t)}... {}
-
-        using Base::operator()...;
-    };
-
-#else
-
-    template<typename Base, typename ... BaseRest>
-    struct overloaded_helper: Base, overloaded_helper<BaseRest...>
-    {
-        template<typename T, typename ... TRest>
-        overloaded_helper(T&& t, TRest&& ...trest) :
-            Base{std::forward<T>(t)},
-            overloaded_helper<BaseRest...>{std::forward<TRest>(trest)...}
-        {}
-
-        using Base::operator();
-        using overloaded_helper<BaseRest...>::operator();
-    };
-
-    template<typename Base>
-    struct overloaded_helper<Base> : Base
-    {
-        template<typename T>
-        overloaded_helper<Base>(T&& t) : Base{std::forward<T>(t)}
-        {}
-
-        using Base::operator();
-    };
-
-#endif //__cplusplus >= 201703L
-
-    template<typename... T>
-    overloaded_helper<typename std::decay<T>::type...> overloaded(T&&... t)
-    {
-        return overloaded_helper<typename std::decay<T>::type...>{std::forward<T>(t)...};
     }
 }
 
