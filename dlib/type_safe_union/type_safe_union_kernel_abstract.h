@@ -446,68 +446,6 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
-
-    template<typename... T>
-    auto overloaded(T&&... t)
-    {
-        return overloaded_helper<std::decay_t<T>...>{std::forward<T>(t)...};
-    }
-    /*!
-        This is a helper function for passing many callable objects (usually lambdas)
-        to either apply_to_contents(), visit() or for_each(), that combine to make a complete
-        visitor. A picture paints a thousand words:
-
-        using tsu = type_safe_union<int,float,std::string>;
-
-        tsu a = std::string("hello there");
-
-        std::string result;
-
-        a.apply_to_contents(overloaded(
-            [&result](int) {
-                result = std::string("int");
-            },
-            [&result](float) {
-                result = std::string("float");
-            },
-            [&result](const std::string& item) {
-                result = item;
-            }
-        ));
-
-        assert(result == "hello there");
-        result = "";
-
-        result = visit(overloaded(
-            [](int) {
-                return std::string("int");
-            },
-            [](float) {
-                return std::string("float");
-            },
-            [](const std::string& item) {
-                return item;
-            }
-        ), a);
-
-        assert(result == "hello there");
-
-        std::vector<int> type_ids;
-
-        for_each_type(a, overloaded(
-            [&type_ids](in_place_tag<int>, tsu& me) {
-                type_ids.push_back(me.get_type_id<int>());
-            },
-            [&type_ids](in_place_tag<float>, tsu& me) {
-                type_ids.push_back(me.get_type_id<float>());
-            },
-            [&type_ids](in_place_tag<std::string>, tsu& me) {
-                type_ids.push_back(me.get_type_id<std::string>());
-            }
-        ));
-
-        assert(type_ids == vector<int>({0,1,2}));
-    !*/
 }
 
 #endif // DLIB_TYPE_SAFE_UNION_KERNEl_ABSTRACT_
