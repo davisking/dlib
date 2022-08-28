@@ -47,6 +47,6 @@ if(WEBP_FOUND)
 
     if(NOT test_for_libwebp_worked)
         set(WEBP_FOUND 0)
-        message (STATUS "System copy of libwebp is broken.  Will build disable WebP support.")
+        message (STATUS "System copy of libwebp is either too old or broken.  Will disable WebP support.")
     endif()
 endif()
