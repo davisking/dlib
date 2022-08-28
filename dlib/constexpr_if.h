@@ -9,16 +9,12 @@ namespace dlib
 {
     namespace detail
     {
-        const auto _ = [](auto&& arg) -> decltype(auto){ return std::forward<decltype(arg)>(arg); }; // same as std::identity in C++20 but better
-
-        template<class... T>
-        using void_t = void;
-
+//        const auto _ = [](auto&& arg) -> decltype(auto){ return std::forward<decltype(arg)>(arg); }; // same as std::identity in C++20 but better
         template<typename Void, template <class...> class Op, class... Args>
         struct is_detected : std::false_type{};
 
         template<template <class...> class Op, class... Args>
-        struct is_detected<void_t<Op<Args...>>, Op, Args...> : std::true_type {};
+        struct is_detected<void(Op<Args...>), Op, Args...> : std::true_type {};
     }
 
     template<typename... T>
@@ -26,6 +22,12 @@ namespace dlib
 
     template<bool... v>
     using bools_ = types_<std::integral_constant<bool,v>...>;
+
+    template<bool... v>
+    auto bools(std::integral_constant<bool, v>...)
+    {
+        return bools_<v...>{};
+    }
 
     template<template <class...> class Op, class... Args>
     using is_detected = detail::is_detected<void, Op, Args...>;
@@ -35,11 +37,11 @@ namespace dlib
         typename... Cases
     >
     constexpr decltype(auto) switch_(
-        types_<T...>    meta_obj,
-        Cases&&...      cases
+        types_<T...> meta_obj,
+        Cases&&...   cases
     )
     {
-        return overloaded(std::forward<Cases>(cases)...)(meta_obj, detail::_);
+        return overloaded(std::forward<Cases>(cases)...)(meta_obj);
     }
 }
 
