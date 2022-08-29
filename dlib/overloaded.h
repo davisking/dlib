@@ -42,9 +42,8 @@ namespace dlib
 
             using Base::operator();
         };
-    }
 #endif //__cpp_fold_expressions
-
+    }
     template<typename... T>
     auto overloaded(T&&... t)
     /*!
