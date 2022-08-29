@@ -571,17 +571,19 @@ namespace dlib
                 int stride_y,
                 int stride_x,
                 int padding_y,
-                int padding_x
-            ) 
+                int padding_x,
+                long groups
+            )
             {
                 (void)data;    /* silence compiler */
                 DLIB_CASSERT(stride_y > 0 && stride_x > 0);
                 DLIB_CASSERT(0 <= padding_y && padding_y < filters.nr());
                 DLIB_CASSERT(0 <= padding_x && padding_x < filters.nc());
+                DLIB_CASSERT(groups >= 0);
                 last_stride_y = stride_y;
                 last_stride_x = stride_x;
                 last_padding_y = padding_y;
-                last_padding_x = padding_x;            
+                last_padding_x = padding_x;
             }
 
              void operator() (
@@ -634,6 +636,7 @@ namespace dlib
             long last_stride_x = 0;
             long last_padding_y = 0;
             long last_padding_x = 0;
+            long groups = 1;
         };
 
     // -----------------------------------------------------------------------------------

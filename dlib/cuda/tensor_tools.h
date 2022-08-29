@@ -1177,11 +1177,16 @@ namespace dlib { namespace tt
             int stride_y,
             int stride_x,
             int padding_y,
-            int padding_x
-        ) {impl.setup(data,filters,stride_y,stride_x,padding_y,padding_x); }
+            int padding_x,
+            long groups
+        ) {impl.setup(data,filters,stride_y,stride_x,padding_y,padding_x,groups); }
         /*!
             requires
-                - filters.k() == data.k()
+                - groups_ >= 1
+                - if groups == 1
+                    - filters.k() == data.k()
+                - if groups > 1
+                    - data.k() % filters.num_samples() == 0
                 - stride_y > 0
                 - stride_x > 0
                 - 0 <= padding_y < filters.nr()
