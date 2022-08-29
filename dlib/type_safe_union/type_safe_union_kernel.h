@@ -526,7 +526,7 @@ namespace dlib
         void for_each_type_impl(
             F&& f,
             TSU&& tsu,
-            dlib::index_sequence<I...>
+            std::index_sequence<I...>
         )
         {
             using Tsu = typename std::decay<TSU>::type;
@@ -551,7 +551,7 @@ namespace dlib
     {
         using Tsu = typename std::decay<TSU>::type;
         static constexpr std::size_t Size = type_safe_union_size<Tsu>::value;
-        detail::for_each_type_impl(std::forward<F>(f), std::forward<TSU>(tsu), dlib::make_index_sequence<Size>{});
+        detail::for_each_type_impl(std::forward<F>(f), std::forward<TSU>(tsu), std::make_index_sequence<Size>{});
     }
 
     template<typename F, typename TSU>
