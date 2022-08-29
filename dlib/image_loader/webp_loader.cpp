@@ -6,9 +6,6 @@
 // only do anything with this file if DLIB_WEBP_SUPPORT is defined
 #ifdef DLIB_WEBP_SUPPORT
 
-#include "../array2d.h"
-#include "../pixel.h"
-#include "../dir_nav.h"
 #include "webp_loader.h"
 
 #include <webp/decode.h>
