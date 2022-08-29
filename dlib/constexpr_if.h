@@ -29,7 +29,8 @@ namespace dlib
     struct types_ {};
     /*!
         WHAT THIS OBJECT REPRESENTS
-            This is a type list. Use this to pass types to the switch_() function.
+            This is a type list. Use this to pass types to the switch_() function as
+            a compile-time initial condition.
    !*/
 
 // ----------------------------------------------------------------------------------------
@@ -43,9 +44,6 @@ namespace dlib
 
     template<bool... v>
     auto bools(std::integral_constant<bool, v>...)
-    {
-        return bools_<v...>{};
-    }
     /*!
         ensures
             - returns a type list of compile time booleans.
@@ -59,9 +57,12 @@ namespace dlib
               Instead use the following:
                 - bools(std::is_same<T,U>{})
                 - bools(std::is_constructible<T>>{})
-              This will convert to either either std::true_type or std::false_type
+              This will convert to either std::true_type or std::false_type.
+              Then use this to pass to switch_() as a compile-time initial condition.
    !*/
-
+    {
+        return bools_<v...>{};
+    }
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -72,17 +73,21 @@ namespace dlib
         types_<T...> meta_obj,
         Cases&&...   cases
     )
-    {
-        return overloaded(std::forward<Cases>(cases)...)(meta_obj, detail::_);
-    }
     /*!
         requires
-            - meta_obj combines a set of initial types
+            - meta_obj combines a set of initial types. These are used as compile-time initial conditions.
             - cases is a set of overload-able conditional branches.
             - at least one of the cases is callable given meta_obj.
+            - each case statement has signature auto(types_<...>, auto _) where _ is an identity function
+              with identical behaviour to std::identity. This is used to make each generic lambda artificially
+              dependent on the function body. This allows semantic analysis of the lambdas to be performed AFTER
+              the correct lambda is chosen depending on meta_obj. This is the crucial bit that makes switch_() behave
+              in a similar way to if constexpr() in C++17. Make sure to use _ on one of the objects in the lambdas.
         ensures
             - calls the correct conditional branch.
-            - the correct conditional branch selected at compile-time.
+            - the correct conditional branch is selected at compile-time.
+            - Note, each branch can return different types, and the return type of the switch_() function
+              is the same as the compile-time selected branch.
 
             Here is an example:
 
@@ -103,7 +108,38 @@ namespace dlib
                     }
                 );
             }
+
+            Here is another example:
+
+            template<typename T>
+            auto transfer_state(T& a, T& b)
+            {
+                return switch(
+                    bools(std::is_move_constructible<T>{}, std::is_copy_constructible<T>{}),
+                    [&](bools_<true, true>, auto _) {
+                        // T is both move-constructible and copy-constructible
+                        a = std::move(_(b));
+                        return move_tag{} | copy_tag{}; // Just for fun, we return different types in each branch.
+                    },
+                    [&](bools_<true, false>, auto _) {
+                        // T is only move-constructible
+                        a = std::move(_(b));
+                        return move_tag{};
+                    },
+                    [&](bools_<false, true>, auto _) {
+                        a = _(b);
+                        return copy_tag{};
+                    },
+                    [&](auto...) {
+                        // Default case statement
+                        return dont_care_tag{};
+                    }
+                );
+            }
       !*/
+    {
+        return overloaded(std::forward<Cases>(cases)...)(meta_obj, detail::_);
+    }
 // ----------------------------------------------------------------------------------------
 
     template<template <class...> class Op, class... Args>
