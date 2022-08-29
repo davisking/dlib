@@ -47,9 +47,6 @@ namespace dlib
 
     template<typename... T>
     auto overloaded(T&&... t)
-    {
-        return detail::overloaded_helper<std::decay_t<T>...>{std::forward<T>(t)...};
-    }
     /*!
         This is a helper function for combining many callable objects (usually lambdas), into
         an overload-able set. This can then be used in visitor patterns like
@@ -111,6 +108,9 @@ namespace dlib
 
         assert(type_ids == vector<int>({0,1,2}));
     !*/
+    {
+        return detail::overloaded_helper<std::decay_t<T>...>{std::forward<T>(t)...};
+    }
 }
 
 #endif //DLIB_OVERLOADED_H_
