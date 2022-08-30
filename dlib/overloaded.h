@@ -48,7 +48,7 @@ namespace dlib
     auto overloaded(T&&... t)
     /*!
         This is a helper function for combining many callable objects (usually lambdas), into
-        an overload-able set. This can then be used in visitor patterns like
+        an overload-able set. This can be used in visitor patterns like
             - dlib::type_safe_union::apply_to_contents()
             - dlib::visit()
             - dlib::for_each()
