@@ -57,13 +57,13 @@ namespace
     auto handle_type_and_return2(T obj)
     {
         return switch_(bools(std::is_same<T,A>{}, std::is_same<T,B>{}, std::is_same<T,C>{}),
-            [&](bools_<true,false,false>, auto _) {
+            [&](true_t, auto, auto, auto _) {
                return _(obj).i;
             },
-            [&](bools_<false,true,false>, auto _) {
+            [&](auto, true_t, auto, auto _) {
                return _(obj).f;
             },
-            [&](bools_<false,false,true>, auto _) {
+            [&](auto, auto, true_t, auto _) {
                return _(obj).str;
             },
             [&](auto...) {
@@ -118,8 +118,8 @@ namespace
     template <typename Func, typename... Args>
     bool try_invoke(Func&& f, Args&&... args)
     {
-        return switch_(bools_<is_invocable<Func, Args...>::value>{},
-            [&](bools_<true>, auto _) {
+        return switch_(bools(is_invocable<Func, Args...>{}),
+            [&](true_t, auto _) {
                 _(std::forward<Func>(f))(std::forward<Args>(args)...);
                 return true;
             },
@@ -165,10 +165,8 @@ namespace
     template<typename T>
     bool try_set_i(T& obj, int i)
     {
-        constexpr bool has_set_i = is_detected<set_i_pred, T>::value;
-
-        return switch_(bools_<has_set_i>{},
-            [&](bools_<true>, auto _) {
+        return switch_(bools(is_detected<set_i_pred, T>{}),
+            [&](true_t, auto _) {
                 _(obj).set_i(i);
                 return true;
             },
