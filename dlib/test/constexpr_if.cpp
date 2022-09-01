@@ -4,6 +4,7 @@
 #include <string>
 #include <dlib/constexpr_if.h>
 #include <dlib/invoke.h>
+#include <cstdio>
 #include "tester.h"
 
 namespace
