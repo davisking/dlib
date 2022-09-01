@@ -232,19 +232,18 @@ namespace dlib
                        _stride_x,
                        padding_y_,
                        padding_x_);
+
+            conv(false, output,
+                 sub.get_output(),
+                 filters(params,0));
+
+            // For some reason, doing this is sometimes slower than two separate calls
+            // conv(false, output,
+            //     sub.get_output(),
+            //     filters(params,0),
+            //     biases(params, filters.size()));
             if (use_bias)
-            {
-                conv(false, output,
-                    sub.get_output(),
-                    filters(params,0),
-                    biases(params, filters.size()));
-            }
-            else
-            {
-                conv(false, output,
-                    sub.get_output(),
-                    filters(params,0));
-            }
+                tt::add(1,output,1,biases(params,filters.size()));
         }
 
         template <typename SUBNET>
