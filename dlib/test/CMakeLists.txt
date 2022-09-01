@@ -42,6 +42,7 @@ set (tests
    conditioning_class_c.cpp
    conditioning_class.cpp
    config_reader.cpp
+   constexpr_if.cpp
    correlation_tracker.cpp
    crc32.cpp
    create_iris_datafile.cpp

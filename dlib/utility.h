@@ -12,8 +12,17 @@
 
 namespace dlib
 {
-    // ---------------------------------------------------------------------
+#ifdef __cpp_lib_integer_sequence
+    template<std::size_t... Ints>
+    using index_sequence = std::index_sequence<Ints...>;
 
+    template<std::size_t N>
+    using make_index_sequence = std::make_index_sequence<N>;
+
+    template<class... T>
+    using index_sequence_for = std::index_sequence_for<T...>;
+#else
+    // ---------------------------------------------------------------------
     template<std::size_t... Ints>
     struct index_sequence
     {
@@ -31,54 +40,44 @@ namespace dlib
 
     template<std::size_t N>
     struct make_index_sequence
-        : merge_and_renumber < typename make_index_sequence < N / 2 >::type,
-          typename make_index_sequence < N - N / 2 >::type > {};
+            : merge_and_renumber < typename make_index_sequence < N / 2 >::type,
+                    typename make_index_sequence < N - N / 2 >::type > {};
 
     template<> struct make_index_sequence<0> : index_sequence<> {};
     template<> struct make_index_sequence<1> : index_sequence<0> {};
 
     template<typename... Ts>
     using index_sequence_for = make_index_sequence<sizeof...(Ts)>;
+    // ---------------------------------------------------------------------
+#endif
 
     // ---------------------------------------------------------------------
 
-    template <typename First, typename... Rest>
-    struct are_nothrow_move_constructible
-        : std::integral_constant<bool, std::is_nothrow_move_constructible<First>::value &&
-                                       are_nothrow_move_constructible<Rest...>::value> {};
+    template<bool First, bool... Rest>
+    struct And : std::integral_constant<bool, First && And<Rest...>::value> {};
 
-    template <typename T>
-    struct are_nothrow_move_constructible<T> : std::is_nothrow_move_constructible<T> {};
+    template<bool Value>
+    struct And<Value> : std::integral_constant<bool, Value>{};
 
     // ---------------------------------------------------------------------
 
-    template <typename First, typename... Rest>
-    struct are_nothrow_move_assignable
-        : std::integral_constant<bool, std::is_nothrow_move_assignable<First>::value &&
-                                       are_nothrow_move_assignable<Rest...>::value> {};
-
-    template <typename T>
-    struct are_nothrow_move_assignable<T> : std::is_nothrow_move_assignable<T> {};
+    template <typename ...Types>
+    struct are_nothrow_move_constructible : And<std::is_nothrow_move_constructible<Types>::value...> {};
 
     // ---------------------------------------------------------------------
 
-    template <typename First, typename... Rest>
-    struct are_nothrow_copy_constructible
-        : std::integral_constant<bool, std::is_nothrow_copy_constructible<First>::value &&
-                                       are_nothrow_copy_constructible<Rest...>::value> {};
-
-    template <typename T>
-    struct are_nothrow_copy_constructible<T> : std::is_nothrow_copy_constructible<T> {};
+    template <typename ...Types>
+    struct are_nothrow_move_assignable : And<std::is_nothrow_move_assignable<Types>::value...> {};
 
     // ---------------------------------------------------------------------
 
-    template <typename First, typename... Rest>
-    struct are_nothrow_copy_assignable
-        : std::integral_constant<bool, std::is_nothrow_copy_assignable<First>::value &&
-                                       are_nothrow_copy_assignable<Rest...>::value> {};
+    template <typename ...Types>
+    struct are_nothrow_copy_constructible : And<std::is_nothrow_copy_constructible<Types>::value...> {};
 
-    template <typename T>
-    struct are_nothrow_copy_assignable<T> : std::is_nothrow_copy_assignable<T> {};
+    // ---------------------------------------------------------------------
+
+    template <typename ...Types>
+    struct are_nothrow_copy_assignable : And<std::is_nothrow_copy_assignable<Types>::value...> {};
 
     // ---------------------------------------------------------------------
 
@@ -115,21 +114,8 @@ namespace dlib
 
     // ---------------------------------------------------------------------
 
-    template <typename First, typename... Rest>
-    struct are_nothrow_swappable
-        : std::integral_constant<bool, is_nothrow_swappable<First>::value &&
-                                       are_nothrow_swappable<Rest...>::value> {};
-
-    template <typename T>
-    struct are_nothrow_swappable<T> : is_nothrow_swappable<T> {};
-
-    // ---------------------------------------------------------------------
-
-    template<bool First, bool... Rest>
-    struct And : std::integral_constant<bool, First && And<Rest...>::value> {};
-
-    template<bool Value>
-    struct And<Value> : std::integral_constant<bool, Value>{};
+    template <typename ...Types>
+    struct are_nothrow_swappable : And<is_nothrow_swappable<Types>::value...> {};
 
     // ---------------------------------------------------------------------
 
