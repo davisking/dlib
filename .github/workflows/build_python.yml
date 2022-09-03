@@ -50,7 +50,7 @@ jobs:
       run: pip install pytest
     - name: Build
       run: |
-        python setup.py build
+        python setup.py build --set PYBIND11_PYTHON_VERSION=3.7
         python setup.py install --user 
     - name: Test
       run: python -m pytest --ignore docs --ignore dlib 
