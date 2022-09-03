@@ -4,6 +4,7 @@
 #define DLIB_UTILITY_Hh_
 
 #include <cstddef>
+#include <type_traits>
 
 /*
     This header contains back-ports of C++14/17 functions and type traits
@@ -58,6 +59,17 @@ namespace dlib
 
     template<bool Value>
     struct And<Value> : std::integral_constant<bool, Value>{};
+
+    // ---------------------------------------------------------------------
+
+    template<class...>
+    struct conjunction : std::true_type {};
+
+    template<class B1>
+    struct conjunction<B1> : B1 {};
+
+    template<class B1, class... Bn>
+    struct conjunction<B1, Bn...> : std::conditional_t<bool(B1::value), conjunction<Bn...>, B1> {};
 
     // ---------------------------------------------------------------------
 
