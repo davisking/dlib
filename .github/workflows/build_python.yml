@@ -46,14 +46,12 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
-      with:
-        python_version: '3.7'
     - name: Install python deps
       run: pip install pytest
     - name: Build
       run: |
-        python setup.py build --set PYBIND11_PYTHON_VERSION=3.7
-        python setup.py install --user
+        python3 setup.py build
+        python3 setup.py install --user
     - name: Test
-      run: python -m pytest --ignore docs --ignore dlib
+      run: python3 -m pytest --ignore docs --ignore dlib
 
