@@ -1144,58 +1144,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template<std::size_t I = 0, typename FuncT, typename... Tp>
-    inline typename std::enable_if<I == sizeof...(Tp), void>::type
-    for_each_in_tuple(std::tuple<Tp...>&, FuncT)
-    {}
-
-    template<std::size_t I = 0, typename FuncT, typename... Tp>
-    inline typename std::enable_if<I < sizeof...(Tp), void>::type
-    for_each_in_tuple(std::tuple<Tp...>& t, FuncT f)
-    {
-        f(std::get<I>(t));
-        for_each_in_tuple<I + 1, FuncT, Tp...>(t, f);
-    }
-    
-    template<std::size_t I = 0, typename FuncT, typename... Tp>
-    inline typename std::enable_if<I == sizeof...(Tp), void>::type
-    for_each_in_tuple(const std::tuple<Tp...>&, FuncT)
-    {}
-
-    template<std::size_t I = 0, typename FuncT, typename... Tp>
-    inline typename std::enable_if<I < sizeof...(Tp), void>::type
-    for_each_in_tuple(const std::tuple<Tp...>& t, FuncT f)
-    {
-        f(std::get<I>(t));
-        for_each_in_tuple<I + 1, FuncT, Tp...>(t, f);
-    }
-    
-    struct serialize_tuple_helper
-    {
-        serialize_tuple_helper(std::ostream& out_) : out(out_) {}
-        
-        template<typename T>
-        void operator()(const T& item)
-        {
-            serialize(item, out);
-        }
-                
-        std::ostream& out;
-    };
-    
-    struct deserialize_tuple_helper
-    {
-        deserialize_tuple_helper(std::istream& in_) : in(in_) {}
-        
-        template<typename T>
-        void operator()(T& item)
-        {
-            deserialize(item, in);
-        }
-                
-        std::istream& in;
-    };
-
     template <typename... Types>
     void serialize (
         const std::tuple<Types...>& item,
@@ -1204,7 +1152,9 @@ namespace dlib
     {
         try
         { 
-            for_each_in_tuple(item, serialize_tuple_helper(out));
+            for_each_in_tuple(item, [&](auto&& x) {
+                serialize(x, out);
+            });
         }
         catch (serialization_error& e)
         { throw serialization_error(e.info + "\n   while serializing object of type std::tuple"); }
@@ -1218,7 +1168,9 @@ namespace dlib
     {
         try
         { 
-            for_each_in_tuple(item, deserialize_tuple_helper(in));
+            for_each_in_tuple(item, [&](auto&& x) {
+                deserialize(x, in);
+            });
         }
         catch (serialization_error& e)
         { throw serialization_error(e.info + "\n   while deserializing object of type std::tuple"); }
