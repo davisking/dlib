@@ -31,16 +31,16 @@ namespace dlib
         WHAT THIS OBJECT REPRESENTS
             This is a type list. Use this to pass types to the switch_() function as
             compile-time initial conditions.
-   !*/
+    !*/
 
 // ----------------------------------------------------------------------------------------
 
     template<bool... v>
-    auto bools(std::integral_constant<bool, v>...)
+    constexpr auto bools(std::integral_constant<bool, v>...)
     /*!
         ensures
             - returns a type list of compile time booleans.
-   !*/
+    !*/
     {
         return types_<std::integral_constant<bool,v>...>{};
     }
@@ -130,7 +130,7 @@ namespace dlib
     /*!
         ensures
             - This is exactly the same as std::experimental::is_detected from library fundamentals v
-   !*/
+    !*/
 
 // ----------------------------------------------------------------------------------------
 }
