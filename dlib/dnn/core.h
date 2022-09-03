@@ -261,7 +261,7 @@ namespace dlib
         auto tuple_subset(
             const Tuple& item, 
             compile_time_integer_list<indices...>
-        )
+        ) -> decltype(std::make_tuple(std::get<indices>(item)...))
         {
             return std::make_tuple(std::get<indices>(item)...);
         }
@@ -283,7 +283,7 @@ namespace dlib
         template <typename... T>
         auto tuple_flatten(
             const std::tuple<T...>& item
-        )
+        ) -> decltype(tuple_flatten(item, typename make_compile_time_integer_range<sizeof...(T)>::type()))
         {
             return tuple_flatten(item, typename make_compile_time_integer_range<sizeof...(T)>::type());
         }
@@ -292,7 +292,7 @@ namespace dlib
         auto tuple_flatten(
             const std::tuple<T...>& item, 
             compile_time_integer_list<indices...>
-        )
+        ) -> decltype(std::tuple_cat(tuple_flatten(std::get<indices-1>(item))...))
         {
             return std::tuple_cat(tuple_flatten(std::get<indices-1>(item))...);
         }
