@@ -127,6 +127,12 @@ namespace dlib
             return detail::type_safe_union_type_id<T,Types...>::value;
         }
 
+        template <typename T>
+        static constexpr int get_type_id (in_place_tag<T>)
+        {
+            return get_type_id<T>();
+        }
+
     private:
         template<typename T>
         struct is_valid : detail::is_any<T,Types...> {};
@@ -168,9 +174,8 @@ namespace dlib
         };
 
         template<typename F, typename TSU>
-        static inline auto dispatch(F&& f, TSU&& me)
-        noexcept(noexcept(dispatcher<F&&,TSU&&>{}(std::forward<F>(f), std::forward<TSU>(me), size_<0>{})))
-        -> decltype(dispatcher<F&&,TSU&&>{}(std::forward<F>(f), std::forward<TSU>(me), size_<0>{})) {
+        static inline decltype(auto) dispatch(F&& f, TSU&& me)
+        noexcept(noexcept(dispatcher<F&&,TSU&&>{}(std::forward<F>(f), std::forward<TSU>(me), size_<0>{}))) {
             return dispatcher<F&&,TSU&&>{}(std::forward<F>(f), std::forward<TSU>(me), size_<0>{});
         }
 
@@ -400,18 +405,16 @@ namespace dlib
         }
 
         template <typename F>
-        auto apply_to_contents(
+        decltype(auto) apply_to_contents(
             F&& f
-        ) noexcept(noexcept(dispatch(std::forward<F>(f), std::declval<type_safe_union&>())))
-        -> decltype(dispatch(std::forward<F>(f), *this)) {
+        ) noexcept(noexcept(dispatch(std::forward<F>(f), std::declval<type_safe_union&>()))) {
             return dispatch(std::forward<F>(f), *this);
         }
 
         template <typename F>
-        auto apply_to_contents(
+        decltype(auto) apply_to_contents(
             F&& f
-        ) const noexcept(noexcept(dispatch(std::forward<F>(f), std::declval<const type_safe_union&>())))
-        -> decltype(dispatch(std::forward<F>(f), *this)) {
+        ) const noexcept(noexcept(dispatch(std::forward<F>(f), std::declval<const type_safe_union&>()))) {
             return dispatch(std::forward<F>(f), *this);
         }
 
@@ -555,49 +558,12 @@ namespace dlib
     }
 
     template<typename F, typename TSU>
-    auto visit(
+    decltype(auto) visit(
         F&& f,
         TSU&& tsu
-    ) noexcept(noexcept(tsu.apply_to_contents(std::forward<F>(f))))
-    -> decltype(tsu.apply_to_contents(std::forward<F>(f))) {
+    ) noexcept(noexcept(tsu.apply_to_contents(std::forward<F>(f)))) {
         return tsu.apply_to_contents(std::forward<F>(f));
     }
-
-    namespace detail
-    {
-        struct serialize_helper
-        {
-            serialize_helper(std::ostream& out_) : out(out_) {}
-
-            template <typename T>
-            void operator() (const T& item) const 
-            { 
-                serialize(item, out); 
-            } 
-
-            std::ostream& out;
-        };  
-
-        struct deserialize_helper
-        {
-            deserialize_helper(
-                std::istream& in_,
-                int index_
-            ) : index(index_),
-                in(in_)
-            {}
-
-            template<typename T, typename TSU>
-            void operator()(in_place_tag<T>, TSU&& x)
-            {
-                if (index == x.template get_type_id<T>())
-                    deserialize(x.template get<T>(), in);
-            }
-
-            const int index = -1;
-            std::istream& in;
-        };
-    } // namespace detail
 
     template<typename... Types>
     inline void serialize (
@@ -608,7 +574,9 @@ namespace dlib
         try
         {
             serialize(item.get_current_type_id(), out);
-            item.apply_to_contents(detail::serialize_helper(out));
+            item.apply_to_contents([&](auto&& x) {
+                serialize(x, out);
+            });
         }
         catch (serialization_error& e)
         {
@@ -630,7 +598,10 @@ namespace dlib
             if (index == 0)
                 item.clear();
             else if (index > 0 && index <= (int)sizeof...(Types))
-                for_each_type(detail::deserialize_helper(in, index), item);
+                for_each_type([&](auto tag, auto&& me) {
+                    if (index == me.get_type_id(tag))
+                        deserialize(me.get(tag), in);
+                }, item);
             else
                 throw serialization_error("bad index value. Should be in range [0,sizeof...(Types))");
         }
