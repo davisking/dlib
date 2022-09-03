@@ -8,6 +8,18 @@
 
 namespace dlib
 {
+// ----------------------------------------------------------------------------------------
+    namespace impl
+    {
+        template<typename List>
+        struct add_one {};
+
+        template<std::size_t... n>
+        struct add_one<std::index_sequence<n...>> { using type = std::index_sequence<(n+1)...>; };
+
+        template<typename List>
+        using add_one_t = typename add_one<List>::type;
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -28,7 +40,7 @@ namespace dlib
                     compile_time_integer_list<1,2,3,4>
         !*/
 
-        using type = std::make_index_sequence<max>;
+        using type = impl::add_one_t<std::make_index_sequence<max>>;
     };
 
 // ----------------------------------------------------------------------------------------
