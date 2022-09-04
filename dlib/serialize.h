@@ -2600,33 +2600,27 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template<typename T>
-    inline void serialize_these(std::ostream& out, const T& x)
+    template<typename... T>
+    inline void serialize_these(std::ostream& out, const T& ...x)
     {
         using dlib::serialize;
-        serialize(x, out);
+#ifdef __cpp_fold_expressions
+        (serialize(out, x),...);
+#else
+        (void)std::initializer_list<int>{(serialize(out,x),0)...};
+#endif
     }
     
-    template<typename T, typename... Rest>
-    inline void serialize_these(std::ostream& out, const T& x, const Rest& ... rest)
-    {
-        serialize_these(out, x);
-        serialize_these(out, rest...);
-    }
-    
-    template<typename T>
-    inline void deserialize_these(std::istream& in, T& x)
+    template<typename... T>
+    inline void deserialize_these(std::istream& in, T& ...x)
     {
         using dlib::deserialize;
-        deserialize(x, in);
+#ifdef __cpp_fold_expressions
+        (deserialize(in, x),...);
+#else
+        (void)std::initializer_list<int>{(deserialize(in,x),0)...};
+#endif
     }
-    
-    template<typename T, typename... Rest>
-    inline void deserialize_these(std::istream& in, T& x, Rest& ... rest)
-    {
-        deserialize_these(in, x);
-        deserialize_these(in, rest...);
-    }  
     
     #define DLIB_DEFINE_DEFAULT_SERIALIZATION(Type, ...)                \
     void serialize_to(std::ostream& dlibDefaultSer$_out) const          \
