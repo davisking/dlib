@@ -2605,9 +2605,9 @@ namespace dlib
     {
         using dlib::serialize;
 #ifdef __cpp_fold_expressions
-        (serialize(out, x),...);
+        (serialize(x, out),...);
 #else
-        (void)std::initializer_list<int>{(serialize(out,x),0)...};
+        (void)std::initializer_list<int>{(serialize(x, out),0)...};
 #endif
     }
     
@@ -2616,9 +2616,9 @@ namespace dlib
     {
         using dlib::deserialize;
 #ifdef __cpp_fold_expressions
-        (deserialize(in, x),...);
+        (deserialize(x, in),...);
 #else
-        (void)std::initializer_list<int>{(deserialize(in,x),0)...};
+        (void)std::initializer_list<int>{(deserialize(x, in),0)...};
 #endif
     }
     
