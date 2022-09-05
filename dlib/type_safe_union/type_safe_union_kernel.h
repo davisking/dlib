@@ -6,10 +6,9 @@
 #include "type_safe_union_kernel_abstract.h"
 #include <new>
 #include <iostream>
-#include <type_traits>
 #include <functional>
 #include "../serialize.h"
-#include "../utility.h"
+#include "../type_traits.h"
 #include "../overloaded.h"
 
 namespace dlib
@@ -85,14 +84,6 @@ namespace dlib
     {
         // ---------------------------------------------------------------------
 
-        template <typename T, typename First, typename... Rest>
-        struct is_any : std::integral_constant<bool, is_any<T,First>::value || is_any<T,Rest...>::value> {};
-
-        template <typename T, typename First>
-        struct is_any<T,First> : std::is_same<T,First> {};
-
-        // ---------------------------------------------------------------------
-
         template <int nTs, typename T, typename... Ts>
         struct type_safe_union_type_id_impl
                 : std::integral_constant<int, -1 - nTs> {};
@@ -135,7 +126,7 @@ namespace dlib
 
     private:
         template<typename T>
-        struct is_valid : detail::is_any<T,Types...> {};
+        struct is_valid : is_any<T,Types...> {};
 
         template<typename T>
         using is_valid_check = typename std::enable_if<is_valid<T>::value, bool>::type;
@@ -226,7 +217,7 @@ namespace dlib
             template<typename T>
             void operator()(T&& x)
             {
-                using U = typename std::decay<T>::type;
+                using U = std::decay_t<T>;
 
                 if (_me.type_identity != get_type_id<U>())
                 {
@@ -341,12 +332,12 @@ namespace dlib
 
         template <
             typename T,
-            is_valid_check<typename std::decay<T>::type> = true
+            is_valid_check<std::decay_t<T>> = true
         >
         type_safe_union (
             T&& item
         )
-        noexcept(std::is_nothrow_constructible<typename std::decay<T>::type, T>::value)
+        noexcept(std::is_nothrow_constructible<std::decay_t<T>, T>::value)
         : type_safe_union()
         {
             assign_to{*this}(std::forward<T>(item));
@@ -354,13 +345,13 @@ namespace dlib
 
         template <
             typename T,
-            is_valid_check<typename std::decay<T>::type> = true
+            is_valid_check<std::decay_t<T>> = true
         >
         type_safe_union& operator= (
             T&& item
         )
-        noexcept(std::is_nothrow_constructible<typename std::decay<T>::type, T>::value &&
-                 std::is_nothrow_assignable<typename std::decay<T>::type, T>::value)
+        noexcept(std::is_nothrow_constructible<std::decay_t<T>, T>::value &&
+                 std::is_nothrow_assignable<std::decay_t<T>, T>::value)
         {
             assign_to{*this}(std::forward<T>(item));
             return *this;
@@ -532,7 +523,7 @@ namespace dlib
             std::index_sequence<I...>
         )
         {
-            using Tsu = typename std::decay<TSU>::type;
+            using Tsu = std::decay_t<TSU>;
             (void)std::initializer_list<int>{
                 (std::forward<F>(f)(
                         in_place_tag<type_safe_union_alternative_t<I, Tsu>>{},
@@ -552,7 +543,7 @@ namespace dlib
         TSU&& tsu
     )
     {
-        using Tsu = typename std::decay<TSU>::type;
+        using Tsu = std::decay_t<TSU>;
         static constexpr std::size_t Size = type_safe_union_size<Tsu>::value;
         detail::for_each_type_impl(std::forward<F>(f), std::forward<TSU>(tsu), std::make_index_sequence<Size>{});
     }
