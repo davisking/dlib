@@ -51,7 +51,7 @@ any_function (
     const T& item
 )
 {
-    typedef typename basic_type<T>::type U;
+    using U = std::decay_t<T>;
     data.reset(new derived<U,function_type>(item));
 }
 
@@ -65,7 +65,7 @@ template <typename T>
 bool contains (
 ) const
 {
-    typedef typename basic_type<T>::type U;
+    using U = std::decay_t<T>;
     return dynamic_cast<derived<U,function_type>*>(data.get()) != 0;
 }
 
@@ -85,7 +85,7 @@ template <typename T>
 T& cast_to(
 ) 
 {
-    typedef typename basic_type<T>::type U;
+    using U = std::decay_t<T>;
     derived<U,function_type>* d = dynamic_cast<derived<U,function_type>*>(data.get());
     if (d == 0)
     {
@@ -99,7 +99,7 @@ template <typename T>
 const T& cast_to(
 ) const
 {
-    typedef typename basic_type<T>::type U;
+    using U = std::decay_t<T>;
     derived<U,function_type>* d = dynamic_cast<derived<U,function_type>*>(data.get());
     if (d == 0)
     {
@@ -113,7 +113,7 @@ template <typename T>
 T& get(
 ) 
 {
-    typedef typename basic_type<T>::type U;
+    using U = std::decay_t<T>;
     derived<U,function_type>* d = dynamic_cast<derived<U,function_type>*>(data.get());
     if (d == 0)
     {
