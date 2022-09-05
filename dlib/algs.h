@@ -400,7 +400,7 @@ namespace dlib
 
     // handle the case where T and U are unrelated types.
     template < typename T, typename U >
-    typename disable_if_c<is_convertible<T*, U*>::value || is_convertible<U*,T*>::value, bool>::type
+    std::enable_if_t<!std::is_convertible<T*, U*>::value && !std::is_convertible<U*,T*>::value, bool>
     is_same_object (
         const T& a, 
         const U& b
@@ -415,7 +415,7 @@ namespace dlib
     // valid way to convert between these two pointer types then we will take that route rather
     // than the void* approach used otherwise.
     template < typename T, typename U >
-    typename enable_if_c<is_convertible<T*, U*>::value || is_convertible<U*,T*>::value, bool>::type
+    std::enable_if_t<std::is_convertible<T*, U*>::value || std::is_convertible<U*,T*>::value, bool>
     is_same_object (
         const T& a, 
         const U& b
