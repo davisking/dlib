@@ -114,7 +114,6 @@
 
  // ----------------------------------------------------------------------------------------
 
-    
     template <typename ...Types>
     struct are_nothrow_move_constructible : And<std::is_nothrow_move_constructible<Types>::value...> {};
 
@@ -175,6 +174,11 @@
 
     template<std::size_t I>
     using size_ = std::integral_constant<std::size_t, I>;
+
+ // ----------------------------------------------------------------------------------------
+
+    template <typename from, typename to>
+    using is_convertible = std::is_convertible<from, to>;
 
  // ----------------------------------------------------------------------------------------
 
