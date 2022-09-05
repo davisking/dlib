@@ -357,29 +357,23 @@ namespace pybind11
         {
             using basic_pixel_type = typename dlib::pixel_traits<pixel_type>::basic_pixel_type;
 
-            template <size_t channels> 
-            static PYBIND11_DESCR getname(typename std::enable_if<channels==1,int>::type) {
-                return _("numpy.ndarray[(rows,cols),") + npy_format_descriptor<basic_pixel_type>::name() + _("]");
-            }
-            template <size_t channels> 
-            static PYBIND11_DESCR getname(typename std::enable_if<channels!=1,int>::type) {
-                if (channels == 2)
-                    return _("numpy.ndarray[(rows,cols,2),") + npy_format_descriptor<basic_pixel_type>::name() + _("]");
+            static constexpr auto getname()
+            {
+                constexpr long channels = dlib::pixel_traits<pixel_type>::num;
+
+                if (channels == 1)
+                    return _("numpy.ndarray[(rows,cols),  ") + npy_format_descriptor<basic_pixel_type>::name + _("]");
+                else if (channels == 2)
+                    return _("numpy.ndarray[(rows,cols,2),") + npy_format_descriptor<basic_pixel_type>::name + _("]");
                 else if (channels == 3)
-                    return _("numpy.ndarray[(rows,cols,3),") + npy_format_descriptor<basic_pixel_type>::name() + _("]");
+                    return _("numpy.ndarray[(rows,cols,3),") + npy_format_descriptor<basic_pixel_type>::name + _("]");
                 else if (channels == 4)
-                    return _("numpy.ndarray[(rows,cols,4),") + npy_format_descriptor<basic_pixel_type>::name() + _("]");
+                    return _("numpy.ndarray[(rows,cols,4),") + npy_format_descriptor<basic_pixel_type>::name + _("]");
+                else
+                    return _("numpy.ndarray[(rows,cols,N),") + npy_format_descriptor<basic_pixel_type>::name + _("]");
             }
 
-            static PYBIND11_DESCR name() {
-                constexpr size_t channels = dlib::pixel_traits<pixel_type>::num;
-                // The reason we have to call getname() in this wonky way is because
-                // pybind11 uses a type that records the length of the returned string in
-                // the type.  So we have to do this overloading to make the return type
-                // from name() consistent.  In C++17 this would be a lot cleaner with
-                // constexpr if, but can't use C++17 yet because of lack of wide support  :(
-                return getname<channels>(0);
-            }
+            static constexpr auto name = getname();
         };
 
         template <typename pixel_type>
@@ -411,7 +405,7 @@ namespace pybind11
             static handle cast(const handle &src, return_value_policy /* policy */, handle /* parent */) {
                 return src.inc_ref();
             }
-            PYBIND11_TYPE_CASTER(type, handle_type_name<type>::name());
+            PYBIND11_TYPE_CASTER(type, handle_type_name<type>::name);
         };
     }
 }
