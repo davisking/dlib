@@ -111,7 +111,8 @@ namespace std
 #include <new>          // for std::bad_alloc
 #include <cstdlib>
 #include <stddef.h>
-#include <limits> // for std::numeric_limits for is_finite()
+#include <limits>
+#include <cmath> // for std::isfinite for is_finite()
 #include "assert.h"
 #include "error.h"
 #include "noncopyable.h"
@@ -119,8 +120,7 @@ namespace std
 #include "uintn.h"
 #include "numeric_constants.h"
 #include "memory_manager_stateless/memory_manager_stateless_kernel_1.h" // for the default memory manager
-
-
+#include "type_traits.h"
 
 // ----------------------------------------------------------------------------------------
 /*!A _dT !*/
@@ -384,48 +384,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename T>
-    using is_pointer_type = std::is_pointer<T>;
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename T>
-    using is_const_type = std::is_const<std::remove_reference_t<T>>;
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename T>
-    using is_reference_type = std::is_reference<std::remove_const_t<T>>;
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename T, typename U>
-    using is_same_type = std::is_same<T,U>;
-
-// ----------------------------------------------------------------------------------------
-
-    /*!A is_any 
-
-        This is a template where is_any<T,Rest...>::value == true when T is 
-        the same type as any one of the types in Rest... 
-    !*/
-
-    template <typename T, typename... Rest>
-    struct is_any : std::false_type {};
-    
-    template <typename T, typename First>
-    struct is_any<T,First> : std::is_same<T,First> {};
-    
-    template <typename T, typename First, typename... Rest>
-    struct is_any<T,First,Rest...> : std::integral_constant<bool, std::is_same<T,First>::value || is_any<T,Rest...>::value> {};
-
-// ----------------------------------------------------------------------------------------
-
-    template<typename T>
-    using is_float_type = std::is_floating_point<T>;
-
-// ----------------------------------------------------------------------------------------
-
     /*!A is_convertible
 
         This is a template that can be used to determine if one type is convertible 
@@ -491,16 +449,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename T>
-    using is_unsigned_type = std::is_unsigned<T>;
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename T>
-    using is_signed_type = std::is_signed<T>;
-
-// ----------------------------------------------------------------------------------------
-
     template <
         typename T
         >
@@ -554,47 +502,9 @@ namespace dlib
     template <> struct static_switch<0,0,0,0,0,0,0,0,0,0,0,0,0,0,1> { const static int value = 15; };
 
 // ----------------------------------------------------------------------------------------
-    /*!A is_built_in_scalar_type
-        
-        This is a template that allows you to determine if the given type is a built
-        in scalar type such as an int, char, float, short, etc.
-
-        For example, is_built_in_scalar_type<char>::value == true
-        For example, is_built_in_scalar_type<std::string>::value == false 
-    !*/
-
-    template <typename T> struct is_built_in_scalar_type        { const static bool value = false; };
-
-    template <> struct is_built_in_scalar_type<float>           { const static bool value = true; };
-    template <> struct is_built_in_scalar_type<double>          { const static bool value = true; };
-    template <> struct is_built_in_scalar_type<long double>     { const static bool value = true; };
-    template <> struct is_built_in_scalar_type<short>           { const static bool value = true; };
-    template <> struct is_built_in_scalar_type<int>             { const static bool value = true; };
-    template <> struct is_built_in_scalar_type<long>            { const static bool value = true; };
-    template <> struct is_built_in_scalar_type<unsigned short>  { const static bool value = true; };
-    template <> struct is_built_in_scalar_type<unsigned int>    { const static bool value = true; };
-    template <> struct is_built_in_scalar_type<unsigned long>   { const static bool value = true; };
-    template <> struct is_built_in_scalar_type<uint64>          { const static bool value = true; };
-    template <> struct is_built_in_scalar_type<int64>           { const static bool value = true; };
-    template <> struct is_built_in_scalar_type<char>            { const static bool value = true; };
-    template <> struct is_built_in_scalar_type<signed char>     { const static bool value = true; };
-    template <> struct is_built_in_scalar_type<unsigned char>   { const static bool value = true; };
-    // Don't define one for wchar_t when using a version of visual studio
-    // older than 8.0 (visual studio 2005) since before then they improperly set
-    // wchar_t to be a typedef rather than its own type as required by the C++ 
-    // standard.
-#if !defined(_MSC_VER) || _NATIVE_WCHAR_T_DEFINED
-    template <> struct is_built_in_scalar_type<wchar_t>         { const static bool value = true; };
-#endif
-
-// ----------------------------------------------------------------------------------------
     
-    template <
-        typename T
-        >
-    typename enable_if<is_built_in_scalar_type<T>,bool>::type is_finite (
-        const T& value
-    )
+    template <typename T, std::enable_if_t<std::is_arithmetic<T>::value, bool> = true>
+    bool is_finite(T value)
     /*!
         requires
             - value must be some kind of scalar type such as int or double
@@ -603,10 +513,7 @@ namespace dlib
               otherwise.
     !*/
     {
-        if (is_float_type<T>::value)
-            return -std::numeric_limits<T>::infinity() < value && value < std::numeric_limits<T>::infinity();
-        else
-            return true;
+        return std::isfinite(value);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -641,25 +548,6 @@ namespace dlib
 
     template <typename T> inline typename disable_if<is_built_in_scalar_type<T>,void>::type assign_zero_if_built_in_scalar_type (T&){}
     template <typename T> inline typename enable_if<is_built_in_scalar_type<T>,void>::type assign_zero_if_built_in_scalar_type (T& a){a=0;}
-
-// ----------------------------------------------------------------------------------------
-
-    /*!A basic_type
-
-        This is a template that takes a type and strips off any const, volatile, or reference
-        qualifiers and gives you back the basic underlying type.  So for example:
-
-        basic_type<const int&>::type == int
-    !*/
-
-    template <typename T> struct basic_type { typedef T type; };
-    template <typename T> struct basic_type<const T> { typedef T type; };
-    template <typename T> struct basic_type<const T&> { typedef T type; };
-    template <typename T> struct basic_type<volatile const T&> { typedef T type; };
-    template <typename T> struct basic_type<T&> { typedef T type; };
-    template <typename T> struct basic_type<volatile T&> { typedef T type; };
-    template <typename T> struct basic_type<volatile T> { typedef T type; };
-    template <typename T> struct basic_type<volatile const T> { typedef T type; };
 
 // ----------------------------------------------------------------------------------------
 
@@ -793,10 +681,6 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
-
-    template<typename T>
-    using is_function = std::is_function<T>;
-
 
     template <typename T> class funct_wrap0
     {
