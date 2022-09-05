@@ -38,19 +38,29 @@
 
 // ----------------------------------------------------------------------------------------
 
+#ifdef __cpp_fold_expressions
+    template<bool... v>
+    struct And : std::integral_constant<bool, (... && v)> {};
+#else
     template<bool First, bool... Rest>
     struct And : std::integral_constant<bool, First && And<Rest...>::value> {};
 
     template<bool Value>
     struct And<Value> : std::integral_constant<bool, Value>{};
+#endif
 
 // ----------------------------------------------------------------------------------------
 
+#ifdef __cpp_fold_expressions
+    template<bool... v>
+    struct Or : std::integral_constant<bool, (... || v)> {};
+#else
     template<bool First, bool... Rest>
-    struct Or : std::integral_constant<bool, First || And<Rest...>::value> {};
+    struct Or : std::integral_constant<bool, First || Or<Rest...>::value> {};
 
     template<bool Value>
     struct Or<Value> : std::integral_constant<bool, Value>{};
+#endif
 
 // ----------------------------------------------------------------------------------------
 
