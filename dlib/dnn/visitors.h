@@ -608,6 +608,15 @@ namespace dlib
                 // update(i);
             }
 
+            // Handle the special case when the tag layer is followed by a skip layer
+            template <unsigned long ID, template <typename> class TAG, typename U, typename E>
+            void operator()(size_t i, const add_tag_layer<ID, add_skip_layer<TAG, U>, E>&)
+            {
+                tagged_layers.push_back(i);
+                const auto t = tag_id<TAG>::id;
+                tag_to_layer.at(t) = from;
+            }
+
             template <template <typename> class TAG, typename U>
             void operator()(size_t, const add_skip_layer<TAG, U>&)
             {

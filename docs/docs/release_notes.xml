@@ -21,6 +21,7 @@ Non-Backwards Compatible Changes:
 
 Bug fixes:
    - Fix saving grayscale WebP images (PR #2591)
+   - Fix dnn dot visitor when a tag layer is followed by a skip layer (PR #2662)
 </current>
 
 <!-- **************************************************************************************  -->
