@@ -300,17 +300,17 @@ typedef Tbase<function_type> base;
 template <typename T, typename enabled = void>
 struct funct_type { typedef T type; };
 template <typename T>
-struct funct_type<T, typename enable_if<is_function<T> >::type> { typedef T* type; };
+struct funct_type<T, typename enable_if<std::is_function<T> >::type> { typedef T* type; };
 
 template <typename T>
-static typename enable_if<is_function<T>,const T*>::type copy (const T& item) { return &item; }
+static typename enable_if<std::is_function<T>,const T*>::type copy (const T& item) { return &item; }
 template <typename T>
-static typename disable_if<is_function<T>,const T&>::type copy (const T& item) { return item; }
+static typename disable_if<std::is_function<T>,const T&>::type copy (const T& item) { return item; }
 
 template <typename T, typename U>
-static typename enable_if<is_function<T>,const T&>::type deref (const U& item) { return *item; }
+static typename enable_if<std::is_function<T>,const T&>::type deref (const U& item) { return *item; }
 template <typename T, typename U>
-static typename disable_if<is_function<T>,const T&>::type deref (const U& item) { return item; }
+static typename disable_if<std::is_function<T>,const T&>::type deref (const U& item) { return item; }
 
 // -----------------------------------------------
 
