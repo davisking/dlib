@@ -384,29 +384,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    /*!A is_convertible
-
-        This is a template that can be used to determine if one type is convertible 
-        into another type.
-
-        For example:
-            is_convertible<int,float>::value == true    // because ints are convertible to floats
-            is_convertible<int*,float>::value == false  // because int pointers are NOT convertible to floats
-    !*/
-
-    template <typename from, typename to>
-    struct is_convertible
-    {
-        struct yes_type { char a; };
-        struct no_type { yes_type a[2]; };
-        static const from& from_helper();
-        static yes_type test(to);
-        static no_type test(...);
-        const static bool value = sizeof(test(from_helper())) == sizeof(yes_type);
-    };
-
-// ----------------------------------------------------------------------------------------
-
     struct general_ {};
     struct special_ : general_ {};
     template<typename> struct int_ { typedef int type; };
