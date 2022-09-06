@@ -480,8 +480,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
     
-    template <typename T, std::enable_if_t<std::is_arithmetic<T>::value, bool> = true>
-    bool is_finite(T value)
+    template <typename T>
+    std::enable_if_t<std::is_floating_point<T>::value, bool> is_finite(T value)
     /*!
         requires
             - value must be some kind of scalar type such as int or double
@@ -491,6 +491,12 @@ namespace dlib
     !*/
     {
         return std::isfinite(value);
+    }
+    
+    template <typename T>
+    std::enable_if_t<std::is_integral<T>::value, bool> is_finite(T value)
+    {
+        return std::isfinite((double)value);
     }
 
 // ----------------------------------------------------------------------------------------
