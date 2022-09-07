@@ -23,44 +23,44 @@ namespace dlib
             const double color_magnitude = 0.2
         )
         {
-            // pick a random gamma correction factor.  
-            double gamma = std::max(0.0, 1 + gamma_magnitude*(rnd.get_random_double()-0.5));
+            // pick a random gamma correction factor.
+            const double gamma = std::max(0.0, 1 + gamma_magnitude*(rnd.get_random_double() - 0.5));
 
             // pick a random color balancing scheme.
-            double red_scale = 1-rnd.get_random_double()*color_magnitude;
-            double green_scale = 1-rnd.get_random_double()*color_magnitude;
-            double blue_scale = 1-rnd.get_random_double()*color_magnitude;
-            const double m = 255*std::max(std::max(red_scale,green_scale),blue_scale);
+            double red_scale = 1 - rnd.get_random_double() * color_magnitude;
+            double green_scale = 1 - rnd.get_random_double() * color_magnitude;
+            double blue_scale = 1 - rnd.get_random_double() * color_magnitude;
+            const double m = 255 * std::max({red_scale, green_scale, blue_scale});
             red_scale /= m;
             green_scale /= m;
             blue_scale /= m;
 
             // Now compute a lookup table for all the color channels.  The table tells us
             // what the transform does.
-            table.resize(256*3);
+            table.resize(256 * 3);
             unsigned long i = 0;
             for (int k = 0; k < 256; ++k)
             {
-                double v = 255*std::pow(k*red_scale, gamma);
-                table[i++] = (unsigned char)(v + 0.5);
+                const double v = 255*std::pow(k * red_scale, gamma);
+                table[i++] = static_cast<unsigned char>(v + 0.5);
             }
             for (int k = 0; k < 256; ++k)
             {
-                double v = 255*std::pow(k*green_scale, gamma);
-                table[i++] = (unsigned char)(v + 0.5);
+                const double v = 255 * std::pow(k * green_scale, gamma);
+                table[i++] = static_cast<unsigned char>(v + 0.5);
             }
             for (int k = 0; k < 256; ++k)
             {
-                double v = 255*std::pow(k*blue_scale, gamma);
-                table[i++] = (unsigned char)(v + 0.5);
+                const double v = 255 * std::pow(k * blue_scale, gamma);
+                table[i++] = static_cast<unsigned char>(v + 0.5);
             }
         }
 
         rgb_pixel operator()(rgb_pixel p) const
         {
-            p.red = table[(unsigned int)p.red];
-            p.green = table[(unsigned int)p.green+256];
-            p.blue = table[(unsigned int)p.blue+512];
+            p.red = table[static_cast<unsigned int>(p.red)];
+            p.green = table[static_cast<unsigned int>(p.green + 256)];
+            p.blue = table[static_cast<unsigned int>(p.blue + 512)];
             return p;
         }
 
