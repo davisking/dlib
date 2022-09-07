@@ -41,18 +41,15 @@ namespace dlib
             unsigned long i = 0;
             for (int k = 0; k < 256; ++k)
             {
-                const double v = 255*std::pow(k * red_scale, gamma);
-                table[i++] = static_cast<unsigned char>(v + 0.5);
+                table[i++] = static_cast<unsigned char>(255*std::pow(k * red_scale, gamma) + 0.5);
             }
             for (int k = 0; k < 256; ++k)
             {
-                const double v = 255 * std::pow(k * green_scale, gamma);
-                table[i++] = static_cast<unsigned char>(v + 0.5);
+                table[i++] = static_cast<unsigned char>(255 * std::pow(k * green_scale, gamma) + 0.5);
             }
             for (int k = 0; k < 256; ++k)
             {
-                const double v = 255 * std::pow(k * blue_scale, gamma);
-                table[i++] = static_cast<unsigned char>(v + 0.5);
+                table[i++] = static_cast<unsigned char>(255 * std::pow(k * blue_scale, gamma) + 0.5);
             }
         }
 
