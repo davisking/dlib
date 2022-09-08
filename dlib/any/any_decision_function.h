@@ -42,6 +42,22 @@ namespace dlib
         {
         }
 
+        template <
+            class T,
+            class T_ = std::decay_t<T>,
+            std::enable_if_t<!std::is_same<T_,any_decision_function>::value, bool> = true
+        >
+        any_decision_function& operator= (
+            T&& item
+        )
+        {
+            if (contains<T_>())
+                unsafe_get<T_>() = std::forward<T>(item);
+            else
+                *this = std::move(any_decision_function{std::forward<T>(item)});
+            return *this;
+        }
+
         result_type operator() (
             const sample_type& item
         ) const
@@ -59,14 +75,6 @@ namespace dlib
     private:
         result_type (*evaluate_func)(const void*, const sample_type&);
     };
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename T, typename U, typename V> 
-    T& any_cast(any_decision_function<U,V>& a) { return a.template cast_to<T>(); }
-
-    template <typename T, typename U, typename V> 
-    const T& any_cast(const any_decision_function<U,V>& a) { return a.template cast_to<T>(); }
 
 // ----------------------------------------------------------------------------------------
 
