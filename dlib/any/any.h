@@ -86,7 +86,7 @@ namespace dlib
             return storage.unsafe_get<T>();
         }
 
-    protected:
+    private:
         te::storage_heap storage;
     };
 

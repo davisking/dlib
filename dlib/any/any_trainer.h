@@ -85,7 +85,7 @@ namespace dlib
         bool contains() const { return storage.contains<T>();}
         bool is_empty() const { return storage.is_empty(); }
         void clear()          { storage.clear(); }
-        void swap (any& item) { std::swap(storage, item.storage); }
+        void swap (any_trainer& item) { std::swap(storage, item.storage); }
 
         template <typename T>
         T& cast_to(
@@ -113,7 +113,7 @@ namespace dlib
                 *this = T{};
             return storage.unsafe_get<T>();
         }
-        
+
     private:
         te::storage_heap storage;
         trained_function_type (*train_func) (

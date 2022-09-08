@@ -79,7 +79,7 @@ namespace dlib
         bool contains() const { return storage.contains<T>();}
         bool is_empty() const { return storage.is_empty(); }
         void clear()          { storage.clear(); }
-        void swap (any& item) { std::swap(storage, item.storage); }
+        void swap (any_decision_function& item) { std::swap(storage, item.storage); }
 
         template <typename T>
         T& cast_to(
