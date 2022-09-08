@@ -115,6 +115,14 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T, typename U, typename V> 
+    T& any_cast(any_decision_function<U,V>& a) { return a.template cast_to<T>(); }
+
+    template <typename T, typename U, typename V> 
+    const T& any_cast(const any_decision_function<U,V>& a) { return a.template cast_to<T>(); }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 
