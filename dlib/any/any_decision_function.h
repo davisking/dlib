@@ -16,16 +16,19 @@ namespace dlib
         typename sample_type_,
         typename result_type_ = double
         >
-    class any_decision_function : public any
+    class any_decision_function
     {
 
     public:
+        using sample_type = sample_type_;
+        using result_type = result_type_;
+        using mem_manager_type = default_memory_manager;
 
-        typedef sample_type_ sample_type;
-        typedef result_type_ result_type;
-        typedef default_memory_manager mem_manager_type;
-
-        using any::any;
+        any_decision_function()                                                 = default;
+        any_decision_function(const any_decision_function& other)               = default;
+        any_decision_function& operator=(const any_decision_function& other)    = default;
+        any_decision_function(any_decision_function&& other)                    = default;
+        any_decision_function& operator=(any_decision_function&& other)         = default;
 
         template <
             class T,
@@ -34,7 +37,7 @@ namespace dlib
         >
         any_decision_function (
             T&& item
-        ) : any{std::forward<T>(item)},
+        ) : storage{std::forward<T>(item)},
             evaluate_func{[](const void* ptr, const sample_type& samp) -> result_type {
                 const T_& f = *reinterpret_cast<const T_*>(ptr);
                 return f(samp);
@@ -52,7 +55,7 @@ namespace dlib
         )
         {
             if (contains<T_>())
-                unsafe_get<T_>() = std::forward<T>(item);
+                storage.unsafe_get<T_>() = std::forward<T>(item);
             else
                 *this = std::move(any_decision_function{std::forward<T>(item)});
             return *this;
@@ -69,10 +72,44 @@ namespace dlib
                 << "\n\t this: " << this
                 );
 
-            return evaluate_func(ptr, item);
+            return evaluate_func(storage.ptr, item);
+        }
+
+        template<typename T>
+        bool contains() const { return storage.contains<T>();}
+        bool is_empty() const { return storage.is_empty(); }
+        void clear()          { storage.clear(); }
+        void swap (any& item) { std::swap(storage, item.storage); }
+
+        template <typename T>
+        T& cast_to(
+        ) 
+        {
+            if (!storage.contains<T>())
+                throw bad_any_cast{};
+            return storage.unsafe_get<T>();
+        }
+
+        template <typename T>
+        const T& cast_to(
+        ) const
+        {
+            if (!storage.contains<T>())
+                throw bad_any_cast{};
+            return storage.unsafe_get<T>();
+        }
+
+        template <typename T>
+        T& get(
+        ) 
+        {
+            if (!storage.contains<T>())
+                *this = T{};
+            return storage.unsafe_get<T>();
         }
 
     private:
+        te::storage_heap storage;
         result_type (*evaluate_func)(const void*, const sample_type&);
     };
 

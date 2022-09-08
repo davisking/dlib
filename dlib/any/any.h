@@ -23,48 +23,71 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class any : public te::storage_heap
+    class any
     {
     public:
-        using te::storage_heap::storage_heap;
+        any()                               = default;
+        any(const any& other)               = default;
+        any& operator=(const any& other)    = default;
+        any(any&& other)                    = default;
+        any& operator=(any&& other)         = default;
+
+        template<
+            typename T,
+            typename T_ = std::decay_t<T>,
+            std::enable_if_t<!std::is_same<T_, any>::value, bool> = true
+        >
+        any(T&& item)
+        : storage{std::forward<T>(item)}
+        {
+        }
+
+        template<
+            typename T,
+            typename T_ = std::decay_t<T>,
+            std::enable_if_t<!std::is_same<T_, any>::value, bool> = true
+        >
+        any& operator=(T&& item)
+        {
+            get<T_>() = std::forward<T>(item);
+            return *this;
+        }
+
+        template<typename T>
+        bool contains() const { return storage.contains<T>();}
+        bool is_empty() const { return storage.is_empty(); }
+        void clear()          { storage.clear(); }
+        void swap (any& item) { std::swap(storage, item.storage); }
 
         template <typename T>
         T& cast_to(
         ) 
         {
-            if (!contains<T>())
+            if (!storage.contains<T>())
                 throw bad_any_cast{};
-            return unsafe_get<T>();
+            return storage.unsafe_get<T>();
         }
 
         template <typename T>
         const T& cast_to(
         ) const
         {
-            if (!contains<T>())
+            if (!storage.contains<T>())
                 throw bad_any_cast{};
-            return unsafe_get<T>();
+            return storage.unsafe_get<T>();
         }
 
         template <typename T>
         T& get(
         ) 
         {
-            if (!contains<T>())
-                *this = T{};
-            return unsafe_get<T>();
+            if (!storage.contains<T>())
+                storage = T{};
+            return storage.unsafe_get<T>();
         }
 
-        void swap (
-            any& item
-        )
-        {
-            any tmp{std::move(*this)};
-            *this = std::move(item);
-            item  = std::move(tmp);
-        }
-
-    private:
+    protected:
+        te::storage_heap storage;
     };
 
 // ----------------------------------------------------------------------------------------

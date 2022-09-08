@@ -17,15 +17,19 @@ namespace dlib
         typename sample_type_,
         typename scalar_type_ = double
         >
-    class any_trainer : public any
+    class any_trainer
     {
     public:
-        typedef sample_type_ sample_type;
-        typedef scalar_type_ scalar_type;
-        typedef default_memory_manager mem_manager_type;
-        typedef any_decision_function<sample_type, scalar_type> trained_function_type;
+        using sample_type = sample_type_;
+        using scalar_type = scalar_type_;
+        using mem_manager_type = default_memory_manager;
+        using trained_function_type = any_decision_function<sample_type, scalar_type>;
 
-        using any::any;
+        any_trainer()                                       = default;
+        any_trainer(const any_trainer& other)               = default;
+        any_trainer& operator=(const any_trainer& other)    = default;
+        any_trainer(any_trainer&& other)                    = default;
+        any_trainer& operator=(any_trainer&& other)         = default;
 
         template <
             class T,
@@ -34,7 +38,7 @@ namespace dlib
         >
         any_trainer (
             T&& item
-        ) : any{std::forward<T>(item)},
+        ) : storage{std::forward<T>(item)},
             train_func{[](
                 const void* ptr,
                 const std::vector<sample_type>& samples,
@@ -56,7 +60,7 @@ namespace dlib
         )
         {
             if (contains<T_>())
-                unsafe_get<T_>() = std::forward<T>(item);
+                storage.unsafe_get<T_>() = std::forward<T>(item);
             else
                 *this = std::move(any_trainer{std::forward<T>(item)});
             return *this;
@@ -74,20 +78,44 @@ namespace dlib
                 << "\n\t this: " << this
                 );
 
-            return train_func(ptr, samples, labels);
+            return train_func(storage.ptr, samples, labels);
         }
 
-        void swap (
-            any_trainer& item
-        )
+        template<typename T>
+        bool contains() const { return storage.contains<T>();}
+        bool is_empty() const { return storage.is_empty(); }
+        void clear()          { storage.clear(); }
+        void swap (any& item) { std::swap(storage, item.storage); }
+
+        template <typename T>
+        T& cast_to(
+        ) 
         {
-            any_trainer tmp{std::move(*this)};
-            *this = std::move(item);
-            item  = std::move(tmp);
+            if (!storage.contains<T>())
+                throw bad_any_cast{};
+            return storage.unsafe_get<T>();
         }
 
-    private:
+        template <typename T>
+        const T& cast_to(
+        ) const
+        {
+            if (!storage.contains<T>())
+                throw bad_any_cast{};
+            return storage.unsafe_get<T>();
+        }
 
+        template <typename T>
+        T& get(
+        ) 
+        {
+            if (!storage.contains<T>())
+                *this = T{};
+            return storage.unsafe_get<T>();
+        }
+        
+    private:
+        te::storage_heap storage;
         trained_function_type (*train_func) (
             const void* self,
             const std::vector<sample_type>& samples,
