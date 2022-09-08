@@ -4,9 +4,7 @@
 #define DLIB_AnY_TRAINER_H_
 
 #include "any.h"
-
 #include "any_decision_function.h"
-
 #include "any_trainer_abstract.h"
 #include <vector>
 
@@ -19,7 +17,7 @@ namespace dlib
         typename sample_type_,
         typename scalar_type_ = double
         >
-    class any_trainer
+    class any_trainer : public any
     {
     public:
         typedef sample_type_ sample_type;
@@ -27,48 +25,41 @@ namespace dlib
         typedef default_memory_manager mem_manager_type;
         typedef any_decision_function<sample_type, scalar_type> trained_function_type;
 
+        using any::any;
 
-        any_trainer()
-        {
-        }
-
+        template <
+            class T,
+            class T_ = std::decay_t<T>,
+            std::enable_if_t<!std::is_same<T_,any_trainer>::value, bool> = true
+        >
         any_trainer (
-            const any_trainer& item
+            T&& item
+        ) : any{std::forward<T>(item)},
+            train_func{[](
+                const void* ptr,
+                const std::vector<sample_type>& samples,
+                const std::vector<scalar_type>& labels
+            ) -> trained_function_type {
+                const T_& f = *reinterpret_cast<const T_*>(ptr);
+                return f.train(samples, labels);
+            }}
+        {
+        }
+
+        template <
+            class T,
+            class T_ = std::decay_t<T>,
+            std::enable_if_t<!std::is_same<T_,any_trainer>::value, bool> = true
+        >
+        any_trainer& operator= (
+            T&& item
         )
         {
-            if (item.data)
-            {
-                item.data->copy_to(data);
-            }
-        }
-
-        template <typename T>
-        any_trainer (
-            const T& item
-        )
-        {
-            typedef typename basic_type<T>::type U;
-            data.reset(new derived<U>(item));
-        }
-
-        void clear (
-        )
-        {
-            data.reset();
-        }
-
-        template <typename T>
-        bool contains (
-        ) const
-        {
-            typedef typename basic_type<T>::type U;
-            return dynamic_cast<derived<U>*>(data.get()) != 0;
-        }
-
-        bool is_empty(
-        ) const
-        {
-            return data.get() == 0;
+            if (contains<T_>())
+                unsafe_get<T_>() = std::forward<T>(item);
+            else
+                *this = std::move(any_trainer{std::forward<T>(item)});
+            return *this;
         }
 
         trained_function_type train (
@@ -83,130 +74,28 @@ namespace dlib
                 << "\n\t this: " << this
                 );
 
-            return data->train(samples, labels);
-        }
-
-        template <typename T>
-        T& cast_to(
-        ) 
-        {
-            typedef typename basic_type<T>::type U;
-            derived<U>* d = dynamic_cast<derived<U>*>(data.get());
-            if (d == 0)
-            {
-                throw bad_any_cast();
-            }
-
-            return d->item;
-        }
-
-        template <typename T>
-        const T& cast_to(
-        ) const
-        {
-            typedef typename basic_type<T>::type U;
-            derived<U>* d = dynamic_cast<derived<U>*>(data.get());
-            if (d == 0)
-            {
-                throw bad_any_cast();
-            }
-
-            return d->item;
-        }
-
-        template <typename T>
-        T& get(
-        ) 
-        {
-            typedef typename basic_type<T>::type U;
-            derived<U>* d = dynamic_cast<derived<U>*>(data.get());
-            if (d == 0)
-            {
-                d = new derived<U>();
-                data.reset(d);
-            }
-
-            return d->item;
-        }
-
-        any_trainer& operator= (
-            const any_trainer& item
-        )
-        {
-            any_trainer(item).swap(*this);
-            return *this;
+            return train_func(ptr, samples, labels);
         }
 
         void swap (
             any_trainer& item
         )
         {
-            data.swap(item.data);
+            any_trainer tmp{std::move(*this)};
+            *this = std::move(item);
+            item  = std::move(tmp);
         }
 
     private:
 
-        struct base
-        {
-            virtual ~base() {}
-
-            virtual trained_function_type train (
-                const std::vector<sample_type>& samples,
-                const std::vector<scalar_type>& labels
-            ) const = 0;
-
-            virtual void copy_to (
-                std::unique_ptr<base>& dest
-            ) const = 0;
-        };
-
-        template <typename T>
-        struct derived : public base
-        {
-            T item;
-            derived() {}
-            derived(const T& val) : item(val) {}
-
-            virtual void copy_to (
-                std::unique_ptr<base>& dest
-            ) const
-            {
-                dest.reset(new derived<T>(item));
-            }
-
-            virtual trained_function_type train (
-                const std::vector<sample_type>& samples,
-                const std::vector<scalar_type>& labels
-            ) const
-            {
-                return item.train(samples, labels);
-            }
-        };
-
-        std::unique_ptr<base> data;
+        trained_function_type (*train_func) (
+            const void* self,
+            const std::vector<sample_type>& samples,
+            const std::vector<scalar_type>& labels
+        ) = nullptr;
     };
 
 // ----------------------------------------------------------------------------------------
-
-    template <
-        typename sample_type,
-        typename scalar_type
-        >
-    inline void swap (
-        any_trainer<sample_type,scalar_type>& a,
-        any_trainer<sample_type,scalar_type>& b
-    ) { a.swap(b); }
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename T, typename U, typename V> 
-    T& any_cast(any_trainer<U,V>& a) { return a.template cast_to<T>(); }
-
-    template <typename T, typename U, typename V> 
-    const T& any_cast(const any_trainer<U,V>& a) { return a.template cast_to<T>(); }
-
-// ----------------------------------------------------------------------------------------
-
 }
 
 
