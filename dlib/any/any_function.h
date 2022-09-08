@@ -3,9 +3,8 @@
 #ifndef DLIB_AnY_FUNCTION_Hh_
 #define DLIB_AnY_FUNCTION_Hh_
 
-#include "assert.h"
+#include "../assert.h"
 #include "any.h"
-
 #include "any_function_abstract.h"
 
 namespace dlib
