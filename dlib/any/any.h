@@ -49,7 +49,10 @@ namespace dlib
         >
         any& operator=(T&& item)
         {
-            get<T_>() = std::forward<T>(item);
+            if (contains<T_>())
+                storage.unsafe_get<T_>() = std::forward<T>(item);
+            else
+                *this = std::move(any{std::forward<T>(item)});
             return *this;
         }
 
@@ -57,7 +60,7 @@ namespace dlib
         bool contains() const { return storage.contains<T>();}
         bool is_empty() const { return storage.is_empty(); }
         void clear()          { storage.clear(); }
-        void swap (any& item) { std::swap(storage, item.storage); }
+        void swap (any& item) { std::swap(*this, item); }
 
         template <typename T>
         T& cast_to(
@@ -82,7 +85,7 @@ namespace dlib
         ) 
         {
             if (!storage.contains<T>())
-                storage = T{};
+                *this = T{};
             return storage.unsafe_get<T>();
         }
 
