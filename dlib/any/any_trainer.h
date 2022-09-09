@@ -16,7 +16,7 @@ namespace dlib
     template <
         typename sample_type_,
         typename scalar_type_ = double
-        >
+    >
     class any_trainer
     {
     public:
@@ -85,7 +85,7 @@ namespace dlib
         bool contains() const { return storage.contains<T>();}
         bool is_empty() const { return storage.is_empty(); }
         void clear()          { storage.clear(); }
-        void swap (any_trainer& item) { std::swap(storage, item.storage); }
+        void swap (any_trainer& item) { std::swap(*this, item); }
 
         template <typename T>
         T& cast_to(
