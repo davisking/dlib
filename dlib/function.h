@@ -3,6 +3,7 @@
 #ifndef DLIB_FUNCTION_H_
 #define DLIB_FUNCTION_H_
 
+#include <cstddef>
 #include "te.h"
 #include "invoke.h"
 
@@ -22,7 +23,7 @@ namespace dlib
     class function_basic<Storage, R(Args...)> 
     {
     public:
-        constexpr function_basic(nullptr_t) {}
+        constexpr function_basic(std::nullptr_t) {}
         constexpr function_basic()                                          = default;
         constexpr function_basic(const function_basic& other)               = default;
         constexpr function_basic& operator=(const function_basic& other)    = default;
