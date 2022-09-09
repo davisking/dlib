@@ -12,15 +12,6 @@ namespace dlib
 {
     namespace te
     {
-        class bad_te_cast : public std::bad_cast 
-        {
-        public:
-            virtual const char * what() const throw()
-            {
-                return "bad_te_cast";
-            }
-        };
-
         template<class Storage>
         struct storage_base
         {
@@ -352,7 +343,7 @@ namespace dlib
             const void* get_ptr() const {return ptr;}
 
             void* ptr = nullptr;
-            std::type_index (*type_id)()        = nullptr;
+            std::type_index (*type_id)() = nullptr;
         };
     }
 }

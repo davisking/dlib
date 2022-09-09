@@ -3,6 +3,7 @@
 
 #include "tester.h"
 #include "../te.h"
+#include "../function.h"
 
 namespace
 {
@@ -175,6 +176,63 @@ namespace
         DLIB_TEST(delete_counter == 1);
     }
 
+    template<typename Function>
+    void test_function()
+    {
+        Function f1;
+        DLIB_TEST(!f1);
+
+        int a = 42;
+        Function f2{[a](int b) {return a + b;}};
+        DLIB_TEST(f2);
+        DLIB_TEST(f2(1) == 43);
+
+        Function f3{f2};
+        DLIB_TEST(f2);
+        DLIB_TEST(f3);
+        DLIB_TEST(f2(2) == 44);
+        DLIB_TEST(f3(2) == 44);
+
+        f1 = f2;
+        DLIB_TEST(f1);
+        DLIB_TEST(f2);
+        DLIB_TEST(f3);
+        DLIB_TEST(f1(2) == 44);
+        DLIB_TEST(f2(2) == 44);
+        DLIB_TEST(f3(2) == 44);
+
+        Function f4{std::move(f2)};
+        DLIB_TEST(f1);
+        DLIB_TEST(!f2);
+        DLIB_TEST(f3);
+        DLIB_TEST(f4);
+        DLIB_TEST(f1(2) == 44);
+        DLIB_TEST(f3(2) == 44);
+        DLIB_TEST(f4(2) == 44);
+
+        f2 = std::move(f1);
+        DLIB_TEST(!f1);
+        DLIB_TEST(f2);
+        DLIB_TEST(f3);
+        DLIB_TEST(f4);
+        DLIB_TEST(f2(2) == 44);
+        DLIB_TEST(f3(2) == 44);
+        DLIB_TEST(f4(2) == 44);
+    }
+
+    void test_function_view()
+    {
+        auto f = [a = 42](int i) mutable {a += i; return a;};
+        dlib::function_view<int(int)> g(f);
+
+        DLIB_TEST(f(1) == 43);
+        DLIB_TEST(g(1) == 44);
+        DLIB_TEST(f(1) == 45);
+        DLIB_TEST(g(1) == 46);
+    }
+
+
+
     class dnn2_tester : public tester
     {
     public:
@@ -186,6 +244,11 @@ namespace
         void perform_test ()
         {
             test_type_erasure();
+            
+            test_function<dlib::function_heap<int(int)>>();
+            test_function<dlib::function_stack<int(int), 32>>();
+            test_function<dlib::function_sbo<int(int), 32>>();
+            test_function_view();
         }
     } a;
 }
