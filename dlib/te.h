@@ -6,6 +6,7 @@
 #include <type_traits>
 #include <utility>
 #include <typeindex>
+#include <new>
 
 namespace dlib
 {
@@ -20,7 +21,44 @@ namespace dlib
             }
         };
 
-        struct storage_heap
+        template<class Storage>
+        struct storage_base
+        {
+            void clear()
+            {
+                Storage& me = *static_cast<Storage*>(this);
+                Storage{std::move(me)};
+            }
+
+            bool is_empty() const
+            {
+                const Storage& me = *static_cast<const Storage*>(this);
+                return me.get_ptr() == nullptr;
+            }
+
+            template<typename T>
+            bool contains() const
+            {
+                const Storage& me = *static_cast<const Storage*>(this);
+                return me.get_ptr() ? me.type_id() == std::type_index{typeid(T)} : false;
+            }
+
+            template<typename T>
+            T& unsafe_get() 
+            {
+                Storage& me = *static_cast<Storage*>(this);
+                return *reinterpret_cast<T*>(me.get_ptr()); 
+            }
+
+            template<typename T>
+            const T& unsafe_get() const 
+            {
+                const Storage& me = *static_cast<const Storage*>(this);
+                return *reinterpret_cast<const T*>(me.get_ptr()); 
+            }
+        };
+
+        struct storage_heap : storage_base<storage_heap>
         {
             storage_heap() = default;
 
@@ -41,20 +79,6 @@ namespace dlib
                     return std::type_index{typeid(T_)};
                 }}
             {
-            }
-
-            template <
-                class T,
-                class T_ = std::decay_t<T>,
-                std::enable_if_t<!std::is_same<T_,storage_heap>::value, bool> = true
-            >
-            storage_heap& operator=(T &&t) noexcept(std::is_nothrow_constructible<T_,T&&>::value)
-            {
-                if (contains<T_>())
-                    unsafe_get<T_>() = std::forward<T>(t);
-                else
-                    *this = std::move(storage_heap{std::forward<T>(t)});
-                return *this;
             }
 
             storage_heap(const storage_heap& other)
@@ -99,27 +123,8 @@ namespace dlib
                     del(ptr);
             }
 
-            void clear()
-            {
-                storage_heap{std::move(*this)};
-            }
-
-            bool is_empty() const
-            {
-                return ptr == nullptr;
-            }
-
-            template<typename T>
-            bool contains() const
-            {
-                return ptr ? type_id() == std::type_index{typeid(T)} : false;
-            }
-
-            template<typename T>
-            T& unsafe_get() {return *reinterpret_cast<T*>(ptr); }
-
-            template<typename T>
-            const T& unsafe_get() const {return *reinterpret_cast<const T*>(ptr); }
+            void*       get_ptr()       {return ptr;}
+            const void* get_ptr() const {return ptr;}
 
             void* ptr                     = nullptr;
             void  (*del)(void*)           = nullptr;
@@ -128,7 +133,7 @@ namespace dlib
         };
 
         template <std::size_t Size, std::size_t Alignment = 8>
-        struct storage_stack
+        struct storage_stack : storage_base<storage_stack<Size, Alignment>>
         {
             using mem_t = std::aligned_storage_t<Size, Alignment>;
 
@@ -156,20 +161,6 @@ namespace dlib
                 static_assert(sizeof(T_) <= Size, "insufficient size");
                 static_assert(Alignment % alignof(T_) == 0, "bad alignment");
                 new (&data) T_{std::forward<T>(t)};
-            }
-
-            template <
-                class T,
-                class T_ = std::decay_t<T>,
-                std::enable_if_t<!std::is_same<T_,storage_stack>::value, bool> = true
-            >
-            storage_stack& operator=(T &&t) noexcept(std::is_nothrow_constructible<T_,T&&>::value)
-            {
-                if (contains<T_>())
-                    unsafe_get<T_>() = std::forward<T>(t);
-                else
-                    *this = std::move(storage_stack{std::forward<T>(t)});
-                return *this;
             }
 
             storage_stack(const storage_stack& other)
@@ -220,27 +211,8 @@ namespace dlib
                     del(data);
             }
 
-            void clear()
-            {
-                storage_stack{std::move(*this)};
-            }
-
-            bool is_empty() const
-            {
-                return del == nullptr;
-            }
-
-            template<typename T>
-            bool contains() const
-            {
-                return del ? type_id() == std::type_index{typeid(T)} : false;
-            }
-
-            template<typename T>
-            T& unsafe_get() {return *reinterpret_cast<T*>(&data); }
-
-            template<typename T>
-            const T& unsafe_get() const {return *reinterpret_cast<const T*>(&data); }
+            void*       get_ptr()       {return del ? (void*)&data       : nullptr;}
+            const void* get_ptr() const {return del ? (const void*)&data : nullptr;}
 
             mem_t data;
             void (*del)(mem_t&)                = nullptr;
@@ -250,7 +222,7 @@ namespace dlib
         };
 
         template <std::size_t Size, std::size_t Alignment = 8>
-        struct storage_sbo
+        struct storage_sbo : storage_base<storage_sbo<Size, Alignment>>
         {
             template<typename T_>
             struct type_fits : std::integral_constant<bool, sizeof(T_) <= Size && Alignment % alignof(T_) == 0>{};
@@ -305,20 +277,6 @@ namespace dlib
             {
             }
 
-            template <
-                class T,
-                class T_ = std::decay_t<T>,
-                std::enable_if_t<!std::is_same<T_,storage_sbo>::value, bool> = true
-            >
-            storage_sbo& operator=(T &&t) noexcept(std::is_nothrow_constructible<T_,T&&>::value)
-            {
-                if (contains<T_>())
-                    unsafe_get<T_>() = std::forward<T>(t);
-                else
-                    *this = std::move(storage_sbo{std::forward<T>(t)});
-                return *this;
-            }
-
             storage_sbo(const storage_sbo& other)
             :   ptr{other.ptr ? other.copy(other.ptr, data) : nullptr},
                 del{other.del},
@@ -364,27 +322,8 @@ namespace dlib
                     del(data, ptr);
             }
 
-            void clear()
-            {
-                storage_sbo{std::move(*this)};
-            }
-
-            bool is_empty() const
-            {
-                return ptr == nullptr;
-            }
-
-            template<typename T>
-            bool contains() const
-            {
-                return ptr ? type_id() == std::type_index{typeid(T)} : false;
-            }
-
-            template<typename T>
-            T& unsafe_get() {return *reinterpret_cast<T*>(ptr); }
-
-            template<typename T>
-            const T& unsafe_get() const {return *reinterpret_cast<const T*>(ptr); }
+            void*       get_ptr()       {return ptr;}
+            const void* get_ptr() const {return ptr;}
 
             mem_t data;
             void* ptr                           = nullptr;
@@ -394,7 +333,7 @@ namespace dlib
             std::type_index (*type_id)()        = nullptr;
         };
 
-        struct storage_view
+        struct storage_view : storage_base<storage_view>
         {
             template <
                 class T,
@@ -409,27 +348,8 @@ namespace dlib
             {
             }
 
-            void clear()
-            {
-                ptr = nullptr;
-            }
-
-            bool is_empty() const
-            {
-                return ptr == nullptr;
-            }
-
-            template<typename T>
-            bool contains() const
-            {
-                return ptr ? type_id() == std::type_index{typeid(T)} : false;
-            }
-
-            template<typename T>
-            T& unsafe_get() {return *reinterpret_cast<T*>(ptr); }
-
-            template<typename T>
-            const T& unsafe_get() const {return *reinterpret_cast<const T*>(ptr); }
+            void*       get_ptr()       {return ptr;}
+            const void* get_ptr() const {return ptr;}
 
             void* ptr = nullptr;
             std::type_index (*type_id)()        = nullptr;
