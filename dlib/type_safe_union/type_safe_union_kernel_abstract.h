@@ -38,7 +38,7 @@ namespace dlib
             using tsu = type_safe_union<A,std::string>;
             tsu a(in_place_tag<A>{}, 0, 1); // a now contains an object of type A
         
-        It is also used with type_safe_union::for_each() to disambiguate types.
+        It is also used with type_safe_union::for_each_type() to disambiguate types.
     !*/
 
 // ----------------------------------------------------------------------------------------
