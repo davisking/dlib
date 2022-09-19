@@ -47,6 +47,10 @@ namespace dlib
 
     namespace detail
     {
+#if __has_builtin(__type_pack_element)
+        template <size_t I, typename... Ts>
+        struct nth_type { using type = __type_pack_element<I, Ts...>; };
+#else
         template<size_t I, typename... Ts>
         struct nth_type;
 
@@ -55,6 +59,7 @@ namespace dlib
 
         template<typename T0, typename... Ts>
         struct nth_type<0, T0, Ts...> { using type = T0; };
+#endif
     }
 
     template <size_t I, typename TSU>
@@ -522,6 +527,13 @@ namespace dlib
         )
         {
             using Tsu = std::decay_t<TSU>;
+
+#ifdef __cpp_fold_expressions
+            (std::forward<F>(f)(
+                in_place_tag<type_safe_union_alternative_t<I, Tsu>>{},
+                std::forward<TSU>(tsu)),
+            ...);
+#else
             (void)std::initializer_list<int>{
                 (std::forward<F>(f)(
                         in_place_tag<type_safe_union_alternative_t<I, Tsu>>{},
@@ -529,6 +541,7 @@ namespace dlib
                  0
                 )...
             };
+#endif            
         }
     }
 
