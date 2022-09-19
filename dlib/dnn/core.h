@@ -19,6 +19,7 @@
 #include "../rand.h"
 #include "../algs.h"
 #include "../metaprogramming.h"
+#include "../utility.h"
 #include "../constexpr_if.h"
 
 #ifdef _MSC_VER
@@ -257,44 +258,42 @@ namespace dlib
 
     namespace impl
     {
-        template <size_t... indices, typename Tuple>
+        template <typename Tuple, size_t... indices>
         auto tuple_subset(
             const Tuple& item, 
-            compile_time_integer_list<indices...>
-        ) -> decltype(std::make_tuple(std::get<indices>(item)...))
+            std::index_sequence<indices...>
+        )
         {
             return std::make_tuple(std::get<indices>(item)...);
         }
 
-        template <typename Head, typename... Tail>
-        std::tuple<Tail...> basic_tuple_tail(
-            const std::tuple<Head, Tail...>& item
+        template <typename ...Types>
+        auto basic_tuple_tail(
+            const std::tuple<Types...>& item
         )
         {
-            return tuple_subset(item, typename make_compile_time_integer_range<sizeof...(Tail)>::type());
+            return tuple_subset(item, pop_front_t<index_sequence_for<Types...>>{});
         }
 
         template <typename T>
-        std::tuple<T> tuple_flatten(const T& t) 
+        auto tuple_flatten(const T& t) 
         {
             return std::make_tuple(t);
         }
 
-        template <typename... T>
-        auto tuple_flatten(
-            const std::tuple<T...>& item
-        ) -> decltype(tuple_flatten(item, typename make_compile_time_integer_range<sizeof...(T)>::type()))
-        {
-            return tuple_flatten(item, typename make_compile_time_integer_range<sizeof...(T)>::type());
-        }
-
-        template <size_t... indices, typename... T>
+        template <size_t... I, typename... T>
         auto tuple_flatten(
             const std::tuple<T...>& item, 
-            compile_time_integer_list<indices...>
-        ) -> decltype(std::tuple_cat(tuple_flatten(std::get<indices-1>(item))...))
+            std::index_sequence<I...>
+        )
         {
-            return std::tuple_cat(tuple_flatten(std::get<indices-1>(item))...);
+            return std::tuple_cat(tuple_flatten(std::get<I>(item))...);
+        }
+
+        template <typename... T>
+        auto tuple_flatten(const std::tuple<T...>& item)
+        {
+            return tuple_flatten(item, std::index_sequence_for<T...>{});
         }
 
         template <typename T>
@@ -516,7 +515,7 @@ namespace dlib
     } // end namespace impl
 
     template <typename... T>
-    typename impl::tuple_head_helper<std::tuple<T...>>::type tuple_head (
+    auto tuple_head (
         const std::tuple<T...>& item
     ) 
     {
@@ -526,7 +525,7 @@ namespace dlib
     template <typename... T>
     auto tuple_tail(
         const std::tuple<T...>& item
-    ) -> decltype(impl::basic_tuple_tail(impl::tuple_flatten(item)))
+    )
     {
         return impl::basic_tuple_tail(impl::tuple_flatten(item));
     }

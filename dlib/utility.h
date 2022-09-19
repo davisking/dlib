@@ -51,6 +51,22 @@ namespace dlib
     using index_sequence_for = make_index_sequence<sizeof...(Ts)>;
     // ---------------------------------------------------------------------
 #endif
+
+    // ---------------------------------------------------------------------
+
+    template<class Sequence>
+    struct pop_front {};
+
+    template<std::size_t I, std::size_t... Ints>
+    struct pop_front<index_sequence<I, Ints...>>
+    {
+        using type = index_sequence<Ints...>;
+    };
+
+    template<class Sequence>
+    using pop_front_t = typename pop_front<Sequence>::type;
+
+    // ---------------------------------------------------------------------
 }
 
 #endif //DLIB_UTILITY_Hh_
