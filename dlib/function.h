@@ -27,22 +27,8 @@ namespace dlib
         constexpr function_basic()                                          = default;
         constexpr function_basic(const function_basic& other)               = default;
         constexpr function_basic& operator=(const function_basic& other)    = default;
-
-        constexpr function_basic(function_basic&& other) noexcept
-        : str{std::move(other.str)},
-          func{std::exchange(other.func, nullptr)}
-        {
-        }
-        
-        constexpr function_basic& operator=(function_basic&& other) noexcept
-        {
-            if (this != &other)
-            {
-                str  = std::move(other.str);
-                func = std::exchange(other.func, nullptr);
-            }
-            return *this;
-        }
+        constexpr function_basic(function_basic&& other)                    = default;        
+        constexpr function_basic& operator=(function_basic&& other)         = default;
 
         template <
             typename F,
@@ -78,12 +64,12 @@ namespace dlib
         }
 
         R operator()(Args... args) const {
-            return func(const_cast<void*>(str.get_ptr()), std::forward<Args>(args)...);
+            return func.ptr(const_cast<void*>(str.get_ptr()), std::forward<Args>(args)...);
         }
 
     private:
         Storage str;
-        R (*func)(void*, Args...) = nullptr;
+        te::managed_move_pointer<R(void*, Args...), true> func;
     };
 
     template <class F> 
@@ -94,6 +80,9 @@ namespace dlib
     
     template <class F, std::size_t Size, std::size_t Alignment = 8> 
     using function_sbo   = function_basic<te::storage_sbo<Size, Alignment>, F>;
+
+    template <class F>
+    using function_shared = function_basic<te::storage_shared, F>;
 
     template <class F> 
     using function_view  = function_basic<te::storage_view, F>;
