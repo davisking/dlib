@@ -271,6 +271,7 @@ namespace
             test_function<dlib::function_heap<int(int)>>();
             test_function<dlib::function_stack<int(int), 32>>();
             test_function<dlib::function_sbo<int(int), 32>>();
+            test_function<dlib::function_shared<int(int)>>();
             test_function_view();
         }
     } a;

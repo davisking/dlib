@@ -13,6 +13,39 @@ namespace dlib
 {
     namespace te
     {
+        template<class T, bool null_after_move>
+        struct managed_move_pointer
+        {
+            managed_move_pointer(T* ptr_) : ptr{ptr_} {}
+            managed_move_pointer()                                          = default;
+            managed_move_pointer(const managed_move_pointer&)               = default;
+            managed_move_pointer& operator=(const managed_move_pointer&)    = default;
+
+            managed_move_pointer(managed_move_pointer&& other) noexcept 
+            : ptr{other.ptr}
+            {
+                if (null_after_move)
+                    other.ptr = nullptr;
+            }
+
+            managed_move_pointer& operator=(managed_move_pointer&& other) noexcept
+            {
+                if (this != &other)
+                {
+                    ptr = other.ptr;
+                    if (null_after_move)
+                        other.ptr = nullptr;
+                }
+                return *this;
+            }
+
+            operator bool() const       { return ptr != nullptr; }
+            const T* operator->() const { return ptr; }
+            T*       operator->()       { return ptr; }     
+
+            T* ptr = nullptr;
+        };
+
         template<class Storage, class T>
         using is_valid = std::enable_if_t<!std::is_same<std::decay_t<T>, Storage>::value, bool>;
 
@@ -363,6 +396,8 @@ namespace dlib
 
         struct storage_shared : storage_base<storage_shared>
         {
+            storage_shared() = default;
+            
             template <
                 class T,
                 class T_ = std::decay_t<T>,
@@ -399,6 +434,8 @@ namespace dlib
                 }}
             {
             }
+
+            void clear() { ptr = nullptr; }
 
             void*       get_ptr()       {return ptr;}
             const void* get_ptr() const {return ptr;}
