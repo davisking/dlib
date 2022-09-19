@@ -7,20 +7,18 @@
 #include <utility>
 #include <typeindex>
 #include <new>
+#include <memory>
 
 namespace dlib
 {
     namespace te
     {
+        template<class Storage, class T>
+        using is_valid = std::enable_if_t<!std::is_same<std::decay_t<T>, Storage>::value, bool>;
+
         template<class Storage>
         struct storage_base
-        {
-            void clear()
-            {
-                Storage& me = *static_cast<Storage*>(this);
-                Storage{std::move(me)};
-            }
-
+        {         
             bool is_empty() const
             {
                 const Storage& me = *static_cast<const Storage*>(this);
@@ -31,7 +29,7 @@ namespace dlib
             bool contains() const
             {
                 const Storage& me = *static_cast<const Storage*>(this);
-                return me.get_ptr() ? me.type_id() == std::type_index{typeid(T)} : false;
+                return me.type_id ? me.type_id() == std::type_index{typeid(T)} : false;
             }
 
             template<typename T>
@@ -56,7 +54,7 @@ namespace dlib
             template <
                 class T,
                 class T_ = std::decay_t<T>,
-                std::enable_if_t<!std::is_same<T_,storage_heap>::value, bool> = true
+                is_valid<storage_heap, T> = true
             >
             storage_heap(T &&t) noexcept(std::is_nothrow_constructible<T_,T&&>::value)
             :   ptr{new T_{std::forward<T>(t)}},
@@ -99,7 +97,7 @@ namespace dlib
             {
                 if (this != &other) 
                 {
-                    storage_heap{std::move(*this)};
+                    clear();
                     ptr     = std::exchange(other.ptr, nullptr);
                     del     = std::exchange(other.del, nullptr);
                     copy    = std::exchange(other.copy, nullptr);
@@ -112,6 +110,11 @@ namespace dlib
             {
                 if (ptr)
                     del(ptr);
+            }
+
+            void clear()
+            {
+                storage_heap{std::move(*this)};
             }
 
             void*       get_ptr()       {return ptr;}
@@ -133,7 +136,7 @@ namespace dlib
             template <
                 class T,
                 class T_ = std::decay_t<T>,
-                std::enable_if_t<!std::is_same<T_,storage_stack>::value, bool> = true
+                is_valid<storage_stack, T> = true
             >
             storage_stack(T &&t) noexcept(std::is_nothrow_constructible<T_,T&&>::value)
             :   del{[](mem_t& self) {
@@ -167,7 +170,15 @@ namespace dlib
             storage_stack& operator=(const storage_stack& other)
             {
                 if (this != &other) 
-                    *this = std::move(storage_stack{other});
+                {
+                    clear();
+                    if (other.copy)
+                        other.copy(other.data, data);
+                    del     = other.del;
+                    copy    = other.copy;
+                    move    = other.move;
+                    type_id = other.type_id;
+                }
                 return *this;
             }
 
@@ -185,7 +196,7 @@ namespace dlib
             {
                 if (this != &other) 
                 {
-                    storage_stack{std::move(*this)};
+                    clear();
                     if (other.move)
                         other.move(other.data, data);
                     del     = other.del;
@@ -198,12 +209,21 @@ namespace dlib
 
             ~storage_stack()
             {
-                if (del)
-                    del(data);
+                clear();
             }
 
-            void*       get_ptr()       {return del ? (void*)&data       : nullptr;}
-            const void* get_ptr() const {return del ? (const void*)&data : nullptr;}
+            void clear()
+            {
+                if (del)
+                    del(data);
+                del     = nullptr;
+                copy    = nullptr;
+                move    = nullptr;
+                type_id = nullptr;
+            }
+
+            void*       get_ptr()       {return &data;}
+            const void* get_ptr() const {return &data;}
 
             mem_t data;
             void (*del)(mem_t&)                = nullptr;
@@ -225,7 +245,7 @@ namespace dlib
             template <
                 class T,
                 class T_ = std::decay_t<T>,
-                std::enable_if_t<!std::is_same<T_,storage_sbo>::value, bool> = true,
+                is_valid<storage_sbo, T> = true,
                 std::enable_if_t<type_fits<T_>::value, bool> = true
             >
             storage_sbo(T &&t) noexcept(std::is_nothrow_constructible<T_,T&&>::value)
@@ -248,7 +268,7 @@ namespace dlib
             template <
                 class T,
                 class T_ = std::decay_t<T>,
-                std::enable_if_t<!std::is_same<T_,storage_sbo>::value, bool> = true,
+                is_valid<storage_sbo, T> = true,
                 std::enable_if_t<!type_fits<T_>::value, bool> = true
             >
             storage_sbo(T &&t) noexcept(std::is_nothrow_constructible<T_,T&&>::value)
@@ -280,7 +300,14 @@ namespace dlib
             storage_sbo& operator=(const storage_sbo& other)
             {
                 if (this != &other) 
-                    *this = std::move(storage_sbo{other});
+                {
+                    clear();
+                    ptr     = other.ptr ? other.copy(other.ptr, data) : nullptr;
+                    del     = other.del;
+                    copy    = other.copy;
+                    move    = other.move;
+                    type_id = other.type_id;
+                }
                 return *this;
             }
 
@@ -297,7 +324,7 @@ namespace dlib
             {
                 if (this != &other) 
                 {
-                    storage_sbo{std::move(*this)};
+                    clear();
                     ptr     = other.ptr ? other.move(other.ptr, data) : nullptr;
                     del     = other.del;
                     copy    = other.copy;
@@ -309,8 +336,18 @@ namespace dlib
 
             ~storage_sbo()
             {
+                clear();
+            }
+
+            void clear()
+            {
                 if (ptr)
                     del(data, ptr);
+                ptr     = nullptr;
+                del     = nullptr;
+                copy    = nullptr;
+                move    = nullptr;
+                type_id = nullptr;
             }
 
             void*       get_ptr()       {return ptr;}
@@ -324,12 +361,36 @@ namespace dlib
             std::type_index (*type_id)()        = nullptr;
         };
 
+        struct storage_shared : storage_base<storage_shared>
+        {
+            template <
+                class T,
+                class T_ = std::decay_t<T>,
+                is_valid<storage_shared, T> = true
+            >
+            storage_shared(T &&t) noexcept
+            :   ptr{std::make_shared<T_>(std::forward<T>(t))},
+                type_id{[] {
+                    return std::type_index{typeid(T_)};
+                }}
+            {
+            }
+
+            void clear() { ptr = nullptr; }
+
+            void*       get_ptr()       {return ptr.get();}
+            const void* get_ptr() const {return ptr.get();}
+
+            std::shared_ptr<void> ptr    = nullptr;
+            std::type_index (*type_id)() = nullptr;
+        };
+
         struct storage_view : storage_base<storage_view>
         {
             template <
                 class T,
                 class T_ = std::decay_t<T>,
-                std::enable_if_t<!std::is_same<T_,storage_view>::value, bool> = true
+                is_valid<storage_view, T> = true
             >
             storage_view(T &&t) noexcept
             :   ptr{&t},

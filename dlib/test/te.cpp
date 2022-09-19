@@ -150,6 +150,29 @@ namespace
         copy_counter = move_counter = delete_counter = 0;
 
         {
+            storage_shared str1{A{copy_counter, move_counter, delete_counter}};
+            DLIB_TEST(copy_counter == 0);
+            DLIB_TEST(move_counter == 1);
+            DLIB_TEST(delete_counter == 1);
+
+            storage_shared str2 = str1;
+            DLIB_TEST(copy_counter == 0);
+            DLIB_TEST(move_counter == 1);
+            DLIB_TEST(delete_counter == 1);
+
+            storage_shared str3 = std::move(str2);
+            DLIB_TEST(copy_counter == 0);
+            DLIB_TEST(move_counter == 1);
+            DLIB_TEST(delete_counter == 1);
+        }
+
+        DLIB_TEST(copy_counter == 0);
+        DLIB_TEST(move_counter == 1);
+        DLIB_TEST(delete_counter == 2);
+
+        copy_counter = move_counter = delete_counter = 0;
+
+        {
             A a{copy_counter, move_counter, delete_counter};
             DLIB_TEST(copy_counter == 0);
             DLIB_TEST(move_counter == 0);
@@ -233,10 +256,10 @@ namespace
 
 
 
-    class dnn2_tester : public tester
+    class te_tester : public tester
     {
     public:
-        dnn2_tester (
+        te_tester (
         ) : tester ("test_te",
                     "Runs tests on type erasure tools")
         {}
