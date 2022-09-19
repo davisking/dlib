@@ -38,7 +38,7 @@ namespace dlib
             using tsu = type_safe_union<A,std::string>;
             tsu a(in_place_tag<A>{}, 0, 1); // a now contains an object of type A
         
-        It is also used with type_safe_union::for_each() to disambiguate types.
+        It is also used with type_safe_union::for_each_type() to disambiguate types.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -233,6 +233,19 @@ namespace dlib
                     - equivalent to returning get_type_id<U>())
                 - else
                     - returns -1
+        !*/
+
+        template <typename T>
+        static constexpr int get_type_id (
+            in_place_tag<T>
+        );
+        /*!
+           ensures
+                - returns get_type_id<T>()
+                - This is useful when using for_each_type() with a generic lambda. For example:
+                  for_each_type([](auto tag, auto&& me) {
+                    printf("ID %i\n", me.get_type_id(tag));
+                  }, item);
         !*/
 
         template <typename T>

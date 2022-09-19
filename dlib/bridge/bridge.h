@@ -283,7 +283,7 @@ namespace dlib
 
 
             template <typename pipe_type>
-            typename enable_if<is_convertible<bridge_status, typename pipe_type::type> >::type  enqueue_bridge_status (
+            std::enable_if_t<std::is_convertible<bridge_status, typename pipe_type::type>::value>  enqueue_bridge_status (
                 pipe_type* p,
                 const bridge_status& status
             )
@@ -296,7 +296,7 @@ namespace dlib
             }
 
             template <typename pipe_type>
-            typename disable_if<is_convertible<bridge_status, typename pipe_type::type> >::type  enqueue_bridge_status (
+            std::enable_if_t<!std::is_convertible<bridge_status, typename pipe_type::type>::value>  enqueue_bridge_status (
                 pipe_type* ,
                 const bridge_status& 
             )

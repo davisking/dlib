@@ -441,6 +441,7 @@ if (NOT TARGET dlib)
             set(source_files ${source_files}
                external/libpng/arm/arm_init.c
                external/libpng/arm/filter_neon_intrinsics.c
+               external/libpng/arm/palette_neon_intrinsics.c
                external/libpng/png.c
                external/libpng/pngerror.c
                external/libpng/pngget.c

@@ -62,7 +62,7 @@ double call_func(py::object f, const matrix<double,0,1>& args)
         "The function being optimized takes a number of arguments that doesn't agree with the size of the bounds lists you provided to find_max_global()");
     DLIB_CASSERT(0 < num && num <= 35, "Functions being optimized must take between 1 and 35 scalar arguments.");
 
-#define CALL_WITH_N_ARGS(N) case N: return dlib::gopt_impl::_cwv(f,args,typename make_compile_time_integer_range<N>::type()).cast<double>(); 
+#define CALL_WITH_N_ARGS(N) case N: return dlib::gopt_impl::_cwv(f,args,std::make_index_sequence<N>{}).cast<double>(); 
     switch (num)
     {
         CALL_WITH_N_ARGS(1)

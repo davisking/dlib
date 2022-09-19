@@ -6,10 +6,9 @@
 #include "type_safe_union_kernel_abstract.h"
 #include <new>
 #include <iostream>
-#include <type_traits>
 #include <functional>
 #include "../serialize.h"
-#include "../utility.h"
+#include "../type_traits.h"
 #include "../overloaded.h"
 
 namespace dlib
@@ -85,14 +84,6 @@ namespace dlib
     {
         // ---------------------------------------------------------------------
 
-        template <typename T, typename First, typename... Rest>
-        struct is_any : std::integral_constant<bool, is_any<T,First>::value || is_any<T,Rest...>::value> {};
-
-        template <typename T, typename First>
-        struct is_any<T,First> : std::is_same<T,First> {};
-
-        // ---------------------------------------------------------------------
-
         template <int nTs, typename T, typename... Ts>
         struct type_safe_union_type_id_impl
                 : std::integral_constant<int, -1 - nTs> {};
@@ -127,12 +118,16 @@ namespace dlib
             return detail::type_safe_union_type_id<T,Types...>::value;
         }
 
+        template <typename T>
+        static constexpr int get_type_id (in_place_tag<T>)
+        {
+            return get_type_id<T>();
+        }
+
     private:
-        template<typename T>
-        struct is_valid : detail::is_any<T,Types...> {};
 
         template<typename T>
-        using is_valid_check = typename std::enable_if<is_valid<T>::value, bool>::type;
+        using is_valid_check = std::enable_if_t<is_any<T,Types...>::value, bool>;
 
         template <size_t I>
         using get_type_t = type_safe_union_alternative_t<I, type_safe_union>;
@@ -168,9 +163,8 @@ namespace dlib
         };
 
         template<typename F, typename TSU>
-        static inline auto dispatch(F&& f, TSU&& me)
-        noexcept(noexcept(dispatcher<F&&,TSU&&>{}(std::forward<F>(f), std::forward<TSU>(me), size_<0>{})))
-        -> decltype(dispatcher<F&&,TSU&&>{}(std::forward<F>(f), std::forward<TSU>(me), size_<0>{})) {
+        static inline decltype(auto) dispatch(F&& f, TSU&& me)
+        noexcept(noexcept(dispatcher<F&&,TSU&&>{}(std::forward<F>(f), std::forward<TSU>(me), size_<0>{}))) {
             return dispatcher<F&&,TSU&&>{}(std::forward<F>(f), std::forward<TSU>(me), size_<0>{});
         }
 
@@ -221,7 +215,7 @@ namespace dlib
             template<typename T>
             void operator()(T&& x)
             {
-                using U = typename std::decay<T>::type;
+                using U = std::decay_t<T>;
 
                 if (_me.type_identity != get_type_id<U>())
                 {
@@ -336,12 +330,12 @@ namespace dlib
 
         template <
             typename T,
-            is_valid_check<typename std::decay<T>::type> = true
+            is_valid_check<std::decay_t<T>> = true
         >
         type_safe_union (
             T&& item
         )
-        noexcept(std::is_nothrow_constructible<typename std::decay<T>::type, T>::value)
+        noexcept(std::is_nothrow_constructible<std::decay_t<T>, T>::value)
         : type_safe_union()
         {
             assign_to{*this}(std::forward<T>(item));
@@ -349,13 +343,13 @@ namespace dlib
 
         template <
             typename T,
-            is_valid_check<typename std::decay<T>::type> = true
+            is_valid_check<std::decay_t<T>> = true
         >
         type_safe_union& operator= (
             T&& item
         )
-        noexcept(std::is_nothrow_constructible<typename std::decay<T>::type, T>::value &&
-                 std::is_nothrow_assignable<typename std::decay<T>::type, T>::value)
+        noexcept(std::is_nothrow_constructible<std::decay_t<T>, T>::value &&
+                 std::is_nothrow_assignable<std::decay_t<T>, T>::value)
         {
             assign_to{*this}(std::forward<T>(item));
             return *this;
@@ -400,18 +394,16 @@ namespace dlib
         }
 
         template <typename F>
-        auto apply_to_contents(
+        decltype(auto) apply_to_contents(
             F&& f
-        ) noexcept(noexcept(dispatch(std::forward<F>(f), std::declval<type_safe_union&>())))
-        -> decltype(dispatch(std::forward<F>(f), *this)) {
+        ) noexcept(noexcept(dispatch(std::forward<F>(f), std::declval<type_safe_union&>()))) {
             return dispatch(std::forward<F>(f), *this);
         }
 
         template <typename F>
-        auto apply_to_contents(
+        decltype(auto) apply_to_contents(
             F&& f
-        ) const noexcept(noexcept(dispatch(std::forward<F>(f), std::declval<const type_safe_union&>())))
-        -> decltype(dispatch(std::forward<F>(f), *this)) {
+        ) const noexcept(noexcept(dispatch(std::forward<F>(f), std::declval<const type_safe_union&>()))) {
             return dispatch(std::forward<F>(f), *this);
         }
 
@@ -529,7 +521,14 @@ namespace dlib
             std::index_sequence<I...>
         )
         {
-            using Tsu = typename std::decay<TSU>::type;
+            using Tsu = std::decay_t<TSU>;
+
+#ifdef __cpp_fold_expressions
+            (std::forward<F>(f)(
+                in_place_tag<type_safe_union_alternative_t<I, Tsu>>{},
+                std::forward<TSU>(tsu)),
+            ...);
+#else
             (void)std::initializer_list<int>{
                 (std::forward<F>(f)(
                         in_place_tag<type_safe_union_alternative_t<I, Tsu>>{},
@@ -537,6 +536,7 @@ namespace dlib
                  0
                 )...
             };
+#endif            
         }
     }
 
@@ -549,55 +549,18 @@ namespace dlib
         TSU&& tsu
     )
     {
-        using Tsu = typename std::decay<TSU>::type;
+        using Tsu = std::decay_t<TSU>;
         static constexpr std::size_t Size = type_safe_union_size<Tsu>::value;
         detail::for_each_type_impl(std::forward<F>(f), std::forward<TSU>(tsu), std::make_index_sequence<Size>{});
     }
 
     template<typename F, typename TSU>
-    auto visit(
+    decltype(auto) visit(
         F&& f,
         TSU&& tsu
-    ) noexcept(noexcept(tsu.apply_to_contents(std::forward<F>(f))))
-    -> decltype(tsu.apply_to_contents(std::forward<F>(f))) {
+    ) noexcept(noexcept(tsu.apply_to_contents(std::forward<F>(f)))) {
         return tsu.apply_to_contents(std::forward<F>(f));
     }
-
-    namespace detail
-    {
-        struct serialize_helper
-        {
-            serialize_helper(std::ostream& out_) : out(out_) {}
-
-            template <typename T>
-            void operator() (const T& item) const 
-            { 
-                serialize(item, out); 
-            } 
-
-            std::ostream& out;
-        };  
-
-        struct deserialize_helper
-        {
-            deserialize_helper(
-                std::istream& in_,
-                int index_
-            ) : index(index_),
-                in(in_)
-            {}
-
-            template<typename T, typename TSU>
-            void operator()(in_place_tag<T>, TSU&& x)
-            {
-                if (index == x.template get_type_id<T>())
-                    deserialize(x.template get<T>(), in);
-            }
-
-            const int index = -1;
-            std::istream& in;
-        };
-    } // namespace detail
 
     template<typename... Types>
     inline void serialize (
@@ -608,7 +571,9 @@ namespace dlib
         try
         {
             serialize(item.get_current_type_id(), out);
-            item.apply_to_contents(detail::serialize_helper(out));
+            item.apply_to_contents([&](auto&& x) {
+                serialize(x, out);
+            });
         }
         catch (serialization_error& e)
         {
@@ -630,7 +595,10 @@ namespace dlib
             if (index == 0)
                 item.clear();
             else if (index > 0 && index <= (int)sizeof...(Types))
-                for_each_type(detail::deserialize_helper(in, index), item);
+                for_each_type([&](auto tag, auto&& me) {
+                    if (index == me.get_type_id(tag))
+                        deserialize(me.get(tag), in);
+                }, item);
             else
                 throw serialization_error("bad index value. Should be in range [0,sizeof...(Types))");
         }
