@@ -236,6 +236,19 @@ namespace dlib
         !*/
 
         template <typename T>
+        static constexpr int get_type_id (
+            in_place_tag<T>
+        );
+        /*!
+           ensures
+                - returns get_type_id<T>()
+                - This is useful when using for_each_type() with a generic lambda. For example:
+                  for_each_type([](auto tag, auto&& me) {
+                    printf("ID %i\n", me.get_type_id(tag));
+                  }, item);
+        !*/
+
+        template <typename T>
         bool contains (
         ) const;
         /*!
