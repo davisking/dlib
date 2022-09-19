@@ -304,8 +304,8 @@ namespace dlib
             F& function_object
         )
         {
-            COMPILE_TIME_ASSERT(is_function<F>::value == false);
-            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
+            COMPILE_TIME_ASSERT(std::is_function<F>::value == false);
+            COMPILE_TIME_ASSERT(std::is_pointer<F>::value == false);
             
             using namespace bfp1_helpers;
             destroy_bf_memory();
@@ -323,8 +323,8 @@ namespace dlib
             A1& arg1
         )
         {
-            COMPILE_TIME_ASSERT(is_function<F>::value == false);
-            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
+            COMPILE_TIME_ASSERT(std::is_function<F>::value == false);
+            COMPILE_TIME_ASSERT(std::is_pointer<F>::value == false);
             
             using namespace bfp1_helpers;
             destroy_bf_memory();
@@ -344,8 +344,8 @@ namespace dlib
             A2& arg2
         )
         {
-            COMPILE_TIME_ASSERT(is_function<F>::value == false);
-            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
+            COMPILE_TIME_ASSERT(std::is_function<F>::value == false);
+            COMPILE_TIME_ASSERT(std::is_pointer<F>::value == false);
             
             using namespace bfp1_helpers;
             destroy_bf_memory();
@@ -367,8 +367,8 @@ namespace dlib
             A3& arg3
         )
         {
-            COMPILE_TIME_ASSERT(is_function<F>::value == false);
-            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
+            COMPILE_TIME_ASSERT(std::is_function<F>::value == false);
+            COMPILE_TIME_ASSERT(std::is_pointer<F>::value == false);
             
             using namespace bfp1_helpers;
             destroy_bf_memory();
@@ -392,8 +392,8 @@ namespace dlib
             A4& arg4
         )
         {
-            COMPILE_TIME_ASSERT(is_function<F>::value == false);
-            COMPILE_TIME_ASSERT(is_pointer_type<F>::value == false);
+            COMPILE_TIME_ASSERT(std::is_function<F>::value == false);
+            COMPILE_TIME_ASSERT(std::is_pointer<F>::value == false);
             
             using namespace bfp1_helpers;
             destroy_bf_memory();

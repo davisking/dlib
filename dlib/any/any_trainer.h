@@ -47,7 +47,7 @@ namespace dlib
             const T& item
         )
         {
-            typedef typename basic_type<T>::type U;
+            using U = std::decay_t<T>;
             data.reset(new derived<U>(item));
         }
 
@@ -61,7 +61,7 @@ namespace dlib
         bool contains (
         ) const
         {
-            typedef typename basic_type<T>::type U;
+            using U = std::decay_t<T>;
             return dynamic_cast<derived<U>*>(data.get()) != 0;
         }
 
@@ -90,7 +90,7 @@ namespace dlib
         T& cast_to(
         ) 
         {
-            typedef typename basic_type<T>::type U;
+            using U = std::decay_t<T>;
             derived<U>* d = dynamic_cast<derived<U>*>(data.get());
             if (d == 0)
             {
@@ -104,7 +104,7 @@ namespace dlib
         const T& cast_to(
         ) const
         {
-            typedef typename basic_type<T>::type U;
+            using U = std::decay_t<T>;
             derived<U>* d = dynamic_cast<derived<U>*>(data.get());
             if (d == 0)
             {
@@ -118,7 +118,7 @@ namespace dlib
         T& get(
         ) 
         {
-            typedef typename basic_type<T>::type U;
+            using U = std::decay_t<T>;
             derived<U>* d = dynamic_cast<derived<U>*>(data.get());
             if (d == 0)
             {

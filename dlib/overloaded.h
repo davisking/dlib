@@ -51,7 +51,7 @@ namespace dlib
         an overload-able set. This can be used in visitor patterns like
             - dlib::type_safe_union::apply_to_contents()
             - dlib::visit()
-            - dlib::for_each()
+            - dlib::for_each_type()
             - dlib::switch_()
 
         A picture paints a thousand words:
