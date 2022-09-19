@@ -35,14 +35,14 @@ namespace dlib
         auto _cwv (
             T&& f, 
             const matrix<double,0,1>& a, 
-            compile_time_integer_list<indices...>
-        ) -> decltype(f(a(indices-1)...)) 
+            std::index_sequence<indices...>
+        ) -> decltype(f(a(indices)...)) 
         {
             DLIB_CASSERT(a.size() == sizeof...(indices), 
                 "You invoked dlib::call_function_and_expand_args(f,a) but the number of arguments expected by f() doesn't match the size of 'a'. "
                 << "Expected " << sizeof...(indices) << " arguments but got " << a.size() << "."
             );  
-            return f(a(indices-1)...); 
+            return f(a(indices)...); 
         }
 
         // Visual studio, as of November 2017, doesn't support C++11 and can't compile this code.  
@@ -52,9 +52,9 @@ namespace dlib
         struct call_function_and_expand_args
         {
             template <typename T>
-            static auto go(T&& f, const matrix<double,0,1>& a) -> decltype(_cwv(std::forward<T>(f),a,typename make_compile_time_integer_range<max_unpack>::type()))
+            static auto go(T&& f, const matrix<double,0,1>& a) -> decltype(_cwv(std::forward<T>(f),a,std::make_index_sequence<max_unpack>{}))
             {
-                return _cwv(std::forward<T>(f),a,typename make_compile_time_integer_range<max_unpack>::type());
+                return _cwv(std::forward<T>(f),a, std::make_index_sequence<max_unpack>{});
             }
 
             template <typename T>
