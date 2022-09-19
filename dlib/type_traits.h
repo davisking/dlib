@@ -11,6 +11,8 @@
 
 #include <type_traits>
 
+namespace dlib
+{
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
@@ -181,5 +183,6 @@
     using is_convertible = std::is_convertible<from, to>;
 
  // ----------------------------------------------------------------------------------------
+}
 
 #endif //DLIB_TYPE_TRAITS_H_
