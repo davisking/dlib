@@ -254,7 +254,106 @@ namespace
         DLIB_TEST(g(1) == 46);
     }
 
+    void global_function1(int& a) {a += 1;}
 
+    template<template<class...> class Function, class Storage>
+    void test_function_pointer()
+    {
+        {
+            Function<Storage, void(int&)> f{global_function1};
+            DLIB_TEST(f);
+            int a = 0;
+            f(a);
+            DLIB_TEST(a == 1);
+
+            f = nullptr;
+            DLIB_TEST(!f);
+            f = global_function1;
+            DLIB_TEST(f);
+            f(a);
+            DLIB_TEST(a == 2);
+        }
+
+        /*! Use address !*/
+        {
+            Function<Storage, void(int&)> f{&global_function1};
+            DLIB_TEST(f);
+            int a = 0;
+            f(a);
+            DLIB_TEST(a == 1);
+
+            f = nullptr;
+            DLIB_TEST(!f);
+            f = &global_function1;
+            DLIB_TEST(f);
+            f(a);
+            DLIB_TEST(a == 2);
+        }
+    }
+
+    struct member_function
+    {
+        void increment(int& a) const {a += 1;}
+    };
+
+    template<template<class...> class Function, class Storage>
+    void test_member_pointer()
+    {
+        {
+            member_function obj;
+
+            Function<Storage, void(member_function&, int&)> f{&member_function::increment};
+            DLIB_TEST(f);
+            int a = 0;
+            f(obj, a);
+            DLIB_TEST(a == 1);
+
+            f = nullptr;
+            DLIB_TEST(!f);
+            f = &member_function::increment;
+            DLIB_TEST(f);
+            f(obj, a);
+            DLIB_TEST(a == 2);
+        }
+
+        /*! Use std::mem_fn !*/
+        {
+            member_function obj;
+
+            Function<Storage, void(member_function&, int&)> f{std::mem_fn(&member_function::increment)};
+            DLIB_TEST(f);
+            int a = 0;
+            f(obj, a);
+            DLIB_TEST(a == 1);
+
+            f = nullptr;
+            DLIB_TEST(!f);
+            f = std::mem_fn(&member_function::increment);
+            DLIB_TEST(f);
+            f(obj, a);
+            DLIB_TEST(a == 2);
+        }
+
+        /*! Use std::bind !*/
+        {
+            using namespace std::placeholders;
+
+            member_function obj;
+
+            Function<Storage, void(int&)> f{std::bind(&member_function::increment, obj, _1)};
+            DLIB_TEST(f);
+            int a = 0;
+            f(a);
+            DLIB_TEST(a == 1);
+
+            f = nullptr;
+            DLIB_TEST(!f);
+            f = std::bind(&member_function::increment, obj, _1);
+            DLIB_TEST(f);
+            f(a);
+            DLIB_TEST(a == 2);
+        }
+    }
 
     class te_tester : public tester
     {
@@ -273,6 +372,14 @@ namespace
             test_function<dlib::function_sbo<int(int), 32>>();
             test_function<dlib::function_shared<int(int)>>();
             test_function_view();
+            test_function_pointer<dlib::function_basic, storage_heap>();
+            test_function_pointer<dlib::function_basic, storage_stack<32>>();
+            test_function_pointer<dlib::function_basic, storage_sbo<32>>();
+            test_function_pointer<dlib::function_basic, storage_shared>();
+            test_member_pointer<dlib::function_basic, storage_heap>();
+            test_member_pointer<dlib::function_basic, storage_stack<32>>();
+            test_member_pointer<dlib::function_basic, storage_sbo<32>>();
+            test_member_pointer<dlib::function_basic, storage_shared>();
         }
     } a;
 }
