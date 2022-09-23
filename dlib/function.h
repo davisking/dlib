@@ -62,7 +62,7 @@ namespace dlib
         }
 
         R operator()(Args... args) const {
-            return func.ptr(const_cast<void*>(str.get_ptr()), std::forward<Args>(args)...);
+            return func(const_cast<void*>(str.get_ptr()), std::forward<Args>(args)...);
         }
 
     private:
