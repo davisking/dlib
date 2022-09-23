@@ -14,12 +14,15 @@ namespace dlib
     namespace te
     {
         template<class T, bool null_after_move>
-        struct managed_move_pointer
+        class managed_move_pointer
         {
-            managed_move_pointer(T* ptr_) : ptr{ptr_} {}
+        public:
             managed_move_pointer()                                          = default;
             managed_move_pointer(const managed_move_pointer&)               = default;
             managed_move_pointer& operator=(const managed_move_pointer&)    = default;
+
+            managed_move_pointer(T* ptr_) : ptr{ptr_} {}
+            managed_move_pointer& operator=(T* ptr_) {ptr = ptr_; return *this;}
 
             managed_move_pointer(managed_move_pointer&& other) noexcept 
             : ptr{other.ptr}
@@ -40,9 +43,10 @@ namespace dlib
             }
 
             operator bool() const       { return ptr != nullptr; }
-            const T* operator->() const { return ptr; }
-            T*       operator->()       { return ptr; }     
+            operator const T*() const   { return ptr; }
+            operator T*()               { return ptr; }     
 
+        private:
             T* ptr = nullptr;
         };
 
@@ -255,8 +259,8 @@ namespace dlib
                 type_id = nullptr;
             }
 
-            void*       get_ptr()       {return &data;}
-            const void* get_ptr() const {return &data;}
+            void*       get_ptr()       {return del ? (void*)&data : nullptr;}
+            const void* get_ptr() const {return del ? (const void*)&data : nullptr;}
 
             mem_t data;
             void (*del)(mem_t&)                = nullptr;
@@ -422,6 +426,8 @@ namespace dlib
 
         struct storage_view : storage_base<storage_view>
         {
+            storage_view() = default;
+            
             template <
                 class T,
                 class T_ = std::decay_t<T>,
@@ -433,6 +439,21 @@ namespace dlib
                     return std::type_index{typeid(T_)};
                 }}
             {
+            }
+            
+            storage_view(const storage_view& other)             = default;
+            storage_view& operator=(const storage_view& other)  = default;
+
+            storage_view(storage_view&& other) noexcept
+            : ptr{std::exchange(other.ptr, nullptr)}
+            {
+            }
+
+            storage_view& operator=(storage_view&& other) noexcept
+            {
+                if (this != &other)
+                    ptr = std::exchange(other.ptr, nullptr);
+                return *this;
             }
 
             void clear() { ptr = nullptr; }
