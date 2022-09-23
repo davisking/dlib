@@ -32,30 +32,28 @@ namespace dlib
 
         template <
             typename F,
-            std::enable_if_t<!std::is_same<std::decay_t<F>, function_basic>::value &&
-                             dlib::is_invocable_r<R, F&&, Args...>::value,
+            std::enable_if_t<!std::is_same<std::decay_t<F>, function_basic>{} &&
+                             dlib::is_invocable_r<R, F&&, Args...>{},
                              bool> = true
         >
         function_basic(
             F&& f
         ) : str{std::forward<F>(f)},
-            func{[](void* self, Args... args) -> R {
-                return dlib::invoke(*reinterpret_cast<std::add_pointer_t<F>>(self),
-                                    std::forward<Args>(args)...);
-            }}
+            func{make_invoker<F&&>()}
         {
         }
 
         template <
             typename F,
-            std::enable_if_t<!std::is_same<std::decay_t<F>, function_basic>::value &&
-                             dlib::is_invocable_r<R, F&&, Args...>::value,
+            std::enable_if_t<!std::is_same<F, function_basic>{} &&
+                             dlib::is_invocable_r<R, F, Args...>{},
                              bool> = true
         >
-        function_basic& operator=(F&& f)
+        function_basic(
+            F* f
+        ) : str{f},
+            func{make_invoker<F*>()}
         {
-            *this = std::move(function_basic{std::forward<F>(f)});
-            return *this;
         }
 
         explicit operator bool() const noexcept
@@ -68,6 +66,15 @@ namespace dlib
         }
 
     private:
+        template<typename Func>
+        static auto make_invoker()
+        {
+            return [](void* self, Args... args) -> R {
+                return dlib::invoke(*reinterpret_cast<std::add_pointer_t<Func>>(self),
+                                    std::forward<Args>(args)...);
+            };
+        }
+        
         Storage str;
         te::managed_move_pointer<R(void*, Args...), true> func;
     };
