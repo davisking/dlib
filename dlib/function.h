@@ -24,8 +24,8 @@ namespace dlib
     {
     private:
         template<class F>
-        using is_valid = std::enable_if_t<!std::is_same<std::decay_t<F>, function_basic>{} &&
-                                          dlib::is_invocable_r<R, F, Args...>{},
+        using is_valid = std::enable_if_t<!std::is_same<std::decay_t<F>, function_basic>::value &&
+                                          dlib::is_invocable_r<R, F, Args...>::value,
                                           bool>;
 
         template<typename Func>
