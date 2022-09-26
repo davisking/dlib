@@ -13,43 +13,6 @@ namespace dlib
 {
     namespace te
     {
-        template<class T, bool null_after_move>
-        class managed_move_pointer
-        {
-        public:
-            managed_move_pointer()                                          = default;
-            managed_move_pointer(const managed_move_pointer&)               = default;
-            managed_move_pointer& operator=(const managed_move_pointer&)    = default;
-
-            managed_move_pointer(T* ptr_) : ptr{ptr_} {}
-            managed_move_pointer& operator=(T* ptr_) {ptr = ptr_; return *this;}
-
-            managed_move_pointer(managed_move_pointer&& other) noexcept 
-            : ptr{other.ptr}
-            {
-                if (null_after_move)
-                    other.ptr = nullptr;
-            }
-
-            managed_move_pointer& operator=(managed_move_pointer&& other) noexcept
-            {
-                if (this != &other)
-                {
-                    ptr = other.ptr;
-                    if (null_after_move)
-                        other.ptr = nullptr;
-                }
-                return *this;
-            }
-
-            operator bool() const       { return ptr != nullptr; }
-            operator const T*() const   { return ptr; }
-            operator T*()               { return ptr; }     
-
-        private:
-            T* ptr = nullptr;
-        };
-
         template<class Storage, class T>
         using is_valid = std::enable_if_t<!std::is_same<std::decay_t<T>, Storage>::value, bool>;
 
