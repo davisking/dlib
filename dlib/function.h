@@ -22,20 +22,49 @@ namespace dlib
     > 
     class function_basic<Storage, R(Args...)> 
     {
+    private:
+        template<class F>
+        using is_valid = std::enable_if_t<!std::is_same<std::decay_t<F>, function_basic>{} &&
+                                          dlib::is_invocable_r<R, F, Args...>{},
+                                          bool>;
+
+        template<typename Func>
+        static auto make_invoker()
+        {
+            return [](void* self, Args... args) -> R {
+                return dlib::invoke(*reinterpret_cast<std::add_pointer_t<Func>>(self),
+                                    std::forward<Args>(args)...);
+            };
+        }
+
+        Storage str;
+        R (*func)(void*, Args...) = nullptr;
+
     public:
-        constexpr function_basic(std::nullptr_t) {}
+        
+        constexpr function_basic(std::nullptr_t) noexcept {}
         constexpr function_basic()                                          = default;
         constexpr function_basic(const function_basic& other)               = default;
         constexpr function_basic& operator=(const function_basic& other)    = default;
-        constexpr function_basic(function_basic&& other)                    = default;        
-        constexpr function_basic& operator=(function_basic&& other)         = default;
 
-        template <
-            typename F,
-            std::enable_if_t<!std::is_same<std::decay_t<F>, function_basic>{} &&
-                             dlib::is_invocable_r<R, F&&, Args...>{},
-                             bool> = true
-        >
+        constexpr function_basic(function_basic&& other) 
+        :   str{std::move(other.str)}, 
+            func{std::exchange(other.func, nullptr)} 
+        {
+        }
+
+        constexpr function_basic& operator=(function_basic&& other)
+        {
+            if (this != &other)
+            {
+                str     = std::move(other.str);
+                func    = std::exchange(other.func, nullptr);
+            }
+
+            return *this;
+        }
+
+        template<class F, is_valid<F> = true>
         function_basic(
             F&& f
         ) : str{std::forward<F>(f)},
@@ -43,12 +72,7 @@ namespace dlib
         {
         }
 
-        template <
-            typename F,
-            std::enable_if_t<!std::is_same<F, function_basic>{} &&
-                             dlib::is_invocable_r<R, F, Args...>{},
-                             bool> = true
-        >
+        template<class F, is_valid<F> = true>
         function_basic(
             F* f
         ) : str{f},
@@ -58,25 +82,12 @@ namespace dlib
 
         explicit operator bool() const noexcept
         {
-            return !str.is_empty() && func;
+            return !str.is_empty() && func != nullptr;
         }
 
         R operator()(Args... args) const {
             return func(const_cast<void*>(str.get_ptr()), std::forward<Args>(args)...);
         }
-
-    private:
-        template<typename Func>
-        static auto make_invoker()
-        {
-            return [](void* self, Args... args) -> R {
-                return dlib::invoke(*reinterpret_cast<std::add_pointer_t<Func>>(self),
-                                    std::forward<Args>(args)...);
-            };
-        }
-        
-        Storage str;
-        te::managed_move_pointer<R(void*, Args...), true> func;
     };
 
     template <class F> 
