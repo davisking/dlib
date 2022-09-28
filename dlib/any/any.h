@@ -5,7 +5,7 @@
 
 #include "any_abstract.h"
 #include <memory>
-#include "../te.h"
+#include "storage.h"
 
 namespace dlib
 {
@@ -34,8 +34,7 @@ namespace dlib
 
         template<
             typename T,
-            typename T_ = std::decay_t<T>,
-            std::enable_if_t<!std::is_same<T_, any>::value, bool> = true
+            std::enable_if_t<!std::is_same<std::decay_t<T>, any>::value, bool> = true
         >
         any(T&& item)
         : storage{std::forward<T>(item)}
