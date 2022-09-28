@@ -2,8 +2,8 @@
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 #include "tester.h"
-#include "../te.h"
-#include "../function.h"
+#include "../any/storage.h"
+#include "../any/any_function.h"
 
 namespace
 {
@@ -246,7 +246,7 @@ namespace
     void test_function_view()
     {
         auto f = [a = 42](int i) mutable {a += i; return a;};
-        dlib::function_view<int(int)> g(f);
+        dlib::any_function_view<int(int)> g(f);
 
         DLIB_TEST(f(1) == 43);
         DLIB_TEST(g(1) == 44);
@@ -367,19 +367,19 @@ namespace
         {
             test_type_erasure();
             
-            test_function<dlib::function_heap<int(int)>>();
-            test_function<dlib::function_stack<int(int), 32>>();
-            test_function<dlib::function_sbo<int(int), 32>>();
-            test_function<dlib::function_shared<int(int)>>();
+            test_function<dlib::any_function<int(int)>>();
+            test_function<dlib::any_function_stack<int(int), 32>>();
+            test_function<dlib::any_function_sbo<int(int), 32>>();
+            test_function<dlib::any_function_shared<int(int)>>();
             test_function_view();
-            test_function_pointer<dlib::function_basic, storage_heap>();
-            test_function_pointer<dlib::function_basic, storage_stack<32>>();
-            test_function_pointer<dlib::function_basic, storage_sbo<32>>();
-            test_function_pointer<dlib::function_basic, storage_shared>();
-            test_member_pointer<dlib::function_basic, storage_heap>();
-            test_member_pointer<dlib::function_basic, storage_stack<32>>();
-            test_member_pointer<dlib::function_basic, storage_sbo<32>>();
-            test_member_pointer<dlib::function_basic, storage_shared>();
+            test_function_pointer<dlib::any_function_basic, storage_heap>();
+            test_function_pointer<dlib::any_function_basic, storage_stack<32>>();
+            test_function_pointer<dlib::any_function_basic, storage_sbo<32>>();
+            test_function_pointer<dlib::any_function_basic, storage_shared>();
+            test_member_pointer<dlib::any_function_basic, storage_heap>();
+            test_member_pointer<dlib::any_function_basic, storage_stack<32>>();
+            test_member_pointer<dlib::any_function_basic, storage_sbo<32>>();
+            test_member_pointer<dlib::any_function_basic, storage_shared>();
         }
     } a;
 }
