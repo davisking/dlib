@@ -13,13 +13,25 @@ namespace dlib
 {
     namespace te
     {
+
+// -----------------------------------------------------------------------------------------------------
+
         template<class Storage, class T>
         using is_valid = std::enable_if_t<!std::is_same<std::decay_t<T>, Storage>::value, bool>;
 
+// -----------------------------------------------------------------------------------------------------
+
         template<class Storage>
         struct storage_base
-        {         
+        {       
             bool is_empty() const
+            /*!
+                ensures
+                    - if (this object contains any kind of object) then
+                        - returns false 
+                    - else
+                        - returns true
+            !*/
             {
                 const Storage& me = *static_cast<const Storage*>(this);
                 return me.get_ptr() == nullptr;
@@ -27,6 +39,13 @@ namespace dlib
 
             template<typename T>
             bool contains() const
+            /*!
+                ensures
+                    - if (this object currently contains an object of type T) then
+                        - returns true
+                    - else
+                        - returns false
+            !*/
             {
                 const Storage& me = *static_cast<const Storage*>(this);
                 return me.type_id ? me.type_id() == std::type_index{typeid(T)} : false;
@@ -34,6 +53,11 @@ namespace dlib
 
             template<typename T>
             T& unsafe_get() 
+            /*!
+                ensures
+                    - returns a reference to the object contained within *this
+                    - if *this doesn't contain an object of type T or any object at all, then it's undefined behaviour (UB)
+            !*/
             {
                 Storage& me = *static_cast<Storage*>(this);
                 return *reinterpret_cast<T*>(me.get_ptr()); 
@@ -41,15 +65,34 @@ namespace dlib
 
             template<typename T>
             const T& unsafe_get() const 
+            /*!
+                ensures
+                    - returns a const reference to the object contained within *this
+                    - if *this doesn't contain an object of type T or any object at all, then it's undefined behaviour (UB)
+            !*/
             {
                 const Storage& me = *static_cast<const Storage*>(this);
                 return *reinterpret_cast<const T*>(me.get_ptr()); 
             }
         };
 
+// -----------------------------------------------------------------------------------------------------
+
         struct storage_heap : storage_base<storage_heap>
         {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object is a storage type that uses type erasure to erase any type.
+                    This particular storage type uses heap allocation only.
+            !*/
+
             storage_heap() = default;
+            /*!
+                ensures
+                    - this object is properly initialized
+                    - is_empty() == true
+                    - for all T: contains<T>() == false
+            !*/
 
             template <
                 class T,
@@ -57,6 +100,12 @@ namespace dlib
                 is_valid<storage_heap, T> = true
             >
             storage_heap(T &&t) noexcept(std::is_nothrow_constructible<T_,T&&>::value)
+            /*!
+                ensures
+                    - Conversion constructor that copies or moves the incoming object (depending on the forwarding reference)
+                    - is_empty() == true
+                    - contains<std::decay_t<T>>() == true, otherwise contains<U>() == false for all other types
+            !*/
             :   ptr{new T_{std::forward<T>(t)}},
                 del{[](void *self) { 
                     delete reinterpret_cast<T_*>(self); 
@@ -71,6 +120,12 @@ namespace dlib
             }
 
             storage_heap(const storage_heap& other)
+            /*!
+                ensures
+                    - if other.is_empty() == false then
+                        - underlying object of other is copied using erased type's copy constructor
+                        - is_empty() == false
+            !*/
             :   ptr{other.ptr ? other.copy(other.ptr) : nullptr},
                 del{other.del},
                 copy{other.copy},
@@ -79,6 +134,15 @@ namespace dlib
             }
 
             storage_heap& operator=(const storage_heap& other)
+            /*!
+                ensures
+                    - underlying object is destructed if is_empty() == false
+                    - if other.is_empty() == false then
+                        - underlying object of other is copied using erased type's copy constructor
+                        - is_empty() == false
+                    - else
+                        - is_empty() == true
+            !*/
             {
                 if (this != &other) 
                     *this = std::move(storage_heap{other});
@@ -86,6 +150,10 @@ namespace dlib
             }
 
             storage_heap(storage_heap&& other) noexcept
+            /*!
+                ensures
+                    - heap storage pointer is moved
+            !*/
             :   ptr{std::exchange(other.ptr, nullptr)},
                 del{std::exchange(other.del, nullptr)},
                 copy{std::exchange(other.copy, nullptr)},
@@ -94,6 +162,12 @@ namespace dlib
             }
 
             storage_heap& operator=(storage_heap&& other) noexcept
+            /*!
+                ensures
+                    - if is_empty() == false then
+                        - underlying object is destructed
+                    - heap storage pointer is moved
+            !*/
             {
                 if (this != &other) 
                 {
@@ -107,18 +181,45 @@ namespace dlib
             }
 
             ~storage_heap()
+            /*!
+                ensures
+                    - if is_empty() == false then
+                        - underlying object is destructed
+                    - is_empty() == true
+            !*/
             {
                 if (ptr)
                     del(ptr);
             }
 
             void clear()
+            /*!
+                ensures
+                    - if is_empty() == false then
+                        - underlying object is destructed
+                    - is_empty() == true
+            !*/
             {
                 storage_heap{std::move(*this)};
             }
 
-            void*       get_ptr()       {return ptr;}
-            const void* get_ptr() const {return ptr;}
+            void* get_ptr()       
+            /*!
+                ensures
+                    - returns a pointer to the underlying object
+            !*/
+            {
+                return ptr;
+            }
+
+            const void* get_ptr() const 
+            /*!
+                ensures
+                    - returns a const pointer to the underlying object
+            !*/
+            {
+                return ptr;
+            }
 
             void* ptr                     = nullptr;
             void  (*del)(void*)           = nullptr;
@@ -126,12 +227,28 @@ namespace dlib
             std::type_index (*type_id)()  = nullptr;
         };
 
+// -----------------------------------------------------------------------------------------------------
+
         template <std::size_t Size, std::size_t Alignment = 8>
         struct storage_stack : storage_base<storage_stack<Size, Alignment>>
         {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object is a storage type that uses type erasure to erase any type.
+                    This particular storage type uses stack allocation using a template size and alignment.
+                    Therefore, only objects whose size and alignment fits the template parameters can be
+                    erased and absorved into this object.
+            !*/
+
             using mem_t = std::aligned_storage_t<Size, Alignment>;
 
             storage_stack() = default;
+            /*!
+                ensures
+                    - this object is properly initialized
+                    - is_empty() == true
+                    - for all T: contains<T>() == false
+            !*/
 
             template <
                 class T,
@@ -139,6 +256,12 @@ namespace dlib
                 is_valid<storage_stack, T> = true
             >
             storage_stack(T &&t) noexcept(std::is_nothrow_constructible<T_,T&&>::value)
+            /*!
+                ensures
+                    - Conversion constructor that copies or moves the incoming object (depending on the forwarding reference)
+                    - is_empty() == true
+                    - contains<std::decay_t<T>>() == true, otherwise contains<U>() == false for all other types
+            !*/
             :   del{[](mem_t& self) {
                     reinterpret_cast<T_*>(&self)->~T_();
                 }},
@@ -158,6 +281,12 @@ namespace dlib
             }
 
             storage_stack(const storage_stack& other)
+            /*!
+                ensures
+                    - if other.is_empty() == false then
+                        - underlying object of other is copied using erased type's copy constructor
+                        - is_empty() == false
+            !*/
             :   del{other.del},
                 copy{other.copy},
                 move{other.move},
@@ -168,6 +297,15 @@ namespace dlib
             }
 
             storage_stack& operator=(const storage_stack& other)
+            /*!
+                ensures
+                    - underlying object is destructed if is_empty() == false
+                    - if other.is_empty() == false then
+                        - underlying object of other is copied using erased type's copy constructor
+                        - is_empty() == false
+                    - else
+                        - is_empty() == true
+            !*/
             {
                 if (this != &other) 
                 {
@@ -183,6 +321,12 @@ namespace dlib
             }
 
             storage_stack(storage_stack&& other)
+            /*!
+                ensures
+                    - if other.is_empty() == false then
+                        - underlying object of other is moved using erased type's moved constructor
+                        - is_empty() == false
+            !*/
             :   del{other.del},
                 copy{other.copy},
                 move{other.move},
@@ -193,6 +337,15 @@ namespace dlib
             }
 
             storage_stack& operator=(storage_stack&& other)
+            /*!
+                ensures
+                    - underlying object is destructed if is_empty() == false
+                    - if other.is_empty() == false then
+                        - underlying object of other is moved using erased type's moved constructor
+                        - is_empty() == false
+                    - else
+                        - is_empty() == true
+            !*/
             {
                 if (this != &other) 
                 {
@@ -208,11 +361,21 @@ namespace dlib
             }
 
             ~storage_stack()
+            /*!
+                ensures
+                    - calls clear()
+            !*/
             {
                 clear();
             }
 
             void clear()
+            /*!
+                ensures
+                    - if is_empty() == false then
+                        - underlying object is destructed
+                    - is_empty() == true
+            !*/
             {
                 if (del)
                     del(data);
@@ -222,8 +385,23 @@ namespace dlib
                 type_id = nullptr;
             }
 
-            void*       get_ptr()       {return del ? (void*)&data : nullptr;}
-            const void* get_ptr() const {return del ? (const void*)&data : nullptr;}
+            void* get_ptr()       
+            /*!
+                ensures
+                    - returns a pointer to the underlying object
+            !*/
+            {
+                return del ? (void*)&data : nullptr;
+            }
+
+            const void* get_ptr() const 
+            /*!
+                ensures
+                    - returns a const pointer to the underlying object
+            !*/
+            {
+                return del ? (const void*)&data : nullptr;
+            }
 
             mem_t data;
             void (*del)(mem_t&)                = nullptr;
@@ -232,15 +410,30 @@ namespace dlib
             std::type_index (*type_id)()       = nullptr;
         };
 
+// -----------------------------------------------------------------------------------------------------
+
         template <std::size_t Size, std::size_t Alignment = 8>
         struct storage_sbo : storage_base<storage_sbo<Size, Alignment>>
         {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object is a storage type that uses type erasure to erase any type.
+                    This particular storage type uses small buffer optimization (SBO), i.e. optional stack allocation
+                    if the erased type fits the SBO parameters, otherwise, it uses heap allocation.
+            !*/
+
             template<typename T_>
             struct type_fits : std::integral_constant<bool, sizeof(T_) <= Size && Alignment % alignof(T_) == 0>{};
 
             using mem_t = std::aligned_storage_t<Size, Alignment>;
 
             storage_sbo() = default;
+            /*!
+                ensures
+                    - this object is properly initialized
+                    - is_empty() == true
+                    - for all T: contains<T>() == false
+            !*/
 
             template <
                 class T,
@@ -249,6 +442,13 @@ namespace dlib
                 std::enable_if_t<type_fits<T_>::value, bool> = true
             >
             storage_sbo(T &&t) noexcept(std::is_nothrow_constructible<T_,T&&>::value)
+            /*!
+                ensures
+                    - Conversion constructor that copies or moves the incoming object (depending on the forwarding reference)
+                    - is_empty() == true
+                    - contains<std::decay_t<T>>() == true, otherwise contains<U>() == false for all other types
+                    - stack allocation is used
+            !*/
             :   ptr{new (&data) T_{std::forward<T>(t)}},
                 del{[](mem_t& self_mem, void*) {
                     reinterpret_cast<T_*>(&self_mem)->~T_();
@@ -272,6 +472,13 @@ namespace dlib
                 std::enable_if_t<!type_fits<T_>::value, bool> = true
             >
             storage_sbo(T &&t) noexcept(std::is_nothrow_constructible<T_,T&&>::value)
+            /*!
+                ensures
+                    - Conversion constructor that copies or moves the incoming object (depending on the forwarding reference)
+                    - is_empty() == true
+                    - contains<std::decay_t<T>>() == true, otherwise contains<U>() == false for all other types
+                    - heap allocation is used
+            !*/
             :   ptr{new T_{std::forward<T>(t)}},
                 del{[](mem_t&, void* self_ptr) {
                     delete reinterpret_cast<T_*>(self_ptr);
@@ -289,6 +496,12 @@ namespace dlib
             }
 
             storage_sbo(const storage_sbo& other)
+            /*!
+                ensures
+                    - if other.is_empty() == false then
+                        - underlying object of other is copied using erased type's copy constructor
+                        - is_empty() == false
+            !*/
             :   ptr{other.ptr ? other.copy(other.ptr, data) : nullptr},
                 del{other.del},
                 copy{other.copy},
@@ -298,6 +511,15 @@ namespace dlib
             }
 
             storage_sbo& operator=(const storage_sbo& other)
+            /*!
+                ensures
+                    - underlying object is destructed if is_empty() == false
+                    - if other.is_empty() == false then
+                        - underlying object of other is copied using erased type's copy constructor
+                        - is_empty() == false
+                    - else
+                        - is_empty() == true
+            !*/
             {
                 if (this != &other) 
                 {
@@ -312,6 +534,15 @@ namespace dlib
             }
 
             storage_sbo(storage_sbo&& other)
+            /*!
+                ensures
+                    - if other.is_empty() == false then
+                        - if underlying object of other is allocated on stack then
+                            - underlying object of other is moved using erased type's moved constructor
+                        - else
+                            - storage heap pointer is moved
+                        - is_empty() == false
+            !*/
             :   ptr{other.ptr ? other.move(other.ptr, data) : nullptr},
                 del{other.del},
                 copy{other.copy},
@@ -321,6 +552,18 @@ namespace dlib
             }
 
             storage_sbo& operator=(storage_sbo&& other)
+            /*!
+                ensures
+                    - underlying object is destructed if is_empty() == false
+                    - if other.is_empty() == false then
+                        - if underlying object of other is allocated on stack then
+                            - underlying object of other is moved using erased type's moved constructor
+                        - else
+                            - storage heap pointer is moved
+                        - is_empty() == false
+                    - else
+                        - is_empty() == true
+            !*/
             {
                 if (this != &other) 
                 {
@@ -335,11 +578,21 @@ namespace dlib
             }
 
             ~storage_sbo()
+            /*!
+                ensures
+                    - calls clear()
+            !*/
             {
                 clear();
             }
 
             void clear()
+            /*!
+                ensures
+                    - if is_empty() == false then
+                        - underlying object is destructed
+                    - is_empty() == true
+            !*/
             {
                 if (ptr)
                     del(data, ptr);
@@ -350,8 +603,23 @@ namespace dlib
                 type_id = nullptr;
             }
 
-            void*       get_ptr()       {return ptr;}
-            const void* get_ptr() const {return ptr;}
+            void* get_ptr()       
+            /*!
+                ensures
+                    - returns a pointer to the underlying object
+            !*/
+            {
+                return ptr;
+            }
+
+            const void* get_ptr() const 
+            /*!
+                ensures
+                    - returns a const pointer to the underlying object
+            !*/
+            {
+                return ptr;
+            }
 
             mem_t data;
             void* ptr                           = nullptr;
@@ -361,16 +629,37 @@ namespace dlib
             std::type_index (*type_id)()        = nullptr;
         };
 
+// -----------------------------------------------------------------------------------------------------
+
         struct storage_shared : storage_base<storage_shared>
         {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object is a storage type that uses type erasure to erase any type.
+                    This particular storage type uses std::shared_ptr<void> to store and erase incoming
+                    objects. Therefore, it uses heap allocation and reference counting.
+            !*/
+
             storage_shared() = default;
-            
+            /*!
+                ensures
+                    - this object is properly initialized
+                    - is_empty() == true
+                    - for all T: contains<T>() == false
+            !*/
+
             template <
                 class T,
                 class T_ = std::decay_t<T>,
                 is_valid<storage_shared, T> = true
             >
             storage_shared(T &&t) noexcept(std::is_nothrow_constructible<T_,T&&>::value)
+            /*!
+                ensures
+                    - Conversion constructor that copies or moves the incoming object (depending on the forwarding reference)
+                    - is_empty() == true
+                    - contains<std::decay_t<T>>() == true, otherwise contains<U>() == false for all other types
+            !*/
             :   ptr{std::make_shared<T_>(std::forward<T>(t))},
                 type_id{[] {
                     return std::type_index{typeid(T_)};
@@ -378,18 +667,58 @@ namespace dlib
             {
             }
 
-            void clear() { ptr = nullptr; }
+            void clear() 
+            /*!
+                ensures
+                    - nulls the underlying shared_ptr<void>
+                    - if this is the last reference then
+                        - underlying object is destructed
+                    - is_empty() == true
+            !*/
+            { 
+                ptr = nullptr;
+            }
 
-            void*       get_ptr()       {return ptr.get();}
-            const void* get_ptr() const {return ptr.get();}
+            void* get_ptr()       
+            /*!
+                ensures
+                    - returns a pointer to the underlying object
+            !*/
+            {
+                return ptr.get();
+            }
+
+            const void* get_ptr() const 
+            /*!
+                ensures
+                    - returns a const pointer to the underlying object
+            !*/
+            {
+                return ptr.get();
+            }
 
             std::shared_ptr<void> ptr    = nullptr;
             std::type_index (*type_id)() = nullptr;
         };
 
+// -----------------------------------------------------------------------------------------------------
+
         struct storage_view : storage_base<storage_view>
         {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object is a storage type that uses type erasure to erase any type.
+                    This particular storage type is a view type, similar to std::string_view or std::span.
+                    So underlying objects are only ever referenced, not copied, moved or destructed.
+            !*/
+
             storage_view() = default;
+            /*!
+                ensures
+                    - this object is properly initialized
+                    - is_empty() == true
+                    - for all T: contains<T>() == false
+            !*/
             
             template <
                 class T,
@@ -397,6 +726,12 @@ namespace dlib
                 is_valid<storage_view, T> = true
             >
             storage_view(T &&t) noexcept
+            /*!
+                ensures
+                    - Conversion constructor that copies the address of the incoming object
+                    - is_empty() == true
+                    - contains<std::decay_t<T>>() == true, otherwise contains<U>() == false for all other types
+            !*/
             :   ptr{&t},
                 type_id{[] {
                     return std::type_index{typeid(T_)};
@@ -419,14 +754,39 @@ namespace dlib
                 return *this;
             }
 
-            void clear() { ptr = nullptr; }
+            void clear() 
+            /*!
+                ensures
+                    - nulls the underlying pointer
+            !*/
+            { 
+                ptr = nullptr;
+            }
 
-            void*       get_ptr()       {return ptr;}
-            const void* get_ptr() const {return ptr;}
+            void* get_ptr()       
+            /*!
+                ensures
+                    - returns a pointer to the underlying object
+            !*/
+            {
+                return ptr;
+            }
+
+            const void* get_ptr() const 
+            /*!
+                ensures
+                    - returns a const pointer to the underlying object
+            !*/
+            {
+                return ptr;
+            }
 
             void* ptr = nullptr;
             std::type_index (*type_id)() = nullptr;
         };
+
+// -----------------------------------------------------------------------------------------------------
+
     }
 }
 
