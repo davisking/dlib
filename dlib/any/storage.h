@@ -99,6 +99,18 @@ namespace dlib
             template <typename T>
             T& get(
             ) 
+            /*!
+                ensures
+                    - #is_empty() == false
+                    - #contains<T>() == true
+                    - if (contains<T>() == true)
+                        - returns a non-const reference to the object contained in *this.
+                    - else
+                        - Constructs an object of type T inside *this
+                        - Any previous object stored in this any object is destructed and its
+                          state is lost.
+                        - returns a non-const reference to the newly created T object.
+            !*/
             {
                 Storage& me = *static_cast<Storage*>(this);
 
@@ -110,6 +122,13 @@ namespace dlib
             template <typename T>
             T& cast_to(
             ) 
+            /*!
+                ensures
+                    - if (contains<T>() == true) then
+                        - returns a non-const reference to the object contained within *this
+                    - else
+                        - throws bad_any_cast
+            !*/
             {
                 if (!contains<T>())
                     throw bad_any_cast{};
@@ -119,6 +138,13 @@ namespace dlib
             template <typename T>
             const T& cast_to(
             ) const
+            /*!
+                ensures
+                    - if (contains<T>() == true) then
+                        - returns a const reference to the object contained within *this
+                    - else
+                        - throws bad_any_cast
+            !*/
             {
                 if (!contains<T>())
                     throw bad_any_cast{};
