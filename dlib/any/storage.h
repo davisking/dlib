@@ -11,6 +11,20 @@
 
 namespace dlib
 {
+
+// -----------------------------------------------------------------------------------------------------
+
+    class bad_any_cast : public std::bad_cast 
+    {
+    public:
+          virtual const char * what() const throw()
+          {
+              return "bad_any_cast";
+          }
+    };
+    
+// -----------------------------------------------------------------------------------------------------
+
     namespace te
     {
 
@@ -73,6 +87,35 @@ namespace dlib
             {
                 const Storage& me = *static_cast<const Storage*>(this);
                 return *reinterpret_cast<const T*>(me.get_ptr()); 
+            }
+            
+            template <typename T>
+            T& get(
+            ) 
+            {
+                Storage& me = *static_cast<Storage*>(this);
+
+                if (!contains<T>())
+                    me = T{};
+                return unsafe_get<T>();
+            }
+
+            template <typename T>
+            T& cast_to(
+            ) 
+            {
+                if (!contains<T>())
+                    throw bad_any_cast{};
+                return unsafe_get<T>();
+            }
+
+            template <typename T>
+            const T& cast_to(
+            ) const
+            {
+                if (!contains<T>())
+                    throw bad_any_cast{};
+                return unsafe_get<T>();
             }
         };
 
