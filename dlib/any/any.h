@@ -9,18 +9,6 @@
 
 namespace dlib
 {
-
-// ----------------------------------------------------------------------------------------
-
-    class bad_any_cast : public std::bad_cast 
-    {
-    public:
-          virtual const char * what() const throw()
-          {
-              return "bad_any_cast";
-          }
-    };
-
 // ----------------------------------------------------------------------------------------
 
     class any
@@ -55,38 +43,14 @@ namespace dlib
             return *this;
         }
 
-        template<typename T>
-        bool contains() const { return storage.contains<T>();}
         bool is_empty() const { return storage.is_empty(); }
         void clear()          { storage.clear(); }
         void swap (any& item) { std::swap(*this, item); }
 
-        template <typename T>
-        T& cast_to(
-        ) 
-        {
-            if (!storage.contains<T>())
-                throw bad_any_cast{};
-            return storage.unsafe_get<T>();
-        }
-
-        template <typename T>
-        const T& cast_to(
-        ) const
-        {
-            if (!storage.contains<T>())
-                throw bad_any_cast{};
-            return storage.unsafe_get<T>();
-        }
-
-        template <typename T>
-        T& get(
-        ) 
-        {
-            if (!storage.contains<T>())
-                *this = T{};
-            return storage.unsafe_get<T>();
-        }
+        template<typename T>      bool contains() const { return storage.contains<T>();}
+        template <typename T>       T& cast_to()        { return storage.cast_to<T>(); }
+        template <typename T> const T& cast_to() const  { return storage.cast_to<T>(); }
+        template <typename T>       T& get()            { return storage.get<T>(); }
 
     private:
         te::storage_heap storage;
