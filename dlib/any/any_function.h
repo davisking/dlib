@@ -87,40 +87,16 @@ namespace dlib
             return func(const_cast<void*>(str.get_ptr()), std::forward<Args>(args)...);
         }
 
-        template<typename T>
-        bool contains()          const          { return str.template contains<T>();}
         void clear()                            { str.clear(); }
         void swap (any_function_basic& item)    { std::swap(*this, item); }
         bool is_empty()          const noexcept { return str.is_empty() || func == nullptr; }
         bool is_set()            const noexcept { return !is_empty(); }
         explicit operator bool() const noexcept { return is_set(); }
 
-        template <typename T>
-        T& cast_to(
-        ) 
-        {
-            if (!str.template contains<T>())
-                throw bad_any_cast{};
-            return str.template unsafe_get<T>();
-        }
-
-        template <typename T>
-        const T& cast_to(
-        ) const
-        {
-            if (!str.template contains<T>())
-                throw bad_any_cast{};
-            return str.template unsafe_get<T>();
-        }
-
-        template <typename T>
-        T& get(
-        ) 
-        {
-            if (!str.template contains<T>())
-                *this = T{};
-            return str.template unsafe_get<T>();
-        }
+        template <typename T>     bool contains() const { return str.template contains<T>();}
+        template <typename T>       T& cast_to()        { return str.template cast_to<T>(); }
+        template <typename T> const T& cast_to() const  { return str.template cast_to<T>(); }
+        template <typename T>       T& get()            { return str.template get<T>(); }
     };
 
 // ----------------------------------------------------------------------------------------
