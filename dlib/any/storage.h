@@ -16,6 +16,13 @@ namespace dlib
 
     class bad_any_cast : public std::bad_cast 
     {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is the exception class used by the any object.
+                It is used to indicate when someone attempts to cast an any
+                object into a type which isn't contained in the any object.
+        !*/
+        
     public:
           virtual const char * what() const throw()
           {
