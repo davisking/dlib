@@ -18,9 +18,9 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object is the exception class used by the any object.
-                It is used to indicate when someone attempts to cast an any
-                object into a type which isn't contained in the any object.
+                This object is the exception class used by the storage objects.
+                It is used to indicate when someone attempts to cast a storage
+                object into a type which isn't contained in the object.
         !*/
         
     public:
@@ -69,7 +69,7 @@ namespace dlib
             !*/
             {
                 const Storage& me = *static_cast<const Storage*>(this);
-                return me.type_id ? me.type_id() == std::type_index{typeid(T)} : false;
+                return !is_empty() && me.type_id != nullptr && me.type_id() == std::type_index{typeid(T)};
             }
 
             template<typename T>
@@ -316,8 +316,6 @@ namespace dlib
                     erased and absorved into this object.
             !*/
 
-            using mem_t = std::aligned_storage_t<Size, Alignment>;
-
             storage_stack() = default;
             /*!
                 ensures
@@ -338,14 +336,26 @@ namespace dlib
                     - is_empty() == true
                     - contains<std::decay_t<T>>() == true, otherwise contains<U>() == false for all other types
             !*/
-            :   del{[](mem_t& self) {
-                    reinterpret_cast<T_*>(&self)->~T_();
+            :   del{[](storage_stack& self) {
+                    reinterpret_cast<T_*>(&self.data)->~T_();
+                    self.del        = nullptr;
+                    self.copy       = nullptr;
+                    self.move       = nullptr;
+                    self.type_id    = nullptr;
                 }},
-                copy{[](const mem_t& self, mem_t& other) {
-                    new (&other) T_{*reinterpret_cast<const T_*>(&self)};
+                copy{[](const storage_stack& src, storage_stack& dst) {
+                    new (&dst.data) T_{*reinterpret_cast<const T_*>(&src.data)};
+                    dst.del     = src.del;
+                    dst.copy    = src.copy;
+                    dst.move    = src.move;
+                    dst.type_id = src.type_id;
                 }},
-                move{[](mem_t& self, mem_t& other) {
-                    new (&other) T_{std::move(*reinterpret_cast<T_*>(&self))};
+                move{[](storage_stack& src, storage_stack& dst) {
+                    new (&dst.data) T_{std::move(*reinterpret_cast<T_*>(&src.data))};
+                    dst.del     = src.del;
+                    dst.copy    = src.copy;
+                    dst.move    = src.move;
+                    dst.type_id = src.type_id;
                 }},
                 type_id{[] {
                     return std::type_index{typeid(T_)};
@@ -363,13 +373,9 @@ namespace dlib
                         - underlying object of other is copied using erased type's copy constructor
                         - is_empty() == false
             !*/
-            :   del{other.del},
-                copy{other.copy},
-                move{other.move},
-                type_id{other.type_id}
             {
                 if (other.copy)
-                    other.copy(other.data, data);
+                    other.copy(other, *this);
             }
 
             storage_stack& operator=(const storage_stack& other)
@@ -387,11 +393,7 @@ namespace dlib
                 {
                     clear();
                     if (other.copy)
-                        other.copy(other.data, data);
-                    del     = other.del;
-                    copy    = other.copy;
-                    move    = other.move;
-                    type_id = other.type_id;
+                        other.copy(other, *this);
                 }
                 return *this;
             }
@@ -403,13 +405,9 @@ namespace dlib
                         - underlying object of other is moved using erased type's moved constructor
                         - is_empty() == false
             !*/
-            :   del{other.del},
-                copy{other.copy},
-                move{other.move},
-                type_id{other.type_id}
             {
                 if (other.move)
-                    other.move(other.data, data);
+                    other.move(other, *this);
             }
 
             storage_stack& operator=(storage_stack&& other)
@@ -427,11 +425,7 @@ namespace dlib
                 {
                     clear();
                     if (other.move)
-                        other.move(other.data, data);
-                    del     = other.del;
-                    copy    = other.copy;
-                    move    = other.move;
-                    type_id = other.type_id;
+                        other.move(other, *this);
                 }
                 return *this;
             }
@@ -454,11 +448,7 @@ namespace dlib
             !*/
             {
                 if (del)
-                    del(data);
-                del     = nullptr;
-                copy    = nullptr;
-                move    = nullptr;
-                type_id = nullptr;
+                    del(*this);
             }
 
             void* get_ptr()       
@@ -479,11 +469,11 @@ namespace dlib
                 return del ? (const void*)&data : nullptr;
             }
 
-            mem_t data;
-            void (*del)(mem_t&)                = nullptr;
-            void (*copy)(const mem_t&, mem_t&) = nullptr;
-            void (*move)(mem_t&, mem_t&)       = nullptr;
-            std::type_index (*type_id)()       = nullptr;
+            std::aligned_storage_t<Size, Alignment> data;
+            void (*del)(storage_stack&)                         = nullptr;
+            void (*copy)(const storage_stack&, storage_stack&)  = nullptr;
+            void (*move)(storage_stack&, storage_stack&)        = nullptr;
+            std::type_index (*type_id)()                        = nullptr;
         };
 
 // -----------------------------------------------------------------------------------------------------
@@ -500,8 +490,6 @@ namespace dlib
 
             template<typename T_>
             struct type_fits : std::integral_constant<bool, sizeof(T_) <= Size && Alignment % alignof(T_) == 0>{};
-
-            using mem_t = std::aligned_storage_t<Size, Alignment>;
 
             storage_sbo() = default;
             /*!
@@ -526,14 +514,27 @@ namespace dlib
                     - stack allocation is used
             !*/
             :   ptr{new (&data) T_{std::forward<T>(t)}},
-                del{[](mem_t& self_mem, void*) {
-                    reinterpret_cast<T_*>(&self_mem)->~T_();
+                del{[](storage_sbo& self) {
+                    reinterpret_cast<T_*>(&self.data)->~T_();
+                    self.ptr        = nullptr;
+                    self.del        = nullptr;
+                    self.copy       = nullptr;
+                    self.move       = nullptr;
+                    self.type_id    = nullptr;
                 }},
-                copy{[](const void* self, mem_t& other) -> void* {
-                    return new (&other) T_{*reinterpret_cast<const T_*>(self)};
+                copy{[](const storage_sbo& src, storage_sbo& dst) {
+                    dst.ptr     = new (&dst.data) T_{*reinterpret_cast<const T_*>(src.ptr)};
+                    dst.del     = src.del;
+                    dst.copy    = src.copy;
+                    dst.move    = src.move;
+                    dst.type_id = src.type_id;
                 }},
-                move{[](void*& self, mem_t& other) -> void* {
-                    return new (&other) T_{std::move(*reinterpret_cast<T_*>(self))};
+                move{[](storage_sbo& src, storage_sbo& dst) {
+                    dst.ptr     = new (&dst.data) T_{std::move(*reinterpret_cast<T_*>(src.ptr))};
+                    dst.del     = src.del;
+                    dst.copy    = src.copy;
+                    dst.move    = src.move;
+                    dst.type_id = src.type_id;
                 }},
                 type_id{[] {
                     return std::type_index{typeid(T_)};
@@ -556,14 +557,27 @@ namespace dlib
                     - heap allocation is used
             !*/
             :   ptr{new T_{std::forward<T>(t)}},
-                del{[](mem_t&, void* self_ptr) {
-                    delete reinterpret_cast<T_*>(self_ptr);
+                del{[](storage_sbo& self) {
+                    delete reinterpret_cast<T_*>(self.ptr);
+                    self.ptr        = nullptr;
+                    self.del        = nullptr;
+                    self.copy       = nullptr;
+                    self.move       = nullptr;
+                    self.type_id    = nullptr;
                 }},
-                copy{[](const void* self, mem_t&) -> void* {
-                    return new T_{*reinterpret_cast<const T_*>(self)};
+                copy{[](const storage_sbo& src, storage_sbo& dst) {
+                    dst.ptr     = new T_{*reinterpret_cast<const T_*>(src.ptr)};
+                    dst.del     = src.del;
+                    dst.copy    = src.copy;
+                    dst.move    = src.move;
+                    dst.type_id = src.type_id;
                 }},
-                move{[](void*& self, mem_t&) -> void* {
-                    return std::exchange(self, nullptr);
+                move{[](storage_sbo& src, storage_sbo& dst) {
+                    dst.ptr     = std::exchange(src.ptr,     nullptr);
+                    dst.del     = std::exchange(src.del,     nullptr);
+                    dst.copy    = std::exchange(src.copy,    nullptr);
+                    dst.move    = std::exchange(src.move,    nullptr);
+                    dst.type_id = std::exchange(dst.type_id, nullptr);
                 }},
                 type_id{[] {
                     return std::type_index{typeid(T_)};
@@ -578,12 +592,9 @@ namespace dlib
                         - underlying object of other is copied using erased type's copy constructor
                         - is_empty() == false
             !*/
-            :   ptr{other.ptr ? other.copy(other.ptr, data) : nullptr},
-                del{other.del},
-                copy{other.copy},
-                move{other.move},
-                type_id{other.type_id}
             {
+                if (other.copy)
+                    other.copy(other, *this);
             }
 
             storage_sbo& operator=(const storage_sbo& other)
@@ -600,11 +611,8 @@ namespace dlib
                 if (this != &other) 
                 {
                     clear();
-                    ptr     = other.ptr ? other.copy(other.ptr, data) : nullptr;
-                    del     = other.del;
-                    copy    = other.copy;
-                    move    = other.move;
-                    type_id = other.type_id;
+                    if (other.copy)
+                        other.copy(other, *this);
                 }
                 return *this;
             }
@@ -619,12 +627,9 @@ namespace dlib
                             - storage heap pointer is moved
                         - is_empty() == false
             !*/
-            :   ptr{other.ptr ? other.move(other.ptr, data) : nullptr},
-                del{other.del},
-                copy{other.copy},
-                move{other.move},
-                type_id{other.type_id}
             {
+                if (other.move)
+                    other.move(other, *this);
             }
 
             storage_sbo& operator=(storage_sbo&& other)
@@ -644,11 +649,8 @@ namespace dlib
                 if (this != &other) 
                 {
                     clear();
-                    ptr     = other.ptr ? other.move(other.ptr, data) : nullptr;
-                    del     = other.del;
-                    copy    = other.copy;
-                    move    = other.move;
-                    type_id = other.type_id;
+                    if (other.move)
+                        other.move(other, *this);
                 }
                 return *this;
             }
@@ -671,12 +673,7 @@ namespace dlib
             !*/
             {
                 if (ptr)
-                    del(data, ptr);
-                ptr     = nullptr;
-                del     = nullptr;
-                copy    = nullptr;
-                move    = nullptr;
-                type_id = nullptr;
+                    del(*this);
             }
 
             void* get_ptr()       
@@ -697,12 +694,12 @@ namespace dlib
                 return ptr;
             }
 
-            mem_t data;
-            void* ptr                           = nullptr;
-            void  (*del)(mem_t&, void*)         = nullptr;
-            void* (*copy)(const void*, mem_t&)  = nullptr;
-            void* (*move)(void*&, mem_t&)       = nullptr;
-            std::type_index (*type_id)()        = nullptr;
+            std::aligned_storage_t<Size, Alignment> data;
+            void* ptr                                       = nullptr;
+            void (*del)(storage_sbo&)                       = nullptr;
+            void (*copy)(const storage_sbo&, storage_sbo&)  = nullptr;
+            void (*move)(storage_sbo&, storage_sbo&)        = nullptr;
+            std::type_index (*type_id)()                    = nullptr;
         };
 
 // -----------------------------------------------------------------------------------------------------
@@ -743,6 +740,26 @@ namespace dlib
             {
             }
 
+            storage_shared(const storage_shared& other)             = default;
+            storage_shared& operator=(const storage_shared& other)  = default;
+
+            storage_shared(storage_shared&& other) noexcept
+            : ptr{std::move(other.ptr)},
+              type_id{std::exchange(other.type_id, nullptr)}
+            {
+            }
+
+            storage_shared& operator=(storage_shared&& other) noexcept
+            {
+                if (this != &other)
+                {
+                    ptr     = std::move(other.ptr);
+                    type_id = std::exchange(other.type_id, nullptr);
+                }
+                    
+                return *this;
+            }
+
             void clear() 
             /*!
                 ensures
@@ -752,7 +769,8 @@ namespace dlib
                     - is_empty() == true
             !*/
             { 
-                ptr = nullptr;
+                ptr     = nullptr;
+                type_id = nullptr;
             }
 
             void* get_ptr()       
@@ -819,14 +837,19 @@ namespace dlib
             storage_view& operator=(const storage_view& other)  = default;
 
             storage_view(storage_view&& other) noexcept
-            : ptr{std::exchange(other.ptr, nullptr)}
+            : ptr{std::exchange(other.ptr, nullptr)},
+              type_id{std::exchange(other.type_id, nullptr)}
             {
             }
 
             storage_view& operator=(storage_view&& other) noexcept
             {
                 if (this != &other)
-                    ptr = std::exchange(other.ptr, nullptr);
+                {
+                    ptr     = std::exchange(other.ptr, nullptr);
+                    type_id = std::exchange(other.type_id, nullptr);
+                }
+                    
                 return *this;
             }
 
@@ -836,7 +859,8 @@ namespace dlib
                     - nulls the underlying pointer
             !*/
             { 
-                ptr = nullptr;
+                ptr     = nullptr;
+                type_id = nullptr;
             }
 
             void* get_ptr()       
