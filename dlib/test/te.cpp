@@ -51,6 +51,20 @@ namespace
         int& delete_counter;
     };
 
+    template <typename Storage>
+    void test_clear() 
+    {
+        Storage a;
+        DLIB_TEST(a.get_ptr() == nullptr);
+        DLIB_TEST(a.is_empty());
+        a = 5;
+        DLIB_TEST(a.get_ptr() != nullptr);
+        DLIB_TEST(!a.is_empty());
+        a.clear();
+        DLIB_TEST(a.get_ptr() == nullptr);
+        DLIB_TEST(a.is_empty());
+    }
+
     void test_type_erasure()
     {
         int copy_counter = 0;
@@ -366,6 +380,11 @@ namespace
         void perform_test ()
         {
             test_type_erasure();
+            test_clear<storage_heap>();
+            test_clear<storage_sbo<20>>();
+            test_clear<storage_stack<20>>();
+            test_clear<storage_shared>();
+            test_clear<storage_view>();
             
             test_function<dlib::any_function<int(int)>>();
             test_function<dlib::any_function_stack<int(int), 32>>();
