@@ -113,16 +113,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <class F> 
-    using any_function = any_function_basic<te::storage_heap, F>;
-
-    template <class F, std::size_t Size, std::size_t Alignment = 8> 
-    using any_function_stack = any_function_basic<te::storage_stack<Size, Alignment>, F>;
-    
-    template <class F, std::size_t Size, std::size_t Alignment = 8> 
-    using any_function_sbo = any_function_basic<te::storage_sbo<Size, Alignment>, F>;
-
-    template <class F>
-    using any_function_shared = any_function_basic<te::storage_shared, F>;
+    using any_function = any_function_basic<te::storage_sbo<16>, F>;
 
     template <class F> 
     using any_function_view = any_function_basic<te::storage_view, F>;

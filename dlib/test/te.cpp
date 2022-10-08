@@ -82,10 +82,12 @@ namespace
             DLIB_TEST(move_counter == 1);
             DLIB_TEST(delete_counter == 1);
 
+            DLIB_TEST(!str2.is_empty());
             storage_heap str3 = std::move(str2);
             DLIB_TEST(copy_counter == 1);
             DLIB_TEST(move_counter == 1); //pointer was moved with storage_heap so move constructor not called
             DLIB_TEST(delete_counter == 1);
+            DLIB_TEST(str2.is_empty());
         }
 
         DLIB_TEST(copy_counter == 1);
@@ -105,10 +107,12 @@ namespace
             DLIB_TEST(move_counter == 1);
             DLIB_TEST(delete_counter == 1);
 
+            DLIB_TEST(!str2.is_empty());
             storage_stack<sizeof(A)> str3 = std::move(str2);
             DLIB_TEST(copy_counter == 1);
             DLIB_TEST(move_counter == 2);
             DLIB_TEST(delete_counter == 1);
+            DLIB_TEST(!str2.is_empty());
         }
 
         DLIB_TEST(copy_counter == 1);
@@ -128,10 +132,12 @@ namespace
             DLIB_TEST(move_counter == 1);
             DLIB_TEST(delete_counter == 1);
 
+            DLIB_TEST(!str2.is_empty());
             storage_sbo<4> str3 = std::move(str2);
             DLIB_TEST(copy_counter == 1);
             DLIB_TEST(move_counter == 1);   // SBO 4 isn't big enough, so heap is used, so pointers are moved
             DLIB_TEST(delete_counter == 1);
+            DLIB_TEST(str2.is_empty());
         }
 
         DLIB_TEST(copy_counter == 1);
@@ -151,10 +157,12 @@ namespace
             DLIB_TEST(move_counter == 1);
             DLIB_TEST(delete_counter == 1);
 
+            DLIB_TEST(!str2.is_empty());
             storage_sbo<sizeof(A)> str3 = std::move(str2);
             DLIB_TEST(copy_counter == 1);
             DLIB_TEST(move_counter == 2);   // SBO is big enough, so stack is used, so move constructor is used
             DLIB_TEST(delete_counter == 1);
+            DLIB_TEST(!str2.is_empty());
         }
 
         DLIB_TEST(copy_counter == 1);
@@ -391,9 +399,6 @@ namespace
             test_clear<storage_view>();
             
             test_function<dlib::any_function<int(int)>>();
-            test_function<dlib::any_function_stack<int(int), 32>>();
-            test_function<dlib::any_function_sbo<int(int), 32>>();
-            test_function<dlib::any_function_shared<int(int)>>();
             test_function_view();
             test_function_pointer<dlib::any_function_basic, storage_heap>();
             test_function_pointer<dlib::any_function_basic, storage_stack<32>>();
