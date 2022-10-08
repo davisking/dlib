@@ -136,7 +136,8 @@ class CMakeBuild(build_ext):
     def build_extension(self, ext):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
 
-        cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
+        cmake_args = ['-DDLIB_BUILD_PYTHON=ON',
+                      '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable]
 
         cmake_args += cmake_extra_options 
@@ -228,7 +229,7 @@ setup(
     author_email='davis@dlib.net',
     url='https://github.com/davisking/dlib',
     license='Boost Software License',
-    ext_modules=[CMakeExtension('_dlib_pybind11','tools/python')],
+    ext_modules=[CMakeExtension('_dlib_pybind11')],
     cmdclass=dict(build_ext=CMakeBuild, test=PyTest),
     zip_safe=False,
     # We need an older more-itertools version because v6 broke pytest (for everyone, not just dlib)

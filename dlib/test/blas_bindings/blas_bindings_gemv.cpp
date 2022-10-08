@@ -109,6 +109,7 @@ namespace
             counter_gemv() = 0;
             val = trans(cv)*m*trans(m)*trans(rv);
             DLIB_TEST_MSG(counter_gemv() == 2, counter_gemv());
+            (void)val;
         }
 
 

@@ -9,10 +9,10 @@
 // when creating a shared library.
 #cmakedefine ENABLE_ASSERTS       // asserts always enabled 
 #cmakedefine DLIB_DISABLE_ASSERTS // asserts always disabled 
+#cmakedefine DLIB_ENABLE_STACK_TRACE
 
 #cmakedefine DLIB_ISO_CPP_ONLY
 #cmakedefine DLIB_NO_GUI_SUPPORT
-#cmakedefine DLIB_ENABLE_STACK_TRACE
 
 #cmakedefine LAPACK_FORCE_UNDERSCORE
 #cmakedefine LAPACK_FORCE_NOUNDERSCORE
@@ -23,11 +23,14 @@
 #cmakedefine DLIB_WEBP_SUPPORT
 #cmakedefine DLIB_PNG_SUPPORT
 #cmakedefine DLIB_GIF_SUPPORT
+#cmakedefine DLIB_LINK_WITH_SQLITE3
 #cmakedefine DLIB_USE_FFTW
 #cmakedefine DLIB_USE_BLAS
 #cmakedefine DLIB_USE_LAPACK
 #cmakedefine DLIB_USE_CUDA
 #cmakedefine DLIB_USE_MKL_FFT
+#cmakedefine DLIB_USE_MKL_WITH_TBB
+#cmakedefine DLIB_USE_MKL_SEQUENTIAL
 
 // This variable allows dlib/test_for_odr_violations.h to catch people who mistakenly use
 // headers from one version of dlib with a compiled dlib binary from a different dlib version.

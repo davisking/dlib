@@ -11,42 +11,14 @@
 
 # Look for the header file.
 
-unset(WEBP_FOUND)
+set(WEBP_FOUND False)
 
 find_path(WEBP_INCLUDE_DIR NAMES webp/decode.h)
+find_library(WEBP_LIBRARY NAMES webp)
 
-if(NOT WEBP_INCLUDE_DIR)
-    unset(WEBP_FOUND)
-else()
-    mark_as_advanced(WEBP_INCLUDE_DIR)
-
-    # Look for the library.
-    find_library(WEBP_LIBRARY NAMES webp)
-    mark_as_advanced(WEBP_LIBRARY)
-
-    # handle the QUIETLY and REQUIRED arguments and set WEBP_FOUND to TRUE if
-    # all listed variables are TRUE
-    include(${CMAKE_ROOT}/Modules/FindPackageHandleStandardArgs.cmake)
-    find_package_handle_standard_args(WebP DEFAULT_MSG WEBP_LIBRARY WEBP_INCLUDE_DIR)
-
+if(WEBP_INCLUDE_DIR AND WEBP_LIBRARY)
+    mark_as_advanced(WEBP_INCLUDE_DIR WEBP_LIBRARY)
+    set(WEBP_FOUND True)
     set(WEBP_LIBRARIES ${WEBP_LIBRARY})
     set(WEBP_INCLUDE_DIRS ${WEBP_INCLUDE_DIR})
-endif()
-
-if(WEBP_FOUND)
-    set(WEBP_TEST_CMAKE_FLAGS
-      "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
-      "-DCMAKE_INCLUDE_PATH=${CMAKE_INCLUDE_PATH}"
-      "-DCMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH}")
-
-    try_compile(test_for_libwebp_worked
-        ${PROJECT_BINARY_DIR}/test_for_libwebp_build
-        ${CMAKE_CURRENT_LIST_DIR}/test_for_libwebp
-        test_if_libwebp_is_broken
-        CMAKE_FLAGS "${WEBP_TEST_CMAKE_FLAGS}")
-
-    if(NOT test_for_libwebp_worked)
-        set(WEBP_FOUND 0)
-        message (STATUS "System copy of libwebp is either too old or broken.  Will disable WebP support.")
-    endif()
 endif()

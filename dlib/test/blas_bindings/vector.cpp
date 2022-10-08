@@ -84,7 +84,7 @@ namespace
             mat2 = c2*trans(a2);
 
             DLIB_TEST(counter_gemm() == 0 && counter_gemv() == 0 && counter_ger() == 0 && counter_dot() == 0);
-
+            (void)var;
         }
 
         void perform_test (
