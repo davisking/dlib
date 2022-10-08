@@ -83,7 +83,7 @@ namespace dlib
         );
         /*!
             ensures
-                - item.is_empty() == true
+                - #item.is_empty() == true
                 - moves item into *this.
         !*/
 

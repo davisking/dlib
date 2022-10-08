@@ -174,10 +174,12 @@ namespace
             DLIB_TEST(move_counter == 1);
             DLIB_TEST(delete_counter == 1);
 
+            DLIB_TEST(!str2.is_empty());
             storage_shared str3 = std::move(str2);
             DLIB_TEST(copy_counter == 0);
             DLIB_TEST(move_counter == 1);
             DLIB_TEST(delete_counter == 1);
+            DLIB_TEST(str2.is_empty());
         }
 
         DLIB_TEST(copy_counter == 0);
@@ -202,10 +204,12 @@ namespace
             DLIB_TEST(move_counter == 0);
             DLIB_TEST(delete_counter == 0);
 
+            DLIB_TEST(!str2.is_empty());
             storage_view str3 = std::move(str2);
             DLIB_TEST(copy_counter == 0);
             DLIB_TEST(move_counter == 0);
             DLIB_TEST(delete_counter == 0);
+            DLIB_TEST(!str2.is_empty());
         }
 
         DLIB_TEST(copy_counter == 0);

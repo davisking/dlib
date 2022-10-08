@@ -448,7 +448,8 @@ namespace dlib
             storage_stack& operator=(storage_stack&& other)
             /*!
                 ensures
-                    - underlying object is destructed if is_empty() == false
+                    - if is_empty() == false then
+                       - destructs the object contained in this class.
                     - #is_empty() == other.is_empty()
                     - if other.is_empty() == false then
                         - underlying object of other is moved using erased type's moved constructor.
@@ -813,25 +814,11 @@ namespace dlib
             {
             }
 
+            // This object has the same copy/move semantics as a std::shared_ptr<void>
             storage_shared(const storage_shared& other)             = default;
             storage_shared& operator=(const storage_shared& other)  = default;
-
-            storage_shared(storage_shared&& other) noexcept
-            : ptr{std::move(other.ptr)},
-              type_id_{std::exchange(other.type_id_, nullptr)}
-            {
-            }
-
-            storage_shared& operator=(storage_shared&& other) noexcept
-            {
-                if (this != &other)
-                {
-                    ptr     = std::move(other.ptr);
-                    type_id_ = std::exchange(other.type_id_, nullptr);
-                }
-                    
-                return *this;
-            }
+            storage_shared(storage_shared&& other) noexcept = default;
+            storage_shared& operator=(storage_shared&& other) noexcept = default;
 
             void clear() 
             /*!
@@ -920,25 +907,11 @@ namespace dlib
             {
             }
             
+            // This object has the same copy/move semantics as a void*.
             storage_view(const storage_view& other)             = default;
             storage_view& operator=(const storage_view& other)  = default;
-
-            storage_view(storage_view&& other) noexcept
-            : ptr{std::exchange(other.ptr, nullptr)},
-              type_id_{std::exchange(other.type_id_, nullptr)}
-            {
-            }
-
-            storage_view& operator=(storage_view&& other) noexcept
-            {
-                if (this != &other)
-                {
-                    ptr     = std::exchange(other.ptr, nullptr);
-                    type_id_ = std::exchange(other.type_id_, nullptr);
-                }
-                    
-                return *this;
-            }
+            storage_view(storage_view&& other) noexcept = default;
+            storage_view& operator=(storage_view&& other) noexcept = default;
 
             void clear() 
             /*!
