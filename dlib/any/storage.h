@@ -53,7 +53,7 @@ namespace dlib
 // -----------------------------------------------------------------------------------------------------
 
         template<class Storage>
-        struct storage_base
+        class storage_base
         {       
             /*!
                 WHAT THIS OBJECT REPRESENTS
@@ -66,6 +66,7 @@ namespace dlib
                     E.g. on the heap or stack or some other more specialized method.
             !*/
 
+        public:
             bool is_empty() const
             /*!
                 ensures
@@ -90,7 +91,7 @@ namespace dlib
             !*/
             {
                 const Storage& me = *static_cast<const Storage*>(this);
-                return !is_empty() && me.type_id != nullptr && me.type_id() == std::type_index{typeid(T)};
+                return !is_empty() && me.type_id() == std::type_index{typeid(T)};
             }
 
             template<typename T>
@@ -177,8 +178,9 @@ namespace dlib
 
 // -----------------------------------------------------------------------------------------------------
 
-        struct storage_heap : storage_base<storage_heap>
+        class storage_heap : public storage_base<storage_heap>
         {
+        public:
             /*!
                 WHAT THIS OBJECT REPRESENTS
                     This object is a storage type that uses type erasure to erase any type.
@@ -212,7 +214,7 @@ namespace dlib
                 copy{[](const void *self) -> void * {
                     return new T_{*reinterpret_cast<const T_*>(self)};
                 }},
-                type_id{[] {
+                type_id_{[] {
                     return std::type_index{typeid(T_)};
                 }}
             {
@@ -228,7 +230,7 @@ namespace dlib
             :   ptr{other.ptr ? other.copy(other.ptr) : nullptr},
                 del{other.del},
                 copy{other.copy},
-                type_id{other.type_id}
+                type_id_{other.type_id_}
             {
             }
 
@@ -256,7 +258,7 @@ namespace dlib
             :   ptr{std::exchange(other.ptr, nullptr)},
                 del{std::exchange(other.del, nullptr)},
                 copy{std::exchange(other.copy, nullptr)},
-                type_id{std::exchange(other.type_id, nullptr)}
+                type_id_{std::exchange(other.type_id_, nullptr)}
             {
             }
 
@@ -274,7 +276,7 @@ namespace dlib
                     ptr     = std::exchange(other.ptr, nullptr);
                     del     = std::exchange(other.del, nullptr);
                     copy    = std::exchange(other.copy, nullptr);
-                    type_id = std::exchange(other.type_id, nullptr);
+                    type_id_ = std::exchange(other.type_id_, nullptr);
                 }
                 return *this;
             }
@@ -320,25 +322,39 @@ namespace dlib
                 return ptr;
             }
 
+            std::type_index type_id() const
+            /*!
+                requires
+                    - is_empty() == false
+                ensures
+                    - returns the std::type_index of the type contained within this object.
+                      I.e. if this object contains the type T then this returns std::type_index{typeid(T)}.
+            !*/
+            {
+                return type_id_();
+            }
+
+        private:
             void* ptr                     = nullptr;
             void  (*del)(void*)           = nullptr;
             void* (*copy)(const void*)    = nullptr;
-            std::type_index (*type_id)()  = nullptr;
+            std::type_index (*type_id_)()  = nullptr;
         };
 
 // -----------------------------------------------------------------------------------------------------
 
         template <std::size_t Size, std::size_t Alignment = 8>
-        struct storage_stack : storage_base<storage_stack<Size, Alignment>>
+        class storage_stack : public storage_base<storage_stack<Size, Alignment>>
         {
             /*!
                 WHAT THIS OBJECT REPRESENTS
                     This object is a storage type that uses type erasure to erase any type.
                     This particular storage type uses stack allocation using a template size and alignment.
                     Therefore, only objects whose size and alignment fits the template parameters can be
-                    erased and absorved into this object.
+                    erased and absorbed into this object.
             !*/
 
+        public:
             storage_stack() = default;
             /*!
                 ensures
@@ -364,23 +380,23 @@ namespace dlib
                     self.del        = nullptr;
                     self.copy       = nullptr;
                     self.move       = nullptr;
-                    self.type_id    = nullptr;
+                    self.type_id_   = nullptr;
                 }},
                 copy{[](const storage_stack& src, storage_stack& dst) {
                     new (&dst.data) T_{*reinterpret_cast<const T_*>(&src.data)};
                     dst.del     = src.del;
                     dst.copy    = src.copy;
                     dst.move    = src.move;
-                    dst.type_id = src.type_id;
+                    dst.type_id_ = src.type_id_;
                 }},
                 move{[](storage_stack& src, storage_stack& dst) {
                     new (&dst.data) T_{std::move(*reinterpret_cast<T_*>(&src.data))};
                     dst.del     = src.del;
                     dst.copy    = src.copy;
                     dst.move    = src.move;
-                    dst.type_id = src.type_id;
+                    dst.type_id_ = src.type_id_;
                 }},
-                type_id{[] {
+                type_id_{[] {
                     return std::type_index{typeid(T_)};
                 }}
             {
@@ -492,17 +508,30 @@ namespace dlib
                 return del ? (const void*)&data : nullptr;
             }
 
+            std::type_index type_id() const
+            /*!
+                requires
+                    - is_empty() == false
+                ensures
+                    - returns the std::type_index of the type contained within this object.
+                      I.e. if this object contains the type T then this returns std::type_index{typeid(T)}.
+            !*/
+            {
+                return type_id_();
+            }
+
+        private:
             std::aligned_storage_t<Size, Alignment> data;
             void (*del)(storage_stack&)                         = nullptr;
             void (*copy)(const storage_stack&, storage_stack&)  = nullptr;
             void (*move)(storage_stack&, storage_stack&)        = nullptr;
-            std::type_index (*type_id)()                        = nullptr;
+            std::type_index (*type_id_)()                        = nullptr;
         };
 
 // -----------------------------------------------------------------------------------------------------
 
         template <std::size_t Size, std::size_t Alignment = 8>
-        struct storage_sbo : storage_base<storage_sbo<Size, Alignment>>
+        class storage_sbo : public storage_base<storage_sbo<Size, Alignment>>
         {
             /*!
                 WHAT THIS OBJECT REPRESENTS
@@ -511,6 +540,7 @@ namespace dlib
                     if the erased type fits the SBO parameters, otherwise, it uses heap allocation.
             !*/
 
+        public:
             template<typename T_>
             struct type_fits : std::integral_constant<bool, sizeof(T_) <= Size && Alignment % alignof(T_) == 0>{};
 
@@ -543,23 +573,23 @@ namespace dlib
                     self.del        = nullptr;
                     self.copy       = nullptr;
                     self.move       = nullptr;
-                    self.type_id    = nullptr;
+                    self.type_id_    = nullptr;
                 }},
                 copy{[](const storage_sbo& src, storage_sbo& dst) {
                     dst.ptr     = new (&dst.data) T_{*reinterpret_cast<const T_*>(src.ptr)};
                     dst.del     = src.del;
                     dst.copy    = src.copy;
                     dst.move    = src.move;
-                    dst.type_id = src.type_id;
+                    dst.type_id_ = src.type_id_;
                 }},
                 move{[](storage_sbo& src, storage_sbo& dst) {
                     dst.ptr     = new (&dst.data) T_{std::move(*reinterpret_cast<T_*>(src.ptr))};
                     dst.del     = src.del;
                     dst.copy    = src.copy;
                     dst.move    = src.move;
-                    dst.type_id = src.type_id;
+                    dst.type_id_ = src.type_id_;
                 }},
-                type_id{[] {
+                type_id_{[] {
                     return std::type_index{typeid(T_)};
                 }}
             {
@@ -586,23 +616,23 @@ namespace dlib
                     self.del        = nullptr;
                     self.copy       = nullptr;
                     self.move       = nullptr;
-                    self.type_id    = nullptr;
+                    self.type_id_    = nullptr;
                 }},
                 copy{[](const storage_sbo& src, storage_sbo& dst) {
                     dst.ptr     = new T_{*reinterpret_cast<const T_*>(src.ptr)};
                     dst.del     = src.del;
                     dst.copy    = src.copy;
                     dst.move    = src.move;
-                    dst.type_id = src.type_id;
+                    dst.type_id_ = src.type_id_;
                 }},
                 move{[](storage_sbo& src, storage_sbo& dst) {
                     dst.ptr     = std::exchange(src.ptr,     nullptr);
                     dst.del     = std::exchange(src.del,     nullptr);
                     dst.copy    = std::exchange(src.copy,    nullptr);
                     dst.move    = std::exchange(src.move,    nullptr);
-                    dst.type_id = std::exchange(dst.type_id, nullptr);
+                    dst.type_id_ = std::exchange(dst.type_id_, nullptr);
                 }},
-                type_id{[] {
+                type_id_{[] {
                     return std::type_index{typeid(T_)};
                 }}
             {
@@ -717,17 +747,30 @@ namespace dlib
                 return ptr;
             }
 
+            std::type_index type_id() const
+            /*!
+                requires
+                    - is_empty() == false
+                ensures
+                    - returns the std::type_index of the type contained within this object.
+                      I.e. if this object contains the type T then this returns std::type_index{typeid(T)}.
+            !*/
+            {
+                return type_id_();
+            }
+
+        private:
             std::aligned_storage_t<Size, Alignment> data;
             void* ptr                                       = nullptr;
             void (*del)(storage_sbo&)                       = nullptr;
             void (*copy)(const storage_sbo&, storage_sbo&)  = nullptr;
             void (*move)(storage_sbo&, storage_sbo&)        = nullptr;
-            std::type_index (*type_id)()                    = nullptr;
+            std::type_index (*type_id_)()                    = nullptr;
         };
 
 // -----------------------------------------------------------------------------------------------------
 
-        struct storage_shared : storage_base<storage_shared>
+        class storage_shared : public storage_base<storage_shared>
         {
             /*!
                 WHAT THIS OBJECT REPRESENTS
@@ -736,6 +779,7 @@ namespace dlib
                     objects. Therefore, it uses heap allocation and reference counting.
             !*/
 
+        public:
             storage_shared() = default;
             /*!
                 ensures
@@ -757,7 +801,7 @@ namespace dlib
                     - contains<std::decay_t<T>>() == true, otherwise contains<U>() == false for all other types
             !*/
             :   ptr{std::make_shared<T_>(std::forward<T>(t))},
-                type_id{[] {
+                type_id_{[] {
                     return std::type_index{typeid(T_)};
                 }}
             {
@@ -768,7 +812,7 @@ namespace dlib
 
             storage_shared(storage_shared&& other) noexcept
             : ptr{std::move(other.ptr)},
-              type_id{std::exchange(other.type_id, nullptr)}
+              type_id_{std::exchange(other.type_id_, nullptr)}
             {
             }
 
@@ -777,7 +821,7 @@ namespace dlib
                 if (this != &other)
                 {
                     ptr     = std::move(other.ptr);
-                    type_id = std::exchange(other.type_id, nullptr);
+                    type_id_ = std::exchange(other.type_id_, nullptr);
                 }
                     
                 return *this;
@@ -793,7 +837,7 @@ namespace dlib
             !*/
             { 
                 ptr     = nullptr;
-                type_id = nullptr;
+                type_id_ = nullptr;
             }
 
             void* get_ptr()       
@@ -814,13 +858,26 @@ namespace dlib
                 return ptr.get();
             }
 
+            std::type_index type_id() const
+            /*!
+                requires
+                    - is_empty() == false
+                ensures
+                    - returns the std::type_index of the type contained within this object.
+                      I.e. if this object contains the type T then this returns std::type_index{typeid(T)}.
+            !*/
+            {
+                return type_id_();
+            }
+
+        private:
             std::shared_ptr<void> ptr    = nullptr;
-            std::type_index (*type_id)() = nullptr;
+            std::type_index (*type_id_)() = nullptr;
         };
 
 // -----------------------------------------------------------------------------------------------------
 
-        struct storage_view : storage_base<storage_view>
+        class storage_view : public storage_base<storage_view>
         {
             /*!
                 WHAT THIS OBJECT REPRESENTS
@@ -829,6 +886,7 @@ namespace dlib
                     So underlying objects are only ever referenced, not copied, moved or destructed.
             !*/
 
+        public:
             storage_view() = default;
             /*!
                 ensures
@@ -850,7 +908,7 @@ namespace dlib
                     - contains<std::decay_t<T>>() == true, otherwise contains<U>() == false for all other types
             !*/
             :   ptr{&t},
-                type_id{[] {
+                type_id_{[] {
                     return std::type_index{typeid(T_)};
                 }}
             {
@@ -861,7 +919,7 @@ namespace dlib
 
             storage_view(storage_view&& other) noexcept
             : ptr{std::exchange(other.ptr, nullptr)},
-              type_id{std::exchange(other.type_id, nullptr)}
+              type_id_{std::exchange(other.type_id_, nullptr)}
             {
             }
 
@@ -870,7 +928,7 @@ namespace dlib
                 if (this != &other)
                 {
                     ptr     = std::exchange(other.ptr, nullptr);
-                    type_id = std::exchange(other.type_id, nullptr);
+                    type_id_ = std::exchange(other.type_id_, nullptr);
                 }
                     
                 return *this;
@@ -883,7 +941,7 @@ namespace dlib
             !*/
             { 
                 ptr     = nullptr;
-                type_id = nullptr;
+                type_id_ = nullptr;
             }
 
             void* get_ptr()       
@@ -904,8 +962,21 @@ namespace dlib
                 return ptr;
             }
 
+            std::type_index type_id() const
+            /*!
+                requires
+                    - is_empty() == false
+                ensures
+                    - returns the std::type_index of the type contained within this object.
+                      I.e. if this object contains the type T then this returns std::type_index{typeid(T)}.
+            !*/
+            {
+                return type_id_();
+            }
+
+        private:
             void* ptr = nullptr;
-            std::type_index (*type_id)() = nullptr;
+            std::type_index (*type_id_)() = nullptr;
         };
 
 // -----------------------------------------------------------------------------------------------------
