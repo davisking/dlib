@@ -114,6 +114,11 @@ namespace
         swap(a,b);
         DLIB_TEST(a_ptr == &b.get<int>());
         DLIB_TEST(b_ptr == &a.get<int>());
+
+
+        b = std::move(a);
+        DLIB_TEST(a.is_empty());
+        DLIB_TEST(b_ptr == &b.get<int>());
     }
 
 // ----------------------------------------------------------------------------------------

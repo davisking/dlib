@@ -63,6 +63,15 @@ namespace dlib
                   any kind of reference to item.
         !*/
 
+        any_function (
+            any_function&& item
+        );
+        /*!
+            ensures
+                - item.is_empty() == true
+                - moves item into *this.
+        !*/
+
         template < typename T >
         any (
             const T& item
@@ -164,16 +173,6 @@ namespace dlib
         !*/
 
     };
-
-// ----------------------------------------------------------------------------------------
-
-    inline void swap (
-        any& a,
-        any& b
-    ) { a.swap(b); }
-    /*!
-        provides a global swap function
-    !*/
 
 // ----------------------------------------------------------------------------------------
 

@@ -37,14 +37,35 @@ namespace dlib
 
 // -----------------------------------------------------------------------------------------------------
 
+        /*!
+            This is used as a SFINAE tool to prevent a function taking a universal reference from
+            binding to some undesired type.  For example:
+                template <
+                    typename T,
+                    T_is_not_this_type<SomeExcludedType, T> = true
+                    >
+                void foo(T&&);
+            prevents foo() from binding to an object of type SomeExcludedType.
+        !*/
         template<class Storage, class T>
-        using is_valid = std::enable_if_t<!std::is_same<std::decay_t<T>, Storage>::value, bool>;
+        using T_is_not_this_type = std::enable_if_t<!std::is_same<std::decay_t<T>, Storage>::value, bool>;
 
 // -----------------------------------------------------------------------------------------------------
 
         template<class Storage>
         struct storage_base
         {       
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This class defines functionality common to all type erasure storage objects
+                    (defined below in this file).  These objects are essentially type-safe versions of
+                    a void*.  In particular, they are containers which can contain only one object
+                    but the object may be of any type.  
+
+                    Each storage object implements a different way of storing the underlying object.
+                    E.g. on the heap or stack or some other more specialized method.
+            !*/
+
             bool is_empty() const
             /*!
                 ensures
@@ -75,9 +96,10 @@ namespace dlib
             template<typename T>
             T& unsafe_get() 
             /*!
+                requires
+                    - contains<T>() == true
                 ensures
-                    - returns a reference to the object contained within *this
-                    - if *this doesn't contain an object of type T or any object at all, then it's undefined behaviour (UB)
+                    - returns a reference to the object contained within *this.
             !*/
             {
                 Storage& me = *static_cast<Storage*>(this);
@@ -87,9 +109,10 @@ namespace dlib
             template<typename T>
             const T& unsafe_get() const 
             /*!
+                requires
+                    - contains<T>() == true
                 ensures
-                    - returns a const reference to the object contained within *this
-                    - if *this doesn't contain an object of type T or any object at all, then it's undefined behaviour (UB)
+                    - returns a const reference to the object contained within *this.
             !*/
             {
                 const Storage& me = *static_cast<const Storage*>(this);
@@ -165,22 +188,22 @@ namespace dlib
             storage_heap() = default;
             /*!
                 ensures
-                    - this object is properly initialized
-                    - is_empty() == true
-                    - for all T: contains<T>() == false
+                    - #is_empty() == true
+                    - for all T: #contains<T>() == false
             !*/
 
             template <
                 class T,
                 class T_ = std::decay_t<T>,
-                is_valid<storage_heap, T> = true
+                T_is_not_this_type<storage_heap, T> = true
             >
             storage_heap(T &&t) noexcept(std::is_nothrow_constructible<T_,T&&>::value)
             /*!
                 ensures
-                    - Conversion constructor that copies or moves the incoming object (depending on the forwarding reference)
-                    - is_empty() == true
-                    - contains<std::decay_t<T>>() == true, otherwise contains<U>() == false for all other types
+                    - copies or moves the incoming object (depending on the forwarding reference)
+                    - #is_empty() == true
+                    - #contains<std::decay_t<T>>() == true
+                    - #unsafe_get<T>() will yield the provided t.
             !*/
             :   ptr{new T_{std::forward<T>(t)}},
                 del{[](void *self) { 
@@ -198,9 +221,9 @@ namespace dlib
             storage_heap(const storage_heap& other)
             /*!
                 ensures
+                    - #is_empty() == other.is_empty()
                     - if other.is_empty() == false then
-                        - underlying object of other is copied using erased type's copy constructor
-                        - is_empty() == false
+                        - underlying object of other is copied using erased type's copy constructor.
             !*/
             :   ptr{other.ptr ? other.copy(other.ptr) : nullptr},
                 del{other.del},
@@ -212,12 +235,11 @@ namespace dlib
             storage_heap& operator=(const storage_heap& other)
             /*!
                 ensures
-                    - underlying object is destructed if is_empty() == false
+                    - if is_empty() == false then
+                       - destructs the object contained in this class.
+                    - #is_empty() == other.is_empty()
                     - if other.is_empty() == false then
-                        - underlying object of other is copied using erased type's copy constructor
-                        - is_empty() == false
-                    - else
-                        - is_empty() == true
+                        - underlying object of other is copied using erased type's copy constructor.
             !*/
             {
                 if (this != &other) 
@@ -228,7 +250,8 @@ namespace dlib
             storage_heap(storage_heap&& other) noexcept
             /*!
                 ensures
-                    - heap storage pointer is moved
+                    - The state of other is moved into *this.
+                    - #other.is_empty() == true
             !*/
             :   ptr{std::exchange(other.ptr, nullptr)},
                 del{std::exchange(other.del, nullptr)},
@@ -240,9 +263,9 @@ namespace dlib
             storage_heap& operator=(storage_heap&& other) noexcept
             /*!
                 ensures
-                    - if is_empty() == false then
-                        - underlying object is destructed
-                    - heap storage pointer is moved
+                    - The state of other is moved into *this.
+                    - #other.is_empty() == true
+                    - returns *this
             !*/
             {
                 if (this != &other) 
@@ -327,7 +350,7 @@ namespace dlib
             template <
                 class T,
                 class T_ = std::decay_t<T>,
-                is_valid<storage_stack, T> = true
+                T_is_not_this_type<storage_stack, T> = true
             >
             storage_stack(T &&t) noexcept(std::is_nothrow_constructible<T_,T&&>::value)
             /*!
@@ -502,7 +525,7 @@ namespace dlib
             template <
                 class T,
                 class T_ = std::decay_t<T>,
-                is_valid<storage_sbo, T> = true,
+                T_is_not_this_type<storage_sbo, T> = true,
                 std::enable_if_t<type_fits<T_>::value, bool> = true
             >
             storage_sbo(T &&t) noexcept(std::is_nothrow_constructible<T_,T&&>::value)
@@ -545,7 +568,7 @@ namespace dlib
             template <
                 class T,
                 class T_ = std::decay_t<T>,
-                is_valid<storage_sbo, T> = true,
+                T_is_not_this_type<storage_sbo, T> = true,
                 std::enable_if_t<!type_fits<T_>::value, bool> = true
             >
             storage_sbo(T &&t) noexcept(std::is_nothrow_constructible<T_,T&&>::value)
@@ -724,7 +747,7 @@ namespace dlib
             template <
                 class T,
                 class T_ = std::decay_t<T>,
-                is_valid<storage_shared, T> = true
+                T_is_not_this_type<storage_shared, T> = true
             >
             storage_shared(T &&t) noexcept(std::is_nothrow_constructible<T_,T&&>::value)
             /*!
@@ -817,7 +840,7 @@ namespace dlib
             template <
                 class T,
                 class T_ = std::decay_t<T>,
-                is_valid<storage_view, T> = true
+                T_is_not_this_type<storage_view, T> = true
             >
             storage_view(T &&t) noexcept
             /*!

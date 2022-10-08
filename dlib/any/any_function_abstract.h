@@ -58,13 +58,6 @@ namespace dlib
 
         // This is the type of object returned by function_type functions.
         typedef result_type_for_function_type result_type;
-        // Typedefs defining the argument types.  If an argument does not exist
-        // then it is set to void.
-        typedef type_of_first_argument_in_funct_type  arg1_type;
-        typedef type_of_second_argument_in_funct_type arg2_type;
-        ...
-        typedef type_of_last_argument_in_funct_type   arg10_type;
-        const static unsigned long num_args = total_number_of_non_void_arguments;
 
         any_function(
         );
@@ -83,6 +76,15 @@ namespace dlib
                   contents of item.  That is, this function performs a deep
                   copy and therefore does not result in *this containing
                   any kind of reference to item.
+        !*/
+
+        any_function (
+            any_function&& item
+        );
+        /*!
+            ensures
+                - item.is_empty() == true
+                - moves item into *this.
         !*/
 
         template < typename T >
@@ -131,7 +133,14 @@ namespace dlib
                 - returns !is_empty()
         !*/
 
-        result_type operator() (
+        explicit operator bool(
+        ) const;
+        /*!
+            ensures
+                - returns is_set()
+        !*/
+
+        result_type operator(Args... args) (
         ) const;
         /*!
             requires
@@ -140,48 +149,8 @@ namespace dlib
             ensures
                 - Let F denote the function object contained within *this.  Then
                   this function performs:
-                    return F()
-                  or if result_type is void then this function performs:
-                    F()
+                    return F(std::forward<Args>(args)...)
         !*/
-
-        result_type operator() (
-            const arg1_type& a1
-        ) const;
-        /*!
-            requires
-                - is_empty() == false
-                - the signature defined by function_type takes one argument
-            ensures
-                - Let F denote the function object contained within *this.  Then
-                  this function performs:
-                    return F(a1)
-                  or if result_type is void then this function performs:
-                    F(a1)
-        !*/
-
-        result_type operator() (
-            const arg1_type& a1,
-            const arg2_type& a2
-        ) const;
-        /*!
-            requires
-                - is_empty() == false
-                - the signature defined by function_type takes two arguments
-            ensures
-                - Let F denote the function object contained within *this.  Then
-                  this function performs:
-                    return F(a1,a2)
-                  or if result_type is void then this function performs:
-                    F(a1,a2)
-        !*/
-
-        /* !!!!!!!!!  NOTE  !!!!!!!!!
-
-           In addition to the above, operator() is defined for up to 10 arguments.
-           They are not listed here because it would clutter the documentation. 
-
-           !!!!!!!!!  NOTE  !!!!!!!!!  */
 
         template <typename T>
         T& cast_to(
@@ -242,19 +211,6 @@ namespace dlib
         !*/
 
     };
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename function_type
-        >
-    inline void swap (
-        any_function<function_type>& a,
-        any_function<function_type>& b
-    ) { a.swap(b); }
-    /*!
-        provides a global swap function
-    !*/
 
 // ----------------------------------------------------------------------------------------
 

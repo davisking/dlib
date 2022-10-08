@@ -12,6 +12,7 @@ namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
+
     template <
         class Storage, 
         class F
@@ -44,6 +45,8 @@ namespace dlib
         R (*func)(void*, Args...) = nullptr;
 
     public:
+
+        using result_type = R;
         
         constexpr any_function_basic(std::nullptr_t) noexcept {}
         constexpr any_function_basic()                                              = default;
