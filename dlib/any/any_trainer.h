@@ -78,7 +78,7 @@ namespace dlib
                 << "\n\t this: " << this
                 );
 
-            return train_func(storage.ptr, samples, labels);
+            return train_func(storage.get_ptr(), samples, labels);
         }
 
         bool is_empty() const { return storage.is_empty(); }
