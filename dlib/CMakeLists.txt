@@ -567,7 +567,8 @@ if (DLIB_BUILD_TESTS)
       test/dnn.cpp
       test/cublas.cpp
       test/find_optimal_parameters.cpp
-      test/elastic_net.cpp)
+      test/elastic_net.cpp
+      test/te.cpp)
 
    if (DLIB_USE_BLAS)
       target_sources(dtest PRIVATE
