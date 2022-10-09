@@ -4,9 +4,7 @@
 #define DLIB_AnY_TRAINER_H_
 
 #include "any.h"
-
 #include "any_decision_function.h"
-
 #include "any_trainer_abstract.h"
 #include <vector>
 
@@ -18,57 +16,54 @@ namespace dlib
     template <
         typename sample_type_,
         typename scalar_type_ = double
-        >
+    >
     class any_trainer
     {
     public:
-        typedef sample_type_ sample_type;
-        typedef scalar_type_ scalar_type;
-        typedef default_memory_manager mem_manager_type;
-        typedef any_decision_function<sample_type, scalar_type> trained_function_type;
+        using sample_type = sample_type_;
+        using scalar_type = scalar_type_;
+        using mem_manager_type = default_memory_manager;
+        using trained_function_type = any_decision_function<sample_type, scalar_type>;
 
+        any_trainer()                                       = default;
+        any_trainer(const any_trainer& other)               = default;
+        any_trainer& operator=(const any_trainer& other)    = default;
+        any_trainer(any_trainer&& other)                    = default;
+        any_trainer& operator=(any_trainer&& other)         = default;
 
-        any_trainer()
-        {
-        }
-
+        template <
+            class T,
+            class T_ = std::decay_t<T>,
+            std::enable_if_t<!std::is_same<T_,any_trainer>::value, bool> = true
+        >
         any_trainer (
-            const any_trainer& item
+            T&& item
+        ) : storage{std::forward<T>(item)},
+            train_func{[](
+                const void* ptr,
+                const std::vector<sample_type>& samples,
+                const std::vector<scalar_type>& labels
+            ) -> trained_function_type {
+                const T_& f = *reinterpret_cast<const T_*>(ptr);
+                return f.train(samples, labels);
+            }}
+        {
+        }
+
+        template <
+            class T,
+            class T_ = std::decay_t<T>,
+            std::enable_if_t<!std::is_same<T_,any_trainer>::value, bool> = true
+        >
+        any_trainer& operator= (
+            T&& item
         )
         {
-            if (item.data)
-            {
-                item.data->copy_to(data);
-            }
-        }
-
-        template <typename T>
-        any_trainer (
-            const T& item
-        )
-        {
-            using U = std::decay_t<T>;
-            data.reset(new derived<U>(item));
-        }
-
-        void clear (
-        )
-        {
-            data.reset();
-        }
-
-        template <typename T>
-        bool contains (
-        ) const
-        {
-            using U = std::decay_t<T>;
-            return dynamic_cast<derived<U>*>(data.get()) != 0;
-        }
-
-        bool is_empty(
-        ) const
-        {
-            return data.get() == 0;
+            if (contains<T_>())
+                storage.unsafe_get<T_>() = std::forward<T>(item);
+            else
+                *this = std::move(any_trainer{std::forward<T>(item)});
+            return *this;
         }
 
         trained_function_type train (
@@ -83,119 +78,26 @@ namespace dlib
                 << "\n\t this: " << this
                 );
 
-            return data->train(samples, labels);
+            return train_func(storage.get_ptr(), samples, labels);
         }
 
-        template <typename T>
-        T& cast_to(
-        ) 
-        {
-            using U = std::decay_t<T>;
-            derived<U>* d = dynamic_cast<derived<U>*>(data.get());
-            if (d == 0)
-            {
-                throw bad_any_cast();
-            }
+        bool is_empty() const { return storage.is_empty(); }
+        void clear()          { storage.clear(); }
+        void swap (any_trainer& item) { std::swap(*this, item); }
 
-            return d->item;
-        }
-
-        template <typename T>
-        const T& cast_to(
-        ) const
-        {
-            using U = std::decay_t<T>;
-            derived<U>* d = dynamic_cast<derived<U>*>(data.get());
-            if (d == 0)
-            {
-                throw bad_any_cast();
-            }
-
-            return d->item;
-        }
-
-        template <typename T>
-        T& get(
-        ) 
-        {
-            using U = std::decay_t<T>;
-            derived<U>* d = dynamic_cast<derived<U>*>(data.get());
-            if (d == 0)
-            {
-                d = new derived<U>();
-                data.reset(d);
-            }
-
-            return d->item;
-        }
-
-        any_trainer& operator= (
-            const any_trainer& item
-        )
-        {
-            any_trainer(item).swap(*this);
-            return *this;
-        }
-
-        void swap (
-            any_trainer& item
-        )
-        {
-            data.swap(item.data);
-        }
+        template <typename T>     bool contains() const { return storage.contains<T>();}
+        template <typename T>       T& cast_to()        { return storage.cast_to<T>(); }
+        template <typename T> const T& cast_to() const  { return storage.cast_to<T>(); }
+        template <typename T>       T& get()            { return storage.get<T>(); }
 
     private:
-
-        struct base
-        {
-            virtual ~base() {}
-
-            virtual trained_function_type train (
-                const std::vector<sample_type>& samples,
-                const std::vector<scalar_type>& labels
-            ) const = 0;
-
-            virtual void copy_to (
-                std::unique_ptr<base>& dest
-            ) const = 0;
-        };
-
-        template <typename T>
-        struct derived : public base
-        {
-            T item;
-            derived() {}
-            derived(const T& val) : item(val) {}
-
-            virtual void copy_to (
-                std::unique_ptr<base>& dest
-            ) const
-            {
-                dest.reset(new derived<T>(item));
-            }
-
-            virtual trained_function_type train (
-                const std::vector<sample_type>& samples,
-                const std::vector<scalar_type>& labels
-            ) const
-            {
-                return item.train(samples, labels);
-            }
-        };
-
-        std::unique_ptr<base> data;
+        te::storage_heap storage;
+        trained_function_type (*train_func) (
+            const void* self,
+            const std::vector<sample_type>& samples,
+            const std::vector<scalar_type>& labels
+        ) = nullptr;
     };
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename sample_type,
-        typename scalar_type
-        >
-    inline void swap (
-        any_trainer<sample_type,scalar_type>& a,
-        any_trainer<sample_type,scalar_type>& b
-    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 

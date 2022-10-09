@@ -69,6 +69,15 @@ namespace dlib
                   any kind of reference to item.
         !*/
 
+        any_trainer (
+            any_trainer&& item
+        );
+        /*!
+            ensures
+                - #item.is_empty() == true
+                - moves item into *this.
+        !*/
+
         template < typename T >
         any_trainer (
             const T& item
