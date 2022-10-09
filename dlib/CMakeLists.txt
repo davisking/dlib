@@ -35,7 +35,7 @@ set(CPACK_PACKAGE_VERSION_PATCH "99")
 set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 
 set(DLIB_CHECK_FOR_VERSION_MISMATCH
-        DLIB_VERSION_MISMATCH_CHECK__EXPECTED_VERSION_${PROJECT_VERSION_MAJOR}_${PROJECT_VERSION_MINOR}_${PROJECT_VERSION_PATCH})
+        DLIB_VERSION_MISMATCH_CHECK__EXPECTED_VERSION_${CPACK_PACKAGE_VERSION_MAJOR}_${CPACK_PACKAGE_VERSION_MINOR}_${CPACK_PACKAGE_VERSION_PATCH})
 ### Summary and versioning ##################################################################################
 
 ### Dependencies ############################################################################################ 
@@ -257,8 +257,7 @@ if (DLIB_WEBP_SUPPORT)
    target_sources(dlib PRIVATE
       image_loader/webp_loader.cpp
       image_saver/save_webp.cpp)
-   target_link_libraries(dlib PUBLIC ${WEBP_LIBRARIES})
-   target_include_directories(dlib PRIVATE ${WEBP_INCLUDE_DIRS})
+   target_link_libraries(dlib PUBLIC WEBP::WEBP)
    target_compile_definitions(dlib PUBLIC DLIB_WEBP_SUPPORT)
 endif()
 
@@ -269,8 +268,7 @@ endif()
 
 if (DLIB_LINK_WITH_SQLITE3)
    target_compile_definitions(dlib PUBLIC DLIB_LINK_WITH_SQLITE3)
-   target_link_libraries(dlib PUBLIC ${SQLite3_LIBRARIES})
-   target_include_directories(dlib PRIVATE ${SQLite3_INCLUDE_DIRS})
+   target_link_libraries(dlib PUBLIC SQLite::SQLite3)
 endif()
 
 if (DLIB_USE_BLAS)
