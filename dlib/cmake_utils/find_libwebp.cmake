@@ -1,16 +1,3 @@
-#=============================================================================
-# Find WebP library
-# From OpenCV
-#=============================================================================
-# Find the native WebP headers and libraries.
-#
-#  WEBP_INCLUDE_DIRS - where to find webp/decode.h, etc.
-#  WEBP_LIBRARIES    - List of libraries when using webp.
-#  WEBP_FOUND        - True if webp is found.
-#=============================================================================
-
-# Look for the header file.
-
 set(WEBP_FOUND False)
 
 find_path(WEBP_INCLUDE_DIR NAMES webp/decode.h)
@@ -21,4 +8,11 @@ if(WEBP_INCLUDE_DIR AND WEBP_LIBRARY)
     set(WEBP_FOUND True)
     set(WEBP_LIBRARIES ${WEBP_LIBRARY})
     set(WEBP_INCLUDE_DIRS ${WEBP_INCLUDE_DIR})
+    message(STATUS "Found WEBP: ${WEBP_LIBRARY}")
+
+    add_library(WEBP::WEBP UNKNOWN IMPORTED GLOBAL)
+    set_target_properties(WEBP::WEBP PROPERTIES
+        IMPORTED_LOCATION "${WEBP_LIBRARY}"
+        INTERFACE_INCLUDE_DIRECTORIES "${WEBP_INCLUDE_DIR}"
+    )
 endif()
