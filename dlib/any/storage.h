@@ -629,7 +629,7 @@ namespace dlib
                     dst.del     = std::exchange(src.del,     nullptr);
                     dst.copy    = std::exchange(src.copy,    nullptr);
                     dst.move    = std::exchange(src.move,    nullptr);
-                    dst.type_id_ = std::exchange(dst.type_id_, nullptr);
+                    dst.type_id_ = std::exchange(src.type_id_, nullptr);
                 }},
                 type_id_{[] {
                     return std::type_index{typeid(T_)};
