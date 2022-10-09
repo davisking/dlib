@@ -4,169 +4,57 @@
 #define DLIB_AnY_H_
 
 #include "any_abstract.h"
-#include "../algs.h"
-
 #include <memory>
-#include <typeinfo>
-#include <type_traits>
+#include "storage.h"
 
 namespace dlib
 {
-
-// ----------------------------------------------------------------------------------------
-
-    class bad_any_cast : public std::bad_cast 
-    {
-    public:
-          virtual const char * what() const throw()
-          {
-              return "bad_any_cast";
-          }
-    };
-
 // ----------------------------------------------------------------------------------------
 
     class any
     {
-
     public:
+        any()                               = default;
+        any(const any& other)               = default;
+        any& operator=(const any& other)    = default;
+        any(any&& other)                    = default;
+        any& operator=(any&& other)         = default;
 
-        any()
+        template<
+            typename T,
+            std::enable_if_t<!std::is_same<std::decay_t<T>, any>::value, bool> = true
+        >
+        any(T&& item)
+        : storage{std::forward<T>(item)}
         {
         }
 
-        any (
-            const any& item
-        )
+        template<
+            typename T,
+            typename T_ = std::decay_t<T>,
+            std::enable_if_t<!std::is_same<T_, any>::value, bool> = true
+        >
+        any& operator=(T&& item)
         {
-            if (item.data)
-            {
-                item.data->copy_to(data);
-            }
-        }
-
-        template <typename T>
-        any (
-            const T& item
-        )
-        {
-            using U = std::decay_t<T>;
-            data.reset(new derived<U>(item));
-        }
-
-        void clear (
-        )
-        {
-            data.reset();
-        }
-
-        template <typename T>
-        bool contains (
-        ) const
-        {
-            using U = std::decay_t<T>;
-            return dynamic_cast<derived<U>*>(data.get()) != 0;
-        }
-
-        bool is_empty(
-        ) const
-        {
-            return data.get() == 0;
-        }
-
-        template <typename T>
-        T& cast_to(
-        ) 
-        {
-            using U = std::decay_t<T>;
-            derived<U>* d = dynamic_cast<derived<U>*>(data.get());
-            if (d == 0)
-            {
-                throw bad_any_cast();
-            }
-
-            return d->item;
-        }
-
-        template <typename T>
-        const T& cast_to(
-        ) const
-        {
-            using U = std::decay_t<T>;
-            derived<U>* d = dynamic_cast<derived<U>*>(data.get());
-            if (d == 0)
-            {
-                throw bad_any_cast();
-            }
-
-            return d->item;
-        }
-
-        template <typename T>
-        T& get(
-        ) 
-        {
-            using U = std::decay_t<T>;
-            derived<U>* d = dynamic_cast<derived<U>*>(data.get());
-            if (d == 0)
-            {
-                d = new derived<U>();
-                data.reset(d);
-            }
-
-            return d->item;
-        }
-
-        any& operator= (
-            const any& item
-        )
-        {
-            any(item).swap(*this);
+            if (contains<T_>())
+                storage.unsafe_get<T_>() = std::forward<T>(item);
+            else
+                *this = std::move(any{std::forward<T>(item)});
             return *this;
         }
 
-        void swap (
-            any& item
-        )
-        {
-            data.swap(item.data);
-        }
+        bool is_empty() const { return storage.is_empty(); }
+        void clear()          { storage.clear(); }
+        void swap (any& item) { std::swap(*this, item); }
+
+        template<typename T>      bool contains() const { return storage.contains<T>();}
+        template <typename T>       T& cast_to()        { return storage.cast_to<T>(); }
+        template <typename T> const T& cast_to() const  { return storage.cast_to<T>(); }
+        template <typename T>       T& get()            { return storage.get<T>(); }
 
     private:
-
-        struct base
-        {
-            virtual ~base() {}
-
-            virtual void copy_to (
-                std::unique_ptr<base>& dest
-            ) const = 0;
-        };
-
-        template <typename T>
-        struct derived : public base
-        {
-            T item;
-            derived() {}
-            derived(const T& val) : item(val) {}
-
-            virtual void copy_to (
-                std::unique_ptr<base>& dest
-            ) const
-            {
-                dest.reset(new derived<T>(item));
-            }
-        };
-
-        std::unique_ptr<base> data;
+        te::storage_heap storage;
     };
-
-// ----------------------------------------------------------------------------------------
-
-    inline void swap (
-        any& a,
-        any& b
-    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 

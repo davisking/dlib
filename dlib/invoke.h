@@ -4,7 +4,7 @@
 #define DLIB_INVOKE_Hh_
 
 #include <functional>
-#include <type_traits>
+#include "type_traits.h"
 #include "utility.h"
 
 namespace dlib
@@ -216,9 +216,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace detail
+    {
+        template <class, typename R, typename F, typename... Args>
+        struct is_invocable_r_impl : std::false_type {};
+
+        template <typename R, typename F, typename... Args>
+        struct is_invocable_r_impl<dlib::void_t<std::is_convertible<invoke_result_t<F, Args...>, R>>, R, F, Args...> : std::true_type {};
+    }
+    
     template <typename R, typename F, typename... Args>
-    struct is_invocable_r : std::integral_constant<bool, dlib::is_invocable<F, Args...>::value &&
-                                                         std::is_convertible<invoke_result_t<F, Args...>, R>::value> {};
+    struct is_invocable_r : detail::is_invocable_r_impl<void, R, F, Args...> {};
     /*!
         ensures
             - identical to std::is_invocable_r<R, F, Args..>
