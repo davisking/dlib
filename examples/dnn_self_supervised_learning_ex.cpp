@@ -283,7 +283,7 @@ try
                 beta = 0;
                 // Perform batch normalization on each feature representation, independently.
                 tt::batch_normalize(eps, za_norm, means, invstds, 1, rms, rvs, za, gamma, beta);
-                tt::batch_normalize(eps, zb_norm, means, invstds, 1, rms, rvs, za, gamma, beta);
+                tt::batch_normalize(eps, zb_norm, means, invstds, 1, rms, rvs, zb, gamma, beta);
                 // Compute the empirical cross-correlation matrix between the features and
                 // visualize it.
                 tt::gemm(0, eccm, 1, za_norm, true, zb_norm, false);
