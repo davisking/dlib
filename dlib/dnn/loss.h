@@ -4128,16 +4128,16 @@ namespace dlib
             // --------------------------------------------
             // 	=> d/dA = 2 * B * diag(diag(A' * B) - vector(1)) = 2 * B * diag(diag(C) - vector(1))
             // 	=> d/dB = 2 * A * diag(diag(A' * B) - vector(1)) = 2 * A * diag(diag(C) - vector(1))
-            tt::gemm(0, grad_input_a, 2, zb_norm, false, cdiag_1, false);
-            tt::gemm(0, grad_input_b, 2, za_norm, false, cdiag_1, false);
+            tt::gemm(0, grad_input_a, 2.0 / batch_size, zb_norm, false, cdiag_1, false);
+            tt::gemm(0, grad_input_b, 2.0 / batch_size, za_norm, false, cdiag_1, false);
 
             // off-diag term: sum(((A'* B) .* D).^2)
             // --------------------------------
-            //  => d/dA = 2 * B * ((B' * A) .* (D .* D)') = 2 * B * (C .* (D .* D)) = 2 * B * (C .* D)
+            //  => d/dA = 2 * B * ((B' * A) .* (D .* D)') = 2 * B * (C' .* (D .* D)) = 2 * B * (C' .* D)
             //  => d/dB = 2 * A * ((A' * B) .* (D .* D))  = 2 * A * (C .* (D .* D)) = 2 * A * (C .* D)
             tt::multiply(false, off_diag, eccm, off_mask);
-            tt::gemm(1, grad_input_a, 2 * lambda, zb_norm, false, off_diag, false);
-            tt::gemm(1, grad_input_b, 2 * lambda, za_norm, false, off_diag, false);
+            tt::gemm(1, grad_input_a, lambda * 2.0 / batch_size, zb_norm, false, off_diag, true);
+            tt::gemm(1, grad_input_b, lambda * 2.0 / batch_size, za_norm, false, off_diag, false);
 
             // Compute the batch norm gradients, g and b grads are not used
             auto gza = split(grad);
