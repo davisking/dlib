@@ -39,6 +39,14 @@ void bind_gui(py::module& m);
 
 PYBIND11_MODULE(_dlib_pybind11, m)
 {
+    // Attempt to give users that have compiled dlib to use SIMD instructions but then tried to use
+    // it on a CPU that doesn't support them a more informative warning that many systems generate
+    // by default in such events.  Note that this may or may not be able to print a warning before
+    // some unavailable SIMD instruction is used.  It depends on what SIMD instructions your
+    // compiler may or may not have inserted into other parts of the code that it compiles.  Which
+    // is entirely up to your compiler.  And by the nature of this user error, we can't control how
+    // this plays out.  So on some systems/setups/compilers they will get this nicer error message
+    // and sometimes they don't.
     warn_about_unavailable_but_used_cpu_instructions();
 
 
