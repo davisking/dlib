@@ -41,17 +41,18 @@ jobs:
     - name: Test
       run: python -m pytest --ignore docs --ignore dlib
 
-  MacOS:
-    runs-on: 'macos-latest'
-    steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
-    - name: Install python deps
-      run: pip3 install pytest numpy
-    - name: Build
-      run: |
-        python3 setup.py build
-        python3 setup.py install --user
-    - name: Test
-      run: python3 -m pytest --ignore docs --ignore dlib
+# Disabled for now since something is going sideways with python packages on github actions
+# MacOS:
+#   runs-on: 'macos-latest'
+#   steps:
+#   - uses: actions/checkout@v3
+#   - uses: actions/setup-python@v4
+#   - name: Install python deps
+#     run: pip3 install pytest numpy
+#   - name: Build
+#     run: |
+#       python3 setup.py build
+#       python3 setup.py install --user
+#   - name: Test
+#     run: python3 -m pytest --ignore docs --ignore dlib
 
