@@ -47,7 +47,7 @@ namespace dlib
     namespace lapack
     {
             // stuff from f2c used to define what exactly is an integer in fortran
-#if (defined(__alpha__) || defined(__sparc64__) || defined(__x86_64__) || defined(__ia64__) || defined(__aarch64__)) && !defined(MATLAB_MEX_FILE) && !defined(USE_64BIT_LAPACK_INTEGERS)
+#if (defined(__alpha__) || defined(__sparc64__) || defined(__x86_64__) || defined(__ia64__) || defined(__aarch64__) || defined(__powerpc64__) || defined(__mips64)) && !defined(MATLAB_MEX_FILE) && !defined(USE_64BIT_LAPACK_INTEGERS)
             typedef int integer;
             typedef unsigned int uinteger;
 #else
