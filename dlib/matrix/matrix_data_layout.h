@@ -24,7 +24,7 @@
 // definitely heap allocated.
 #if defined(__GNUC__) && ((__GNUC__ == 11 && __GNUC_MINOR__ == 3))
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Werror=free-nonheap-object"
+#pragma GCC diagnostic ignored "-Wfree-nonheap-object"
 #endif
 
 namespace dlib
