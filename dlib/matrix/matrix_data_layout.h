@@ -17,16 +17,6 @@
 #pragma GCC diagnostic ignored "-Warray-bounds"
 #endif
 
-// GCC 11.3 wrongly yields this warning:
-//  dlib::row_major_layout::layout<double, 0, 2, dlib::memory_manager_stateless_kernel_1<char> >::data’ with nonzero offset 8 [-Werror=free-nonheap-object]
-//   61 |                 delete [] item;
-// Which by inspection of the class below you can see is clearly incorrect, as `data` is most
-// definitely heap allocated.
-#if defined(__GNUC__) && ((__GNUC__ == 11 && __GNUC_MINOR__ == 3))
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wfree-nonheap-object"
-#endif
-
 namespace dlib
 {
 
@@ -1342,10 +1332,6 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
 }
-
-#if defined(__GNUC__) && ((__GNUC__ >= 4 && __GNUC_MINOR__ >= 8) || (__GNUC__ > 4))
-#pragma GCC diagnostic pop
-#endif
 
 #if defined(__GNUC__) && ((__GNUC__ >= 4 && __GNUC_MINOR__ >= 8) || (__GNUC__ > 4))
 #pragma GCC diagnostic pop
