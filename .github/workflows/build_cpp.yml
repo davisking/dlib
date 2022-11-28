@@ -106,7 +106,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Configure
-      run: cmake . -B ${{ env.build_dir }}
+      run: |
+        # don't use CMake 3.25.0 https://gitlab.kitware.com/cmake/cmake/-/issues/23975
+        pip3 install cmake==3.24.0
+        cmake . -B ${{ env.build_dir }}
     - name: Build just tests
       run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --target dtest --parallel 4
     - name: Test
@@ -119,7 +122,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Configure
-      run: cmake . -B ${{ env.build_dir }}
+      run: |
+        # don't use CMake 3.25.0 https://gitlab.kitware.com/cmake/cmake/-/issues/23975
+        pip3 install cmake==3.24.0
+        cmake . -B ${{ env.build_dir }}
     - name: Build just tests
       run: cmake --build ${{ env.build_dir }} --config Debug --target dtest --parallel 4
     - name: Build ancillary tools

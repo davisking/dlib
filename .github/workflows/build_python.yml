@@ -19,9 +19,13 @@ jobs:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
     - name: Install python deps
-      run: pip install pytest numpy
+      run: |
+        pip install pytest numpy
+        # don't use CMake 3.25.0 https://gitlab.kitware.com/cmake/cmake/-/issues/23975
+        pip3 install cmake==3.24.0
     - name: Build
       run: |
+        pip3 install cmake==3.24.0
         python setup.py build
         python setup.py install --user
     - name: Test
