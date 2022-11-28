@@ -178,6 +178,16 @@ if (CMAKE_COMPILER_IS_GNUCXX)
    add_compile_options(-Wno-unused-function)
    add_compile_options(-Wno-strict-overflow)
    add_compile_options(-Wno-maybe-uninitialized)
+
+   if (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 11.3.0)
+      # GCC 11.3 wrongly yields this warning:
+      #  dlib::row_major_layout::layout<double, 0, 2, dlib::memory_manager_stateless_kernel_1<char> >::data’ with nonzero offset 8 [-Werror=free-nonheap-object]
+      #   61 |                 delete [] item;
+      # Which by inspection of the dlib::row_major_layout::layout class you can see is clearly incorrect, as `data` is most
+      # definitely heap allocated.
+      add_compile_options(-Wno-free-nonheap-object)
+   endif()
+
 elseif (MSVC)
    # Treat warnings as errors.
    add_compile_options(/WX)
