@@ -3177,8 +3177,7 @@ namespace dlib
 
         friend void to_xml(const leaky_relu_& item, std::ostream& out)
         {
-            out << "<leaky_relu alpha='"<< item.alpha << "'>\n";
-            out << "<leaky_relu/>\n";
+            out << "<leaky_relu alpha='"<< item.alpha << "'/>\n";
         }
 
     private:
@@ -3695,8 +3694,7 @@ namespace dlib
 
         friend void to_xml(const smelu_& item, std::ostream& out)
         {
-            out << "<smelu beta='"<< item.beta << "'>\n";
-            out << "<smelu/>\n";
+            out << "<smelu beta='"<< item.beta << "'/>\n";
         }
 
     private:
