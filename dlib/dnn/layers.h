@@ -369,7 +369,7 @@ namespace dlib
                 << " bias_weight_decay_mult='"<<item.bias_weight_decay_multiplier<<"'"
                 << " use_bias='"<<(item.use_bias?"true":"false")<<"'>\n";
             out << mat(item.params);
-            out << "</con>";
+            out << "</con>\n";
         }
 
     private:
@@ -693,7 +693,7 @@ namespace dlib
                 << " bias_weight_decay_mult='"<<item.bias_weight_decay_multiplier<<"'"
                 << " use_bias='"<<(item.use_bias?"true":"false")<<"'>\n";
             out << mat(item.params);
-            out << "</cont>";
+            out << "</cont>\n";
         }
 
     private:
@@ -1445,7 +1445,7 @@ namespace dlib
 
         friend void to_xml(const layer_norm_& item, std::ostream& out)
         {
-            out << "layer_norm";
+            out << "<layer_norm";
             out << " eps='"<<item.eps<<"'";
             out << " learning_rate_mult='"<<item.learning_rate_multiplier<<"'";
             out << " weight_decay_mult='"<<item.weight_decay_multiplier<<"'";
@@ -1943,7 +1943,6 @@ namespace dlib
                     << " bias_learning_rate_mult='"<<item.bias_learning_rate_multiplier<<"'"
                     << " bias_weight_decay_mult='"<<item.bias_weight_decay_multiplier<<"'"
                     << " use_bias='"<<(item.use_bias?"true":"false")<<"'>\n";
-                out << ">\n";
                 out << mat(item.params);
                 out << "</fc>\n";
             }

@@ -119,7 +119,7 @@ namespace dlib
 
         friend void to_xml(const loss_binary_hinge_& /*item*/, std::ostream& out)
         {
-            out << "<loss_binary_hinge/>";
+            out << "<loss_binary_hinge/>\n";
         }
 
     };
@@ -236,7 +236,7 @@ namespace dlib
 
         friend void to_xml(const loss_binary_log_& /*item*/, std::ostream& out)
         {
-            out << "<loss_binary_log/>";
+            out << "<loss_binary_log/>\n";
         }
 
     };
@@ -353,7 +353,7 @@ namespace dlib
 
         friend void to_xml(const loss_multiclass_log_& /*item*/, std::ostream& out)
         {
-            out << "<loss_multiclass_log/>";
+            out << "<loss_multiclass_log/>\n";
         }
 
     };
@@ -472,7 +472,7 @@ namespace dlib
 
         friend void to_xml(const loss_multiclass_log_weighted_& /*item*/, std::ostream& out)
         {
-            out << "<loss_multiclass_log_weighted/>";
+            out << "<loss_multiclass_log_weighted/>\n";
         }
 
     };
@@ -735,7 +735,7 @@ namespace dlib
         {
             out << "<loss_multimulticlass_log>\n";
             out << item;
-            out << "\n</loss_multimulticlass_log>";
+            out << "\n</loss_multimulticlass_log>\n";
         }
 
     private:
@@ -900,7 +900,7 @@ namespace dlib
 
         friend void to_xml(const loss_multibinary_log_& item, std::ostream& out)
         {
-            out << "<loss_multibinary_log gamma='" << item.gamma << "'/>";
+            out << "<loss_multibinary_log gamma='" << item.gamma << "'/>\n";
         }
 
     private:
@@ -1715,7 +1715,7 @@ namespace dlib
         friend void to_xml(const loss_mmod_& /*item*/, std::ostream& out)
         {
             // TODO, add options fields
-            out << "<loss_mmod/>";
+            out << "<loss_mmod/>\n";
         }
 
     private:
@@ -2236,7 +2236,7 @@ namespace dlib
 
         friend void to_xml(const loss_metric_& item, std::ostream& out)
         {
-            out << "<loss_metric margin='"<<item.margin<<"' distance_threshold='"<<item.dist_thresh<<"'/>";
+            out << "<loss_metric margin='"<<item.margin<<"' distance_threshold='"<<item.dist_thresh<<"'/>\n";
         }
 
     private:
@@ -2386,7 +2386,7 @@ namespace dlib
 
         friend void to_xml(const loss_ranking_& /*item*/, std::ostream& out)
         {
-            out << "<loss_ranking/>";
+            out << "<loss_ranking/>\n";
         }
 
     };
@@ -2493,7 +2493,7 @@ namespace dlib
 
         friend void to_xml(const loss_mean_squared_& /*item*/, std::ostream& out)
         {
-            out << "<loss_mean_squared/>";
+            out << "<loss_mean_squared/>\n";
         }
 
     };
@@ -2621,7 +2621,7 @@ namespace dlib
 
         friend void to_xml(const loss_epsilon_insensitive_& item, std::ostream& out)
         {
-            out << "<loss_epsilon_insensitive_ epsilon='" << item.eps << "'/>";
+            out << "<loss_epsilon_insensitive_ epsilon='" << item.eps << "'/>\n";
         }
 
     private:
@@ -2743,7 +2743,7 @@ namespace dlib
 
         friend void to_xml(const loss_mean_squared_multioutput_& /*item*/, std::ostream& out)
         {
-            out << "<loss_mean_squared_multioutput/>";
+            out << "<loss_mean_squared_multioutput/>\n";
         }
 
     };
@@ -2853,7 +2853,7 @@ namespace dlib
 
         friend void to_xml(const loss_binary_log_per_pixel_& /*item*/, std::ostream& out)
         {
-            out << "<loss_binary_log_per_pixel/>";
+            out << "<loss_binary_log_per_pixel/>\n";
         }
 
     private:
@@ -2998,7 +2998,7 @@ namespace dlib
 
         friend void to_xml(const loss_multiclass_log_per_pixel_& /*item*/, std::ostream& out)
         {
-            out << "<loss_multiclass_log_per_pixel/>";
+            out << "<loss_multiclass_log_per_pixel/>\n";
         }
 
     private:
@@ -3098,7 +3098,7 @@ namespace dlib
 
         friend void to_xml(const loss_multiclass_log_per_pixel_weighted_& /*item*/, std::ostream& out)
         {
-            out << "<loss_multiclass_log_per_pixel_weighted/>";
+            out << "<loss_multiclass_log_per_pixel_weighted/>\n";
         }
 
     private:
@@ -3231,7 +3231,7 @@ namespace dlib
 
         friend void to_xml(const loss_mean_squared_per_pixel_& /*item*/, std::ostream& out)
         {
-            out << "<loss_mean_squared_per_pixel/>";
+            out << "<loss_mean_squared_per_pixel/>\n";
         }
 
     };
@@ -3349,7 +3349,7 @@ namespace dlib
 
         friend void to_xml(const loss_mean_squared_per_channel_and_pixel_& /*item*/, std::ostream& out)
         {
-            out << "<loss_mean_squared_per_channel_and_pixel/>";
+            out << "<loss_mean_squared_per_channel_and_pixel/>\n";
         }
 
     private:
@@ -3462,7 +3462,7 @@ namespace dlib
 
         friend void to_xml(const loss_dot_& /*item*/, std::ostream& out)
         {
-            out << "<loss_dot/>";
+            out << "<loss_dot/>\n";
         }
 
     };
@@ -4002,7 +4002,7 @@ namespace dlib
 
         friend void to_xml(const loss_yolo_& /*item*/, std::ostream& out)
         {
-            out << "<loss_yolo/>";
+            out << "<loss_yolo/>\n";
         }
 
     private:
@@ -4182,7 +4182,7 @@ namespace dlib
 
         friend void to_xml(const loss_barlow_twins_& item, std::ostream& out)
         {
-            out << "<loss_barlow_twins lambda='" << item.lambda << "'/>";
+            out << "<loss_barlow_twins lambda='" << item.lambda << "'/>\n";
         }
 
     private:

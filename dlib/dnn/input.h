@@ -156,7 +156,7 @@ namespace dlib
 
         friend void to_xml(const input_rgb_image& item, std::ostream& out)
         {
-            out << "<input_rgb_image r='"<<item.avg_red<<"' g='"<<item.avg_green<<"' b='"<<item.avg_blue<<"'/>";
+            out << "<input_rgb_image r='"<<item.avg_red<<"' g='"<<item.avg_green<<"' b='"<<item.avg_blue<<"'/>\n";
         }
 
     private:
@@ -289,7 +289,7 @@ namespace dlib
 
         friend void to_xml(const input_rgb_image_sized& item, std::ostream& out)
         {
-            out << "<input_rgb_image_sized r='"<<item.avg_red<<"' g='"<<item.avg_green<<"' b='"<<item.avg_blue<<"' nr='"<<NR<<"' nc='"<<NC<<"'/>";
+            out << "<input_rgb_image_sized r='"<<item.avg_red<<"' g='"<<item.avg_green<<"' b='"<<item.avg_blue<<"' nr='"<<NR<<"' nc='"<<NC<<"'/>\n";
         }
 
     private:
@@ -448,7 +448,7 @@ namespace dlib
 
         friend void to_xml(const input_rgb_image_pair& item, std::ostream& out)
         {
-            out << "<input_rgb_image_pair r='"<<item.avg_red<<"' g='"<<item.avg_green<<"' b='"<<item.avg_blue<<"'/>";
+            out << "<input_rgb_image_pair r='"<<item.avg_red<<"' g='"<<item.avg_green<<"' b='"<<item.avg_blue<<"'/>\n";
         }
 
     private:
@@ -559,7 +559,7 @@ namespace dlib
 
         friend void to_xml(const input& /*item*/, std::ostream& out)
         {
-            out << "<input/>";
+            out << "<input/>\n";
         }
     };
 
@@ -652,7 +652,7 @@ namespace dlib
 
         friend void to_xml(const input& /*item*/, std::ostream& out)
         {
-            out << "<input/>";
+            out << "<input/>\n";
         }
     };
 
@@ -747,7 +747,7 @@ namespace dlib
 
         friend void to_xml(const input&, std::ostream& out)
         {
-            out << "<input/>";
+            out << "<input/>\n";
         }
     };
 
@@ -943,7 +943,7 @@ namespace dlib
             out << "<input_grayscale_image_pyramid"
                 <<"' pyramid_padding='"<<item.pyramid_padding
                 <<"' pyramid_outer_padding='"<<item.pyramid_outer_padding
-                <<"'/>";
+                <<"'/>\n";
         }
     };
 
@@ -1073,7 +1073,7 @@ namespace dlib
                 <<"' b='"<<item.avg_blue
                 <<"' pyramid_padding='"<<item.pyramid_padding
                 <<"' pyramid_outer_padding='"<<item.pyramid_outer_padding
-                <<"'/>";
+                <<"'/>\n";
         }
 
     private:
