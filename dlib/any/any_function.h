@@ -4,7 +4,7 @@
 #define DLIB_AnY_FUNCTION_Hh_
 
 #include "../assert.h"
-#include "../invoke.h"
+#include "../functional.h"
 #include "any.h"
 #include "any_function_abstract.h"
 
