@@ -312,6 +312,51 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace detail
+    {
+        template<class F, class ...Args>
+        struct front_binder
+        {
+            F                   func;
+            std::tuple<Args...> args;
+
+            template<std::size_t ...I, class ...Rest>
+            constexpr auto run(index_sequence<I...>, Rest&&... rest)
+                noexcept(noexcept(dlib::invoke(func, std::get<I>(args)..., std::forward<Rest>(rest)...)))
+                      -> decltype(dlib::invoke(func, std::get<I>(args)..., std::forward<Rest>(rest)...))
+            {
+                return dlib::invoke(func, std::get<I>(args)..., std::forward<Rest>(rest)...);
+            }
+
+            template<class ...Rest>
+            constexpr auto operator()(Rest&&... rest) 
+                noexcept(noexcept(run(index_sequence_for<Args...>{}, std::forward<Rest>(rest)...)))
+                      -> decltype(run(index_sequence_for<Args...>{}, std::forward<Rest>(rest)...))
+            {
+                return run(index_sequence_for<Args...>{}, std::forward<Rest>(rest)...);
+            }
+        };
+
+        template<class F, class... Args>
+        constexpr auto make_front_binder(
+            F&& func, 
+            Args&&... args
+        )
+        {
+            return front_binder<std::decay_t<F>, std::decay_t<Args>...>{std::forward<F>(func), std::forward<Args>(args)...};
+        }
+    }
+    
+    template<class F, class ...Args>
+    constexpr auto bind_front(
+        F&& func,
+        Args&&... args
+    ) noexcept(noexcept(detail::make_front_binder(std::forward<F>(func), std::forward<Args>(args)...)))
+    {
+        return detail::make_front_binder(std::forward<F>(func), std::forward<Args>(args)...);
+    }
+
+// ----------------------------------------------------------------------------------------
 }
 
 #endif //DLIB_INVOKE_Hh_

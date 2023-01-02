@@ -332,6 +332,35 @@ namespace
 
     // ----------------------------------------------------------------------------------------
 
+    constexpr int test_bind_front_func(int a, int b)
+    {
+        return a - b;
+    }
+
+    struct test_bind_front_func_class
+    {
+        constexpr test_bind_front_func_class(int v) : val{v} {}
+        int val;
+        constexpr int minus(int arg) const noexcept { return val - arg; }
+    };
+
+    void test_bind_front()
+    {
+        // Pure function
+        static_assert(dlib::bind_front(test_bind_front_func, 50)(3) == 47, "this should be constexpr");
+        DLIB_TEST(dlib::bind_front(test_bind_front_func, 50)(3) == 47);
+
+        // Member function
+        static_assert(dlib::bind_front(&test_bind_front_func_class::minus, test_bind_front_func_class{50})(3) == 47, "this should be constexpr");
+        DLIB_TEST(dlib::bind_front(&test_bind_front_func_class::minus, test_bind_front_func_class{50})(3) == 47);
+        DLIB_TEST(dlib::bind_front(&test_bind_front_func_class::minus, std::make_shared<test_bind_front_func_class>(50))(3) == 47);
+
+        // Lambda
+        DLIB_TEST(dlib::bind_front([](int a, int b) {return a - b;}, 50)(3) == 47);
+    }
+
+    // ----------------------------------------------------------------------------------------
+
     class invoke_tester : public tester
     {
     public:
@@ -350,6 +379,7 @@ namespace
             test_make_from_tuple();
             test_invoke_r();
             test_constexpr();
+            test_bind_front();
         }
     } a;
 }
