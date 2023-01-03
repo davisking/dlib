@@ -360,6 +360,11 @@ namespace dlib
         F&& func,
         Args&&... args
     ) noexcept(noexcept(detail::make_binder<false>(std::forward<F>(func), std::forward<Args>(args)...)))
+    /*!
+        ensures
+            - identical to std::bind_front()
+            - works with C++11 onwards
+    !*/
     {
         return detail::make_binder<false>(std::forward<F>(func), std::forward<Args>(args)...);
     }
@@ -369,6 +374,11 @@ namespace dlib
         F&& func,
         Args&&... args
     ) noexcept(noexcept(detail::make_binder<true>(std::forward<F>(func), std::forward<Args>(args)...)))
+    /*!
+        ensures
+            - identical to std::bind_back()
+            - works with C++11 onwards
+    !*/
     {
         return detail::make_binder<true>(std::forward<F>(func), std::forward<Args>(args)...);
     }
