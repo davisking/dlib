@@ -56,6 +56,26 @@ jobs:
     - name: Build examples, etc
       run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --parallel 2
 
+  ubuntu-latest-gcc-7:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install libwebp-dev
+    - name: Install gcc 7
+      run: |
+        sudo apt install gcc-7 g++-7
+    - name: Configure
+      run: cmake ${{ github.workspace }}/dlib/test -B ${{ env.build_dir }}
+    - name: Build just tests
+      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --target dtest --parallel 4
+    - name: Test
+      run: ${{ env.build_dir }}/dtest --runall -q
+    - name: Build examples, etc
+      run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --parallel 2
+
   ubuntu-latest-clang-default:
     runs-on: 'ubuntu-latest'
     steps:
