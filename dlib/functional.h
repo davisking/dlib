@@ -314,34 +314,43 @@ namespace dlib
 
     namespace detail
     {
+
+        template<class Binder, std::size_t ...I, class ...Rest>
+        constexpr static auto binder_run(
+            Binder&& self,
+            std::integral_constant<bool, false>,
+            index_sequence<I...>, 
+            Rest&&... rest
+        ) noexcept(noexcept(dlib::invoke(std::forward<Binder>(self).func, std::get<I>(std::forward<Binder>(self).args)..., std::forward<Rest>(rest)...)))
+                -> decltype(dlib::invoke(std::forward<Binder>(self).func, std::get<I>(std::forward<Binder>(self).args)..., std::forward<Rest>(rest)...))
+        {
+            return dlib::invoke(std::forward<Binder>(self).func, std::get<I>(std::forward<Binder>(self).args)..., std::forward<Rest>(rest)...);
+        }
+
+        template<class Binder, std::size_t ...I, class ...Rest>
+        constexpr static auto binder_run(
+            Binder&& self,
+            std::integral_constant<bool, true>,
+            index_sequence<I...>, 
+            Rest&&... rest
+        ) noexcept(noexcept(dlib::invoke(std::forward<Binder>(self).func, std::forward<Rest>(rest)..., std::get<I>(std::forward<Binder>(self).args)...)))
+                -> decltype(dlib::invoke(std::forward<Binder>(self).func, std::forward<Rest>(rest)..., std::get<I>(std::forward<Binder>(self).args)...))
+        {
+            return dlib::invoke(std::forward<Binder>(self).func, std::forward<Rest>(rest)..., std::get<I>(std::forward<Binder>(self).args)...);
+        }
+
         template<bool Back, class F, class ...Args>
         struct binder_wrapper
         {
             F                   func;
             std::tuple<Args...> args;
 
-            template<std::size_t ...I, class ...Rest>
-            constexpr auto run(std::integral_constant<bool, false>, index_sequence<I...>, Rest&&... rest)
-                noexcept(noexcept(dlib::invoke(func, std::get<I>(args)..., std::forward<Rest>(rest)...)))
-                      -> decltype(dlib::invoke(func, std::get<I>(args)..., std::forward<Rest>(rest)...))
-            {
-                return dlib::invoke(func, std::get<I>(args)..., std::forward<Rest>(rest)...);
-            }
-
-            template<std::size_t ...I, class ...Rest>
-            constexpr auto run(std::integral_constant<bool, true>, index_sequence<I...>, Rest&&... rest)
-                noexcept(noexcept(dlib::invoke(func, std::forward<Rest>(rest)..., std::get<I>(args)...)))
-                      -> decltype(dlib::invoke(func, std::forward<Rest>(rest)..., std::get<I>(args)...))
-            {
-                return dlib::invoke(func, std::forward<Rest>(rest)..., std::get<I>(args)...);
-            }
-
             template<class ...Rest>
             constexpr auto operator()(Rest&&... rest) 
-                noexcept(noexcept(run(std::integral_constant<bool, Back>{}, index_sequence_for<Args...>{}, std::forward<Rest>(rest)...)))
-                      -> decltype(run(std::integral_constant<bool, Back>{}, index_sequence_for<Args...>{}, std::forward<Rest>(rest)...))
+                noexcept(noexcept(binder_run(*this, std::integral_constant<bool, Back>{}, index_sequence_for<Args...>{}, std::forward<Rest>(rest)...)))
+                      -> decltype(binder_run(*this, std::integral_constant<bool, Back>{}, index_sequence_for<Args...>{}, std::forward<Rest>(rest)...))
             {
-                return run(std::integral_constant<bool, Back>{}, index_sequence_for<Args...>{}, std::forward<Rest>(rest)...);
+                return binder_run(*this, std::integral_constant<bool, Back>{}, index_sequence_for<Args...>{}, std::forward<Rest>(rest)...);
             }
         };
 
