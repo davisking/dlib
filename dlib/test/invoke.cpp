@@ -5,7 +5,7 @@
 #include <array>
 #include <tuple>
 #include <utility>
-#include <dlib/invoke.h>
+#include <dlib/functional.h>
 #include "tester.h"
 
 namespace
@@ -332,6 +332,50 @@ namespace
 
     // ----------------------------------------------------------------------------------------
 
+    constexpr int test_bind_func(int a, int b)
+    {
+        return a - b;
+    }
+
+    struct test_bind_func_class
+    {
+        constexpr test_bind_func_class(int v) : val{v} {}
+        int val;
+        constexpr int minus(int arg) const noexcept { return val - arg; }
+    };
+
+    void test_bind_front()
+    {
+        // Pure function
+        static_assert(dlib::bind_front(test_bind_func, 50)(3) == 47, "this should be constexpr");
+        DLIB_TEST(dlib::bind_front(test_bind_func, 50)(3) == 47);
+
+        // Member function
+        static_assert(dlib::bind_front(&test_bind_func_class::minus, test_bind_func_class{50})(3) == 47, "this should be constexpr");
+        DLIB_TEST(dlib::bind_front(&test_bind_func_class::minus, test_bind_func_class{50})(3) == 47);
+        DLIB_TEST(dlib::bind_front(&test_bind_func_class::minus, std::make_shared<test_bind_func_class>(50))(3) == 47);
+
+        // Lambda
+        DLIB_TEST(dlib::bind_front([](int a, int b) {return a - b;}, 50)(3) == 47);
+    }
+
+    void test_bind_back()
+    {
+        // Pure function
+        static_assert(dlib::bind_back(test_bind_func, 50)(3) == -47, "this should be constexpr");
+        DLIB_TEST(dlib::bind_back(test_bind_func, 50)(3) == -47);
+
+        // Member function
+        static_assert(dlib::bind_back(&test_bind_func_class::minus, 50)(test_bind_func_class{3}) == -47, "this should be constexpr");
+        DLIB_TEST(dlib::bind_back(&test_bind_func_class::minus, 50)(test_bind_func_class{3}) == -47);
+        DLIB_TEST(dlib::bind_back(&test_bind_func_class::minus, 50)(std::make_shared<test_bind_func_class>(3)) == -47);
+
+        // Lambda
+        DLIB_TEST(dlib::bind_back([](int a, int b) {return a - b;}, 50)(3) == -47);
+    }
+
+    // ----------------------------------------------------------------------------------------
+
     class invoke_tester : public tester
     {
     public:
@@ -350,6 +394,8 @@ namespace
             test_make_from_tuple();
             test_invoke_r();
             test_constexpr();
+            test_bind_front();
+            test_bind_back();
         }
     } a;
 }

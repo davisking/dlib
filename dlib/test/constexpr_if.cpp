@@ -3,7 +3,7 @@
 
 #include <string>
 #include <dlib/constexpr_if.h>
-#include <dlib/invoke.h>
+#include <dlib/functional.h>
 #include <cstdio>
 #include "tester.h"
 

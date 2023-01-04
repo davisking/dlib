@@ -4,7 +4,7 @@
 #define DLIB_METApROGRAMMING_Hh_
 
 #include "constexpr_if.h"
-#include "invoke.h"
+#include "functional.h"
 
 namespace dlib
 {
