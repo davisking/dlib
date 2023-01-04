@@ -347,8 +347,8 @@ namespace dlib
 
             template<class ...Rest>
             constexpr auto operator()(Rest&&... rest) 
-                noexcept(noexcept(binder_run(*this, std::integral_constant<bool, Back>{}, index_sequence_for<Args...>{}, std::forward<Rest>(rest)...)))
-                      -> decltype(binder_run(*this, std::integral_constant<bool, Back>{}, index_sequence_for<Args...>{}, std::forward<Rest>(rest)...))
+                noexcept(noexcept(binder_run(std::declval<binder_wrapper&>(), std::integral_constant<bool, Back>{}, index_sequence_for<Args...>{}, std::forward<Rest>(rest)...)))
+                      -> decltype(binder_run(std::declval<binder_wrapper&>(), std::integral_constant<bool, Back>{}, index_sequence_for<Args...>{}, std::forward<Rest>(rest)...))
             {
                 return binder_run(*this, std::integral_constant<bool, Back>{}, index_sequence_for<Args...>{}, std::forward<Rest>(rest)...);
             }
