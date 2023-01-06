@@ -184,7 +184,8 @@ if (NOT TARGET dlib)
       "Disable this is you don't want to use the MKL DFTI FFT implementation" )
    set (DLIB_ENABLE_ASSERTS_STR
       "Enable this if you want to turn on the DLIB_ASSERT macro" )
-
+   set (DLIB_USE_FFMPEG_STR
+      "Disable this if you don't want to use the FFMPEG library" )
 
    option(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} OFF)
    option(DLIB_ISO_CPP_ONLY ${DLIB_ISO_CPP_ONLY_STR} OFF)
@@ -236,6 +237,7 @@ if (NOT TARGET dlib)
       option(DLIB_WEBP_SUPPORT ${DLIB_WEBP_SUPPORT_STR} OFF)
       #option(DLIB_USE_FFTW ${DLIB_USE_FFTW_STR} OFF)
       option(DLIB_USE_MKL_FFT ${DLIB_USE_MKL_FFT_STR} OFF)
+      option(DLIB_USE_FFMPEG ${DLIB_USE_FFMPEG_STR} OFF)
    else()
       option(DLIB_JPEG_SUPPORT ${DLIB_JPEG_SUPPORT_STR} ON)
       option(DLIB_WEBP_SUPPORT ${DLIB_WEBP_SUPPORT_STR} ON)
@@ -248,6 +250,7 @@ if (NOT TARGET dlib)
       option(DLIB_GIF_SUPPORT ${DLIB_GIF_SUPPORT_STR} ON)
       #option(DLIB_USE_FFTW ${DLIB_USE_FFTW_STR} ON)
       option(DLIB_USE_MKL_FFT ${DLIB_USE_MKL_FFT_STR} ON)
+      option(DLIB_USE_FFMPEG ${DLIB_USE_FFMPEG_STR} ON)
    endif()
    toggle_preprocessor_switch(DLIB_JPEG_SUPPORT)
    toggle_preprocessor_switch(DLIB_WEBP_SUPPORT)
@@ -258,6 +261,7 @@ if (NOT TARGET dlib)
    toggle_preprocessor_switch(DLIB_GIF_SUPPORT) 
    #toggle_preprocessor_switch(DLIB_USE_FFTW)
    toggle_preprocessor_switch(DLIB_USE_MKL_FFT)
+   toggle_preprocessor_switch(DLIB_USE_FFMPEG)
 
 
    set(source_files
@@ -566,7 +570,7 @@ if (NOT TARGET dlib)
              set(DLIB_WEBP_SUPPORT OFF CACHE BOOL ${DLIB_WEBP_SUPPORT_STR} FORCE )
              toggle_preprocessor_switch(DLIB_WEBP_SUPPORT)
          endif()
-     endif()
+      endif()
 
 
       if (DLIB_USE_BLAS OR DLIB_USE_LAPACK OR DLIB_USE_MKL_FFT)
@@ -830,7 +834,20 @@ if (NOT TARGET dlib)
          mark_as_advanced(fftw fftw_path)
       endif()
 
-
+      if (DLIB_USE_FFMPEG)
+         include(cmake_utils/find_ffmpeg.cmake)
+         if (FFMPEG_FOUND)
+            list (APPEND dlib_needed_private_includes ${FFMPEG_INCLUDE_DIRS})
+            list (APPEND dlib_needed_private_libraries ${FFMPEG_LINK_LIBRARIES})
+            # set(source_files ${source_files}
+            #    media/webp_loader.cpp
+            #    media/save_webp.cpp)
+            enable_preprocessor_switch(DLIB_USE_FFMPEG)
+         else()
+            set(DLIB_USE_FFMPEG OFF CACHE BOOL ${DLIB_USE_FFMPEG_STR} FORCE )
+            disable_preprocessor_switch(DLIB_USE_FFMPEG)
+         endif()
+      endif()
 
       # Tell CMake to build dlib via add_library()/cuda_add_library()
       if (DLIB_USE_CUDA)
