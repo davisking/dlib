@@ -2,6 +2,7 @@
 #include <cassert>
 #include <algorithm>
 #include "ffmpeg_utils.h"
+#include "../assert.h"
 
 namespace dlib
 {
@@ -114,162 +115,188 @@ namespace dlib
             return obj;
         }
 
-        Frame Frame::make(
-            int             h,
-            int             w,
-            AVPixelFormat   pixfmt,
-            int             sample_rate,
-            int             nb_samples,
-            uint64_t        channel_layout,
-            AVSampleFormat  samplefmt,
-            std::chrono::system_clock::time_point timestamp
-        )
-        {
-            Frame obj;
-            obj.frame = make_avframe();
-            obj.frame->height           = h;
-            obj.frame->width            = w;
-            obj.frame->sample_rate      = sample_rate;
-            obj.frame->channel_layout   = channel_layout;
-            obj.frame->nb_samples       = nb_samples;
-            obj.frame->format           = h > 0 && w > 0 ? (int)pixfmt : (int)samplefmt;
-            obj.timestamp               = timestamp;
+    }
 
-            int ret = av_frame_get_buffer(obj.frame.get(), 0); //use default alignment, which is likely 32
-            if (ret < 0)
+    Frame Frame::make(
+        int             h,
+        int             w,
+        AVPixelFormat   pixfmt,
+        int             sample_rate,
+        int             nb_samples,
+        uint64_t        channel_layout,
+        AVSampleFormat  samplefmt,
+        std::chrono::system_clock::time_point timestamp
+    )
+    {
+        using namespace details;
+
+        Frame obj;
+        obj.frame = make_avframe();
+        obj.frame->height           = h;
+        obj.frame->width            = w;
+        obj.frame->sample_rate      = sample_rate;
+        obj.frame->channel_layout   = channel_layout;
+        obj.frame->nb_samples       = nb_samples;
+        obj.frame->format           = h > 0 && w > 0 ? (int)pixfmt : (int)samplefmt;
+        obj.timestamp               = timestamp;
+
+        int ret = av_frame_get_buffer(obj.frame.get(), 0); //use default alignment, which is likely 32
+        if (ret < 0)
+        {
+            obj.frame = nullptr;
+            throw std::runtime_error("av_frame_get_buffer() failed : " + get_av_error(ret));
+        }
+
+//        ret = av_frame_make_writable(obj.frame.get());
+//        if (ret < 0)
+//        {
+//            obj.frame.reset(nullptr);
+//            throw std::runtime_error("av_frame_make_writable() failed : " + get_av_error(ret));
+//        }
+
+        if (obj.is_audio())
+            obj.frame->pts = av_rescale_q(obj.timestamp.time_since_epoch().count(),
+                                        {decltype(obj.timestamp)::period::num, (decltype(obj.timestamp)::period::den)},
+                                        {1, obj.frame->sample_rate});
+
+        return obj;
+    }
+
+    Frame Frame::make_image(
+        int h,
+        int w,
+        AVPixelFormat fmt,
+        std::chrono::system_clock::time_point timestamp_us
+    )
+    {
+        return make(h, w, fmt, 0, 0, 0, AV_SAMPLE_FMT_NONE, timestamp_us);
+    }
+
+    Frame Frame::make_audio(
+        int             sample_rate,
+        int             nb_samples,
+        uint64_t        channel_layout,
+        AVSampleFormat  fmt,
+        std::chrono::system_clock::time_point timestamp_us
+    )
+    {
+        return make(0,0,AV_PIX_FMT_NONE, sample_rate, nb_samples, channel_layout, fmt, timestamp_us);
+    }
+
+    Frame::Frame(const Frame &ori)
+    {
+        copy_from(ori);
+    }
+
+    Frame& Frame::operator=(const Frame& ori)
+    {
+        copy_from(ori);
+        return *this;
+    }
+
+    void Frame::copy_from(const Frame &ori)
+    {
+        if (ori.is_empty())
+        {
+            Frame empty{std::move(*this)};
+        }
+        else
+        {
+            const bool same_image =
+                    is_image() && ori.is_image() &&
+                    std::tie(    frame->height,     frame->width,     frame->format) ==
+                    std::tie(ori.frame->height, ori.frame->width, ori.frame->format);
+
+            const bool same_audio =
+                    is_audio() && ori.is_audio() &&
+                    std::tie(    frame->sample_rate,     frame->nb_samples,     frame->channel_layout,     frame->format) ==
+                    std::tie(ori.frame->sample_rate, ori.frame->nb_samples, ori.frame->channel_layout, ori.frame->format);
+
+            if (!same_image && !same_audio)
             {
-                obj.frame = nullptr;
-                throw std::runtime_error("av_frame_get_buffer() failed : " + get_av_error(ret));
+                Frame tmp = make(ori.frame->height,
+                                ori.frame->width,
+                                (AVPixelFormat)ori.frame->format,
+                                ori.frame->sample_rate,
+                                ori.frame->nb_samples,
+                                ori.frame->channel_layout,
+                                (AVSampleFormat)ori.frame->format,
+                                ori.timestamp);
+                *this = std::move(tmp);
             }
 
-    //        ret = av_frame_make_writable(obj.frame.get());
-    //        if (ret < 0)
-    //        {
-    //            obj.frame.reset(nullptr);
-    //            throw std::runtime_error("av_frame_make_writable() failed : " + get_av_error(ret));
-    //        }
-
-            if (obj.is_audio())
-                obj.frame->pts = av_rescale_q(obj.timestamp.time_since_epoch().count(),
-                                            {decltype(obj.timestamp)::period::num, (decltype(obj.timestamp)::period::den)},
-                                            {1, obj.frame->sample_rate});
-
-            return obj;
+            av_frame_copy(frame.get(), ori.frame.get());
+            av_frame_copy_props(frame.get(), ori.frame.get());
         }
+    }
 
-        Frame Frame::make_image(
-            int h,
-            int w,
-            AVPixelFormat fmt,
-            std::chrono::system_clock::time_point timestamp_us
-        )
-        {
-            return make(h, w, fmt, 0, 0, 0, AV_SAMPLE_FMT_NONE, timestamp_us);
-        }
+    bool Frame::is_empty() const noexcept
+    {
+        return !is_image() && !is_audio();
+    }
 
-        Frame Frame::make_audio(
-            int             sample_rate,
-            int             nb_samples,
-            uint64_t        channel_layout,
-            AVSampleFormat  fmt,
-            std::chrono::system_clock::time_point timestamp_us
-        )
-        {
-            return make(0,0,AV_PIX_FMT_NONE, sample_rate, nb_samples, channel_layout, fmt, timestamp_us);
-        }
+    bool Frame::is_image() const noexcept
+    {
+        return frame && frame->width > 0 && frame->height > 0 && frame->format >= 0;
+    }
 
-        Frame::Frame(const Frame &ori)
-        {
-            copy(ori);
-        }
+    bool Frame::is_audio() const noexcept
+    {
+        return frame && frame->nb_samples > 0 && frame->channel_layout > 0 && frame->sample_rate > 0;
+    }
 
-        Frame& Frame::operator=(const Frame& ori)
-        {
-            copy(ori);
-            return *this;
-        }
+    AVPixelFormat Frame::pixfmt() const noexcept
+    {
+        return is_image() ? (AVPixelFormat)frame->format : AV_PIX_FMT_NONE;
+    }
 
-        void Frame::copy(const Frame &ori)
-        {
-            if (ori.is_empty())
-            {
-                Frame empty{std::move(*this)};
-            }
-            else
-            {
-                const bool same_image =
-                        is_image() && ori.is_image() &&
-                        std::tie(    frame->height,     frame->width,     frame->format) ==
-                        std::tie(ori.frame->height, ori.frame->width, ori.frame->format);
+    int Frame::height() const noexcept
+    {
+        return is_image() ? frame->height : 0;
+    }
 
-                const bool same_audio =
-                        is_audio() && ori.is_audio() &&
-                        std::tie(    frame->sample_rate,     frame->nb_samples,     frame->channel_layout,     frame->format) ==
-                        std::tie(ori.frame->sample_rate, ori.frame->nb_samples, ori.frame->channel_layout, ori.frame->format);
+    int Frame::width() const noexcept
+    {
+        return is_image() ? frame->width : 0;
+    }
 
-                if (!same_image && !same_audio)
-                {
-                    Frame tmp = make(ori.frame->height,
-                                    ori.frame->width,
-                                    (AVPixelFormat)ori.frame->format,
-                                    ori.frame->sample_rate,
-                                    ori.frame->nb_samples,
-                                    ori.frame->channel_layout,
-                                    (AVSampleFormat)ori.frame->format,
-                                    ori.timestamp);
-                    *this = std::move(tmp);
-                }
+    AVSampleFormat Frame::samplefmt() const noexcept
+    {
+        return is_audio() ? (AVSampleFormat)frame->format : AV_SAMPLE_FMT_NONE;
+    }
 
-                av_frame_copy(frame.get(), ori.frame.get());
-                av_frame_copy_props(frame.get(), ori.frame.get());
-            }
-        }
+    int Frame::nsamples() const noexcept
+    {
+        return is_audio() ? frame->nb_samples : 0;
+    }
 
-        bool Frame::is_empty() const
-        {
-            return !is_image() && !is_audio();
-        }
+    uint64_t Frame::layout() const noexcept
+    {
+        return frame->channel_layout;
+    }
 
-        bool Frame::is_image() const
-        {
-            return frame && frame->width > 0 && frame->height > 0 && frame->format >= 0;
-        }
+    int Frame::nchannels() const noexcept
+    {
+        return is_audio() ? av_get_channel_layout_nb_channels(frame->channel_layout) : 0;
+    }
 
-        bool Frame::is_audio() const
-        {
-            return frame && frame->nb_samples > 0 && frame->channel_layout > 0 && frame->sample_rate > 0;
-        }
+    int Frame::sample_rate() const noexcept
+    {
+        return is_audio() ? frame->sample_rate : 0;
+    }
 
-        AVPixelFormat Frame::pixfmt() const
-        {
-            return is_image() ? (AVPixelFormat)frame->format : AV_PIX_FMT_NONE;
-        }
+    std::chrono::system_clock::time_point Frame::get_timestamp() const noexcept
+    {
+        return timestamp;
+    }
 
-        int Frame::height() const
-        {
-            return is_image() ? frame->height : 0;
-        }
+    const AVFrame& Frame::get_frame() const noexcept
+    {
+        return *frame;
+    }
 
-        int Frame::width() const
-        {
-            return is_image() ? frame->width : 0;
-        }
-
-        AVSampleFormat Frame::samplefmt() const
-        {
-            return is_audio() ? (AVSampleFormat)frame->format : AV_SAMPLE_FMT_NONE;
-        }
-
-        int Frame::nchannels() const
-        {
-            return is_audio() ? av_get_channel_layout_nb_channels(frame->channel_layout) : 0;
-        }
-
-        int Frame::sample_rate() const
-        {
-            return is_audio() ? frame->sample_rate : 0;
-        }
-
+    namespace details
+    {
         int sw_image_resizer::get_src_h() const {
             return _src_h;
         }
@@ -637,5 +664,72 @@ namespace dlib
                 it++;
         }
         return details;
+    }
+
+    type_safe_union<array2d<rgb_pixel>, audio_frame> convert(const Frame& f)
+    {
+        type_safe_union<array2d<rgb_pixel>, audio_frame> obj;
+
+        if (f.is_image())
+        {
+            DLIB_ASSERT(frame.pixfmt() == AV_PIX_FMT_RGB24, "frame isn't RGB image. Make sure your decoder/demuxer/encoder/muxer has correct args passed to constructor");
+            
+            array2d<rgb_pixel> image(f.height(), f.width());
+
+            for (int row = 0 ; row < f.height() ; row++)
+            {
+                memcpy(image.begin() + row * f.width(),
+                       f.get_frame().data[0] + row * f.get_frame().linesize[0],
+                       f.width()*3);
+            }
+            
+            obj = std::move(image);
+        }
+        else if (f.is_audio())
+        {
+            DLIB_ASSERT(frame.samplefmt() == AV_SAMPLE_FMT_S16, "audio buffer requires s16 format. Make sure correct args are passed to constructor of decoder/demuxer/encoder/muxer");
+
+            audio_frame audio;
+            audio.sample_rate = f.sample_rate();
+            audio.samples.resize(f.nsamples());
+
+            if (f.nchannels() == 1)
+            {
+                for (int i = 0 ; i < f.nsamples() ; ++i)
+                {
+                    memcpy(&audio.samples[i].ch1, f.get_frame().data[i], sizeof(int16_t));
+                    audio.samples[i].ch2 = audio.samples[i].ch1;
+                }  
+            }
+            else if (f.nchannels() == 2)
+            {
+                memcpy(audio.samples.data(), f.get_frame().data[0], audio.samples.size()*sizeof(audio_frame::sample));
+            }
+
+            obj = std::move(audio);
+        }
+
+        return obj;
+    }
+
+    Frame convert(const array2d<rgb_pixel>& frame)
+    {
+        Frame f = Frame::make_image(frame.nr(), frame.nc(), AV_PIX_FMT_RGB24, {});
+
+        for (int row = 0 ; row < f.height() ; row++)
+        {
+            memcpy(f.get_frame().data[0] + row * f.get_frame().linesize[0],
+                   frame.begin() + row * f.width(),
+                   f.width()*3);
+        }
+
+        return f;
+    }
+
+    Frame convert(const audio_frame& frame)
+    {
+        Frame f = Frame::make_audio(frame.sample_rate, frame.samples.size(), AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16, frame.timestamp);
+        memcpy(f.frame->data[0], frame.samples.data(), frame.samples.size()*sizeof(audio_frame::sample));
+        return f;
     }
 }

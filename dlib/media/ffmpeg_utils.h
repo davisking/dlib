@@ -11,6 +11,9 @@
 #include <vector>
 #include <memory>
 #include "../smart_pointers/observer_ptr.h"
+#include "../array2d.h"
+#include "../pixel.h"
+#include "../type_safe_union.h"
 
 extern "C" {
 #include <libavutil/dict.h>
@@ -31,12 +34,19 @@ namespace dlib
 {
     namespace details
     {
+    
+    // ---------------------------------------------------------------------------------------------------
+
         extern const bool FFMPEG_INITIALIZED;
+
+    // ---------------------------------------------------------------------------------------------------
 
         std::string get_av_error(int ret);
         std::string get_pixel_fmt_str(AVPixelFormat fmt);
         std::string get_audio_fmt_str(AVSampleFormat fmt);
         std::string get_channel_layout_str(uint64_t layout);
+
+    // ---------------------------------------------------------------------------------------------------
 
         struct rational
         {
@@ -44,6 +54,8 @@ namespace dlib
             int denom;
             float get();
         };
+
+    // ---------------------------------------------------------------------------------------------------
 
         struct av_deleter
         {
@@ -56,12 +68,25 @@ namespace dlib
             void operator()(AVCodecParserContext* ptr)  const;
             void operator()(AVFormatContext* ptr)       const;
         };
+    
+    // ---------------------------------------------------------------------------------------------------
 
-        template<class AVObject>
-        using av_ptr = std::unique_ptr<AVObject, av_deleter>;
+    }
 
-        template<class AVObject>
-        using av_raw = dlib::observer_ptr<AVObject>;
+    // ---------------------------------------------------------------------------------------------------
+
+    template<class AVObject>
+    using av_ptr = std::unique_ptr<AVObject, details::av_deleter>;
+
+    template<class AVObject>
+    using av_raw = dlib::observer_ptr<AVObject>;
+
+    // ---------------------------------------------------------------------------------------------------
+
+    namespace details
+    {
+
+    // ---------------------------------------------------------------------------------------------------
 
         struct av_dict
         {
@@ -77,61 +102,102 @@ namespace dlib
             AVDictionary *avdic = nullptr;
         };
 
+    // ---------------------------------------------------------------------------------------------------
+
         av_ptr<AVFrame>  make_avframe();
         av_ptr<AVPacket> make_avpacket();
+    
+    // ---------------------------------------------------------------------------------------------------
 
-        struct Frame
-        {
-            Frame()                         = default;
-            Frame(Frame&& ori)              = default;
-            Frame& operator=(Frame&& ori)   = default;
-            Frame(const Frame& ori);
-            Frame& operator=(const Frame& ori);
+        class sw_image_resizer;
+        class sw_audio_resampler;
+        class sw_audio_fifo;
+    
+    // ---------------------------------------------------------------------------------------------------
+    }
 
-            static Frame make(
-                int h,
-                int w,
-                AVPixelFormat pixfmt,
-                int sample_rate,
-                int nb_samples,
-                uint64_t channel_layout,
-                AVSampleFormat samplefmt,
-                std::chrono::system_clock::time_point timestamp
-            );
+    // ---------------------------------------------------------------------------------------------------
 
-            static Frame make_image(
-                int h,
-                int w,
-                AVPixelFormat pixfmt,
-                std::chrono::system_clock::time_point timestamp_us
-            );
+    class Frame;
+    class audio_frame;
+    Frame convert(const audio_frame& frame);
+    Frame convert(const array2d<rgb_pixel>& frame);
 
-            static Frame make_audio(
-                int sample_rate,
-                int nb_samples,
-                uint64_t channel_layout,
-                AVSampleFormat samplefmt,
-                std::chrono::system_clock::time_point timestamp
-            );
+    class Frame
+    {
+    public:
+        Frame()                         = default;
+        Frame(Frame&& ori)              = default;
+        Frame& operator=(Frame&& ori)   = default;
+        Frame(const Frame& ori);
+        Frame& operator=(const Frame& ori);
 
-            bool is_empty() const;
-            void copy(const Frame& other);
+        bool            is_empty()      const noexcept;
+        bool            is_image()      const noexcept;
+        bool            is_audio()      const noexcept;
 
-            /*image*/
-            bool is_image() const;
-            AVPixelFormat pixfmt() const;
-            int height() const;
-            int width() const;
+        /*image*/
+        AVPixelFormat   pixfmt()        const noexcept;
+        int             height()        const noexcept;
+        int             width()         const noexcept;
 
-            /*audio*/
-            bool is_audio() const;
-            int nchannels() const;
-            AVSampleFormat samplefmt() const;
-            int sample_rate() const;
+        /*audio*/
+        int             nsamples()      const noexcept;
+        int             nchannels()     const noexcept;
+        uint64_t        layout()        const noexcept;
+        AVSampleFormat  samplefmt()     const noexcept;
+        int             sample_rate()   const noexcept;
 
-            av_ptr<AVFrame> frame;
-            std::chrono::system_clock::time_point timestamp;
-        };
+        std::chrono::system_clock::time_point get_timestamp() const noexcept;
+        const AVFrame& get_frame() const noexcept;
+
+    private:
+        // Users should only be able to access const functions
+        // However, the implementation details should be able to access non-const functions and data.
+        friend class details::sw_image_resizer;
+        friend class details::sw_audio_resampler;
+        friend class details::sw_audio_fifo;
+        friend Frame convert(const audio_frame& frame);
+        friend Frame convert(const array2d<rgb_pixel>& frame);
+
+        static Frame make(
+            int h,
+            int w,
+            AVPixelFormat pixfmt,
+            int sample_rate,
+            int nb_samples,
+            uint64_t channel_layout,
+            AVSampleFormat samplefmt,
+            std::chrono::system_clock::time_point timestamp
+        );
+
+        static Frame make_image(
+            int h,
+            int w,
+            AVPixelFormat pixfmt,
+            std::chrono::system_clock::time_point timestamp_us
+        );
+
+        static Frame make_audio(
+            int sample_rate,
+            int nb_samples,
+            uint64_t channel_layout,
+            AVSampleFormat samplefmt,
+            std::chrono::system_clock::time_point timestamp
+        );
+
+        void copy_from(const Frame& other);
+
+        av_ptr<AVFrame> frame;
+        std::chrono::system_clock::time_point timestamp;
+    };
+
+    // ---------------------------------------------------------------------------------------------------
+
+    namespace details
+    {
+    
+    // ---------------------------------------------------------------------------------------------------
 
         class sw_image_resizer
         {
@@ -169,6 +235,8 @@ namespace dlib
             AVPixelFormat   _dst_fmt    = AV_PIX_FMT_NONE;
             av_ptr<SwsContext> _imgConvertCtx;
         };
+
+    // ---------------------------------------------------------------------------------------------------
 
         class sw_audio_resampler
         {
@@ -210,6 +278,8 @@ namespace dlib
             uint64_t            tracked_samples_ = 0;
         };
 
+    // ---------------------------------------------------------------------------------------------------
+
         class sw_audio_fifo
         {
         public:
@@ -232,7 +302,12 @@ namespace dlib
             uint64_t sample_count   = 0;
             av_ptr<AVAudioFifo> fifo;
         };
+
+    // ---------------------------------------------------------------------------------------------------
+
     }
+
+    // ---------------------------------------------------------------------------------------------------
 
     struct audio_frame
     {
@@ -242,9 +317,12 @@ namespace dlib
             int16_t ch2 = 0;
         };
 
-        std::vector<sample> samples;
-        float sample_rate = 0;
+        std::vector<sample>                     samples;
+        float                                   sample_rate{0};
+        std::chrono::system_clock::time_point   timestamp{};
     };
+
+    // ---------------------------------------------------------------------------------------------------
 
     std::vector<std::string> ffmpeg_list_protocols();
     std::vector<std::string> ffmpeg_list_demuxers();
@@ -257,6 +335,14 @@ namespace dlib
         bool supports_decoding;
     };
     std::vector<codec_details> ffmpeg_list_codecs();
+
+    // ---------------------------------------------------------------------------------------------------
+
+    type_safe_union<array2d<rgb_pixel>, audio_frame> convert(const Frame& frame);
+    Frame                                            convert(const array2d<rgb_pixel>& frame);
+    Frame                                            convert(const audio_frame& frame);
+
+    // ---------------------------------------------------------------------------------------------------
 }
 
 #endif //DLIB_FFMPEG_UTILS
