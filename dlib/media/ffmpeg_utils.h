@@ -112,6 +112,7 @@ namespace dlib
         class sw_image_resizer;
         class sw_audio_resampler;
         class sw_audio_fifo;
+        class decoder_extractor;
     
     // ---------------------------------------------------------------------------------------------------
     }
@@ -157,6 +158,7 @@ namespace dlib
         friend class details::sw_image_resizer;
         friend class details::sw_audio_resampler;
         friend class details::sw_audio_fifo;
+        friend class details::decoder_extractor;
         friend Frame convert(const audio_frame& frame);
         friend Frame convert(const array2d<rgb_pixel>& frame);
 

@@ -162,12 +162,16 @@ set (tests
    find_optimal_parameters.cpp
    elastic_net.cpp
    te.cpp
+   ffmpeg.cpp
    )
 
 
 # add all the cpp files we want to compile to this list.  This tells
 # cmake that they are part of our target (which is the executable named dtest)
 ADD_EXECUTABLE(${target_name} main.cpp tester.cpp ${tests})
+
+get_filename_component(DLIB_FFMPEG_DATA ${CMAKE_SOURCE_DIR}/ffmpeg_data/details.cfg REALPATH)
+add_compile_definitions(DLIB_FFMPEG_DATA="${DLIB_FFMPEG_DATA}")
 
 if (CMAKE_COMPILER_IS_GNUCXX)
    # Turn on all warnings, and treat them as errors.

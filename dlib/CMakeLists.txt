@@ -840,7 +840,8 @@ if (NOT TARGET dlib)
             list (APPEND dlib_needed_private_includes ${FFMPEG_INCLUDE_DIRS})
             list (APPEND dlib_needed_private_libraries ${FFMPEG_LINK_LIBRARIES})
             set(source_files ${source_files}
-               media/ffmpeg_utils.cpp)
+               media/ffmpeg_utils.cpp
+               media/ffmpeg_demuxer.cpp)
             enable_preprocessor_switch(DLIB_USE_FFMPEG)
          else()
             set(DLIB_USE_FFMPEG OFF CACHE BOOL ${DLIB_USE_FFMPEG_STR} FORCE )
