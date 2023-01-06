@@ -1,5 +1,6 @@
 #include <chrono>
 #include "ffmpeg_demuxer.h"
+#include "../string.h"
 
 using namespace std::chrono;
 
@@ -370,463 +371,448 @@ namespace dlib
         return extractor.read(dst_frame);
     }
 
-    // demuxer_ffmpeg::demuxer_ffmpeg(const args &a)
-    // {
-    //     if (!open(a))
-    //         st.pFormatCtx = nullptr;
-    // }
-
-    // demuxer_ffmpeg::demuxer_ffmpeg(demuxer_ffmpeg &&other) noexcept
-    // : st{std::move(other.st)}
-    // {
-    //     if (st.pFormatCtx)
-    //         st.pFormatCtx->opaque = this;
-    // }
-
-    // demuxer_ffmpeg& demuxer_ffmpeg::operator=(demuxer_ffmpeg &&other) noexcept
-    // {
-    //     st = std::move(other.st);
-    //     if (st.pFormatCtx)
-    //         st.pFormatCtx->opaque = this;
-    //     return *this;
-    // }
-
-    // bool demuxer_ffmpeg::open(const args& a)
-    // {
-    //     st = {};
-    //     st.args_ = a;
-
-    //     AVFormatContext* pFormatCtx = avformat_alloc_context();
-    //     pFormatCtx->opaque = this;
-    //     pFormatCtx->interrupt_callback.opaque   = pFormatCtx;
-    //     pFormatCtx->interrupt_callback.callback = [](void* ctx) -> int {
-    //         AVFormatContext* pFormatCtx = (AVFormatContext*)ctx;
-    //         demuxer_ffmpeg* me = (demuxer_ffmpeg*)pFormatCtx->opaque;
-    //         return me->interrupt_callback();
-    //     };
-
-    //     if (st.args_.probesize > 0)
-    //         pFormatCtx->probesize = st.args_.probesize;
-
-    //     av_dict opts = st.args_.format_options;
-    //     AVInputFormat* input_format = st.args_.input_format.empty() ? nullptr : av_find_input_format(st.args_.input_format.c_str());
-
-    //     st.connecting_time = system_clock::now();
-    //     st.connected_time  = system_clock::time_point::max();
-
-    //     int ret = avformat_open_input(&pFormatCtx,
-    //                                   st.args_.filepath.c_str(),
-    //                                   input_format,
-    //                                   opts.get());
-
-    //     if (ret != 0)
-    //     {
-    //         printf("avformat_open_input() failed with error `%s`\n", get_av_error(ret).c_str());
-    //         return false;
-    //     }
-
-    //     st.connected_time = system_clock::now();
-    //     st.pFormatCtx.reset(pFormatCtx);
-
-    //     ret = avformat_find_stream_info(st.pFormatCtx.get(), NULL);
-
-    //     if (ret < 0)
-    //     {
-    //         printf("avformat_find_stream_info() failed with error `%s`\n", get_av_error(ret).c_str());
-    //         return false;
-    //     }
-
-    //     auto setup_stream = [&](bool is_video)
-    //     {
-    //         const AVMediaType media_type   = is_video ? AVMEDIA_TYPE_VIDEO : AVMEDIA_TYPE_AUDIO;
-    //         const auto&       channel_args = is_video ? static_cast<const dec_codec_args&>(st.args_.image_options) :
-    //                                                     static_cast<const dec_codec_args&>(st.args_.audio_options);
-
-    //         AVCodec* pCodec = nullptr;
-    //         const int stream_id = av_find_best_stream(st.pFormatCtx.get(), media_type, -1, -1, &pCodec, 0);
-
-    //         if (stream_id == AVERROR_STREAM_NOT_FOUND)
-    //         {
-    //             //You might be asking for both video and audio but only video is available. That's OK. Just provide video.
-    //             return true;
-    //         }
-    //         else if (stream_id == AVERROR_DECODER_NOT_FOUND)
-    //         {
-    //             printf("av_find_best_stream() : decoder not found for stream type `%s`\n", av_get_media_type_string(media_type));
-    //             return false;
-    //         }
-    //         else if (stream_id < 0)
-    //         {
-    //             printf("av_find_best_stream() failed : `%s`\n", get_av_error(stream_id).c_str());
-    //             return false;
-    //         }
-
-    //         av_ptr<AVCodecContext> pCodecCtx{avcodec_alloc_context3(pCodec)};
-
-    //         if (!pCodecCtx)
-    //         {
-    //             printf("avcodec_alloc_context3() failed to allocate codec context for `%s`\n", pCodec->name);
-    //             return false;
-    //         }
-
-    //         const int ret = avcodec_parameters_to_context(pCodecCtx.get(), st.pFormatCtx->streams[stream_id]->codecpar);
-    //         if (ret < 0)
-    //         {
-    //             printf("avcodec_parameters_to_context() failed : `%s`\n", get_av_error(ret).c_str());
-    //             return false;
-    //         }
-
-    //         if (pCodecCtx->codec_type == AVMEDIA_TYPE_VIDEO)
-    //         {
-    //             if (pCodecCtx->height   == 0 ||
-    //                 pCodecCtx->width    == 0 ||
-    //                 pCodecCtx->pix_fmt  == AV_PIX_FMT_NONE)
-    //             {
-    //                 printf("Codec parameters look wrong : (h,w,pixel_fmt) : (%i,%i,%s)\n",
-    //                        pCodecCtx->height,
-    //                        pCodecCtx->width,
-    //                        get_pixel_fmt_str(pCodecCtx->pix_fmt).c_str());
-    //                 return false;
-    //             }
-    //         }
-    //         else if (pCodecCtx->codec_type == AVMEDIA_TYPE_AUDIO)
-    //         {
-    //             if (pCodecCtx->sample_rate == 0 ||
-    //                 pCodecCtx->sample_fmt  == AV_SAMPLE_FMT_NONE)
-    //             {
-    //                 printf("Codec parameters look wrong: sample_rate : %i sample_fmt : %i\n",
-    //                        pCodecCtx->sample_rate,
-    //                        pCodecCtx->sample_fmt);
-    //                 return false;
-    //             }
-
-    //             if (pCodecCtx->channel_layout == 0)
-    //                 pCodecCtx->channel_layout = av_get_default_channel_layout(pCodecCtx->channels);
-    //         }
-    //         else
-    //         {
-    //             printf("Unrecognized media type %i\n", pCodecCtx->codec_type);
-    //             return false;
-    //         }
-
-    //         if (is_video)
-    //         {
-    //             decoder_extractor::args extractor_args;
-    //             extractor_args.args_codec = st.args_.image_options;
-    //             extractor_args.args_image = st.args_.image_options;
-    //             extractor_args.time_base  = st.pFormatCtx->streams[stream_id]->time_base;
-    //             st.channel_video = decoder_extractor{{extractor_args}, std::move(pCodecCtx), pCodec};
-    //             st.channel_video.stream_id = stream_id;
-    //             /*! Only really need this if you want to call properties without having read anything yet !*/
-    //             st.channel_video.resizer_image.reset(
-    //                 st.channel_video.pCodecCtx->height,
-    //                 st.channel_video.pCodecCtx->width,
-    //                 st.channel_video.pCodecCtx->pix_fmt,
-    //                 st.args_.image_options.h > 0 ? st.args_.image_options.h : st.channel_video.pCodecCtx->height,
-    //                 st.args_.image_options.w > 0 ? st.args_.image_options.w : st.channel_video.pCodecCtx->width,
-    //                 st.args_.image_options.fmt != AV_PIX_FMT_NONE ? st.args_.image_options.fmt : st.channel_video.pCodecCtx->pix_fmt
-    //             );
-    //         }
-    //         else
-    //         {
-    //             decoder_extractor::args extractor_args;
-    //             extractor_args.args_codec = st.args_.audio_options;
-    //             extractor_args.args_audio = st.args_.audio_options;
-    //             extractor_args.time_base  = st.pFormatCtx->streams[stream_id]->time_base;
-    //             st.channel_audio = decoder_extractor{{extractor_args}, std::move(pCodecCtx), pCodec};
-    //             st.channel_audio.stream_id = stream_id;
-    //             /*! Only really need this if you want to call properties without having read anything yet !*/
-    //             st.channel_audio.resizer_audio.reset(
-    //                 st.channel_audio.pCodecCtx->sample_rate,
-    //                 st.channel_audio.pCodecCtx->channel_layout,
-    //                 st.channel_audio.pCodecCtx->sample_fmt,
-    //                 st.args_.audio_options.sample_rate > 0            ? st.args_.audio_options.sample_rate      : st.channel_audio.pCodecCtx->sample_rate,
-    //                 st.args_.audio_options.channel_layout > 0         ? st.args_.audio_options.channel_layout   : st.channel_audio.pCodecCtx->channel_layout,
-    //                 st.args_.audio_options.fmt != AV_SAMPLE_FMT_NONE  ? st.args_.audio_options.fmt              : st.channel_audio.pCodecCtx->sample_fmt
-    //             );
-    //         }
-
-    //         return true;
-    //     };
-
-    //     if (st.args_.enable_image)
-    //         setup_stream(true);
-
-    //     if (st.args_.enable_audio)
-    //         setup_stream(false);
-
-    //     if (!st.channel_audio.is_open() && !st.channel_video.is_open())
-    //     {
-    //         printf("At least one of video and audio channels must be enabled\n");
-    //         return false;
-    //     }
-
-    //     populate_metadata();
-
-    //     st.packet = make_avpacket();
-    //     st.opened = true;
-    //     return true;
-    // }
-
-    // bool demuxer_ffmpeg::is_open() const noexcept
-    // {
-    //     const bool frames_cached = !st.frame_queue.empty();
-    //     const bool object_alive  = st.pFormatCtx != nullptr &&
-    //                                st.opened &&
-    //                                (st.channel_video.is_open() || st.channel_audio.is_open());
-    //     return FFMPEG_INITIALIZED && (frames_cached || object_alive);
-    // }
-
-    // bool demuxer_ffmpeg::interrupt_callback()
-    // {
-    //     const auto now = system_clock::now();
-
-    //     if (st.args_.connect_timeout < std::chrono::milliseconds::max())
-    //         if (st.connected_time > now && now > (st.connecting_time + st.args_.connect_timeout))
-    //             return true;
-
-    //     if (st.args_.read_timeout < std::chrono::milliseconds::max())
-    //         if (now > (st.last_read_time + st.args_.read_timeout))
-    //             return true;
-
-    //     if (st.args_.interrupter && st.args_.interrupter())
-    //         return true;
-
-    //     return false;
-    // }
-
-    // void demuxer_ffmpeg::populate_metadata()
-    // {
-    //     for (unsigned int i = 0; i < st.pFormatCtx->nb_streams; i++)
-    //     {
-    //         std::string metadata_str;
-    //         {
-    //             char* charbuf = 0;
-    //             av_dict_get_string(st.pFormatCtx->streams[i]->metadata, &charbuf, ',', ';');
-    //             metadata_str = std::string(charbuf);
-    //             free(charbuf);
-    //         }
-
-    //         std::vector<std::string> keyvals = dlib::split(metadata_str, ";");
-    //         for (size_t kv = 0; kv < keyvals.size(); kv++) {
-    //             std::vector<std::string> kv_item = dlib::split(keyvals[kv], ",");
-    //             assert(kv_item.size() == 2);
-    //             st.metadata[i][kv_item[0]] = dlib::trim(kv_item[1]);
-    //         }
-    //     }
-    // }
-
-    // typedef enum {
-    //     DEMUXER_RECV_PACKET = 0,
-    //     DEMUXER_SEND_PACKET,
-    //     DEMUXER_FLUSH,
-    //     DEMUXER_DONE,
-    //     DEMUXER_ERROR = -1
-    // } demuxer_state;
-
-    // bool demuxer_ffmpeg::fill_queue()
-    // {
-    //     if (!is_open())
-    //         return false;
-
-    //     decoder_extractor *channel = nullptr;
-    //     demuxer_state state = DEMUXER_RECV_PACKET;
-
-    //     auto recv_packet = [&]
-    //     {
-    //         if (!st.frame_queue.empty())
-    //         {
-    //             state = DEMUXER_DONE;
-    //         }
-    //         else
-    //         {
-    //             av_packet_unref(st.packet.get());
-    //             const int ret = av_read_frame(st.pFormatCtx.get(), st.packet.get());
-
-    //             if (ret == AVERROR_EOF)
-    //             {
-    //                 state = DEMUXER_FLUSH;
-    //             }
-    //             else if (ret >= 0)
-    //             {
-    //                 if (st.packet->stream_index == st.channel_video.stream_id)
-    //                 {
-    //                     channel = &st.channel_video;
-    //                     state   = DEMUXER_SEND_PACKET;
-    //                 }
-    //                 else if (st.packet->stream_index == st.channel_audio.stream_id)
-    //                 {
-    //                     channel = &st.channel_audio;
-    //                     state   = DEMUXER_SEND_PACKET;
-    //                 }
-    //             }
-    //             else
-    //             {
-    //                 printf("av_read_frame() failed : `%s`\n", get_av_error(ret).c_str());
-    //                 state = DEMUXER_ERROR;
-    //             }
-    //         }
-    //     };
-
-    //     auto send_packet = [&]
-    //     {
-    //         if (!channel->push(st.packet))
-    //             state = DEMUXER_ERROR;
-    //         else
-    //         {
-    //             decoder_read_t suc;
-    //             Frame frame;
-
-    //             while ((suc = channel->read(frame)) == DECODER_FRAME_AVAILABLE)
-    //                 st.frame_queue.push(std::move(frame));
-
-    //             if (suc == DECODER_EAGAIN)
-    //                 state = DEMUXER_RECV_PACKET;
-    //             else
-    //                 state = DEMUXER_DONE;
-    //         }
-    //     };
-
-    //     auto flushing_channel = [&]
-    //     {
-    //         while (state != DEMUXER_ERROR && state != DEMUXER_DONE)
-    //             send_packet();
-    //     };
-
-    //     auto flushing = [&]
-    //     {
-    //         st.packet = nullptr;
-    //         if (st.channel_video.is_open())
-    //         {
-    //             channel = &st.channel_video;
-    //             flushing_channel();
-    //         }
-    //         if (st.channel_audio.is_open())
-    //         {
-    //             channel = &st.channel_audio;
-    //             flushing_channel();
-    //         }
-    //     };
-
-    //     while (state != DEMUXER_DONE && state != DEMUXER_ERROR)
-    //     {
-    //         switch(state)
-    //         {
-    //             case DEMUXER_RECV_PACKET: recv_packet(); break;
-    //             case DEMUXER_SEND_PACKET: send_packet(); break;
-    //             case DEMUXER_FLUSH:       flushing(); break;
-    //             default: break;
-    //         }
-    //     }
-
-    //     return state != DEMUXER_ERROR;
-    // }
-
-    // bool demuxer_ffmpeg::read(Frame& dst_frame)
-    // {
-    //     if (!fill_queue())
-    //         return false;
-
-    //     if (!st.frame_queue.empty())
-    //     {
-    //         dst_frame = std::move(st.frame_queue.front());
-    //         st.frame_queue.pop();
-    //         return true;
-    //     }
-
-    //     return false;
-    // }
-
-    // bool demuxer_ffmpeg::read(
-    //     type_safe_union<array2d<rgb_pixel>, audio_frame> &frame,
-    //     std::chrono::system_clock::time_point &timestamp
-    // )
-    // {
-    //     Frame f;
-
-    //     if (!read(f))
-    //         return false;
-
-    //     if (f.is_image())
-    //     {
-    //         frame = frame_to_dlib_image(f, st.channel_video.resizer_image);
-    //     }
-    //     else if (f.is_audio())
-    //     {
-    //         frame = frame_to_dlib_audio(f, st.channel_audio.resizer_audio);
-    //     }
-
-    //     timestamp = f.timestamp;
-
-    //     return true;
-    // }
-
-    // bool            demuxer_ffmpeg::video_enabled()     const noexcept { return st.channel_video.is_image_decoder(); }
-    // bool            demuxer_ffmpeg::audio_enabled()     const noexcept { return st.channel_audio.is_audio_decoder(); }
-    // int             demuxer_ffmpeg::height()            const noexcept { return st.channel_video.height(); }
-    // int             demuxer_ffmpeg::width()             const noexcept { return st.channel_video.width(); }
-    // AVPixelFormat   demuxer_ffmpeg::pixel_fmt()         const noexcept { return st.channel_video.pixel_fmt(); }
-    // int             demuxer_ffmpeg::sample_rate()       const noexcept { return st.channel_audio.sample_rate(); }
-    // uint64_t        demuxer_ffmpeg::channel_layout()    const noexcept { return st.channel_audio.channel_layout(); }
-    // AVSampleFormat  demuxer_ffmpeg::sample_fmt()        const noexcept { return st.channel_audio.sample_fmt(); }
-    // int             demuxer_ffmpeg::nchannels()         const noexcept { return st.channel_audio.nchannels(); }
-    // AVCodecID   demuxer_ffmpeg::get_video_codec_id()    const noexcept { return st.channel_video.get_codec_id(); }
-    // AVCodecID   demuxer_ffmpeg::get_audio_codec_id()    const noexcept { return st.channel_audio.get_codec_id(); }
-    // std::string demuxer_ffmpeg::get_video_codec_name()  const noexcept { return st.channel_video.get_codec_name(); }
-    // std::string demuxer_ffmpeg::get_audio_codec_name()  const noexcept { return st.channel_audio.get_codec_name(); }
-
-    // float demuxer_ffmpeg::fps() const noexcept
-    // {
-    //     /*!
-    //         Do we need to adjust _pFormatCtx->fps_probe_size ?
-    //         Do we need to adjust _pFormatCtx->max_analyze_duration ?
-    //     !*/
-    //     if (st.channel_video.is_image_decoder() && st.pFormatCtx)
-    //     {
-    //         const float num = st.pFormatCtx->streams[st.channel_video.stream_id]->avg_frame_rate.num;
-    //         const float den = st.pFormatCtx->streams[st.channel_video.stream_id]->avg_frame_rate.den;
-    //         return num / den;
-    //     }
-
-    //     return 0.0f;
-    // }
-
-    // int demuxer_ffmpeg::estimated_nframes() const noexcept
-    // {
-    //     return st.channel_video.is_audio_decoder() ? st.pFormatCtx->streams[st.channel_video.stream_id]->nb_frames : 0;
-    // }
-
-    // int demuxer_ffmpeg::estimated_total_samples() const noexcept
-    // {
-    //     return st.channel_audio.is_audio_decoder() ? st.pFormatCtx->streams[st.channel_audio.stream_id]->duration : 0;
-    // }
-
-    // float demuxer_ffmpeg::duration() const noexcept
-    // {
-    //     return st.pFormatCtx ? (float)av_rescale_q(st.pFormatCtx->duration, {1, AV_TIME_BASE}, {1, 1000000}) * 1e-6 : 0.0f;
-    // }
-
-    // std::unordered_map<int, std::unordered_map<std::string, std::string>> demuxer_ffmpeg::get_all_metadata() const noexcept
-    // {
-    //     return st.metadata;
-    // }
-
-    // std::unordered_map<std::string, std::string> demuxer_ffmpeg::get_video_metadata() const noexcept
-    // {
-    //     auto it = st.metadata.find(st.channel_video.stream_id);
-    //     return it != st.metadata.end() ? it->second : std::unordered_map<std::string, std::string>{};
-    // }
-
-    // std::unordered_map<std::string, std::string> demuxer_ffmpeg::get_audio_metadata() const noexcept
-    // {
-    //     auto it = st.metadata.find(st.channel_audio.stream_id);
-    //     return it != st.metadata.end() ? it->second : std::unordered_map<std::string, std::string>{};
-    // }
-
-    // float demuxer_ffmpeg::get_rotation_angle() const noexcept
-    // {
-    //     const auto metadata = get_video_metadata();
-    //     const auto it = metadata.find("rotate");
-    //     return it != metadata.end() ? std::stof(it->second) : 0;
-    // }
+    ffmpeg_demuxer::ffmpeg_demuxer(const args &a)
+    {
+        if (!open(a))
+            st.pFormatCtx = nullptr;
+    }
+
+    ffmpeg_demuxer::ffmpeg_demuxer(ffmpeg_demuxer &&other) noexcept
+    : st{std::move(other.st)}
+    {
+        if (st.pFormatCtx)
+            st.pFormatCtx->opaque = this;
+    }
+
+    ffmpeg_demuxer& ffmpeg_demuxer::operator=(ffmpeg_demuxer &&other) noexcept
+    {
+        st = std::move(other.st);
+        if (st.pFormatCtx)
+            st.pFormatCtx->opaque = this;
+        return *this;
+    }
+
+    bool ffmpeg_demuxer::open(const args& a)
+    {
+        using namespace details;
+
+        st = {};
+        st.args_ = a;
+
+        AVFormatContext* pFormatCtx = avformat_alloc_context();
+        pFormatCtx->opaque = this;
+        pFormatCtx->interrupt_callback.opaque   = pFormatCtx;
+        pFormatCtx->interrupt_callback.callback = [](void* ctx) -> int {
+            AVFormatContext* pFormatCtx = (AVFormatContext*)ctx;
+            ffmpeg_demuxer* me = (ffmpeg_demuxer*)pFormatCtx->opaque;
+            return me->interrupt_callback();
+        };
+
+        if (st.args_.probesize > 0)
+            pFormatCtx->probesize = st.args_.probesize;
+
+        av_dict opts = st.args_.format_options;
+        AVInputFormat* input_format = st.args_.input_format.empty() ? nullptr : av_find_input_format(st.args_.input_format.c_str());
+
+        st.connecting_time = system_clock::now();
+        st.connected_time  = system_clock::time_point::max();
+
+        int ret = avformat_open_input(&pFormatCtx,
+                                      st.args_.filepath.c_str(),
+                                      input_format,
+                                      opts.get());
+
+        if (ret != 0)
+        {
+            printf("avformat_open_input() failed with error `%s`\n", get_av_error(ret).c_str());
+            return false;
+        }
+
+        st.connected_time = system_clock::now();
+        st.pFormatCtx.reset(pFormatCtx);
+
+        ret = avformat_find_stream_info(st.pFormatCtx.get(), NULL);
+
+        if (ret < 0)
+        {
+            printf("avformat_find_stream_info() failed with error `%s`\n", get_av_error(ret).c_str());
+            return false;
+        }
+
+        auto setup_stream = [&](bool is_video)
+        {
+            const AVMediaType media_type   = is_video ? AVMEDIA_TYPE_VIDEO : AVMEDIA_TYPE_AUDIO;
+            const auto&       channel_args = is_video ? static_cast<const decoder_codec_args&>(st.args_.image_options) :
+                                                        static_cast<const decoder_codec_args&>(st.args_.audio_options);
+
+            AVCodec* pCodec = nullptr;
+            const int stream_id = av_find_best_stream(st.pFormatCtx.get(), media_type, -1, -1, &pCodec, 0);
+
+            if (stream_id == AVERROR_STREAM_NOT_FOUND)
+            {
+                //You might be asking for both video and audio but only video is available. That's OK. Just provide video.
+                return true;
+            }
+            else if (stream_id == AVERROR_DECODER_NOT_FOUND)
+            {
+                printf("av_find_best_stream() : decoder not found for stream type `%s`\n", av_get_media_type_string(media_type));
+                return false;
+            }
+            else if (stream_id < 0)
+            {
+                printf("av_find_best_stream() failed : `%s`\n", get_av_error(stream_id).c_str());
+                return false;
+            }
+
+            av_ptr<AVCodecContext> pCodecCtx{avcodec_alloc_context3(pCodec)};
+
+            if (!pCodecCtx)
+            {
+                printf("avcodec_alloc_context3() failed to allocate codec context for `%s`\n", pCodec->name);
+                return false;
+            }
+
+            const int ret = avcodec_parameters_to_context(pCodecCtx.get(), st.pFormatCtx->streams[stream_id]->codecpar);
+            if (ret < 0)
+            {
+                printf("avcodec_parameters_to_context() failed : `%s`\n", get_av_error(ret).c_str());
+                return false;
+            }
+
+            if (pCodecCtx->codec_type == AVMEDIA_TYPE_VIDEO)
+            {
+                if (pCodecCtx->height   == 0 ||
+                    pCodecCtx->width    == 0 ||
+                    pCodecCtx->pix_fmt  == AV_PIX_FMT_NONE)
+                {
+                    printf("Codec parameters look wrong : (h,w,pixel_fmt) : (%i,%i,%s)\n",
+                           pCodecCtx->height,
+                           pCodecCtx->width,
+                           get_pixel_fmt_str(pCodecCtx->pix_fmt).c_str());
+                    return false;
+                }
+            }
+            else if (pCodecCtx->codec_type == AVMEDIA_TYPE_AUDIO)
+            {
+                if (pCodecCtx->sample_rate == 0 ||
+                    pCodecCtx->sample_fmt  == AV_SAMPLE_FMT_NONE)
+                {
+                    printf("Codec parameters look wrong: sample_rate : %i sample_fmt : %i\n",
+                           pCodecCtx->sample_rate,
+                           pCodecCtx->sample_fmt);
+                    return false;
+                }
+
+                if (pCodecCtx->channel_layout == 0)
+                    pCodecCtx->channel_layout = av_get_default_channel_layout(pCodecCtx->channels);
+            }
+            else
+            {
+                printf("Unrecognized media type %i\n", pCodecCtx->codec_type);
+                return false;
+            }
+
+            if (is_video)
+            {
+                decoder_extractor::args extractor_args;
+                extractor_args.args_codec = st.args_.image_options;
+                extractor_args.args_image = st.args_.image_options;
+                extractor_args.time_base  = st.pFormatCtx->streams[stream_id]->time_base;
+                st.channel_video = decoder_extractor{{extractor_args}, std::move(pCodecCtx), pCodec};
+                st.channel_video.stream_id = stream_id;
+                /*! Only really need this if you want to call properties without having read anything yet !*/
+                st.channel_video.resizer_image.reset(
+                    st.channel_video.pCodecCtx->height,
+                    st.channel_video.pCodecCtx->width,
+                    st.channel_video.pCodecCtx->pix_fmt,
+                    st.args_.image_options.h > 0 ? st.args_.image_options.h : st.channel_video.pCodecCtx->height,
+                    st.args_.image_options.w > 0 ? st.args_.image_options.w : st.channel_video.pCodecCtx->width,
+                    st.args_.image_options.fmt != AV_PIX_FMT_NONE ? st.args_.image_options.fmt : st.channel_video.pCodecCtx->pix_fmt
+                );
+            }
+            else
+            {
+                decoder_extractor::args extractor_args;
+                extractor_args.args_codec = st.args_.audio_options;
+                extractor_args.args_audio = st.args_.audio_options;
+                extractor_args.time_base  = st.pFormatCtx->streams[stream_id]->time_base;
+                st.channel_audio = decoder_extractor{{extractor_args}, std::move(pCodecCtx), pCodec};
+                st.channel_audio.stream_id = stream_id;
+                /*! Only really need this if you want to call properties without having read anything yet !*/
+                st.channel_audio.resizer_audio.reset(
+                    st.channel_audio.pCodecCtx->sample_rate,
+                    st.channel_audio.pCodecCtx->channel_layout,
+                    st.channel_audio.pCodecCtx->sample_fmt,
+                    st.args_.audio_options.sample_rate > 0            ? st.args_.audio_options.sample_rate      : st.channel_audio.pCodecCtx->sample_rate,
+                    st.args_.audio_options.channel_layout > 0         ? st.args_.audio_options.channel_layout   : st.channel_audio.pCodecCtx->channel_layout,
+                    st.args_.audio_options.fmt != AV_SAMPLE_FMT_NONE  ? st.args_.audio_options.fmt              : st.channel_audio.pCodecCtx->sample_fmt
+                );
+            }
+
+            return true;
+        };
+
+        if (st.args_.enable_image)
+            setup_stream(true);
+
+        if (st.args_.enable_audio)
+            setup_stream(false);
+
+        if (!st.channel_audio.is_open() && !st.channel_video.is_open())
+        {
+            printf("At least one of video and audio channels must be enabled\n");
+            return false;
+        }
+
+        populate_metadata();
+
+        st.packet = make_avpacket();
+        st.opened = true;
+        return true;
+    }
+
+    bool ffmpeg_demuxer::is_open() const noexcept
+    {
+        using namespace details;
+
+        const bool frames_cached = !st.frame_queue.empty();
+        const bool object_alive  = st.pFormatCtx != nullptr &&
+                                   st.opened &&
+                                   (st.channel_video.is_open() || st.channel_audio.is_open());
+        return FFMPEG_INITIALIZED && (frames_cached || object_alive);
+    }
+
+    bool ffmpeg_demuxer::interrupt_callback()
+    {
+        const auto now = system_clock::now();
+
+        if (st.args_.connect_timeout < std::chrono::milliseconds::max() && // check there is a timeout
+            now < st.connected_time &&                                     // we haven't already connected
+            now > (st.connecting_time + st.args_.connect_timeout)          // we've timed-out
+        )
+            return true;
+
+        if (st.args_.read_timeout < std::chrono::milliseconds::max() &&   // check there is a timeout
+            now > (st.last_read_time + st.args_.read_timeout)             // we've timed-out
+        )
+            return true;
+
+        if (st.args_.interrupter && st.args_.interrupter())               // check user-specified callback
+            return true;
+
+        return false;
+    }
+
+    void ffmpeg_demuxer::populate_metadata()
+    {
+        for (unsigned int i = 0; i < st.pFormatCtx->nb_streams; i++)
+        {
+            std::string metadata_str;
+            {
+                char* charbuf = 0;
+                av_dict_get_string(st.pFormatCtx->streams[i]->metadata, &charbuf, ',', ';');
+                metadata_str = std::string(charbuf);
+                free(charbuf);
+            }
+
+            std::vector<std::string> keyvals = dlib::split(metadata_str, ";");
+            for (size_t kv = 0; kv < keyvals.size(); kv++) {
+                std::vector<std::string> kv_item = dlib::split(keyvals[kv], ",");
+                assert(kv_item.size() == 2);
+                st.metadata[i][kv_item[0]] = dlib::trim(kv_item[1]);
+            }
+        }
+    }
+
+    typedef enum {
+        DEMUXER_RECV_PACKET = 0,
+        DEMUXER_SEND_PACKET,
+        DEMUXER_FLUSH,
+        DEMUXER_DONE,
+        DEMUXER_ERROR = -1
+    } demuxer_state;
+
+    bool ffmpeg_demuxer::fill_queue()
+    {
+        using namespace details;
+
+        if (!is_open())
+            return false;
+
+        decoder_extractor *channel = nullptr;
+        demuxer_state state = DEMUXER_RECV_PACKET;
+
+        auto recv_packet = [&]
+        {
+            if (!st.frame_queue.empty())
+            {
+                state = DEMUXER_DONE;
+            }
+            else
+            {
+                av_packet_unref(st.packet.get());
+                const int ret = av_read_frame(st.pFormatCtx.get(), st.packet.get());
+
+                if (ret == AVERROR_EOF)
+                {
+                    state = DEMUXER_FLUSH;
+                }
+                else if (ret >= 0)
+                {
+                    if (st.packet->stream_index == st.channel_video.stream_id)
+                    {
+                        channel = &st.channel_video;
+                        state   = DEMUXER_SEND_PACKET;
+                    }
+                    else if (st.packet->stream_index == st.channel_audio.stream_id)
+                    {
+                        channel = &st.channel_audio;
+                        state   = DEMUXER_SEND_PACKET;
+                    }
+                }
+                else
+                {
+                    printf("av_read_frame() failed : `%s`\n", get_av_error(ret).c_str());
+                    state = DEMUXER_ERROR;
+                }
+            }
+        };
+
+        auto send_packet = [&]
+        {
+            if (!channel->push(st.packet))
+                state = DEMUXER_ERROR;
+            else
+            {
+                decoder_status suc;
+                Frame frame;
+
+                while ((suc = channel->read(frame)) == DECODER_FRAME_AVAILABLE)
+                    st.frame_queue.push(std::move(frame));
+
+                if (suc == DECODER_EAGAIN)
+                    state = DEMUXER_RECV_PACKET;
+                else
+                    state = DEMUXER_DONE;
+            }
+        };
+
+        auto flushing_channel = [&]
+        {
+            while (state != DEMUXER_ERROR && state != DEMUXER_DONE)
+                send_packet();
+        };
+
+        auto flushing = [&]
+        {
+            st.packet = nullptr;
+            if (st.channel_video.is_open())
+            {
+                channel = &st.channel_video;
+                flushing_channel();
+            }
+            if (st.channel_audio.is_open())
+            {
+                channel = &st.channel_audio;
+                flushing_channel();
+            }
+        };
+
+        while (state != DEMUXER_DONE && state != DEMUXER_ERROR)
+        {
+            switch(state)
+            {
+                case DEMUXER_RECV_PACKET: recv_packet(); break;
+                case DEMUXER_SEND_PACKET: send_packet(); break;
+                case DEMUXER_FLUSH:       flushing(); break;
+                default: break;
+            }
+        }
+
+        return state != DEMUXER_ERROR;
+    }
+
+    bool ffmpeg_demuxer::read(Frame& dst_frame)
+    {
+        if (!fill_queue())
+            return false;
+
+        if (!st.frame_queue.empty())
+        {
+            dst_frame = std::move(st.frame_queue.front());
+            st.frame_queue.pop();
+            return true;
+        }
+
+        return false;
+    }
+
+    bool            ffmpeg_demuxer::video_enabled()     const noexcept { return st.channel_video.is_image_decoder(); }
+    bool            ffmpeg_demuxer::audio_enabled()     const noexcept { return st.channel_audio.is_audio_decoder(); }
+    int             ffmpeg_demuxer::height()            const noexcept { return st.channel_video.height(); }
+    int             ffmpeg_demuxer::width()             const noexcept { return st.channel_video.width(); }
+    AVPixelFormat   ffmpeg_demuxer::pixel_fmt()         const noexcept { return st.channel_video.pixel_fmt(); }
+    int             ffmpeg_demuxer::sample_rate()       const noexcept { return st.channel_audio.sample_rate(); }
+    uint64_t        ffmpeg_demuxer::channel_layout()    const noexcept { return st.channel_audio.channel_layout(); }
+    AVSampleFormat  ffmpeg_demuxer::sample_fmt()        const noexcept { return st.channel_audio.sample_fmt(); }
+    int             ffmpeg_demuxer::nchannels()         const noexcept { return st.channel_audio.nchannels(); }
+    AVCodecID   ffmpeg_demuxer::get_video_codec_id()    const noexcept { return st.channel_video.get_codec_id(); }
+    AVCodecID   ffmpeg_demuxer::get_audio_codec_id()    const noexcept { return st.channel_audio.get_codec_id(); }
+    std::string ffmpeg_demuxer::get_video_codec_name()  const noexcept { return st.channel_video.get_codec_name(); }
+    std::string ffmpeg_demuxer::get_audio_codec_name()  const noexcept { return st.channel_audio.get_codec_name(); }
+
+    float ffmpeg_demuxer::fps() const noexcept
+    {
+        /*!
+            Do we need to adjust _pFormatCtx->fps_probe_size ?
+            Do we need to adjust _pFormatCtx->max_analyze_duration ?
+        !*/
+        if (st.channel_video.is_image_decoder() && st.pFormatCtx)
+        {
+            const float num = st.pFormatCtx->streams[st.channel_video.stream_id]->avg_frame_rate.num;
+            const float den = st.pFormatCtx->streams[st.channel_video.stream_id]->avg_frame_rate.den;
+            return num / den;
+        }
+
+        return 0.0f;
+    }
+
+    int ffmpeg_demuxer::estimated_nframes() const noexcept
+    {
+        return st.channel_video.is_audio_decoder() ? st.pFormatCtx->streams[st.channel_video.stream_id]->nb_frames : 0;
+    }
+
+    int ffmpeg_demuxer::estimated_total_samples() const noexcept
+    {
+        return st.channel_audio.is_audio_decoder() ? st.pFormatCtx->streams[st.channel_audio.stream_id]->duration : 0;
+    }
+
+    float ffmpeg_demuxer::duration() const noexcept
+    {
+        return st.pFormatCtx ? (float)av_rescale_q(st.pFormatCtx->duration, {1, AV_TIME_BASE}, {1, 1000000}) * 1e-6 : 0.0f;
+    }
+
+    std::unordered_map<int, std::unordered_map<std::string, std::string>> ffmpeg_demuxer::get_all_metadata() const noexcept
+    {
+        return st.metadata;
+    }
+
+    std::unordered_map<std::string, std::string> ffmpeg_demuxer::get_video_metadata() const noexcept
+    {
+        auto it = st.metadata.find(st.channel_video.stream_id);
+        return it != st.metadata.end() ? it->second : std::unordered_map<std::string, std::string>{};
+    }
+
+    std::unordered_map<std::string, std::string> ffmpeg_demuxer::get_audio_metadata() const noexcept
+    {
+        auto it = st.metadata.find(st.channel_audio.stream_id);
+        return it != st.metadata.end() ? it->second : std::unordered_map<std::string, std::string>{};
+    }
+
+    float ffmpeg_demuxer::get_rotation_angle() const noexcept
+    {
+        const auto metadata = get_video_metadata();
+        const auto it = metadata.find("rotate");
+        return it != metadata.end() ? std::stof(it->second) : 0;
+    }
 }

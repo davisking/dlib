@@ -338,101 +338,129 @@ namespace dlib
 
     // ---------------------------------------------------------------------------------------------------
 
-    // class demuxer_ffmpeg
-    // {
-    // public:
-    //     struct args
-    //     {
-    //         args() = default;
-    //         args(std::string filepath_) : filepath{std::move(filepath_)} {}
+    class ffmpeg_demuxer
+    {
+    public:
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This class is a libavformat wrapper which decodes video or audio from file.
+                It is analoguous to OpenCV's cv::VideoCapture class but is more configurable,
+                and supports audio, devices (X11, webcam, microphone, ...) and network streams
+                such as RTSP, HTTP, and more.
+                Note that a video file, e.g. MP4, can contain multiple streams: video, audio, subtitles, etc.
+                This class can decode both video and audio at the same time.
+                For audio files, e.g. MP3, FLAG, it only decodes audio. (obs)
+        !*/
 
-    //         /*!
-    //             filepath        : Filepath, URL or device
-    //             input_format    : Input format hint. e.g. 'rtsp', 'X11', etc. Usually not required and guessed.
-    //             probesize       : Sets AVFormatContext::probsize
-    //             connect_timeout : Connection/listening timeout. Only relevant to network muxers such as RTSP, HTTP etc.
-    //             read_timeout    : Read timeout. Only relevant to network muxers such as RTSP, HTTP etc
-    //             format_options  : A dictionary filled with AVFormatContext and demuxer-private options. Used by avformat_open_input()
-    //             interrupter     : Optional connection/listening interruption callback.
-    //         !*/
+        struct args
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                   Constructor arguments for ffmpeg_demuxer
+            !*/
 
-    //         std::string                         filepath;
-    //         std::string                         input_format;
-    //         int                                 probesize       = -1;
-    //         std::chrono::milliseconds           connect_timeout = std::chrono::milliseconds::max();
-    //         std::chrono::milliseconds           read_timeout    = std::chrono::milliseconds::max();
-    //         std::function<bool()>               interrupter;
-    //         std::unordered_map<std::string, std::string> format_options;
+            args() = default;
 
-    //         struct : dec_codec_args, dec_image_args{} image_options;
-    //         struct : dec_codec_args, dec_audio_args{} audio_options;
-    //         bool enable_image = true;
-    //         bool enable_audio = true;
-    //     };
+            args(std::string filepath_) : filepath{std::move(filepath_)} {}
+            /*!
+                ensures
+                    - Returns basic arguments using filepath only. Everything else is either defaulted or guessed by libavformat.
+            !*/
 
-    //     demuxer_ffmpeg() = default;
-    //     demuxer_ffmpeg(const args& a);
-    //     demuxer_ffmpeg(demuxer_ffmpeg&& other) noexcept;
-    //     demuxer_ffmpeg& operator=(demuxer_ffmpeg&& other) noexcept;
+            // Filepath, URL or device
+            std::string filepath;
 
-    //     bool is_open()          const noexcept;
-    //     bool audio_enabled()    const noexcept;
-    //     bool video_enabled()    const noexcept;
+            // Input format hint. e.g. 'rtsp', 'X11', etc. 99% of the time, users are not required to specify this as libavformat tries to guess it.
+            std::string input_format;
 
-    //     /*! video dims !*/
-    //     int             height()                    const noexcept;
-    //     int             width()                     const noexcept;
-    //     AVPixelFormat   pixel_fmt()                 const noexcept;
-    //     float           fps()                       const noexcept;
-    //     int             estimated_nframes()         const noexcept;
-    //     AVCodecID       get_video_codec_id()        const noexcept;
-    //     std::string     get_video_codec_name()      const noexcept;
-    //     /*!audio dims! */
-    //     int             sample_rate()               const noexcept;
-    //     uint64_t        channel_layout()            const noexcept;
-    //     AVSampleFormat  sample_fmt()                const noexcept;
-    //     int             nchannels()                 const noexcept;
-    //     int             estimated_total_samples()   const noexcept;
-    //     AVCodecID       get_audio_codec_id()        const noexcept;
-    //     std::string     get_audio_codec_name()      const noexcept;
-    //     float           duration()                  const noexcept;
+            // Sets AVFormatContext::probsize
+            // Please see libavformat documentation for more details
+            int probesize{-1};
 
-    //     bool read(
-    //         type_safe_union<array2d<rgb_pixel>, audio_frame>& frame,
-    //         std::chrono::system_clock::time_point &timestamp
-    //     );
+            // Only relevant to network demuxers such as RTSP, HTTP etc.
+            // Connection/listening timeout. 
+            std::chrono::milliseconds connect_timeout{std::chrono::milliseconds::max()};
+            
+            // Only relevant to network demuxers such as RTSP, HTTP etc
+            // Read timeout. 
+            std::chrono::milliseconds read_timeout{std::chrono::milliseconds::max()};
 
-    //     /*expert use*/
-    //     bool read(
-    //         Frame& frame
-    //     );
+            // Only relevant to network demuxers such as RTSP, HTTP etc
+            // Connection/listening interruption callback.
+            // The constructor periodially calls interrupter() while waiting on the network. If it returns true, then
+            // the connection is aborted and the demuxer is closed.
+            // So user may use this in conjunction with some thread-safe shared state to signal an abort/interrupt.
+            std::function<bool()> interrupter;
 
-    //     /*! metadata! */
-    //     std::unordered_map<int, std::unordered_map<std::string, std::string>> get_all_metadata() const noexcept;
-    //     std::unordered_map<std::string,std::string> get_video_metadata() const noexcept;
-    //     std::unordered_map<std::string,std::string> get_audio_metadata() const noexcept;
-    //     float get_rotation_angle() const noexcept;
+            // A dictionary filled with AVFormatContext and demuxer-private options. Used by avformat_open_input().
+            // Please see libavformat documentation for more details
+            std::unordered_map<std::string, std::string> format_options;
 
-    // private:
-    //     bool open(const args& a);
-    //     bool fill_queue();
-    //     bool interrupt_callback();
-    //     void populate_metadata();
+            // Video stream arguments
+            struct : decoder_codec_args, decoder_image_args{} image_options;
+            // Audio stream arguments
+            struct : decoder_codec_args, decoder_audio_args{} audio_options;
+            // Whether or not to decode video stream
+            bool enable_image = true;
+            // Whether or not to decode audio stream
+            bool enable_audio = true;
+        };
 
-    //     struct {
-    //         args                    args_;
-    //         bool                    opened = false;
-    //         av_ptr<AVFormatContext> pFormatCtx;
-    //         av_ptr<AVPacket>        packet;
-    //         std::chrono::system_clock::time_point connecting_time{};
-    //         std::chrono::system_clock::time_point connected_time{};
-    //         std::chrono::system_clock::time_point last_read_time{};
-    //         std::unordered_map<int, std::unordered_map<std::string, std::string>> metadata;
-    //         decoder_extractor channel_video;
-    //         decoder_extractor channel_audio;
-    //         std::queue<Frame> frame_queue;
-    //     } st;
-    // };
+        ffmpeg_demuxer() = default;
+        ffmpeg_demuxer(const args& a);
+        ffmpeg_demuxer(ffmpeg_demuxer&& other) noexcept;
+        ffmpeg_demuxer& operator=(ffmpeg_demuxer&& other) noexcept;
+
+        bool is_open()          const noexcept;
+        bool audio_enabled()    const noexcept;
+        bool video_enabled()    const noexcept;
+
+        /*! video dims !*/
+        int             height()                    const noexcept;
+        int             width()                     const noexcept;
+        AVPixelFormat   pixel_fmt()                 const noexcept;
+        float           fps()                       const noexcept;
+        int             estimated_nframes()         const noexcept;
+        AVCodecID       get_video_codec_id()        const noexcept;
+        std::string     get_video_codec_name()      const noexcept;
+        /*!audio dims! */
+        int             sample_rate()               const noexcept;
+        uint64_t        channel_layout()            const noexcept;
+        AVSampleFormat  sample_fmt()                const noexcept;
+        int             nchannels()                 const noexcept;
+        int             estimated_total_samples()   const noexcept;
+        AVCodecID       get_audio_codec_id()        const noexcept;
+        std::string     get_audio_codec_name()      const noexcept;
+        float           duration()                  const noexcept;
+
+        bool read(Frame& frame);
+
+        /*! metadata! */
+        std::unordered_map<int, std::unordered_map<std::string, std::string>> get_all_metadata() const noexcept;
+        std::unordered_map<std::string,std::string> get_video_metadata() const noexcept;
+        std::unordered_map<std::string,std::string> get_audio_metadata() const noexcept;
+        float get_rotation_angle() const noexcept;
+
+    private:
+        bool open(const args& a);
+        bool fill_queue();
+        bool interrupt_callback();
+        void populate_metadata();
+
+        struct {
+            args                    args_;
+            bool                    opened = false;
+            av_ptr<AVFormatContext> pFormatCtx;
+            av_ptr<AVPacket>        packet;
+            std::chrono::system_clock::time_point connecting_time{};
+            std::chrono::system_clock::time_point connected_time{};
+            std::chrono::system_clock::time_point last_read_time{};
+            std::unordered_map<int, std::unordered_map<std::string, std::string>> metadata;
+            details::decoder_extractor channel_video;
+            details::decoder_extractor channel_audio;
+            std::queue<Frame> frame_queue;
+        } st;
+    };
 
     // ---------------------------------------------------------------------------------------------------
 }
