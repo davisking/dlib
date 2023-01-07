@@ -310,7 +310,7 @@ namespace dlib
         {
             // When flushing, calling parse() multiple times with encoded == nullptr and nencoded == 0 will 
             // 1. flush the parser
-            // 2. flush the codec:  since second time round packet->data == nullptr and packet->size == 0 which will flush the codec
+            // 2. flush the codec:  since second time round packet->data == nullptr and packet->size == 0 which will flush the codec, then close it
             ok = parse();
 
             if (ok && (packet->size > 0 || flushing))
