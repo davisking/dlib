@@ -11,6 +11,14 @@ namespace dlib
         bool ffmpeg_initialize_all()
         {
             avdevice_register_all();
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 10, 100)
+            // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L91
+            avcodec_register_all();
+#endif
+#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100) 
+            // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L86
+            av_register_all();
+#endif
             return true;
         }
 

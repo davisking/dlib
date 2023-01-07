@@ -362,6 +362,7 @@ namespace dlib
         bool supports_encoding;
         bool supports_decoding;
     };
+    
     std::vector<codec_details> ffmpeg_list_codecs();
     /*!
         ensures
