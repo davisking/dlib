@@ -681,10 +681,8 @@ namespace dlib
         return details;
     }
 
-    type_safe_union<array2d<rgb_pixel>, audio_frame> convert(const Frame& f)
+    void convert(const Frame& f, type_safe_union<array2d<rgb_pixel>, audio_frame>& obj)
     {
-        type_safe_union<array2d<rgb_pixel>, audio_frame> obj;
-
         if (f.is_image())
         {
             DLIB_ASSERT(frame.pixfmt() == AV_PIX_FMT_RGB24, "frame isn't RGB image. Make sure your decoder/demuxer/encoder/muxer has correct args passed to constructor");
@@ -723,7 +721,12 @@ namespace dlib
 
             obj = std::move(audio);
         }
+    }
 
+    type_safe_union<array2d<rgb_pixel>, audio_frame> convert(const Frame& f)
+    {
+        type_safe_union<array2d<rgb_pixel>, audio_frame> obj;
+        convert(f, obj);
         return obj;
     }
 

@@ -50,7 +50,7 @@ namespace
         {
             while ((status = decoder.read(frame)) == DECODER_FRAME_AVAILABLE)
             {
-                obj = convert(frame);
+                convert(frame, obj);
                 DLIB_TEST(frame.is_image());
                 DLIB_TEST(frame.height() == height);
                 DLIB_TEST(frame.width() == width);

@@ -372,6 +372,12 @@ namespace dlib
 
     // ---------------------------------------------------------------------------------------------------
 
+    void convert(const Frame& frame, type_safe_union<array2d<rgb_pixel>, audio_frame>& obj);
+    /*!
+        ensures
+            - converts a Frame object into dlib objects if possible, i.e. if the format and layout is already correct
+    !*/
+
     type_safe_union<array2d<rgb_pixel>, audio_frame> convert(const Frame& frame);
     /*!
         ensures
