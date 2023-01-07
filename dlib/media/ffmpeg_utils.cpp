@@ -611,20 +611,30 @@ namespace dlib
     std::vector<std::string> ffmpeg_list_demuxers()
     {
         std::vector<std::string> demuxers;
-        void* opaque = nullptr;
         const AVInputFormat* demuxer = NULL;
+#if LIBAVFORMAT_VERSION_MAJOR >= 58
+        void* opaque = nullptr;
         while ((demuxer = av_demuxer_iterate(&opaque)))
             demuxers.push_back(demuxer->name);
+#else
+        while ((demuxer = av_iformat_next(demuxer)))
+            demuxers.push_back(demuxer->name);
+#endif
         return demuxers;
     }
 
     std::vector<std::string> ffmpeg_list_muxers()
     {
         std::vector<std::string> muxers;
-        void* opaque = nullptr;
         const AVOutputFormat* muxer = NULL;
+#if LIBAVFORMAT_VERSION_MAJOR >= 58
+        void* opaque = nullptr;
         while ((muxer = av_muxer_iterate(&opaque)))
             muxers.push_back(muxer->name);
+#else
+        while ((muxer = av_oformat_next(muxer)))
+            muxers.push_back(muxers->name);
+#endif
         return muxers;
     }
 
