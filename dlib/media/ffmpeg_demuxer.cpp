@@ -37,29 +37,27 @@ namespace dlib
 
         bool decoder_extractor::is_open() const noexcept
         {
-            const bool frames_cached = !frame_queue.empty();
-            const bool object_alive  = pCodecCtx != nullptr;
-            return FFMPEG_INITIALIZED && (frames_cached || object_alive);
+            return FFMPEG_INITIALIZED && pCodecCtx != nullptr;
         }
 
         bool decoder_extractor::is_image_decoder() const noexcept
         {
-            return pCodecCtx && pCodecCtx->codec_type == AVMEDIA_TYPE_VIDEO;
+            return is_open() && pCodecCtx->codec_type == AVMEDIA_TYPE_VIDEO;
         }
 
         bool decoder_extractor::is_audio_decoder() const noexcept
         {
-            return pCodecCtx && pCodecCtx->codec_type == AVMEDIA_TYPE_AUDIO;
+            return is_open() && pCodecCtx->codec_type == AVMEDIA_TYPE_AUDIO;
         }
 
         AVCodecID decoder_extractor::get_codec_id() const noexcept
         {
-            return pCodecCtx ? pCodecCtx->codec_id : AV_CODEC_ID_NONE;
+            return is_open() ? pCodecCtx->codec_id : AV_CODEC_ID_NONE;
         }
 
         std::string decoder_extractor::get_codec_name() const noexcept
         {
-            return pCodecCtx ? avcodec_get_name(pCodecCtx->codec_id) : "NONE";
+            return is_open() ? avcodec_get_name(pCodecCtx->codec_id) : "NONE";
         }
 
         int             decoder_extractor::height()         const noexcept { return resizer_image.get_dst_h(); }
@@ -175,6 +173,16 @@ namespace dlib
             }
 
             return state != EXTRACT_ERROR;
+        }
+
+        bool decoder_extractor::frames_available()  const noexcept
+        {
+            return !frame_queue.empty();
+        }
+            
+        int  decoder_extractor::nframes_remaining() const noexcept
+        {
+            return frame_queue.size();
         }
 
         decoder_status decoder_extractor::read(Frame &dst_frame)
@@ -298,29 +306,15 @@ namespace dlib
         const bool flushing = encoded == nullptr && nencoded == 0;
         bool ok = true;
 
-        while (ok && (nencoded > 0 || flushing))
+        while (ok && is_open() && (nencoded > 0 || flushing))
         {
-            // Parse data OR flush parser
+            // When flushing, calling parse() multiple times with encoded == nullptr and nencoded == 0 will 
+            // 1. flush the parser
+            // 2. flush the codec:  since second time round packet->data == nullptr and packet->size == 0 which will flush the codec
             ok = parse();
 
-            // If data is available, decode
-            if (ok && packet->size > 0)
+            if (ok && (packet->size > 0 || flushing))
                 ok = extractor.push(packet);
-            
-            // If flushing, only flush parser once, so break
-            if (flushing)
-                break;
-        }
-
-        if (flushing)
-        {
-            // Flush codec
-            ok = extractor.push(nullptr);
-        }
-
-        if (!ok || flushing)
-        {
-            extractor.pCodecCtx = nullptr; // close
         }
     
         return ok;

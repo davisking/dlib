@@ -127,6 +127,8 @@ namespace dlib
             int             nchannels()         const noexcept;
 
             bool push(const av_ptr<AVPacket>& pkt);
+            bool frames_available()  const noexcept;
+            int  nframes_remaining() const noexcept;
             decoder_status read(Frame& dst_frame);
 
         private:
@@ -181,7 +183,8 @@ namespace dlib
         bool is_open() const noexcept;
         /*!
             ensures
-                - returns true if codec is openened or nframes_available() > 0
+                - returns true if codec is openened
+                - However, if is_open() == false, nframes_available() may still be > 0. So call read() until empty.
         !*/
 
         bool is_image_decoder() const noexcept;
