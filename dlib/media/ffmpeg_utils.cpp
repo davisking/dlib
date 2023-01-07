@@ -633,7 +633,7 @@ namespace dlib
             muxers.push_back(muxer->name);
 #else
         while ((muxer = av_oformat_next(muxer)))
-            muxers.push_back(muxers->name);
+            muxers.push_back(muxer->name);
 #endif
         return muxers;
     }
@@ -641,13 +641,18 @@ namespace dlib
     std::vector<codec_details> ffmpeg_list_available_codecs()
     {
         std::vector<codec_details> details;
+        
+#if LIBAVCODEC_VERSION_MAJOR >= 58
         const AVCodec* codec = NULL;
-
-#if LIBAVCODEC_VERSION_MAJOR >= 58 && LIBAVCODEC_VERSION_MINOR >= 10 && LIBAVCODEC_VERSION_MICRO >= 100
+  #if LIBAVCODEC_VERSION_MINOR >= 10 && LIBAVCODEC_VERSION_MICRO >= 100
         void* opaque = nullptr;
         while ((codec = av_codec_iterate(&opaque)))
-#else
+  #else
         while ((codec = av_codec_iterate(codec)))
+  #endif 
+#else
+        AVCodec* codec = NULL;
+        while ((codec = av_codec_next(codec)))
 #endif
         {
             codec_details detail;

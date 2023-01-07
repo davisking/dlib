@@ -127,6 +127,19 @@ namespace dlib
     class Frame
     {
     public:
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This class wraps AVFrame* into a std::unique_ptr with an appropriate deleter.
+                It also has a std::chrono timestamp which closely matches the AVFrame's internal pts.
+                It has a bunch of helper functions for retrieving the frame's properties.
+                See ffmeg documentation for AVFrame.
+                It contains frame data, which may be image, audio or other.
+                The format and layout of the frame is not necessarily RGB (for image) or stereo s16 (for audio).
+                It depends on codec configuration.
+                It is up to the user to appropriately read the data using get_frame().data, get_frame().linesize.
+                There are however helper functions convert() with overloads to convert to/from dlib objects.
+        !*/
+
         Frame()                         = default;
         Frame(Frame&& ori)              = default;
         Frame& operator=(Frame&& ori)   = default;
@@ -327,8 +340,21 @@ namespace dlib
     // ---------------------------------------------------------------------------------------------------
 
     std::vector<std::string> ffmpeg_list_protocols();
+    /*!
+        ensures
+            - returns a list of all registered ffmpeg protocols
+    !*/
     std::vector<std::string> ffmpeg_list_demuxers();
+    /*!
+        ensures
+            - returns a list of all registered ffmpeg demuxers
+    !*/
+
     std::vector<std::string> ffmpeg_list_muxers();
+    /*!
+        ensures
+            - returns a list of all registered ffmpeg muxers
+    !*/
 
     struct codec_details
     {
@@ -337,12 +363,32 @@ namespace dlib
         bool supports_decoding;
     };
     std::vector<codec_details> ffmpeg_list_codecs();
+    /*!
+        ensures
+            - returns a list of all registered ffmpeg codecs with information on whether decoding and/or encoding is supported.
+              Note that not all codecs support encoding, unless your installation of ffmpeg is built with third party library
+              dependencies like libx264, libx265, etc.
+    !*/
 
     // ---------------------------------------------------------------------------------------------------
 
     type_safe_union<array2d<rgb_pixel>, audio_frame> convert(const Frame& frame);
-    Frame                                            convert(const array2d<rgb_pixel>& frame);
-    Frame                                            convert(const audio_frame& frame);
+    /*!
+        ensures
+            - converts a Frame object into dlib objects if possible, i.e. if the format and layout is already correct
+    !*/
+
+    Frame convert(const array2d<rgb_pixel>& frame);
+    /*!
+        ensures
+            - converts a dlib image into a frame object
+    !*/
+
+    Frame convert(const audio_frame& frame);
+    /*!
+        ensures
+            - converts a dlib audio frame into a frame object
+    !*/
 
     // ---------------------------------------------------------------------------------------------------
 }

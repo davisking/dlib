@@ -38,6 +38,7 @@ namespace
         DLIB_TEST(decoder.is_image_decoder());
         DLIB_TEST(decoder.get_codec_name() == codec);
 
+        type_safe_union<array2d<rgb_pixel>, audio_frame> obj;
         dlib::Frame             frame;
         int                     count{0};
         dlib::decoder_status    status{DECODER_EAGAIN};
@@ -49,9 +50,13 @@ namespace
         {
             while ((status = decoder.read(frame)) == DECODER_FRAME_AVAILABLE)
             {
+                obj = convert(frame);
+                DLIB_TEST(frame.is_image());
                 DLIB_TEST(frame.height() == height);
                 DLIB_TEST(frame.width() == width);
-                DLIB_TEST(frame.is_image());
+                DLIB_TEST(obj.contains<array2d<rgb_pixel>>());
+                DLIB_TEST(obj.get<array2d<rgb_pixel>>().nr() == height);
+                DLIB_TEST(obj.get<array2d<rgb_pixel>>().nc() == width);
                 ++count;
                 DLIB_TEST(decoder.height() == height);
                 DLIB_TEST(decoder.width() == width);
