@@ -306,15 +306,24 @@ namespace dlib
         const bool flushing = encoded == nullptr && nencoded == 0;
         bool ok = true;
 
-        while (ok && is_open() && (nencoded > 0 || flushing))
+        while (ok && (nencoded > 0 || flushing))
         {
-            // When flushing, calling parse() multiple times with encoded == nullptr and nencoded == 0 will 
-            // 1. flush the parser
-            // 2. flush the codec:  since second time round packet->data == nullptr and packet->size == 0 which will flush the codec, then close it
+            // Parse data OR flush parser
             ok = parse();
 
-            if (ok && (packet->size > 0 || flushing))
+            // If data is available, decode
+            if (ok && packet->size > 0)
                 ok = extractor.push(packet);
+            
+            // If flushing, only flush parser once, so break
+            if (flushing)
+                break;
+        }
+
+        if (flushing)
+        {
+            // Flush codec
+            ok = extractor.push(nullptr);
         }
     
         return ok;
@@ -618,17 +627,21 @@ namespace dlib
         }
     }
 
-    typedef enum {
+    enum demuxer_state
+    {
         DEMUXER_RECV_PACKET = 0,
         DEMUXER_SEND_PACKET,
         DEMUXER_FLUSH,
         DEMUXER_DONE,
         DEMUXER_ERROR = -1
-    } demuxer_state;
+    };
 
     bool ffmpeg_demuxer::fill_queue()
     {
         using namespace details;
+
+        if (!st.frame_queue.empty())
+            return true;
 
         if (!is_open())
             return false;
@@ -741,19 +754,20 @@ namespace dlib
         return false;
     }
 
-    bool            ffmpeg_demuxer::video_enabled()     const noexcept { return st.channel_video.is_image_decoder(); }
-    bool            ffmpeg_demuxer::audio_enabled()     const noexcept { return st.channel_audio.is_audio_decoder(); }
-    int             ffmpeg_demuxer::height()            const noexcept { return st.channel_video.height(); }
-    int             ffmpeg_demuxer::width()             const noexcept { return st.channel_video.width(); }
-    AVPixelFormat   ffmpeg_demuxer::pixel_fmt()         const noexcept { return st.channel_video.pixel_fmt(); }
-    int             ffmpeg_demuxer::sample_rate()       const noexcept { return st.channel_audio.sample_rate(); }
-    uint64_t        ffmpeg_demuxer::channel_layout()    const noexcept { return st.channel_audio.channel_layout(); }
-    AVSampleFormat  ffmpeg_demuxer::sample_fmt()        const noexcept { return st.channel_audio.sample_fmt(); }
-    int             ffmpeg_demuxer::nchannels()         const noexcept { return st.channel_audio.nchannels(); }
-    AVCodecID   ffmpeg_demuxer::get_video_codec_id()    const noexcept { return st.channel_video.get_codec_id(); }
-    AVCodecID   ffmpeg_demuxer::get_audio_codec_id()    const noexcept { return st.channel_audio.get_codec_id(); }
-    std::string ffmpeg_demuxer::get_video_codec_name()  const noexcept { return st.channel_video.get_codec_name(); }
-    std::string ffmpeg_demuxer::get_audio_codec_name()  const noexcept { return st.channel_audio.get_codec_name(); }
+    bool            ffmpeg_demuxer::video_enabled()         const noexcept { return st.channel_video.is_image_decoder(); }
+    bool            ffmpeg_demuxer::audio_enabled()         const noexcept { return st.channel_audio.is_audio_decoder(); }
+    int             ffmpeg_demuxer::height()                const noexcept { return st.channel_video.height(); }
+    int             ffmpeg_demuxer::width()                 const noexcept { return st.channel_video.width(); }
+    AVPixelFormat   ffmpeg_demuxer::pixel_fmt()             const noexcept { return st.channel_video.pixel_fmt(); }
+    AVCodecID       ffmpeg_demuxer::get_video_codec_id()    const noexcept { return st.channel_video.get_codec_id(); }
+    std::string     ffmpeg_demuxer::get_video_codec_name()  const noexcept { return st.channel_video.get_codec_name(); }
+
+    int             ffmpeg_demuxer::sample_rate()           const noexcept { return st.channel_audio.sample_rate(); }
+    uint64_t        ffmpeg_demuxer::channel_layout()        const noexcept { return st.channel_audio.channel_layout(); }
+    AVSampleFormat  ffmpeg_demuxer::sample_fmt()            const noexcept { return st.channel_audio.sample_fmt(); }
+    int             ffmpeg_demuxer::nchannels()             const noexcept { return st.channel_audio.nchannels(); }
+    AVCodecID       ffmpeg_demuxer::get_audio_codec_id()    const noexcept { return st.channel_audio.get_codec_id(); }
+    std::string     ffmpeg_demuxer::get_audio_codec_name()  const noexcept { return st.channel_audio.get_codec_name(); }
 
     float ffmpeg_demuxer::fps() const noexcept
     {
