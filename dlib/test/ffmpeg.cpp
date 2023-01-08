@@ -33,6 +33,8 @@ namespace
 
         ffmpeg_decoder::args args;
         args.args_codec.codec_name = codec;
+        args.args_image.fmt = AV_PIX_FMT_RGB24;
+
         dlib::ffmpeg_decoder decoder(args);
         DLIB_TEST(decoder.is_open());
         DLIB_TEST(decoder.is_image_decoder());
@@ -50,10 +52,11 @@ namespace
         {
             while ((status = decoder.read(frame)) == DECODER_FRAME_AVAILABLE)
             {
-                convert(frame, obj);
                 DLIB_TEST(frame.is_image());
                 DLIB_TEST(frame.height() == height);
                 DLIB_TEST(frame.width() == width);
+                DLIB_TEST(frame.pixfmt() == AV_PIX_FMT_RGB24);
+                convert(frame, obj);
                 DLIB_TEST(obj.contains<array2d<rgb_pixel>>());
                 DLIB_TEST(obj.get<array2d<rgb_pixel>>().nr() == height);
                 DLIB_TEST(obj.get<array2d<rgb_pixel>>().nc() == width);
@@ -77,6 +80,50 @@ namespace
         pull();
         DLIB_TEST(count == nframes);
         DLIB_TEST(!decoder.is_open());
+    }
+
+    void test_demuxer (
+        const std::string& filepath,
+        const dlib::config_reader& cfg
+    )
+    {
+        const int nframes   = dlib::get_option(cfg, "nframes", 0);
+        const int height    = dlib::get_option(cfg, "height", 0);
+        const int width     = dlib::get_option(cfg, "width", 0);
+
+        dlib::ffmpeg_demuxer::args args;
+        args.filepath           = filepath;
+        args.image_options.fmt  = AV_PIX_FMT_RGB24;
+
+        dlib::ffmpeg_demuxer cap(args);
+        DLIB_TEST(cap.is_open());
+        DLIB_TEST(cap.video_enabled());
+        DLIB_TEST(cap.height() == height);
+        DLIB_TEST(cap.width() == width);
+        DLIB_TEST(cap.pixel_fmt() == AV_PIX_FMT_RGB24);
+
+        type_safe_union<array2d<rgb_pixel>, audio_frame> obj;
+        dlib::Frame frame;
+        int         count{0};
+
+        while (cap.read(frame))
+        {
+            DLIB_TEST(frame.is_image());
+            DLIB_TEST(frame.height() == height);
+            DLIB_TEST(frame.width() == width);
+            DLIB_TEST(frame.pixfmt() == AV_PIX_FMT_RGB24);
+            convert(frame, obj);
+            DLIB_TEST(obj.contains<array2d<rgb_pixel>>());
+            DLIB_TEST(obj.get<array2d<rgb_pixel>>().nr() == height);
+            DLIB_TEST(obj.get<array2d<rgb_pixel>>().nc() == width);
+            ++count;
+
+            if (count % 10 == 0)
+                print_spinner();
+        }
+
+        DLIB_TEST(count == nframes);
+        DLIB_TEST(!cap.is_open());
     }
 
     class video_tester : public tester
@@ -105,6 +152,20 @@ namespace
                     const std::string filepath = get_parent_directory(f).full_name() + "/" + sublock["file"];
 
                     test_decoder(filepath, sublock);
+                }
+            }
+
+            {
+                const auto& video_file_block = cfg.block("video_file");
+                std::vector<string> blocks;
+                video_file_block.get_blocks(blocks);
+
+                for (const auto& block : blocks)
+                {
+                    const auto& sublock = video_file_block.block(block);
+                    const std::string filepath = get_parent_directory(f).full_name() + "/" + sublock["file"];
+
+                    test_demuxer(filepath, sublock);
                 }
             }
         }

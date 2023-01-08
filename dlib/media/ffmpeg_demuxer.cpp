@@ -14,11 +14,9 @@ namespace dlib
             const AVCodec* codec
         )
         {
-            args_       = a;
-            frame       = make_avframe();
+            args_   = a;
+            frame   = make_avframe();
 
-            if (args_.args_codec.nthreads > 0)
-                pCodecCtx_->thread_count = args_.args_codec.nthreads;
             if (args_.args_codec.bitrate > 0)
                 pCodecCtx_->bit_rate = args_.args_codec.bitrate;
             if (args_.args_codec.flags > 0)
@@ -288,8 +286,8 @@ namespace dlib
                 }
                 else
                 {
-                    encoded     += ret;
-                    nencoded    -= ret;
+                    encoded  += ret;
+                    nencoded -= ret;
                 }
             } else
             {
@@ -322,7 +320,7 @@ namespace dlib
 
         if (flushing)
         {
-            // Flush codec
+            // Flush codec. After this, extractor.is_open() == false
             ok = extractor.push(nullptr);
         }
     
@@ -578,11 +576,10 @@ namespace dlib
     {
         using namespace details;
 
-        const bool frames_cached = !st.frame_queue.empty();
         const bool object_alive  = st.pFormatCtx != nullptr &&
                                    st.opened &&
                                    (st.channel_video.is_open() || st.channel_audio.is_open());
-        return FFMPEG_INITIALIZED && (frames_cached || object_alive);
+        return FFMPEG_INITIALIZED && object_alive;
     }
 
     bool ffmpeg_demuxer::interrupt_callback()
@@ -627,15 +624,6 @@ namespace dlib
         }
     }
 
-    enum demuxer_state
-    {
-        DEMUXER_RECV_PACKET = 0,
-        DEMUXER_SEND_PACKET,
-        DEMUXER_FLUSH,
-        DEMUXER_DONE,
-        DEMUXER_ERROR = -1
-    };
-
     bool ffmpeg_demuxer::fill_queue()
     {
         using namespace details;
@@ -643,100 +631,74 @@ namespace dlib
         if (!st.frame_queue.empty())
             return true;
 
-        if (!is_open())
-            return false;
+        decoder_extractor* channel{nullptr};
 
-        decoder_extractor *channel = nullptr;
-        demuxer_state state = DEMUXER_RECV_PACKET;
-
-        auto recv_packet = [&]
+        const auto parse = [&]
         {
-            if (!st.frame_queue.empty())
+            channel = nullptr;
+            av_packet_unref(st.packet.get());
+
+            const int ret = av_read_frame(st.pFormatCtx.get(), st.packet.get());
+
+            if (ret == AVERROR_EOF)
             {
-                state = DEMUXER_DONE;
+                return false;
+            }
+            else if (ret < 0)
+            {
+                printf("av_read_frame() failed : `%s`\n", get_av_error(ret).c_str());
+                return false;
             }
             else
             {
-                av_packet_unref(st.packet.get());
-                const int ret = av_read_frame(st.pFormatCtx.get(), st.packet.get());
+                if (st.packet->stream_index == st.channel_video.stream_id)
+                    channel = &st.channel_video;
 
-                if (ret == AVERROR_EOF)
-                {
-                    state = DEMUXER_FLUSH;
-                }
-                else if (ret >= 0)
-                {
-                    if (st.packet->stream_index == st.channel_video.stream_id)
-                    {
-                        channel = &st.channel_video;
-                        state   = DEMUXER_SEND_PACKET;
-                    }
-                    else if (st.packet->stream_index == st.channel_audio.stream_id)
-                    {
-                        channel = &st.channel_audio;
-                        state   = DEMUXER_SEND_PACKET;
-                    }
-                }
-                else
-                {
-                    printf("av_read_frame() failed : `%s`\n", get_av_error(ret).c_str());
-                    state = DEMUXER_ERROR;
-                }
+                else if (st.packet->stream_index == st.channel_audio.stream_id)
+                    channel = &st.channel_audio;
             }
+
+            return true;
         };
 
-        auto send_packet = [&]
+        bool ok{true};
+
+        while (is_open() && st.frame_queue.empty() && ok)
         {
-            if (!channel->push(st.packet))
-                state = DEMUXER_ERROR;
-            else
+            ok = parse();
+
+            if (ok && st.packet->size > 0)
             {
+                // Decode
+                ok = channel->push(st.packet);
+
+                // Pull all frames from extractor to (*this).st.frame_queue
                 decoder_status suc;
                 Frame frame;
 
                 while ((suc = channel->read(frame)) == DECODER_FRAME_AVAILABLE)
                     st.frame_queue.push(std::move(frame));
-
-                if (suc == DECODER_EAGAIN)
-                    state = DEMUXER_RECV_PACKET;
-                else
-                    state = DEMUXER_DONE;
-            }
-        };
-
-        auto flushing_channel = [&]
-        {
-            while (state != DEMUXER_ERROR && state != DEMUXER_DONE)
-                send_packet();
-        };
-
-        auto flushing = [&]
-        {
-            st.packet = nullptr;
-            if (st.channel_video.is_open())
-            {
-                channel = &st.channel_video;
-                flushing_channel();
-            }
-            if (st.channel_audio.is_open())
-            {
-                channel = &st.channel_audio;
-                flushing_channel();
-            }
-        };
-
-        while (state != DEMUXER_DONE && state != DEMUXER_ERROR)
-        {
-            switch(state)
-            {
-                case DEMUXER_RECV_PACKET: recv_packet(); break;
-                case DEMUXER_SEND_PACKET: send_packet(); break;
-                case DEMUXER_FLUSH:       flushing(); break;
-                default: break;
             }
         }
 
-        return state != DEMUXER_ERROR;
+        if (!ok)
+        {
+            // Flush
+            st.channel_video.push(nullptr);
+            st.channel_audio.push(nullptr);
+
+            // Pull remaining frames
+            decoder_status suc;
+            Frame frame;
+
+            while ((suc = st.channel_video.read(frame)) == DECODER_FRAME_AVAILABLE)
+                st.frame_queue.push(std::move(frame));   
+            
+            while ((suc = st.channel_audio.read(frame)) == DECODER_FRAME_AVAILABLE)
+                st.frame_queue.push(std::move(frame)); 
+        }
+
+        return !st.frame_queue.empty();
     }
 
     bool ffmpeg_demuxer::read(Frame& dst_frame)

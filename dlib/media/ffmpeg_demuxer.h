@@ -19,16 +19,25 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This class groups a set of arguments passed to ffmpeg_decoder and ffmpeg_demuxer.
                 Non-default values will configure an image resizer which will transform images
-                from the decoder's/demuxer's format to the desired presentation format.
+                from the decoder's/demuxer's internal format to the desired presentation format.
+                In a lot of codecs, RGB isn't the default format, usually YUV is. So,
+                it is usually necessary to reformat the frame into RGB or some other presentation
+                format. The ffmpeg object used to do this can simultaneously resize the image.
+                Therefore, the API allows users to optionally resize the image, as well as convert to RGB,
+                before being presented to user, as a possible optimization.
         !*/
 
         // Height of extracted frames. If 0, use whatever comes out decoder
-        int             h   = 0;
+        int h{0};
+
         // Width of extracted frames. If 0, use whatever comes out decoder
-        int             w   = 0;
+        int w{0};
+
         // Pixel format of extracted frames. If AV_PIX_FMT_NONE, use whatever comes out decoder
-        AVPixelFormat   fmt = AV_PIX_FMT_NONE;
+        AVPixelFormat fmt{AV_PIX_FMT_NONE};
     };
+
+    // ---------------------------------------------------------------------------------------------------
 
     struct decoder_audio_args
     {
@@ -40,12 +49,16 @@ namespace dlib
         !*/
 
         // Sample rate of audio frames. If 0, use whatever comes out decoder
-        int             sample_rate     = 0;
+        int sample_rate{0};
+        
         // Channel layout (mono, stereo) of audio frames
-        uint64_t        channel_layout  = AV_CH_LAYOUT_STEREO;
+        uint64_t channel_layout{AV_CH_LAYOUT_STEREO};
+
         // Sample format of audio frames. If AV_SAMPLE_FMT_NONE, use whatever comes out decoder
-        AVSampleFormat  fmt             = AV_SAMPLE_FMT_NONE;
+        AVSampleFormat fmt{AV_SAMPLE_FMT_NONE};
     };
+
+    // ---------------------------------------------------------------------------------------------------
 
     struct decoder_codec_args
     {
@@ -56,22 +69,23 @@ namespace dlib
                 Note, for ffmpeg_decoder, these are essential as they cannot be guessed.
                 For ffmpeg_demuxer, these are derived from the input file.
                 Note, for some demuxers, you may still want to set these. For example, network demuxers
-                such as RTSP may require setting codec_options.
+                such as RTSP or HTTP may require setting codec_options.
         !*/
 
-        // Codec ID used to configure the decoder. Used by ffmpeg_decoder, NOT by ffmpeg_demuxer.
-        AVCodecID   codec       = AV_CODEC_ID_NONE;
-        // Codec name used to configure the decoder. This is used if codec == AV_CODEC_ID_NONE. Used by ffmpeg_decoder, NOT by ffmpeg_demuxer.
-        std::string codec_name  = "";
-        // Sets AVCodecContext::thread_count if non-negative. Otherwise, ffmpeg's default is used.
-        int         nthreads    = -1;
+        // Codec ID used to configure the decoder. Used by ffmpeg_decoder, IGNORED by ffmpeg_demuxer.
+        AVCodecID codec{AV_CODEC_ID_NONE};
+
+        // Codec name used to configure the decoder. This is used if codec == AV_CODEC_ID_NONE. Used by ffmpeg_decoder, IGNORED by ffmpeg_demuxer.
+        std::string codec_name;
+
         // Sets AVCodecContext::bit_rate if non-negative. Otherwise, ffmpeg's default is used.
-        int64_t     bitrate     = -1;
-        // ORed with AVCodecContext::flags if non-negative. Otherwise, ffmpeg's default is used.
-        int         flags       = 0;
-        // A dictionary of AVCodecContext and codec-private options. Used by avcodec_open2()
+        int64_t bitrate{-1};
+
+        // OR-ed with AVCodecContext::flags if non-negative. Otherwise, ffmpeg's default is used.
+        int flags{0};
+
+        // A dictionary of AVCodecContext and codec-private options. Used by "avcodec_open2()"
         // Note, when using ffmpeg_decoder, either codec or codec_name have to be specified.
-        // When using ffmpeg_demuxer, codec and codec_name will be ignored.
         // This is less likely to be used when using ffmpeg_demuxer.
         std::unordered_map<std::string, std::string> codec_options;
     };
@@ -190,13 +204,13 @@ namespace dlib
         bool is_image_decoder() const noexcept;
         /*!
             ensures
-                - returns true if codec is openened and codec is an image/gif/video codec
+                - returns true if is_open() == true and codec is an image/gif/video codec
         !*/
 
         bool is_audio_decoder() const noexcept;
         /*!
             ensures
-                - returns true if codec is openened and codec is an audio codec
+                - returns true if is_open() == true and codec is an audio codec
         !*/
 
         AVCodecID get_codec_id() const noexcept;
@@ -222,7 +236,8 @@ namespace dlib
             requires
                 - is_image_decoder() == true
                 - must have called push_encoded() enough times such that nframes_available() > 0
-            ensures
+                  The height cannot be deduced from codec only. It can only be deduced from decoded data.
+            ensures 
                 - returns height of images to be returned by read()
                 - If decoder_image_args::h > 0, then frames returned by read() are automatically scaled.
         !*/
@@ -395,17 +410,20 @@ namespace dlib
             // So user may use this in conjunction with some thread-safe shared state to signal an abort/interrupt.
             std::function<bool()> interrupter;
 
-            // A dictionary filled with AVFormatContext and demuxer-private options. Used by avformat_open_input().
+            // A dictionary filled with AVFormatContext and demuxer-private options. Used by "avformat_open_input()"".
             // Please see libavformat documentation for more details
             std::unordered_map<std::string, std::string> format_options;
 
             // Video stream arguments
             struct : decoder_codec_args, decoder_image_args{} image_options;
+
             // Audio stream arguments
             struct : decoder_codec_args, decoder_audio_args{} audio_options;
-            // Whether or not to decode video stream
+            
+            // Whether or not to decode video stream.
             bool enable_image = true;
-            // Whether or not to decode audio stream
+
+            // Whether or not to decode audio stream.
             bool enable_audio = true;
         };
 
