@@ -141,8 +141,6 @@ namespace dlib
             int             nchannels()         const noexcept;
 
             bool push(const av_ptr<AVPacket>& pkt);
-            bool frames_available()  const noexcept;
-            int  nframes_remaining() const noexcept;
             decoder_status read(Frame& dst_frame);
 
         private:
@@ -470,7 +468,6 @@ namespace dlib
 
         struct {
             args                    args_;
-            bool                    opened = false;
             av_ptr<AVFormatContext> pFormatCtx;
             av_ptr<AVPacket>        packet;
             std::chrono::system_clock::time_point connecting_time{};

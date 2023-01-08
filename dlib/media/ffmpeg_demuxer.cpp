@@ -173,16 +173,6 @@ namespace dlib
             return state != EXTRACT_ERROR;
         }
 
-        bool decoder_extractor::frames_available()  const noexcept
-        {
-            return !frame_queue.empty();
-        }
-            
-        int  decoder_extractor::nframes_remaining() const noexcept
-        {
-            return frame_queue.size();
-        }
-
         decoder_status decoder_extractor::read(Frame &dst_frame)
         {
             if (!frame_queue.empty())
@@ -568,7 +558,6 @@ namespace dlib
         populate_metadata();
 
         st.packet = make_avpacket();
-        st.opened = true;
         return true;
     }
 
@@ -577,7 +566,6 @@ namespace dlib
         using namespace details;
 
         const bool object_alive  = st.pFormatCtx != nullptr &&
-                                   st.opened &&
                                    (st.channel_video.is_open() || st.channel_audio.is_open());
         return FFMPEG_INITIALIZED && object_alive;
     }
