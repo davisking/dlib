@@ -63,6 +63,9 @@ namespace
                 ++count;
                 DLIB_TEST(decoder.height() == height);
                 DLIB_TEST(decoder.width() == width);
+
+                if (count % 10 == 0)
+                    print_spinner();
             }
         };
 
@@ -70,7 +73,6 @@ namespace
         {
             fin.read(buf.data(), buf.size());
             size_t ret = fin.gcount();
-            print_spinner();
 
             DLIB_TEST(decoder.push_encoded((const uint8_t*)buf.data(), ret));
             pull();
