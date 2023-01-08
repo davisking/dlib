@@ -35,27 +35,27 @@ namespace dlib
 
         bool decoder_extractor::is_open() const noexcept
         {
-            return FFMPEG_INITIALIZED && pCodecCtx != nullptr;
+            return FFMPEG_INITIALIZED && (pCodecCtx != nullptr || !frame_queue.empty());
         }
 
         bool decoder_extractor::is_image_decoder() const noexcept
         {
-            return is_open() && pCodecCtx->codec_type == AVMEDIA_TYPE_VIDEO;
+            return pCodecCtx != nullptr && pCodecCtx->codec_type == AVMEDIA_TYPE_VIDEO;
         }
 
         bool decoder_extractor::is_audio_decoder() const noexcept
         {
-            return is_open() && pCodecCtx->codec_type == AVMEDIA_TYPE_AUDIO;
+            return pCodecCtx != nullptr && pCodecCtx->codec_type == AVMEDIA_TYPE_AUDIO;
         }
 
         AVCodecID decoder_extractor::get_codec_id() const noexcept
         {
-            return is_open() ? pCodecCtx->codec_id : AV_CODEC_ID_NONE;
+            return pCodecCtx != nullptr ? pCodecCtx->codec_id : AV_CODEC_ID_NONE;
         }
 
         std::string decoder_extractor::get_codec_name() const noexcept
         {
-            return is_open() ? avcodec_get_name(pCodecCtx->codec_id) : "NONE";
+            return pCodecCtx != nullptr ? avcodec_get_name(pCodecCtx->codec_id) : "NONE";
         }
 
         int             decoder_extractor::height()         const noexcept { return resizer_image.get_dst_h(); }
@@ -310,7 +310,7 @@ namespace dlib
 
         if (flushing)
         {
-            // Flush codec. After this, extractor.is_open() == false
+            // Flush codec. After this, pCodecCtx == nullptr
             ok = extractor.push(nullptr);
         }
     
@@ -561,13 +561,17 @@ namespace dlib
         return true;
     }
 
-    bool ffmpeg_demuxer::is_open() const noexcept
+    bool ffmpeg_demuxer::object_alive() const noexcept
     {
         using namespace details;
-
-        const bool object_alive  = st.pFormatCtx != nullptr &&
-                                   (st.channel_video.is_open() || st.channel_audio.is_open());
+        const bool object_alive = st.pFormatCtx != nullptr &&
+                                  (st.channel_video.is_open() || st.channel_audio.is_open());
         return FFMPEG_INITIALIZED && object_alive;
+    }
+
+    bool ffmpeg_demuxer::is_open() const noexcept
+    {
+        return object_alive() || !st.frame_queue.empty();
     }
 
     bool ffmpeg_demuxer::interrupt_callback()
@@ -651,7 +655,7 @@ namespace dlib
 
         bool ok{true};
 
-        while (is_open() && st.frame_queue.empty() && ok)
+        while (object_alive() && st.frame_queue.empty() && ok)
         {
             ok = parse();
 

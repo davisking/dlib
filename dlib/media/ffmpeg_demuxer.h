@@ -148,8 +148,8 @@ namespace dlib
             friend class dlib::ffmpeg_demuxer;
 
             args                    args_;
-            uint64_t                next_pts    = 0;
-            int                     stream_id   = -1;
+            uint64_t                next_pts{0};
+            int                     stream_id{-1};
             av_ptr<AVCodecContext>  pCodecCtx;
             av_ptr<AVFrame>         frame;
             sw_image_resizer        resizer_image;
@@ -195,8 +195,7 @@ namespace dlib
         bool is_open() const noexcept;
         /*!
             ensures
-                - returns true if codec is openened
-                - However, if is_open() == false, nframes_available() may still be > 0. So call read() until empty.
+                - returns true if frames are available, i.e. read() == true
         !*/
 
         bool is_image_decoder() const noexcept;
@@ -321,6 +320,7 @@ namespace dlib
             requires
                 - is_open() == true
             ensures
+                - Flushes the decoder. This must be called when there is no more data to be decoded. Last remaining frames will be available.
                 - calls push_encoded(nullptr, 0)
         !*/
 
@@ -359,9 +359,9 @@ namespace dlib
     public:
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This class is a libavformat wrapper which decodes video or audio from file.
+                This class is a libavformat wrapper which demuxes video and/or audio streams from file and decodes them.
                 It is analoguous to OpenCV's cv::VideoCapture class but is more configurable,
-                and supports audio, devices (X11, webcam, microphone, ...) and network streams
+                supports audio, devices (X11, webcam, microphone, ...) and network streams
                 such as RTSP, HTTP, and more.
                 Note that a video file, e.g. MP4, can contain multiple streams: video, audio, subtitles, etc.
                 This class can decode both video and audio at the same time.
@@ -419,49 +419,234 @@ namespace dlib
             struct : decoder_codec_args, decoder_audio_args{} audio_options;
             
             // Whether or not to decode video stream.
-            bool enable_image = true;
+            bool enable_image{true};
 
             // Whether or not to decode audio stream.
-            bool enable_audio = true;
+            bool enable_audio{true};
         };
 
         ffmpeg_demuxer() = default;
+        /*!
+            ensures
+                - is_open() == false
+        !*/
+
         ffmpeg_demuxer(const args& a);
+        /*!
+            ensures
+                - Creates a demuxer using args.
+        !*/
+
         ffmpeg_demuxer(ffmpeg_demuxer&& other) noexcept;
+        /*!
+            ensures
+                - Move constructor
+                - After move, other.is_open() == false
+        !*/
+
         ffmpeg_demuxer& operator=(ffmpeg_demuxer&& other) noexcept;
+        /*!
+            ensures
+                - Move assignment
+                - After move, other.is_open() == false
+        !*/
 
-        bool is_open()          const noexcept;
-        bool audio_enabled()    const noexcept;
-        bool video_enabled()    const noexcept;
+        bool is_open() const noexcept;
+        /*!
+            ensures
+                - returns true if frames are available, i.e. read() == true
+        !*/
 
-        /*! video dims !*/
-        int             height()                    const noexcept;
-        int             width()                     const noexcept;
-        AVPixelFormat   pixel_fmt()                 const noexcept;
-        float           fps()                       const noexcept;
-        int             estimated_nframes()         const noexcept;
-        AVCodecID       get_video_codec_id()        const noexcept;
-        std::string     get_video_codec_name()      const noexcept;
-        /*!audio dims! */
-        int             sample_rate()               const noexcept;
-        uint64_t        channel_layout()            const noexcept;
-        AVSampleFormat  sample_fmt()                const noexcept;
-        int             nchannels()                 const noexcept;
-        int             estimated_total_samples()   const noexcept;
-        AVCodecID       get_audio_codec_id()        const noexcept;
-        std::string     get_audio_codec_name()      const noexcept;
-        float           duration()                  const noexcept;
+        bool audio_enabled() const noexcept;
+        /*!
+            ensures
+                - returns true if is_open() == true and an audio stream is available and open
+        !*/
+
+        bool video_enabled() const noexcept;
+        /*!
+            ensures
+                - returns true if is_open() == true and an video stream is available and open
+        !*/
+
+        int height() const noexcept;
+        /*!
+            ensures 
+                - if (video_enabled())
+                    returns height of images to be returned by read()
+                  else
+                    returns 0
+        !*/
+
+        int width() const noexcept;
+        /*!
+            ensures 
+                - if (video_enabled())
+                    returns width of images to be returned by read()
+                  else
+                    returns 0
+        !*/
+
+        AVPixelFormat pixel_fmt() const noexcept;
+        /*!
+            ensures 
+                - if (video_enabled())
+                    returns pixel format of images to be returned by read()
+                  else
+                    returns AV_PIX_FMT_NONE
+        !*/
+
+        float fps() const noexcept;
+        /*!
+            ensures 
+                - if (video_enabled())
+                    returns frames per second (FPS) of video stream (if available)
+                  else
+                    returns 0
+        !*/
+
+        int estimated_nframes() const noexcept;
+        /*!
+            ensures 
+                - if (video_enabled())
+                    estimates and returns number of frames in video stream
+                  else
+                    returns 0
+        !*/
+
+        AVCodecID get_video_codec_id() const noexcept;
+        /*!
+            ensures 
+                - if (video_enabled())
+                    returns codec ID of video stream
+                  else
+                    returns AV_CODEC_ID_NONE
+        !*/
+
+        std::string get_video_codec_name() const noexcept;
+        /*!
+            ensures 
+                - if (video_enabled())
+                    returns codec name of video stream
+                  else
+                    returns ""
+        !*/
+
+        int sample_rate() const noexcept;
+        /*!
+            ensures 
+                - if (audio_enabled())
+                    returns sample rate of audio stream
+                  else
+                    returns 0
+        !*/
+
+        uint64_t channel_layout() const noexcept;
+        /*!
+            ensures 
+                - if (audio_enabled())
+                    returns channel layout of audio stream (e.g. AV_CH_LAYOUT_STEREO)
+                  else
+                    returns 0
+        !*/
+
+        AVSampleFormat sample_fmt() const noexcept;
+        /*!
+            ensures 
+                - if (audio_enabled())
+                    returns sample format of audio stream (e.g. AV_SAMPLE_FMT_S16)
+                  else
+                    returns AV_SAMPLE_FMT_NONE
+        !*/
+
+        int nchannels() const noexcept;
+        /*!
+            ensures 
+                - if (audio_enabled())
+                    returns number of audio channels in audio stream (e.g. 1 for mono, 2 for stereo)
+                  else
+                    returns 0
+        !*/
+
+        int estimated_total_samples() const noexcept;
+        /*!
+            ensures 
+                - if (audio_enabled())
+                    returns estimated number of samples in audio stream
+                  else
+                    returns 0
+        !*/
+
+        AVCodecID get_audio_codec_id() const noexcept;
+        /*!
+            ensures 
+                - if (audio_enabled())
+                    returns codec ID of audio stream
+                  else
+                    returns AV_CODEC_ID_NONE
+        !*/
+
+        std::string get_audio_codec_name() const noexcept;
+        /*!
+            ensures 
+                - if (audio_enabled())
+                    returns codec name of audio stream
+                  else
+                    returns ""
+        !*/
+
+        float duration() const noexcept;
+        /*!
+            ensures 
+                - if (is_open())
+                    returns an estimated duration of file in seconds
+                  else
+                    returns 0
+        !*/
 
         bool read(Frame& frame);
+        /*!
+            ensures 
+                - if (is_open())
+                    returns true and frame.is_empty() == false
+                  else
+                    returns false and frame.is_empty() == true
+        !*/
 
         /*! metadata! */
         std::unordered_map<int, std::unordered_map<std::string, std::string>> get_all_metadata() const noexcept;
+        /*!
+            ensures 
+                - if (is_open())
+                    returns metadata in file
+        !*/
+
         std::unordered_map<std::string,std::string> get_video_metadata() const noexcept;
+        /*!
+            ensures 
+                - if (is_open())
+                    returns video related metadata in file
+        !*/
+
         std::unordered_map<std::string,std::string> get_audio_metadata() const noexcept;
+        /*!
+            ensures 
+                - if (is_open())
+                    returns audio related metadata in file
+        !*/
+
         float get_rotation_angle() const noexcept;
+        /*!
+            ensures 
+                - if (is_open())
+                    returns video rotation angle from metadata
+                  else
+                    returns 0
+        !*/
 
     private:
         bool open(const args& a);
+        bool object_alive() const noexcept;
         bool fill_queue();
         bool interrupt_callback();
         void populate_metadata();
