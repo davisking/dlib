@@ -26,45 +26,75 @@ namespace
         const dlib::config_reader& cfg
     )
     {
-        const std::string codec     = dlib::get_option(cfg, "codec", "");
-        const int nframes           = dlib::get_option(cfg, "nframes", 0);
-        const int height            = dlib::get_option(cfg, "height", 0);
-        const int width             = dlib::get_option(cfg, "width", 0);
+        const std::string codec = dlib::get_option(cfg, "codec", "");
+        const int nframes       = dlib::get_option(cfg, "nframes", 0);
+        const int height        = dlib::get_option(cfg, "height", 0);
+        const int width         = dlib::get_option(cfg, "width", 0);
+        const int sample_rate   = dlib::get_option(cfg, "sample_rate", 0);
+        const bool is_audio     = sample_rate > 0;
 
         ffmpeg_decoder::args args;
-        args.args_codec.codec_name = codec;
-        args.args_image.fmt = AV_PIX_FMT_RGB24;
+        args.args_codec.codec_name  = codec;
+        args.args_image.fmt         = AV_PIX_FMT_RGB24;
+        args.args_audio.fmt         = AV_SAMPLE_FMT_S16;
 
         dlib::ffmpeg_decoder decoder(args);
         DLIB_TEST(decoder.is_open());
-        DLIB_TEST(decoder.is_image_decoder());
         DLIB_TEST(decoder.get_codec_name() == codec);
+        if (is_audio)
+            DLIB_TEST(decoder.is_audio_decoder());
+        else
+            DLIB_TEST(decoder.is_image_decoder());
 
         type_safe_union<array2d<rgb_pixel>, audio_frame> obj;
         dlib::Frame             frame;
         int                     count{0};
+        int                     nsamples{0};
+        int                     iteration{0};
         dlib::decoder_status    status{DECODER_EAGAIN};
 
         ifstream fin{filepath, std::ios::binary};
         std::vector<char> buf(1024);
 
-        auto pull = [&]
+        const auto pull = [&]
         {
             while ((status = decoder.read(frame)) == DECODER_FRAME_AVAILABLE)
             {
-                DLIB_TEST(frame.is_image());
-                DLIB_TEST(frame.height() == height);
-                DLIB_TEST(frame.width() == width);
-                DLIB_TEST(frame.pixfmt() == AV_PIX_FMT_RGB24);
+                if (is_audio)
+                {
+                    DLIB_TEST(frame.is_audio());
+                    DLIB_TEST(frame.sample_rate() == sample_rate);
+                    DLIB_TEST(frame.samplefmt() == AV_SAMPLE_FMT_S16);
+                }
+                else
+                {
+                    DLIB_TEST(frame.is_image());
+                    DLIB_TEST(frame.height() == height);
+                    DLIB_TEST(frame.width() == width);
+                    DLIB_TEST(frame.pixfmt() == AV_PIX_FMT_RGB24);
+                }
+                
                 convert(frame, obj);
-                DLIB_TEST(obj.contains<array2d<rgb_pixel>>());
-                DLIB_TEST(obj.get<array2d<rgb_pixel>>().nr() == height);
-                DLIB_TEST(obj.get<array2d<rgb_pixel>>().nc() == width);
-                ++count;
-                DLIB_TEST(decoder.height() == height);
-                DLIB_TEST(decoder.width() == width);
 
-                if (count % 10 == 0)
+                if (is_audio)
+                {
+                    DLIB_TEST(obj.contains<audio_frame>());
+                    DLIB_TEST(obj.get<audio_frame>().sample_rate == sample_rate);
+                    nsamples += obj.get<audio_frame>().samples.size();
+                }
+                else
+                {
+                    DLIB_TEST(obj.contains<array2d<rgb_pixel>>());
+                    DLIB_TEST(obj.get<array2d<rgb_pixel>>().nr() == height);
+                    DLIB_TEST(obj.get<array2d<rgb_pixel>>().nc() == width);
+                    ++count;
+                    DLIB_TEST(decoder.height() == height);
+                    DLIB_TEST(decoder.width() == width);
+                }
+
+                ++iteration;
+                
+                if (iteration % 10 == 0)
                     print_spinner();
             }
         };
@@ -144,7 +174,7 @@ namespace
             dlib::config_reader cfg(f.full_name());
 
             {
-                const auto& video_raw_block = cfg.block("video_raw");
+                const auto& video_raw_block = cfg.block("decoding");
                 std::vector<string> blocks;
                 video_raw_block.get_blocks(blocks);
 
@@ -158,7 +188,7 @@ namespace
             }
 
             {
-                const auto& video_file_block = cfg.block("video_file");
+                const auto& video_file_block = cfg.block("demuxing");
                 std::vector<string> blocks;
                 video_file_block.get_blocks(blocks);
 

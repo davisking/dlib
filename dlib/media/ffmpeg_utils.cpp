@@ -695,7 +695,7 @@ namespace dlib
     {
         if (f.is_image())
         {
-            DLIB_ASSERT(frame.pixfmt() == AV_PIX_FMT_RGB24, "frame isn't RGB image. Make sure your decoder/demuxer/encoder/muxer has correct args passed to constructor");
+            DLIB_ASSERT(f.pixfmt() == AV_PIX_FMT_RGB24, "frame isn't RGB image. Make sure your decoder/demuxer/encoder/muxer has correct args passed to constructor");
             
             array2d<rgb_pixel> image(f.height(), f.width());
 
@@ -710,7 +710,7 @@ namespace dlib
         }
         else if (f.is_audio())
         {
-            DLIB_ASSERT(frame.samplefmt() == AV_SAMPLE_FMT_S16, "audio buffer requires s16 format. Make sure correct args are passed to constructor of decoder/demuxer/encoder/muxer");
+            DLIB_ASSERT(f.samplefmt() == AV_SAMPLE_FMT_S16, "audio buffer requires s16 format. Make sure correct args are passed to constructor of decoder/demuxer/encoder/muxer");
 
             audio_frame audio;
             audio.sample_rate = f.sample_rate();
