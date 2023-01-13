@@ -693,12 +693,11 @@ namespace dlib
             }
         }
 
-        void convert(const frame& f, audio_frame& obj)
+        void convert(const frame& f, audio_frame& audio)
         {
             DLIB_ASSERT(f.is_audio(), "frame must be of audio type");
             DLIB_ASSERT(f.samplefmt() == AV_SAMPLE_FMT_S16, "audio buffer requires s16 format. Make sure correct args are passed to constructor of decoder/demuxer/encoder/muxer");
 
-            audio_frame audio;
             audio.sample_rate = f.sample_rate();
             audio.samples.resize(f.nsamples());
 
