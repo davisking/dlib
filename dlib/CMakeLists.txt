@@ -837,8 +837,8 @@ if (NOT TARGET dlib)
       if (DLIB_USE_FFMPEG)
          include(cmake_utils/find_ffmpeg.cmake)
          if (FFMPEG_FOUND)
-            list (APPEND dlib_needed_private_includes ${FFMPEG_INCLUDE_DIRS})
-            list (APPEND dlib_needed_private_libraries ${FFMPEG_LINK_LIBRARIES})
+            list (APPEND dlib_needed_public_includes ${FFMPEG_INCLUDE_DIRS})
+            list (APPEND dlib_needed_public_libraries ${FFMPEG_LINK_LIBRARIES})
             set(source_files ${source_files}
                media/ffmpeg_utils.cpp
                media/ffmpeg_demuxer.cpp)
