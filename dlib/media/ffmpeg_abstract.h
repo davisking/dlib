@@ -10,6 +10,26 @@ namespace dlib
     {
         // ---------------------------------------------------------------------------------------------------
 
+        std::string get_pixel_fmt_str(AVPixelFormat fmt);
+        /*!
+            ensures
+                - Returns a string description of AVPixelFormat
+        !*/
+
+        std::string get_audio_fmt_str(AVSampleFormat fmt);
+        /*!
+            ensures
+                - Returns a string description of AVSampleFormat
+        !*/
+
+        std::string get_channel_layout_str(uint64_t layout);
+        /*!
+            ensures
+                - Returns a string description of a channel layout, where layout is e.g. AV_CH_LAYOUT_STEREO
+        !*/
+        
+        // ---------------------------------------------------------------------------------------------------
+
         /*!
             These represent the versions of ffmpeg libraries dlib was built against.
             These are only useful for debugging if you think your bug is related to mismatching ffmpeg versions
@@ -691,14 +711,20 @@ namespace dlib
 
             bool audio_enabled() const noexcept;
             /*!
+                requires
+                    - args.enable_audio == true
+
                 ensures
                     - returns true if is_open() == true and an audio stream is available and open
             !*/
 
             bool video_enabled() const noexcept;
             /*!
+                requires
+                    - args.enable_image == true
+
                 ensures
-                    - returns true if is_open() == true and an video stream is available and open
+                    - returns true if is_open() == true and an video stream is available and open.
             !*/
 
             int height() const noexcept;
@@ -846,7 +872,7 @@ namespace dlib
             !*/
 
             /*! metadata! */
-            std::unordered_map<int, std::unordered_map<std::string, std::string>> get_all_metadata() const noexcept;
+            const std::unordered_map<int, std::unordered_map<std::string, std::string>>& get_all_metadata() const noexcept;
             /*!
                 ensures 
                     - if (is_open())

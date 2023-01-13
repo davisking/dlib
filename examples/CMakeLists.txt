@@ -229,4 +229,5 @@ endif()
 
 if (DLIB_USE_FFMPEG AND NOT DLIB_NO_GUI_SUPPORT)
    add_example(webcam_face_pose_ex)
+   add_example(ffmpeg_video_demuxing)
 endif()

@@ -742,7 +742,7 @@ namespace dlib
 
         int demuxer::estimated_nframes() const noexcept
         {
-            return st.channel_video.is_audio_decoder() ? st.pFormatCtx->streams[st.channel_video.stream_id]->nb_frames : 0;
+            return st.channel_video.is_image_decoder() ? st.pFormatCtx->streams[st.channel_video.stream_id]->nb_frames : 0;
         }
 
         int demuxer::estimated_total_samples() const noexcept
@@ -755,7 +755,7 @@ namespace dlib
             return st.pFormatCtx ? (float)av_rescale_q(st.pFormatCtx->duration, {1, AV_TIME_BASE}, {1, 1000000}) * 1e-6 : 0.0f;
         }
 
-        std::unordered_map<int, std::unordered_map<std::string, std::string>> demuxer::get_all_metadata() const noexcept
+        const std::unordered_map<int, std::unordered_map<std::string, std::string>>& demuxer::get_all_metadata() const noexcept
         {
             return st.metadata;
         }

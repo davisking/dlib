@@ -38,6 +38,14 @@ namespace dlib
 {
     namespace ffmpeg
     {
+        // ---------------------------------------------------------------------------------------------------
+
+        std::string get_pixel_fmt_str(AVPixelFormat fmt);
+        std::string get_audio_fmt_str(AVSampleFormat fmt);
+        std::string get_channel_layout_str(uint64_t layout);
+
+        // ---------------------------------------------------------------------------------------------------
+
         class frame;
 
         namespace details
@@ -54,9 +62,6 @@ namespace dlib
         // ---------------------------------------------------------------------------------------------------
 
             std::string get_av_error(int ret);
-            std::string get_pixel_fmt_str(AVPixelFormat fmt);
-            std::string get_audio_fmt_str(AVSampleFormat fmt);
-            std::string get_channel_layout_str(uint64_t layout);
 
         // ---------------------------------------------------------------------------------------------------
 

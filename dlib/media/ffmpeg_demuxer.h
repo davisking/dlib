@@ -207,7 +207,7 @@ namespace dlib
             bool read(frame& frame);
 
             /*! metadata! */
-            std::unordered_map<int, std::unordered_map<std::string, std::string>> get_all_metadata() const noexcept;
+            const std::unordered_map<int, std::unordered_map<std::string, std::string>>& get_all_metadata() const noexcept;
             std::unordered_map<std::string,std::string> get_video_metadata() const noexcept;
             std::unordered_map<std::string,std::string> get_audio_metadata() const noexcept;
             float get_rotation_angle() const noexcept;

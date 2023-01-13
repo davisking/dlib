@@ -89,6 +89,35 @@ namespace dlib
 
         namespace details
         {
+            std::string get_av_error(int ret)
+            {
+                char buf[128] = {0};
+                int suc = av_strerror(ret, buf, sizeof(buf));
+                return suc == 0 ? buf : "couldn't set error";
+            }
+        }
+
+        std::string get_pixel_fmt_str(AVPixelFormat fmt)
+        {
+            const char* name = av_get_pix_fmt_name(fmt);
+            return name ? std::string(name) : std::string("unknown");
+        }
+
+        std::string get_audio_fmt_str(AVSampleFormat fmt)
+        {
+            const char* name = av_get_sample_fmt_name(fmt);
+            return name ? std::string(name) : std::string("unknown");
+        }
+
+        std::string get_channel_layout_str(uint64_t layout)
+        {
+            std::string buf(32, '\0');
+            av_get_channel_layout_string(&buf[0], buf.size(), 0, layout);
+            return buf;
+        }
+
+        namespace details
+        {
             bool ffmpeg_initialize_all()
             {
                 avdevice_register_all();
@@ -104,32 +133,6 @@ namespace dlib
             }
 
             const bool FFMPEG_INITIALIZED = ffmpeg_initialize_all();
-
-            std::string get_av_error(int ret)
-            {
-                char buf[128] = {0};
-                int suc = av_strerror(ret, buf, sizeof(buf));
-                return suc == 0 ? buf : "couldn't set error";
-            }
-
-            std::string get_pixel_fmt_str(AVPixelFormat fmt)
-            {
-                const char* name = av_get_pix_fmt_name(fmt);
-                return name ? std::string(name) : std::string("unknown");
-            }
-
-            std::string get_audio_fmt_str(AVSampleFormat fmt)
-            {
-                const char* name = av_get_sample_fmt_name(fmt);
-                return name ? std::string(name) : std::string("unknown");
-            }
-
-            std::string get_channel_layout_str(uint64_t layout)
-            {
-                std::string buf(32, '\0');
-                av_get_channel_layout_string(&buf[0], buf.size(), 0, layout);
-                return buf;
-            }
 
             void av_deleter::operator()(AVFrame *ptr)               const { if (ptr) av_frame_free(&ptr); }
             void av_deleter::operator()(AVPacket *ptr)              const { if (ptr) av_packet_free(&ptr); }
@@ -700,6 +703,7 @@ namespace dlib
 
             audio.sample_rate = f.sample_rate();
             audio.samples.resize(f.nsamples());
+            audio.timestamp = f.get_timestamp();
 
             if (f.nchannels() == 1)
             {
