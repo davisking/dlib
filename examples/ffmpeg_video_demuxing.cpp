@@ -86,12 +86,38 @@ try
     }
 
     ffmpeg::frame frame;
-    array2d<rgb_pixel> img;
+    type_safe_union<array2d<rgb_pixel>, ffmpeg::audio_frame> obj;
 
     while (cap.read(frame))
     {
-        convert(frame, img);
-        win.set_image(img);
+        convert(frame, obj);
+
+        visit(overloaded(
+            [&](const array2d<rgb_pixel>& img) 
+            {
+                win.set_image(img);
+            },
+            [](const ffmpeg::audio_frame& audio)
+            {
+                //You could play through your speaker here if you wanted
+            }
+        ), obj);
+
+        // Alternatively, you could have done:
+        // array2d<rgb_pixel>  img;
+        // ffmpeg::audio_frame audio;
+
+        // if (frame.is_image() && frame.pixfmt() == AV_PIX_FMT_RGB24)
+        // {
+        //     convert(frame, img);
+        //     win.set_image(img);
+        // }
+
+        // if (frame.is_audio() && frame.samplefmt() == AV_SAMPLE_FMT_S16)
+        // {
+        //     convert(frame, audio);
+        //     // Do something useful, maybe play through your speaker? 
+        // }
     }
 
     return EXIT_SUCCESS;
