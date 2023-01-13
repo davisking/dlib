@@ -97,7 +97,7 @@ try
             {
                 win.set_image(img);
             },
-            [](const ffmpeg::audio_frame& audio)
+            [](const ffmpeg::audio_frame& /*audio*/)
             {
                 //You could play through your speaker here if you wanted
             }
