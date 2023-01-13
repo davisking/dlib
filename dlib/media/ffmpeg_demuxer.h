@@ -19,7 +19,7 @@ namespace dlib
         {
             int             h{0};
             int             w{0};
-            AVPixelFormat   fmt{AV_PIX_FMT_NONE};
+            AVPixelFormat   fmt{AV_PIX_FMT_RGB24};
         };
 
         // ---------------------------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ namespace dlib
         {
             int             sample_rate{0};
             uint64_t        channel_layout{AV_CH_LAYOUT_STEREO};
-            AVSampleFormat  fmt{AV_SAMPLE_FMT_NONE};
+            AVSampleFormat  fmt{AV_SAMPLE_FMT_S16};
         };
 
         // ---------------------------------------------------------------------------------------------------
@@ -162,9 +162,6 @@ namespace dlib
 
             struct args
             {
-                args() = default;
-                args(std::string filepath_) : filepath{std::move(filepath_)} {}
-
                 std::string filepath;
                 std::string input_format;
                 std::unordered_map<std::string, std::string> format_options;
@@ -182,6 +179,7 @@ namespace dlib
 
             demuxer() = default;
             demuxer(const args& a);
+            demuxer(std::string filepath_device_url);
             demuxer(demuxer&& other)            noexcept;
             demuxer& operator=(demuxer&& other) noexcept;
 

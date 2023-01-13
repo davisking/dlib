@@ -4,6 +4,10 @@
 #ifndef DLIB_FFMPEG_UTILS
 #define DLIB_FFMPEG_UTILS
 
+#ifndef DLIB_USE_FFMPEG
+static_assert(false, "This version of dlib isn't built with the FFMPEG wrappers");
+#endif
+
 #include <cstdint>
 #include <string>
 #include <unordered_map>
@@ -334,11 +338,11 @@ namespace dlib
         // ---------------------------------------------------------------------------------------------------
 
         void convert(const frame& f, type_safe_union<array2d<rgb_pixel>, audio_frame>& obj);
-
+        void convert(const frame& f, array2d<rgb_pixel>& obj);
+        void convert(const frame& f, audio_frame& obj);
         type_safe_union<array2d<rgb_pixel>, audio_frame> convert(const frame& f);
 
         frame convert(const array2d<rgb_pixel>& img);
-
         frame convert(const audio_frame& audio);
 
         // ---------------------------------------------------------------------------------------------------

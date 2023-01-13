@@ -364,6 +364,11 @@ namespace dlib
                 st.pFormatCtx = nullptr;
         }
 
+        demuxer::demuxer(std::string filepath_device_url)
+        : demuxer(args{std::move(filepath_device_url)})
+        {
+        }
+
         demuxer::demuxer(demuxer &&other) noexcept
         : st{std::move(other.st)}
         {

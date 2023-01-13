@@ -143,6 +143,8 @@ namespace dlib
 
     };
 
+    static_assert(sizeof(rgb_pixel) == 3, "sizeof(rgb_pixel) != 3. Type punning won't work on arrays of rgb_pixel's");
+
 // ----------------------------------------------------------------------------------------
 
     struct bgr_pixel
@@ -181,6 +183,8 @@ namespace dlib
         }
 
     };
+
+    static_assert(sizeof(bgr_pixel) == 3, "sizeof(bgr_pixel) != 3. Type punning won't work on arrays of bgr_pixel's");
 
 // ----------------------------------------------------------------------------------------
 
@@ -222,6 +226,8 @@ namespace dlib
 
     };
 
+    static_assert(sizeof(rgb_alpha_pixel) == 4, "sizeof(rgb_alpha_pixel) != 4. Type punning won't work on arrays of rgb_alpha_pixel's");
+
 // ----------------------------------------------------------------------------------------
 
     struct bgr_alpha_pixel
@@ -261,6 +267,8 @@ namespace dlib
         }
 
     };
+
+    static_assert(sizeof(bgr_alpha_pixel) == 4, "sizeof(bgr_alpha_pixel) != 4. Type punning won't work on arrays of bgr_alpha_pixel's");
 
 // ----------------------------------------------------------------------------------------
 

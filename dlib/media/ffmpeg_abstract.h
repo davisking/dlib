@@ -273,6 +273,26 @@ namespace dlib
                 - converts a frame object into dlib objects if possible, i.e. if the format and layout is already correct
         !*/
 
+        void convert(const frame& f, array2d<rgb_pixel>& obj);
+        /*!
+            requires
+                - f.is_image() == true
+                - f.pixfmt() == AV_PIX_FMT_RGB24
+
+            ensures
+                - converts a frame object into array2d<rgb_pixel>
+        !*/
+
+        void convert(const frame& f, audio_frame& obj);
+        /*!
+            requires
+                - f.is_audio() == true
+                - f.samplefmt() == AV_SAMPLE_FMT_S16
+
+            ensures
+                - converts a frame object into audio_frame
+        !*/
+
         type_safe_union<array2d<rgb_pixel>, audio_frame> convert(const frame& f);
         /*!
             requires
@@ -316,8 +336,8 @@ namespace dlib
             // Width of extracted frames. If 0, use whatever comes out decoder
             int w{0};
 
-            // Pixel format of extracted frames. If AV_PIX_FMT_NONE, use whatever comes out decoder
-            AVPixelFormat fmt{AV_PIX_FMT_NONE};
+            // Pixel format of extracted frames. If AV_PIX_FMT_NONE, use whatever comes out decoder. The default is AV_PIX_FMT_RGB24
+            AVPixelFormat fmt{AV_PIX_FMT_RGB24};
         };
 
         // ---------------------------------------------------------------------------------------------------
@@ -337,8 +357,8 @@ namespace dlib
             // Channel layout (mono, stereo) of audio frames
             uint64_t channel_layout{AV_CH_LAYOUT_STEREO};
 
-            // Sample format of audio frames. If AV_SAMPLE_FMT_NONE, use whatever comes out decoder
-            AVSampleFormat fmt{AV_SAMPLE_FMT_NONE};
+            // Sample format of audio frames. If AV_SAMPLE_FMT_NONE, use whatever comes out decoder. Default is AV_SAMPLE_FMT_S16
+            AVSampleFormat fmt{AV_SAMPLE_FMT_S16};
         };
 
         // ---------------------------------------------------------------------------------------------------
@@ -589,14 +609,6 @@ namespace dlib
                     Constructor arguments for demuxer
                 !*/
 
-                args() = default;
-
-                args(const std::string& filepath_);
-                /*!
-                    ensures
-                        - Returns basic arguments using filepath only. Everything else is either defaulted or guessed by libavformat.
-                !*/
-
                 // Filepath, URL or device
                 std::string filepath;
 
@@ -606,7 +618,7 @@ namespace dlib
                 // A dictionary filled with AVFormatContext and demuxer-private options. Used by "avformat_open_input()"".
                 // Please see libavformat documentation for more details
                 std::unordered_map<std::string, std::string> format_options;
-                
+
                 // Sets AVFormatContext::probsize
                 // Please see libavformat documentation for more details
                 int probesize{-1};
@@ -649,6 +661,12 @@ namespace dlib
             /*!
                 ensures
                     - Creates a demuxer using args.
+            !*/
+
+            demuxer(std::string filepath_device_url)
+            /*!
+                ensures
+                    - Equivalent to calling demuxer(demuxer::args{filepath_device_url})
             !*/
 
             demuxer(demuxer&& other) noexcept;

@@ -678,45 +678,53 @@ namespace dlib
             return details;
         }
 
+        void convert(const frame& f, array2d<rgb_pixel>& image)
+        {
+            DLIB_ASSERT(f.is_image(), "frame isn't an image type");
+            DLIB_ASSERT(f.pixfmt() == AV_PIX_FMT_RGB24, "frame isn't RGB image, but " << f.pixfmt() << ". Make sure your decoder/demuxer/encoder/muxer has correct args passed to constructor");
+        
+            image.set_size(f.height(), f.width());
+
+            for (int row = 0 ; row < f.height() ; row++)
+            {
+                memcpy(image.begin() + row * f.width(),
+                       f.get_frame().data[0] + row * f.get_frame().linesize[0],
+                       f.width()*3);
+            }
+        }
+
+        void convert(const frame& f, audio_frame& obj)
+        {
+            DLIB_ASSERT(f.is_audio(), "frame must be of audio type");
+            DLIB_ASSERT(f.samplefmt() == AV_SAMPLE_FMT_S16, "audio buffer requires s16 format. Make sure correct args are passed to constructor of decoder/demuxer/encoder/muxer");
+
+            audio_frame audio;
+            audio.sample_rate = f.sample_rate();
+            audio.samples.resize(f.nsamples());
+
+            if (f.nchannels() == 1)
+            {
+                for (int i = 0 ; i < f.nsamples() ; ++i)
+                {
+                    memcpy(&audio.samples[i].ch1, f.get_frame().data[i], sizeof(int16_t));
+                    audio.samples[i].ch2 = audio.samples[i].ch1;
+                }  
+            }
+            else if (f.nchannels() == 2)
+            {
+                memcpy(audio.samples.data(), f.get_frame().data[0], audio.samples.size()*sizeof(audio_frame::sample));
+            }
+        }
+
         void convert(const frame& f, type_safe_union<array2d<rgb_pixel>, audio_frame>& obj)
         {
             if (f.is_image())
             {
-                DLIB_ASSERT(f.pixfmt() == AV_PIX_FMT_RGB24, "frame isn't RGB image. Make sure your decoder/demuxer/encoder/muxer has correct args passed to constructor");
-                
-                array2d<rgb_pixel> image(f.height(), f.width());
-
-                for (int row = 0 ; row < f.height() ; row++)
-                {
-                    memcpy(image.begin() + row * f.width(),
-                        f.get_frame().data[0] + row * f.get_frame().linesize[0],
-                        f.width()*3);
-                }
-                
-                obj = std::move(image);
+                convert(f, obj.get<array2d<rgb_pixel>>());
             }
             else if (f.is_audio())
             {
-                DLIB_ASSERT(f.samplefmt() == AV_SAMPLE_FMT_S16, "audio buffer requires s16 format. Make sure correct args are passed to constructor of decoder/demuxer/encoder/muxer");
-
-                audio_frame audio;
-                audio.sample_rate = f.sample_rate();
-                audio.samples.resize(f.nsamples());
-
-                if (f.nchannels() == 1)
-                {
-                    for (int i = 0 ; i < f.nsamples() ; ++i)
-                    {
-                        memcpy(&audio.samples[i].ch1, f.get_frame().data[i], sizeof(int16_t));
-                        audio.samples[i].ch2 = audio.samples[i].ch1;
-                    }  
-                }
-                else if (f.nchannels() == 2)
-                {
-                    memcpy(audio.samples.data(), f.get_frame().data[0], audio.samples.size()*sizeof(audio_frame::sample));
-                }
-
-                obj = std::move(audio);
+                convert(f, obj.get<audio_frame>());
             }
         }
 
