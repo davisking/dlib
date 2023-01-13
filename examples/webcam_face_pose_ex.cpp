@@ -27,12 +27,11 @@
     2011.  SSE4 is the next fastest and is supported by most current machines.  
 */
 
-#include <dlib/opencv.h>
-#include <opencv2/highgui/highgui.hpp>
 #include <dlib/image_processing/frontal_face_detector.h>
 #include <dlib/image_processing/render_face_detections.h>
 #include <dlib/image_processing.h>
 #include <dlib/gui_widgets.h>
+#include <dlib/media.h>
 
 using namespace dlib;
 using namespace std;
@@ -41,8 +40,9 @@ int main()
 {
     try
     {
-        cv::VideoCapture cap(0);
-        if (!cap.isOpened())
+        ffmpeg::demuxer cap("/dev/video0");
+
+        if (!cap.is_open())
         {
             cerr << "Unable to connect to camera" << endl;
             return 1;
@@ -55,33 +55,29 @@ int main()
         shape_predictor pose_model;
         deserialize("shape_predictor_68_face_landmarks.dat") >> pose_model;
 
+        ffmpeg::frame frame;
+        array2d<rgb_pixel> img;
+
         // Grab and process frames until the main window is closed by the user.
         while(!win.is_closed())
         {
             // Grab a frame
-            cv::Mat temp;
-            if (!cap.read(temp))
-            {
+            if (!cap.read(frame))
                 break;
-            }
-            // Turn OpenCV's Mat into something dlib can deal with.  Note that this just
-            // wraps the Mat object, it doesn't copy anything.  So cimg is only valid as
-            // long as temp is valid.  Also don't do anything to temp that would cause it
-            // to reallocate the memory which stores the image as that will make cimg
-            // contain dangling pointers.  This basically means you shouldn't modify temp
-            // while using cimg.
-            cv_image<bgr_pixel> cimg(temp);
+
+            // Convert the frame object into a dlib image object
+            convert(frame, img);
 
             // Detect faces 
-            std::vector<rectangle> faces = detector(cimg);
+            std::vector<rectangle> faces = detector(img);
             // Find the pose of each face.
             std::vector<full_object_detection> shapes;
             for (unsigned long i = 0; i < faces.size(); ++i)
-                shapes.push_back(pose_model(cimg, faces[i]));
+                shapes.push_back(pose_model(img, faces[i]));
 
             // Display it all on the screen
             win.clear_overlay();
-            win.set_image(cimg);
+            win.set_image(img);
             win.add_overlay(render_face_detections(shapes));
         }
     }
