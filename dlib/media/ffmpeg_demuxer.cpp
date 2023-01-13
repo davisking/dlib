@@ -27,7 +27,7 @@ namespace dlib
                 av_dict opt = args_.args_codec.codec_options;
                 int ret = avcodec_open2(pCodecCtx_.get(), codec, opt.get());
 
-                if (ret >= 0)
+                if (ret >= 0 && FFMPEG_INITIALIZED) // Don't let your compiler optimize away FFMPEG_INITIALIZED, particularly when stripping binaries.
                 {
                     pCodecCtx = std::move(pCodecCtx_);
                 }
