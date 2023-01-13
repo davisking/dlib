@@ -4,760 +4,748 @@
 #include "ffmpeg_utils.h"
 #include "../assert.h"
 
+using namespace std::chrono;
+
 namespace dlib
 {
-    namespace details
+    namespace ffmpeg
     {
-        bool ffmpeg_initialize_all()
-        {
-            avdevice_register_all();
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 10, 100)
-            // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L91
-            avcodec_register_all();
-#endif
-#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100) 
-            // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L86
-            av_register_all();
-#endif
-            return true;
-        }
+        const int DLIB_LIBAVFORMAT_MAJOR_VERSION = LIBAVFORMAT_VERSION_MAJOR;
+        const int DLIB_LIBAVFORMAT_MINOR_VERSION = LIBAVFORMAT_VERSION_MINOR;
+        const int DLIB_LIBAVFORMAT_MICRO_VERSION = LIBAVFORMAT_VERSION_MICRO;
 
-        const bool FFMPEG_INITIALIZED = ffmpeg_initialize_all();
+        const int DLIB_LIBAVCODEC_MAJOR_VERSION  = LIBAVCODEC_VERSION_MAJOR;
+        const int DLIB_LIBAVCODEC_MINOR_VERSION  = LIBAVCODEC_VERSION_MINOR;
+        const int DLIB_LIBAVCODEC_MICRO_VERSION  = LIBAVCODEC_VERSION_MICRO;
 
-        std::string get_av_error(int ret)
-        {
-            char buf[128] = {0};
-            int suc = av_strerror(ret, buf, sizeof(buf));
-            return suc == 0 ? buf : "couldn't set error";
-        }
+        const int DLIB_LIBAVUTIL_MAJOR_VERSION   = LIBAVUTIL_VERSION_MAJOR;
+        const int DLIB_LIBAVUTIL_MINOR_VERSION   = LIBAVUTIL_VERSION_MINOR;
+        const int DLIB_LIBAVUTIL_MICRO_VERSION   = LIBAVUTIL_VERSION_MICRO;
 
-        std::string get_pixel_fmt_str(AVPixelFormat fmt)
-        {
-            const char* name = av_get_pix_fmt_name(fmt);
-            return name ? std::string(name) : std::string("unknown");
-        }
+        const int DLIB_LIBAVDEVICE_MAJOR_VERSION = LIBAVDEVICE_VERSION_MAJOR;
+        const int DLIB_LIBAVDEVICE_MINOR_VERSION = LIBAVDEVICE_VERSION_MINOR;
+        const int DLIB_LIBAVDEVICE_MICRO_VERSION = LIBAVDEVICE_VERSION_MICRO;
 
-        std::string get_audio_fmt_str(AVSampleFormat fmt)
-        {
-            const char* name = av_get_sample_fmt_name(fmt);
-            return name ? std::string(name) : std::string("unknown");
-        }
-
-        std::string get_channel_layout_str(uint64_t layout)
-        {
-            std::string buf(32, '\0');
-            av_get_channel_layout_string(&buf[0], buf.size(), 0, layout);
-            return buf;
-        }
-
-        float rational::get() { return float(num) / denom; }
-
-        void av_deleter::operator()(AVFrame *ptr)               const { if (ptr) av_frame_free(&ptr); }
-        void av_deleter::operator()(AVPacket *ptr)              const { if (ptr) av_packet_free(&ptr); }
-        void av_deleter::operator()(AVAudioFifo *ptr)           const { if (ptr) av_audio_fifo_free(ptr); }
-        void av_deleter::operator()(SwsContext *ptr)            const { if (ptr) sws_freeContext(ptr); }
-        void av_deleter::operator()(SwrContext *ptr)            const { if (ptr) swr_free(&ptr); }
-        void av_deleter::operator()(AVCodecContext *ptr)        const { if (ptr) avcodec_free_context(&ptr); }
-        void av_deleter::operator()(AVCodecParserContext *ptr)  const { if (ptr) av_parser_close(ptr); }
-        void av_deleter::operator()(AVFormatContext *ptr)       const { if (ptr) avformat_close_input(&ptr); }
-
-        av_dict::av_dict(const std::unordered_map<std::string, std::string>& options)
-        {
-            int ret = 0;
-
-            for (const auto& opt : options) {
-                if ((ret = av_dict_set(&avdic, opt.first.c_str(), opt.second.c_str(), 0)) < 0) {
-                    printf("av_dict_set() failed : %s\n", get_av_error(ret).c_str());
-                    break;
-                }
-            }
-        }
-
-        av_dict::av_dict(const av_dict& ori)
-        {
-            av_dict_copy(&avdic, ori.avdic, 0);
-        }
-
-        av_dict& av_dict::operator=(const av_dict& ori)
-        {
-            *this = std::move(av_dict{ori});
-            return *this;
-        }
-
-        av_dict::av_dict(av_dict &&ori) noexcept
-        : avdic{std::exchange(ori.avdic, nullptr)}
-        {
-        }
-
-        av_dict &av_dict::operator=(av_dict &&ori) noexcept
-        {
-            if (this != &ori)
-                avdic = std::exchange(ori.avdic, nullptr);
-            return *this;
-        }
-
-        av_dict::~av_dict()
-        {
-            if (avdic)
-                av_dict_free(&avdic);
-        }
-
-        AVDictionary** av_dict::get()
-        {
-            return avdic ? &avdic: nullptr;
-        }
-
-        av_ptr<AVFrame> make_avframe()
-        {
-            av_ptr<AVFrame> obj(av_frame_alloc());
-            if (!obj)
-                throw std::runtime_error("Failed to allocate AVFrame");
-            return obj;
-        }
-
-        av_ptr<AVPacket> make_avpacket()
-        {
-            av_ptr<AVPacket> obj(av_packet_alloc());
-            if (!obj)
-                throw std::runtime_error("Failed to allocate AVPacket");
-            return obj;
-        }
-
-    }
-
-    Frame Frame::make(
-        int             h,
-        int             w,
-        AVPixelFormat   pixfmt,
-        int             sample_rate,
-        int             nb_samples,
-        uint64_t        channel_layout,
-        AVSampleFormat  samplefmt,
-        std::chrono::system_clock::time_point timestamp
-    )
-    {
-        using namespace details;
-
-        Frame obj;
-        obj.frame = make_avframe();
-        obj.frame->height           = h;
-        obj.frame->width            = w;
-        obj.frame->sample_rate      = sample_rate;
-        obj.frame->channel_layout   = channel_layout;
-        obj.frame->nb_samples       = nb_samples;
-        obj.frame->format           = h > 0 && w > 0 ? (int)pixfmt : (int)samplefmt;
-        obj.timestamp               = timestamp;
-
-        int ret = av_frame_get_buffer(obj.frame.get(), 0); //use default alignment, which is likely 32
-        if (ret < 0)
-        {
-            obj.frame = nullptr;
-            throw std::runtime_error("av_frame_get_buffer() failed : " + get_av_error(ret));
-        }
-
-//        ret = av_frame_make_writable(obj.frame.get());
-//        if (ret < 0)
-//        {
-//            obj.frame.reset(nullptr);
-//            throw std::runtime_error("av_frame_make_writable() failed : " + get_av_error(ret));
-//        }
-
-        if (obj.is_audio())
-            obj.frame->pts = av_rescale_q(obj.timestamp.time_since_epoch().count(),
-                                        {decltype(obj.timestamp)::period::num, (decltype(obj.timestamp)::period::den)},
-                                        {1, obj.frame->sample_rate});
-
-        return obj;
-    }
-
-    Frame Frame::make_image(
-        int h,
-        int w,
-        AVPixelFormat fmt,
-        std::chrono::system_clock::time_point timestamp_us
-    )
-    {
-        return make(h, w, fmt, 0, 0, 0, AV_SAMPLE_FMT_NONE, timestamp_us);
-    }
-
-    Frame Frame::make_audio(
-        int             sample_rate,
-        int             nb_samples,
-        uint64_t        channel_layout,
-        AVSampleFormat  fmt,
-        std::chrono::system_clock::time_point timestamp_us
-    )
-    {
-        return make(0,0,AV_PIX_FMT_NONE, sample_rate, nb_samples, channel_layout, fmt, timestamp_us);
-    }
-
-    Frame::Frame(const Frame &ori)
-    {
-        copy_from(ori);
-    }
-
-    Frame& Frame::operator=(const Frame& ori)
-    {
-        copy_from(ori);
-        return *this;
-    }
-
-    void Frame::copy_from(const Frame &ori)
-    {
-        if (ori.is_empty())
-        {
-            Frame empty{std::move(*this)};
-        }
-        else
-        {
-            const bool same_image =
-                    is_image() && ori.is_image() &&
-                    std::tie(    frame->height,     frame->width,     frame->format) ==
-                    std::tie(ori.frame->height, ori.frame->width, ori.frame->format);
-
-            const bool same_audio =
-                    is_audio() && ori.is_audio() &&
-                    std::tie(    frame->sample_rate,     frame->nb_samples,     frame->channel_layout,     frame->format) ==
-                    std::tie(ori.frame->sample_rate, ori.frame->nb_samples, ori.frame->channel_layout, ori.frame->format);
-
-            if (!same_image && !same_audio)
-            {
-                Frame tmp = make(ori.frame->height,
-                                ori.frame->width,
-                                (AVPixelFormat)ori.frame->format,
-                                ori.frame->sample_rate,
-                                ori.frame->nb_samples,
-                                ori.frame->channel_layout,
-                                (AVSampleFormat)ori.frame->format,
-                                ori.timestamp);
-                *this = std::move(tmp);
-            }
-
-            av_frame_copy(frame.get(), ori.frame.get());
-            av_frame_copy_props(frame.get(), ori.frame.get());
-        }
-    }
-
-    bool Frame::is_empty() const noexcept
-    {
-        return !is_image() && !is_audio();
-    }
-
-    bool Frame::is_image() const noexcept
-    {
-        return frame && frame->width > 0 && frame->height > 0 && frame->format >= 0;
-    }
-
-    bool Frame::is_audio() const noexcept
-    {
-        return frame && frame->nb_samples > 0 && frame->channel_layout > 0 && frame->sample_rate > 0;
-    }
-
-    AVPixelFormat Frame::pixfmt() const noexcept
-    {
-        return is_image() ? (AVPixelFormat)frame->format : AV_PIX_FMT_NONE;
-    }
-
-    int Frame::height() const noexcept
-    {
-        return is_image() ? frame->height : 0;
-    }
-
-    int Frame::width() const noexcept
-    {
-        return is_image() ? frame->width : 0;
-    }
-
-    AVSampleFormat Frame::samplefmt() const noexcept
-    {
-        return is_audio() ? (AVSampleFormat)frame->format : AV_SAMPLE_FMT_NONE;
-    }
-
-    int Frame::nsamples() const noexcept
-    {
-        return is_audio() ? frame->nb_samples : 0;
-    }
-
-    uint64_t Frame::layout() const noexcept
-    {
-        return frame->channel_layout;
-    }
-
-    int Frame::nchannels() const noexcept
-    {
-        return is_audio() ? av_get_channel_layout_nb_channels(frame->channel_layout) : 0;
-    }
-
-    int Frame::sample_rate() const noexcept
-    {
-        return is_audio() ? frame->sample_rate : 0;
-    }
-
-    std::chrono::system_clock::time_point Frame::get_timestamp() const noexcept
-    {
-        return timestamp;
-    }
-
-    const AVFrame& Frame::get_frame() const noexcept
-    {
-        return *frame;
-    }
-
-    namespace details
-    {
-        int sw_image_resizer::get_src_h() const {
-            return _src_h;
-        }
-
-        int sw_image_resizer::get_src_w() const {
-            return _src_w;
-        }
-
-        AVPixelFormat sw_image_resizer::get_src_fmt() const {
-            return _src_fmt;
-        }
-
-        int sw_image_resizer::get_dst_h() const {
-            return _dst_h;
-        }
-
-        int sw_image_resizer::get_dst_w() const {
-            return _dst_w;
-        }
-
-        AVPixelFormat sw_image_resizer::get_dst_fmt() const {
-            return _dst_fmt;
-        }
-
-        void sw_image_resizer::reset(
-            int src_h, int src_w, AVPixelFormat src_fmt,
-            int dst_h, int dst_w, AVPixelFormat dst_fmt)
-        {
-            auto this_params = std::tie(_src_h, _src_w, _src_fmt, _dst_h, _dst_w, _dst_fmt);
-            auto new_params  = std::tie( src_h,  src_w,  src_fmt,  dst_h,  dst_w,  dst_fmt);
-
-            if (this_params != new_params)
-            {
-                this_params = new_params;
-
-                _imgConvertCtx.reset(nullptr);
-
-                if (_dst_h != _src_h ||
-                    _dst_w != _src_w ||
-                    _dst_fmt != _src_fmt)
-                {
-                    _imgConvertCtx.reset(sws_getContext(_src_w, _src_h, _src_fmt,
-                                                        _dst_w, _dst_h, _dst_fmt,
-                                                        SWS_FAST_BILINEAR, NULL, NULL, NULL));
-                }
-            }
-        }
-
-        void sw_image_resizer::resize (
-            const Frame& src,
-            int dst_h, int dst_w, AVPixelFormat dst_pixfmt,
-            Frame& dst
+        void check_ffmpeg_versions(
+            int avformat_major,
+            int avformat_minor,
+            int avformat_micro,
+            int avcodec_major,
+            int avcodec_minor,
+            int avcodec_micro,
+            int avutil_major,
+            int avutil_minor,
+            int avutil_micro,
+            int avdevice_major,
+            int avdevice_minor,
+            int avdevice_micro
         )
         {
-            assert(src.is_image());
+            // LIBAVFORMAT
 
-            const bool is_same_object = std::addressof(src) == std::addressof(dst);
+            if (avformat_major != LIBAVFORMAT_VERSION_MAJOR)
+                printf("Using LIBAVFORMAT_VERSION_MAJOR %i dlib built with %i\n", avformat_major, LIBAVFORMAT_VERSION_MAJOR);
+            
+            if (avformat_minor != LIBAVFORMAT_VERSION_MINOR)
+                printf("Using LIBAVFORMAT_VERSION_MINOR %i dlib built with %i\n", avformat_minor, LIBAVFORMAT_VERSION_MINOR);
+            
+            if (avformat_micro != LIBAVFORMAT_VERSION_MICRO)
+                printf("Using LIBAVFORMAT_VERSION_MICRO %i dlib built with %i\n", avformat_micro, LIBAVFORMAT_VERSION_MICRO);
 
-            reset(src.frame->height, src.frame->width, src.pixfmt(),
-                dst_h, dst_w, dst_pixfmt);
 
-            if (_imgConvertCtx)
+            // LIBAVCODEC
+
+            if (avcodec_major != LIBAVCODEC_VERSION_MAJOR)
+                printf("Using LIBAVCODEC_VERSION_MAJOR %i dlib built with %i\n", avcodec_major, LIBAVCODEC_VERSION_MAJOR);
+            
+            if (avcodec_minor != LIBAVCODEC_VERSION_MINOR)
+                printf("Using LIBAVCODEC_VERSION_MINOR %i dlib built with %i\n", avcodec_minor, LIBAVCODEC_VERSION_MINOR);
+
+            if (avcodec_micro != LIBAVCODEC_VERSION_MICRO)
+                printf("Using LIBAVCODEC_VERSION_MICRO %i dlib built with %i\n", avcodec_micro, LIBAVCODEC_VERSION_MICRO);
+
+            // LIBAVUTIL
+
+            if (avutil_major != LIBAVUTIL_VERSION_MAJOR)
+                printf("Using LIBAVUTIL_VERSION_MAJOR %i dlib built with %i\n", avutil_major, LIBAVUTIL_VERSION_MAJOR);
+
+            if (avutil_minor != LIBAVUTIL_VERSION_MINOR)
+                printf("Using LIBAVUTIL_VERSION_MINOR %i dlib built with %i\n", avutil_minor, LIBAVUTIL_VERSION_MINOR);
+
+            if (avutil_micro != LIBAVUTIL_VERSION_MICRO)
+                printf("Using LIBAVUTIL_VERSION_MICRO %i dlib built with %i\n", avutil_micro, LIBAVUTIL_VERSION_MICRO);
+
+            // LIBAVDEVICE
+
+            if (avdevice_major != LIBAVDEVICE_VERSION_MAJOR)
+                printf("Using LIBAVDEVICE_VERSION_MAJOR %i dlib built with %i\n", avdevice_major, LIBAVDEVICE_VERSION_MAJOR);
+
+            if (avdevice_minor != LIBAVDEVICE_VERSION_MINOR)
+                printf("Using LIBAVDEVICE_VERSION_MINOR %i dlib built with %i\n", avdevice_minor, LIBAVDEVICE_VERSION_MINOR);
+
+            if (avdevice_micro != LIBAVDEVICE_VERSION_MICRO)
+                printf("Using LIBAVDEVICE_VERSION_MICRO %i dlib built with %i\n", avdevice_micro, LIBAVDEVICE_VERSION_MICRO);
+        }
+
+        namespace details
+        {
+            bool ffmpeg_initialize_all()
             {
-                Frame tmp;
-                Frame* ptr = std::addressof(dst);
+                avdevice_register_all();
+    #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 10, 100)
+                // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L91
+                avcodec_register_all();
+    #endif
+    #if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100) 
+                // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L86
+                av_register_all();
+    #endif
+                return true;
+            }
 
-                if (is_same_object ||
-                    !dst.is_image() ||
-                    std::tie(dst.frame->height, dst.frame->width, dst.frame->format) !=
-                    std::tie(_dst_h, _dst_w, _dst_fmt))
+            const bool FFMPEG_INITIALIZED = ffmpeg_initialize_all();
+
+            std::string get_av_error(int ret)
+            {
+                char buf[128] = {0};
+                int suc = av_strerror(ret, buf, sizeof(buf));
+                return suc == 0 ? buf : "couldn't set error";
+            }
+
+            std::string get_pixel_fmt_str(AVPixelFormat fmt)
+            {
+                const char* name = av_get_pix_fmt_name(fmt);
+                return name ? std::string(name) : std::string("unknown");
+            }
+
+            std::string get_audio_fmt_str(AVSampleFormat fmt)
+            {
+                const char* name = av_get_sample_fmt_name(fmt);
+                return name ? std::string(name) : std::string("unknown");
+            }
+
+            std::string get_channel_layout_str(uint64_t layout)
+            {
+                std::string buf(32, '\0');
+                av_get_channel_layout_string(&buf[0], buf.size(), 0, layout);
+                return buf;
+            }
+
+            void av_deleter::operator()(AVFrame *ptr)               const { if (ptr) av_frame_free(&ptr); }
+            void av_deleter::operator()(AVPacket *ptr)              const { if (ptr) av_packet_free(&ptr); }
+            void av_deleter::operator()(AVAudioFifo *ptr)           const { if (ptr) av_audio_fifo_free(ptr); }
+            void av_deleter::operator()(SwsContext *ptr)            const { if (ptr) sws_freeContext(ptr); }
+            void av_deleter::operator()(SwrContext *ptr)            const { if (ptr) swr_free(&ptr); }
+            void av_deleter::operator()(AVCodecContext *ptr)        const { if (ptr) avcodec_free_context(&ptr); }
+            void av_deleter::operator()(AVCodecParserContext *ptr)  const { if (ptr) av_parser_close(ptr); }
+            void av_deleter::operator()(AVFormatContext *ptr)       const 
+            { 
+                if (ptr) 
                 {
-                    tmp = Frame::make_image(_dst_h, _dst_w, _dst_fmt, src.timestamp);
-                    ptr = std::addressof(tmp);
+                    if (ptr->iformat)
+                        avformat_close_input(&ptr); 
+                    else if (ptr->oformat)
+                        avformat_free_context(ptr);
                 }
-
-                sws_scale(_imgConvertCtx.get(),
-                        src.frame->data, src.frame->linesize, 0, src.frame->height,
-                        ptr->frame->data, ptr->frame->linesize);
-
-                if (ptr != std::addressof(dst))
-                    dst = std::move(tmp);
             }
-            else if (!is_same_object)
+
+            av_ptr<AVFrame> make_avframe()
             {
-                dst = src;
+                av_ptr<AVFrame> obj(av_frame_alloc());
+                if (!obj)
+                    throw std::runtime_error("Failed to allocate AVframe");
+                return obj;
             }
-        }
 
-        void sw_image_resizer::resize(
-            const Frame& src,
-            Frame& dst
-        )
-        {
-            resize(src, _dst_h, _dst_w, _dst_fmt, dst);
-        }
-
-        void sw_audio_resampler::reset(
-            int src_sample_rate, uint64_t src_channel_layout, AVSampleFormat src_fmt,
-            int dst_sample_rate, uint64_t dst_channel_layout, AVSampleFormat dst_fmt
-        )
-        {
-            auto this_params = std::tie(src_sample_rate_,
-                                        src_channel_layout_,
-                                        src_fmt_,
-                                        dst_sample_rate_,
-                                        dst_channel_layout_,
-                                        dst_fmt_);
-            auto new_params  = std::tie(src_sample_rate,
-                                        src_channel_layout,
-                                        src_fmt,
-                                        dst_sample_rate,
-                                        dst_channel_layout,
-                                        dst_fmt);
-
-            if (this_params != new_params)
+            av_ptr<AVPacket> make_avpacket()
             {
-                this_params = new_params;
+                av_ptr<AVPacket> obj(av_packet_alloc());
+                if (!obj)
+                    throw std::runtime_error("Failed to allocate AVPacket");
+                return obj;
+            }
 
-                audioResamplerCtx_.reset(nullptr);
+            av_dict::av_dict(const std::unordered_map<std::string, std::string>& options)
+            {
+                int ret = 0;
 
-                if (src_sample_rate_    != dst_sample_rate_ ||
-                    src_channel_layout_ != dst_channel_layout_ ||
-                    src_fmt_            != dst_fmt_)
-                {
-                    audioResamplerCtx_.reset(swr_alloc_set_opts(NULL,
-                                                            dst_channel_layout_, dst_fmt_, dst_sample_rate_,
-                                                            src_channel_layout_, src_fmt_, src_sample_rate_,
-                                                            0, NULL));
-                    int ret = 0;
-                    if ((ret = swr_init(audioResamplerCtx_.get())) < 0)
-                    {
-                        audioResamplerCtx_.reset(nullptr);
-                        throw std::runtime_error("swr_init() failed : " + get_av_error(ret));
+                for (const auto& opt : options) {
+                    if ((ret = av_dict_set(&avdic, opt.first.c_str(), opt.second.c_str(), 0)) < 0) {
+                        printf("av_dict_set() failed : %s\n", get_av_error(ret).c_str());
+                        break;
                     }
                 }
             }
-        }
 
-        void sw_audio_resampler::resize(
-            const Frame&    src,
-            int             dst_sample_rate,
-            uint64_t        dst_channel_layout,
-            AVSampleFormat  dst_samplefmt,
-            Frame&          dst
-        )
-        {
-            using namespace std::chrono;
-            assert(src.is_audio());
-
-            const bool is_same_object = std::addressof(src) == std::addressof(dst);
-
-            reset(src.frame->sample_rate, src.frame->channel_layout, (AVSampleFormat)src.frame->format,
-                dst_sample_rate, dst_channel_layout, dst_samplefmt);
-
-            if (audioResamplerCtx_)
+            av_dict::av_dict(const av_dict& ori)
             {
-                Frame tmp;
-                Frame* ptr = std::addressof(dst);
-
-                const int64_t delay       = swr_get_delay(audioResamplerCtx_.get(), src_sample_rate_);
-                const auto dst_nb_samples = av_rescale_rnd(delay + src.frame->nb_samples, dst_sample_rate_, src_sample_rate_, AV_ROUND_UP);
-
-                if (is_same_object ||
-                    !dst.is_audio() ||
-                    std::tie(dst.frame->sample_rate, dst.frame->channel_layout, dst.frame->format, dst.frame->nb_samples) !=
-                    std::tie(dst_sample_rate_, dst_channel_layout_, dst_fmt_, dst_nb_samples))
-                {
-                    tmp = Frame::make_audio(dst_sample_rate_, dst_nb_samples, dst_channel_layout_, dst_fmt_, std::chrono::system_clock::time_point{});
-                    ptr = std::addressof(tmp);
-                }
-
-                int ret = swr_convert(audioResamplerCtx_.get(),
-                                    ptr->frame->data, ptr->frame->nb_samples,
-                                    (const uint8_t**)src.frame->data, src.frame->nb_samples);
-                if (ret < 0)
-                    throw std::runtime_error("swr_convert() failed : " + get_av_error(ret));
-
-                ptr->frame->nb_samples = ret;
-                ptr->frame->pts   = tracked_samples_;
-                ptr->timestamp    = system_clock::time_point{nanoseconds{av_rescale_q(tracked_samples_,
-                                                                                    {1, dst_sample_rate_},
-                                                                                    {nanoseconds::period::num, nanoseconds::period::den})}};
-                tracked_samples_ += ptr->frame->nb_samples;
-
-                if (ptr!= std::addressof(dst))
-                    dst = std::move(tmp);
+                av_dict_copy(&avdic, ori.avdic, 0);
             }
-            else if (!is_same_object)
+
+            av_dict& av_dict::operator=(const av_dict& ori)
             {
-                dst = src;
+                *this = std::move(av_dict{ori});
+                return *this;
+            }
+
+            av_dict::av_dict(av_dict &&ori) noexcept
+            : avdic{std::exchange(ori.avdic, nullptr)}
+            {
+            }
+
+            av_dict &av_dict::operator=(av_dict &&ori) noexcept
+            {
+                if (this != &ori)
+                    avdic = std::exchange(ori.avdic, nullptr);
+                return *this;
+            }
+
+            av_dict::~av_dict()
+            {
+                if (avdic)
+                    av_dict_free(&avdic);
+            }
+
+            AVDictionary** av_dict::get()
+            {
+                return avdic ? &avdic: nullptr;
             }
         }
 
-        void sw_audio_resampler::resize(
-            const Frame& src,
-            Frame& dst
+        frame::frame(
+            int             h,
+            int             w,
+            AVPixelFormat   pixfmt,
+            int             sample_rate,
+            int             nb_samples,
+            uint64_t        channel_layout,
+            AVSampleFormat  samplefmt,
+            std::chrono::system_clock::time_point timestamp_
         )
         {
-            resize(src, dst_sample_rate_, dst_channel_layout_, dst_fmt_, dst);
-        }
+            using namespace details;
 
-        int sw_audio_resampler::get_src_rate() const
-        {
-            return src_sample_rate_;
-        }
+            f = make_avframe();
+            f->height           = h;
+            f->width            = w;
+            f->sample_rate      = sample_rate;
+            f->channel_layout   = channel_layout;
+            f->nb_samples       = nb_samples;
+            f->format           = h > 0 && w > 0 ? (int)pixfmt : (int)samplefmt;
+            timestamp           = timestamp_;
 
-        uint64_t sw_audio_resampler::get_src_layout() const
-        {
-            return src_channel_layout_;
-        }
-
-        AVSampleFormat sw_audio_resampler::get_src_fmt() const
-        {
-            return src_fmt_;
-        }
-
-        int sw_audio_resampler::get_dst_rate() const
-        {
-            return dst_sample_rate_;
-        }
-
-        uint64_t sw_audio_resampler::get_dst_layout() const
-        {
-            return dst_channel_layout_;
-        }
-
-        AVSampleFormat sw_audio_resampler::get_dst_fmt() const
-        {
-            return dst_fmt_;
-        }
-
-        sw_audio_fifo::sw_audio_fifo(
-            int codec_frame_size,
-            int sample_format,
-            int nchannels
-        ) : frame_size(codec_frame_size),
-            fmt(sample_format),
-            channels(nchannels)
-        {
-            if (frame_size > 0)
+            int ret = av_frame_get_buffer(f.get(), 0); //use default alignment, which is likely 32
+            if (ret < 0)
             {
-                fifo.reset(av_audio_fifo_alloc((AVSampleFormat)fmt, channels, frame_size));
-                if (!fifo)
-                    throw std::runtime_error("av_audio_fifo_alloc() failed");
+                f = nullptr;
+                throw std::runtime_error("av_frame_get_buffer() failed : " + get_av_error(ret));
             }
+
+    //        ret = av_frame_make_writable(obj.frame.get());
+    //        if (ret < 0)
+    //        {
+    //            obj.frame.reset(nullptr);
+    //            throw std::runtime_error("av_frame_make_writable() failed : " + get_av_error(ret));
+    //        }
+
+            if (is_audio())
+                f->pts = av_rescale_q(timestamp.time_since_epoch().count(),
+                                      {decltype(timestamp)::period::num, (decltype(timestamp)::period::den)},
+                                      {1, f->sample_rate});
         }
 
-        std::vector<Frame> sw_audio_fifo::push_pull(
-            Frame&& in
-        )
+        frame::frame(
+            int h,
+            int w,
+            AVPixelFormat fmt,
+            std::chrono::system_clock::time_point timestamp
+        ) : frame(h, w, fmt, 0, 0, 0, AV_SAMPLE_FMT_NONE, timestamp)
         {
-            using namespace std::chrono;
-            assert(in.is_audio());
+        }
 
-            std::vector<Frame> outs;
+        frame::frame(
+            int             sample_rate,
+            int             nb_samples,
+            uint64_t        channel_layout,
+            AVSampleFormat  fmt,
+            std::chrono::system_clock::time_point timestamp
+        ) : frame(0,0,AV_PIX_FMT_NONE, sample_rate, nb_samples, channel_layout, fmt, timestamp)
+        {
+        }
 
-            //check that the configuration hasn't suddenly changed this would be exceptional
-            const int nchannels = in.nchannels();
-            auto current_params = std::tie(fmt, channels);
-            auto new_params     = std::tie(in.frame->format, nchannels);
+        frame::frame(const frame &ori)
+        {
+            copy_from(ori);
+        }
 
-            if (current_params != new_params)
-                throw std::runtime_error("new audio frame params differ from first ");
+        frame& frame::operator=(const frame& ori)
+        {
+            if (this != &ori)
+                copy_from(ori);
+            return *this;
+        }
 
-            if (frame_size == 0)
+        void frame::copy_from(const frame &ori)
+        {
+            if (ori.is_empty())
             {
-                outs.push_back(std::move(in));
+                frame empty{std::move(*this)};
             }
             else
             {
-                if (av_audio_fifo_write(fifo.get(), (void**)in.frame->data, in.frame->nb_samples) != in.frame->nb_samples)
-                    throw std::runtime_error("av_audio_fifo_write() failed to write all samples");
+                const bool same_image_dims =
+                        is_image() &&
+                        std::tie(    f->height,     f->width,     f->format) ==
+                        std::tie(ori.f->height, ori.f->width, ori.f->format);
 
-                while (av_audio_fifo_size(fifo.get()) >= frame_size)
+                const bool same_audio_dims =
+                        is_audio() &&
+                        std::tie(    f->sample_rate,     f->nb_samples,     f->channel_layout,     f->format) ==
+                        std::tie(ori.f->sample_rate, ori.f->nb_samples, ori.f->channel_layout, ori.f->format);
+
+                if (!same_image_dims && !same_audio_dims)
                 {
-                    const system_clock::time_point timestamp{nanoseconds{av_rescale_q(
-                            sample_count,
-                            {1, in.frame->sample_rate},
-                            {nanoseconds::period::num, nanoseconds::period::den})}};
+                    *this = std::move(frame(ori.f->height,
+                                            ori.f->width,
+                                            (AVPixelFormat)ori.f->format,
+                                            ori.f->sample_rate,
+                                            ori.f->nb_samples,
+                                            ori.f->channel_layout,
+                                            (AVSampleFormat)ori.f->format,
+                                            ori.timestamp));
+                }
 
-                    Frame out = Frame::make_audio(in.frame->sample_rate, frame_size, in.frame->channel_layout, in.samplefmt(), timestamp);
+                av_frame_copy(f.get(), ori.f.get());
+                av_frame_copy_props(f.get(), ori.f.get());
+            }
+        }
 
-                    if (av_audio_fifo_read(fifo.get(), (void**)out.frame->data, out.frame->nb_samples) != out.frame->nb_samples)
-                        throw std::runtime_error("av_audio_fifo_read() failed to read all requested samples");
+        bool frame::is_image() const noexcept
+        {
+            return f && f->width > 0 && f->height > 0 && f->format != AV_PIX_FMT_NONE;
+        }
 
-                    sample_count += out.frame->nb_samples;
-                    outs.push_back(std::move(out));
+        bool frame::is_audio() const noexcept
+        {
+            return f && f->nb_samples > 0 && f->channel_layout > 0 && f->sample_rate > 0 && f->format != AV_SAMPLE_FMT_NONE;
+        }
+
+        bool            frame::is_empty()   const noexcept { return !is_image() && !is_audio(); }
+        AVPixelFormat   frame::pixfmt()     const noexcept { return is_image() ? (AVPixelFormat)f->format : AV_PIX_FMT_NONE; }
+        int             frame::height()     const noexcept { return is_image() ? f->height : 0; }
+        int             frame::width()      const noexcept { return is_image() ? f->width : 0; }
+        AVSampleFormat  frame::samplefmt()  const noexcept { return is_audio() ? (AVSampleFormat)f->format : AV_SAMPLE_FMT_NONE; }
+        int             frame::nsamples()   const noexcept { return is_audio() ? f->nb_samples : 0; }
+        uint64_t        frame::layout()     const noexcept { return is_audio() ? f->channel_layout : 0; }
+        int             frame::nchannels()  const noexcept { return is_audio() ? av_get_channel_layout_nb_channels(f->channel_layout) : 0; }
+        int             frame::sample_rate() const noexcept{ return is_audio() ? f->sample_rate : 0; }
+
+        std::chrono::system_clock::time_point frame::get_timestamp() const noexcept
+        {
+            return timestamp;
+        }
+
+        const AVFrame&  frame::get_frame() const { DLIB_CASSERT(f, "is_empty() == true"); return *f; }
+        AVFrame&        frame::get_frame()       { DLIB_CASSERT(f, "is_empty() == true"); return *f; }
+
+        namespace details
+        {
+            int             resizer::get_src_h()    const noexcept { return src_h; }
+            int             resizer::get_src_w()    const noexcept { return src_w; }
+            AVPixelFormat   resizer::get_src_fmt()  const noexcept { return src_fmt; }
+            int             resizer::get_dst_h()    const noexcept { return dst_h; }
+            int             resizer::get_dst_w()    const noexcept { return dst_w; }
+            AVPixelFormat   resizer::get_dst_fmt()  const noexcept { return dst_fmt; }
+
+            void resizer::reset(
+                const int src_h_, const int src_w_, const AVPixelFormat src_fmt_,
+                const int dst_h_, const int dst_w_, const AVPixelFormat dst_fmt_)
+            {
+                auto this_params = std::tie(src_h,  src_w,  src_fmt,  dst_h,  dst_w,  dst_fmt);
+                auto new_params  = std::tie(src_h_, src_w_, src_fmt_, dst_h_, dst_w_, dst_fmt_);
+
+                if (this_params != new_params)
+                {
+                    this_params = new_params;
+
+                    imgConvertCtx = nullptr;
+
+                    if (std::tie(src_h, src_w, src_fmt) != 
+                        std::tie(dst_h, dst_w, dst_fmt))
+                    {
+                        imgConvertCtx.reset(sws_getContext(src_w, src_h, src_fmt,
+                                                           dst_w, dst_h, dst_fmt,
+                                                           SWS_FAST_BILINEAR, NULL, NULL, NULL));
+                    }
                 }
             }
 
-            return outs;
-        }
-    }
-
-    std::vector<std::string> ffmpeg_list_protocols()
-    {
-        std::vector<std::string> protocols;
-        void* opaque = NULL;
-        const char* name = 0;
-        while ((name = avio_enum_protocols(&opaque, 0)))
-            protocols.emplace_back(name);
-
-        opaque  = NULL;
-        name    = 0;
-
-        while ((name = avio_enum_protocols(&opaque, 1)))
-            protocols.emplace_back(name);
-
-        return protocols;
-    }
-
-    std::vector<std::string> ffmpeg_list_demuxers()
-    {
-        std::vector<std::string> demuxers;
-        const AVInputFormat* demuxer = NULL;
-
-#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100)
-        // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L86
-        while ((demuxer = av_iformat_next(demuxer)))
-#else
-        void* opaque = nullptr;
-        while ((demuxer = av_demuxer_iterate(&opaque)))
-#endif
-            demuxers.push_back(demuxer->name);
-
-        return demuxers;
-    }
-
-    std::vector<std::string> ffmpeg_list_muxers()
-    {
-        std::vector<std::string> muxers;
-        const AVOutputFormat* muxer = NULL;
-
-#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100)
-        // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L86
-        while ((muxer = av_oformat_next(muxer)))
-#else
-        void* opaque = nullptr;
-        while ((muxer = av_muxer_iterate(&opaque)))
-#endif
-            muxers.push_back(muxer->name);
-    
-        return muxers;
-    }
-
-    std::vector<codec_details> ffmpeg_list_available_codecs()
-    {
-        std::vector<codec_details> details;
-
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 10, 100)
-        // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L91
-        AVCodec* codec = NULL;
-        while ((codec = av_codec_next(codec)))
-#else
-        const AVCodec* codec = NULL;
-        void* opaque = nullptr;
-        while ((codec = av_codec_iterate(&opaque)))
-#endif
-        {
-            codec_details detail;
-            detail.codec_name = codec->name;
-            detail.supports_encoding = av_codec_is_encoder(codec);
-            detail.supports_decoding = av_codec_is_decoder(codec);
-            details.push_back(std::move(detail));
-        }
-
-        //sort
-        std::sort(details.begin(), details.end(), [](const codec_details& a, const codec_details& b) {return a.codec_name < b.codec_name;});
-        //merge
-        auto it = details.begin() + 1;
-        while (it != details.end())
-        {
-            auto prev = it - 1;
-
-            if (it->codec_name == prev->codec_name)
+            void resizer::resize (
+                const frame& src,
+                const int dst_h_, const int dst_w_, const AVPixelFormat dst_pixfmt_,
+                frame& dst
+            )
             {
-                prev->supports_encoding |= it->supports_encoding;
-                prev->supports_decoding |= it->supports_decoding;
-                it = details.erase(it);
-            }
-            else
-                it++;
-        }
-        return details;
-    }
+                DLIB_CASSERT(src.is_image(), "src.is_image() == false");
 
-    void convert(const Frame& f, type_safe_union<array2d<rgb_pixel>, audio_frame>& obj)
-    {
-        if (f.is_image())
+                const bool is_same_object = std::addressof(src) == std::addressof(dst);
+
+                reset(src.height(), src.width(), src.pixfmt(),
+                      dst_h_, dst_w_, dst_pixfmt_);
+
+                if (imgConvertCtx)
+                {
+                    frame tmp;
+                    frame* ptr = std::addressof(dst);
+
+                    if (is_same_object ||
+                        !dst.is_image() ||
+                        std::make_tuple(dst.height(), dst.width(), dst.pixfmt()) !=
+                        std::make_tuple(dst_h,        dst_w,       dst_fmt))
+                    {
+                        tmp = frame(dst_h, dst_w, dst_fmt, src.get_timestamp());
+                        ptr = std::addressof(tmp);
+                    }
+
+                    sws_scale(imgConvertCtx.get(),
+                               src.get_frame().data,  src.get_frame().linesize, 0, src.height(),
+                              ptr->get_frame().data, ptr->get_frame().linesize);
+
+                    if (ptr != std::addressof(dst))
+                        dst = std::move(tmp);
+                }
+                else if (!is_same_object)
+                {
+                    dst = src;
+                }
+            }
+
+            void resizer::resize(
+                const frame& src,
+                frame& dst
+            )
+            {
+                resize(src, dst_h, dst_w, dst_fmt, dst);
+            }
+
+            int             resampler::get_src_rate()   const noexcept { return src_sample_rate; }
+            uint64_t        resampler::get_src_layout() const noexcept { return src_channel_layout; }
+            AVSampleFormat  resampler::get_src_fmt()    const noexcept { return src_fmt; }
+            int             resampler::get_dst_rate()   const noexcept { return dst_sample_rate; }
+            uint64_t        resampler::get_dst_layout() const noexcept { return dst_channel_layout; }
+            AVSampleFormat  resampler::get_dst_fmt()    const noexcept { return dst_fmt; }
+
+            void resampler::reset(
+                const int src_sample_rate_, const uint64_t src_channel_layout_, const AVSampleFormat src_fmt_,
+                const int dst_sample_rate_, const uint64_t dst_channel_layout_, const AVSampleFormat dst_fmt_
+            )
+            {
+                auto this_params = std::tie(src_sample_rate,
+                                            src_channel_layout,
+                                            src_fmt,
+                                            dst_sample_rate,
+                                            dst_channel_layout,
+                                            dst_fmt);
+                auto new_params  = std::tie(src_sample_rate_,
+                                            src_channel_layout_,
+                                            src_fmt_,
+                                            dst_sample_rate_,
+                                            dst_channel_layout_,
+                                            dst_fmt_);
+
+                if (this_params != new_params)
+                {
+                    this_params = new_params;
+
+                    audioResamplerCtx = nullptr;
+
+                    if (std::tie(src_sample_rate, src_channel_layout, src_fmt) !=
+                        std::tie(dst_sample_rate, dst_channel_layout, dst_fmt))
+                    {
+                        audioResamplerCtx.reset(swr_alloc_set_opts(NULL,
+                                                                dst_channel_layout_, dst_fmt_, dst_sample_rate_,
+                                                                src_channel_layout_, src_fmt_, src_sample_rate_,
+                                                                0, NULL));
+                        int ret = 0;
+                        if ((ret = swr_init(audioResamplerCtx.get())) < 0)
+                        {
+                            audioResamplerCtx = nullptr;
+                            throw std::runtime_error("swr_init() failed : " + get_av_error(ret));
+                        }
+                    }
+                }
+            }
+
+            void resampler::resize(
+                const frame&            src,
+                const int               dst_sample_rate_,
+                const uint64_t          dst_channel_layout_,
+                const AVSampleFormat    dst_samplefmt_,
+                frame&                  dst
+            )
+            {
+                DLIB_CASSERT(src.is_audio(), "src.is_audio() == false");
+
+                const bool is_same_object = std::addressof(src) == std::addressof(dst);
+
+                reset(src.sample_rate(),         src.layout(), src.samplefmt(),
+                      dst_sample_rate_,  dst_channel_layout_,  dst_samplefmt_);
+
+                if (audioResamplerCtx)
+                {
+                    av_ptr<AVFrame> tmp = make_avframe();
+                    tmp->sample_rate    = dst_sample_rate;
+                    tmp->channel_layout = dst_channel_layout;
+                    tmp->format         = (int)dst_fmt;
+
+                    const int ret = swr_convert_frame(audioResamplerCtx.get(), tmp.get(), &src.get_frame());
+                    if (ret < 0)
+                        throw std::runtime_error("swr_convert_frame() failed : " + get_av_error(ret));
+
+                    dst.f           = std::move(tmp);
+                    dst.f->pts      = tracked_samples;
+                    dst.timestamp   = system_clock::time_point{nanoseconds{av_rescale_q(tracked_samples,
+                                                                                        {1, dst_sample_rate},
+                                                                                        {nanoseconds::period::num, nanoseconds::period::den})}};
+                    tracked_samples += dst.nsamples();
+
+                }
+                else if (!is_same_object)
+                {
+                    dst = src;
+                }
+            }
+
+            void resampler::resize(
+                const frame& src,
+                frame& dst
+            )
+            {
+                resize(src, dst_sample_rate, dst_channel_layout, dst_fmt, dst);
+            }
+
+            sw_audio_fifo::sw_audio_fifo(
+                const int            codec_frame_size_,
+                const AVSampleFormat sample_format_,
+                const int            nchannels_
+            ) : frame_size(codec_frame_size_),
+                fmt(sample_format_),
+                nchannels(nchannels_)
+            {
+                if (frame_size > 0)
+                {
+                    fifo.reset(av_audio_fifo_alloc(fmt, nchannels, frame_size));
+                    if (!fifo)
+                        throw std::runtime_error("av_audio_fifo_alloc() failed");
+                }
+            }
+
+            std::vector<frame> sw_audio_fifo::push_pull(
+                frame&& in
+            )
+            {
+                using namespace std::chrono;
+                assert(in.is_audio());
+
+                std::vector<frame> outs;
+
+                //check that the configuration hasn't suddenly changed this would be exceptional
+                auto current_params = std::tie(fmt, nchannels);
+                auto new_params     = std::make_tuple(in.samplefmt(), in.nchannels());
+
+                if (current_params != new_params)
+                    throw std::runtime_error("new audio frame params differ from first ");
+
+                if (frame_size == 0)
+                {
+                    outs.push_back(std::move(in));
+                }
+                else
+                {
+                    if (av_audio_fifo_write(fifo.get(), (void**)in.get_frame().data, in.nsamples()) != in.nsamples())
+                        throw std::runtime_error("av_audio_fifo_write() failed to write all samples");
+
+                    while (av_audio_fifo_size(fifo.get()) >= frame_size)
+                    {
+                        const system_clock::time_point timestamp{nanoseconds{av_rescale_q(
+                                sample_count,
+                                {1, in.sample_rate()},
+                                {nanoseconds::period::num, nanoseconds::period::den})}};
+
+                        frame out(in.sample_rate(), frame_size, in.layout(), in.samplefmt(), timestamp);
+
+                        if (av_audio_fifo_read(fifo.get(), (void**)out.get_frame().data, out.nsamples()) != out.nsamples())
+                            throw std::runtime_error("av_audio_fifo_read() failed to read all requested samples");
+
+                        sample_count += out.nsamples();
+                        outs.push_back(std::move(out));
+                    }
+                }
+
+                return outs;
+            }
+        }
+
+        std::vector<std::string> ffmpeg_list_protocols()
         {
-            DLIB_ASSERT(f.pixfmt() == AV_PIX_FMT_RGB24, "frame isn't RGB image. Make sure your decoder/demuxer/encoder/muxer has correct args passed to constructor");
-            
-            array2d<rgb_pixel> image(f.height(), f.width());
+            std::vector<std::string> protocols;
+            void* opaque = NULL;
+            const char* name = 0;
+            while ((name = avio_enum_protocols(&opaque, 0)))
+                protocols.emplace_back(name);
+
+            opaque  = NULL;
+            name    = 0;
+
+            while ((name = avio_enum_protocols(&opaque, 1)))
+                protocols.emplace_back(name);
+
+            return protocols;
+        }
+
+        std::vector<std::string> ffmpeg_list_demuxers()
+        {
+            std::vector<std::string> demuxers;
+            const AVInputFormat* demuxer = NULL;
+
+    #if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100)
+            // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L86
+            while ((demuxer = av_iformat_next(demuxer)))
+    #else
+            void* opaque = nullptr;
+            while ((demuxer = av_demuxer_iterate(&opaque)))
+    #endif
+                demuxers.push_back(demuxer->name);
+
+            return demuxers;
+        }
+
+        std::vector<std::string> ffmpeg_list_muxers()
+        {
+            std::vector<std::string> muxers;
+            const AVOutputFormat* muxer = NULL;
+
+    #if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100)
+            // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L86
+            while ((muxer = av_oformat_next(muxer)))
+    #else
+            void* opaque = nullptr;
+            while ((muxer = av_muxer_iterate(&opaque)))
+    #endif
+                muxers.push_back(muxer->name);
+        
+            return muxers;
+        }
+
+        std::vector<codec_details> ffmpeg_list_available_codecs()
+        {
+            std::vector<codec_details> details;
+
+    #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 10, 100)
+            // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L91
+            AVCodec* codec = NULL;
+            while ((codec = av_codec_next(codec)))
+    #else
+            const AVCodec* codec = NULL;
+            void* opaque = nullptr;
+            while ((codec = av_codec_iterate(&opaque)))
+    #endif
+            {
+                codec_details detail;
+                detail.codec_name = codec->name;
+                detail.supports_encoding = av_codec_is_encoder(codec);
+                detail.supports_decoding = av_codec_is_decoder(codec);
+                details.push_back(std::move(detail));
+            }
+
+            //sort
+            std::sort(details.begin(), details.end(), [](const codec_details& a, const codec_details& b) {return a.codec_name < b.codec_name;});
+            //merge
+            auto it = details.begin() + 1;
+            while (it != details.end())
+            {
+                auto prev = it - 1;
+
+                if (it->codec_name == prev->codec_name)
+                {
+                    prev->supports_encoding |= it->supports_encoding;
+                    prev->supports_decoding |= it->supports_decoding;
+                    it = details.erase(it);
+                }
+                else
+                    it++;
+            }
+            return details;
+        }
+
+        void convert(const frame& f, type_safe_union<array2d<rgb_pixel>, audio_frame>& obj)
+        {
+            if (f.is_image())
+            {
+                DLIB_ASSERT(f.pixfmt() == AV_PIX_FMT_RGB24, "frame isn't RGB image. Make sure your decoder/demuxer/encoder/muxer has correct args passed to constructor");
+                
+                array2d<rgb_pixel> image(f.height(), f.width());
+
+                for (int row = 0 ; row < f.height() ; row++)
+                {
+                    memcpy(image.begin() + row * f.width(),
+                        f.get_frame().data[0] + row * f.get_frame().linesize[0],
+                        f.width()*3);
+                }
+                
+                obj = std::move(image);
+            }
+            else if (f.is_audio())
+            {
+                DLIB_ASSERT(f.samplefmt() == AV_SAMPLE_FMT_S16, "audio buffer requires s16 format. Make sure correct args are passed to constructor of decoder/demuxer/encoder/muxer");
+
+                audio_frame audio;
+                audio.sample_rate = f.sample_rate();
+                audio.samples.resize(f.nsamples());
+
+                if (f.nchannels() == 1)
+                {
+                    for (int i = 0 ; i < f.nsamples() ; ++i)
+                    {
+                        memcpy(&audio.samples[i].ch1, f.get_frame().data[i], sizeof(int16_t));
+                        audio.samples[i].ch2 = audio.samples[i].ch1;
+                    }  
+                }
+                else if (f.nchannels() == 2)
+                {
+                    memcpy(audio.samples.data(), f.get_frame().data[0], audio.samples.size()*sizeof(audio_frame::sample));
+                }
+
+                obj = std::move(audio);
+            }
+        }
+
+        type_safe_union<array2d<rgb_pixel>, audio_frame> convert(const frame& f)
+        {
+            type_safe_union<array2d<rgb_pixel>, audio_frame> obj;
+            convert(f, obj);
+            return obj;
+        }
+
+        frame convert(const array2d<rgb_pixel>& img)
+        {
+            frame f(img.nr(), img.nc(), AV_PIX_FMT_RGB24, {});
 
             for (int row = 0 ; row < f.height() ; row++)
             {
-                memcpy(image.begin() + row * f.width(),
-                       f.get_frame().data[0] + row * f.get_frame().linesize[0],
+                memcpy(f.get_frame().data[0] + row * f.get_frame().linesize[0],
+                       img.begin() + row * f.width(),
                        f.width()*3);
             }
-            
-            obj = std::move(image);
+
+            return f;
         }
-        else if (f.is_audio())
+
+        frame convert(const audio_frame& audio)
         {
-            DLIB_ASSERT(f.samplefmt() == AV_SAMPLE_FMT_S16, "audio buffer requires s16 format. Make sure correct args are passed to constructor of decoder/demuxer/encoder/muxer");
-
-            audio_frame audio;
-            audio.sample_rate = f.sample_rate();
-            audio.samples.resize(f.nsamples());
-
-            if (f.nchannels() == 1)
-            {
-                for (int i = 0 ; i < f.nsamples() ; ++i)
-                {
-                    memcpy(&audio.samples[i].ch1, f.get_frame().data[i], sizeof(int16_t));
-                    audio.samples[i].ch2 = audio.samples[i].ch1;
-                }  
-            }
-            else if (f.nchannels() == 2)
-            {
-                memcpy(audio.samples.data(), f.get_frame().data[0], audio.samples.size()*sizeof(audio_frame::sample));
-            }
-
-            obj = std::move(audio);
+            frame f(audio.sample_rate, audio.samples.size(), AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16, audio.timestamp);
+            memcpy(f.get_frame().data[0], audio.samples.data(), audio.samples.size()*sizeof(audio_frame::sample));
+            return f;
         }
-    }
-
-    type_safe_union<array2d<rgb_pixel>, audio_frame> convert(const Frame& f)
-    {
-        type_safe_union<array2d<rgb_pixel>, audio_frame> obj;
-        convert(f, obj);
-        return obj;
-    }
-
-    Frame convert(const array2d<rgb_pixel>& frame)
-    {
-        Frame f = Frame::make_image(frame.nr(), frame.nc(), AV_PIX_FMT_RGB24, {});
-
-        for (int row = 0 ; row < f.height() ; row++)
-        {
-            memcpy(f.get_frame().data[0] + row * f.get_frame().linesize[0],
-                   frame.begin() + row * f.width(),
-                   f.width()*3);
-        }
-
-        return f;
-    }
-
-    Frame convert(const audio_frame& frame)
-    {
-        Frame f = Frame::make_audio(frame.sample_rate, frame.samples.size(), AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16, frame.timestamp);
-        memcpy(f.frame->data[0], frame.samples.data(), frame.samples.size()*sizeof(audio_frame::sample));
-        return f;
     }
 }

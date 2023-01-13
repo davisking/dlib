@@ -15,10 +15,11 @@ static_assert(false, "Build is faulty. DLIB_VIDEOS_FILEPATH should be defined by
 
 namespace  
 {
+    using namespace std;
     using namespace test;
     using namespace dlib;
-    using namespace std;
-
+    using namespace dlib::ffmpeg;
+    
     logger dlog("test.video");
 
     void test_decoder(
@@ -33,32 +34,32 @@ namespace
         const int sample_rate   = dlib::get_option(cfg, "sample_rate", 0);
         const bool is_audio     = sample_rate > 0;
 
-        ffmpeg_decoder::args args;
+        decoder::args args;
         args.args_codec.codec_name  = codec;
         args.args_image.fmt         = AV_PIX_FMT_RGB24;
         args.args_audio.fmt         = AV_SAMPLE_FMT_S16;
 
-        dlib::ffmpeg_decoder decoder(args);
-        DLIB_TEST(decoder.is_open());
-        DLIB_TEST(decoder.get_codec_name() == codec);
+        decoder dec(args);
+        DLIB_TEST(dec.is_open());
+        DLIB_TEST(dec.get_codec_name() == codec);
         if (is_audio)
-            DLIB_TEST(decoder.is_audio_decoder());
+            DLIB_TEST(dec.is_audio_decoder());
         else
-            DLIB_TEST(decoder.is_image_decoder());
+            DLIB_TEST(dec.is_image_decoder());
 
         type_safe_union<array2d<rgb_pixel>, audio_frame> obj;
-        dlib::Frame             frame;
+        dlib::ffmpeg::frame     frame;
         int                     count{0};
         int                     nsamples{0};
         int                     iteration{0};
-        dlib::decoder_status    status{DECODER_EAGAIN};
+        decoder_status          status{DECODER_EAGAIN};
 
         ifstream fin{filepath, std::ios::binary};
         std::vector<char> buf(1024);
 
         const auto pull = [&]
         {
-            while ((status = decoder.read(frame)) == DECODER_FRAME_AVAILABLE)
+            while ((status = dec.read(frame)) == DECODER_FRAME_AVAILABLE)
             {
                 convert(frame, obj);
 
@@ -72,8 +73,8 @@ namespace
                     DLIB_TEST(obj.get<audio_frame>().sample_rate == sample_rate);
                     nsamples += obj.get<audio_frame>().samples.size();
 
-                    DLIB_TEST(decoder.sample_rate() == sample_rate);
-                    DLIB_TEST(decoder.sample_fmt() == AV_SAMPLE_FMT_S16);
+                    DLIB_TEST(dec.sample_rate() == sample_rate);
+                    DLIB_TEST(dec.sample_fmt() == AV_SAMPLE_FMT_S16);
                 }
                 else
                 {
@@ -87,8 +88,8 @@ namespace
                     DLIB_TEST(obj.get<array2d<rgb_pixel>>().nc() == width);
                     ++count;
 
-                    DLIB_TEST(decoder.height() == height);
-                    DLIB_TEST(decoder.width() == width);
+                    DLIB_TEST(dec.height() == height);
+                    DLIB_TEST(dec.width() == width);
                 }
 
                 ++iteration;
@@ -103,14 +104,14 @@ namespace
             fin.read(buf.data(), buf.size());
             size_t ret = fin.gcount();
 
-            DLIB_TEST(decoder.push_encoded((const uint8_t*)buf.data(), ret));
+            DLIB_TEST(dec.push_encoded((const uint8_t*)buf.data(), ret));
             pull();
         }
 
-        decoder.flush();
+        dec.flush();
         pull();
         DLIB_TEST(count == nframes);
-        DLIB_TEST(!decoder.is_open());
+        DLIB_TEST(!dec.is_open());
     }
 
     void test_demuxer (
@@ -125,12 +126,12 @@ namespace
         const bool has_video    = height > 0 && width > 0 && nframes > 0;
         const bool has_audio    = sample_rate > 0;
 
-        dlib::ffmpeg_demuxer::args args;
+        demuxer::args args;
         args.filepath           = filepath;
         args.image_options.fmt  = AV_PIX_FMT_RGB24;
         args.audio_options.fmt  = AV_SAMPLE_FMT_S16;
 
-        dlib::ffmpeg_demuxer cap(args);
+        demuxer cap(args);
         DLIB_TEST(cap.is_open());
         DLIB_TEST(cap.video_enabled() == has_video);
         DLIB_TEST(cap.audio_enabled() == has_audio);
@@ -148,10 +149,10 @@ namespace
         }
         
         type_safe_union<array2d<rgb_pixel>, audio_frame> obj;
-        dlib::Frame frame;
-        int         count{0};
-        int         nsamples{0};
-        int         iteration{0};
+        dlib::ffmpeg::frame frame;
+        int                 count{0};
+        int                 nsamples{0};
+        int                 iteration{0};
 
         while (cap.read(frame))
         {
