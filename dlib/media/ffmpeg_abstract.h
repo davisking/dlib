@@ -872,32 +872,18 @@ namespace dlib
             !*/
 
             /*! metadata! */
-            const std::unordered_map<int, std::unordered_map<std::string, std::string>>& get_all_metadata() const noexcept;
+            const std::unordered_map<std::string, std::string>& get_metadata() const noexcept;
             /*!
                 ensures 
                     - if (is_open())
                         returns metadata in file
             !*/
 
-            std::unordered_map<std::string,std::string> get_video_metadata() const noexcept;
-            /*!
-                ensures 
-                    - if (is_open())
-                        returns video related metadata in file
-            !*/
-
-            std::unordered_map<std::string,std::string> get_audio_metadata() const noexcept;
-            /*!
-                ensures 
-                    - if (is_open())
-                        returns audio related metadata in file
-            !*/
-
             float get_rotation_angle() const noexcept;
             /*!
                 ensures 
                     - if (is_open())
-                        returns video rotation angle from metadata
+                        returns video rotation angle from metadata if available
                     else
                         returns 0
             !*/

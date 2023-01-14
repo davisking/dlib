@@ -1,6 +1,5 @@
 #include <chrono>
 #include "ffmpeg_demuxer.h"
-#include "../string.h"
 
 using namespace std::chrono;
 
@@ -598,23 +597,14 @@ namespace dlib
 
         void demuxer::populate_metadata()
         {
+            AVDictionaryEntry *tag = nullptr;
+            while ((tag = av_dict_get(st.pFormatCtx->metadata, "", tag, AV_DICT_IGNORE_SUFFIX)))
+                st.metadata.emplace(tag->key, tag->value);
+            
+            tag = nullptr;
             for (unsigned int i = 0; i < st.pFormatCtx->nb_streams; i++)
-            {
-                std::string metadata_str;
-                {
-                    char* charbuf = 0;
-                    av_dict_get_string(st.pFormatCtx->streams[i]->metadata, &charbuf, ',', ';');
-                    metadata_str = std::string(charbuf);
-                    free(charbuf);
-                }
-
-                std::vector<std::string> keyvals = dlib::split(metadata_str, ";");
-                for (size_t kv = 0; kv < keyvals.size(); kv++) {
-                    std::vector<std::string> kv_item = dlib::split(keyvals[kv], ",");
-                    assert(kv_item.size() == 2);
-                    st.metadata[i][kv_item[0]] = dlib::trim(kv_item[1]);
-                }
-            }
+                while ((tag = av_dict_get(st.pFormatCtx->streams[i]->metadata, "", tag, AV_DICT_IGNORE_SUFFIX)))
+                    st.metadata.emplace(std::string("stream_") + std::to_string(i) + "_" + std::string(tag->key), tag->value);
         }
 
         bool demuxer::fill_queue()
@@ -755,28 +745,15 @@ namespace dlib
             return st.pFormatCtx ? (float)av_rescale_q(st.pFormatCtx->duration, {1, AV_TIME_BASE}, {1, 1000000}) * 1e-6 : 0.0f;
         }
 
-        const std::unordered_map<int, std::unordered_map<std::string, std::string>>& demuxer::get_all_metadata() const noexcept
+        const std::unordered_map<std::string, std::string>& demuxer::get_metadata() const noexcept
         {
             return st.metadata;
         }
 
-        std::unordered_map<std::string, std::string> demuxer::get_video_metadata() const noexcept
-        {
-            auto it = st.metadata.find(st.channel_video.stream_id);
-            return it != st.metadata.end() ? it->second : std::unordered_map<std::string, std::string>{};
-        }
-
-        std::unordered_map<std::string, std::string> demuxer::get_audio_metadata() const noexcept
-        {
-            auto it = st.metadata.find(st.channel_audio.stream_id);
-            return it != st.metadata.end() ? it->second : std::unordered_map<std::string, std::string>{};
-        }
-
         float demuxer::get_rotation_angle() const noexcept
         {
-            const auto metadata = get_video_metadata();
-            const auto it = metadata.find("rotate");
-            return it != metadata.end() ? std::stof(it->second) : 0;
+            const auto it = st.metadata.find("rotate");
+            return it != st.metadata.end() ? std::stof(it->second) : 0;
         }
     }
 }

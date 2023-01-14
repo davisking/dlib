@@ -207,9 +207,7 @@ namespace dlib
             bool read(frame& frame);
 
             /*! metadata! */
-            const std::unordered_map<int, std::unordered_map<std::string, std::string>>& get_all_metadata() const noexcept;
-            std::unordered_map<std::string,std::string> get_video_metadata() const noexcept;
-            std::unordered_map<std::string,std::string> get_audio_metadata() const noexcept;
+            const std::unordered_map<std::string, std::string>& get_metadata() const noexcept;
             float get_rotation_angle() const noexcept;
 
         private:
@@ -226,7 +224,7 @@ namespace dlib
                 std::chrono::system_clock::time_point   connecting_time{};
                 std::chrono::system_clock::time_point   connected_time{};
                 std::chrono::system_clock::time_point   last_read_time{};
-                std::unordered_map<int, std::unordered_map<std::string, std::string>> metadata;
+                std::unordered_map<std::string, std::string> metadata;
                 details::decoder_extractor              channel_video;
                 details::decoder_extractor              channel_audio;
                 std::queue<frame>                       frame_queue;
