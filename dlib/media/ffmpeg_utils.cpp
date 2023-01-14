@@ -10,21 +10,24 @@ namespace dlib
 {
     namespace ffmpeg
     {
-        const int DLIB_LIBAVFORMAT_MAJOR_VERSION = LIBAVFORMAT_VERSION_MAJOR;
-        const int DLIB_LIBAVFORMAT_MINOR_VERSION = LIBAVFORMAT_VERSION_MINOR;
-        const int DLIB_LIBAVFORMAT_MICRO_VERSION = LIBAVFORMAT_VERSION_MICRO;
+        ffmpeg_versions get_ffmpeg_versions_dlib_built_against()
+        {
+            return {LIBAVFORMAT_VERSION_MAJOR,
+                    LIBAVFORMAT_VERSION_MINOR,
+                    LIBAVFORMAT_VERSION_MICRO,
 
-        const int DLIB_LIBAVCODEC_MAJOR_VERSION  = LIBAVCODEC_VERSION_MAJOR;
-        const int DLIB_LIBAVCODEC_MINOR_VERSION  = LIBAVCODEC_VERSION_MINOR;
-        const int DLIB_LIBAVCODEC_MICRO_VERSION  = LIBAVCODEC_VERSION_MICRO;
+                    LIBAVCODEC_VERSION_MAJOR,
+                    LIBAVCODEC_VERSION_MINOR,
+                    LIBAVCODEC_VERSION_MICRO,
 
-        const int DLIB_LIBAVUTIL_MAJOR_VERSION   = LIBAVUTIL_VERSION_MAJOR;
-        const int DLIB_LIBAVUTIL_MINOR_VERSION   = LIBAVUTIL_VERSION_MINOR;
-        const int DLIB_LIBAVUTIL_MICRO_VERSION   = LIBAVUTIL_VERSION_MICRO;
-
-        const int DLIB_LIBAVDEVICE_MAJOR_VERSION = LIBAVDEVICE_VERSION_MAJOR;
-        const int DLIB_LIBAVDEVICE_MINOR_VERSION = LIBAVDEVICE_VERSION_MINOR;
-        const int DLIB_LIBAVDEVICE_MICRO_VERSION = LIBAVDEVICE_VERSION_MICRO;
+                    LIBAVUTIL_VERSION_MAJOR,
+                    LIBAVUTIL_VERSION_MINOR,
+                    LIBAVUTIL_VERSION_MICRO,
+                    
+                    LIBAVDEVICE_VERSION_MAJOR,
+                    LIBAVDEVICE_VERSION_MINOR,
+                    LIBAVDEVICE_VERSION_MICRO};
+        }
 
         void check_ffmpeg_versions(
             int avformat_major,
@@ -589,7 +592,7 @@ namespace dlib
             }
         }
 
-        std::vector<std::string> ffmpeg_list_protocols()
+        std::vector<std::string> list_protocols()
         {
             std::vector<std::string> protocols;
             void* opaque = NULL;
@@ -606,7 +609,7 @@ namespace dlib
             return protocols;
         }
 
-        std::vector<std::string> ffmpeg_list_demuxers()
+        std::vector<std::string> list_demuxers()
         {
             std::vector<std::string> demuxers;
             const AVInputFormat* demuxer = NULL;
@@ -623,7 +626,7 @@ namespace dlib
             return demuxers;
         }
 
-        std::vector<std::string> ffmpeg_list_muxers()
+        std::vector<std::string> list_muxers()
         {
             std::vector<std::string> muxers;
             const AVOutputFormat* muxer = NULL;
@@ -640,7 +643,7 @@ namespace dlib
             return muxers;
         }
 
-        std::vector<codec_details> ffmpeg_list_available_codecs()
+        std::vector<codec_details> list_codecs()
         {
             std::vector<codec_details> details;
 

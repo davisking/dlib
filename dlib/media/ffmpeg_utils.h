@@ -40,6 +40,44 @@ namespace dlib
     {
         // ---------------------------------------------------------------------------------------------------
 
+        struct ffmpeg_versions
+        {
+            int libavformat_major{0};
+            int libavformat_minor{0};
+            int libavformat_micro{0};
+            
+            int libavcodec_major{0};
+            int libavcodec_minor{0};
+            int libavcodec_micro{0};
+
+            int libavutil_major{0};
+            int libavutil_minor{0};
+            int libavutil_micro{0};
+
+            int libavdevice_major{0};
+            int libavdevice_minor{0};
+            int libavdevice_micro{0};
+        };
+
+        ffmpeg_versions get_ffmpeg_versions_dlib_built_against();
+
+        void check_ffmpeg_versions(
+            int avformat_major = LIBAVFORMAT_VERSION_MAJOR,
+            int avformat_minor = LIBAVFORMAT_VERSION_MINOR,
+            int avformat_micro = LIBAVFORMAT_VERSION_MICRO,
+            int avcodec_major  = LIBAVCODEC_VERSION_MAJOR,
+            int avcodec_minor  = LIBAVCODEC_VERSION_MINOR,
+            int avcodec_micro  = LIBAVCODEC_VERSION_MICRO,
+            int avutil_major   = LIBAVUTIL_VERSION_MAJOR,
+            int avutil_minor   = LIBAVUTIL_VERSION_MINOR,
+            int avutil_micro   = LIBAVUTIL_VERSION_MICRO,
+            int avdevice_major = LIBAVDEVICE_VERSION_MAJOR,
+            int avdevice_minor = LIBAVDEVICE_VERSION_MINOR,
+            int avdevice_micro = LIBAVDEVICE_VERSION_MICRO
+        );
+
+        // ---------------------------------------------------------------------------------------------------
+
         std::string get_pixel_fmt_str(AVPixelFormat fmt);
         std::string get_audio_fmt_str(AVSampleFormat fmt);
         std::string get_channel_layout_str(uint64_t layout);
@@ -214,39 +252,6 @@ namespace dlib
 
         // ---------------------------------------------------------------------------------------------------
 
-        extern const int DLIB_LIBAVFORMAT_MAJOR_VERSION;
-        extern const int DLIB_LIBAVFORMAT_MINOR_VERSION;
-        extern const int DLIB_LIBAVFORMAT_MICRO_VERSION;
-
-        extern const int DLIB_LIBAVCODEC_MAJOR_VERSION;
-        extern const int DLIB_LIBAVCODEC_MINOR_VERSION;
-        extern const int DLIB_LIBAVCODEC_MICRO_VERSION;
-
-        extern const int DLIB_LIBAVUTIL_MAJOR_VERSION;
-        extern const int DLIB_LIBAVUTIL_MINOR_VERSION;
-        extern const int DLIB_LIBAVUTIL_MICRO_VERSION;
-
-        extern const int DLIB_LIBAVDEVICE_MAJOR_VERSION;
-        extern const int DLIB_LIBAVDEVICE_MINOR_VERSION;
-        extern const int DLIB_LIBAVDEVICE_MICRO_VERSION;
-
-        void check_ffmpeg_versions(
-            int avformat_major = LIBAVFORMAT_VERSION_MAJOR,
-            int avformat_minor = LIBAVFORMAT_VERSION_MINOR,
-            int avformat_micro = LIBAVFORMAT_VERSION_MICRO,
-            int avcodec_major  = LIBAVCODEC_VERSION_MAJOR,
-            int avcodec_minor  = LIBAVCODEC_VERSION_MINOR,
-            int avcodec_micro  = LIBAVCODEC_VERSION_MICRO,
-            int avutil_major   = LIBAVUTIL_VERSION_MAJOR,
-            int avutil_minor   = LIBAVUTIL_VERSION_MINOR,
-            int avutil_micro   = LIBAVUTIL_VERSION_MICRO,
-            int avdevice_major = LIBAVDEVICE_VERSION_MAJOR,
-            int avdevice_minor = LIBAVDEVICE_VERSION_MINOR,
-            int avdevice_micro = LIBAVDEVICE_VERSION_MICRO
-        );
-
-        // ---------------------------------------------------------------------------------------------------
-
         class frame
         {
         public:
@@ -335,10 +340,10 @@ namespace dlib
             bool supports_decoding;
         };
 
-        std::vector<std::string>   ffmpeg_list_protocols();
-        std::vector<std::string>   ffmpeg_list_demuxers();
-        std::vector<std::string>   ffmpeg_list_muxers();
-        std::vector<codec_details> ffmpeg_list_codecs();
+        std::vector<std::string>   list_protocols();
+        std::vector<std::string>   list_demuxers();
+        std::vector<std::string>   list_muxers();
+        std::vector<codec_details> list_codecs();
 
         // ---------------------------------------------------------------------------------------------------
 

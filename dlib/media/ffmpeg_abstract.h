@@ -10,6 +10,47 @@ namespace dlib
     {
         // ---------------------------------------------------------------------------------------------------
 
+        
+        struct ffmpeg_versions
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    These represent the versions of ffmpeg libraries dlib was built against.
+            !*/
+
+            int libavformat_major{0};
+            int libavformat_minor{0};
+            int libavformat_micro{0};
+            
+            int libavcodec_major{0};
+            int libavcodec_minor{0};
+            int libavcodec_micro{0};
+
+            int libavutil_major{0};
+            int libavutil_minor{0};
+            int libavutil_micro{0};
+
+            int libavdevice_major{0};
+            int libavdevice_minor{0};
+            int libavdevice_micro{0};
+        };
+
+        ffmpeg_versions get_ffmpeg_versions_dlib_built_against();
+        /*!
+            ensures
+                - Returns the ffmpeg version dlib was built against.
+        !*/
+
+        void check_ffmpeg_versions();
+        /*!
+            ensures
+                - Checks the versions of ffmpeg currently being used in a translation unit vs the ones dlib was built against
+                - Prints mismatching versions if any.
+                - Not required to call this. This is only a debugging facility.
+        !*/
+
+        // ---------------------------------------------------------------------------------------------------
+
         std::string get_pixel_fmt_str(AVPixelFormat fmt);
         /*!
             ensures
@@ -26,38 +67,6 @@ namespace dlib
         /*!
             ensures
                 - Returns a string description of a channel layout, where layout is e.g. AV_CH_LAYOUT_STEREO
-        !*/
-        
-        // ---------------------------------------------------------------------------------------------------
-
-        /*!
-            These represent the versions of ffmpeg libraries dlib was built against.
-            These are only useful for debugging if you think your bug is related to mismatching ffmpeg versions
-            between the ones you are currently linking against, and the ones dlib was built against.
-        !*/
-
-        extern const int DLIB_LIBAVFORMAT_MAJOR_VERSION;
-        extern const int DLIB_LIBAVFORMAT_MINOR_VERSION;
-        extern const int DLIB_LIBAVFORMAT_MICRO_VERSION;
-
-        extern const int DLIB_LIBAVCODEC_MAJOR_VERSION;
-        extern const int DLIB_LIBAVCODEC_MINOR_VERSION;
-        extern const int DLIB_LIBAVCODEC_MICRO_VERSION;
-
-        extern const int DLIB_LIBAVUTIL_MAJOR_VERSION;
-        extern const int DLIB_LIBAVUTIL_MINOR_VERSION;
-        extern const int DLIB_LIBAVUTIL_MICRO_VERSION;
-
-        extern const int DLIB_LIBAVDEVICE_MAJOR_VERSION;
-        extern const int DLIB_LIBAVDEVICE_MINOR_VERSION;
-        extern const int DLIB_LIBAVDEVICE_MICRO_VERSION;
-
-        void check_ffmpeg_versions();
-        /*!
-            ensures
-                - Checks the versions of ffmpeg currently being used in a translation unit vs the ones dlib was built against
-                - Prints mismatching versions if any.
-                - Not required to call this. This is only a debugging facility.
         !*/
 
         // ---------------------------------------------------------------------------------------------------
@@ -252,19 +261,19 @@ namespace dlib
 
         // ---------------------------------------------------------------------------------------------------
 
-        std::vector<std::string> ffmpeg_list_protocols();
+        std::vector<std::string> list_protocols();
         /*!
             ensures
                 - returns a list of all registered ffmpeg protocols
         !*/
 
-        std::vector<std::string> ffmpeg_list_demuxers();
+        std::vector<std::string> list_demuxers();
         /*!
             ensures
                 - returns a list of all registered ffmpeg demuxers
         !*/
 
-        std::vector<std::string> ffmpeg_list_muxers();
+        std::vector<std::string> list_muxers();
         /*!
             ensures
                 - returns a list of all registered ffmpeg muxers
@@ -277,7 +286,7 @@ namespace dlib
             bool supports_decoding;
         };
         
-        std::vector<codec_details> ffmpeg_list_codecs();
+        std::vector<codec_details> list_codecs();
         /*!
             ensures
                 - returns a list of all registered ffmpeg codecs with information on whether decoding and/or encoding is supported.
