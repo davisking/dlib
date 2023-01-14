@@ -15,7 +15,9 @@ namespace dlib
         struct overloaded_helper : Base...
         {
             template<typename... T>
-            overloaded_helper(T&& ... t) : Base{std::forward<T>(t)}... {}
+            constexpr overloaded_helper(T&& ... t)
+            noexcept((std::is_nothrow_constructible<Base,T&&>::value && ...))
+            : Base{std::forward<T>(t)}... {}
 
             using Base::operator()...;
         };
@@ -24,9 +26,10 @@ namespace dlib
         struct overloaded_helper: Base, overloaded_helper<BaseRest...>
         {
             template<typename T, typename ... TRest>
-            overloaded_helper(T&& t, TRest&& ...trest) :
-                    Base{std::forward<T>(t)},
-                    overloaded_helper<BaseRest...>{std::forward<TRest>(trest)...}
+            constexpr overloaded_helper(T&& t, TRest&& ...trest) 
+            noexcept(std::is_nothrow_constructible<Base, T&&>::value && std::is_nothrow_constructible<overloaded_helper<BaseRest...>, TRest&&...>::value)
+            : Base{std::forward<T>(t)},
+              overloaded_helper<BaseRest...>{std::forward<TRest>(trest)...}
             {}
 
             using Base::operator();
@@ -37,15 +40,18 @@ namespace dlib
         struct overloaded_helper<Base> : Base
         {
             template<typename T>
-            overloaded_helper<Base>(T&& t) : Base{std::forward<T>(t)}
+            constexpr overloaded_helper<Base>(T&& t) 
+            noexcept(std::is_nothrow_constructible<Base, T&&>::value)
+            : Base{std::forward<T>(t)}
             {}
 
             using Base::operator();
         };
 #endif //__cpp_fold_expressions
     }
+    
     template<typename... T>
-    auto overloaded(T&&... t)
+    constexpr auto overloaded(T&&... t)
     /*!
         This is a helper function for combining many callable objects (usually lambdas), into
         an overload-able set. This can be used in visitor patterns like
@@ -107,6 +113,7 @@ namespace dlib
 
         assert(type_ids == vector<int>({0,1,2}));
     !*/
+    noexcept(std::is_nothrow_constructible<detail::overloaded_helper<std::decay_t<T>...>, T&&...>::value)
     {
         return detail::overloaded_helper<std::decay_t<T>...>{std::forward<T>(t)...};
     }
