@@ -64,7 +64,7 @@ int main(const int argc, const char** argv)
                      end(codecs),   
                      [](const auto& codec) {return codec.codec_name == "h264" && codec.supports_decoding;}) != codecs.end();
 
-    printf("Anwser: %i\n", mp4_available);
+    printf("Anwser: %i\n", mp4_available && h264_available);
 
     return EXIT_SUCCESS;
 }
