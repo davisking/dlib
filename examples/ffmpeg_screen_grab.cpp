@@ -12,7 +12,7 @@
 using namespace std;
 using namespace dlib;
 
-int main(const int argc, const char** argv)
+int main()
 try
 {
     const auto demuxers              = ffmpeg::list_demuxers();
