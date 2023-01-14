@@ -21,7 +21,7 @@ int main(const int argc, const char** argv)
     printf("libavformat version %i.%i.%i\n", versions.libavformat_major, versions.libavformat_minor, versions.libavformat_micro);
     printf("libavcodec  version %i.%i.%i\n", versions.libavcodec_major,  versions.libavcodec_minor,  versions.libavcodec_micro);
     printf("libavutil   version %i.%i.%i\n", versions.libavutil_major,   versions.libavutil_minor,   versions.libavutil_micro);
-    printf("libavdeivce version %i.%i.%i\n", versions.libavdevice_major, versions.libavdevice_minor, versions.libavdevice_micro);
+    printf("libavdevice version %i.%i.%i\n", versions.libavdevice_major, versions.libavdevice_minor, versions.libavdevice_micro);
 
     // Checks the versions of ffmpeg currently being linked against vs the ones dlib used
     ffmpeg::check_ffmpeg_versions();
@@ -53,7 +53,7 @@ int main(const int argc, const char** argv)
     printf("\n");
 
     printf("Can read MP4 file with H264 encoded video stream?\n");
-    
+
     const bool mp4_available = 
         std::find_if(begin(demuxers),   
                      end(demuxers), 
