@@ -14,7 +14,7 @@
 using namespace std;
 using namespace dlib;
 
-int main(const int argc, const char** argv)
+int main()
 {
     // Prints the version of ffmpeg dlib was built against
     auto versions = ffmpeg::get_ffmpeg_versions_dlib_built_against();
