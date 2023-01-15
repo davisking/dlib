@@ -402,6 +402,15 @@ namespace dlib
             if (st.args_.probesize > 0)
                 pFormatCtx->probesize = st.args_.probesize;
 
+            // Hacking begins. 
+            if (st.args_.image_options.h > 0 && 
+                st.args_.image_options.w > 0 && 
+                st.args_.format_options.find("video_size") == st.args_.format_options.end())
+            {
+                // See if format supports "video_size"
+                st.args_.format_options["video_size"] = std::to_string(st.args_.image_options.w) + "x" + std::to_string(st.args_.image_options.h);
+            }
+
             av_dict opts = st.args_.format_options;
             AVInputFormat* input_format = st.args_.input_format.empty() ? nullptr : av_find_input_format(st.args_.input_format.c_str());
 

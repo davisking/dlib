@@ -42,17 +42,15 @@ int main(int argc, const char** argv)
     try
     {
         command_line_parser parser;
-        parser.add_option("hw_video_size",  "requested v4l2 video size <width>x<height> (before decoding)", 1);
-        parser.add_option("hw_framerate",   "requested v4l2 framerate (before decoding)" , 1);
-        parser.add_option("height",         "height of frames (post decoding)", 1);
-        parser.add_option("width",          "width of frames  (post decoding)", 1);
-        
+        parser.add_option("height",     "height of frames", 1);
+        parser.add_option("width",      "width of frames", 1);
+        parser.add_option("framerate",  "webcam desired framerate", 1);
         parser.set_group_name("Help Options");
-        parser.add_option("h",      "alias of --help");
-        parser.add_option("help",   "display this message and exit");
+        parser.add_option("h",          "alias of --help");
+        parser.add_option("help",       "display this message and exit");
 
         parser.parse(argc, argv);
-        const char* one_time_opts[] = {"hw_video_size", "hw_framerate", "height", "width"};
+        const char* one_time_opts[] = {"height", "width", "framerate"};
         parser.check_one_time_options(one_time_opts);
 
         if (parser.option("h") || parser.option("help"))
@@ -67,18 +65,11 @@ int main(int argc, const char** argv)
             ffmpeg::demuxer::args args;
 
             args.filepath = "/dev/video0";
+            args.image_options.h = get_option(parser, "height", 0);
+            args.image_options.w = get_option(parser, "width",  0);
 
-            if (parser.option("hw_video_size"))
-                args.format_options["video_size"] = get_option(parser, "hw_video_size", "");
-
-            if (parser.option("hw_framerate"))
-                args.format_options["framerate"]  = get_option(parser, "hw_framerate", "");
-
-            if (parser.option("height"))
-                args.image_options.h              = get_option(parser, "height", 0);
-
-            if (parser.option("width"))
-                args.image_options.w              = get_option(parser, "width", 0);
+            if (parser.option("framerate"))
+                args.format_options["framerate"]  = get_option(parser, "framerate", "");
 
             return args;
         }()};
