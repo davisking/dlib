@@ -419,8 +419,14 @@ namespace dlib
                 return false;
             }
 
+            if (opts.size() > 0)
+            {
+                printf("demuxer::args::format_options ignored:\n");
+                opts.print();
+            }
+
             st.connected_time = system_clock::now();
-            st.pFormatCtx.reset(pFormatCtx);
+            st.pFormatCtx.reset(std::exchange(pFormatCtx, nullptr));
 
             ret = avformat_find_stream_info(st.pFormatCtx.get(), NULL);
 

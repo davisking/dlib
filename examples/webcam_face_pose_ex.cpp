@@ -30,23 +30,68 @@
 #include <dlib/image_processing/frontal_face_detector.h>
 #include <dlib/image_processing/render_face_detections.h>
 #include <dlib/image_processing.h>
+#include <dlib/cmd_line_parser.h>
 #include <dlib/gui_widgets.h>
 #include <dlib/media.h>
 
 using namespace dlib;
 using namespace std;
 
-int main()
+int main(int argc, const char** argv)
 {
     try
     {
-        ffmpeg::demuxer cap("/dev/video0");
+        command_line_parser parser;
+        parser.add_option("hw_video_size",  "requested v4l2 video size <width>x<height> (before decoding)", 1);
+        parser.add_option("hw_framerate",   "requested v4l2 framerate (before decoding)" , 1);
+        parser.add_option("height",         "height of frames (post decoding)", 1);
+        parser.add_option("width",          "width of frames  (post decoding)", 1);
+        
+        parser.set_group_name("Help Options");
+        parser.add_option("h",      "alias of --help");
+        parser.add_option("help",   "display this message and exit");
+
+        parser.parse(argc, argv);
+        const char* one_time_opts[] = {"hw_video_size", "hw_framerate", "height", "width"};
+        parser.check_one_time_options(one_time_opts);
+
+        if (parser.option("h") || parser.option("help"))
+        {
+            parser.print_options();
+            printf("Please use `v4l2-ctl --list-formats-ext` to view all supported hardware formats\n");
+            return 0;
+        }
+
+        ffmpeg::demuxer cap{[&]
+        {
+            ffmpeg::demuxer::args args;
+
+            args.filepath = "/dev/video0";
+
+            if (parser.option("hw_video_size"))
+                args.format_options["video_size"] = get_option(parser, "hw_video_size", "");
+
+            if (parser.option("hw_framerate"))
+                args.format_options["framerate"]  = get_option(parser, "hw_framerate", "");
+
+            if (parser.option("height"))
+                args.image_options.h              = get_option(parser, "height", 0);
+
+            if (parser.option("width"))
+                args.image_options.w              = get_option(parser, "width", 0);
+
+            return args;
+        }()};
 
         if (!cap.is_open())
         {
             cerr << "Unable to connect to camera" << endl;
             return 1;
         }
+
+        printf("height  : %i\n", cap.height());
+        printf("width   : %i\n", cap.width());
+        printf("fps     : %f\n", cap.fps());
 
         image_window win;
 
@@ -59,12 +104,8 @@ int main()
         array2d<rgb_pixel> img;
 
         // Grab and process frames until the main window is closed by the user.
-        while(!win.is_closed())
+        while(cap.read(frame) && !win.is_closed())
         {
-            // Grab a frame
-            if (!cap.read(frame))
-                break;
-
             // Convert the frame object into a dlib image object
             convert(frame, img);
 

@@ -134,6 +134,8 @@ namespace dlib
                 av_dict(av_dict &&ori) noexcept;
                 av_dict &operator=(av_dict &&ori) noexcept;
                 ~av_dict();
+                size_t size() const;
+                void print() const;
                 AVDictionary** get();
 
                 AVDictionary *avdic = nullptr;

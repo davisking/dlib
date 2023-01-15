@@ -216,6 +216,21 @@ namespace dlib
             {
                 return avdic ? &avdic: nullptr;
             }
+
+            std::size_t av_dict::size() const
+            {
+                return avdic ? av_dict_count(avdic) : 0;
+            }
+
+            void av_dict::print() const
+            {
+                if (avdic)
+                {
+                    AVDictionaryEntry *tag = nullptr;
+                    while ((tag = av_dict_get(avdic, "", tag, AV_DICT_IGNORE_SUFFIX)))
+                        printf("%s : %s\n", tag->key, tag->value);
+                }
+            }
         }
 
         frame::frame(
