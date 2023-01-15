@@ -357,6 +357,12 @@ namespace dlib
                     format. The ffmpeg object used to do this can simultaneously resize the image.
                     Therefore, the API allows users to optionally resize the image, as well as convert to RGB,
                     before being presented to user, as a possible optimization.
+                    In the case of demuxer, if:
+                        - h > 0
+                        - w > 0
+                        - and the demuxer is a device like v4l2 or xcbgrab
+                    then we attempt to set the video size of the device before decoding.
+                    Otherwise, the image dimensions set the bilinear resizer which resizes frames AFTER decoding.
             !*/
 
             // Height of extracted frames. If 0, use whatever comes out decoder
