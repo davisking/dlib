@@ -16,18 +16,6 @@ using namespace dlib;
 
 int main()
 {
-    // Prints the version of ffmpeg dlib was built against
-    auto versions = ffmpeg::get_ffmpeg_versions_dlib_built_against();
-    printf("libavformat version %i.%i.%i\n", versions.libavformat_major, versions.libavformat_minor, versions.libavformat_micro);
-    printf("libavcodec  version %i.%i.%i\n", versions.libavcodec_major,  versions.libavcodec_minor,  versions.libavcodec_micro);
-    printf("libavutil   version %i.%i.%i\n", versions.libavutil_major,   versions.libavutil_minor,   versions.libavutil_micro);
-    printf("libavdevice version %i.%i.%i\n", versions.libavdevice_major, versions.libavdevice_minor, versions.libavdevice_micro);
-
-    // Checks the versions of ffmpeg currently being linked against vs the ones dlib used
-    ffmpeg::check_ffmpeg_versions();
-
-    printf("\n");
-
     // List all codecs supported by this installation of ffmpeg libraries
     const auto codecs = ffmpeg::list_codecs();
     printf("Supported codecs:\n");
