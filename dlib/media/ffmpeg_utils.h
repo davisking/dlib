@@ -312,8 +312,6 @@ namespace dlib
                 std::chrono::system_clock::time_point   timestamp
             );
 
-            void copy_from(const frame& other);
-
             details::av_ptr<AVFrame> f;
             std::chrono::system_clock::time_point timestamp;
         };

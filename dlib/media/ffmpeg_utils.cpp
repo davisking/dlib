@@ -295,50 +295,34 @@ namespace dlib
         }
 
         frame::frame(const frame &ori)
+        :   f{ori.f ? av_frame_clone(ori.f.get()) : nullptr},
+            timestamp{ori.timestamp}
         {
-            copy_from(ori);
         }
 
         frame& frame::operator=(const frame& ori)
         {
             if (this != &ori)
-                copy_from(ori);
-            return *this;
-        }
-
-        void frame::copy_from(const frame &ori)
-        {
-            if (ori.is_empty())
             {
-                frame empty{std::move(*this)};
-            }
-            else
-            {
-                const bool same_image_dims =
-                        is_image() &&
-                        std::tie(    f->height,     f->width,     f->format) ==
-                        std::tie(ori.f->height, ori.f->width, ori.f->format);
-
-                const bool same_audio_dims =
-                        is_audio() &&
-                        std::tie(    f->sample_rate,     f->nb_samples,     f->channel_layout,     f->format) ==
-                        std::tie(ori.f->sample_rate, ori.f->nb_samples, ori.f->channel_layout, ori.f->format);
-
-                if (!same_image_dims && !same_audio_dims)
+                if (ori.is_empty())
                 {
-                    *this = std::move(frame(ori.f->height,
-                                            ori.f->width,
-                                            (AVPixelFormat)ori.f->format,
-                                            ori.f->sample_rate,
-                                            ori.f->nb_samples,
-                                            ori.f->channel_layout,
-                                            (AVSampleFormat)ori.f->format,
-                                            ori.timestamp));
+                    frame empty{std::move(*this)};
                 }
-
-                av_frame_copy(f.get(), ori.f.get());
-                av_frame_copy_props(f.get(), ori.f.get());
+                else if (is_empty())
+                {
+                    f.reset(av_frame_clone(ori.f.get()));
+                    timestamp = ori.timestamp;
+                }
+                else
+                {
+                    av_frame_unref(f.get());
+                    av_frame_ref(f.get(), ori.f.get());
+                    timestamp = ori.timestamp;
+                }
+                
             }
+
+            return *this;
         }
 
         bool frame::is_image() const noexcept
