@@ -61,7 +61,7 @@ namespace dlib
             
             public:
 
-                static const bool get()
+                static bool get()
                 {
                     static bool v = register_library();
                     return v;

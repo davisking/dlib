@@ -179,7 +179,7 @@ namespace dlib
 
             demuxer() = default;
             demuxer(const args& a);
-            demuxer(std::string filepath_device_url);
+            demuxer(const std::string& filepath);
             demuxer(demuxer&& other)            noexcept;
             demuxer& operator=(demuxer&& other) noexcept;
 
@@ -612,8 +612,15 @@ namespace dlib
                 st.pFormatCtx = nullptr;
         }
 
-        inline demuxer::demuxer(std::string filepath_device_url)
-        : demuxer(args{std::move(filepath_device_url)})
+        inline demuxer::args make_args_from_filepath(const std::string& filepath)
+        {
+            demuxer::args args;
+            args.filepath = filepath;
+            return args;
+        }
+
+        inline demuxer::demuxer(const std::string& filepath)
+        : demuxer(make_args_from_filepath(filepath))
         {
         }
 
@@ -699,9 +706,7 @@ namespace dlib
 
             auto setup_stream = [&](bool is_video)
             {
-                const AVMediaType media_type   = is_video ? AVMEDIA_TYPE_VIDEO : AVMEDIA_TYPE_AUDIO;
-                const auto&       channel_args = is_video ? static_cast<const decoder_codec_args&>(st.args_.image_options) :
-                                                            static_cast<const decoder_codec_args&>(st.args_.audio_options);
+                const AVMediaType media_type = is_video ? AVMEDIA_TYPE_VIDEO : AVMEDIA_TYPE_AUDIO;
 
                 AVCodec* pCodec = nullptr;
                 const int stream_id = av_find_best_stream(st.pFormatCtx.get(), media_type, -1, -1, &pCodec, 0);
