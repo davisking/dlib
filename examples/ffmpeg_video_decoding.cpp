@@ -77,26 +77,19 @@ try
         return EXIT_FAILURE;
     }
 
-    type_safe_union<array2d<rgb_pixel>, ffmpeg::audio_frame> obj;
     dlib::ffmpeg::frame     frame;
+    array2d<rgb_pixel>      img;
     ffmpeg::decoder_status  status{ffmpeg::DECODER_EAGAIN};
 
     const auto pull = [&]
     {
         while ((status = dec.read(frame)) == ffmpeg::DECODER_FRAME_AVAILABLE)
         {
-            convert(frame, obj);
-
-            visit(overloaded(
-                [&](const array2d<rgb_pixel>& img) 
-                {
-                    win.set_image(img);
-                },
-                [](const ffmpeg::audio_frame& /*audio*/)
-                {
-                    //You could play through your speaker here if you wanted
-                }
-            ), obj);
+            if (frame.is_image() && frame.pixfmt() == AV_PIX_FMT_RGB24)
+            {
+                convert(frame, img);
+                win.set_image(img);
+            }
         }
     };
 

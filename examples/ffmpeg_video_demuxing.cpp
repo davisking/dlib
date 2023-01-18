@@ -126,44 +126,22 @@ try
         printf("    key : %-32s ; val : %-32s\n", metadata.first.c_str(), metadata.second.c_str());
 
     ffmpeg::frame frame;
-    type_safe_union<array2d<rgb_pixel>, ffmpeg::audio_frame> obj;
+    array2d<rgb_pixel> img;
     size_t audio_samples{0};
 
     while (cap.read(frame))
     {
-        convert(frame, obj);
+        if (frame.is_image() && frame.pixfmt() == AV_PIX_FMT_RGB24)
+        {
+            convert(frame, img);
+            win.set_image(img);
+        }
 
-        visit(overloaded(
-            [&](const array2d<rgb_pixel>& img) 
-            {
-                win.set_image(img);
-            },
-            [&](const ffmpeg::audio_frame& audio)
-            {
-                audio_samples += audio.samples.size();
-                printf("\r\tDecoding %zu samples", audio_samples); fflush(stdout);
-            }
-        ), obj);
-
-        /*
-            Alternatively, you could have done:
-
-                array2d<rgb_pixel>  img;
-                ffmpeg::audio_frame audio;
-
-                if (frame.is_image() && frame.pixfmt() == AV_PIX_FMT_RGB24)
-                {
-                    convert(frame, img);
-                    win.set_image(img);
-                }
-
-                if (frame.is_audio() && frame.samplefmt() == AV_SAMPLE_FMT_S16)
-                {
-                    convert(frame, audio);
-                    // Do something useful, maybe play through your speaker? 
-                }
-
-        */
+        if (frame.is_audio())
+        {
+            audio_samples += frame.nsamples();
+            printf("\r\tDecoding %zu samples", audio_samples); fflush(stdout);
+        }
     }
 
     printf("\n");
