@@ -8,19 +8,19 @@
 static_assert(false, "This version of dlib isn't built with the FFMPEG wrappers");
 #endif
 
+#include <cstdint>
 #include <stdexcept>
 #include <cassert>
+#include <memory>
 #include <algorithm>
-#include <cstdint>
 #include <string>
 #include <chrono>
 #include <vector>
-#include <memory>
+#include <array>
 #include <unordered_map>
 #include "../array2d.h"
 #include "../pixel.h"
 #include "../assert.h"
-#include "../type_safe_union.h"
 #include "ffmpeg_abstract.h"
 
 extern "C" {
@@ -230,6 +230,7 @@ namespace dlib
         std::string get_pixel_fmt_str(AVPixelFormat fmt);
         std::string get_audio_fmt_str(AVSampleFormat fmt);
         std::string get_channel_layout_str(uint64_t layout);
+        uint64_t    get_layout_from_channels(std::size_t nchannels);
 
 // ---------------------------------------------------------------------------------------------------
 
@@ -296,24 +297,32 @@ namespace dlib
                 std::chrono::system_clock::time_point   timestamp
             );
 
+            void copy_from(const frame& other);
+
             details::av_ptr<AVFrame> f;
             std::chrono::system_clock::time_point timestamp;
         };
 
 // ---------------------------------------------------------------------------------------------------
 
-        struct audio_frame
+        template<class SampleType, std::size_t Channels>
+        struct audio
         {
-            struct sample
-            {
-                int16_t ch1 = 0;
-                int16_t ch2 = 0;
-            };
+            using sample = std::array<SampleType, Channels>;
 
             std::vector<sample>                     samples;
             float                                   sample_rate{0};
             std::chrono::system_clock::time_point   timestamp{};
         };
+
+        template<class SampleType>
+        struct sample_traits {};
+
+        template<> struct sample_traits<uint8_t> {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_U8; };
+        template<> struct sample_traits<int16_t> {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_S16; };
+        template<> struct sample_traits<int32_t> {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_S32; };
+        template<> struct sample_traits<float>   {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_FLT; };
+        template<> struct sample_traits<double>  {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_DBL; };
 
 // ---------------------------------------------------------------------------------------------------
 
@@ -331,13 +340,14 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-        void convert(const frame& f, type_safe_union<array2d<rgb_pixel>, audio_frame>& obj);
         void convert(const frame& f, array2d<rgb_pixel>& obj);
-        void convert(const frame& f, audio_frame& obj);
-        type_safe_union<array2d<rgb_pixel>, audio_frame> convert(const frame& f);
-
         frame convert(const array2d<rgb_pixel>& img);
-        frame convert(const audio_frame& audio);
+
+        template<class SampleFmt, std::size_t Channels>
+        void convert(const frame& f, audio<SampleFmt, Channels>& obj);
+
+        template<class SampleFmt, std::size_t Channels>
+        frame convert(const audio<SampleFmt, Channels>& audio);
 
 // ---------------------------------------------------------------------------------------------------
     
@@ -384,6 +394,16 @@ namespace dlib
             std::string buf(32, '\0');
             av_get_channel_layout_string(&buf[0], buf.size(), 0, layout);
             return buf;
+        }
+
+        inline uint64_t get_layout_from_channels(std::size_t nchannels)
+        {
+            switch(nchannels)
+            {
+                case 1: return AV_CH_LAYOUT_MONO;
+                case 2: return AV_CH_LAYOUT_STEREO;
+                default: return 0;
+            }
         }
 
 // ---------------------------------------------------------------------------------------------------
@@ -508,9 +528,10 @@ namespace dlib
         
 // ---------------------------------------------------------------------------------------------------
 
-            inline void resizer::reset(
+            inline void resizer::reset (
                 const int src_h_, const int src_w_, const AVPixelFormat src_fmt_,
-                const int dst_h_, const int dst_w_, const AVPixelFormat dst_fmt_)
+                const int dst_h_, const int dst_w_, const AVPixelFormat dst_fmt_
+            )
             {
                 auto this_params = std::tie(src_h,  src_w,  src_fmt,  dst_h,  dst_w,  dst_fmt);
                 auto new_params  = std::tie(src_h_, src_w_, src_fmt_, dst_h_, dst_w_, dst_fmt_);
@@ -803,33 +824,50 @@ namespace dlib
         }
 
         inline frame::frame(const frame &ori)
-        :   f{ori.f ? av_frame_clone(ori.f.get()) : nullptr},
-            timestamp{ori.timestamp}
         {
+            copy_from(ori);
         }
 
         inline frame& frame::operator=(const frame& ori)
         {
             if (this != &ori)
-            {
-                if (ori.is_empty())
-                {
-                    frame empty{std::move(*this)};
-                }
-                else if (is_empty())
-                {
-                    f.reset(av_frame_clone(ori.f.get()));
-                    timestamp = ori.timestamp;
-                }
-                else
-                {
-                    av_frame_unref(f.get());
-                    av_frame_ref(f.get(), ori.f.get());
-                    timestamp = ori.timestamp;
-                }
-            }
-
+                copy_from(ori);
             return *this;
+        }
+
+        inline void frame::copy_from(const frame& ori)
+        {
+            if (ori.is_empty())
+            {
+                frame empty{std::move(*this)};
+            }
+            else
+            {
+                const bool same_image_dims =
+                        is_image() &&
+                        std::tie(    f->height,     f->width,     f->format) ==
+                        std::tie(ori.f->height, ori.f->width, ori.f->format);
+
+                const bool same_audio_dims =
+                        is_audio() &&
+                        std::tie(    f->sample_rate,     f->nb_samples,     f->channel_layout,     f->format) ==
+                        std::tie(ori.f->sample_rate, ori.f->nb_samples, ori.f->channel_layout, ori.f->format);
+
+                if (!same_image_dims && !same_audio_dims)
+                {
+                    *this = std::move(frame(ori.f->height,
+                                            ori.f->width,
+                                            (AVPixelFormat)ori.f->format,
+                                            ori.f->sample_rate,
+                                            ori.f->nb_samples,
+                                            ori.f->channel_layout,
+                                            (AVSampleFormat)ori.f->format,
+                                            ori.timestamp));
+                }
+
+                av_frame_copy(f.get(), ori.f.get());
+                av_frame_copy_props(f.get(), ori.f.get());
+            }
         }
 
         inline bool frame::is_image() const noexcept
@@ -861,16 +899,17 @@ namespace dlib
 
         inline std::vector<std::string> list_protocols()
         {
+            const bool init = details::register_ffmpeg::get(); // Don't let this get optimized away
             std::vector<std::string> protocols;
             void* opaque = NULL;
             const char* name = 0;
-            while (details::register_ffmpeg::get() && (name = avio_enum_protocols(&opaque, 0)))
+            while (init && (name = avio_enum_protocols(&opaque, 0)))
                 protocols.emplace_back(name);
 
             opaque  = NULL;
             name    = 0;
 
-            while (details::register_ffmpeg::get() && (name = avio_enum_protocols(&opaque, 1)))
+            while (init && (name = avio_enum_protocols(&opaque, 1)))
                 protocols.emplace_back(name);
 
             return protocols;
@@ -880,15 +919,16 @@ namespace dlib
 
         inline std::vector<std::string> list_demuxers()
         {
+            const bool init = details::register_ffmpeg::get(); // Don't let this get optimized away
             std::vector<std::string> demuxers;
             const AVInputFormat* demuxer = NULL;
 
     #if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100)
             // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L86
-            while (details::register_ffmpeg::get() && (demuxer = av_iformat_next(demuxer)))
+            while (init && (demuxer = av_iformat_next(demuxer)))
     #else
             void* opaque = nullptr;
-            while (details::register_ffmpeg::get() && (demuxer = av_demuxer_iterate(&opaque)))
+            while (init && (demuxer = av_demuxer_iterate(&opaque)))
     #endif
                 demuxers.push_back(demuxer->name);
 
@@ -899,15 +939,16 @@ namespace dlib
 
         inline std::vector<std::string> list_muxers()
         {
+            const bool init = details::register_ffmpeg::get(); // Don't let this get optimized away
             std::vector<std::string> muxers;
             const AVOutputFormat* muxer = NULL;
 
     #if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100)
             // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L86
-            while (details::register_ffmpeg::get() && (muxer = av_oformat_next(muxer)))
+            while (init && (muxer = av_oformat_next(muxer)))
     #else
             void* opaque = nullptr;
-            while (details::register_ffmpeg::get() && (muxer = av_muxer_iterate(&opaque)))
+            while (init && (muxer = av_muxer_iterate(&opaque)))
     #endif
                 muxers.push_back(muxer->name);
         
@@ -918,16 +959,17 @@ namespace dlib
 
         inline std::vector<codec_details> list_codecs()
         {
+            const bool init = details::register_ffmpeg::get(); // Don't let this get optimized away
             std::vector<codec_details> details;
 
     #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 10, 100)
             // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L91
             AVCodec* codec = NULL;
-            while (details::register_ffmpeg::get() && (codec = av_codec_next(codec)))
+            while (init && (codec = av_codec_next(codec)))
     #else
             const AVCodec* codec = NULL;
             void* opaque = nullptr;
-            while (details::register_ffmpeg::get() && (codec = av_codec_iterate(&opaque)))
+            while (init && (codec = av_codec_iterate(&opaque)))
     #endif
             {
                 codec_details detail;
@@ -965,6 +1007,7 @@ namespace dlib
             DLIB_CASSERT(f.is_image(), "frame isn't an image type");
             DLIB_CASSERT(f.pixfmt() == AV_PIX_FMT_RGB24, "frame isn't RGB image, but " << f.pixfmt() << ". Make sure your decoder/demuxer/encoder/muxer has correct args passed to constructor");
         
+            // TODO: use av_image_get_buffer_size() and av_image_copy_to_buffer() instead. Just a bit worried about the align field.
             image.set_size(f.height(), f.width());
 
             for (int row = 0 ; row < f.height() ; row++)
@@ -973,48 +1016,6 @@ namespace dlib
                        f.get_frame().data[0] + row * f.get_frame().linesize[0],
                        f.width()*3);
             }
-        }
-
-        inline void convert(const frame& f, audio_frame& audio)
-        {
-            DLIB_CASSERT(f.is_audio(), "frame must be of audio type");
-            DLIB_CASSERT(f.samplefmt() == AV_SAMPLE_FMT_S16, "audio buffer requires s16 format. Make sure correct args are passed to constructor of decoder/demuxer/encoder/muxer");
-
-            audio.sample_rate = f.sample_rate();
-            audio.samples.resize(f.nsamples());
-            audio.timestamp = f.get_timestamp();
-
-            if (f.nchannels() == 1)
-            {
-                for (int i = 0 ; i < f.nsamples() ; ++i)
-                {
-                    memcpy(&audio.samples[i].ch1, f.get_frame().data[i], sizeof(int16_t));
-                    audio.samples[i].ch2 = audio.samples[i].ch1;
-                }  
-            }
-            else if (f.nchannels() == 2)
-            {
-                memcpy(audio.samples.data(), f.get_frame().data[0], audio.samples.size()*sizeof(audio_frame::sample));
-            }
-        }
-
-        inline void convert(const frame& f, type_safe_union<array2d<rgb_pixel>, audio_frame>& obj)
-        {
-            if (f.is_image())
-            {
-                convert(f, obj.get<array2d<rgb_pixel>>());
-            }
-            else if (f.is_audio())
-            {
-                convert(f, obj.get<audio_frame>());
-            }
-        }
-
-        inline type_safe_union<array2d<rgb_pixel>, audio_frame> convert(const frame& f)
-        {
-            type_safe_union<array2d<rgb_pixel>, audio_frame> obj;
-            convert(f, obj);
-            return obj;
         }
 
         inline frame convert(const array2d<rgb_pixel>& img)
@@ -1031,10 +1032,24 @@ namespace dlib
             return f;
         }
 
-        inline frame convert(const audio_frame& audio)
+        template<class SampleFmt, std::size_t Channels>
+        inline void convert(const frame& f, audio<SampleFmt, Channels>& obj)
         {
-            frame f(audio.sample_rate, audio.samples.size(), AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16, audio.timestamp);
-            memcpy(f.get_frame().data[0], audio.samples.data(), audio.samples.size()*sizeof(audio_frame::sample));
+            DLIB_CASSERT(f.is_audio(), "frame must be of audio type");
+            DLIB_CASSERT(f.samplefmt() == sample_traits<SampleFmt>::fmt, "audio buffer has wrong format for this type. Make sure correct args are passed to constructor of decoder/demuxer/encoder/muxer");
+            DLIB_CASSERT(f.nchannels() == Channels, "wrong number of channels");
+
+            obj.sample_rate = f.sample_rate();
+            obj.samples.resize(f.nsamples());
+            obj.timestamp = f.get_timestamp();
+            memcpy(obj.samples.data(), f.get_frame().data[0], obj.samples.size()*Channels);
+        }
+
+        template<class SampleFmt, std::size_t Channels>
+        inline frame convert(const audio<SampleFmt, Channels>& obj)
+        {
+            frame f(obj.sample_rate, obj.samples.size(), get_layout_from_channels(Channels), sample_traits<SampleFmt>::fmt, obj.timestamp);
+            memcpy(f.get_frame().data[0], obj.samples.data(), obj.samples.size()*Channels);
             return f;
         }
 

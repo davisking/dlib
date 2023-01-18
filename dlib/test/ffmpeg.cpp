@@ -35,9 +35,10 @@ namespace
         const bool is_audio     = sample_rate > 0;
 
         decoder::args args;
-        args.args_codec.codec_name  = codec;
-        args.args_image.fmt         = AV_PIX_FMT_RGB24;
-        args.args_audio.fmt         = AV_SAMPLE_FMT_S16;
+        args.args_codec.codec_name      = codec;
+        args.args_image.fmt             = AV_PIX_FMT_RGB24;
+        args.args_audio.fmt             = AV_SAMPLE_FMT_S16;
+        args.args_audio.channel_layout  = AV_CH_LAYOUT_MONO;
 
         decoder dec(args);
         DLIB_TEST(dec.is_open());
@@ -47,12 +48,13 @@ namespace
         else
             DLIB_TEST(dec.is_image_decoder());
 
-        type_safe_union<array2d<rgb_pixel>, audio_frame> obj;
-        dlib::ffmpeg::frame     frame;
-        int                     count{0};
-        int                     nsamples{0};
-        int                     iteration{0};
-        decoder_status          status{DECODER_EAGAIN};
+        array2d<rgb_pixel>          img;
+        ffmpeg::audio<int16_t, 1>   audio;
+        dlib::ffmpeg::frame         frame;
+        int                         count{0};
+        int                         nsamples{0};
+        int                         iteration{0};
+        decoder_status              status{DECODER_EAGAIN};
 
         ifstream fin{filepath, std::ios::binary};
         std::vector<char> buf(1024);
@@ -61,31 +63,29 @@ namespace
         {
             while ((status = dec.read(frame)) == DECODER_FRAME_AVAILABLE)
             {
-                convert(frame, obj);
-
                 if (is_audio)
                 {
+                    convert(frame, audio);
                     DLIB_TEST(frame.is_audio());
                     DLIB_TEST(frame.sample_rate() == sample_rate);
                     DLIB_TEST(frame.samplefmt() == AV_SAMPLE_FMT_S16);
 
-                    DLIB_TEST(obj.contains<audio_frame>());
-                    DLIB_TEST(obj.get<audio_frame>().sample_rate == sample_rate);
-                    nsamples += obj.get<audio_frame>().samples.size();
+                    DLIB_TEST(audio.sample_rate == sample_rate);
+                    nsamples += audio.samples.size();
 
                     DLIB_TEST(dec.sample_rate() == sample_rate);
                     DLIB_TEST(dec.sample_fmt() == AV_SAMPLE_FMT_S16);
                 }
                 else
                 {
+                    convert(frame, img);
                     DLIB_TEST(frame.is_image());
                     DLIB_TEST(frame.height() == height);
                     DLIB_TEST(frame.width() == width);
                     DLIB_TEST(frame.pixfmt() == AV_PIX_FMT_RGB24);
 
-                    DLIB_TEST(obj.contains<array2d<rgb_pixel>>());
-                    DLIB_TEST(obj.get<array2d<rgb_pixel>>().nr() == height);
-                    DLIB_TEST(obj.get<array2d<rgb_pixel>>().nc() == width);
+                    DLIB_TEST(img.nr() == height);
+                    DLIB_TEST(img.nc() == width);
                     ++count;
 
                     DLIB_TEST(dec.height() == height);
@@ -148,25 +148,25 @@ namespace
             DLIB_TEST(cap.sample_fmt() == AV_SAMPLE_FMT_S16);
         }
         
-        type_safe_union<array2d<rgb_pixel>, audio_frame> obj;
         dlib::ffmpeg::frame frame;
+        array2d<rgb_pixel>  img;
+        audio<int16_t, 1>   audio1;
+        audio<int16_t, 2>   audio2;
         int                 count{0};
         int                 nsamples{0};
         int                 iteration{0};
 
         while (cap.read(frame))
         {
-            convert(frame, obj);
-
             if (frame.is_image())
             {
                 DLIB_TEST(frame.height() == height);
                 DLIB_TEST(frame.width() == width);
                 DLIB_TEST(frame.pixfmt() == AV_PIX_FMT_RGB24);
+                convert(frame, img);
 
-                DLIB_TEST(obj.contains<array2d<rgb_pixel>>());
-                DLIB_TEST(obj.get<array2d<rgb_pixel>>().nr() == height);
-                DLIB_TEST(obj.get<array2d<rgb_pixel>>().nc() == width);
+                DLIB_TEST(img.nr() == height);
+                DLIB_TEST(img.nc() == width);
                 ++count;
             }
 
@@ -175,9 +175,17 @@ namespace
                 DLIB_TEST(frame.sample_rate() == sample_rate);
                 DLIB_TEST(frame.samplefmt() == AV_SAMPLE_FMT_S16);
 
-                DLIB_TEST(obj.contains<audio_frame>());
-                DLIB_TEST(obj.get<audio_frame>().sample_rate == sample_rate);
-                nsamples += obj.get<audio_frame>().samples.size();
+                if (frame.nchannels() == 1)
+                {
+                    convert(frame, audio1);
+                }
+                else if (frame.nchannels() == 2)
+                {
+                    convert(frame, audio2);
+                }
+
+                DLIB_TEST(frame.sample_rate() == sample_rate);
+                nsamples += frame.nsamples();
             }
 
             ++iteration;

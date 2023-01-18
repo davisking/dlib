@@ -10,47 +10,6 @@ namespace dlib
     {
         // ---------------------------------------------------------------------------------------------------
 
-        
-        struct ffmpeg_versions
-        {
-            /*!
-                WHAT THIS OBJECT REPRESENTS
-                    These represent the versions of ffmpeg libraries dlib was built against.
-            !*/
-
-            int libavformat_major{0};
-            int libavformat_minor{0};
-            int libavformat_micro{0};
-            
-            int libavcodec_major{0};
-            int libavcodec_minor{0};
-            int libavcodec_micro{0};
-
-            int libavutil_major{0};
-            int libavutil_minor{0};
-            int libavutil_micro{0};
-
-            int libavdevice_major{0};
-            int libavdevice_minor{0};
-            int libavdevice_micro{0};
-        };
-
-        ffmpeg_versions get_ffmpeg_versions_dlib_built_against();
-        /*!
-            ensures
-                - Returns the ffmpeg version dlib was built against.
-        !*/
-
-        void check_ffmpeg_versions();
-        /*!
-            ensures
-                - Checks the versions of ffmpeg currently being used in a translation unit vs the ones dlib was built against
-                - Prints mismatching versions if any.
-                - Not required to call this. This is only a debugging facility.
-        !*/
-
-        // ---------------------------------------------------------------------------------------------------
-
         std::string get_pixel_fmt_str(AVPixelFormat fmt);
         /*!
             ensures
@@ -261,6 +220,37 @@ namespace dlib
 
         // ---------------------------------------------------------------------------------------------------
 
+        template<class SampleType, std::size_t Channels>
+        struct audio
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object is a typed audio buffer which can convert to and back dlib::ffmpeg::frame.
+            !*/
+            using sample = std::array<SampleType, Channels>;
+
+            std::vector<sample>                     samples;
+            float                                   sample_rate{0};
+            std::chrono::system_clock::time_point   timestamp{};
+        };
+
+        template<class SampleType>
+        struct sample_traits 
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This is a type trait for converting a sample type to ffmpeg's AVSampleFormat obj.
+            !*/
+        };
+
+        template<> struct sample_traits<uint8_t> {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_U8; };
+        template<> struct sample_traits<int16_t> {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_S16; };
+        template<> struct sample_traits<int32_t> {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_S32; };
+        template<> struct sample_traits<float>   {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_FLT; };
+        template<> struct sample_traits<double>  {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_DBL; };
+
+        // ---------------------------------------------------------------------------------------------------
+
         std::vector<std::string> list_protocols();
         /*!
             ensures
@@ -296,12 +286,6 @@ namespace dlib
 
         // ---------------------------------------------------------------------------------------------------
 
-        void convert(const frame& f, type_safe_union<array2d<rgb_pixel>, audio_frame>& obj);
-        /*!
-            ensures
-                - converts a frame object into dlib objects if possible, i.e. if the format and layout is already correct
-        !*/
-
         void convert(const frame& f, array2d<rgb_pixel>& obj);
         /*!
             requires
@@ -312,35 +296,28 @@ namespace dlib
                 - converts a frame object into array2d<rgb_pixel>
         !*/
 
-        void convert(const frame& f, audio_frame& obj);
-        /*!
-            requires
-                - f.is_audio() == true
-                - f.samplefmt() == AV_SAMPLE_FMT_S16
-
-            ensures
-                - converts a frame object into audio_frame
-        !*/
-
-        type_safe_union<array2d<rgb_pixel>, audio_frame> convert(const frame& f);
-        /*!
-            requires
-                - pixfmt() == AV_PIX_FMT_RGB24 or samplefmt() == AV_SAMPLE_FMT_S16
-
-            ensures
-                - converts a frame object into dlib objects if possible
-        !*/
-
-        frame convert(const array2d<rgb_pixel>& f);
+        frame convert(const array2d<rgb_pixel>& img);
         /*!
             ensures
                 - converts a dlib image into a frame object
         !*/
 
-        frame convert(const audio_frame& f);
+        template<class SampleFmt, std::size_t Channels>
+        void convert(const frame& f, audio<SampleFmt, Channels>& obj);
+        /*!
+            requires
+                - f.is_audio() == true
+                - f.samplefmt() == sample_traits<SampleFmt>::fmt
+
+            ensures
+                - converts a frame object into audio object
+        !*/
+
+        template<class SampleFmt, std::size_t Channels>
+        frame convert(const audio<SampleFmt, Channels>& audio);
         /*!
             ensures
-                - converts a dlib audio frame into a frame object
+                - converts a dlib audio object into a frame object
         !*/
 
         // ---------------------------------------------------------------------------------------------------
@@ -644,6 +621,18 @@ namespace dlib
                     Constructor arguments for demuxer
                 !*/
 
+                args() = default;
+                /*!
+                    ensures
+                        - Default constructor
+                !*/
+
+                args(const std::string& filepath);
+                /*!
+                    ensures
+                        - this->filepath = filepath
+                !*/
+
                 // Filepath, URL or device
                 std::string filepath;
 
@@ -696,12 +685,6 @@ namespace dlib
             /*!
                 ensures
                     - Creates a demuxer using args.
-            !*/
-
-            demuxer(std::string filepath_device_url)
-            /*!
-                ensures
-                    - Equivalent to calling demuxer(demuxer::args{filepath_device_url})
             !*/
 
             demuxer(demuxer&& other) noexcept;

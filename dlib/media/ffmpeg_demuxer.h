@@ -162,6 +162,9 @@ namespace dlib
 
             struct args
             {
+                args() = default;
+                args(const std::string& filepath);
+ 
                 std::string filepath;
                 std::string input_format;
                 std::unordered_map<std::string, std::string> format_options;
@@ -179,7 +182,6 @@ namespace dlib
 
             demuxer() = default;
             demuxer(const args& a);
-            demuxer(const std::string& filepath);
             demuxer(demuxer&& other)            noexcept;
             demuxer& operator=(demuxer&& other) noexcept;
 
@@ -267,7 +269,7 @@ namespace dlib
                 av_dict opt = args_.args_codec.codec_options;
                 int ret = avcodec_open2(pCodecCtx_.get(), codec, opt.get());
 
-                if (ret >= 0 && details::register_ffmpeg::get())
+                if (ret >= 0)
                 {
                     pCodecCtx = std::move(pCodecCtx_);
                 }
@@ -437,6 +439,7 @@ namespace dlib
             DLIB_ASSERT(a.args_codec.codec != AV_CODEC_ID_NONE || a.args_codec.codec_name != "", "At least args_codec.codec or args_codec.codec_name must be set");
             
             const bool init = details::register_ffmpeg::get();
+            
             AVCodec* pCodec = nullptr;
 
             if (a.args_codec.codec != AV_CODEC_ID_NONE)
@@ -606,22 +609,15 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
+        inline demuxer::args::args(const std::string& filepath_)
+        : filepath{filepath_}
+        {
+        }
+
         inline demuxer::demuxer(const args &a)
         {
             if (!open(a))
                 st.pFormatCtx = nullptr;
-        }
-
-        inline demuxer::args make_args_from_filepath(const std::string& filepath)
-        {
-            demuxer::args args;
-            args.filepath = filepath;
-            return args;
-        }
-
-        inline demuxer::demuxer(const std::string& filepath)
-        : demuxer(make_args_from_filepath(filepath))
-        {
         }
 
         inline demuxer::demuxer(demuxer &&other) noexcept
@@ -838,7 +834,7 @@ namespace dlib
             using namespace details;
             const bool object_alive = st.pFormatCtx != nullptr &&
                                     (st.channel_video.is_open() || st.channel_audio.is_open());
-            return details::register_ffmpeg::get() && object_alive;
+            return object_alive;
         }
 
         inline bool demuxer::is_open() const noexcept
