@@ -1019,6 +1019,8 @@ namespace dlib
             const size_t imgsize = image.nr()*image.nc()*sizeof(pixel);
             const size_t expsize = av_image_get_buffer_size(f.pixfmt(), f.width(), f.height(), 1);
             DLIB_ASSERT(imgsize == expsize, "image size in bytes != expected buffer size required by ffmpeg to do a copy");
+            (void)imgsize;
+            (void)expsize;
 
             const int ret = av_image_copy_to_buffer((uint8_t*)image.begin(), 
                                                     imgsize, 
@@ -1030,6 +1032,7 @@ namespace dlib
                                                     1);    
             
             DLIB_ASSERT(ret == expsize, "av_image_copy_to_buffer()  error : " << details::get_av_error(ret));
+            (void)ret;
         }
 
         template<
@@ -1051,8 +1054,9 @@ namespace dlib
             int         src_linesizes[4]    = {0};
             uint8_t*    src_pointers[4]     = {nullptr};
 
-            int ret = av_image_fill_arrays(src_pointers, src_linesizes, (uint8_t*)img.begin(), f.pixfmt(), f.width(), f.height(), 1);
+            const int ret = av_image_fill_arrays(src_pointers, src_linesizes, (uint8_t*)img.begin(), f.pixfmt(), f.width(), f.height(), 1);
             DLIB_ASSERT(ret == imgsize, "av_image_fill_arrays()  error : " << details::get_av_error(ret));
+            (void)ret;
             
             av_image_copy(f.get_frame().data,
                           f.get_frame().linesize,
