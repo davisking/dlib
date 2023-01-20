@@ -20,6 +20,36 @@ namespace
 
     logger dlog("test.pixel");
 
+    // Compile time tests
+    struct not_a_pixel_type{};
+
+    static_assert(is_pixel_type<rgb_pixel>::value, "bad trait definition");
+    static_assert(is_pixel_type<bgr_pixel>::value, "bad trait definition");
+    static_assert(is_pixel_type<rgb_alpha_pixel>::value, "bad trait definition");
+    static_assert(is_pixel_type<bgr_alpha_pixel>::value, "bad trait definition");
+    static_assert(is_pixel_type<hsi_pixel>::value, "bad trait definition");
+    static_assert(is_pixel_type<lab_pixel>::value, "bad trait definition");
+
+    static_assert(is_pixel_type<char>::value,           "bad trait definition");
+    static_assert(is_pixel_type<signed char>::value,    "bad trait definition");
+    static_assert(is_pixel_type<unsigned char>::value,  "bad trait definition");
+    static_assert(is_pixel_type<short>::value,          "bad trait definition");
+    static_assert(is_pixel_type<unsigned short>::value, "bad trait definition");
+    static_assert(is_pixel_type<int>::value,            "bad trait definition");
+    static_assert(is_pixel_type<unsigned int>::value,   "bad trait definition");
+    static_assert(is_pixel_type<long>::value,           "bad trait definition");
+    static_assert(is_pixel_type<unsigned long>::value,  "bad trait definition");
+    static_assert(is_pixel_type<int64>::value,          "bad trait definition");
+    static_assert(is_pixel_type<uint64>::value,         "bad trait definition");
+
+    static_assert(is_pixel_type<float>::value,                      "bad trait definition");
+    static_assert(is_pixel_type<double>::value,                     "bad trait definition");
+    static_assert(is_pixel_type<long double>::value,                "bad trait definition");
+    static_assert(is_pixel_type<std::complex<float>>::value,        "bad trait definition");
+    static_assert(is_pixel_type<std::complex<double>>::value,       "bad trait definition");
+    static_assert(is_pixel_type<std::complex<long double>>::value,  "bad trait definition");
+
+    static_assert(!is_pixel_type<not_a_pixel_type>::value, "bad trait definition");
 
     void pixel_test (
     )
