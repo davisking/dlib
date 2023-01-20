@@ -305,15 +305,16 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-        template<class SampleType, std::size_t Channels>
-        struct audio
-        {
-            using sample = std::array<SampleType, Channels>;
+        template<class PixelType>
+        struct pix_traits {};
 
-            std::vector<sample>                     samples;
-            float                                   sample_rate{0};
-            std::chrono::system_clock::time_point   timestamp{};
-        };
+        template<> struct pix_traits<uint8_t>           {constexpr static AVPixelFormat fmt = AV_PIX_FMT_GRAY8; };
+        template<> struct pix_traits<rgb_pixel>         {constexpr static AVPixelFormat fmt = AV_PIX_FMT_RGB24; };
+        template<> struct pix_traits<bgr_pixel>         {constexpr static AVPixelFormat fmt = AV_PIX_FMT_BGR24; };
+        template<> struct pix_traits<rgb_alpha_pixel>   {constexpr static AVPixelFormat fmt = AV_PIX_FMT_RGBA;  };
+        template<> struct pix_traits<bgr_alpha_pixel>   {constexpr static AVPixelFormat fmt = AV_PIX_FMT_BGRA;  };
+
+// ---------------------------------------------------------------------------------------------------
 
         template<class SampleType>
         struct sample_traits {};
@@ -323,6 +324,18 @@ namespace dlib
         template<> struct sample_traits<int32_t> {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_S32; };
         template<> struct sample_traits<float>   {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_FLT; };
         template<> struct sample_traits<double>  {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_DBL; };
+
+// ---------------------------------------------------------------------------------------------------
+
+        template<class SampleType, std::size_t Channels>
+        struct audio
+        {
+            using sample = std::array<SampleType, Channels>;
+
+            std::vector<sample>                     samples;
+            float                                   sample_rate{0};
+            std::chrono::system_clock::time_point   timestamp{};
+        };
 
 // ---------------------------------------------------------------------------------------------------
 
@@ -337,17 +350,6 @@ namespace dlib
         std::vector<std::string>   list_demuxers();
         std::vector<std::string>   list_muxers();
         std::vector<codec_details> list_codecs();
-
-// ---------------------------------------------------------------------------------------------------
-
-        void convert(const frame& f, array2d<rgb_pixel>& obj);
-        frame convert(const array2d<rgb_pixel>& img);
-
-        template<class SampleFmt, std::size_t Channels>
-        void convert(const frame& f, audio<SampleFmt, Channels>& obj);
-
-        template<class SampleFmt, std::size_t Channels>
-        frame convert(const audio<SampleFmt, Channels>& audio);
 
 // ---------------------------------------------------------------------------------------------------
     
@@ -1002,42 +1004,71 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-        inline void convert(const frame& f, array2d<rgb_pixel>& image)
+        template <
+          class ImageContainer, 
+          is_image_check<ImageContainer> = true
+        >
+        void convert(const frame& f, ImageContainer& image)
         {
-            DLIB_CASSERT(f.is_image(), "frame isn't an image type");
-            DLIB_CASSERT(f.pixfmt() == AV_PIX_FMT_RGB24, "frame isn't RGB image, but " << f.pixfmt() << ". Make sure your decoder/demuxer/encoder/muxer has correct args passed to constructor");
+            using pixel = typename image_traits<ImageContainer>::pixel_type;
+            
+            DLIB_ASSERT(f.is_image(), "frame isn't an image type");
+            DLIB_ASSERT(f.pixfmt() == pix_traits<pixel>::fmt, "frame doesn't have correct format");
         
-            // TODO: use av_image_get_buffer_size() and av_image_copy_to_buffer() instead. Just a bit worried about the align field.
             image.set_size(f.height(), f.width());
+            const size_t imgsize = image.nr()*image.nc()*sizeof(pixel);
+            const size_t expsize = av_image_get_buffer_size(f.pixfmt(), f.width(), f.height(), 1);
+            DLIB_ASSERT(imgsize == expsize, "image size in bytes != expected buffer size required by ffmpeg to do a copy");
 
-            for (int row = 0 ; row < f.height() ; row++)
-            {
-                memcpy(image.begin() + row * f.width(),
-                       f.get_frame().data[0] + row * f.get_frame().linesize[0],
-                       f.width()*3);
-            }
+            const int ret = av_image_copy_to_buffer((uint8_t*)image.begin(), 
+                                                    imgsize, 
+                                                    f.get_frame().data, 
+                                                    f.get_frame().linesize, 
+                                                    f.pixfmt(), 
+                                                    f.width(), 
+                                                    f.height(), 
+                                                    1);    
+            
+            DLIB_ASSERT(ret == expsize, "av_image_copy_to_buffer()  error : " << details::get_av_error(ret));
         }
 
-        inline frame convert(const array2d<rgb_pixel>& img)
+        template<
+          class ImageContainer, 
+          is_image_check<ImageContainer> = true
+        >
+        void convert(const ImageContainer& img, frame& f)
         {
-            frame f(img.nr(), img.nc(), AV_PIX_FMT_RGB24, {});
+            using pixel = typename image_traits<ImageContainer>::pixel_type;
 
-            for (int row = 0 ; row < f.height() ; row++)
+            if (f.height() != img.nr() ||
+                f.width()  != img.nc() ||
+                f.pixfmt() != pix_traits<pixel>::fmt)
             {
-                memcpy(f.get_frame().data[0] + row * f.get_frame().linesize[0],
-                       img.begin() + row * f.width(),
-                       f.width()*3);
+                f = frame(img.nr(), img.nc(), pix_traits<pixel>::fmt, {});
             }
 
-            return f;
+            const size_t imgsize            = img.nr()*img.nc()*sizeof(pixel);
+            int         src_linesizes[4]    = {0};
+            uint8_t*    src_pointers[4]     = {nullptr};
+
+            int ret = av_image_fill_arrays(src_pointers, src_linesizes, (uint8_t*)img.begin(), f.pixfmt(), f.width(), f.height(), 1);
+            DLIB_ASSERT(ret == imgsize, "av_image_fill_arrays()  error : " << details::get_av_error(ret));
+            
+            av_image_copy(f.get_frame().data,
+                          f.get_frame().linesize,
+                          (const uint8_t**)src_pointers,
+                          src_linesizes,
+                          f.pixfmt(),
+                          f.width(),
+                          f.height());
         }
 
         template<class SampleFmt, std::size_t Channels>
         inline void convert(const frame& f, audio<SampleFmt, Channels>& obj)
         {
-            DLIB_CASSERT(f.is_audio(), "frame must be of audio type");
-            DLIB_CASSERT(f.samplefmt() == sample_traits<SampleFmt>::fmt, "audio buffer has wrong format for this type. Make sure correct args are passed to constructor of decoder/demuxer/encoder/muxer");
-            DLIB_CASSERT(f.nchannels() == Channels, "wrong number of channels");
+            DLIB_ASSERT(f.is_audio(), "frame must be of audio type");
+            DLIB_ASSERT(f.samplefmt() == sample_traits<SampleFmt>::fmt, "audio buffer has wrong format for this type. Make sure correct args are passed to constructor of decoder/demuxer/encoder/muxer");
+            DLIB_ASSERT(f.nchannels() == Channels, "wrong number of channels");
 
             obj.sample_rate = f.sample_rate();
             obj.samples.resize(f.nsamples());
@@ -1046,11 +1077,21 @@ namespace dlib
         }
 
         template<class SampleFmt, std::size_t Channels>
-        inline frame convert(const audio<SampleFmt, Channels>& obj)
+        inline void convert(const audio<SampleFmt, Channels>& obj, frame& f)
         {
-            frame f(obj.sample_rate, obj.samples.size(), get_layout_from_channels(Channels), sample_traits<SampleFmt>::fmt, obj.timestamp);
+            if (f.samplefmt()   != sample_traits<SampleFmt>::fmt ||
+                f.layout()      != get_layout_from_channels(Channels) ||
+                f.sample_rate() != obj.sample_rate ||
+                f.nsamples()    != obj.samples.size())
+            {
+                f = frame(obj.sample_rate, 
+                          obj.samples.size(), 
+                          get_layout_from_channels(Channels), 
+                          sample_traits<SampleFmt>::fmt, 
+                          obj.timestamp);
+            }
+            
             memcpy(f.get_frame().data[0], obj.samples.data(), obj.samples.size()*Channels);
-            return f;
         }
 
 // ---------------------------------------------------------------------------------------------------

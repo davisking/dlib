@@ -50,7 +50,7 @@ namespace
 
         array2d<rgb_pixel>          img;
         ffmpeg::audio<int16_t, 1>   audio;
-        dlib::ffmpeg::frame         frame;
+        dlib::ffmpeg::frame         frame, frame_copy;
         int                         count{0};
         int                         nsamples{0};
         int                         iteration{0};
@@ -66,11 +66,17 @@ namespace
                 if (is_audio)
                 {
                     convert(frame, audio);
+                    convert(audio, frame_copy);
                     DLIB_TEST(frame.is_audio());
                     DLIB_TEST(frame.sample_rate() == sample_rate);
                     DLIB_TEST(frame.samplefmt() == AV_SAMPLE_FMT_S16);
+                    DLIB_TEST(frame_copy.is_audio());
+                    DLIB_TEST(frame_copy.sample_rate() == sample_rate);
+                    DLIB_TEST(frame_copy.samplefmt() == AV_SAMPLE_FMT_S16);
+                    DLIB_TEST(frame_copy.nsamples() == frame.nsamples());
 
                     DLIB_TEST(audio.sample_rate == sample_rate);
+                    DLIB_TEST(audio.samples.size() == frame.nsamples());
                     nsamples += audio.samples.size();
 
                     DLIB_TEST(dec.sample_rate() == sample_rate);
@@ -79,10 +85,15 @@ namespace
                 else
                 {
                     convert(frame, img);
+                    convert(img, frame_copy);
                     DLIB_TEST(frame.is_image());
                     DLIB_TEST(frame.height() == height);
                     DLIB_TEST(frame.width() == width);
                     DLIB_TEST(frame.pixfmt() == AV_PIX_FMT_RGB24);
+                    DLIB_TEST(frame_copy.is_image());
+                    DLIB_TEST(frame_copy.height() == frame.height());
+                    DLIB_TEST(frame_copy.width() == frame.width());
+                    DLIB_TEST(frame_copy.pixfmt() == frame.pixfmt());
 
                     DLIB_TEST(img.nr() == height);
                     DLIB_TEST(img.nc() == width);
@@ -148,7 +159,7 @@ namespace
             DLIB_TEST(cap.sample_fmt() == AV_SAMPLE_FMT_S16);
         }
         
-        dlib::ffmpeg::frame frame;
+        dlib::ffmpeg::frame frame, frame_copy;
         array2d<rgb_pixel>  img;
         audio<int16_t, 1>   audio1;
         audio<int16_t, 2>   audio2;
@@ -167,6 +178,12 @@ namespace
 
                 DLIB_TEST(img.nr() == height);
                 DLIB_TEST(img.nc() == width);
+                convert(img, frame_copy);
+
+                DLIB_TEST(frame_copy.height() == frame.height());
+                DLIB_TEST(frame_copy.width() == frame.width());
+                DLIB_TEST(frame_copy.pixfmt() == frame.pixfmt());
+                
                 ++count;
             }
 

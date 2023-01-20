@@ -220,19 +220,22 @@ namespace dlib
 
         // ---------------------------------------------------------------------------------------------------
 
-        template<class SampleType, std::size_t Channels>
-        struct audio
+        template<class PixelType>
+        struct pix_traits 
         {
             /*!
                 WHAT THIS OBJECT REPRESENTS
-                    This object is a typed audio buffer which can convert to and back dlib::ffmpeg::frame.
+                    This is a type trait for converting a sample type to ffmpeg's AVPixelFormat obj.
             !*/
-            using sample = std::array<SampleType, Channels>;
-
-            std::vector<sample>                     samples;
-            float                                   sample_rate{0};
-            std::chrono::system_clock::time_point   timestamp{};
         };
+
+        template<> struct pix_traits<uint8_t>           {constexpr static AVPixelFormat fmt = AV_PIX_FMT_GRAY8; };
+        template<> struct pix_traits<rgb_pixel>         {constexpr static AVPixelFormat fmt = AV_PIX_FMT_RGB24; };
+        template<> struct pix_traits<bgr_pixel>         {constexpr static AVPixelFormat fmt = AV_PIX_FMT_BGR24; };
+        template<> struct pix_traits<rgb_alpha_pixel>   {constexpr static AVPixelFormat fmt = AV_PIX_FMT_RGBA;  };
+        template<> struct pix_traits<bgr_alpha_pixel>   {constexpr static AVPixelFormat fmt = AV_PIX_FMT_BGRA;  };
+
+        // ---------------------------------------------------------------------------------------------------
 
         template<class SampleType>
         struct sample_traits 
@@ -248,6 +251,22 @@ namespace dlib
         template<> struct sample_traits<int32_t> {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_S32; };
         template<> struct sample_traits<float>   {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_FLT; };
         template<> struct sample_traits<double>  {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_DBL; };
+
+        // ---------------------------------------------------------------------------------------------------
+
+        template<class SampleType, std::size_t Channels>
+        struct audio
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object is a typed audio buffer which can convert to and back dlib::ffmpeg::frame.
+            !*/
+            using sample = std::array<SampleType, Channels>;
+
+            std::vector<sample>                     samples;
+            float                                   sample_rate{0};
+            std::chrono::system_clock::time_point   timestamp{};
+        };
 
         // ---------------------------------------------------------------------------------------------------
 
@@ -286,17 +305,19 @@ namespace dlib
 
         // ---------------------------------------------------------------------------------------------------
 
-        void convert(const frame& f, array2d<rgb_pixel>& obj);
+        template <class ImageContainer>
+        void convert(const frame& f, ImageContainer& image)
         /*!
             requires
                 - f.is_image() == true
-                - f.pixfmt() == AV_PIX_FMT_RGB24
+                - f.pixfmt() == pix_traits<typename image_traits<ImageContainer>::pixel_type>::fmt
 
             ensures
                 - converts a frame object into array2d<rgb_pixel>
         !*/
 
-        frame convert(const array2d<rgb_pixel>& img);
+        template <class ImageContainer>
+        void convert(const ImageContainer& img, frame& f)
         /*!
             ensures
                 - converts a dlib image into a frame object
@@ -314,7 +335,7 @@ namespace dlib
         !*/
 
         template<class SampleFmt, std::size_t Channels>
-        frame convert(const audio<SampleFmt, Channels>& audio);
+        void convert(const audio<SampleFmt, Channels>& audio, frame& b);
         /*!
             ensures
                 - converts a dlib audio object into a frame object
