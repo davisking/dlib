@@ -154,8 +154,7 @@ namespace dlib
         struct is_image_type : std::false_type{};
 
         template<class Container>
-        struct is_image_type<Container, void_t<is_pixel_check<typename Container::type>,
-                                               typename image_traits<Container>::pixel_type>> : std::true_type{};
+        struct is_image_type<Container, void_t<is_pixel_check<typename image_traits<Container>::pixel_type>>> : std::true_type{};
     }
 
     template<class Container>
