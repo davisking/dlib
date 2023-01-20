@@ -146,12 +146,34 @@ namespace dlib
     template <typename image_type>
     struct is_grayscale_image { const static bool value = pixel_traits<typename image_traits<image_type>::pixel_type>::grayscale; };
 
+// ----------------------------------------------------------------------------------------
 
-    // Check if T has image_traits<T> defined for it.
-    template <typename T, typename enabled = size_t>
-    struct is_image_type : public std::false_type{};
-    template <typename T>
-    struct is_image_type<T, decltype(sizeof(image_traits<typename std::decay<T>::type>))> : public std::true_type{};
+    namespace details
+    {
+        template<class Container, class = void>
+        struct is_image_type : std::false_type{};
+
+        template<class Container>
+        struct is_image_type<Container, void_t<is_pixel_check<typename Container::type>,
+                                               typename image_traits<Container>::pixel_type>> : std::true_type{};
+    }
+
+    template<class Container>
+    using is_image_type = details::is_image_type<Container>;
+    /*!
+        ensures
+            - determines whether Container satisfies the generic image interface
+              i.e. is a 2D container of pixel types
+              e.g. array2d<rgb_pixel>, matrix<float>, etc...
+    !*/
+
+    template<class Container>
+    using is_image_check = std::enable_if_t<is_image_type<Container>::value, bool>;
+    /*!
+        ensures
+            - SFINAE tool that prevents a function taking a universal reference from binding to arbitrary types.
+              Instead, it can only bind to image types.
+    !*/
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
