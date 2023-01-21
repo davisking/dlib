@@ -674,7 +674,7 @@ namespace dlib
             }
 
             av_dict opts = st.args_.format_options;
-            const AVInputFormat* input_format = st.args_.input_format.empty() ? nullptr : av_find_input_format(st.args_.input_format.c_str());
+            AVInputFormat* input_format = st.args_.input_format.empty() ? nullptr : av_find_input_format(st.args_.input_format.c_str());
 
             st.connecting_time = system_clock::now();
             st.connected_time  = system_clock::time_point::max();
