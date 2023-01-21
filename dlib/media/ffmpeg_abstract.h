@@ -303,6 +303,18 @@ namespace dlib
                   dependencies like libx264, libx265, etc.
         !*/
 
+        std::vector<std::string> list_input_devices();
+        /*!
+            ensures
+                - returns a list of all registered ffmpeg input devices
+        !*/
+
+        std::vector<std::string> list_output_devices();
+        /*!
+            ensures
+                - returns a list of all registered ffmpeg output devices
+        !*/
+
         // ---------------------------------------------------------------------------------------------------
 
         template <class ImageContainer>

@@ -33,13 +33,26 @@ int main()
     printf("\n");
     
     // List all muxers supported by this installation of ffmpeg libraries
-    const auto muxers = ffmpeg::list_muxers();
     printf("Supported muxers:\n");
-    for (const auto& muxer : muxers)
+    for (const auto& muxer : ffmpeg::list_muxers())
         printf("%s\n", muxer.c_str());
 
     printf("\n");
 
+    // List all input devices supported by this installation of ffmpeg libraries
+    printf("Supported input devices:\n");
+    for (const auto& device :  ffmpeg::list_input_devices())
+        printf("%s\n", device.c_str());
+
+    printf("\n");
+
+    // List all input devices supported by this installation of ffmpeg libraries
+    printf("Supported output devices:\n");
+    for (const auto& device :  ffmpeg::list_output_devices())
+        printf("%s\n", device.c_str());
+
+    printf("\n");
+    
     printf("Can read MP4 file with H264 encoded video stream?\n");
 
     const bool mp4_available = 

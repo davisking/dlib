@@ -441,7 +441,7 @@ namespace dlib
             
             const bool init = details::register_ffmpeg::get();
             
-            AVCodec* pCodec = nullptr;
+            const AVCodec* pCodec = nullptr;
 
             if (a.args_codec.codec != AV_CODEC_ID_NONE)
                 pCodec = init ? avcodec_find_decoder(a.args_codec.codec) : nullptr;
@@ -674,7 +674,7 @@ namespace dlib
             }
 
             av_dict opts = st.args_.format_options;
-            AVInputFormat* input_format = st.args_.input_format.empty() ? nullptr : av_find_input_format(st.args_.input_format.c_str());
+            const AVInputFormat* input_format = st.args_.input_format.empty() ? nullptr : av_find_input_format(st.args_.input_format.c_str());
 
             st.connecting_time = system_clock::now();
             st.connected_time  = system_clock::time_point::max();

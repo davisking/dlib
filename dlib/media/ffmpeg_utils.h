@@ -350,6 +350,8 @@ namespace dlib
         std::vector<std::string>   list_demuxers();
         std::vector<std::string>   list_muxers();
         std::vector<codec_details> list_codecs();
+        std::vector<std::string>   list_input_devices();
+        std::vector<std::string>   list_output_devices();
 
 // ---------------------------------------------------------------------------------------------------
     
@@ -903,12 +905,12 @@ namespace dlib
         {
             const bool init = details::register_ffmpeg::get(); // Don't let this get optimized away
             std::vector<std::string> protocols;
-            void* opaque = NULL;
+            void* opaque = nullptr;
             const char* name = 0;
             while (init && (name = avio_enum_protocols(&opaque, 0)))
                 protocols.emplace_back(name);
 
-            opaque  = NULL;
+            opaque  = nullptr;
             name    = 0;
 
             while (init && (name = avio_enum_protocols(&opaque, 1)))
@@ -923,7 +925,7 @@ namespace dlib
         {
             const bool init = details::register_ffmpeg::get(); // Don't let this get optimized away
             std::vector<std::string> demuxers;
-            const AVInputFormat* demuxer = NULL;
+            const AVInputFormat* demuxer = nullptr;
 
     #if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100)
             // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L86
@@ -943,7 +945,7 @@ namespace dlib
         {
             const bool init = details::register_ffmpeg::get(); // Don't let this get optimized away
             std::vector<std::string> muxers;
-            const AVOutputFormat* muxer = NULL;
+            const AVOutputFormat* muxer = nullptr;
 
     #if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100)
             // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L86
@@ -966,10 +968,10 @@ namespace dlib
 
     #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 10, 100)
             // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L91
-            AVCodec* codec = NULL;
+            AVCodec* codec = nullptr;
             while (init && (codec = av_codec_next(codec)))
     #else
-            const AVCodec* codec = NULL;
+            const AVCodec* codec = nullptr;
             void* opaque = nullptr;
             while (init && (codec = av_codec_iterate(&opaque)))
     #endif
@@ -1000,6 +1002,42 @@ namespace dlib
             details.erase(std::remove_if(details.begin(), details.end(), [](const auto& d) {return d.codec_name.empty();}), details.end());
 
             return details;
+        }
+
+// ---------------------------------------------------------------------------------------------------
+
+        inline std::vector<std::string> list_input_devices()
+        {
+            const bool init = details::register_ffmpeg::get(); // Don't let this get optimized away
+            std::vector<std::string> devices;
+            AVInputFormat* device = nullptr;
+
+            while (init && (device = av_input_audio_device_next(device)))
+                devices.push_back(device->name);
+
+            device = nullptr;
+            while (init && (device = av_input_video_device_next(device)))
+                devices.push_back(device->name);
+
+            return devices;
+        }
+
+// ---------------------------------------------------------------------------------------------------
+
+        inline std::vector<std::string> list_output_devices()
+        {
+            const bool init = details::register_ffmpeg::get(); // Don't let this get optimized away
+            std::vector<std::string> devices;
+            AVOutputFormat* device = nullptr;
+
+            while (init && (device = av_output_audio_device_next(device)))
+                devices.push_back(device->name);
+
+            device = nullptr;
+            while (init && (device = av_output_video_device_next(device)))
+                devices.push_back(device->name);
+
+            return devices;
         }
 
 // ---------------------------------------------------------------------------------------------------
@@ -1099,7 +1137,7 @@ namespace dlib
         inline void convert(const audio<SampleFmt, Channels>& obj, frame& f)
         {
             using sample = typename audio<SampleFmt, Channels>::sample;
-            
+
             if (f.samplefmt()   != sample_traits<SampleFmt>::fmt ||
                 f.layout()      != get_layout_from_channels(Channels) ||
                 f.sample_rate() != obj.sample_rate ||
