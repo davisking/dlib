@@ -84,6 +84,7 @@ namespace dlib
                 void operator()(AVCodecContext* ptr)        const;
                 void operator()(AVCodecParserContext* ptr)  const;
                 void operator()(AVFormatContext* ptr)       const;
+                void operator()(AVDeviceInfoList* ptr)      const;
             };
 
             template<class AVObject>
@@ -346,12 +347,24 @@ namespace dlib
             bool supports_decoding{false};
         };
 
-        std::vector<std::string>   list_protocols();
-        std::vector<std::string>   list_demuxers();
-        std::vector<std::string>   list_muxers();
-        std::vector<codec_details> list_codecs();
-        std::vector<std::string>   list_input_devices();
-        std::vector<std::string>   list_output_devices();
+        struct device_details
+        {
+            struct instance
+            {
+                std::string name;
+                std::string description;
+            };
+
+            std::string device_type;
+            std::vector<instance> devices;
+        };
+
+        std::vector<std::string>    list_protocols();
+        std::vector<std::string>    list_demuxers();
+        std::vector<std::string>    list_muxers();
+        std::vector<codec_details>  list_codecs();
+        std::vector<device_details> list_input_devices();
+        std::vector<device_details> list_output_devices();
 
 // ---------------------------------------------------------------------------------------------------
     
@@ -440,6 +453,7 @@ namespace dlib
             inline void av_deleter::operator()(SwrContext *ptr)            const { if (ptr) swr_free(&ptr); }
             inline void av_deleter::operator()(AVCodecContext *ptr)        const { if (ptr) avcodec_free_context(&ptr); }
             inline void av_deleter::operator()(AVCodecParserContext *ptr)  const { if (ptr) av_parser_close(ptr); }
+            inline void av_deleter::operator()(AVDeviceInfoList* ptr)      const { if (ptr) avdevice_free_list_devices(&ptr); }
             inline void av_deleter::operator()(AVFormatContext *ptr)       const 
             { 
                 if (ptr) 
@@ -1006,36 +1020,88 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-        inline std::vector<std::string> list_input_devices()
+        inline std::vector<device_details> list_input_devices()
         {
             const bool init = details::register_ffmpeg::get(); // Don't let this get optimized away
-            std::vector<std::string> devices;
+            std::vector<device_details> devices;
             AVInputFormat* device = nullptr;
 
+            details::av_ptr<AVDeviceInfoList> managed;
+
+            const auto iter = [&](AVInputFormat* device)
+            {
+                device_details details;
+                details.device_type = std::string(device->name);
+
+                AVDeviceInfoList* device_list = nullptr;
+                avdevice_list_input_sources(device, nullptr, nullptr, &device_list);
+                managed.reset(device_list);
+
+                if (device_list)
+                {
+                    for (int i = 0 ; i < device_list->nb_devices ; ++i)
+                    {
+                        device_details::instance instance;
+                        instance.name        = std::string(device_list->devices[i]->device_name);
+                        instance.description = std::string(device_list->devices[i]->device_description);
+                        details.devices.push_back(std::move(instance));
+                    }
+                }
+
+                devices.push_back(std::move(details));
+            };
+
             while (init && (device = av_input_audio_device_next(device)))
-                devices.push_back(device->name);
+                iter(device);
 
             device = nullptr;
+
             while (init && (device = av_input_video_device_next(device)))
-                devices.push_back(device->name);
+                iter(device);
 
             return devices;
         }
 
 // ---------------------------------------------------------------------------------------------------
 
-        inline std::vector<std::string> list_output_devices()
+        inline std::vector<device_details> list_output_devices()
         {
             const bool init = details::register_ffmpeg::get(); // Don't let this get optimized away
-            std::vector<std::string> devices;
+            std::vector<device_details> devices;
             AVOutputFormat* device = nullptr;
 
+            details::av_ptr<AVDeviceInfoList> managed;
+
+            const auto iter = [&](AVOutputFormat* device)
+            {
+                device_details details;
+                details.device_type = std::string(device->name);
+
+                AVDeviceInfoList* device_list = nullptr;
+                avdevice_list_output_sinks(device, nullptr, nullptr, &device_list);
+                managed.reset(device_list);
+
+                if (device_list)
+                {
+                    for (int i = 0 ; i < device_list->nb_devices ; ++i)
+                    {
+                        device_details::instance instance;
+                        instance.name        = std::string(device_list->devices[i]->device_name);
+                        instance.description = std::string(device_list->devices[i]->device_description);
+                        details.devices.push_back(std::move(instance));
+                    }
+                }
+
+                devices.push_back(std::move(details));
+            };
+
             while (init && (device = av_output_audio_device_next(device)))
-                devices.push_back(device->name);
+                iter(device);
 
             device = nullptr;
+
             while (init && (device = av_output_video_device_next(device)))
-                devices.push_back(device->name);
+                iter(device);
 
             return devices;
         }

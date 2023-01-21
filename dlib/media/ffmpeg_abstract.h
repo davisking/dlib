@@ -270,6 +270,34 @@ namespace dlib
 
         // ---------------------------------------------------------------------------------------------------
 
+        struct codec_details
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object informs on available codecs provided by the installation of ffmpeg dlib is linked against.
+            !*/
+            std::string codec_name;
+            bool supports_encoding;
+            bool supports_decoding;
+        };
+
+        struct device_details
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object informs on available devices provided by the installation of ffmpeg dlib is linked against.
+            !*/
+
+            struct instance
+            {
+                std::string name;
+                std::string description;
+            };
+
+            std::string device_type;
+            std::vector<instance> devices;
+        };
+        
         std::vector<std::string> list_protocols();
         /*!
             ensures
@@ -287,13 +315,6 @@ namespace dlib
             ensures
                 - returns a list of all registered ffmpeg muxers
         !*/
-
-        struct codec_details
-        {
-            std::string codec_name;
-            bool supports_encoding;
-            bool supports_decoding;
-        };
         
         std::vector<codec_details> list_codecs();
         /*!
@@ -303,16 +324,16 @@ namespace dlib
                   dependencies like libx264, libx265, etc.
         !*/
 
-        std::vector<std::string> list_input_devices();
+        std::vector<device_details> list_input_devices();
         /*!
             ensures
-                - returns a list of all registered ffmpeg input devices
+                - returns a list of all registered ffmpeg input devices and available instances of those devices
         !*/
 
-        std::vector<std::string> list_output_devices();
+        std::vector<device_details> list_output_devices();
         /*!
             ensures
-                - returns a list of all registered ffmpeg output devices
+                - returns a list of all registered ffmpeg output devices and available instances of those devices
         !*/
 
         // ---------------------------------------------------------------------------------------------------

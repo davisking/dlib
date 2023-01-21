@@ -42,14 +42,30 @@ int main()
     // List all input devices supported by this installation of ffmpeg libraries
     printf("Supported input devices:\n");
     for (const auto& device :  ffmpeg::list_input_devices())
-        printf("%s\n", device.c_str());
+    {
+        printf("device type : %s\n", device.device_type.c_str());
+        if (!device.devices.empty())
+        {
+            printf("    instances :\n");
+            for (const auto& instance : device.devices)
+                printf("        name : `%-32s` , description `%s`\n", instance.name.c_str(), instance.description.c_str());
+        }
+    }
 
     printf("\n");
 
     // List all input devices supported by this installation of ffmpeg libraries
     printf("Supported output devices:\n");
     for (const auto& device :  ffmpeg::list_output_devices())
-        printf("%s\n", device.c_str());
+    {
+        printf("device type : %s\n", device.device_type.c_str());
+        if (!device.devices.empty())
+        {
+            printf("    instances :\n");
+            for (const auto& instance : device.devices)
+                printf("        name : `%-32s` , description `%s`\n", instance.name.c_str(), instance.description.c_str());
+        }
+    }
 
     printf("\n");
     
