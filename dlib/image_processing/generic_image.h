@@ -131,20 +131,23 @@ namespace dlib
     !*/
 
     template <typename image_type>
-    struct is_rgb_image { const static bool value = pixel_traits<typename image_traits<image_type>::pixel_type>::rgb; };
+    using pixel_type_t = typename image_traits<image_type>::pixel_type;
+
+    template <typename image_type>
+    struct is_rgb_image { const static bool value = pixel_traits<pixel_type_t<image_type>>::rgb; };
 
     template <typename image_type>
     struct is_color_space_cartesian_image { const static bool value = 
-        pixel_traits<typename image_traits<image_type>::pixel_type>::rgb || 
-        pixel_traits<typename image_traits<image_type>::pixel_type>::lab || 
-        pixel_traits<typename image_traits<image_type>::pixel_type>::grayscale; };
+        pixel_traits<pixel_type_t<image_type>>::rgb || 
+        pixel_traits<pixel_type_t<image_type>>::lab || 
+        pixel_traits<pixel_type_t<image_type>>::grayscale; };
     /*
         Tells if all color components of image pixels are in cartesian coordinates, compared to e.g. polar coordinates.
         Polar coordinates that may require more complicated blending.
     */
 
     template <typename image_type>
-    struct is_grayscale_image { const static bool value = pixel_traits<typename image_traits<image_type>::pixel_type>::grayscale; };
+    struct is_grayscale_image { const static bool value = pixel_traits<pixel_type_t<image_type>>::grayscale; };
 
 // ----------------------------------------------------------------------------------------
 
@@ -154,7 +157,7 @@ namespace dlib
         struct is_image_type : std::false_type{};
 
         template<class Container>
-        struct is_image_type<Container, void_t<is_pixel_check<typename image_traits<Container>::pixel_type>>> : std::true_type{};
+        struct is_image_type<Container, void_t<is_pixel_check<pixel_type_t<Container>>>> : std::true_type{};
     }
 
     template<class Container>
@@ -212,7 +215,7 @@ namespace dlib
         !*/
 
     public:
-        typedef typename image_traits<image_type>::pixel_type pixel_type;
+        using pixel_type = pixel_type_t<image_type>;
 
         image_view(
             image_type& img
@@ -358,7 +361,7 @@ namespace dlib
         !*/
 
     public:
-        typedef typename image_traits<image_type>::pixel_type pixel_type;
+        using pixel_type = pixel_type_t<image_type>;
 
         const_image_view(
             const image_type& img
@@ -507,15 +510,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
-    struct image_traits<image_view<T>>
-    {
-        typedef typename image_traits<T>::pixel_type pixel_type;
-    };
+    struct image_traits<image_view<T>> { using pixel_type = pixel_type_t<T>; };
+
     template <typename T>
-    struct image_traits<const image_view<T>>
-    {
-        typedef typename image_traits<T>::pixel_type pixel_type;
-    };
+    struct image_traits<const image_view<T>> { using pixel_type = pixel_type_t<T>; };
 
     template <typename T>
     inline long num_rows( const image_view<T>& img) { return img.nr(); }
@@ -551,15 +549,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
-    struct image_traits<const_image_view<T>>
-    {
-        typedef typename image_traits<T>::pixel_type pixel_type;
-    };
+    struct image_traits<const_image_view<T>> {using pixel_type = pixel_type_t<T>; };
+
     template <typename T>
-    struct image_traits<const const_image_view<T>>
-    {
-        typedef typename image_traits<T>::pixel_type pixel_type;
-    };
+    struct image_traits<const const_image_view<T>> {using pixel_type = pixel_type_t<T>; };
 
     template <typename T>
     inline long num_rows( const const_image_view<T>& img) { return img.nr(); }
