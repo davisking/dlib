@@ -327,8 +327,9 @@ namespace dlib
         void convert(const frame& f, audio<SampleFmt, Channels>& obj);
         /*!
             requires
-                - f.is_audio() == true
+                - f.is_audio()  == true
                 - f.samplefmt() == sample_traits<SampleFmt>::fmt
+                - f.nchannels() == Channels
 
             ensures
                 - converts a frame object into audio object
