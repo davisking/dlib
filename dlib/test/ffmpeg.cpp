@@ -71,8 +71,8 @@ namespace
                     DLIB_TEST(frame.sample_rate() == sample_rate);
                     DLIB_TEST(frame.samplefmt() == AV_SAMPLE_FMT_S16);
                     DLIB_TEST(frame_copy.is_audio());
-                    DLIB_TEST(frame_copy.sample_rate() == sample_rate);
-                    DLIB_TEST(frame_copy.samplefmt() == AV_SAMPLE_FMT_S16);
+                    DLIB_TEST(frame_copy.sample_rate() == frame.sample_rate());
+                    DLIB_TEST(frame_copy.samplefmt() == frame.samplefmt());
                     DLIB_TEST(frame_copy.nsamples() == frame.nsamples());
 
                     DLIB_TEST(audio.sample_rate == sample_rate);
@@ -195,14 +195,20 @@ namespace
                 if (frame.nchannels() == 1)
                 {
                     convert(frame, audio1);
+                    convert(audio1, frame_copy);
                 }
                 else if (frame.nchannels() == 2)
                 {
                     convert(frame, audio2);
+                    convert(audio2, frame_copy);
                 }
 
                 DLIB_TEST(frame.sample_rate() == sample_rate);
                 nsamples += frame.nsamples();
+                DLIB_TEST(frame_copy.is_audio());
+                DLIB_TEST(frame_copy.sample_rate() == frame.sample_rate());
+                DLIB_TEST(frame_copy.samplefmt() == frame.samplefmt());
+                DLIB_TEST(frame_copy.nsamples() == frame.nsamples());
             }
 
             ++iteration;

@@ -63,7 +63,7 @@ namespace dlib
 
                 static bool get()
                 {
-                    static bool v = register_library();
+                    static const bool v = register_library();
                     return v;
                 }
             
@@ -1070,19 +1070,36 @@ namespace dlib
         template<class SampleFmt, std::size_t Channels>
         inline void convert(const frame& f, audio<SampleFmt, Channels>& obj)
         {
+            using sample = typename audio<SampleFmt, Channels>::sample;
+
             DLIB_ASSERT(f.is_audio(), "frame must be of audio type");
             DLIB_ASSERT(f.samplefmt() == sample_traits<SampleFmt>::fmt, "audio buffer has wrong format for this type. Make sure correct args are passed to constructor of decoder/demuxer/encoder/muxer");
             DLIB_ASSERT(f.nchannels() == Channels, "wrong number of channels");
 
+            obj.timestamp   = f.get_timestamp();
             obj.sample_rate = f.sample_rate();
             obj.samples.resize(f.nsamples());
-            obj.timestamp = f.get_timestamp();
-            memcpy(obj.samples.data(), f.get_frame().data[0], obj.samples.size()*Channels);
+
+            uint8_t* dst_pointers[8]    = {nullptr}; 
+            int      dst_linesize       = 0;
+
+            const int bufsize  = obj.samples.size()*sizeof(sample);
+            const int expsize1 = av_samples_get_buffer_size(&dst_linesize, f.nchannels(), f.nsamples(), f.samplefmt(), 1);
+            const int expsize2 = av_samples_fill_arrays(dst_pointers, &dst_linesize, (uint8_t*)obj.samples.data(), f.nchannels(), f.nsamples(), f.samplefmt(), 1);
+            DLIB_ASSERT(bufsize == expsize1, "audio size in bytes != expected buffer size required by ffmpeg to do a copy");
+            DLIB_ASSERT(expsize1 == expsize2, "inconsistent audio buffer sizes returned by ffmpeg");
+            (void)bufsize;
+            (void)expsize1;
+            (void)expsize2;
+
+            av_samples_copy(dst_pointers, f.get_frame().data, 0, 0, f.nsamples(), f.nchannels(), f.samplefmt());
         }
 
         template<class SampleFmt, std::size_t Channels>
         inline void convert(const audio<SampleFmt, Channels>& obj, frame& f)
         {
+            using sample = typename audio<SampleFmt, Channels>::sample;
+            
             if (f.samplefmt()   != sample_traits<SampleFmt>::fmt ||
                 f.layout()      != get_layout_from_channels(Channels) ||
                 f.sample_rate() != obj.sample_rate ||
@@ -1094,8 +1111,20 @@ namespace dlib
                           sample_traits<SampleFmt>::fmt, 
                           obj.timestamp);
             }
-            
-            memcpy(f.get_frame().data[0], obj.samples.data(), obj.samples.size()*Channels);
+
+            uint8_t* src_pointers[8]    = {nullptr}; 
+            int      src_linesize       = 0;
+
+            const int bufsize  = obj.samples.size()*sizeof(sample);
+            const int expsize1 = av_samples_get_buffer_size(&src_linesize, f.nchannels(), f.nsamples(), f.samplefmt(), 1);
+            const int expsize2 = av_samples_fill_arrays(src_pointers, &src_linesize, (const uint8_t*)obj.samples.data(), f.nchannels(), f.nsamples(), f.samplefmt(), 1);
+            DLIB_ASSERT(bufsize == expsize1, "audio size in bytes != expected buffer size required by ffmpeg to do a copy");
+            DLIB_ASSERT(expsize1 == expsize2, "inconsistent audio buffer sizes returned by ffmpeg");
+            (void)bufsize;
+            (void)expsize1;
+            (void)expsize2;
+
+            av_samples_copy(f.get_frame().data, src_pointers, 0, 0, f.nsamples(), f.nchannels(), f.samplefmt());
         }
 
 // ---------------------------------------------------------------------------------------------------
