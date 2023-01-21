@@ -168,6 +168,7 @@ namespace dlib
                 std::string filepath;
                 std::string input_format;
                 std::unordered_map<std::string, std::string> format_options;
+                int framerate{0};
 
                 int probesize{-1};
                 std::chrono::milliseconds   connect_timeout{std::chrono::milliseconds::max()};
@@ -664,6 +665,12 @@ namespace dlib
             {
                 // See if format supports "video_size"
                 st.args_.format_options["video_size"] = std::to_string(st.args_.image_options.w) + "x" + std::to_string(st.args_.image_options.h);
+            }
+
+            if (st.args_.framerate > 0)
+            {
+                // See if format supports "framerate"
+                st.args_.format_options["framerate"] = std::to_string(st.args_.framerate);
             }
 
             av_dict opts = st.args_.format_options;

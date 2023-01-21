@@ -63,14 +63,10 @@ int main(int argc, const char** argv)
         ffmpeg::demuxer cap{[&]
         {
             ffmpeg::demuxer::args args;
-
-            args.filepath = "/dev/video0";
+            args.filepath        = "/dev/video0";
             args.image_options.h = get_option(parser, "height", 0);
             args.image_options.w = get_option(parser, "width",  0);
-
-            if (parser.option("framerate"))
-                args.format_options["framerate"]  = get_option(parser, "framerate", "");
-
+            args.framerate       = get_option(parser, "framerate", 0);
             return args;
         }()};
 

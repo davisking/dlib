@@ -665,6 +665,9 @@ namespace dlib
                 // Please see libavformat documentation for more details
                 std::unordered_map<std::string, std::string> format_options;
 
+                // Sets the output framerate for any device that allows you to do so, e.g. webcam, x11grab, etc. Does not apply to files
+                int framerate{0};
+
                 // Sets AVFormatContext::probsize
                 // Please see libavformat documentation for more details
                 int probesize{-1};
