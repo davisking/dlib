@@ -50,8 +50,8 @@ namespace dlib
     class simd4i
     {    
         typedef union {
-            vector signed int v;
-            vector bool int b;
+            __vector signed int v;
+            __vector __bool int b;
             signed int x[4];
         } v4i;
 
@@ -60,8 +60,8 @@ namespace dlib
     public:
         inline simd4i() : x{0,0,0,0} { }
         inline simd4i(const simd4i& v) : x(v.x) { }
-        inline simd4i(const vector int& v) : x{v} { }
-        inline simd4i(const vector bool int& b) { x.b=b; }
+        inline simd4i(const __vector int& v) : x{v} { }
+        inline simd4i(const __vector __bool int& b) { x.b=b; }
 
         inline simd4i(int32 f) : x{f,f,f,f} { }
         inline simd4i(int32 r0, int32 r1, int32 r2, int32 r3)
@@ -70,10 +70,10 @@ namespace dlib
         inline simd4i& operator=(const simd4i& v) { x = v.x; return *this; }
         inline simd4i& operator=(const int32& v) { *this = simd4i(v); return *this; }
 
-        inline vector signed int operator() () const { return x.v; }
+        inline __vector signed int operator() () const { return x.v; }
         inline int32 operator[](unsigned int idx) const { return x.x[idx]; }
         
-        inline vector bool int to_bool() const { return x.b; }
+        inline __vector __bool int to_bool() const { return x.b; }
         
         // intrinsics now seem to use xxpermdi automatically now
         inline void load_aligned(const int32* ptr)  { x.v = vec_ld(0, ptr); }
@@ -253,7 +253,7 @@ namespace dlib
                       _lhs[2]*_rhs[2],
                       _lhs[3]*_rhs[3]);
 #elif defined(DLIB_HAVE_VSX)
-        vector int a = lhs(), b = rhs();
+        __vector int a = lhs(), b = rhs();
         asm("vmuluwm %0, %0, %1\n\t" : "+&v" (a) : "v" (b) );
         return simd4i(a);
 #elif defined(DLIB_HAVE_NEON)
