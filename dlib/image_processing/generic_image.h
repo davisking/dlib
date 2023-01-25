@@ -153,11 +153,11 @@ namespace dlib
 
     namespace details
     {
-        template<class Container, class = void>
+        template<class Container, class Alwaysvoid = void>
         struct is_image_type : std::false_type{};
 
         template<class Container>
-        struct is_image_type<Container, void_t<is_pixel_check<pixel_type_t<Container>>>> : std::true_type{};
+        struct is_image_type<Container, dlib::void_t<is_pixel_check<pixel_type_t<Container>>>> : std::true_type{};
     }
 
     template<class Container>
