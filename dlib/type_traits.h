@@ -183,6 +183,21 @@ namespace dlib
     using is_convertible = std::is_convertible<from, to>;
 
  // ----------------------------------------------------------------------------------------
+
+    namespace details
+    {
+        template<class T, class AlwaysVoid = void>
+        struct is_complete_type : std::false_type{};
+
+        template<class T>
+        struct is_complete_type<T, void_t<decltype(sizeof(T))>> : std::true_type{};
+    }
+
+    template<class T>
+    using is_complete_type = details::is_complete_type<T>;
+
+ // ----------------------------------------------------------------------------------------
+ 
 }
 
 #endif //DLIB_TYPE_TRAITS_H_
