@@ -338,20 +338,25 @@ namespace dlib
 
         // ---------------------------------------------------------------------------------------------------
 
-        template <class ImageContainer>
-        void convert(const frame& f, ImageContainer& image)
+        template <class image_type>
+        void convert(const frame& f, image_type& image)
         /*!
             requires
+                - image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
                 - f.is_image() == true
-                - f.pixfmt() == pix_traits<typename image_traits<ImageContainer>::pixel_type>::fmt
+                - f.pixfmt() == pix_traits<pixel_type_t<image_type>>::fmt
 
             ensures
                 - converts a frame object into array2d<rgb_pixel>
         !*/
 
-        template <class ImageContainer>
-        void convert(const ImageContainer& img, frame& f)
+        template <class image_type>
+        void convert(const image_type& img, frame& f)
         /*!
+            requires
+                - image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h
             ensures
                 - converts a dlib image into a frame object
         !*/
