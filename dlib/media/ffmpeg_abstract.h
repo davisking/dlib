@@ -487,7 +487,7 @@ namespace dlib
             {
                 /*!
                     WHAT THIS OBJECT REPRESENTS
-                    Constructor arguments for decoder
+                        This holds constructor arguments for decoder.
                 !*/
 
                 decoder_codec_args args_codec;
@@ -649,9 +649,6 @@ namespace dlib
                         is_open() == false
                         dst_frame.is_empty() == true
             !*/
-
-        private:
-            // Implementation details
         };
 
         // ---------------------------------------------------------------------------------------------------
@@ -673,7 +670,7 @@ namespace dlib
             {
                 /*!
                     WHAT THIS OBJECT REPRESENTS
-                    Constructor arguments for demuxer
+                        This holds constructor arguments for demuxer.
                 !*/
 
                 args() = default;
@@ -943,9 +940,6 @@ namespace dlib
                     else
                         returns 0
             !*/
-
-        private:
-            // Implementation details
         };
 
         // ---------------------------------------------------------------------------------------------------
