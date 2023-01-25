@@ -8,7 +8,8 @@
     It also demonstrates how to check ffmpeg library versions programmatically.
 */
 
-#include <cstdio>
+#include <iostream>
+#include <iomanip>
 #include <dlib/media/ffmpeg_utils.h>
 
 using namespace std;
@@ -18,59 +19,56 @@ int main()
 {
     // List all codecs supported by this installation of ffmpeg libraries
     const auto codecs = ffmpeg::list_codecs();
-    printf("Supported codecs:\n");
+    
+    std::cout << "Supported codecs:\n";
     for (const auto& codec : codecs)
-        printf("name : %-16s : encoding supported %i decoding supported %i\n", codec.codec_name.c_str(), codec.supports_encoding, codec.supports_decoding);
-
-    printf("\n");
+        std::cout << "    name : " << std::left << std::setw(20) << codec.codec_name << " : encoding supported " << codec.supports_encoding << " decoding supported " << codec.supports_decoding << '\n';
+    std::cout << '\n';
 
     // List all demuxers supported by this installation of ffmpeg libraries
     const auto demuxers = ffmpeg::list_demuxers();
-    printf("Supported demuxers:\n");
-    for (const auto& demuxer : demuxers)
-        printf("%s\n", demuxer.c_str());
 
-    printf("\n");
+    std::cout << "Supported demuxers:\n";
+    for (const auto& demuxer : demuxers)
+        std::cout << "    name : " << demuxer << '\n';
+    std::cout << '\n';
     
     // List all muxers supported by this installation of ffmpeg libraries
-    printf("Supported muxers:\n");
+    std::cout << "Supported muxers:\n";
     for (const auto& muxer : ffmpeg::list_muxers())
-        printf("%s\n", muxer.c_str());
-
-    printf("\n");
+        std::cout << "    name : " << muxer << '\n';
+    std::cout << '\n';
 
     // List all input devices supported by this installation of ffmpeg libraries
-    printf("Supported input devices:\n");
+    std::cout << "Supported input devices:\n";
     for (const auto& device :  ffmpeg::list_input_devices())
     {
-        printf("device type : %s\n", device.device_type.c_str());
+        std::cout << "    device type : " << device.device_type << '\n';
         if (!device.devices.empty())
         {
-            printf("    instances :\n");
+            std::cout << "        instances :\n";
             for (const auto& instance : device.devices)
-                printf("        name : `%-32s` , description `%s`\n", instance.name.c_str(), instance.description.c_str());
+                std::cout << "            name : " << std::left << std::setw(32) << instance.name << ", description : " << instance.description << '\n';
         }
     }
 
-    printf("\n");
+    std::cout << '\n';
 
     // List all input devices supported by this installation of ffmpeg libraries
-    printf("Supported output devices:\n");
+    std::cout << "Supported output devices:\n";
     for (const auto& device :  ffmpeg::list_output_devices())
     {
-        printf("device type : %s\n", device.device_type.c_str());
+        std::cout << "    device type : " << device.device_type << '\n';
         if (!device.devices.empty())
         {
-            printf("    instances :\n");
+            std::cout << "        instances :\n";
             for (const auto& instance : device.devices)
-                printf("        name : `%-32s` , description `%s`\n", instance.name.c_str(), instance.description.c_str());
+                std::cout << "            name : " << std::left << std::setw(32) << instance.name << ", description : " << instance.description << '\n';
         }
     }
 
-    printf("\n");
+    std::cout << '\n';
     
-    printf("Can read MP4 file with H264 encoded video stream?\n");
-
     const bool mp4_available = 
         std::find_if(begin(demuxers),   
                      end(demuxers), 
@@ -81,7 +79,7 @@ int main()
                      end(codecs),   
                      [](const auto& codec) {return codec.codec_name == "h264" && codec.supports_decoding;}) != codecs.end();
 
-    printf("Anwser: %i\n", mp4_available && h264_available);
+    std::cout << "Can read MP4 file with H264 encoded video stream? " << (mp4_available && h264_available) << '\n';
 
     return EXIT_SUCCESS;
 }
