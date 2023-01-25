@@ -1,13 +1,17 @@
 // The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
+
     This example program shows how to find frontal human faces in an image and
     estimate their pose.  The pose takes the form of 68 landmarks.  These are
     points on the face such as the corners of the mouth, along the eyebrows, on
     the eyes, and so forth.  
     
+
     This example is essentially just a version of the face_landmark_detection_ex.cpp
-    example modified to use OpenCV's VideoCapture object to read from a camera instead 
+    example modified to use dlib's demuxer object to read from a camera instead 
     of files.
+
+
     Finally, note that the face detector is fastest when compiled with at least
     SSE2 instructions enabled.  So if you are using a PC with an Intel or AMD
     chip then you should enable at least SSE2 instructions.  If you are using
@@ -23,27 +27,59 @@
     2011.  SSE4 is the next fastest and is supported by most current machines.  
 */
 
-#include <dlib/opencv.h>
-#include <opencv2/highgui/highgui.hpp>
 #include <dlib/image_processing/frontal_face_detector.h>
 #include <dlib/image_processing/render_face_detections.h>
 #include <dlib/image_processing.h>
+#include <dlib/cmd_line_parser.h>
 #include <dlib/gui_widgets.h>
+#include <dlib/media.h>
 
 using namespace dlib;
 using namespace std;
 
-int main()
+int main(int argc, const char** argv)
 {
     try
     {
-        cv::VideoCapture cap(0);
-        if (!cap.isOpened())
+        command_line_parser parser;
+        parser.add_option("height",     "height of frames", 1);
+        parser.add_option("width",      "width of frames", 1);
+        parser.add_option("framerate",  "webcam desired framerate", 1);
+        parser.set_group_name("Help Options");
+        parser.add_option("h",          "alias of --help");
+        parser.add_option("help",       "display this message and exit");
+
+        parser.parse(argc, argv);
+        const char* one_time_opts[] = {"height", "width", "framerate"};
+        parser.check_one_time_options(one_time_opts);
+
+        if (parser.option("h") || parser.option("help"))
+        {
+            parser.print_options();
+            cout << "Please use `v4l2-ctl --list-formats-ext` to view all supported hardware formats\n";
+            return 0;
+        }
+
+        ffmpeg::demuxer cap{[&]
+        {
+            ffmpeg::demuxer::args args;
+            args.filepath        = "/dev/video0";
+            args.image_options.h = get_option(parser, "height", 0);
+            args.image_options.w = get_option(parser, "width",  0);
+            args.framerate       = get_option(parser, "framerate", 0);
+            return args;
+        }()};
+
+        if (!cap.is_open())
         {
             cerr << "Unable to connect to camera" << endl;
             return 1;
         }
 
+        cout << "height  : " << cap.height() << '\n';
+        cout << "width   : " << cap.width() << '\n';
+        cout << "fps     : " << cap.fps() << '\n';
+        
         image_window win;
 
         // Load face detection and pose estimation models.
@@ -51,33 +87,25 @@ int main()
         shape_predictor pose_model;
         deserialize("shape_predictor_68_face_landmarks.dat") >> pose_model;
 
+        ffmpeg::frame frame;
+        array2d<rgb_pixel> img;
+
         // Grab and process frames until the main window is closed by the user.
-        while(!win.is_closed())
+        while(cap.read(frame) && !win.is_closed())
         {
-            // Grab a frame
-            cv::Mat temp;
-            if (!cap.read(temp))
-            {
-                break;
-            }
-            // Turn OpenCV's Mat into something dlib can deal with.  Note that this just
-            // wraps the Mat object, it doesn't copy anything.  So cimg is only valid as
-            // long as temp is valid.  Also don't do anything to temp that would cause it
-            // to reallocate the memory which stores the image as that will make cimg
-            // contain dangling pointers.  This basically means you shouldn't modify temp
-            // while using cimg.
-            cv_image<bgr_pixel> cimg(temp);
+            // Convert the frame object into a dlib image object
+            convert(frame, img);
 
             // Detect faces 
-            std::vector<rectangle> faces = detector(cimg);
+            std::vector<rectangle> faces = detector(img);
             // Find the pose of each face.
             std::vector<full_object_detection> shapes;
             for (unsigned long i = 0; i < faces.size(); ++i)
-                shapes.push_back(pose_model(cimg, faces[i]));
+                shapes.push_back(pose_model(img, faces[i]));
 
             // Display it all on the screen
             win.clear_overlay();
-            win.set_image(cimg);
+            win.set_image(img);
             win.add_overlay(render_face_detections(shapes));
         }
     }
@@ -93,3 +121,4 @@ int main()
         cout << e.what() << endl;
     }
 }
+
