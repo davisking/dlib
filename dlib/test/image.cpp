@@ -78,8 +78,11 @@ namespace
     static_assert(is_image_type<matrix<std::complex<double>>>::value,       "bad trait definition");
     static_assert(is_image_type<matrix<std::complex<long double>>>::value,  "bad trait definition");
 
+    static_assert(!is_image_type<not_a_pixel_type>::value,          "bad trait definition");
+    static_assert(!is_image_type<rgb_pixel>::value,                 "bad trait definition");
+    static_assert(!is_image_type<std::vector<rgb_pixel>>::value,    "bad trait definition");
     static_assert(!is_image_type<array2d<not_a_pixel_type>>::value, "bad trait definition");
-    static_assert(!is_image_type<matrix<not_a_pixel_type>>::value, "bad trait definition");
+    static_assert(!is_image_type<matrix<not_a_pixel_type>>::value,  "bad trait definition");
 
 
     void image_test (
