@@ -11,6 +11,7 @@
 #include <limits>
 #include <complex>
 #include "enable_if.h"
+#include "type_traits.h"
 
 namespace dlib
 {
@@ -109,39 +110,19 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    namespace details
-    {
-        template<typename...T>
-        using void_t = void;
-
-        template<class Pixel, class = void>
-        struct is_pixel_type : std::false_type{};
-
-        template<class Pixel>
-        struct is_pixel_type<Pixel, void_t<decltype(pixel_traits<Pixel>::grayscale),
-                                           decltype(pixel_traits<Pixel>::rgb),
-                                           decltype(pixel_traits<Pixel>::rgb_alpha),
-                                           decltype(pixel_traits<Pixel>::hsi),
-                                           decltype(pixel_traits<Pixel>::lab),
-                                           decltype(pixel_traits<Pixel>::has_alpha),
-                                           decltype(pixel_traits<Pixel>::bgr_layout),
-                                           decltype(pixel_traits<Pixel>::num),
-                                           decltype(pixel_traits<Pixel>::is_unsigned)>> : std::true_type{};
-    }
-
-    template<class Pixel>
-    using is_pixel_type = details::is_pixel_type<Pixel>;
+    template <class Pixel>
+    using is_pixel_type = is_complete_type<pixel_traits<Pixel>>;
     /*!
         ensures
-            - determines whether Pixel has a pixel_traits<> specialization and if so, it is well defined
+            - determines whether Pixel has a pixel_traits<> specialization
     !*/
 
     template<class Pixel>
     using is_pixel_check = std::enable_if_t<is_pixel_type<Pixel>::value, bool>;
     /*!
         ensures
-            - SFINAE tool that prevents a function taking a universal reference from binding to arbitrary types.
-              Instead, it can only bind to pixel types, i.e. types that have pixel_traits<> specialised.
+            - SFINAE tool that prevents a function taking arbitrary types.
+              Instead, only pixel types with a pixel_traits<> specialisation are allowed.
     !*/
 
 // ----------------------------------------------------------------------------------------
