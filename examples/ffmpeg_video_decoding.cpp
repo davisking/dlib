@@ -7,7 +7,7 @@
     This is a pretty simple example. It loads a raw codec file, parses chunks of 
     data to the decoder and plots images to a GUI window.
 
-    Background about video files, something OpenCV doesn't make entirely clear:
+    Background about video files:
 
         Using FFMpeg's terminology, a video/audio file has the following structure:
             - container:
