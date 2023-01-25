@@ -278,38 +278,18 @@ namespace dlib
                     printf("avcodec_open2() failed : `%s`\n", get_av_error(ret).c_str());
             }
 
-            inline bool decoder_extractor::is_open() const noexcept
-            {
-                return pCodecCtx != nullptr || !frame_queue.empty();
-            }
-
-            inline bool decoder_extractor::is_image_decoder() const noexcept
-            {
-                return pCodecCtx != nullptr && pCodecCtx->codec_type == AVMEDIA_TYPE_VIDEO;
-            }
-
-            inline bool decoder_extractor::is_audio_decoder() const noexcept
-            {
-                return pCodecCtx != nullptr && pCodecCtx->codec_type == AVMEDIA_TYPE_AUDIO;
-            }
-
-            inline AVCodecID decoder_extractor::get_codec_id() const noexcept
-            {
-                return pCodecCtx != nullptr ? pCodecCtx->codec_id : AV_CODEC_ID_NONE;
-            }
-
-            inline std::string decoder_extractor::get_codec_name() const noexcept
-            {
-                return pCodecCtx != nullptr ? avcodec_get_name(pCodecCtx->codec_id) : "NONE";
-            }
-
-            inline int             decoder_extractor::height()         const noexcept { return resizer_image.get_dst_h(); }
-            inline int             decoder_extractor::width()          const noexcept { return resizer_image.get_dst_w(); }
-            inline AVPixelFormat   decoder_extractor::pixel_fmt()      const noexcept { return resizer_image.get_dst_fmt(); }
-            inline int             decoder_extractor::sample_rate()    const noexcept { return resizer_audio.get_dst_rate(); }
-            inline uint64_t        decoder_extractor::channel_layout() const noexcept { return resizer_audio.get_dst_layout(); }
-            inline AVSampleFormat  decoder_extractor::sample_fmt()     const noexcept { return resizer_audio.get_dst_fmt(); }
-            inline int             decoder_extractor::nchannels()      const noexcept { return av_get_channel_layout_nb_channels(channel_layout()); }
+            inline bool             decoder_extractor::is_open()            const noexcept { return pCodecCtx != nullptr || !frame_queue.empty(); }
+            inline bool             decoder_extractor::is_image_decoder()   const noexcept { return pCodecCtx != nullptr && pCodecCtx->codec_type == AVMEDIA_TYPE_VIDEO; }
+            inline bool             decoder_extractor::is_audio_decoder()   const noexcept { return pCodecCtx != nullptr && pCodecCtx->codec_type == AVMEDIA_TYPE_AUDIO; }
+            inline AVCodecID        decoder_extractor::get_codec_id()       const noexcept { return pCodecCtx != nullptr ? pCodecCtx->codec_id : AV_CODEC_ID_NONE; }
+            inline std::string      decoder_extractor::get_codec_name()     const noexcept { return pCodecCtx != nullptr ? avcodec_get_name(pCodecCtx->codec_id) : "NONE"; }
+            inline int              decoder_extractor::height()             const noexcept { return resizer_image.get_dst_h(); }
+            inline int              decoder_extractor::width()              const noexcept { return resizer_image.get_dst_w(); }
+            inline AVPixelFormat    decoder_extractor::pixel_fmt()          const noexcept { return resizer_image.get_dst_fmt(); }
+            inline int              decoder_extractor::sample_rate()        const noexcept { return resizer_audio.get_dst_rate(); }
+            inline uint64_t         decoder_extractor::channel_layout()     const noexcept { return resizer_audio.get_dst_layout(); }
+            inline AVSampleFormat   decoder_extractor::sample_fmt()         const noexcept { return resizer_audio.get_dst_fmt(); }
+            inline int              decoder_extractor::nchannels()          const noexcept { return av_get_channel_layout_nb_channels(channel_layout()); }
 
             enum extract_state
             {
@@ -838,10 +818,7 @@ namespace dlib
 
         inline bool demuxer::object_alive() const noexcept
         {
-            using namespace details;
-            const bool object_alive = st.pFormatCtx != nullptr &&
-                                    (st.channel_video.is_open() || st.channel_audio.is_open());
-            return object_alive;
+            return st.pFormatCtx != nullptr && (st.channel_video.is_open() || st.channel_audio.is_open());
         }
 
         inline bool demuxer::is_open() const noexcept
