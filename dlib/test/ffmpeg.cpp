@@ -7,6 +7,7 @@
 #include <dlib/dir_nav.h>
 #include <dlib/config_reader.h>
 #include <dlib/media.h>
+#include <dlib/array2d.h>
 #include "tester.h"
 
 #ifndef DLIB_FFMPEG_DATA

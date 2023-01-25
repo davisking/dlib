@@ -18,7 +18,7 @@ static_assert(false, "This version of dlib isn't built with the FFMPEG wrappers"
 #include <vector>
 #include <array>
 #include <unordered_map>
-#include "../array2d.h"
+#include "../image_processing/generic_image.h"
 #include "../pixel.h"
 #include "../assert.h"
 #include "ffmpeg_abstract.h"
