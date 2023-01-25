@@ -4,6 +4,7 @@
 #define DLIB_IF_CONSTEXPR_H
 
 #include "overloaded.h"
+#include "type_traits.h"
 
 namespace dlib
 {
@@ -13,14 +14,11 @@ namespace dlib
     {
         const auto _ = [](auto&& arg) -> decltype(auto) { return std::forward<decltype(arg)>(arg); };
 
-        template<typename...T>
-        using void_t = void;
-
         template<typename Void, template <class...> class Op, class... Args>
         struct is_detected : std::false_type{};
 
         template<template <class...> class Op, class... Args>
-        struct is_detected<void_t<Op<Args...>>, Op, Args...> : std::true_type {};
+        struct is_detected<dlib::void_t<Op<Args...>>, Op, Args...> : std::true_type {};
     }
 
 // ----------------------------------------------------------------------------------------
