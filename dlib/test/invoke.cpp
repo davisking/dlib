@@ -17,6 +17,29 @@ namespace
 
     // ----------------------------------------------------------------------------------------
 
+    namespace test_swap_traits
+    {
+        struct some_struct {int i{0};};
+
+        void swap(some_struct& a, some_struct& b) = delete;
+
+        static_assert(!dlib::is_swappable<some_struct>::value, "oops");
+        static_assert(!dlib::is_nothrow_swappable<some_struct>::value, "oops");
+
+        struct some_other_struct {int i{0};};
+
+        void swap(some_other_struct& a, some_other_struct& b)
+        {
+            std::swap(a.i, b.i);
+            throw std::runtime_error("toy example");
+        }
+
+        static_assert(dlib::is_swappable<some_other_struct>::value, "oops");
+        static_assert(!dlib::is_nothrow_swappable<some_other_struct>::value, "oops");
+    }
+
+    // ----------------------------------------------------------------------------------------
+
     static const std::string run1_str1 = "hello there 1";
     static const std::string run1_str2 = "hello there 2";
     static const std::string run1_str3 = "hello there 3";
