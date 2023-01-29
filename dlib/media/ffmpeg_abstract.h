@@ -486,6 +486,10 @@ namespace dlib
             /*!
                 WHAT THIS OBJECT REPRESENTS
                     This class is a libavcodec wrapper which decodes video or audio from raw memory.
+                    Note, if you are reading raw memory from file, it is easier to use demuxer
+                    as it also works with raw codec files like .h264 files.
+                    This class is suitable for example when reading raw encoded data from a socket,
+                    or interfacing with another library that provides encoded data.
             !*/
 
             struct args
@@ -645,14 +649,19 @@ namespace dlib
             decoder_status read(frame& dst_frame);
             /*!
                 ensures
-                    - if (DECODER_EAGAIN)
-                        dst_frame.is_empty() == true
-                        need to call push_encoded() again or flush()
-                    else if (DECODER_FRAME_AVAILABLE)
-                        dst_frame.is_empty() == false
-                    else if (DECODER_CLOSED)
-                        is_open() == false
-                        dst_frame.is_empty() == true
+                    - Attempts to read a frame, storing the result in dst_frame.
+                    - If it is successful then returns DECODER_FRAME_AVAILABLE and 
+                      dst_frame.is_empty() == false.  Otherwise, returns one of the 
+                      following:
+                         - DECODER_EAGAIN: this indicates more encoded data is required to decode
+                           additional frames.  In particular, you will need to keep calling push_encoded() 
+                           until this function returns DECODER_FRAME_AVAILABLE.
+                           Aternatively, if there is no more encoded data, call flush(). This will flush the decoder,
+                           resulting in additional frames being available. 
+                           After the decoder is flushed, this function function will return DECODER_FRAME_AVAILABLE
+                           until it finally calls DECODER_CLOSED.
+                        - DECODER_CLOSED: This indicates there aren't any more frames.  If this happens
+                          then it also means that is_open() == false and you can no longer retrieve anymore frames.
             !*/
         };
 
