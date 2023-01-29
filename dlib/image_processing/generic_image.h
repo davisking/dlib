@@ -165,7 +165,7 @@ namespace dlib
     /*!
         ensures
             - determines whether Container satisfies the generic image interface
-              i.e. is a 2D container of pixel types
+              i.e. there exists an image_traits<> specialization and the underlying pixel type has a pixel_trait<> specialiation
               e.g. array2d<rgb_pixel>, matrix<float>, etc...
     !*/
 
@@ -173,8 +173,8 @@ namespace dlib
     using is_image_check = std::enable_if_t<is_image_type<Container>::value, bool>;
     /*!
         ensures
-            - SFINAE tool that prevents a function taking a universal reference from binding to arbitrary types.
-              Instead, it can only bind to image types.
+            - SFINAE tool that prevents a function taking arbitrary types.
+              Instead, only image types that satisfy the generic image interface are allowed.
     !*/
 
 // ----------------------------------------------------------------------------------------
