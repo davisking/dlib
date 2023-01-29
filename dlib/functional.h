@@ -175,8 +175,7 @@ namespace dlib
         template<class AlwaysVoid, class F, class... Args>
         struct invoke_traits
         {
-            static constexpr bool is_invocable{false};
-            static constexpr bool is_noexcept{false};
+            static constexpr bool value{false};
 
             template<class R>
             using is_convertible = std::false_type;
@@ -185,8 +184,7 @@ namespace dlib
         template<class F, class... Args>
         struct invoke_traits<void_t<decltype(dlib::invoke(std::declval<F>(), std::declval<Args>()...))>, F, Args...>
         {
-            static constexpr bool is_invocable{true};
-            static constexpr bool is_noexcept{noexcept(dlib::invoke(std::declval<F>(), std::declval<Args>()...))};
+            static constexpr bool value{true};
             using type = decltype(dlib::invoke(std::declval<F>(), std::declval<Args>()...));
 
             template<class R>
@@ -215,20 +213,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template< typename F, typename... Args >
-    struct is_invocable : std::integral_constant<bool, detail::invoke_traits< void, F, Args...>::is_invocable> {};
+    struct is_invocable : std::integral_constant<bool, detail::invoke_traits< void, F, Args...>::value> {};
     /*!
         ensures
             - identical to std::is_invocable<F, Args..>
-            - works with C++11 onwards
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template< typename F, typename... Args >
-    struct is_nothrow_invocable : std::integral_constant<bool, detail::invoke_traits< void, F, Args...>::is_noexcept> {};
-    /*!
-        ensures
-            - identical to std::is_nothrow_invocable<F, Args..>
             - works with C++11 onwards
     !*/
 
