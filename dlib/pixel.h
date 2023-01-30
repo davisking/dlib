@@ -11,6 +11,7 @@
 #include <limits>
 #include <complex>
 #include "enable_if.h"
+#include "type_traits.h"
 
 namespace dlib
 {
@@ -109,6 +110,23 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <class Pixel>
+    using is_pixel_type = is_complete_type<pixel_traits<Pixel>>;
+    /*!
+        ensures
+            - determines whether Pixel has a pixel_traits<> specialization
+    !*/
+
+    template<class Pixel>
+    using is_pixel_check = std::enable_if_t<is_pixel_type<Pixel>::value, bool>;
+    /*!
+        ensures
+            - SFINAE tool that prevents a function taking arbitrary types.
+              Instead, only pixel types with a pixel_traits<> specialisation are allowed.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     struct rgb_pixel
     {
         /*!
@@ -142,6 +160,8 @@ namespace dlib
         }
 
     };
+
+    static_assert(sizeof(rgb_pixel) == 3, "sizeof(rgb_pixel) != 3. Type punning won't work on arrays of rgb_pixel's");
 
 // ----------------------------------------------------------------------------------------
 
@@ -181,6 +201,8 @@ namespace dlib
         }
 
     };
+
+    static_assert(sizeof(bgr_pixel) == 3, "sizeof(bgr_pixel) != 3. Type punning won't work on arrays of bgr_pixel's");
 
 // ----------------------------------------------------------------------------------------
 
@@ -222,6 +244,8 @@ namespace dlib
 
     };
 
+    static_assert(sizeof(rgb_alpha_pixel) == 4, "sizeof(rgb_alpha_pixel) != 4. Type punning won't work on arrays of rgb_alpha_pixel's");
+
 // ----------------------------------------------------------------------------------------
 
     struct bgr_alpha_pixel
@@ -261,6 +285,8 @@ namespace dlib
         }
 
     };
+
+    static_assert(sizeof(bgr_alpha_pixel) == 4, "sizeof(bgr_alpha_pixel) != 4. Type punning won't work on arrays of bgr_alpha_pixel's");
 
 // ----------------------------------------------------------------------------------------
 
@@ -666,6 +692,7 @@ namespace dlib
     struct float_grayscale_pixel_traits
     {
         constexpr static bool rgb  = false;
+        constexpr static bool bgr_layout  = false;
         constexpr static bool rgb_alpha  = false;
         constexpr static bool grayscale = true;
         constexpr static bool hsi = false;

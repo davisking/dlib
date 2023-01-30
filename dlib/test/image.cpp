@@ -23,6 +23,67 @@ namespace
 
     logger dlog("test.image");
 
+    /*! Compile time tests !*/
+    struct not_a_pixel_type{};
+
+    static_assert(is_image_type<array2d<rgb_pixel>>::value, "bad trait definition");
+    static_assert(is_image_type<array2d<bgr_pixel>>::value, "bad trait definition");
+    static_assert(is_image_type<array2d<rgb_alpha_pixel>>::value, "bad trait definition");
+    static_assert(is_image_type<array2d<bgr_alpha_pixel>>::value, "bad trait definition");
+    static_assert(is_image_type<array2d<hsi_pixel>>::value, "bad trait definition");
+    static_assert(is_image_type<array2d<lab_pixel>>::value, "bad trait definition");
+
+    static_assert(is_image_type<array2d<char>>::value,           "bad trait definition");
+    static_assert(is_image_type<array2d<signed char>>::value,    "bad trait definition");
+    static_assert(is_image_type<array2d<unsigned char>>::value,  "bad trait definition");
+    static_assert(is_image_type<array2d<short>>::value,          "bad trait definition");
+    static_assert(is_image_type<array2d<unsigned short>>::value, "bad trait definition");
+    static_assert(is_image_type<array2d<int>>::value,            "bad trait definition");
+    static_assert(is_image_type<array2d<unsigned int>>::value,   "bad trait definition");
+    static_assert(is_image_type<array2d<long>>::value,           "bad trait definition");
+    static_assert(is_image_type<array2d<unsigned long>>::value,  "bad trait definition");
+    static_assert(is_image_type<array2d<int64>>::value,          "bad trait definition");
+    static_assert(is_image_type<array2d<uint64>>::value,         "bad trait definition");
+
+    static_assert(is_image_type<array2d<float>>::value,                      "bad trait definition");
+    static_assert(is_image_type<array2d<double>>::value,                     "bad trait definition");
+    static_assert(is_image_type<array2d<long double>>::value,                "bad trait definition");
+    static_assert(is_image_type<array2d<std::complex<float>>>::value,        "bad trait definition");
+    static_assert(is_image_type<array2d<std::complex<double>>>::value,       "bad trait definition");
+    static_assert(is_image_type<array2d<std::complex<long double>>>::value,  "bad trait definition");
+
+    static_assert(is_image_type<array2d<rgb_pixel>>::value, "bad trait definition");
+    static_assert(is_image_type<array2d<bgr_pixel>>::value, "bad trait definition");
+    static_assert(is_image_type<array2d<rgb_alpha_pixel>>::value, "bad trait definition");
+    static_assert(is_image_type<array2d<bgr_alpha_pixel>>::value, "bad trait definition");
+    static_assert(is_image_type<array2d<hsi_pixel>>::value, "bad trait definition");
+    static_assert(is_image_type<array2d<lab_pixel>>::value, "bad trait definition");
+
+    static_assert(is_image_type<matrix<char>>::value,           "bad trait definition");
+    static_assert(is_image_type<matrix<signed char>>::value,    "bad trait definition");
+    static_assert(is_image_type<matrix<unsigned char>>::value,  "bad trait definition");
+    static_assert(is_image_type<matrix<short>>::value,          "bad trait definition");
+    static_assert(is_image_type<matrix<unsigned short>>::value, "bad trait definition");
+    static_assert(is_image_type<matrix<int>>::value,            "bad trait definition");
+    static_assert(is_image_type<matrix<unsigned int>>::value,   "bad trait definition");
+    static_assert(is_image_type<matrix<long>>::value,           "bad trait definition");
+    static_assert(is_image_type<matrix<unsigned long>>::value,  "bad trait definition");
+    static_assert(is_image_type<matrix<int64>>::value,          "bad trait definition");
+    static_assert(is_image_type<matrix<uint64>>::value,         "bad trait definition");
+
+    static_assert(is_image_type<matrix<float>>::value,                      "bad trait definition");
+    static_assert(is_image_type<matrix<double>>::value,                     "bad trait definition");
+    static_assert(is_image_type<matrix<long double>>::value,                "bad trait definition");
+    static_assert(is_image_type<matrix<std::complex<float>>>::value,        "bad trait definition");
+    static_assert(is_image_type<matrix<std::complex<double>>>::value,       "bad trait definition");
+    static_assert(is_image_type<matrix<std::complex<long double>>>::value,  "bad trait definition");
+
+    static_assert(!is_image_type<not_a_pixel_type>::value,          "bad trait definition");
+    static_assert(!is_image_type<rgb_pixel>::value,                 "bad trait definition");
+    static_assert(!is_image_type<std::vector<rgb_pixel>>::value,    "bad trait definition");
+    static_assert(!is_image_type<array2d<not_a_pixel_type>>::value, "bad trait definition");
+    static_assert(!is_image_type<matrix<not_a_pixel_type>>::value,  "bad trait definition");
+
 
     void image_test (
     )
