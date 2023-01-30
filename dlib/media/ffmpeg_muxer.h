@@ -6,7 +6,7 @@
 
 #include <queue>
 #include <functional>
-#include <map>
+#include <unordered_map>
 #include "ffmpeg_utils.h"
 #include "sink_view.h"
 
@@ -57,7 +57,7 @@ namespace dlib
                 encoder_audio_args  args_audio;
             };
 
-            encoder()                                    = default;
+            encoder()                             = default;
             encoder(encoder&& other)              = default;
             encoder& operator=(encoder&& other)   = default;
 
@@ -89,6 +89,12 @@ namespace dlib
         private:
             friend class muxer;
 
+            encoder(
+                const args&      a,
+                AVFormatContext* pFormatCtx,
+                AVStream*        stream
+            );
+
             bool open();
 
             args                            _args;
@@ -99,7 +105,8 @@ namespace dlib
             details::resampler              resizer_audio;
             details::audio_fifo             fifo;
             sink_view                       encoded;
-            AVFormatContext*                pFormatCtx{nullptr}; //Non-owning pointer         
+            AVFormatContext*                pFormatCtx{nullptr}; //Non-owning pointer    
+            AVStream*                       stream{nullptr};     //Non-owning pointer   
         };
 
 // ---------------------------------------------------------------------------------------------------
@@ -319,9 +326,21 @@ namespace dlib
 
         inline encoder::encoder(
             const args &a,
-            std::shared_ptr<std::ostream> out
+            sink_view sink
         ) : _args(a),
-            encoded(std::move(out))
+            encoded{sink}
+        {
+            if (!open())
+                pCodecCtx = nullptr;
+        }
+
+        inline encoder::encoder(
+            const args&      a,
+            AVFormatContext* pFormatCtx_,
+            AVStream*        stream_
+        ) : _args(a),
+            pFormatCtx{pFormatCtx_},
+            stream{stream_}
         {
             if (!open())
                 pCodecCtx = nullptr;
@@ -336,7 +355,7 @@ namespace dlib
         {
             using namespace details;
 
-            DLIB_CASSERT(encoded != nullptr, "Empty std::shared_ptr<std::ostream>");
+            DLIB_CASSERT(!encoded.is_empty() || (pFormatCtx != nullptr && stream != nullptr), "Empty sink");
 
             const bool init = details::register_ffmpeg::get(); // This must be used somewhere otherwise compiler might optimize it away.
 
