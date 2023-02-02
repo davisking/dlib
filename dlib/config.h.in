@@ -28,6 +28,7 @@
 #cmakedefine DLIB_USE_LAPACK
 #cmakedefine DLIB_USE_CUDA
 #cmakedefine DLIB_USE_MKL_FFT
+#cmakedefine DLIB_USE_FFMPEG
 
 // This variable allows dlib/test_for_odr_violations.h to catch people who mistakenly use
 // headers from one version of dlib with a compiled dlib binary from a different dlib version.
