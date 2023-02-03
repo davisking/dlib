@@ -106,6 +106,7 @@ target_link_libraries(assignment_learning_ex dlib::dlib)
 macro(add_example name)
    add_executable(${name} ${name}.cpp)
    target_link_libraries(${name} dlib::dlib )
+   # And strip symbols to make your binary smaller if you like.  Certainly not required though.
    target_link_options(${name} PRIVATE $<$<CONFIG:RELEASE>:-s>)
 endmacro()
 
