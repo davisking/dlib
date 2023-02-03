@@ -14,9 +14,7 @@ set(DLIB_TEST_COMPILE_ALL_SOURCE_CPP ON)
 
 add_subdirectory(.. dlib_build)
 
-# This variable contains a list of all the tests we are building
-# into the regression test suite.
-set (tests
+add_executable(${target_name} main.cpp tester.cpp
    example.cpp
    active_learning.cpp
    any.cpp
@@ -163,15 +161,10 @@ set (tests
    elastic_net.cpp
    te.cpp
    ffmpeg.cpp
-   )
-
-
-# add all the cpp files we want to compile to this list.  This tells
-# cmake that they are part of our target (which is the executable named dtest)
-ADD_EXECUTABLE(${target_name} main.cpp tester.cpp ${tests})
+)
 
 get_filename_component(DLIB_FFMPEG_DATA ${CMAKE_SOURCE_DIR}/ffmpeg_data/details.cfg REALPATH)
-add_compile_definitions(DLIB_FFMPEG_DATA="${DLIB_FFMPEG_DATA}")
+target_compile_definitions(${target_name} PRIVATE DLIB_FFMPEG_DATA="${DLIB_FFMPEG_DATA}")
 
 if (CMAKE_COMPILER_IS_GNUCXX)
    # Turn on all warnings, and treat them as errors.
@@ -191,6 +184,7 @@ if (CMAKE_COMPILER_IS_GNUCXX)
       # definitely heap allocated.
       add_compile_options(-Wno-free-nonheap-object)
    endif()
+   target_link_options(${target_name} PRIVATE $<$<CONFIG:RELEASE>:-s>)
 
 elseif (MSVC)
    # Treat warnings as errors.
@@ -200,10 +194,11 @@ else() # basically Clang
    add_compile_options(-W -Werror)
    # This is for the comment in face_detection_ex.cpp that says "faces/*.jpg"
    add_compile_options(-Wno-comment)
+   target_link_options(${target_name} PRIVATE $<$<CONFIG:RELEASE>:-s>)
 endif()
 
 
-TARGET_LINK_LIBRARIES(${target_name} dlib::dlib )
+target_link_libraries(${target_name} dlib::dlib )
 
 
 if (NOT DLIB_NO_GUI_SUPPORT)
