@@ -106,6 +106,7 @@ target_link_libraries(assignment_learning_ex dlib::dlib)
 macro(add_example name)
    add_executable(${name} ${name}.cpp)
    target_link_libraries(${name} dlib::dlib )
+   target_link_options(${name} PRIVATE $<$<CONFIG:RELEASE>:-s>)
 endmacro()
 
 # if an example requires GUI, call this macro to check DLIB_NO_GUI_SUPPORT to include or exclude
