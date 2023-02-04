@@ -394,12 +394,18 @@ namespace dlib
                     format. The ffmpeg object used to do this can simultaneously resize the image.
                     Therefore, the API allows users to optionally resize the image, as well as convert to RGB,
                     before being presented to user, as a possible optimization.
+
                     In the case of demuxer, if:
                         - h > 0
                         - w > 0
                         - and the demuxer is a device like v4l2 or xcbgrab
                     then we attempt to set the video size of the device before decoding.
                     Otherwise, the image dimensions set the bilinear resizer which resizes frames AFTER decoding.
+
+                    Furthermore, in the case of demuxer, if:
+                        - framerate > 0
+                        - and the demuxer is a device like v4l2 or xcbgrab
+                    then we attempt to set the framerate of the input device before deocding.
             !*/
 
             // Height of extracted frames. If 0, use whatever comes out decoder
@@ -410,6 +416,9 @@ namespace dlib
 
             // Pixel format of extracted frames. If AV_PIX_FMT_NONE, use whatever comes out decoder. The default is AV_PIX_FMT_RGB24
             AVPixelFormat fmt{AV_PIX_FMT_RGB24};
+
+            // Sets the output framerate for any device that allows you to do so, e.g. webcam, x11grab, etc. Does not apply to files
+            int framerate{-1};
         };
 
         // ---------------------------------------------------------------------------------------------------
@@ -708,9 +717,6 @@ namespace dlib
                 // A dictionary filled with AVFormatContext and demuxer-private options. Used by "avformat_open_input()"".
                 // Please see libavformat documentation for more details
                 std::unordered_map<std::string, std::string> format_options;
-
-                // Sets the output framerate for any device that allows you to do so, e.g. webcam, x11grab, etc. Does not apply to files
-                int framerate{0};
 
                 // Sets AVFormatContext::probsize
                 // Please see libavformat documentation for more details
