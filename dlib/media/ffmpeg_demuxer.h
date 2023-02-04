@@ -20,6 +20,7 @@ namespace dlib
             int             h{0};
             int             w{0};
             AVPixelFormat   fmt{AV_PIX_FMT_RGB24};
+            int             framerate{0};
         };
 
 // ---------------------------------------------------------------------------------------------------
@@ -167,7 +168,6 @@ namespace dlib
                 std::string filepath;
                 std::string input_format;
                 std::unordered_map<std::string, std::string> format_options;
-                int framerate{0};
 
                 int probesize{-1};
                 std::chrono::milliseconds   connect_timeout{std::chrono::milliseconds::max()};
@@ -679,10 +679,11 @@ namespace dlib
                 st.args_.format_options["video_size"] = std::to_string(st.args_.image_options.w) + "x" + std::to_string(st.args_.image_options.h);
             }
 
-            if (st.args_.framerate > 0)
+            if (st.args_.image_options.framerate > 0 &&
+                st.args_.format_options.find("framerate") == st.args_.format_options.end())
             {
                 // See if format supports "framerate"
-                st.args_.format_options["framerate"] = std::to_string(st.args_.framerate);
+                st.args_.format_options["framerate"] = std::to_string(st.args_.image_options.framerate);
             }
 
             av_dict opts = st.args_.format_options;

@@ -286,6 +286,7 @@ namespace dlib
 
             friend class details::resampler;
             friend class details::decoder_extractor;
+            friend class encoder;
 
             frame(
                 int                                     h,
