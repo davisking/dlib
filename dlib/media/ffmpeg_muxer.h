@@ -374,8 +374,8 @@ namespace dlib
                 pCodecCtx->height       = args_.args_image.h;
                 pCodecCtx->width        = args_.args_image.w;
                 pCodecCtx->pix_fmt      = args_.args_image.fmt;
-                pCodecCtx->time_base    = (AVRational){1, args_.args_image.framerate};
-                pCodecCtx->framerate    = (AVRational){args_.args_image.framerate, 1};
+                pCodecCtx->time_base    = AVRational{1, args_.args_image.framerate};
+                pCodecCtx->framerate    = AVRational{args_.args_image.framerate, 1};
 
                 //don't know what src options are, but at least dst options are set
                 resizer_image.reset(pCodecCtx->height, pCodecCtx->width, pCodecCtx->pix_fmt,
@@ -391,7 +391,7 @@ namespace dlib
                 pCodecCtx->sample_fmt       = args_.args_audio.fmt;
                 pCodecCtx->channel_layout   = args_.args_audio.channel_layout;
                 pCodecCtx->channels         = av_get_channel_layout_nb_channels(pCodecCtx->channel_layout);
-                pCodecCtx->time_base        = (AVRational){ 1, pCodecCtx->sample_rate };
+                pCodecCtx->time_base        = AVRational{ 1, pCodecCtx->sample_rate };
 
                 if (pCodecCtx->codec_id == AV_CODEC_ID_AAC) {
                     pCodecCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
