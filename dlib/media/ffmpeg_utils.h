@@ -744,7 +744,12 @@ namespace dlib
                 auto new_params     = std::make_tuple(in.samplefmt(), in.nchannels());
 
                 if (current_params != new_params)
-                    throw std::runtime_error("new audio frame params differ from first ");
+                {
+                    std::string msg = "New audio frame params differ from first\n";
+                    msg += "Current : fmt " + get_audio_fmt_str(fmt) + " nchannels " + std::to_string(nchannels) + "\n";
+                    msg += "New     : fmt " + get_audio_fmt_str(in.samplefmt()) + " nchannels " + std::to_string(in.nchannels()) + "\n";
+                    throw std::runtime_error(std::move(msg));
+                }
 
                 if (frame_size == 0)
                 {
