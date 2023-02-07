@@ -377,6 +377,8 @@ namespace dlib
                 pCodecCtx->time_base    = AVRational{1, args_.args_image.framerate};
                 pCodecCtx->framerate    = AVRational{args_.args_image.framerate, 1};
 
+                check_properties(pCodec, pCodecCtx.get());
+
                 //don't know what src options are, but at least dst options are set
                 resizer_image.reset(pCodecCtx->height, pCodecCtx->width, pCodecCtx->pix_fmt,
                                     pCodecCtx->height, pCodecCtx->width, pCodecCtx->pix_fmt);
@@ -397,6 +399,8 @@ namespace dlib
                     pCodecCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
                 }
 
+                check_properties(pCodec, pCodecCtx.get());
+                
                 //don't know what src options are, but at least dst options are set
                 resizer_audio.reset(
                         pCodecCtx->sample_rate, pCodecCtx->channel_layout, pCodecCtx->sample_fmt,
@@ -404,7 +408,6 @@ namespace dlib
                 );
             }
 
-            check_properties(pCodec, pCodecCtx.get());
             av_dict opt = args_.args_codec.codec_options;
             const int ret = avcodec_open2(pCodecCtx.get(), pCodec, opt.get());
             if (ret < 0)
