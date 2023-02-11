@@ -1758,7 +1758,7 @@ namespace dlib
             - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, repeat, or
               add_tag_layer.
         ensures
-            - returns the input later of the given network object.  This is the same as just calling
+            - returns the input layer of the given network object.  This is the same as just calling
               net.input_layer().
     !*/
 

@@ -106,6 +106,8 @@ target_link_libraries(assignment_learning_ex dlib::dlib)
 macro(add_example name)
    add_executable(${name} ${name}.cpp)
    target_link_libraries(${name} dlib::dlib )
+   # And strip symbols to make your binary smaller if you like.  Certainly not required though.
+   target_link_options(${name} PRIVATE $<$<CONFIG:RELEASE>:-s>)
 endmacro()
 
 # if an example requires GUI, call this macro to check DLIB_NO_GUI_SUPPORT to include or exclude
@@ -229,10 +231,10 @@ endif()
 
 if (DLIB_USE_FFMPEG AND NOT DLIB_NO_GUI_SUPPORT)
    add_example(ffmpeg_webcam_face_pose_ex)
-   add_example(ffmpeg_video_demuxing)
-   add_example(ffmpeg_video_decoding)
-   add_example(ffmpeg_info)
-   add_example(ffmpeg_screen_grab)
+   add_example(ffmpeg_video_demuxing_ex)
+   add_example(ffmpeg_video_decoding_ex)
+   add_example(ffmpeg_info_ex)
+   add_example(ffmpeg_screen_grab_ex)
 endif()
 
 if (DLIB_NO_GUI_SUPPORT)

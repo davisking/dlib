@@ -222,14 +222,23 @@ namespace dlib
         );
         /*!
             ensures
-                - updates the mean, variance, skewness, and kurtosis stored in this object
-                  so that the new value is factored into them.
+                - updates the sum, mean, variance, skewness, and kurtosis stored in this
+                  object so that the new value is factored into them.
+                - #sum() == sum() + val
                 - #mean() == mean()*current_n()/(current_n()+1) + val/(current_n()+1).
                   (i.e. the updated mean value that takes the new value into account)
                 - #variance() == the updated variance that takes this new value into account.
                 - #skewness() == the updated skewness that takes this new value into account.
                 - #ex_kurtosis() == the updated kurtosis that takes this new value into account.
                 - #current_n() == current_n() + 1
+        !*/
+
+        T sum (
+        ) const;
+        /*!
+            ensures
+                - returns the sum of all the values presented to this object
+                  so far.
         !*/
 
         T mean (
