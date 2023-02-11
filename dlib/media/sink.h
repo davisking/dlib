@@ -18,9 +18,10 @@ namespace dlib
 
         template <
           class Byte, 
+          class Allocator,
           std::enable_if_t<is_byte<Byte>::value, bool> = true
         >
-        auto sink(std::vector<Byte>& buf)
+        auto sink(std::vector<Byte, Allocator>& buf)
         {
             return [&](std::size_t ndata, const char* data) {
                 buf.insert(buf.end(), data, data + ndata);
