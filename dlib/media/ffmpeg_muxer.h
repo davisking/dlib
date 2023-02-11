@@ -75,13 +75,14 @@ namespace dlib
             int             height()            const noexcept;
             int             width()             const noexcept;
             AVPixelFormat   pixel_fmt()         const noexcept;
+            int             fps()               const noexcept;
             /*! audio properties !*/
             int             sample_rate()       const noexcept;
             uint64_t        channel_layout()    const noexcept;
             AVSampleFormat  sample_fmt()        const noexcept;
             int             nchannels()         const noexcept;
 
-            bool push(frame&& frame);
+            bool push(frame frame);
             void flush();
 
         private:
@@ -124,8 +125,8 @@ namespace dlib
                 std::chrono::milliseconds   read_timeout{std::chrono::milliseconds::max()};
                 std::function<bool()>       interrupter;
                 
-                struct : encoder_codec_args, encoder_image_args{} image_options;
-                struct : encoder_codec_args, encoder_audio_args{} audio_options;
+                struct : encoder_codec_args, encoder_image_args{} args_image;
+                struct : encoder_codec_args, encoder_audio_args{} args_audio;
                 bool enable_image{true};
                 bool enable_audio{true};
             };
@@ -136,20 +137,27 @@ namespace dlib
             muxer& operator=(muxer&& other) noexcept;
             ~muxer();
 
-            bool            is_open()           const noexcept;
-            bool            audio_enabled()     const noexcept;
-            bool            video_enabled()     const noexcept;
-            /*video dims*/
-            int             height()            const noexcept;
-            int             width()             const noexcept;
-            AVPixelFormat   pixel_fmt()         const noexcept;
-            /*audio dims*/
-            int             sample_rate()       const noexcept;
-            uint64_t        channel_layout()    const noexcept;
-            AVSampleFormat  sample_fmt()        const noexcept;
-            int             nchannels()         const noexcept;
+            bool is_open() const noexcept;
+            bool audio_enabled() const noexcept;
+            bool video_enabled() const noexcept;
 
-            bool push(frame&& f);
+            int             height()                    const noexcept;
+            int             width()                     const noexcept;
+            AVPixelFormat   pixel_fmt()                 const noexcept;
+            float           fps()                       const noexcept;
+            int             estimated_nframes()         const noexcept;
+            AVCodecID       get_video_codec_id()        const noexcept;
+            std::string     get_video_codec_name()      const noexcept;
+
+            int             sample_rate()               const noexcept;
+            uint64_t        channel_layout()            const noexcept;
+            AVSampleFormat  sample_fmt()                const noexcept;
+            int             nchannels()                 const noexcept;
+            int             estimated_total_samples()   const noexcept;
+            AVCodecID       get_audio_codec_id()        const noexcept;
+            std::string     get_audio_codec_name()      const noexcept;
+
+            bool push(frame f);
             void flush();
 
         private:
@@ -187,6 +195,7 @@ namespace dlib
         inline bool operator!=(const AVRational& a, const AVRational& b) {return !(a == b);}
         inline bool operator==(const AVRational& a, int framerate)       {return a.den > 0 && (a.num / a.den) == framerate;}
         inline bool operator!=(const AVRational& a, int framerate)       {return !(a == framerate);}
+        inline int  to_int(const AVRational& a)                          {return a.num / a.den;}
 
         inline void check_properties(
             const AVCodec* pCodec,
@@ -431,6 +440,7 @@ namespace dlib
         inline bool            encoder::is_audio_encoder() const noexcept { return pCodecCtx && pCodecCtx->codec_type == AVMEDIA_TYPE_AUDIO; }
         inline AVCodecID       encoder::get_codec_id()     const noexcept { return pCodecCtx ? pCodecCtx->codec_id : AV_CODEC_ID_NONE; }
         inline std::string     encoder::get_codec_name()   const noexcept { return pCodecCtx ? avcodec_get_name(pCodecCtx->codec_id) : "NONE"; }
+        inline int             encoder::fps()              const noexcept { return pCodecCtx ? to_int(pCodecCtx->framerate) : 0; }
         inline int             encoder::height()           const noexcept { return resizer_image.get_dst_h(); }
         inline int             encoder::width()            const noexcept { return resizer_image.get_dst_w(); }
         inline AVPixelFormat   encoder::pixel_fmt()        const noexcept { return resizer_image.get_dst_fmt(); }
@@ -448,7 +458,7 @@ namespace dlib
             ENCODE_ERROR = -1
         };
         
-        inline bool encoder::push(frame&& f)
+        inline bool encoder::push(frame f_)
         {
             using namespace std::chrono;
             using namespace details;
@@ -459,20 +469,22 @@ namespace dlib
             std::vector<frame> frames;
 
             // Resize if image. Resample if audio. Push through audio fifo if necessary (some audio codecs requires fixed size frames)
-            if (f.is_image())
+            if (f_.is_image())
             {
-                resizer_image.resize(f, f);
-                frames.push_back(std::move(f));
+                frame tmp;
+                resizer_image.resize(f_, tmp);
+                frames.push_back(std::move(tmp));
             }
-            else if (f.is_audio())
+            else if (f_.is_audio())
             {
-                resizer_audio.resize(f, f);
-                frames = fifo.push_pull(std::move(f));
+                frame tmp;
+                resizer_audio.resize(f_, tmp);
+                frames = fifo.push_pull(std::move(tmp));
             }
             else
             {
                 // FLUSH
-                frames.push_back(std::move(f));
+                frames.push_back(std::move(f_));
             }
 
             // Set pts based on timestamps or tracked state
@@ -641,13 +653,13 @@ namespace dlib
 
                 if (is_video)
                 {
-                    args.args_codec = st.args_.image_options;
-                    args.args_image = st.args_.image_options;
+                    args.args_codec = st.args_.args_image;
+                    args.args_image = st.args_.args_image;
                 }
                 else
                 {
-                    args.args_codec = st.args_.audio_options;
-                    args.args_audio = st.args_.audio_options;
+                    args.args_codec = st.args_.args_audio;
+                    args.args_audio = st.args_.args_audio;
                 }
 
                 if (st.pFormatCtx->oformat->flags & AVFMT_GLOBALHEADER)
@@ -771,12 +783,12 @@ namespace dlib
             return false;
         }
 
-        bool muxer::push(frame &&frame)
+        bool muxer::push(frame f)
         {
             if (!is_open())
                 return false;
 
-            if (frame.is_image())
+            if (f.is_image())
             {
                 if (!st.encoder_image.is_open())
                 {
@@ -784,10 +796,10 @@ namespace dlib
                     return false;
                 }
 
-                return st.encoder_image.push(std::move(frame));
+                return st.encoder_image.push(std::move(f));
             }
 
-            else if (frame.is_image())
+            else if (f.is_audio())
             {
                 if (!st.encoder_audio.is_open())
                 {
@@ -795,7 +807,7 @@ namespace dlib
                     return false;
                 }
 
-                return st.encoder_audio.push(std::move(frame));
+                return st.encoder_audio.push(std::move(f));
             }
 
             return false;
@@ -819,18 +831,21 @@ namespace dlib
             st.pFormatCtx.reset(nullptr); //close
         }
 
-        inline bool             muxer::is_open()        const noexcept { return video_enabled() || audio_enabled(); }
-        inline bool             muxer::video_enabled()  const noexcept { return st.pFormatCtx != nullptr && st.encoder_image.is_open(); }
-        inline bool             muxer::audio_enabled()  const noexcept { return st.pFormatCtx != nullptr && st.encoder_audio.is_open(); }
-        inline int              muxer::height()         const noexcept { return st.encoder_image.height(); }
-        inline int              muxer::width()          const noexcept { return st.encoder_image.width(); }
-        inline AVPixelFormat    muxer::pixel_fmt()      const noexcept { return st.encoder_image.pixel_fmt(); }
-        inline int              muxer::sample_rate()    const noexcept { return st.encoder_audio.sample_rate(); }
-        uint64_t                muxer::channel_layout() const noexcept { return st.encoder_audio.channel_layout(); }
-        int                     muxer::nchannels()      const noexcept { return st.encoder_audio.nchannels(); }
-        AVSampleFormat          muxer::sample_fmt()     const noexcept { return st.encoder_audio.sample_fmt(); }
+        inline bool             muxer::is_open()                const noexcept { return video_enabled() || audio_enabled(); }
+        inline bool             muxer::video_enabled()          const noexcept { return st.pFormatCtx != nullptr && st.encoder_image.is_image_encoder(); }
+        inline bool             muxer::audio_enabled()          const noexcept { return st.pFormatCtx != nullptr && st.encoder_audio.is_audio_encoder(); }
+        inline int              muxer::height()                 const noexcept { return st.encoder_image.height(); }
+        inline int              muxer::width()                  const noexcept { return st.encoder_image.width(); }
+        inline AVPixelFormat    muxer::pixel_fmt()              const noexcept { return st.encoder_image.pixel_fmt(); }
+        inline AVCodecID        muxer::get_video_codec_id()     const noexcept { return st.encoder_image.get_codec_id(); }
+        inline std::string      muxer::get_video_codec_name()   const noexcept { return st.encoder_image.get_codec_name(); }
+        inline int              muxer::sample_rate()            const noexcept { return st.encoder_audio.sample_rate(); }
+        uint64_t                muxer::channel_layout()         const noexcept { return st.encoder_audio.channel_layout(); }
+        int                     muxer::nchannels()              const noexcept { return st.encoder_audio.nchannels(); }
+        AVSampleFormat          muxer::sample_fmt()             const noexcept { return st.encoder_audio.sample_fmt(); }
+        inline AVCodecID        muxer::get_audio_codec_id()     const noexcept { return st.encoder_audio.get_codec_id(); }
+        inline std::string      muxer::get_audio_codec_name()   const noexcept { return st.encoder_audio.get_codec_name(); }
     }
 }
-
 
 #endif //DLIB_VIDEO_MUXER
