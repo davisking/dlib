@@ -174,8 +174,8 @@ namespace dlib
                 std::chrono::milliseconds   read_timeout{std::chrono::milliseconds::max()};
                 std::function<bool()>       interrupter;
                 
-                struct : decoder_codec_args, decoder_image_args{} image_options;
-                struct : decoder_codec_args, decoder_audio_args{} audio_options;
+                struct : decoder_codec_args, decoder_image_args{} args_image;
+                struct : decoder_codec_args, decoder_audio_args{} args_audio;
                 bool enable_image{true};
                 bool enable_audio{true};
             };
@@ -671,19 +671,19 @@ namespace dlib
                 pFormatCtx->probesize = st.args_.probesize;
 
             // Hacking begins. 
-            if (st.args_.image_options.h > 0 && 
-                st.args_.image_options.w > 0 && 
+            if (st.args_.args_image.h > 0 && 
+                st.args_.args_image.w > 0 && 
                 st.args_.format_options.find("video_size") == st.args_.format_options.end())
             {
                 // See if format supports "video_size"
-                st.args_.format_options["video_size"] = std::to_string(st.args_.image_options.w) + "x" + std::to_string(st.args_.image_options.h);
+                st.args_.format_options["video_size"] = std::to_string(st.args_.args_image.w) + "x" + std::to_string(st.args_.args_image.h);
             }
 
-            if (st.args_.image_options.framerate > 0 &&
+            if (st.args_.args_image.framerate > 0 &&
                 st.args_.format_options.find("framerate") == st.args_.format_options.end())
             {
                 // See if format supports "framerate"
-                st.args_.format_options["framerate"] = std::to_string(st.args_.image_options.framerate);
+                st.args_.format_options["framerate"] = std::to_string(st.args_.args_image.framerate);
             }
 
             av_dict opts = st.args_.format_options;
@@ -795,8 +795,8 @@ namespace dlib
                 {
                     st.channel_video = decoder_extractor{[&] {
                         decoder_extractor::args args;
-                        args.args_codec = st.args_.image_options;
-                        args.args_image = st.args_.image_options;
+                        args.args_codec = st.args_.args_image;
+                        args.args_image = st.args_.args_image;
                         args.time_base  = st.pFormatCtx->streams[stream_id]->time_base;
                         return args;
                     }(), std::move(pCodecCtx), pCodec};
@@ -807,8 +807,8 @@ namespace dlib
                 {
                     st.channel_audio = decoder_extractor{[&] {
                         decoder_extractor::args args;
-                        args.args_codec = st.args_.audio_options;
-                        args.args_audio = st.args_.audio_options;
+                        args.args_codec = st.args_.args_audio;
+                        args.args_audio = st.args_.args_audio;
                         args.time_base  = st.pFormatCtx->streams[stream_id]->time_base;
                         return args;
                     }(), std::move(pCodecCtx), pCodec};
