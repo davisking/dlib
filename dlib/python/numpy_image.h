@@ -380,7 +380,7 @@ namespace pybind11
         struct pyobject_caster<dlib::numpy_image<pixel_type>> {
             using type = dlib::numpy_image<pixel_type>;
 
-            bool load(handle src, bool convert) {
+            bool load(handle src, bool /*convert*/) {
                 // If passed a tuple where the first element of the tuple is a valid
                 // numpy_image then bind the numpy_image to that element of the tuple.
                 // We do this because there is a pattern of returning an image and some
