@@ -963,6 +963,332 @@ namespace dlib
         };
 
         // ---------------------------------------------------------------------------------------------------
+
+        template <
+          class Byte, 
+          class Allocator,
+          std::enable_if_t<is_byte<Byte>::value, bool> = true
+        >
+        DEDUCED sink(std::vector<Byte, Allocator>& buf);
+        /*!
+            requires
+                - Byte must be a byte type, e.g. char, int8_t or uint8_t
+                - The lifetime of buf must exceed the lifetime of the encoder 
+                  instance you are passing this to.
+
+            ensures
+                - Creates a "view" type which type-erases &buf and creates
+                  a suitable callback with signature bool(std::size_t, const char*)
+                  which can be passed to encoder.
+                - When the callback is invoked, packet data is appended to buf.
+        !*/
+
+        // ---------------------------------------------------------------------------------------------------
+
+        DEDUCED sink(std::ostream& out);
+        /*!
+            requires
+                - The lifetime of out must exceed the lifetime of the encoder 
+                  instance you are passing this to.
+
+            ensures
+                - Creates a "view" type which type-erases &out and creates
+                  a suitable callback with signature bool(std::size_t, const char*)
+                  which can be passed to encoder.
+                - When the callback is invoked, packet data is added to the output stream.
+        !*/
+
+        // ---------------------------------------------------------------------------------------------------
+
+        struct encoder_image_args
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This class groups a set of arguments passed to the encoder and muxer classes.
+                    These must be set to non-zero or non-trivial values as they are used to configure 
+                    the underlying codec and optionally, an internal image scaler.
+                    Any frame that is pushed to encoder or muxer instances is resized to the codec's 
+                    pre-configured settings if their dimensions or pixel format don't match.
+                    For example, if the codec is configured to use height 512, width 384 and RGB format,
+                    using the variables below, and the frames already have these settings when pushed, 
+                    then no resizing is performed. If however they don't, then they are first resized. 
+                    So users don't have to worry about that.
+            !*/
+
+            // Target height of codec.
+            int h{0};
+
+            // Target width of codec.
+            int w{0};
+            
+            // Target pixel format of codec.
+            AVPixelFormat fmt{AV_PIX_FMT_YUV420P};
+
+            // Target framerate of codec/muxer
+            int framerate{0};
+        };
+
+        // ---------------------------------------------------------------------------------------------------
+
+        struct encoder_audio_args
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This class groups a set of arguments passed to the encoder and muxer classes.
+                    These must be set to non-zero or non-trivial values as they are used to configure 
+                    the underlying codec and optionally, an internal audio resampler.
+                    Any frame that is pushed to encoder or muxer instances is resampled to the codec's
+                    pre-configured settings if their sample format, sample rate or channel layout, don't match.
+            !*/
+
+            // Target sample rate of codec
+            int sample_rate{0};
+
+            // Target channel layout of codec
+            uint64_t channel_layout{AV_CH_LAYOUT_STEREO};
+
+            // Target sample format of codec
+            AVSampleFormat fmt{AV_SAMPLE_FMT_S16};
+        };
+
+        // ---------------------------------------------------------------------------------------------------
+
+        struct encoder_codec_args
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This class groups a set of arguments passed to the encoder and muxer classes.
+                    Some of these must be set to non-zero or non-trivial values as they are used 
+                    to configure the underlying codec. Others will only be used if non-zero or
+                    non-trivial.
+            !*/
+
+            // Codec ID used to configure the encoder. Either codec or codeC_name MUST be set.
+            AVCodecID codec{AV_CODEC_ID_NONE};
+
+            // Codec name used to configure the encoder. This is used if codec == AV_CODEC_ID_NONE.
+            std::string codec_name;
+
+            // A dictionary of AVCodecContext and codec-private options. Used by "avcodec_open2()"
+            std::unordered_map<std::string, std::string> codec_options;
+
+            // Sets AVCodecContext::bit_rate if non-negative.
+            int64_t bitrate{-1};
+
+            // Sets AVCodecContext::gop_size if non-negative.
+            int gop_size{-1};
+
+            // OR-ed with AVCodecContext::flags if non-negative.
+            int flags{0};
+        };
+
+        // ---------------------------------------------------------------------------------------------------
+
+        class encoder
+        {
+        public:
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This class is a libavcodec wrapper which encodes video or audio to raw memory.
+                    Note, if you are creating a media file, it is easier to use the muxer object
+                    as it also works with raw codec files like .h264 files.
+                    This class is suitable for example if you need to send raw packets over a socket
+                    or interface with another library that requires encoded data, not raw images
+                    or raw audio samples.
+            !*/
+
+            struct args
+            {
+                /*!
+                    WHAT THIS OBJECT REPRESENTS
+                        This holds constructor arguments for encoder.
+                !*/
+                encoder_codec_args args_codec;
+                encoder_image_args args_image;
+                encoder_audio_args args_audio;
+            };
+
+            encoder() = default;
+            /*!
+                ensures
+                    - is_open() == false
+            !*/
+
+            encoder(
+                const args& a,
+                std::function<bool(std::size_t, const char*)> sink
+            );
+            /*!
+                requires
+                    - a.args_codec.codec or a.args_codec.codec_name are set
+                    - Either a.args_image or a.args_audio is fully set
+                    - sink is set to a valid callback for writing packet data
+                      dlib/media/sink.h contains callback wrappers for
+                      different buffer types.
+
+                ensures
+                    - Constructs encoder from a and sink
+                    - is_open() == true
+            !*/
+
+            encoder(encoder&& other) = default;
+            /*!
+                ensures
+                    - Move constructor
+                    - other is in an empty but otherwise valid state after move
+                    - other.is_open() == false after move
+            !*/
+
+            encoder& operator=(encoder&& other) = default;
+            /*!
+                ensures
+                    - Move assignment operator
+                    - other is in an empty but otherwise valid state after move
+                    - other.is_open() == false after move
+            !*/
+            
+            ~encoder();
+            /*!
+                ensures
+                    - Destructor
+                    - flush() is called first if it hasn't already been called
+            !*/
+
+            bool is_open() const noexcept;
+            /*!
+                ensures
+                    - Returns true if the codec is open and user may call push()
+            !*/
+
+            bool is_image_encoder() const noexcept;
+            /*!
+                ensures
+                    - Returns true if the codec is an image encoder.
+            !*/
+
+            bool is_audio_encoder() const noexcept;
+            /*!
+                ensures
+                    - Returns true if the codec is an audio encoder.
+            !*/
+
+            AVCodecID get_codec_id() const noexcept;
+            /*!
+                requires
+                    - is_open() == true
+                ensures
+                    - returns the codec id. See ffmpeg documentation or libavcodec/codec_id.h
+            !*/
+
+            std::string get_codec_name()    const noexcept;
+            /*!
+                requires
+                    - is_open() == true
+                ensures
+                    - returns string representation of codec id.
+            !*/
+
+            int height() const noexcept;
+            /*!
+                requires
+                    - is_image_encoder() == true
+                ensures
+                    - returns the height of the configured codec, not necessarily the
+                      height of frames used with push(frame)
+            !*/
+
+            int width() const noexcept;
+            /*!
+                requires
+                    - is_image_encoder() == true
+                ensures
+                    - returns the width of the configured codec, not necessarily the
+                      width of frames used with push(frame)
+            !*/
+
+            AVPixelFormat pixel_fmt() const noexcept;
+            /*!
+                requires
+                    - is_image_encoder() == true
+                ensures
+                    - returns the pixel format of the configured codec, not necessarily the
+                      pixel format of frames used with push(frame)
+            !*/
+
+            int fps() const noexcept;
+             /*!
+                requires
+                    - is_image_encoder() == true
+                ensures
+                    - returns the configured framerate of the codec.
+            !*/
+
+            int sample_rate() const noexcept;
+            /*!
+                requires
+                    - is_audio_encoder() == true
+                ensures
+                    - returns the sample rate of the configured codec, not necessarily the
+                      sample rate of frames used with push(frame)
+            !*/
+
+            uint64_t channel_layout() const noexcept;
+            /*!
+                requires
+                    - is_audio_encoder() == true
+                ensures
+                    - returns the channel layout of the configured codec, not necessarily the
+                      channel layout of frames used with push(frame).
+                      e.g. AV_CH_LAYOUT_STEREO, AV_CH_LAYOUT_MONO etc.
+            !*/
+
+            AVSampleFormat sample_fmt() const noexcept;
+            /*!
+                requires
+                    - is_audio_encoder() == true
+                ensures
+                    - returns the sample format of the configured codec, not necessarily the
+                      sample format of frames used with push(frame)
+            !*/
+
+            int nchannels() const noexcept;
+            /*!
+                requires
+                    - is_audio_encoder() == true
+                ensures
+                    - returns the number of audio channels in the configured codec.
+            !*/
+
+            bool push(frame f);
+            /*!
+                requires
+                    - is_open() == true
+                    - if is_image_encoder() == true, then f.is_image() == true
+                    - if is_audio_encoder() == true, then f.is_audio() == true
+                    - flush() has not been called
+
+                ensures
+                    - If f does not have matching settings to the codec, it is either
+                      resized or resampled before being pushed to the codec and encoded.
+                    - The callback passed to the constructor may or may not be invoked
+                      as the underlying resampler, audio fifo and codec may buffer.
+                    - Returns true if successfully encoded, even if callback wasn't invoked.
+                    - Returns false if either EOF, i.e. flush() has been previously called,
+                      or an error occured, in which case is_open() == false.
+            !*/
+
+            void flush();
+            /*!
+                requires
+                    - is_open() == true
+                
+                ensures
+                    - Flushes the codec. Callback passed to constructor will likely be invoked.
+                    - is_open() == false
+            !*/
+        };
+
+        // ---------------------------------------------------------------------------------------------------
     }
 }
 

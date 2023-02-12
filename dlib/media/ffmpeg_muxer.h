@@ -19,7 +19,7 @@ namespace dlib
         {
             int             h{0};
             int             w{0};
-            AVPixelFormat   fmt{AV_PIX_FMT_RGB24};
+            AVPixelFormat   fmt{AV_PIX_FMT_YUV420P};
             int             framerate{0};
         };
 
@@ -51,9 +51,9 @@ namespace dlib
         public:
             struct args
             {
-                encoder_codec_args  args_codec;
-                encoder_image_args  args_image;
-                encoder_audio_args  args_audio;
+                encoder_codec_args args_codec;
+                encoder_image_args args_image;
+                encoder_audio_args args_audio;
             };
 
             encoder()                             = default;
