@@ -1016,7 +1016,13 @@ namespace dlib
 
         inline int demuxer::estimated_total_samples() const noexcept
         {
-            return st.channel_audio.is_audio_decoder() ? st.pFormatCtx->streams[st.stream_id_audio]->duration : 0;
+            if (st.channel_audio.is_audio_decoder())
+            {
+                const AVRational src_time_base = st.pFormatCtx->streams[st.stream_id_audio]->time_base;
+                const AVRational dst_time_base = {1, sample_rate()};
+                return av_rescale_q(st.pFormatCtx->streams[st.stream_id_audio]->duration, src_time_base, dst_time_base);
+            }
+            return 0;
         }
 
         inline float demuxer::duration() const noexcept
