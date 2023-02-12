@@ -40,6 +40,7 @@ namespace dlib
             std::string                                  codec_name;
             std::unordered_map<std::string, std::string> codec_options;
             int64_t                                      bitrate{-1};
+            int                                          gop_size{-1};
             int                                          flags{0};
         };
 
@@ -370,6 +371,8 @@ namespace dlib
 
             if (args_.args_codec.bitrate > 0)
                 pCodecCtx->bit_rate = args_.args_codec.bitrate;
+            if (args_.args_codec.gop_size > 0)
+                pCodecCtx->gop_size = args_.args_codec.gop_size;
             if (args_.args_codec.flags > 0)
                 pCodecCtx->flags |= args_.args_codec.flags;
 
@@ -383,10 +386,9 @@ namespace dlib
                 pCodecCtx->height       = args_.args_image.h;
                 pCodecCtx->width        = args_.args_image.w;
                 pCodecCtx->pix_fmt      = args_.args_image.fmt;
+                check_properties(pCodec, pCodecCtx.get());
                 pCodecCtx->time_base    = AVRational{1, args_.args_image.framerate};
                 pCodecCtx->framerate    = AVRational{args_.args_image.framerate, 1};
-
-                check_properties(pCodec, pCodecCtx.get());
 
                 //don't know what src options are, but at least dst options are set
                 resizer_image.reset(pCodecCtx->height, pCodecCtx->width, pCodecCtx->pix_fmt,
@@ -401,6 +403,7 @@ namespace dlib
                 pCodecCtx->sample_rate      = args_.args_audio.sample_rate;
                 pCodecCtx->sample_fmt       = args_.args_audio.fmt;
                 pCodecCtx->channel_layout   = args_.args_audio.channel_layout;
+                check_properties(pCodec, pCodecCtx.get());
                 pCodecCtx->channels         = av_get_channel_layout_nb_channels(pCodecCtx->channel_layout);
                 pCodecCtx->time_base        = AVRational{ 1, pCodecCtx->sample_rate };
 
@@ -408,8 +411,6 @@ namespace dlib
                     pCodecCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
                 }
 
-                check_properties(pCodec, pCodecCtx.get());
-                
                 //don't know what src options are, but at least dst options are set
                 resizer_audio.reset(
                         pCodecCtx->sample_rate, pCodecCtx->channel_layout, pCodecCtx->sample_fmt,
@@ -487,17 +488,17 @@ namespace dlib
                 frames.push_back(std::move(f_));
             }
 
-            // Set pts based on timestamps or tracked state
+            // Set pts based on tracked state. Ignore timestamps for now
             for (auto& f : frames)
             {
-                if (f.get_timestamp() != std::chrono::system_clock::time_point{})
-                {
-                    f.f->pts = av_rescale_q(
-                            f.timestamp.time_since_epoch().count(),
-                            {decltype(f.timestamp)::period::num,decltype(f.timestamp)::period::den},
-                            pCodecCtx->time_base);
-                }
-                else if (f.f)
+                // if (f.get_timestamp() != std::chrono::system_clock::time_point{})
+                // {
+                //     f.f->pts = av_rescale_q(
+                //             f.timestamp.time_since_epoch().count(),
+                //             {decltype(f.timestamp)::period::num,decltype(f.timestamp)::period::den},
+                //             pCodecCtx->time_base);
+                // }
+                if (f.f)
                 {
                     f.f->pts = next_pts;
                 }
@@ -697,7 +698,8 @@ namespace dlib
                     return false;
                 }
 
-                stream->id = stream_counter;
+                stream->id          = stream_counter;
+                stream->time_base   = enc.pCodecCtx->time_base;
                 ++stream_counter;
 
                 int ret = avcodec_parameters_from_context(stream->codecpar, enc.pCodecCtx.get());
@@ -828,7 +830,7 @@ namespace dlib
             if ((st.pFormatCtx->oformat->flags & AVFMT_NOFILE) == 0)
                 avio_closep(&st.pFormatCtx->pb);
 
-            st.pFormatCtx.reset(nullptr); //close
+            st.pFormatCtx = nullptr;
         }
 
         inline bool             muxer::is_open()                const noexcept { return video_enabled() || audio_enabled(); }

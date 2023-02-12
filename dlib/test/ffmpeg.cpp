@@ -441,7 +441,7 @@ namespace
         DLIB_TEST(cap.height()              == height);
         DLIB_TEST(cap.width()               == width);
         DLIB_TEST(cap.sample_rate()         == sample_rate);
-        // DLIB_TEST_MSG(cap.estimated_nframes()   == nframes, "estimated " <<  cap.estimated_nframes() << " true " << nframes);
+        DLIB_TEST(cap.estimated_nframes()   == nframes);
         estimated_samples_min = cap.estimated_total_samples() - cap.sample_rate(); // - 1s
         estimated_samples_max = cap.estimated_total_samples() + cap.sample_rate(); // + 1s
 
@@ -472,8 +472,8 @@ namespace
         }
 
         DLIB_TEST(counter_images == nframes);
-        // DLIB_TEST(counter_samples >= estimated_samples_min); //within 1 second
-        // DLIB_TEST(counter_samples <= estimated_samples_max); //within 1 second
+        DLIB_TEST(counter_samples >= estimated_samples_min); //within 1 second
+        DLIB_TEST(counter_samples <= estimated_samples_max); //within 1 second
         DLIB_TEST(!cap.is_open());
     }
 
