@@ -18,6 +18,7 @@ static_assert(false, "This version of dlib isn't built with the FFMPEG wrappers"
 #include <vector>
 #include <array>
 #include <unordered_map>
+#include <iostream>
 #include "../image_processing/generic_image.h"
 #include "../pixel.h"
 #include "../assert.h"
@@ -382,6 +383,19 @@ namespace dlib
 {
     namespace ffmpeg
     {
+// ---------------------------------------------------------------------------------------------------
+
+        template<class... Args>
+        inline bool fail(std::ostream& out, Args&&... args)
+        {
+#ifdef __cpp_fold_expressions
+            ((out << args),...);
+#else
+            (void)std::initializer_list<int>{((out << args), 0)...};
+#endif
+            out << std::endl;
+            return false;
+        }
 
 // ---------------------------------------------------------------------------------------------------
 
