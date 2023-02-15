@@ -650,6 +650,7 @@ namespace dlib
 
         inline bool demuxer::open(const args& a)
         {
+            using namespace std;
             using namespace std::chrono;
             using namespace details;
 
@@ -698,10 +699,7 @@ namespace dlib
                                         opts.get());
 
             if (ret != 0)
-            {
-                printf("avformat_open_input() failed with error `%s`\n", get_av_error(ret).c_str());
-                return false;
-            }
+                return fail(cerr, "avformat_open_input() failed with error : ", get_av_error(ret));
 
             if (opts.size() > 0)
             {
@@ -715,10 +713,7 @@ namespace dlib
             ret = avformat_find_stream_info(st.pFormatCtx.get(), NULL);
 
             if (ret < 0)
-            {
-                printf("avformat_find_stream_info() failed with error `%s`\n", get_av_error(ret).c_str());
-                return false;
-            }
+                return fail(cerr, "avformat_find_stream_info() failed with error : ", get_av_error(ret));
 
             const auto setup_stream = [&](bool is_video)
             {
@@ -728,68 +723,46 @@ namespace dlib
                 const int stream_id = av_find_best_stream(st.pFormatCtx.get(), media_type, -1, -1, &pCodec, 0);
 
                 if (stream_id == AVERROR_STREAM_NOT_FOUND)
-                {
-                    //You might be asking for both video and audio but only video is available. That's OK. Just provide video.
-                    return true;
-                }
+                    return true; //You might be asking for both video and audio but only video is available. That's OK. Just provide video.
+
                 else if (stream_id == AVERROR_DECODER_NOT_FOUND)
-                {
-                    printf("av_find_best_stream() : decoder not found for stream type `%s`\n", av_get_media_type_string(media_type));
-                    return false;
-                }
+                    return fail(cerr, "av_find_best_stream() : decoder not found for stream type : ", av_get_media_type_string(media_type));
+
                 else if (stream_id < 0)
-                {
-                    printf("av_find_best_stream() failed : `%s`\n", get_av_error(stream_id).c_str());
-                    return false;
-                }
+                    return fail(cerr, "av_find_best_stream() failed : ", get_av_error(stream_id));
 
                 av_ptr<AVCodecContext> pCodecCtx{avcodec_alloc_context3(pCodec)};
 
                 if (!pCodecCtx)
-                {
-                    printf("avcodec_alloc_context3() failed to allocate codec context for `%s`\n", pCodec->name);
-                    return false;
-                }
+                    return fail(cerr, "avcodec_alloc_context3() failed to allocate codec context for ", pCodec->name);
 
                 const int ret = avcodec_parameters_to_context(pCodecCtx.get(), st.pFormatCtx->streams[stream_id]->codecpar);
                 if (ret < 0)
-                {
-                    printf("avcodec_parameters_to_context() failed : `%s`\n", get_av_error(ret).c_str());
-                    return false;
-                }
+                    return fail(cerr, "avcodec_parameters_to_context() failed : ", get_av_error(ret));
 
                 if (pCodecCtx->codec_type == AVMEDIA_TYPE_VIDEO)
                 {
                     if (pCodecCtx->height   == 0 ||
                         pCodecCtx->width    == 0 ||
                         pCodecCtx->pix_fmt  == AV_PIX_FMT_NONE)
-                    {
-                        printf("Codec parameters look wrong : (h,w,pixel_fmt) : (%i,%i,%s)\n",
-                            pCodecCtx->height,
-                            pCodecCtx->width,
-                            get_pixel_fmt_str(pCodecCtx->pix_fmt).c_str());
-                        return false;
-                    }
+                    return fail(cerr, "Codec parameters look wrong : (h,w,pixel_fmt) : (",
+                            pCodecCtx->height, ",",
+                            pCodecCtx->width,  ",",
+                            get_pixel_fmt_str(pCodecCtx->pix_fmt), ")");
                 }
                 else if (pCodecCtx->codec_type == AVMEDIA_TYPE_AUDIO)
                 {
                     if (pCodecCtx->sample_rate == 0 ||
                         pCodecCtx->sample_fmt  == AV_SAMPLE_FMT_NONE)
-                    {
-                        printf("Codec parameters look wrong: sample_rate : %i sample_fmt : %i\n",
-                            pCodecCtx->sample_rate,
-                            pCodecCtx->sample_fmt);
-                        return false;
-                    }
+                        return fail(cerr,"Codec parameters look wrong :",
+                            " sample_rate : ", pCodecCtx->sample_rate,
+                            " sample format : ", get_audio_fmt_str(pCodecCtx->sample_fmt));
 
                     if (pCodecCtx->channel_layout == 0)
                         pCodecCtx->channel_layout = av_get_default_channel_layout(pCodecCtx->channels);
                 }
                 else
-                {
-                    printf("Unrecognized media type %i\n", pCodecCtx->codec_type);
-                    return false;
-                }
+                    return fail(cerr,"Unrecognized media type ", pCodecCtx->codec_type);
 
                 if (is_video)
                 {
@@ -819,23 +792,14 @@ namespace dlib
                 return true;
             };
 
-            if (st.args_.enable_image)
-            {
-                if (!setup_stream(true))
-                    return false;
-            }
+            if (st.args_.enable_image && !setup_stream(true))
+                return false;
 
-            if (st.args_.enable_audio)
-            {
-                if (!setup_stream(false))
-                    return false;
-            }
+            if (st.args_.enable_audio && !setup_stream(false))
+                return false;
 
             if (!st.channel_audio.is_open() && !st.channel_video.is_open())
-            {
-                printf("At least one of video and audio channels must be enabled\n");
-                return false;
-            }
+                return fail(cerr, "At least one of video and audio channels must be enabled");
 
             populate_metadata();
 

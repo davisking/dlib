@@ -691,17 +691,11 @@ namespace dlib
                 return true;
             };
 
-            if (st.args_.enable_image)
-            {
-                if (!setup_stream(true))
-                    return false;
-            }
+            if (st.args_.enable_image && !setup_stream(true))
+                return false;
 
-            if (st.args_.enable_audio)
-            {
-                if (!setup_stream(false))
-                    return false;
-            }
+            if (st.args_.enable_audio && !setup_stream(false))
+                return false;
 
             st.pFormatCtx->opaque = this;
             st.pFormatCtx->interrupt_callback.opaque    = st.pFormatCtx.get();
