@@ -97,6 +97,7 @@ namespace dlib
             bool open();
 
             args                            args_;
+            bool                            open_{false};
             details::av_ptr<AVCodecContext> pCodecCtx;
             details::av_ptr<AVPacket>       packet;
             int                             next_pts{0};
@@ -426,10 +427,11 @@ namespace dlib
                                   pCodecCtx->channels);
             }
 
-            return true;
+            open_ = true;
+            return open_;
         }
 
-        inline bool            encoder::is_open()          const noexcept { return pCodecCtx != nullptr && sink != nullptr; }
+        inline bool            encoder::is_open()          const noexcept { return pCodecCtx != nullptr && sink != nullptr && open_; }
         inline bool            encoder::is_image_encoder() const noexcept { return pCodecCtx && pCodecCtx->codec_type == AVMEDIA_TYPE_VIDEO; }
         inline bool            encoder::is_audio_encoder() const noexcept { return pCodecCtx && pCodecCtx->codec_type == AVMEDIA_TYPE_AUDIO; }
         inline AVCodecID       encoder::get_codec_id()     const noexcept { return pCodecCtx ? pCodecCtx->codec_id : AV_CODEC_ID_NONE; }
@@ -507,10 +509,10 @@ namespace dlib
                 } else if (ret == AVERROR(EAGAIN)) {
                     state   = ENCODE_READ_PACKET_THEN_SEND_FRAME;
                 } else if (ret == AVERROR_EOF) {
-                    pCodecCtx = nullptr;
+                    open_   = false;
                     state   = ENCODE_DONE;
                 } else {
-                    pCodecCtx = nullptr;
+                    open_   = false;
                     state   = ENCODE_ERROR;
                     printf("avcodec_send_frame() failed : `%s`\n", get_av_error(ret).c_str());
                 }
@@ -525,12 +527,12 @@ namespace dlib
                 else if (ret == AVERROR(EAGAIN))
                     state   = ENCODE_DONE;
                 else if (ret == AVERROR_EOF) {
-                    pCodecCtx = nullptr;
+                    open_   = false;
                     state   = ENCODE_DONE;
                 }
                 else if (ret < 0)
                 {
-                    pCodecCtx = nullptr;
+                    open_   = false;
                     state   = ENCODE_ERROR;
                     printf("avcodec_receive_packet() failed : %i - `%s`\n", ret, get_av_error(ret).c_str());
                 }
@@ -538,15 +540,15 @@ namespace dlib
                 {
                     if (!sink(pCodecCtx.get(), packet.get()))
                     {
-                        pCodecCtx = nullptr;
-                        state     = ENCODE_ERROR;
+                        open_   = false;
+                        state   = ENCODE_ERROR;
                     }
                 }
             };
 
             encoding_state state = ENCODE_SEND_FRAME;
 
-            for (size_t i = 0 ; i < frames.size() && pCodecCtx != nullptr ; ++i)
+            for (size_t i = 0 ; i < frames.size() && is_open() ; ++i)
             {
                 state = ENCODE_SEND_FRAME;
 
@@ -785,6 +787,7 @@ namespace dlib
             if (!is_open())
                 return;
 
+            // Flush the encoder but don't actually close the underlying AVCodecContext
             st.encoder_image.flush();
             st.encoder_audio.flush();
 
@@ -796,6 +799,8 @@ namespace dlib
                 avio_closep(&st.pFormatCtx->pb);
 
             st.pFormatCtx = nullptr;
+            st.encoder_image = {};
+            st.encoder_audio = {};
         }
 
         inline bool             muxer::is_open()                const noexcept { return video_enabled() || audio_enabled(); }
