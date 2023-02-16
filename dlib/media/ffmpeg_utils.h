@@ -1175,7 +1175,7 @@ namespace dlib
                                                     f.height(), 
                                                     1);    
             
-            DLIB_ASSERT(ret == expsize, "av_image_copy_to_buffer()  error : " << details::get_av_error(ret));
+            DLIB_ASSERT(ret == (int)expsize, "av_image_copy_to_buffer() error : " << details::get_av_error(ret));
             (void)ret;
         }
 
