@@ -8,7 +8,8 @@ namespace dlib
 {
     namespace ffmpeg
     {
-        // ---------------------------------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------------------------------
 
         std::string get_pixel_fmt_str(AVPixelFormat fmt);
         /*!
@@ -28,7 +29,7 @@ namespace dlib
                 - Returns a string description of a channel layout, where layout is e.g. AV_CH_LAYOUT_STEREO
         !*/
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         class frame
         {
@@ -218,7 +219,7 @@ namespace dlib
             // Implementation details
         };
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         template<class PixelType>
         struct pix_traits 
@@ -235,7 +236,7 @@ namespace dlib
         template<> struct pix_traits<rgb_alpha_pixel>   {constexpr static AVPixelFormat fmt = AV_PIX_FMT_RGBA;  };
         template<> struct pix_traits<bgr_alpha_pixel>   {constexpr static AVPixelFormat fmt = AV_PIX_FMT_BGRA;  };
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         template<class SampleType>
         struct sample_traits 
@@ -252,7 +253,7 @@ namespace dlib
         template<> struct sample_traits<float>   {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_FLT; };
         template<> struct sample_traits<double>  {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_DBL; };
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         template<class SampleType, std::size_t Channels>
         struct audio
@@ -268,7 +269,7 @@ namespace dlib
             std::chrono::system_clock::time_point   timestamp{};
         };
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         struct codec_details
         {
@@ -336,7 +337,39 @@ namespace dlib
                 - returns a list of all registered ffmpeg output devices and available instances of those devices
         !*/
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
+
+        struct video_enabled_t
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This is a strong type which controls whether or not we want
+                    to enable video decoding in demuxer or video encoding in muxer
+            !*/
+
+            constexpr explicit video_enabled_t(bool enabled_);
+            bool enabled{false};
+        };
+
+        constexpr video_enabled_t video_enabled{true};
+        constexpr video_enabled_t video_disabled{false};
+
+        struct audio_enabled_t
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This is a strong type which controls whether or not we want
+                    to enable audio decoding in demuxer or audio encoding in muxer
+            !*/
+
+            constexpr explicit audio_enabled_t(bool enabled_) : enabled{enabled_} {}
+            bool enabled{false};
+        };
+
+        constexpr audio_enabled_t audio_enabled{true};
+        constexpr audio_enabled_t audio_disabled{false};
+
+// ---------------------------------------------------------------------------------------------------
 
         template <class image_type>
         void convert(const frame& f, image_type& image)
@@ -380,7 +413,7 @@ namespace dlib
                 - converts a dlib audio object into a frame object
         !*/
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         struct decoder_image_args
         {
@@ -421,7 +454,7 @@ namespace dlib
             int framerate{-1};
         };
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         struct decoder_audio_args
         {
@@ -442,7 +475,7 @@ namespace dlib
             AVSampleFormat fmt{AV_SAMPLE_FMT_S16};
         };
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         struct decoder_codec_args
         {
@@ -473,7 +506,7 @@ namespace dlib
             int flags{0};
         };
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         enum decoder_status
         {
@@ -487,7 +520,7 @@ namespace dlib
             DECODER_FRAME_AVAILABLE
         };
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         class decoder
         {
@@ -674,7 +707,7 @@ namespace dlib
             !*/
         };
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         class demuxer
         {
@@ -706,6 +739,14 @@ namespace dlib
                 /*!
                     ensures
                         - this->filepath = filepath
+                !*/
+
+                args(const std::string& filepath, video_enabled_t video_on, audio_enabled_t audio_on);
+                /*!
+                    ensures
+                        - this->filepath        = filepath
+                        - this->enable_image    = video_on.enabled
+                        - this->enable_audio    = audio_on.enabled
                 !*/
 
                 // Filepath, URL or device
@@ -962,7 +1003,7 @@ namespace dlib
             !*/
         };
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         template <
           class Byte, 
@@ -983,7 +1024,7 @@ namespace dlib
                 - When the callback is invoked, packet data is appended to buf.
         !*/
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         DEDUCED sink(std::ostream& out);
         /*!
@@ -998,7 +1039,7 @@ namespace dlib
                 - When the callback is invoked, packet data is added to the output stream.
         !*/
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         struct encoder_image_args
         {
@@ -1028,7 +1069,7 @@ namespace dlib
             int framerate{0};
         };
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         struct encoder_audio_args
         {
@@ -1051,7 +1092,7 @@ namespace dlib
             AVSampleFormat fmt{AV_SAMPLE_FMT_S16};
         };
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         struct encoder_codec_args
         {
@@ -1082,7 +1123,7 @@ namespace dlib
             int flags{0};
         };
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         class encoder
         {
@@ -1288,7 +1329,7 @@ namespace dlib
             !*/
         };
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         class muxer
         {
@@ -1584,7 +1625,7 @@ namespace dlib
             !*/
         };
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
     }
 }
 

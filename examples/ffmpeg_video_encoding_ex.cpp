@@ -69,24 +69,14 @@ try
         return EXIT_FAILURE;
     }
 
+    // Encode to multiple different types of buffers.
     const auto encode = [&](auto& out)
     {
-        demuxer cap([&] {
-            demuxer::args args;
-            args.filepath       = filepath;
-            args.enable_audio   = false;
-            return args;
-        }());
+        demuxer cap({filepath, video_enabled, audio_disabled});
 
-        if (!cap.is_open())
+        if (!cap.is_open() || !cap.video_enabled())
         {
             cout << "Failed to open " << filepath << endl;
-            return;
-        }
-
-        if (!cap.video_enabled())
-        {
-            cout << "This file does not contain any video" << endl;
             return;
         }
 
@@ -103,7 +93,9 @@ try
         while (cap.read(f))
             enc.push(std::move(f));
         
-        enc.flush(); // You don't have to call flush here because it's called in the destructor of encoder
+        // enc.flush(); 
+        // You don't have to call flush() here because it's called in the destructor of encoder
+        // If you call it more than once, it becomes a no-op basically.
     };
 
     std::vector<char>       buf1;

@@ -370,6 +370,26 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
     
+        struct video_enabled_t
+        {
+            constexpr explicit video_enabled_t(bool enabled_) : enabled{enabled_} {}
+            bool enabled{false};
+        };
+
+        constexpr video_enabled_t video_enabled{true};
+        constexpr video_enabled_t video_disabled{false};
+
+        struct audio_enabled_t
+        {
+            constexpr explicit audio_enabled_t(bool enabled_) : enabled{enabled_} {}
+            bool enabled{false};
+        };
+
+        constexpr audio_enabled_t audio_enabled{true};
+        constexpr audio_enabled_t audio_disabled{false};
+
+// ---------------------------------------------------------------------------------------------------
+
     }
 }
 
