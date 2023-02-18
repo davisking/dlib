@@ -32,7 +32,7 @@ try
     parser.add_option("codec_audio",    "audio codec name. e.g. `aac`. Defaults to `ac3`", 1);
     parser.add_option("height",         "height of encoded stream. Defaults to whatever is in the video file", 1);
     parser.add_option("width",          "width of encoded stream. Defaults to whatever is in the video file", 1);
-    parser.add_option("sample_rate",    "sample rate of encoded stream. Defaults to whatever is in the video file", 1);
+    parser.add_option("sample_rate",    "audio sample rate of encoded stream. Defaults to whatever is in the video file", 1);
 
     parser.set_group_name("Help Options");
     parser.add_option("h",      "alias of --help");
@@ -59,7 +59,16 @@ try
     const std::string codec_video       = get_option(parser, "codec_video", "mpeg4");
     const std::string codec_audio       = get_option(parser, "codec_audio", "aac");
 
-    // Check your codec is available
+    // First we're going to check that the requested codecs are supported by this installation of ffmpeg.
+    // Note that this step isn't necessary. If they're not supported, the muxer instance will fail
+    // in its constructor, printing a hopefully helpful message explaining why and then is_open() will 
+    // return false.
+    // We do this extra step simply for educational purposes and users can understand some of the errors
+    // ffmpeg can return and why. In this case, because it wasn't built with the extended dependencies
+    // required.
+    // Note, ffmpeg has built-in DECODERS for pretty much every codec. However, it sometimes uses 
+    // third-party dependencies like libx264, libx265, libvp9 etc for ENCODERS. It's usually simpler
+    // to write a decoder than it is to write an encoder.
     const auto codecs = ffmpeg::list_codecs();
 
     if (std::find_if(begin(codecs),   
@@ -82,6 +91,9 @@ try
         return EXIT_FAILURE;
     }
 
+    // Next, we're going to open a video file. In this example, we only decode images, not audio.
+    // This convenience constructor allows you to do this.
+    // Note, video_enabled, video_disabled, audio_enabled and audio_disabled are global constexpr flags.
     demuxer cap({input_filepath, video_enabled, audio_disabled});
 
     if (!cap.is_open())
@@ -92,13 +104,22 @@ try
 
     const std::string url = "rtsp://0.0.0.0:8000/stream";
 
+    // We start 2 threads:
+    //  - 1 for an RTSP server that listens for an incoming RTSP client and decodes the frames
+    //  - 1 for an RTSP client that connects and pushes/muxes image frames.
+   
     std::thread rx{[&] 
     {
+        // This is an example that show-cases the usage of demuxer::args::format_options.
+        // This is used for AVFormatContext and demuxer-private options specific to the container.
+        // {"rtsp_flags", "listen"} tells the RTSP demuxer that it is a server
+        // {"rtsp_transport", "tcp"} configures RTSP over TCP transport. This way we don't loose packets.
+
         demuxer cap([&] {
             demuxer::args args;
             args.filepath = url;
             args.format_options["rtsp_flags"]       = "listen";
-            args.format_options["rtsp_transport"]    = "tcp";
+            args.format_options["rtsp_transport"]   = "tcp";
             return args;
         }());
 
@@ -110,6 +131,8 @@ try
 
         image_window win;
 
+        // By default, demuxer converts images to RGB. So we can read() and convert() to RGB without
+        // having to specify demuxer::args::args_image::fmt = AV_PIX_FMT_RGB24
         frame f;
         array2d<rgb_pixel> img;
 
@@ -124,6 +147,9 @@ try
 
     std::thread tx{[&] 
     {
+        // The muxer acts as an RTSP client, so we don't use {"rtsp_flags", "listen"}
+        // When using RTSP, it is usually a good idea to specify muxer::args::output_format = "rtsp"
+        // even though the URL has rtsp:// in its address.
         muxer writer([&] {
             muxer::args args;
             args.filepath       = url;
