@@ -1,9 +1,9 @@
 // Copyright (C) 2022  Davis E. King (davis@dlib.net), Adrià Arrufat
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SAVE_WEBP_Hh_
-#define DLIB_SAVE_WEBP_Hh_
+#ifndef DLIB_SAVE_JXL_Hh_
+#define DLIB_SAVE_JXL_Hh_
 
-#include "save_webp_abstract.h"
+#include "save_jxl_abstract.h"
 
 #include "../enable_if.h"
 #include "image_saver.h"
@@ -50,10 +50,10 @@ namespace dlib
         float quality = 75
     )
     {
-#ifndef DLIB_WEBP_SUPPORT
+#ifndef DLIB_JPEGXL_SUPPORT
             /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 You are getting this error because you are trying to use the save_webp
-                function but you haven't defined DLIB_WEBP_SUPPORT.  You must do so to use
+                function but you haven't defined DLIB_JPEGXL_SUPPORT.  You must do so to use
                 this object.   You must also make sure you set your build environment
                 to link against the libwebp library.
             !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
@@ -64,8 +64,8 @@ namespace dlib
 
         // make sure requires clause is not broken
         DLIB_CASSERT(img.size() != 0,
-            "\t save_webp()"
-            << "\n\t You can't save an empty image as a WEBP."
+            "\t save_jxl()"
+            << "\n\t You can't save an empty image as a JPEG XL."
             );
         DLIB_CASSERT(0 <= quality,
             "\t save_webp()"
@@ -123,4 +123,4 @@ namespace dlib
 
 }
 
-#endif // DLIB_SAVE_WEBP_Hh_
+#endif // DLIB_SAVE_JXL_Hh_
