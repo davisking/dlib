@@ -63,7 +63,7 @@ try
     }
 
     const std::string filepath = get_option(parser, "i", "");
-    const std::string codec    = get_option(parser, "codec", "");
+    const std::string codec    = get_option(parser, "codec", "h264");
 
     image_window win;
 
