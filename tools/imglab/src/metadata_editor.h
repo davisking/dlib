@@ -58,7 +58,8 @@ class metadata_editor : public dlib::drawable_window
 {
 public:
     metadata_editor(
-        const std::string& filename_
+        const std::string& filename_,
+        const std::string& font_path = ""
     );
 
     ~metadata_editor();
@@ -107,6 +108,8 @@ private:
     time_t last_keyboard_jump_pos_update;
     bool display_equialized_image = false;
     color_mapper string_to_color;
+
+    std::shared_ptr<dlib::font> font = dlib::default_font::get_font();
 };
 
 // ----------------------------------------------------------------------------------------

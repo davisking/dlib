@@ -21,7 +21,7 @@
 #include <dlib/dir_nav.h>
 
 
-const char* VERSION = "1.19";
+const char* VERSION = "1.20";
 
 
 
@@ -599,6 +599,7 @@ int main(int argc, char** argv)
 
         parser.add_option("h","Displays this information.");
         parser.add_option("v","Display version.");
+        parser.add_option("font", "Set the label font in the GUI.", 1);
 
         parser.set_group_name("Creating XML files");
         parser.add_option("c","Create an XML file named <arg> listing a set of images.",1);
@@ -671,6 +672,8 @@ int main(int argc, char** argv)
 
 
         parser.parse(argc, argv);
+
+        const std::string font_path = get_option(parser, "font", "");
 
         const char* singles[] = {"h","c","r","l","files","convert","parts","rmdiff", "rmtrunc", "rmdupes", "seed", "shuffle", "split", "add", 
                                  "flip-basic", "flip", "rotate", "tile", "size", "cluster", "resample", "min-object-size", "rmempty",
@@ -1263,7 +1266,7 @@ int main(int argc, char** argv)
 
         if (parser.number_of_arguments() == 1)
         {
-            metadata_editor editor(parser[0]);
+            metadata_editor editor(parser[0], font_path);
             if (parser.option("parts"))
             {
                 std::vector<string> parts = split(parser.option("parts").argument());
