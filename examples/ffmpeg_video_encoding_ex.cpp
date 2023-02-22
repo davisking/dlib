@@ -53,7 +53,11 @@ try
     const std::string filepath = get_option(parser, "i", "");
     const std::string codec    = get_option(parser, "codec", "mpeg4");
 
-    // Check your codec is available
+    // Check your codec is available.
+    // Note, this step isn't necessary. If the requested codec isn't available as an encoder, 
+    // the constructor of encoder will fail and encoder::is_open() == false
+    // However, this gives a helpful message and further demonstrates the convenient functions
+    // dlib provides for inspecting your installation of ffmpeg.
     const auto codecs = ffmpeg::list_codecs();
 
     const bool codec_available = std::find_if(begin(codecs),   
@@ -64,23 +68,26 @@ try
     {
         cout << "Codec `" << codec << "` is not available as an encoder in your installation of ffmpeg." << endl;
         cout << "Either choose another codec, or build ffmpeg from source with the right dependencies installed." << endl;
-        cout << "For example, if you are trying to encode to h264, hevc/h265, vp9 or avi, then your installation of ffmpeg ";
+        cout << "For example, if you are trying to encode to h264, hevc/h265, vp9 or avi, then your installation of ffmpeg" << endl;
         cout << "needs to link to libx264, libx265, libvp9 or libav1" << endl;
         return EXIT_FAILURE;
     }
 
-    // Encode to multiple different types of buffers.
-    const auto encode = [&](auto& out)
+    // Load input video.
+    // Note, this uses a convenient constructor which (dis)enables audio and/or video.
+    demuxer cap({filepath, video_enabled, audio_disabled});
+
+    if (!cap.is_open() || !cap.video_enabled())
     {
-        demuxer cap({filepath, video_enabled, audio_disabled});
+        cout << "Failed to open " << filepath << endl;
+        return EXIT_FAILURE;
+    }
 
-        if (!cap.is_open() || !cap.video_enabled())
-        {
-            cout << "Failed to open " << filepath << endl;
-            return;
-        }
-
-        encoder enc([&] {
+    // This is a small functor that creates an encoder using the command line arguments
+    // and different types of output buffers using the convenient sink() overload.
+    const auto make_encoder = [&](auto& out) 
+    {
+        return encoder([&] {
             encoder::args args;
             args.args_codec.codec_name  = codec;
             args.args_image.h           = get_option(parser, "height", cap.height());
@@ -88,27 +95,42 @@ try
             args.args_image.framerate   = cap.fps();
             return args;
         }(), sink(out));
-
-        frame f;
-        while (cap.read(f))
-            enc.push(std::move(f));
-        
-        // enc.flush(); 
-        // You don't have to call flush() here because it's called in the destructor of encoder
-        // If you call it more than once, it becomes a no-op basically.
     };
 
+    // Encode to multiple different types of buffers.
     std::vector<char>       buf1;
     std::vector<int8_t>     buf2;
     std::vector<uint8_t>    buf3;
     std::ostringstream      buf4;
     std::ofstream           buf5("encoded.h264", std::ios::binary);
 
-    encode(buf1);
-    encode(buf2);
-    encode(buf3);
-    encode(buf4);
-    encode(buf5);
+    // Different encoders for different buffers
+    auto enc1 = make_encoder(buf1);
+    auto enc2 = make_encoder(buf2);
+    auto enc3 = make_encoder(buf3);
+    auto enc4 = make_encoder(buf4);
+    auto enc5 = make_encoder(buf5);
+
+    frame f;
+    while (cap.read(f))
+    {
+        enc1.push(f);
+        enc2.push(f);
+        enc3.push(f);
+        enc4.push(f);
+        enc5.push(f);
+    }
+
+    // Flush all the encoders
+    // Note, encoder::~encoder calls flush()
+    // So if the encoders were going out of scope at this point, you wouldn't have to call flush()
+    // Also note, flush() becomes a no-op after the 1st time you call it, and it is safe to do so.
+    // Also note, you cannot push any more frames into an encoder after it has been flushed.
+    enc1.flush();
+    enc2.flush();
+    enc3.flush();
+    enc4.flush();
+    enc5.flush();
 
     cout << "vector<char>       size " << buf1.size() << endl;
     cout << "vector<int8_t>     size " << buf2.size() << endl;
