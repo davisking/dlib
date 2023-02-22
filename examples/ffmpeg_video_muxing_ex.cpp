@@ -65,7 +65,11 @@ try
     const std::string codec_video       = get_option(parser, "codec_video", "mpeg4");
     const std::string codec_audio       = get_option(parser, "codec_audio", "aac");
 
-    // Check your codec is available
+    // Check your codec is available.
+    // Note, this step isn't necessary. If the requested codec isn't available as an encoder, 
+    // the constructor of muxer will fail and muxer::is_open() == false
+    // However, this gives a helpful message and further demonstrates the convenient functions
+    // dlib provides for inspecting your installation of ffmpeg.
     const auto codecs = ffmpeg::list_codecs();
 
     if (std::find_if(begin(codecs),   
