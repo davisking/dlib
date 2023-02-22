@@ -842,7 +842,14 @@ namespace dlib
             f->format           = h > 0 && w > 0 ? (int)pixfmt : (int)samplefmt;
             timestamp           = timestamp_;
 
-            int ret = av_frame_get_buffer(f.get(), 0); //use default alignment, which is likely 32
+            // The ffmpeg documentation recommends you always use align==0.
+            // However, in ffmpeg 3.2, there is a bug where if you do that, data buffers don't get allocated.
+            // So workaround is to manually set align==32
+            // Not ideal, but i've checked the source code in ffmpeg 3.3, 4.4 and 5.0 libavutil/frame.c
+            // and in every case, if align==0, then align=32
+            const int align = 32;
+
+            const int ret = av_frame_get_buffer(f.get(), align);
             if (ret < 0)
             {
                 f = nullptr;
