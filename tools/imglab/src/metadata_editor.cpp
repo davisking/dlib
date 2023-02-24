@@ -23,7 +23,8 @@ extern const char* VERSION;
 
 metadata_editor::
 metadata_editor(
-    const std::string& filename_
+    const std::string& filename_,
+    const std::string& font_path
 ) : 
     mbar(*this),
     lb_images(*this),
@@ -36,6 +37,26 @@ metadata_editor(
 {
     file metadata_file(filename_);
     filename = metadata_file.full_name();
+
+    // Set the custom label fonts
+    if (!font_path.empty())
+    {
+        const auto custom_font = std::make_shared<dlib::bdf_font>();
+        std::ifstream fin(font_path);
+        if (fin.good())
+        {
+            custom_font->read_bdf_file(fin, 0xFFFF);
+            custom_font->adjust_metrics();
+            font = std::move(custom_font);
+        }
+        else
+        {
+            std::cerr << "WARNING: could not open file '" + font_path + "', using default font\n.";
+        }
+    }
+    display.set_main_font(font);
+    overlay_label.set_main_font(font);
+
     // Make our current directory be the one that contains the metadata file.  We 
     // do this because that file might contain relative paths to the image files
     // we are supposed to be loading.
