@@ -344,9 +344,16 @@ namespace dlib
 
         struct codec_details
         {
+            AVCodecID   codec_id{AV_CODEC_ID_NONE};
             std::string codec_name;
             bool supports_encoding{false};
             bool supports_decoding{false};
+        };
+
+        struct muxer_details
+        {
+            std::string name;
+            std::vector<codec_details> supported_codecs;
         };
 
         struct device_details
@@ -363,7 +370,7 @@ namespace dlib
 
         std::vector<std::string>    list_protocols();
         std::vector<std::string>    list_demuxers();
-        std::vector<std::string>    list_muxers();
+        std::vector<muxer_details>  list_muxers();
         std::vector<codec_details>  list_codecs();
         std::vector<device_details> list_input_devices();
         std::vector<device_details> list_output_devices();
@@ -1002,10 +1009,27 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-        inline std::vector<std::string> list_muxers()
+        inline std::vector<codec_details> list_codecs_for_muxer (
+            const AVOutputFormat*               oformat,
+            const std::vector<codec_details>&   all_codecs = list_codecs()
+        )
+        {
+            std::vector<codec_details> supported_codecs;
+
+            for (const auto& codec : all_codecs)
+                if (avformat_query_codec(oformat, codec.codec_id, FF_COMPLIANCE_STRICT) == 1)
+                    supported_codecs.push_back(codec);
+            
+            return supported_codecs;
+        }
+
+        inline std::vector<muxer_details> list_muxers()
         {
             const bool init = details::register_ffmpeg::get(); // Don't let this get optimized away
-            std::vector<std::string> muxers;
+
+            const auto codecs = list_codecs();
+
+            std::vector<muxer_details> all_details;
             const AVOutputFormat* muxer = nullptr;
 
     #if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100)
@@ -1015,9 +1039,14 @@ namespace dlib
             void* opaque = nullptr;
             while (init && (muxer = av_muxer_iterate(&opaque)))
     #endif
-                muxers.push_back(muxer->name);
+            {
+                muxer_details details;
+                details.name                = muxer->name;
+                details.supported_codecs    = list_codecs_for_muxer(muxer, codecs);
+                all_details.push_back(details);
+            }      
         
-            return muxers;
+            return all_details;
         }
 
 // ---------------------------------------------------------------------------------------------------
@@ -1038,7 +1067,8 @@ namespace dlib
     #endif
             {
                 codec_details detail;
-                detail.codec_name = codec->name;
+                detail.codec_id     = codec->id;
+                detail.codec_name   = codec->name;
                 detail.supports_encoding = av_codec_is_encoder(codec);
                 detail.supports_decoding = av_codec_is_decoder(codec);
                 details.push_back(std::move(detail));

@@ -20,14 +20,16 @@ int main(const int argc, const char** argv)
 try
 {
     command_line_parser parser;
-    parser.add_option("t", "capture time in seconds", 1);
+    parser.add_option("t",      "capture time in seconds", 1);
+    parser.add_option("o",      "output audio file. E.g. recording.m4a, recording.wav", 1);
+    parser.add_option("codec",  "audio codec. E.g. aac, pcm_s16le", 1);
 
     parser.set_group_name("Help Options");
     parser.add_option("h",      "alias of --help");
     parser.add_option("help",   "display this message and exit");
 
     parser.parse(argc, argv);
-    const char* one_time_opts[] = {"t"};
+    const char* one_time_opts[] = {"t", "o", "codec"};
     parser.check_one_time_options(one_time_opts);
 
     if (parser.option("h") || parser.option("help"))
@@ -37,6 +39,8 @@ try
     }
 
     const seconds time{get_option(parser, "t",  1)};
+    const std::string filename  = get_option(parser, "o",       "recording.m4a");
+    const std::string codec     = get_option(parser, "codec",   "aac");
 
     // We're going to look for an appropriate audio device.
     // On linux, look for a device type "alsa"
@@ -77,9 +81,9 @@ try
     // Create WAV file
     muxer writer([&] {
         muxer::args args;
-        args.filepath                   = "recording.wav";
+        args.filepath                   = filename;
         args.enable_image               = false;
-        args.args_audio.codec_name      = "pcm_s16le";
+        args.args_audio.codec_name      = codec;
         args.args_audio.sample_rate     = cap.sample_rate();
         args.args_audio.channel_layout  = cap.channel_layout();
         args.args_audio.fmt             = cap.sample_fmt();

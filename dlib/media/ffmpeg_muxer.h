@@ -612,6 +612,8 @@ namespace dlib
             if (!st.args_.enable_audio && !st.args_.enable_image)
                 return fail(cerr, "You need to set at least one of `enable_audio` or `enable_image`");
 
+            static const auto all_codecs = list_codecs();
+
             {
                 st.connecting_time = system_clock::now();
                 st.connected_time  = system_clock::time_point::max();
@@ -624,9 +626,6 @@ namespace dlib
                 if (ret < 0)
                     return fail(cerr, "avformat_alloc_output_context2() failed : ", get_av_error(ret));
 
-                if (!pFormatCtx->oformat)
-                    return fail(cerr, "Output format is null");
-
                 st.pFormatCtx.reset(pFormatCtx);
             }
 
@@ -634,6 +633,7 @@ namespace dlib
 
             const auto setup_stream = [&](bool is_video)
             {
+                // Setup encoder for this stream
                 auto& enc = is_video ? st.encoder_image : st.encoder_audio;
 
                 encoder::args args;
@@ -671,6 +671,23 @@ namespace dlib
                     return ret == 0;
                 };
 
+                // Before we create the encoder, check the codec is supported by this muxer
+                const auto supported_codecs = list_codecs_for_muxer(st.pFormatCtx->oformat, all_codecs);
+
+                if (std::find_if(begin(supported_codecs), end(supported_codecs), [&](const auto& supported) {
+                    return args.args_codec.codec != AV_CODEC_ID_NONE ? 
+                                supported.codec_id   == args.args_codec.codec :
+                                supported.codec_name == args.args_codec.codec_name;
+                }) == end(supported_codecs))
+                {
+                    cerr << "Codec `" << avcodec_get_name(args.args_codec.codec) << "` or `" << args.args_codec.codec_name << "` cannot be stored in this file\n";
+                    cerr << "List of supported codecs for muxer `" << st.pFormatCtx->oformat->name << "` :\n";
+                    for (const auto& supported : supported_codecs)
+                        cerr << "    `" << supported.codec_name << "`\n";
+                    return false;
+                }
+
+                // Codec is supported by muxer, so create encoder
                 enc = encoder(args, handle_packet);
 
                 if (!enc.is_open())
