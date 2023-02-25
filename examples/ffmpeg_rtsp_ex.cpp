@@ -27,19 +27,17 @@ int main(const int argc, const char** argv)
 try
 {
     command_line_parser parser;
-    parser.add_option("i",              "input video", 1);
-    parser.add_option("codec_video",    "video codec name. e.g. `h264`. Defaults to `mpeg4`", 1);
-    parser.add_option("codec_audio",    "audio codec name. e.g. `aac`. Defaults to `ac3`", 1);
-    parser.add_option("height",         "height of encoded stream. Defaults to whatever is in the video file", 1);
-    parser.add_option("width",          "width of encoded stream. Defaults to whatever is in the video file", 1);
-    parser.add_option("sample_rate",    "audio sample rate of encoded stream. Defaults to whatever is in the video file", 1);
+    parser.add_option("i",      "input video", 1);
+    parser.add_option("codec",  "video codec name. e.g. `h264`. Defaults to `mpeg4`", 1);
+    parser.add_option("height", "height of encoded stream. Defaults to whatever is in the video file", 1);
+    parser.add_option("width",  "width of encoded stream. Defaults to whatever is in the video file", 1);
 
     parser.set_group_name("Help Options");
     parser.add_option("h",      "alias of --help");
     parser.add_option("help",   "display this message and exit");
 
     parser.parse(argc, argv);
-    const char* one_time_opts[] = {"i", "codec_video", "codec_audio", "height", "width", "sample_rate"};
+    const char* one_time_opts[] = {"i", "codec", "height", "width"};
     parser.check_one_time_options(one_time_opts);
 
     if (parser.option("h") || parser.option("help"))
@@ -55,43 +53,10 @@ try
         return 0;
     }
 
-    const std::string input_filepath    = get_option(parser, "i", "");
-    const std::string codec_video       = get_option(parser, "codec_video", "mpeg4");
-    const std::string codec_audio       = get_option(parser, "codec_audio", "aac");
+    const std::string input_filepath = get_option(parser, "i", "");
 
-    // First we're going to check that the requested codecs are supported by this installation of ffmpeg.
-    // Note that this step isn't necessary. If they're not supported, the muxer instance will fail
-    // in its constructor, printing a hopefully helpful message explaining why and then is_open() will 
-    // return false.
-    // We do this extra step simply for educational purposes and users can understand some of the errors
-    // ffmpeg can return and why. In this case, because it wasn't built with the extended dependencies
-    // required.
-    // Note, ffmpeg has built-in DECODERS for pretty much every codec. However, it sometimes uses 
-    // third-party dependencies like libx264, libx265, libvp9 etc for ENCODERS. It's usually simpler
-    // to write a decoder than it is to write an encoder.
-    const auto codecs = ffmpeg::list_codecs();
-
-    if (std::find_if(begin(codecs),   
-                     end(codecs),   
-                     [&](const auto& c) {return c.codec_name == codec_video && c.supports_encoding;}) == codecs.end())
-    {
-        cout << "Codec `" << codec_video << "` is not available as an encoder in your installation of ffmpeg." << endl;
-        cout << "Either choose another codec, or build ffmpeg from source with the right dependencies installed." << endl;
-        cout << "For example, if you are trying to encode to h264, hevc/h265, vp9 or avi, then your installation of ffmpeg ";
-        cout << "needs to link to libx264, libx265, libvp9 or libav1" << endl;
-        return EXIT_FAILURE;
-    }
-
-    if (std::find_if(begin(codecs),   
-                     end(codecs),   
-                     [&](const auto& c) {return c.codec_name == codec_audio && c.supports_encoding;}) == codecs.end())
-    {
-        cout << "Codec `" << codec_audio << "` is not available as an encoder in your installation of ffmpeg." << endl;
-        cout << "Either choose another codec, or build ffmpeg from source with the right dependencies installed." << endl;
-        return EXIT_FAILURE;
-    }
-
-    // Next, we're going to open a video file. In this example, we only decode images, not audio.
+    // First, we open a video which we use to transmit and receive images over RTSP.
+    // In this example, we only decode images, not audio.
     // This convenience constructor allows you to do this.
     // Note, video_enabled, video_disabled, audio_enabled and audio_disabled are global constexpr flags.
     demuxer cap({input_filepath, video_enabled, audio_disabled});
@@ -114,18 +79,20 @@ try
         // This is used for AVFormatContext and demuxer-private options specific to the container.
         // {"rtsp_flags", "listen"} tells the RTSP demuxer that it is a server
         // {"rtsp_transport", "tcp"} configures RTSP over TCP transport. This way we don't loose packets.
+        // We set a listening timeout of 5s.
 
         demuxer cap([&] {
             demuxer::args args;
             args.filepath = url;
             args.format_options["rtsp_flags"]       = "listen";
             args.format_options["rtsp_transport"]   = "tcp";
+            args.connect_timeout = 5s;
             return args;
         }());
 
         if (!cap.is_open())
         {
-            cout << "Failed to open rtsp client" << endl;
+            cout << "Failed to receive connection from RTSP client" << endl;
             return;
         }
 
@@ -160,7 +127,7 @@ try
 
             if (args.enable_image)
             {
-                args.args_image.codec_name  = codec_video;
+                args.args_image.codec_name  = get_option(parser, "codec", "mpeg4");
                 args.args_image.h           = get_option(parser, "height", cap.height());
                 args.args_image.w           = get_option(parser, "width",  cap.width());
                 args.args_image.fmt         = cap.pixel_fmt();

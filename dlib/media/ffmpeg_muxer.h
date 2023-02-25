@@ -681,7 +681,7 @@ namespace dlib
                 }) == end(supported_codecs))
                 {
                     cerr << "Codec `" << avcodec_get_name(args.args_codec.codec) << "` or `" << args.args_codec.codec_name << "` cannot be stored in this file\n";
-                    cerr << "List of supported codecs for muxer `" << st.pFormatCtx->oformat->name << "` :\n";
+                    cerr << "List of supported codecs for muxer `" << st.pFormatCtx->oformat->name << "` in this installation of ffmpeg:\n";
                     for (const auto& supported : supported_codecs)
                         cerr << "    `" << supported.codec_name << "`\n";
                     return false;
