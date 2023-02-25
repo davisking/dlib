@@ -62,35 +62,6 @@ try
 
     const std::string input_filepath    = get_option(parser, "i", "");
     const std::string output_filepath   = get_option(parser, "o", "");
-    const std::string codec_video       = get_option(parser, "codec_video", "mpeg4");
-    const std::string codec_audio       = get_option(parser, "codec_audio", "aac");
-
-    // Check your codec is available.
-    // Note, this step isn't necessary. If the requested codec isn't available as an encoder, 
-    // the constructor of muxer will fail and muxer::is_open() == false
-    // However, this gives a helpful message and further demonstrates the convenient functions
-    // dlib provides for inspecting your installation of ffmpeg.
-    const auto codecs = ffmpeg::list_codecs();
-
-    if (std::find_if(begin(codecs),   
-                     end(codecs),   
-                     [&](const auto& c) {return c.codec_name == codec_video && c.supports_encoding;}) == codecs.end())
-    {
-        cout << "Codec `" << codec_video << "` is not available as an encoder in your installation of ffmpeg." << endl;
-        cout << "Either choose another codec, or build ffmpeg from source with the right dependencies installed." << endl;
-        cout << "For example, if you are trying to encode to h264, hevc/h265, vp9 or avi, then your installation of ffmpeg ";
-        cout << "needs to link to libx264, libx265, libvp9 or libav1" << endl;
-        return EXIT_FAILURE;
-    }
-
-    if (std::find_if(begin(codecs),   
-                     end(codecs),   
-                     [&](const auto& c) {return c.codec_name == codec_audio && c.supports_encoding;}) == codecs.end())
-    {
-        cout << "Codec `" << codec_audio << "` is not available as an encoder in your installation of ffmpeg." << endl;
-        cout << "Either choose another codec, or build ffmpeg from source with the right dependencies installed." << endl;
-        return EXIT_FAILURE;
-    }
 
     demuxer cap(input_filepath);
 
@@ -107,7 +78,7 @@ try
         args.enable_audio = cap.audio_enabled();
         if (args.enable_image)
         {
-            args.args_image.codec_name  = codec_video;
+            args.args_image.codec_name  = get_option(parser, "codec_video", "mpeg4");;
             args.args_image.h           = get_option(parser, "height", cap.height());
             args.args_image.w           = get_option(parser, "width",  cap.width());
             args.args_image.fmt         = cap.pixel_fmt();
@@ -115,7 +86,7 @@ try
         }
         if (args.enable_audio)
         {
-            args.args_audio.codec_name      = codec_audio;
+            args.args_audio.codec_name      = get_option(parser, "codec_audio", "aac");;
             args.args_audio.sample_rate     = get_option(parser, "sample_rate", cap.sample_rate());
             args.args_audio.channel_layout  = cap.channel_layout();
             args.args_audio.fmt             = cap.sample_fmt();

@@ -239,6 +239,7 @@ if (DLIB_USE_FFMPEG AND NOT DLIB_NO_GUI_SUPPORT)
    add_example(ffmpeg_video_muxing_ex)
    add_example(ffmpeg_rtsp_ex)
    add_example(ffmpeg_microphone_to_file_ex)
+   add_example(ffmpeg_file_to_speaker_ex)
 endif()
 
 if (DLIB_NO_GUI_SUPPORT)
