@@ -277,9 +277,20 @@ namespace dlib
                 WHAT THIS OBJECT REPRESENTS
                     This object informs on available codecs provided by the installation of ffmpeg dlib is linked against.
             !*/
+            AVCodecID   codec_id;
             std::string codec_name;
             bool supports_encoding;
             bool supports_decoding;
+        };
+
+        struct muxer_details
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object informs on available muxers provided by the installation of ffmpeg dlib is linked against.
+            !*/
+            std::string name;
+            std::vector<codec_details> supported_codecs;
         };
 
         struct device_details
@@ -311,7 +322,7 @@ namespace dlib
                 - returns a list of all registered ffmpeg demuxers
         !*/
 
-        std::vector<std::string> list_muxers();
+        std::vector<muxer_details> list_muxers();
         /*!
             ensures
                 - returns a list of all registered ffmpeg muxers
