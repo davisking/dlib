@@ -375,10 +375,14 @@ namespace dlib
 
             if (pCodec->type == AVMEDIA_TYPE_VIDEO)
             {
-                DLIB_CASSERT(args_.args_image.h > 0, "height must be set");
-                DLIB_CASSERT(args_.args_image.w > 0, "width must be set");
-                DLIB_CASSERT(args_.args_image.fmt != AV_PIX_FMT_NONE, "pixel format must be set");
-                DLIB_CASSERT(args_.args_image.framerate > 0, "framerate must be set");
+                if (args_.args_image.h <= 0) 
+                    return fail(cerr, pCodec->name, " is an image codec. height must be set");
+                if (args_.args_image.w <= 0) 
+                    return fail(cerr, pCodec->name, " is an image codec. width must be set");
+                if (args_.args_image.fmt == AV_PIX_FMT_NONE) 
+                    return fail(cerr, pCodec->name, " is an image codec. height must be set");
+                if (args_.args_image.framerate <= 0) 
+                    return fail(cerr, pCodec->name, " is an image codec. framerate must be set");
 
                 pCodecCtx->height       = args_.args_image.h;
                 pCodecCtx->width        = args_.args_image.w;
@@ -393,9 +397,12 @@ namespace dlib
             }
             else if (pCodec->type == AVMEDIA_TYPE_AUDIO)
             {
-                DLIB_CASSERT(args_.args_audio.sample_rate > 0, "sample rate not set");
-                DLIB_CASSERT(args_.args_audio.channel_layout > 0, "channel layout not set");
-                DLIB_CASSERT(args_.args_audio.fmt != AV_SAMPLE_FMT_NONE, "audio sample format not set");
+                if (args_.args_audio.sample_rate <= 0) 
+                    return fail(cerr, pCodec->name, " is an audio codec. sample_rate must be set");
+                if (args_.args_audio.channel_layout <= 0) 
+                    return fail(cerr, pCodec->name, " is an audio codec. channel_layout must be set");
+                if (args_.args_audio.fmt == AV_SAMPLE_FMT_NONE) 
+                    return fail(cerr, pCodec->name, " is an audio codec. fmt (sample format) must be set");
 
                 pCodecCtx->sample_rate      = args_.args_audio.sample_rate;
                 pCodecCtx->sample_fmt       = args_.args_audio.fmt;
