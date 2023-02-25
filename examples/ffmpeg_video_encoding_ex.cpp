@@ -51,27 +51,6 @@ try
     }
 
     const std::string filepath = get_option(parser, "i", "");
-    const std::string codec    = get_option(parser, "codec", "mpeg4");
-
-    // Check your codec is available.
-    // Note, this step isn't necessary. If the requested codec isn't available as an encoder, 
-    // the constructor of encoder will fail and encoder::is_open() == false
-    // However, this gives a helpful message and further demonstrates the convenient functions
-    // dlib provides for inspecting your installation of ffmpeg.
-    const auto codecs = ffmpeg::list_codecs();
-
-    const bool codec_available = std::find_if(begin(codecs),   
-                                              end(codecs),   
-                                              [&](const auto& c) {return c.codec_name == codec && c.supports_encoding;}) != codecs.end();
-
-    if (!codec_available)
-    {
-        cout << "Codec `" << codec << "` is not available as an encoder in your installation of ffmpeg." << endl;
-        cout << "Either choose another codec, or build ffmpeg from source with the right dependencies installed." << endl;
-        cout << "For example, if you are trying to encode to h264, hevc/h265, vp9 or avi, then your installation of ffmpeg" << endl;
-        cout << "needs to link to libx264, libx265, libvp9 or libav1" << endl;
-        return EXIT_FAILURE;
-    }
 
     // Load input video.
     // Note, this uses a convenient constructor which (dis)enables audio and/or video.
@@ -89,7 +68,7 @@ try
     {
         return encoder([&] {
             encoder::args args;
-            args.args_codec.codec_name  = codec;
+            args.args_codec.codec_name  = get_option(parser, "codec", "mpeg4");
             args.args_image.h           = get_option(parser, "height", cap.height());
             args.args_image.w           = get_option(parser, "width",  cap.width());
             args.args_image.framerate   = cap.fps();
