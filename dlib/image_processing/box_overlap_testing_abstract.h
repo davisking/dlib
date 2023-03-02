@@ -16,8 +16,8 @@ namespace dlib
     );
     /*!
         ensures
-            - returns area of the intersection of a and b divided by (a+b).area().  If both
-              boxes are empty then returns 0.
+            - returns area of the intersection of a and b divided by the area covered by the union
+              of the boxes.  If both boxes are empty then returns 0.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -28,8 +28,8 @@ namespace dlib
     );
     /*!
         ensures
-            - returns area of the intersection of a and b divided by (a+b).area().  If both
-              boxes are empty then returns 0.
+            - returns area of the intersection of a and b divided by the area covered by the union
+              of the boxes.  If both boxes are empty then returns 0.
     !*/
 
 // ----------------------------------------------------------------------------------------
