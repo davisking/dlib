@@ -20,8 +20,8 @@ namespace dlib
         const double inner = a.intersect(b).area();
         if (inner == 0)
             return 0;
-        const double outer = (a+b).area();
-        return inner/outer;
+        const double outer = a.area() + b.area() - inner;
+        return inner / outer;
     }
 
 // ----------------------------------------------------------------------------------------
