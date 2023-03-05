@@ -91,6 +91,25 @@ namespace dlib
                 - throws invalid_utf8_error
     !*/
 
+    template <typename forward_iterator, typename unary_op>
+    inline void convert_utf8_to_utf32 (
+            forward_iterator ibegin,
+            forward_iterator iend,
+            unary_op op
+    );
+    /*!
+        requires
+            - ibegin == iterator pointing to the start of the range
+            - iend == iterator pointing to the end of the range
+            - unary_op == a callable object that takes one parameter
+        ensures
+            - visits the range [ibegin, iend) in order and converts the utf-8
+              encoded characters into utf-32 characters.
+            - calls op(ch) on each converted utf-32 character.
+            - if (an error occurs while converting the characters)
+                - throws invalid_utf8_error
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     const ustring convert_wstring_to_utf32 (
