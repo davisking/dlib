@@ -637,6 +637,14 @@ namespace dlib
         unichar ch;
         int status = 0;
 
+        // ugly hack
+        if (sizeof(*ibegin) == sizeof(unichar))
+        {
+            while (ibegin != iend)
+                op(*(ibegin++));
+            return;
+        }
+
         while (ibegin != iend)
         {
             status = unicode_helpers::u8_to_u32(ch, ibegin, iend);
@@ -656,10 +664,10 @@ namespace dlib
     }
 
     template <typename unary_op>
-    inline void convert_utf8_to_utf32(const ustring& str, unary_op op)
+    inline void convert_utf8_to_utf32(ustring::iterator ibegin, ustring::iterator iend, unary_op op)
     {
-        for (const auto ch : str)
-            op(ch);
+        while (ibegin != iend)
+            op(*(ibegin++));
     }
 
 // ----------------------------------------------------------------------------------------
