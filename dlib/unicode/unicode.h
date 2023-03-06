@@ -110,107 +110,6 @@ namespace dlib
 
     namespace unicode_helpers
     {
-
-        template <
-            typename charT
-            >
-        int u8_to_u32(
-            charT& result,
-            std::istream& in
-        )
-        /*!
-            ensures
-                - if (there just wasn't any more data and we hit EOF) then
-                    - returns 0
-                - else if (we decoded another character without error) then
-                    - #result == the decoded character
-                    - returns the number of bytes consumed to make this character
-                - else
-                    - some error occurred
-                    - returns -1
-        !*/
-        {
-            int val = in.get();
-            if (val == EOF)
-                return 0;
-
-            unichar ch[4];
-            ch[0] = zero_extend_cast<unichar>(val);
-            if ( ch[0] < 0x80 )
-            {
-                result = static_cast<charT>(ch[0]);
-                return 1;
-            }
-            if ( ( ch[0] & ~0x3F ) == 0x80 )
-            {
-                // invalid leading byte
-                return -1;
-            }
-            if ( ( ch[0] & ~0x1F ) == 0xC0 )
-            {
-                val = in.get();
-                if ( val == EOF )
-                    return -1;
-                
-                ch[1] = zero_extend_cast<unichar>(val); 
-                if ( ( ch[1] & ~0x3F ) != 0x80 )
-                    return -1; // invalid tail
-                if ( ( ch[0] & ~0x01 ) == 0xC0 )
-                    return -1; // overlong form
-                ch[0] &= 0x1F;
-                ch[1] &= 0x3F;
-                result = static_cast<charT>(( ch[0] << 6 ) | ch[1]);
-                return 2;
-            }
-            if ( ( ch[0] & ~0x0F ) == 0xE0 )
-            {
-                for ( unsigned n = 1;n < 3;n++ )
-                {
-                    val = in.get();
-                    if ( val == EOF )
-                        return -1;
-                    ch[n] = zero_extend_cast<unichar>(val); 
-                    if ( ( ch[n] & ~0x3F ) != 0x80 )
-                        return -1; // invalid tail
-                    ch[n] &= 0x3F;
-                }
-                ch[0] &= 0x0F;
-                result = static_cast<charT>(( ch[0] << 12 ) | ( ch[1] << 6 ) | ch[2]);
-                if ( result < 0x0800 )
-                    return -1; // overlong form
-                if ( result >= 0xD800 && result < 0xE000 )
-                    return -1; // invalid character (UTF-16 surrogate pairs)
-                if ( result >= 0xFDD0 && result <= 0xFDEF )
-                    return -1; // noncharacter
-                if ( result >= 0xFFFE )
-                    return -1; // noncharacter
-                return 3;
-            }
-            if ( ( ch[0] & ~0x07 ) == 0xF0 )
-            {
-                for ( unsigned n = 1;n < 4;n++ )
-                {
-                    val = in.get();
-                    if ( val == EOF )
-                        return -1;
-                    ch[n] = zero_extend_cast<unichar>(val); 
-                    if ( ( ch[n] & ~0x3F ) != 0x80 )
-                        return -1; // invalid tail
-                    ch[n] &= 0x3F;
-                }
-                if ( ( ch[0] ^ 0xF6 ) < 4 )
-                    return -1;
-                ch[0] &= 0x07;
-                result  = static_cast<charT>(( ch[0] << 18 ) | ( ch[1] << 12 ) | ( ch[2] << 6 ) | ch[3]);
-                if ( result < 0x10000 )
-                    return -1; // overlong form
-                if ( (result & 0xFFFF) >= 0xFFFE )
-                    return -1; // noncharacter
-                return 4;
-            }
-            return -1;
-        }
-
         template <
             typename charT,
             typename forward_iterator
@@ -265,7 +164,7 @@ namespace dlib
                     return -1; // overlong form
                 ch[0] &= 0x1F;
                 ch[1] &= 0x3F;
-                result = static_cast<charT>(( ch[0] << 6 ) | ch[1]);
+                result = static_cast<charT>((ch[0] << 6) | ch[1]);
                 return 2;
             }
             if ((ch[0] & ~0x0F ) == 0xE0)
@@ -362,7 +261,8 @@ namespace dlib
                 for (i = 0; i < n; ++i)
                 {
                     charT ch;
-                    if (unicode_helpers::u8_to_u32(ch,fin) > 0)
+                    using iter_type = std::istreambuf_iterator<char>;
+                    if (unicode_helpers::u8_to_u32(ch, iter_type(fin), iter_type()) > 0)
                     {
                         (in_buffer+max_putback)[i] = ch;
                     }
@@ -599,52 +499,34 @@ namespace dlib
         invalid_utf8_error():error(EUTF8_TO_UTF32) {}
     };
 
-    inline const ustring convert_utf8_to_utf32 (
-        const std::string& str
+    template <typename forward_iterator, typename unary_op>
+    inline void convert_utf8_to_utf32(
+        forward_iterator ibegin,
+        forward_iterator iend,
+        unary_op op
     )
     {
-        using namespace unicode_helpers;
-        ustring temp;
 
-        temp.reserve(str.size());
+        using char_type = std::decay_t<decltype(*ibegin)>;
+        static_assert(std::is_same<char_type, char>::value ||
+                      std::is_same<char_type, wchar_t>::value ||
+                      std::is_same<char_type, unichar>::value,
+                      "char_type must be either char or unichar");
 
-        int status = 0;
-        unichar ch;
-
-        for (size_t i = 0; i < str.size();)
-        {
-            status = u8_to_u32(ch, str.begin() + status, str.end());
-            if (status > 0)
-            {
-                temp.push_back(ch);
-                i += status;
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        if (status < 0)
-            throw invalid_utf8_error();
-
-        return temp;
-    }
-
-    template <typename forward_iterator, typename unary_op>
-    inline void convert_utf8_to_utf32(forward_iterator ibegin, forward_iterator iend, unary_op op)
-    {
-        unichar ch;
-        int status = 0;
-
-        // ugly hack
-        if (sizeof(*ibegin) == sizeof(unichar))
+        if (std::is_same<char_type, unichar>::value)
         {
             while (ibegin != iend)
                 op(*(ibegin++));
             return;
         }
 
+        if (std::is_same<char_type, wchar_t>::value)
+        {
+            return;
+        }
+
+        unichar ch;
+        int status = 0;
         while (ibegin != iend)
         {
             status = unicode_helpers::u8_to_u32(ch, ibegin, iend);
@@ -663,11 +545,19 @@ namespace dlib
             throw invalid_utf8_error();
     }
 
-    template <typename unary_op>
-    inline void convert_utf8_to_utf32(ustring::iterator ibegin, ustring::iterator iend, unary_op op)
+    inline const ustring convert_utf8_to_utf32 (
+        const std::string& str
+    )
     {
-        while (ibegin != iend)
-            op(*(ibegin++));
+        ustring temp;
+        temp.reserve(str.size());
+
+        convert_utf8_to_utf32(str.begin(), str.end(), [&](unichar ch)
+        {
+            temp.push_back(ch);
+        });
+
+        return temp;
     }
 
 // ----------------------------------------------------------------------------------------
