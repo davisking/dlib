@@ -254,7 +254,8 @@ py::list bottom_up_clustering(py::list descriptors, const int min_num_clusters, 
     const auto num_clusters = dlib::bottom_up_cluster(dist, labels, min_num_clusters, max_dist);
 
     py::list clusters;
-    for (size_t i = 0; i < labels.size(); ++i) {
+    for (size_t i = 0; i < labels.size(); ++i)
+    {
         clusters.append(labels[i]);
     }
     return clusters;
