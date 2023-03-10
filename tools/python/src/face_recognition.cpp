@@ -241,8 +241,8 @@ py::list bottom_up_clustering(py::list descriptors, const int min_num_clusters, 
     {
         for (size_t j = i+1; j < num_descriptors; ++j)
         {
-            const long i2 = static_cast<long>(i),
-                       j2 = static_cast<long>(j);
+            const long i2 = static_cast<long>(i);
+            const long j2 = static_cast<long>(j);
             matrix<double,0,1>& first_descriptor = descriptors[i].cast<matrix<double,0,1>&>();
             matrix<double,0,1>& second_descriptor = descriptors[j].cast<matrix<double,0,1>&>();
             dist(i2, j2) = dlib::length( first_descriptor- second_descriptor);
