@@ -89,7 +89,7 @@ namespace dlib
     class simd4f
     {    
         typedef union {
-            vector float v;
+            __vector float v;
             float x[4];
         } v4f;
         
@@ -98,7 +98,7 @@ namespace dlib
     public:
         inline simd4f() : x{0,0,0,0} {}
         inline simd4f(const simd4f& v) : x(v.x) { }
-        inline simd4f(const vector float& v) : x{v} { }
+        inline simd4f(const __vector float& v) : x{v} { }
 
         inline simd4f(const simd4i& v) {
             x.x[0]=v[0]; x.x[1]=v[1]; x.x[2]=v[2]; x.x[3]=v[3];
@@ -112,7 +112,7 @@ namespace dlib
         inline simd4f& operator=(const simd4f& v) { x = v.x; return *this; }
         inline simd4f& operator=(const float& v) { *this = simd4f(v); return *this; }
 
-        inline vector float operator() () const { return x.v; }
+        inline __vector float operator() () const { return x.v; }
         inline float operator[](unsigned int idx) const { return x.x[idx]; }
         
         inline void load_aligned(const float* ptr)  { x.v = vec_ld(0, ptr); }
