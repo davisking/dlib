@@ -12,13 +12,14 @@ body:
     id: platform
     attributes:
       label: What Operating System(s) are you seeing this problem on?
+      description: Select all that apply
       options:
         - Linux (x86-64)
         - Linux (aarch64)
         - macOS (Intel)
         - macOS (Apple Silicon)
         - Windows
-        - Other (plase, specify in the steps to reproduce)
+        - Other (plase, specify in the Steps to Reproduce)
     validations:
       required: true
   - type: input
