@@ -51,9 +51,7 @@ body:
       label: Current Behavior
       description: A clear and concise description of what the bug is
       placeholder: |
-        Tell us what happened.  You can attach screenshots by clicking
-        this area to highlight it and then drag the files in, or just paste the image from
-        the clipboard to upload it.
+        Tell us what happened.  Expain in detail the current behavior.
     validations:
       required: true
   - type: textarea
