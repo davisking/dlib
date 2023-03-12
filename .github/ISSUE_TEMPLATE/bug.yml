@@ -4,7 +4,7 @@ labels: type:bug
 assignees: []
 body:
   - type: dropdown
-    id: os
+    id: platform
     attributes:
       label: What Operating System(s) are you seeing this problem on?
       options:
@@ -13,6 +13,7 @@ body:
         - macOS (Intel)
         - macOS (Apple Silicon)
         - Windows
+        - Other (plase, specify in the steps to reproduce)
     validations:
       required: true
   - type: input
@@ -21,6 +22,14 @@ body:
       label: dlib version
       description: "The commit hash, tag name, or package version"
       placeholder: "19.24"
+    validations:
+      required: true
+  - type: input
+    id: compiler
+    attributes:
+      label: Compiler
+      description: "The compiler and version you used to build dlib from source"
+      placeohoder: "e.g.: GCC 9, MSVC 19, clang 10"
     validations:
       required: true
   - type: textarea
