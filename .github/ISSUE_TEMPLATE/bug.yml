@@ -8,7 +8,7 @@ body:
     attributes:
       value: |
         Before you ask a question, check Google for a solution, [the dlib FAQ](http://dlib.net/faq.html), or consult the dlib documentation.  Every single function in dlib is documented in detail.  If you obviously haven't read the documentation your issue will be closed.
-  - type: checkboxes
+  - type: dropdown
     id: platform
     attributes:
       label: What Operating System(s) are you seeing this problem on?
