@@ -1,0 +1,24 @@
+name: Feature Request
+description: Suggest an idea for dlib
+labels: type:enhancement
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        It is OK to suggest interesting improvements to dlib, even if you are not volunteering to implement them.
+        **However, the issue tracker is not a code writing service, do not ask for someone to write code for you**.
+        E.g. Do not ask for feature improvements to the example programs.
+        **If there is some feature improvement you want in an example program then it's up to you to write it**.
+  - type: textarea
+    id: description
+    attributes:
+      label: Main idea
+      description: Describe what you want to add or improve
+    validations:
+      required: true
+  - type: textarea
+    id: other
+    attributes:
+      label: Anything else?
+      description: Add any other context about the suggestion here.

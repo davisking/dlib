@@ -1,0 +1,71 @@
+name: Bug Report
+description: Create a bug report.
+title: "[Bug]: "
+labels: bug
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before you ask a question, check Google for a solution, [the dlib FAQ](http://dlib.net/faq.html), or consult the dlib documentation.  Every single function in dlib is documented in detail.  If you obviously haven't read the documentation your issue will be closed.
+  - type: dropdown
+    id: platform
+    attributes:
+      label: What Operating System(s) are you seeing this problem on?
+      description: Select all that apply
+      multiple: true
+      options:
+        - Linux (x86-64)
+        - Linux (aarch64)
+        - macOS (Intel)
+        - macOS (Apple Silicon)
+        - Windows
+        - Other (plase, specify in the Steps to Reproduce)
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: dlib version
+      description: "The commit hash, tag name, or package version"
+      placeholder: "19.24"
+    validations:
+      required: true
+  - type: input
+    id: compiler
+    attributes:
+      label: Compiler
+      description: "The compiler and version you used to build dlib from source"
+      placeholder: "e.g.: GCC 9, MSVC 19, clang 10"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: |
+        A clear and concise description of what you expected to happen
+  - type: textarea
+    id: current
+    attributes:
+      label: Current Behavior
+      description: A clear and concise description of what the bug is
+      placeholder: |
+        Tell us what happened.  Expain in detail the current behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        Please include as much information as possible that can help to reproduce and
+        understand the issue.
+
+  - type: textarea
+    id: other
+    attributes:
+      label: Anything else?
+      description: |
+        Add any other context about the problem here.
