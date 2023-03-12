@@ -13,6 +13,7 @@ body:
     attributes:
       label: What Operating System(s) are you seeing this problem on?
       description: Select all that apply
+      multiple: true
       options:
         - Linux (x86-64)
         - Linux (aarch64)
