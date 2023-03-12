@@ -29,7 +29,7 @@ body:
     attributes:
       label: Compiler
       description: "The compiler and version you used to build dlib from source"
-      placeohoder: "e.g.: GCC 9, MSVC 19, clang 10"
+      placeholder: "e.g.: GCC 9, MSVC 19, clang 10"
     validations:
       required: true
   - type: textarea
