@@ -3,7 +3,7 @@ description: Suggest an idea for dlib
 labels: type:enhancement
 assignees: []
 body:
-  - markdown:
+  - type: markdown
     attributes:
       value: |
         It is OK to suggest interesting improvements to dlib, even if you are not volunteering to implement them.
@@ -17,11 +17,6 @@ body:
       description: Describe what you want to add or improve
     validations:
       required: true
-  - type: textarea
-    id: alternative
-    attributes:
-      label: Alternative ideas
-      description: Describe alternative ideas or directions if any
   - type: textarea
     id: other
     attributes:
