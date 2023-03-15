@@ -32,6 +32,14 @@ body:
     validations:
       required: true
   - type: input
+    id: python
+    attributes:
+      label: Python version
+      description: "The version of Python you are using"
+      placeholder: "3.8"
+    validations:
+      required: false
+  - type: input
     id: compiler
     attributes:
       label: Compiler
