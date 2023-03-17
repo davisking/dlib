@@ -3,7 +3,6 @@
 #
 # Manifest template for creating the dlib source distribution.
 
-
 include MANIFEST.in
 include setup.py
 include README.md
