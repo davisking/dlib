@@ -2204,21 +2204,6 @@
    <!-- ************************************************************************* -->
       
       <component>
-         <name>partition_pixels</name>
-         <file>dlib/image_transforms.h</file>
-         <spec_file link="true">dlib/image_transforms/thresholding_abstract.h</spec_file>
-         <description>        
-              Finds a threshold value that would be reasonable to use with
-              <a href="#threshold_image">threshold_image</a>.  It does this by
-              finding the threshold that partitions the pixels in an image into
-              two groups such that the sum of absolute deviations between each
-              pixel and the mean of its group is minimized.
-         </description>
-      </component>
-            
-   <!-- ************************************************************************* -->
-      
-      <component>
          <name>label_connected_blobs</name>
          <file>dlib/image_transforms.h</file>
          <spec_file link="true">dlib/image_transforms/label_connected_blobs_abstract.h</spec_file>
