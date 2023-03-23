@@ -11,14 +11,14 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
+import sys, os, glob
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath('../../../build/lib.linux-x86_64-2.7'))
-sys.path.insert(0, os.path.abspath('../../../build/lib.linux-x86_64-3.8'))
+for path in glob.glob('../../../build/lib.linux-*'):
+    sys.path.insert(0, os.path.abspath(path))
 
 import generate_dlib_listing
 generate_dlib_listing.make_listing_files()
