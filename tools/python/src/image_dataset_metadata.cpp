@@ -251,7 +251,8 @@ void bind_image_dataset_metadata(py::module &m_)
 
 
     m.def("save_image_dataset_metadata", &save_image_dataset_metadata, py::arg("data"), py::arg("filename"),
-        "Writes the contents of the meta object to a file with the given filename.  The file will be in an XML format."
+        "Writes the contents of the meta object to a file with the given filename.  The file will be in an XML format, "
+        "although any extension can be used to name the file."
         );
 
     m.def("load_image_dataset_metadata", &py_load_image_dataset_metadata, py::arg("filename"),
