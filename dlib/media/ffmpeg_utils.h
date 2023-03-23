@@ -18,6 +18,7 @@ static_assert(false, "This version of dlib isn't built with the FFMPEG wrappers"
 #include <vector>
 #include <array>
 #include <unordered_map>
+#include <iostream>
 #include "../image_processing/generic_image.h"
 #include "../pixel.h"
 #include "../assert.h"
@@ -342,9 +343,16 @@ namespace dlib
 
         struct codec_details
         {
+            AVCodecID   codec_id{AV_CODEC_ID_NONE};
             std::string codec_name;
             bool supports_encoding{false};
             bool supports_decoding{false};
+        };
+
+        struct muxer_details
+        {
+            std::string name;
+            std::vector<codec_details> supported_codecs;
         };
 
         struct device_details
@@ -361,13 +369,13 @@ namespace dlib
 
         std::vector<std::string>    list_protocols();
         std::vector<std::string>    list_demuxers();
-        std::vector<std::string>    list_muxers();
+        std::vector<muxer_details>  list_muxers();
         std::vector<codec_details>  list_codecs();
         std::vector<device_details> list_input_devices();
         std::vector<device_details> list_output_devices();
 
 // ---------------------------------------------------------------------------------------------------
-    
+
     }
 }
 
@@ -381,6 +389,23 @@ namespace dlib
 {
     namespace ffmpeg
     {
+
+// ---------------------------------------------------------------------------------------------------
+
+        namespace details
+        {
+            template<class... Args>
+            inline bool fail(std::ostream& out, Args&&... args)
+            {
+#ifdef __cpp_fold_expressions
+                ((out << args),...);
+#else
+                (void)std::initializer_list<int>{((out << args), 0)...};
+#endif
+                out << std::endl;
+                return false;
+            }
+        }
 
 // ---------------------------------------------------------------------------------------------------
 
@@ -962,10 +987,27 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-        inline std::vector<std::string> list_muxers()
+        inline std::vector<codec_details> list_codecs_for_muxer (
+            const AVOutputFormat*               oformat,
+            const std::vector<codec_details>&   all_codecs = list_codecs()
+        )
+        {
+            std::vector<codec_details> supported_codecs;
+
+            for (const auto& codec : all_codecs)
+                if (avformat_query_codec(oformat, codec.codec_id, FF_COMPLIANCE_STRICT) == 1)
+                    supported_codecs.push_back(codec);
+            
+            return supported_codecs;
+        }
+        
+        inline std::vector<muxer_details> list_muxers()
         {
             const bool init = details::register_ffmpeg::get(); // Don't let this get optimized away
-            std::vector<std::string> muxers;
+
+            const auto codecs = list_codecs();
+
+            std::vector<muxer_details> all_details;
             const AVOutputFormat* muxer = nullptr;
 
     #if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100)
@@ -975,9 +1017,14 @@ namespace dlib
             void* opaque = nullptr;
             while (init && (muxer = av_muxer_iterate(&opaque)))
     #endif
-                muxers.push_back(muxer->name);
+            {
+                muxer_details details;
+                details.name                = muxer->name;
+                details.supported_codecs    = list_codecs_for_muxer(muxer, codecs);
+                all_details.push_back(details);
+            }      
         
-            return muxers;
+            return all_details;
         }
 
 // ---------------------------------------------------------------------------------------------------
@@ -998,7 +1045,8 @@ namespace dlib
     #endif
             {
                 codec_details detail;
-                detail.codec_name = codec->name;
+                detail.codec_id     = codec->id;
+                detail.codec_name   = codec->name;
                 detail.supports_encoding = av_codec_is_encoder(codec);
                 detail.supports_decoding = av_codec_is_decoder(codec);
                 details.push_back(std::move(detail));
@@ -1031,11 +1079,17 @@ namespace dlib
         {
             const bool init = details::register_ffmpeg::get(); // Don't let this get optimized away
             std::vector<device_details> devices;
-            AVInputFormat* device = nullptr;
 
+#if LIBAVDEVICE_VERSION_INT < AV_VERSION_INT(59, 0, 100)
+            using AVInputFormatPtr = AVInputFormat*;
+#else
+            using AVInputFormatPtr = const AVInputFormat*;
+#endif
+
+            AVInputFormatPtr device{nullptr};
             details::av_ptr<AVDeviceInfoList> managed;
 
-            const auto iter = [&](AVInputFormat* device)
+            const auto iter = [&](AVInputFormatPtr device)
             {
                 device_details details;
                 details.device_type = std::string(device->name);
@@ -1075,11 +1129,18 @@ namespace dlib
         {
             const bool init = details::register_ffmpeg::get(); // Don't let this get optimized away
             std::vector<device_details> devices;
-            AVOutputFormat* device = nullptr;
+
+#if LIBAVDEVICE_VERSION_INT < AV_VERSION_INT(59, 0, 100)
+            using AVOutputFormatPtr = AVOutputFormat*;
+#else
+            using AVOutputFormatPtr = const AVOutputFormat*;
+#endif
+
+            AVOutputFormatPtr device{nullptr};
 
             details::av_ptr<AVDeviceInfoList> managed;
 
-            const auto iter = [&](AVOutputFormat* device)
+            const auto iter = [&](AVOutputFormatPtr device)
             {
                 device_details details;
                 details.device_type = std::string(device->name);
@@ -1121,7 +1182,7 @@ namespace dlib
         >
         void convert(const frame& f, ImageContainer& image)
         {
-            using pixel = typename image_traits<ImageContainer>::pixel_type;
+            using pixel = pixel_type_t<ImageContainer>;
             
             DLIB_ASSERT(f.is_image(), "frame isn't an image type");
             DLIB_ASSERT(f.pixfmt() == pix_traits<pixel>::fmt, "frame doesn't have correct format");
@@ -1142,7 +1203,7 @@ namespace dlib
                                                     f.height(), 
                                                     1);    
             
-            DLIB_ASSERT(ret == (int)expsize, "av_image_copy_to_buffer()  error : " << details::get_av_error(ret));
+            DLIB_ASSERT(ret == (int)expsize, "av_image_copy_to_buffer() error : " << details::get_av_error(ret));
             (void)ret;
         }
 
@@ -1152,7 +1213,7 @@ namespace dlib
         >
         void convert(const ImageContainer& img, frame& f)
         {
-            using pixel = typename image_traits<ImageContainer>::pixel_type;
+            using pixel = pixel_type_t<ImageContainer>;
 
             if (f.height() != img.nr() ||
                 f.width()  != img.nc() ||
