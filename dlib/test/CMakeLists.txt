@@ -184,7 +184,11 @@ if (CMAKE_COMPILER_IS_GNUCXX)
       # definitely heap allocated.
       add_compile_options(-Wno-free-nonheap-object)
    endif()
-   target_link_options(${target_name} PRIVATE $<$<CONFIG:RELEASE>:-s>)
+
+   if(${CMAKE_VERSION} VERSION_GREATER "3.8.0") 
+      # strip debug symbols to make the binary smaller
+      target_link_options(${target_name} PRIVATE $<$<CONFIG:RELEASE>:-s>)
+   endif()
 
 elseif (MSVC)
    # Treat warnings as errors.
@@ -194,7 +198,11 @@ else() # basically Clang
    add_compile_options(-W -Werror)
    # This is for the comment in face_detection_ex.cpp that says "faces/*.jpg"
    add_compile_options(-Wno-comment)
-   target_link_options(${target_name} PRIVATE $<$<CONFIG:RELEASE>:-s>)
+
+   if(${CMAKE_VERSION} VERSION_GREATER "3.8.0") 
+      # strip debug symbols to make the binary smaller
+      target_link_options(${target_name} PRIVATE $<$<CONFIG:RELEASE>:-s>)
+   endif()
 endif()
 
 
