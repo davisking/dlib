@@ -8,6 +8,7 @@
 #include "../pixel.h"
 #include "../matrix.h"
 #include "../gui_widgets/fonts.h"
+#include "../geometry.h"
 #include <cmath>
 
 namespace dlib
@@ -402,7 +403,163 @@ namespace dlib
         }
     }
 
-// ----------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------
+
+    template <typename image_type, typename pixel_type>
+    void fill_convex_polygon (
+        image_type& image,
+        const polygon& poly,
+        const pixel_type& pixel,
+        const bool alpha_blend = true,
+        const rectangle& area = rectangle(std::numeric_limits<long>::min(), std::numeric_limits<long>::min(),
+                                          std::numeric_limits<long>::max(), std::numeric_limits<long>::max())
+    )
+    {
+        using std::max;
+        using std::min;
+        const rectangle valid_area(get_rect(image).intersect(area));
+
+        const rectangle bounding_box = poly.get_rect();
+
+        // Don't do anything if the polygon is totally outside the area we can draw in
+        // right now.
+        if (bounding_box.intersect(valid_area).is_empty())
+            return;
+
+        rgb_alpha_pixel alpha_pixel;
+        assign_pixel(alpha_pixel, pixel);
+        const unsigned char max_alpha = alpha_pixel.alpha;
+
+        // we will only want to loop over the part of left_boundary that is part of the
+        // valid_area.
+        long top = max(valid_area.top(),bounding_box.top());
+        long bottom = min(valid_area.bottom(),bounding_box.bottom());
+
+        // Since we look at the adjacent rows of boundary information when doing the alpha
+        // blending, we want to make sure we always have some boundary information unless
+        // we are at the absolute edge of the polygon.
+        const long top_offset = (top == bounding_box.top()) ? 0 : 1;
+        const long bottom_offset = (bottom == bounding_box.bottom()) ? 0 : 1;
+        if (top != bounding_box.top())
+            top -= 1;
+        if (bottom != bounding_box.bottom())
+            bottom += 1;
+
+        std::vector<double> left_boundary;
+        std::vector<double> right_boundary;
+        poly.get_convex_shape(top, bottom, left_boundary, right_boundary);
+
+        // draw the polygon row by row
+        for (unsigned long i = top_offset; i < left_boundary.size(); ++i)
+        {
+            long left_x = static_cast<long>(std::ceil(left_boundary[i]));
+            long right_x = static_cast<long>(std::floor(right_boundary[i]));
+
+            left_x = max(left_x, valid_area.left());
+            right_x = min(right_x, valid_area.right());
+
+            if (i < left_boundary.size()-bottom_offset)
+            {
+                // draw the main body of the polygon
+                for (long x = left_x; x <= right_x; ++x)
+                {
+                    const long y = i+top;
+                    assign_pixel(image(y, x), pixel);
+                }
+            }
+
+            if (i == 0)
+                continue;
+
+            if (!alpha_blend)
+                continue;
+
+            // Now draw anti-aliased edges so they don't look all pixely.
+
+            // Alpha blend the edges on the left side.
+            double delta = left_boundary[i-1] - left_boundary[i];
+            if (std::abs(delta) <= 1)
+            {
+                if (std::floor(left_boundary[i]) != left_x)
+                {
+                    const point p(static_cast<long>(std::floor(left_boundary[i])), i+top);
+                    rgb_alpha_pixel temp = alpha_pixel;
+                    temp.alpha = max_alpha-static_cast<unsigned char>((left_boundary[i]-p.x())*max_alpha);
+                    if (valid_area.contains(p))
+                        assign_pixel(image(p.y(), p.x()),temp);
+                }
+            }
+            else if (delta < 0)  // on the bottom side
+            {
+                for (long x = static_cast<long>(std::ceil(left_boundary[i-1])); x < left_x; ++x)
+                {
+                    const point p(x, i+top);
+                    rgb_alpha_pixel temp = alpha_pixel;
+                    temp.alpha = static_cast<unsigned char>((x-left_boundary[i-1])/std::abs(delta)*max_alpha);
+                    if (valid_area.contains(p))
+                        assign_pixel(image(p.y(), p.x()),temp);
+                }
+            }
+            else // on the top side
+            {
+                const long old_left_x = static_cast<long>(std::ceil(left_boundary[i-1]));
+                for (long x = left_x; x < old_left_x; ++x)
+                {
+                    const point p(x, i+top-1);
+                    rgb_alpha_pixel temp = alpha_pixel;
+                    temp.alpha = static_cast<unsigned char>((x-left_boundary[i])/delta*max_alpha);
+                    if (valid_area.contains(p))
+                        assign_pixel(image(p.y(), p.x()),temp);
+                }
+            }
+
+
+            // Alpha blend the edges on the right side
+            delta = right_boundary[i-1] - right_boundary[i];
+            if (std::abs(delta) <= 1)
+            {
+                if (std::ceil(right_boundary[i]) != right_x)
+                {
+                    const point p(static_cast<long>(std::ceil(right_boundary[i])), i+top);
+                    rgb_alpha_pixel temp = alpha_pixel;
+                    temp.alpha = max_alpha-static_cast<unsigned char>((p.x()-right_boundary[i])*max_alpha);
+                    if (valid_area.contains(p))
+                        assign_pixel(image(p.y(), p.x()),temp);
+                }
+            }
+            else if (delta < 0) // on the top side
+            {
+                for (long x = static_cast<long>(std::floor(right_boundary[i-1]))+1; x <= right_x; ++x)
+                {
+                    const point p(x, i+top-1);
+                    rgb_alpha_pixel temp = alpha_pixel;
+                    temp.alpha = static_cast<unsigned char>((right_boundary[i]-x)/std::abs(delta)*max_alpha);
+                    if (valid_area.contains(p))
+                        assign_pixel(image(p.y(), p.x()),temp);
+                }
+            }
+            else // on the bottom side
+            {
+                const long old_right_x = static_cast<long>(std::floor(right_boundary[i-1]));
+                for (long x = right_x+1; x <= old_right_x; ++x)
+                {
+                    const point p(x, i+top);
+                    rgb_alpha_pixel temp = alpha_pixel;
+                    temp.alpha = static_cast<unsigned char>((right_boundary[i-1]-x)/delta*max_alpha);
+                    if (valid_area.contains(p))
+                        assign_pixel(image(p.y(), p.x()),temp);
+                }
+            }
+        }
+    }
+
+    template <typename image_type>
+    inline void draw_solid_convex_polygon (
+        image_type& image,
+        const polygon& poly
+    ) { fill_convex_polygon(image, poly, 0); }
+
+// ---------------------------------------------------------------------------------------
 
     template <
         typename image_array_type
