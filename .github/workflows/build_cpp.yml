@@ -18,18 +18,15 @@ defaults:
     working-directory: dlib/test
 
 jobs:
-  ubuntu-latest-gcc-default-cmake-3.8:
+  ubuntu-latest-gcc-default:
     runs-on: 'ubuntu-latest'
     steps:
     - uses: actions/checkout@v2
-      #    - uses: lukka/get-cmake@latest
-      #  with:
-      #    cmakeVersion: 3.8.0
     - name: Install dependencies
       run: |
         sudo apt update
         sudo apt install libwebp-dev libavformat-dev libavcodec-dev libavdevice-dev libavfilter-dev libswresample-dev libswscale-dev libavutil-dev 
-    - name: Configure
+    - name: Configuree
       run: cmake ${{ github.workspace }}/dlib/test -B ${{ env.build_dir }}
     - name: Build just tests
       run: cmake --build ${{ env.build_dir }} --config ${{ env.config }} --target dtest --parallel 4
