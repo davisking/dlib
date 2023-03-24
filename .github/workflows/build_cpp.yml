@@ -22,9 +22,9 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
     - uses: actions/checkout@v2
-    - uses: lukka/get-cmake@latest
-        with:
-          cmakeVersion: 3.8.0
+      #    - uses: lukka/get-cmake@latest
+      #  with:
+      #    cmakeVersion: 3.8.0
     - name: Install dependencies
       run: |
         sudo apt update
