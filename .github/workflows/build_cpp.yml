@@ -18,7 +18,7 @@ defaults:
     working-directory: dlib/test
 
 jobs:
-  ubuntu-latest-gcc-default-cmake-3.8:
+  ubuntu-latest-gcc-default-cmake-3-8:
     runs-on: 'ubuntu-latest'
     steps:
     - uses: actions/checkout@v2
