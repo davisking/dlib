@@ -25,8 +25,9 @@ jobs:
     - uses: actions/cache@v2
       id: cache-cmake-download
       with:
-        path: cmake-3.8.0-Linux-x86_64  # cache this folder
-        key: cmake-3.8.0
+        # cache this folder:
+        path: cmake-3.8.0-Linux-x86_64
+        key: cmake-3.8.0_try2
     - run: |
         # Get the minimum version of cmake dlib supports
         wget https://cmake.org/files/v3.8/cmake-3.8.0-Linux-x86_64.tar.gz
