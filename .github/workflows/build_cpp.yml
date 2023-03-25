@@ -8,9 +8,6 @@ on:
     branches:
     - master
 
-env:
-  config: Release
-
 defaults:
   run:
     shell: bash
