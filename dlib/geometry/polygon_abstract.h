@@ -38,6 +38,8 @@ namespace dlib
 
         point& operator[](const size_type idx);
         /*!
+            requires
+                - idx < size()
             ensures
                 - returns the point of the polygon at index idx.
         !*/
