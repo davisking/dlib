@@ -402,7 +402,7 @@ namespace dlib
 #else
                 (void)std::initializer_list<int>{((out << args), 0)...};
 #endif
-                out << std::endl;
+                out << '\n';
                 return false;
             }
         }

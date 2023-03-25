@@ -513,6 +513,9 @@ namespace dlib
 
         inline bool decoder::push_encoded_padded(const uint8_t *encoded, int nencoded)
         {
+            using namespace std;
+            using namespace details;
+
             if (!is_open())
                 return false;
 
@@ -533,15 +536,10 @@ namespace dlib
                     );
 
                     if (ret < 0)
-                    {
-                        printf("AV : error while parsing encoded buffer\n");
-                        return false;
-                    }
-                    else
-                    {
-                        encoded  += ret;
-                        nencoded -= ret;
-                    }
+                        return fail(cerr, "AV : error while parsing encoded buffer");
+
+                    encoded  += ret;
+                    nencoded -= ret;
                 } else
                 {
                     /*! Codec does not require parser !*/
@@ -860,6 +858,7 @@ namespace dlib
 
         inline bool demuxer::fill_queue()
         {
+            using namespace std;
             using namespace details;
 
             if (!st.frame_queue.empty())
@@ -875,22 +874,16 @@ namespace dlib
                 const int ret = av_read_frame(st.pFormatCtx.get(), st.packet.get());
 
                 if (ret == AVERROR_EOF)
-                {
                     return false;
-                }
+   
                 else if (ret < 0)
-                {
-                    printf("av_read_frame() failed : `%s`\n", get_av_error(ret).c_str());
-                    return false;
-                }
-                else
-                {
-                    if (st.packet->stream_index == st.stream_id_video)
-                        channel = &st.channel_video;
+                    return fail(cerr, "av_read_frame() failed : ", get_av_error(ret));
+ 
+                if (st.packet->stream_index == st.stream_id_video)
+                    channel = &st.channel_video;
 
-                    else if (st.packet->stream_index == st.stream_id_audio)
-                        channel = &st.channel_audio;
-                }
+                else if (st.packet->stream_index == st.stream_id_audio)
+                    channel = &st.channel_audio;
 
                 return true;
             };
