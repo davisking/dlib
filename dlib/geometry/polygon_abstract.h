@@ -56,6 +56,8 @@ namespace dlib
         /*!
             ensures
                 - returns the point of the polygon at index idx.
+            throws
+                - std::out_of_range if idx >= size()
         !*/
 
         rectangle get_rect() const;
