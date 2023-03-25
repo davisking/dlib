@@ -14,7 +14,7 @@ namespace dlib
     public:
         using size_type = std::vector<point>::size_type;
 
-        polygon(const std::vector<point>& points) : points(points) {}
+        polygon(std::vector<point> points) : points(std::move(points)) {}
 
         size_type size() const { return points.size(); }
 
