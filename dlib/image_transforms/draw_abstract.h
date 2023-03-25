@@ -197,7 +197,7 @@ namespace dlib
         image_type& image,
         const polygon& poly,
         const pixel_type& pixel,
-        const bool alpha_blend = true,
+        const bool antialias = true,
         const rectangle& area = rectangle(std::numeric_limits<long>::min(), std::numeric_limits<long>::min(),
                                           std::numeric_limits<long>::max(), std::numeric_limits<long>::max())
     );
@@ -215,7 +215,7 @@ namespace dlib
             - When drawing the polygon, only the part of the polygon which overlaps both
               the given image and area rectangle is drawn.
             - Uses the given pixel color to draw the polygon.
-            - if (alpha_blend == true) then we draw anti-aliased edges so they don't
+            - if (antialias == true) then we draw anti-aliased edges so they don't
               look all pixely by alpha-blending them with the image.
     !*/
 

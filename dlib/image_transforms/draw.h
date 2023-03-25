@@ -410,7 +410,7 @@ namespace dlib
         image_type& image,
         const polygon& poly,
         const pixel_type& pixel,
-        const bool alpha_blend = true,
+        const bool antialias = true,
         const rectangle& area = rectangle(std::numeric_limits<long>::min(), std::numeric_limits<long>::min(),
                                           std::numeric_limits<long>::max(), std::numeric_limits<long>::max())
     )
@@ -468,10 +468,7 @@ namespace dlib
                 }
             }
 
-            if (i == 0)
-                continue;
-
-            if (!alpha_blend)
+            if (i == 0 || !antialias)
                 continue;
 
             // Now draw anti-aliased edges so they don't look all pixely.
