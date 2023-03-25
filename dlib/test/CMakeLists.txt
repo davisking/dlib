@@ -185,7 +185,7 @@ if (CMAKE_COMPILER_IS_GNUCXX)
       add_compile_options(-Wno-free-nonheap-object)
    endif()
 
-   if(${CMAKE_VERSION} VERSION_GREATER "3.8.0") 
+   if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.13.0") 
       # strip debug symbols to make the binary smaller
       target_link_options(${target_name} PRIVATE $<$<CONFIG:RELEASE>:-s>)
    endif()
