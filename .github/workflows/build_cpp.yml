@@ -54,7 +54,7 @@ jobs:
         cd build
         make -j2
 
-  ubuntu-latest-gcc-11:
+  ubuntu-latest-gcc-11-blas:
     runs-on: 'ubuntu-latest'
     steps:
     - uses: actions/checkout@v2
@@ -62,6 +62,7 @@ jobs:
       run: |
         sudo apt update
         sudo apt install libwebp-dev libavformat-dev libavcodec-dev libavdevice-dev libavfilter-dev libswresample-dev libswscale-dev libavutil-dev 
+        sudo apt install libopenblas-dev liblapack-dev
     - name: Install gcc 11
       run: |
         sudo apt install gcc-11 g++-11
@@ -74,6 +75,14 @@ jobs:
       run: build/dtest --runall -q
     - name: Build examples, etc
       run: cmake --build build --config Release --parallel 2
+
+    # Test the BLAS bindings
+    - name: Configure BLAS binding tests
+      run: cmake ${{ github.workspace }}/dlib/test/blas_bindings -B build_blas_bindings
+    - name: Build blas binding tests
+      run: cmake --build build_blas_bindings --config Debug --parallel 4
+    - name: Test BLAS bindings
+      run: build_blas_bindings/dtest --runall -q
 
   ubuntu-18_04-gcc-7:
     runs-on: 'ubuntu-18.04'
@@ -95,7 +104,13 @@ jobs:
     - name: Build examples, etc
       run: cmake --build build --config Release --parallel 2
 
-  ubuntu-latest-clang-default:
+    # Test cmake scrips can build standalone dlib as a shared library
+    - name: Configure dlib as shared library  
+      run: cmake ${{ github.workspace }}/dlib -B build_dlib_shared -DBUILD_SHARED_LIBS=1
+    - name: Build dlib as shared library
+      run: cmake --build build_dlib_shared --parallel 4
+
+  ubuntu-latest-clang-default-avx:
     runs-on: 'ubuntu-latest'
     steps:
     - uses: actions/checkout@v2
@@ -107,7 +122,7 @@ jobs:
       run: |
         export CC=/usr/bin/clang
         export CXX=/usr/bin/clang++
-        cmake ${{ github.workspace }}/dlib/test -B build
+        cmake ${{ github.workspace }}/dlib/test -B build -DUSE_AVX_INSTRUCTIONS=1
     - name: Build just tests
       run: cmake --build build --config Release --target dtest --parallel 4
     - name: Test
