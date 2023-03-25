@@ -54,11 +54,11 @@ namespace dlib
                 - returns the point of the polygon at index idx.
         !*/
 
+        rectangle get_rect() const;
         /*!
             ensures
                 - returns smallest rectangle that contains all points in the polygon.
         !*/
-        rectangle get_rect() const;
 
         double area() const;
         /*!
