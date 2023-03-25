@@ -24,7 +24,7 @@ namespace dlib
     public:
         using size_type = std::vector<point>::size_type;
 
-        polygon(const std::vector<point>& points);
+        polygon(std::vector<point> points);
         /*!
             ensures
                 - #*this represents a polygon defined by points.
