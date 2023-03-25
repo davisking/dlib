@@ -375,6 +375,26 @@ namespace dlib
         std::vector<device_details> list_output_devices();
 
 // ---------------------------------------------------------------------------------------------------
+    
+        struct video_enabled_t
+        {
+            constexpr explicit video_enabled_t(bool enabled_) : enabled{enabled_} {}
+            bool enabled{false};
+        };
+
+        constexpr video_enabled_t video_enabled{true};
+        constexpr video_enabled_t video_disabled{false};
+
+        struct audio_enabled_t
+        {
+            constexpr explicit audio_enabled_t(bool enabled_) : enabled{enabled_} {}
+            bool enabled{false};
+        };
+
+        constexpr audio_enabled_t audio_enabled{true};
+        constexpr audio_enabled_t audio_disabled{false};
+
+// ---------------------------------------------------------------------------------------------------
 
     }
 }
@@ -444,7 +464,7 @@ namespace dlib
             {
                 case 1: return AV_CH_LAYOUT_MONO;
                 case 2: return AV_CH_LAYOUT_STEREO;
-                default: return 0;
+                default: DLIB_CASSERT(false, "Don't support " << nchannels << " yet"); return 0;
             }
         }
 

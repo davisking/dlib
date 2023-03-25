@@ -350,6 +350,42 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
+        struct video_enabled_t
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This is a strong type which controls whether or not we want
+                    to enable video decoding in demuxer or video encoding in muxer.
+
+                    For example, you can now use the convenience constructor:
+
+                        demuxer cap(filename, video_enabled, audio_disabled);
+            !*/
+
+            constexpr explicit video_enabled_t(bool enabled_);
+            bool enabled{false};
+        };
+
+        constexpr video_enabled_t video_enabled{true};
+        constexpr video_enabled_t video_disabled{false};
+
+        struct audio_enabled_t
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This is a strong type which controls whether or not we want
+                    to enable audio decoding in demuxer or audio encoding in muxer
+            !*/
+
+            constexpr explicit audio_enabled_t(bool enabled_) : enabled{enabled_} {}
+            bool enabled{false};
+        };
+
+        constexpr audio_enabled_t audio_enabled{true};
+        constexpr audio_enabled_t audio_disabled{false};
+
+// ---------------------------------------------------------------------------------------------------
+
         template <class image_type>
         void convert(const frame& f, image_type& image)
         /*!
@@ -718,6 +754,14 @@ namespace dlib
                 /*!
                     ensures
                         - this->filepath = filepath
+                !*/
+
+                args(const std::string& filepath, video_enabled_t video_on, audio_enabled_t audio_on);
+                /*!
+                    ensures
+                        - this->filepath        = filepath
+                        - this->enable_image    = video_on.enabled
+                        - this->enable_audio    = audio_on.enabled
                 !*/
 
                 // Filepath, URL or device

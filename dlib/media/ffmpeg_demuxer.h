@@ -164,6 +164,7 @@ namespace dlib
             {
                 args() = default;
                 args(const std::string& filepath);
+                args(const std::string& filepath, video_enabled_t video_on, audio_enabled_t audio_on);
  
                 std::string filepath;
                 std::string input_format;
@@ -622,6 +623,16 @@ namespace dlib
 
         inline demuxer::args::args(const std::string& filepath_)
         : filepath{filepath_}
+        {
+        }
+
+        inline demuxer::args::args(
+            const std::string& filepath_, 
+            video_enabled_t video_on, 
+            audio_enabled_t audio_on
+        ) : filepath{filepath_},
+            enable_image{video_on.enabled},
+            enable_audio{audio_on.enabled}
         {
         }
 
