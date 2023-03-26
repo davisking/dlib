@@ -535,7 +535,22 @@ namespace dlib
 
             inline bool channel_layout_empty(const AVFrame* frame)
             {
-                return av_channel_layout_check(&frame->ch_layout) == 0;
+                return frame && av_channel_layout_check(&frame->ch_layout) == 0;
+            }
+
+            inline uint64_t get_layout(const AVFrame* frame)
+            {
+                return frame->ch_layout.u.mask;
+            }
+
+            inline void set_layout(AVFrame* frame, const uint64_t channel_layout)
+            {
+                frame->ch_layout = convert_layout(channel_layout);
+            }
+
+            inline int get_nchannels(const AVFrame* frame)
+            {
+                return frame->ch_layout.nb_channels;
             }
         }
 
@@ -568,6 +583,21 @@ namespace dlib
             inline bool channel_layout_empty(const AVFrame* frame)
             {
                 return frame->channel_layout == 0;
+            }
+
+            inline uint64_t get_layout(const AVFrame* frame)
+            {
+                return frame->channel_layout;
+            }
+
+            inline void set_layout(AVFrame* frame, const uint64_t channel_layout)
+            {
+                frame->channel_layout = channel_layout;
+            }
+
+            inline int get_nchannels(const AVFrame* frame)
+            {
+                return av_get_channel_layout_nb_channels(frame->channel_layout);
             }
         }
 
@@ -862,11 +892,7 @@ namespace dlib
                     av_ptr<AVFrame> tmp = make_avframe();
                     tmp->sample_rate    = dst_sample_rate;
                     tmp->format         = (int)dst_fmt;
-#if FF_API_OLD_CHANNEL_LAYOUT
-                    tmp->ch_layout      = convert_layout(dst_channel_layout);
-#else
-                    tmp->channel_layout = dst_channel_layout;
-#endif
+                    set_layout(tmp.get(), dst_channel_layout);
 
                     const int ret = swr_convert_frame(audioResamplerCtx.get(), tmp.get(), &src.get_frame());
                     if (ret < 0)
@@ -983,11 +1009,7 @@ namespace dlib
             f->nb_samples       = nb_samples;
             f->format           = h > 0 && w > 0 ? (int)pixfmt : (int)samplefmt;
             timestamp           = timestamp_;
-#if FF_API_OLD_CHANNEL_LAYOUT
-            f->ch_layout        = convert_layout(channel_layout);
-#else
-            f->channel_layout   = channel_layout;
-#endif
+            set_layout(f.get(), channel_layout);
 
             // The ffmpeg documentation recommends you always use align==0.
             // However, in ffmpeg 3.2, there is a bug where if you do that, data buffers don't get allocated.
@@ -1104,33 +1126,11 @@ namespace dlib
         inline AVSampleFormat       frame::samplefmt()  const noexcept { return is_audio() ? (AVSampleFormat)f->format : AV_SAMPLE_FMT_NONE; }
         inline int                  frame::nsamples()   const noexcept { return is_audio() ? f->nb_samples : 0; }
         inline int                  frame::sample_rate() const noexcept{ return is_audio() ? f->sample_rate : 0; }
+        inline uint64_t             frame::layout()     const noexcept { return is_audio() ? details::get_layout(f.get()) : 0; }
+        inline int                  frame::nchannels()  const noexcept { return is_audio() ? details::get_nchannels(f.get()) : 0; } 
+        inline const AVFrame&       frame::get_frame()  const { DLIB_CASSERT(f, "is_empty() == true"); return *f; }
+        inline AVFrame&             frame::get_frame()        { DLIB_CASSERT(f, "is_empty() == true"); return *f; }
         inline std::chrono::system_clock::time_point frame::get_timestamp() const noexcept { return timestamp; }
-
-#if FF_API_OLD_CHANNEL_LAYOUT
-
-        inline uint64_t frame::layout() const noexcept 
-        { 
-            return is_audio() ? f->ch_layout.u.mask : 0;
-        }
-
-        inline int frame::nchannels() const noexcept 
-        { 
-            return is_audio() ? f->ch_layout.nb_channels : 0;
-        }
-#else
-        inline uint64_t frame::layout() const noexcept 
-        { 
-            return is_audio() ? f->channel_layout : 0;
-        }
-         
-        inline int frame::nchannels() const noexcept 
-        { 
-            return is_audio() ? av_get_channel_layout_nb_channels(f->channel_layout) : 0; 
-        }
-#endif
-
-        inline const AVFrame&  frame::get_frame() const { DLIB_CASSERT(f, "is_empty() == true"); return *f; }
-        inline AVFrame&        frame::get_frame()       { DLIB_CASSERT(f, "is_empty() == true"); return *f; }
 
 // ---------------------------------------------------------------------------------------------------
 
