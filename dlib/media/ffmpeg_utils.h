@@ -489,7 +489,9 @@ namespace dlib
                 case AV_CH_LAYOUT_OCTAGONAL:            return 8;
                 case AV_CH_LAYOUT_HEXADECAGONAL:        return 16;
                 case AV_CH_LAYOUT_STEREO_DOWNMIX:       return 2;
+#if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(56, 58, 100)
                 case AV_CH_LAYOUT_22POINT2:             return 24;
+#endif
                 default: break;
             }
 
