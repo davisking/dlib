@@ -465,7 +465,7 @@ namespace dlib
             // Pixel format of extracted frames. If AV_PIX_FMT_NONE, use whatever comes out decoder. The default is AV_PIX_FMT_RGB24
             AVPixelFormat fmt{AV_PIX_FMT_RGB24};
 
-            // Sets the output framerate for any device that allows you to do so, e.g. webcam, x11grab, etc. Does not apply to files
+            // Sets the output framerate for any device that allows you to do so, e.g. webcam, x11grab, etc. Does not apply to files. If -1, ignored.
             int framerate{-1};
         };
 
