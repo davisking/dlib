@@ -295,17 +295,23 @@ namespace dlib
                     );   
                 }
 
+#if FF_API_OLD_CHANNEL_LAYOUT
+                const uint64_t pCodecCtx_channel_layout = pCodecCtx->ch_layout.u.mask;
+#else   
+                const uint64_t pCodecCtx_channel_layout = pCodecCtx->channel_layout;
+#endif
+
                 // Set audio resampler if possible
                 if (pCodecCtx->sample_rate > 0                  &&
                     pCodecCtx->sample_fmt != AV_SAMPLE_FMT_NONE &&
-                    pCodecCtx->channel_layout > 0)
+                    pCodecCtx_channel_layout > 0)
                 {
                     resizer_audio.reset(
                         pCodecCtx->sample_rate,
-                        pCodecCtx->channel_layout,                   
+                        pCodecCtx_channel_layout,
                         pCodecCtx->sample_fmt,
                         args_.args_audio.sample_rate > 0            ? args_.args_audio.sample_rate      : pCodecCtx->sample_rate,
-                        args_.args_audio.channel_layout > 0         ? args_.args_audio.channel_layout   : pCodecCtx->channel_layout,
+                        args_.args_audio.channel_layout > 0         ? args_.args_audio.channel_layout   : pCodecCtx_channel_layout,
                         args_.args_audio.fmt != AV_SAMPLE_FMT_NONE  ? args_.args_audio.fmt              : pCodecCtx->sample_fmt
                     );
                 }
@@ -322,7 +328,19 @@ namespace dlib
             inline int              decoder_extractor::sample_rate()        const noexcept { return resizer_audio.get_dst_rate(); }
             inline uint64_t         decoder_extractor::channel_layout()     const noexcept { return resizer_audio.get_dst_layout(); }
             inline AVSampleFormat   decoder_extractor::sample_fmt()         const noexcept { return resizer_audio.get_dst_fmt(); }
-            inline int              decoder_extractor::nchannels()          const noexcept { return av_get_channel_layout_nb_channels(channel_layout()); }
+
+#if FF_API_OLD_CHANNEL_LAYOUT
+            inline int decoder_extractor::nchannels() const noexcept 
+            {
+                const auto ch_layout = details::convert_layout(channel_layout());
+                return ch_layout.nb_channels;
+            }
+#else
+            inline int decoder_extractor::nchannels() const noexcept 
+            { 
+                return av_get_channel_layout_nb_channels(channel_layout()); 
+            }
+#endif
 
             enum extract_state
             {
@@ -762,21 +780,20 @@ namespace dlib
                     if (pCodecCtx->height   == 0 ||
                         pCodecCtx->width    == 0 ||
                         pCodecCtx->pix_fmt  == AV_PIX_FMT_NONE)
-                    return fail(cerr, "Codec parameters look wrong : (h,w,pixel_fmt) : (",
-                            pCodecCtx->height, ",",
-                            pCodecCtx->width,  ",",
-                            get_pixel_fmt_str(pCodecCtx->pix_fmt), ")");
+                        return fail(cerr, "Codec parameters look wrong : (h,w,pixel_fmt) : (",
+                                pCodecCtx->height, ",",
+                                pCodecCtx->width,  ",",
+                                get_pixel_fmt_str(pCodecCtx->pix_fmt), ")");
                 }
                 else if (pCodecCtx->codec_type == AVMEDIA_TYPE_AUDIO)
                 {
                     if (pCodecCtx->sample_rate == 0 ||
-                        pCodecCtx->sample_fmt  == AV_SAMPLE_FMT_NONE)
+                        pCodecCtx->sample_fmt  == AV_SAMPLE_FMT_NONE ||
+                        details::channel_layout_empty(pCodecCtx.get()))
                         return fail(cerr,"Codec parameters look wrong :",
                             " sample_rate : ", pCodecCtx->sample_rate,
-                            " sample format : ", get_audio_fmt_str(pCodecCtx->sample_fmt));
-
-                    if (pCodecCtx->channel_layout == 0)
-                        pCodecCtx->channel_layout = av_get_default_channel_layout(pCodecCtx->channels);
+                            " sample format : ", get_audio_fmt_str(pCodecCtx->sample_fmt),
+                            " channel layout : ", details::get_channel_layout_str(pCodecCtx.get()));
                 }
                 else
                     return fail(cerr,"Unrecognized media type ", pCodecCtx->codec_type);
