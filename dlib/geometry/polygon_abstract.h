@@ -89,6 +89,9 @@ namespace dlib
                       the polygon at coordinate y.                                         
                     - #right_boundary[y-top] == the x coordinate for the right most side of
                       the polygon at coordinate y.                                         
+
+              Note that it isn't illegal to call this method if the polygon defined by
+              points isn't convex.  In that case, we won't return a convex shape.
         !*/
 
     private:
