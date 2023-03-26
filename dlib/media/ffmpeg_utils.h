@@ -557,7 +557,7 @@ namespace dlib
         {
             inline std::string get_channel_layout_str(const AVCodecContext* pCodecCtx)
             {
-                return get_channel_layout_str(pCodecCtx->channel_layout);
+                return dlib::ffmpeg::get_channel_layout_str(pCodecCtx->channel_layout);
             }
 
             inline bool channel_layout_empty(const AVCodecContext* pCodecCtx)
@@ -1118,7 +1118,7 @@ namespace dlib
             return is_audio() ? f->ch_layout.nb_channels : 0;
         }
 #else
-        inline std::string frame::layout() const noexcept 
+        inline uint64_t frame::layout() const noexcept 
         { 
             return is_audio() ? f->channel_layout : 0;
         }
