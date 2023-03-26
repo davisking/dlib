@@ -926,7 +926,6 @@ namespace
             DLIB_TEST(left_boundary[y - top] == i);
         for (long y = top, i = 10; y <= bottom; ++y, --i)
             DLIB_TEST(right_boundary[y - top] == i);
-
     }
 
 // ----------------------------------------------------------------------------------------
