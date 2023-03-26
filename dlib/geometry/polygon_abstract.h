@@ -24,7 +24,7 @@ namespace dlib
     public:
         using size_type = std::vector<point>::size_type;
 
-        polygon(const std::vector<point>& points);
+        polygon(std::vector<point> points);
         /*!
             ensures
                 - #*this represents a polygon defined by points.
@@ -38,12 +38,16 @@ namespace dlib
 
         point& operator[](const size_type idx);
         /*!
+            requires
+                - idx < size()
             ensures
                 - returns the point of the polygon at index idx.
         !*/
 
         const point& operator[](const size_type idx) const;
         /*!
+            requires
+                - idx < size()
             ensures
                 - returns the point of the polygon at index idx.
         !*/
@@ -52,13 +56,15 @@ namespace dlib
         /*!
             ensures
                 - returns the point of the polygon at index idx.
+            throws
+                - std::out_of_range if idx >= size()
         !*/
 
+        rectangle get_rect() const;
         /*!
             ensures
                 - returns smallest rectangle that contains all points in the polygon.
         !*/
-        rectangle get_rect() const;
 
         double area() const;
         /*!
