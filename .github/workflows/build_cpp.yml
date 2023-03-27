@@ -57,7 +57,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        ~/cmake-3.8.0-Linux-x86_64/bin/cmake -DCMAKE_PREFIX_PATH=~/ffmpeg-n5.1.3_installation .. 
+        ~/cmake-3.8.0-Linux-x86_64/bin/cmake -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n5.1.3_installation .. 
     - name: Build just tests
       run: |
         cd build
