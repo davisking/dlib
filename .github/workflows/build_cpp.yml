@@ -36,7 +36,7 @@ jobs:
       with:
         # cache this folder:
         path: /home/runner/ffmpeg-n5.1.3_installation
-        key: FFmpeg-n5.1.3_try2
+        key: FFmpeg-n5.1.3_try3
     - run: |
         sudo apt install yasm
         # Get ffmpeg 5
