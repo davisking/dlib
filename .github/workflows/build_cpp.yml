@@ -35,7 +35,7 @@ jobs:
       id: cache-ffmpeg5-download
       with:
         # cache this folder:
-        path: ~/ffmpeg-n5.1.3_installation
+        path: /home/runner/ffmpeg-n5.1.3_installation
         key: FFmpeg-n5.1.3_try2
     - run: |
         sudo apt install yasm
@@ -43,7 +43,7 @@ jobs:
         wget https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n5.1.3.tar.gz
         tar -xf n5.1.3.tar.gz -C ~
         cd ~/FFmpeg-n5.1.3
-        ./configure --prefix=~/ffmpeg-n5.1.3_installation
+        ./configure --prefix=/home/runner/ffmpeg-n5.1.3_installation
         make -j4
         make install
         cd -
