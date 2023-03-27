@@ -38,9 +38,10 @@ jobs:
         path: ~/FFmpeg-n5.1.3
         key: FFmpeg-n5.1.3_try
     - run: |
+        sudo apt install yasm
         # Get ffmpeg 5
         wget https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n5.1.3.tar.gz
-        tar -zxvf n5.1.3.tar.gz -C ~
+        tar -xf n5.1.3.tar.gz -C ~
         cd ~/FFmpeg-n5.1.3
         ./configure
         make -j4
