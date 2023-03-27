@@ -295,11 +295,7 @@ namespace dlib
                     );   
                 }
 
-#if FF_API_OLD_CHANNEL_LAYOUT
-                const uint64_t pCodecCtx_channel_layout = pCodecCtx->ch_layout.u.mask;
-#else   
-                const uint64_t pCodecCtx_channel_layout = pCodecCtx->channel_layout;
-#endif
+                const uint64_t pCodecCtx_channel_layout = details::get_layout(pCodecCtx.get());
 
                 // Set audio resampler if possible
                 if (pCodecCtx->sample_rate > 0                  &&
@@ -326,21 +322,9 @@ namespace dlib
             inline int              decoder_extractor::width()              const noexcept { return resizer_image.get_dst_w(); }
             inline AVPixelFormat    decoder_extractor::pixel_fmt()          const noexcept { return resizer_image.get_dst_fmt(); }
             inline int              decoder_extractor::sample_rate()        const noexcept { return resizer_audio.get_dst_rate(); }
-            inline uint64_t         decoder_extractor::channel_layout()     const noexcept { return resizer_audio.get_dst_layout(); }
             inline AVSampleFormat   decoder_extractor::sample_fmt()         const noexcept { return resizer_audio.get_dst_fmt(); }
-
-#if FF_API_OLD_CHANNEL_LAYOUT
-            inline int decoder_extractor::nchannels() const noexcept 
-            {
-                const auto ch_layout = details::convert_layout(channel_layout());
-                return ch_layout.nb_channels;
-            }
-#else
-            inline int decoder_extractor::nchannels() const noexcept 
-            { 
-                return av_get_channel_layout_nb_channels(channel_layout()); 
-            }
-#endif
+            inline uint64_t         decoder_extractor::channel_layout()     const noexcept { return resizer_audio.get_dst_layout(); }
+            inline int              decoder_extractor::nchannels()          const noexcept { return details::get_nchannels(channel_layout()); }
 
             enum extract_state
             {

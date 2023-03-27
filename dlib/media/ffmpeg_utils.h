@@ -540,6 +540,11 @@ namespace dlib
                 return frame && av_channel_layout_check(&frame->ch_layout) == 0;
             }
 
+            inline uint64_t get_layout(const AVCodecContext* pCodecCtx)
+            {
+                return pCodecCtx->ch_layout.u.mask;
+            }
+
             inline uint64_t get_layout(const AVFrame* frame)
             {
                 return frame->ch_layout.u.mask;
@@ -553,6 +558,11 @@ namespace dlib
             inline int get_nchannels(const AVFrame* frame)
             {
                 return frame->ch_layout.nb_channels;
+            }
+
+            inline int get_nchannels(const uint64_t channel_layout)
+            {
+                return convert_layout(channel_layout).nb_channels;
             }
         }
 
@@ -587,6 +597,11 @@ namespace dlib
                 return frame->channel_layout == 0;
             }
 
+            inline uint64_t get_layout(const AVCodecContext* pCodecCtx)
+            {
+                return pCodecCtx->channel_layout;
+            }
+
             inline uint64_t get_layout(const AVFrame* frame)
             {
                 return frame->channel_layout;
@@ -597,10 +612,15 @@ namespace dlib
                 frame->channel_layout = channel_layout;
             }
 
+            inline int get_nchannels(const uint64_t channel_layout)
+            {
+                return av_get_channel_layout_nb_channels(channel_layout);
+            }
+
             inline int get_nchannels(const AVFrame* frame)
             {
-                return av_get_channel_layout_nb_channels(frame->channel_layout);
-            }
+                return get_nchannels(frame->channel_layout);
+            }            
         }
 
 // ---------------------------------------------------------------------------------------------------
