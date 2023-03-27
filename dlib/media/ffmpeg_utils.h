@@ -516,7 +516,7 @@ namespace dlib
             inline std::string get_channel_layout_str(const AVChannelLayout& ch_layout)
             {
                 std::string str(32, '\0');
-                const int ret = av_channel_layout_describe(&ch_layout, str.data(), str.size());
+                const int ret = av_channel_layout_describe(&ch_layout, &str[0], str.size());
                 if (ret > 0)
                     str.resize(ret);
                 else
