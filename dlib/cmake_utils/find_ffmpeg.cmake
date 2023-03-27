@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.8.0)
+
 message(STATUS "Searching for FFMPEG/LIBAV")
 find_package(PkgConfig)
 if (PkgConfig_FOUND)
