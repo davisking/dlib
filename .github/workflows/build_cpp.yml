@@ -17,13 +17,6 @@ jobs:
   ubuntu-latest-gcc-default-cmake-3-8-ffmpeg5:
     runs-on: 'ubuntu-latest'
 
-    env:
-      ffmpeg_tar:     n5.1.3.tar.gz
-      ffmpeg_url:     https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n5.1.3.tar.gz
-      ffmpeg_src:     FFmpeg-n5.1.3
-      ffmpeg_install: /home/runner/ffmpeg-n5.1.3_installation
-      ffmpeg_key:     ffmpeg-n5.1.3_try4
-      
     steps:
     - uses: actions/checkout@v2
 
@@ -50,16 +43,16 @@ jobs:
       uses: actions/cache@v3
       id: cache-ffmpeg5
       with:
-        path: ${{ env.ffmpeg_install }}
-        key: ${{ env.ffmpeg_key }}
+        path: /home/runner/ffmpeg-n5.1.3_installation
+        key: ffmpeg-n5.1.3_try4
         
     - name: Build FFmpeg 5
       if: steps.cache-ffmpeg5.outputs.cache-hit != 'true'
       run: |
-        wget ${{ env.ffmpeg_url }}
-        tar -xf ${{ env.ffmpeg_tar }}
-        cd ${{ env.ffmpeg_src }}
-        ./configure --prefix=${{ env.ffmpeg_install }} --disable-doc --disable-programs
+        wget https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n5.1.3.tar.gz
+        tar -xf n5.1.3.tar.gz
+        cd FFmpeg-n5.1.3
+        ./configure --prefix=/home/runner/ffmpeg-n5.1.3_installation --disable-doc --disable-programs
         make -j4
         make install
         cd ..
@@ -68,7 +61,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        ~/cmake-3.8.0-Linux-x86_64/bin/cmake -DCMAKE_PREFIX_PATH=${{ env.ffmpeg_install }} .. 
+        ~/cmake-3.8.0-Linux-x86_64/bin/cmake -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n5.1.3_installation .. 
     
     - name: Build just tests
       run: |
@@ -114,14 +107,7 @@ jobs:
       run: build_blas_bindings/dtest --runall -q
 
   ubuntu-18_04-gcc-7:
-    runs-on: 'ubuntu-18.04'
-
-    env:
-      ffmpeg_tar:     n3.2.18.tar.gz
-      ffmpeg_url:     https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n3.2.18.tar.gz
-      ffmpeg_src:     FFmpeg-n3.2.18
-      ffmpeg_install: /home/runner/ffmpeg-n3.2.18_installation
-      ffmpeg_key:     ffmpeg-n3.2.18_try1
+    runs-on: 'ubuntu-18.04'   
 
     steps:
     - uses: actions/checkout@v2
@@ -135,22 +121,22 @@ jobs:
       uses: actions/cache@v3
       id: cache-ffmpeg3.2
       with:
-        path: ${{ env.ffmpeg_install }}
-        key: ${{ env.ffmpeg_key }}
+        path: /home/runner/ffmpeg-n3.2.18_installation
+        key: ffmpeg-n3.2.18_try1
         
     - name: Build FFmpeg 3.2
       if: steps.cache-ffmpeg3.2.outputs.cache-hit != 'true'
       run: |
-        wget ${{ env.ffmpeg_url }}
-        tar -xf ${{ env.ffmpeg_tar }}
-        cd ${{ env.ffmpeg_src }}
-        ./configure --prefix=${{ env.ffmpeg_install }} --disable-doc --disable-programs
+        wget https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n3.2.18.tar.gz
+        tar -xf n3.2.18.tar.gz
+        cd FFmpeg-n3.2.18
+        ./configure --prefix=/home/runner/ffmpeg-n3.2.18_installation --disable-doc --disable-programs
         make -j4
         make install
         cd ..
 
     - name: Configure
-      run: cmake ${{ github.workspace }}/dlib/test -B build -DCMAKE_PREFIX_PATH=${{ env.ffmpeg_install }}
+      run: cmake ${{ github.workspace }}/dlib/test -B build -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n3.2.18_installation
 
     - name: Build just tests
       run: cmake --build build --config Release --target dtest --parallel 4
@@ -163,7 +149,7 @@ jobs:
 
     # Test cmake scrips can build standalone dlib as a shared library
     - name: Configure dlib as shared library  
-      run: cmake ${{ github.workspace }}/dlib -B build_dlib_shared -DBUILD_SHARED_LIBS=1 -DCMAKE_PREFIX_PATH=${{ env.ffmpeg_install }}
+      run: cmake ${{ github.workspace }}/dlib -B build_dlib_shared -DBUILD_SHARED_LIBS=1 -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n3.2.18_installation
 
     - name: Build dlib as shared library
       run: cmake --build build_dlib_shared --parallel 4
