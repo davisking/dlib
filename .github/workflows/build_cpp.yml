@@ -50,16 +50,16 @@ jobs:
       uses: actions/cache@v3
       id: cache-ffmpeg5
       with:
-        path: $ffmpeg_install
-        key: $ffmpeg_key
+        path: ${{ env.ffmpeg_install }}
+        key: ${{ env.ffmpeg_key }}
         
     - name: Build FFmpeg 5
       if: steps.cache-ffmpeg5.outputs.cache-hit != 'true'
       run: |
-        wget $ffmpeg_url
-        tar -xf $ffmpeg_tar
-        cd $ffmpeg_src
-        ./configure --prefix=$ffmpeg_install --disable-doc --disable-programs
+        wget ${{ env.ffmpeg_url }}
+        tar -xf ${{ env.ffmpeg_tar }}
+        cd ${{ env.ffmpeg_src }}
+        ./configure --prefix=${{ env.ffmpeg_install }} --disable-doc --disable-programs
         make -j4
         make install
         cd ..
@@ -68,7 +68,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        ~/cmake-3.8.0-Linux-x86_64/bin/cmake -DCMAKE_PREFIX_PATH=$ffmpeg_install .. 
+        ~/cmake-3.8.0-Linux-x86_64/bin/cmake -DCMAKE_PREFIX_PATH=${{ env.ffmpeg_install }} .. 
     
     - name: Build just tests
       run: |
@@ -135,22 +135,22 @@ jobs:
       uses: actions/cache@v3
       id: cache-ffmpeg3.2
       with:
-        path: $ffmpeg_install
-        key: $ffmpeg_key
+        path: ${{ env.ffmpeg_install }}
+        key: ${{ env.ffmpeg_key }}
         
     - name: Build FFmpeg 3.2
       if: steps.cache-ffmpeg3.2.outputs.cache-hit != 'true'
       run: |
-        wget $ffmpeg_url
-        tar -xf $ffmpeg_tar
-        cd $ffmpeg_src
-        ./configure --prefix=$ffmpeg_install --disable-doc --disable-programs
+        wget ${{ env.ffmpeg_url }}
+        tar -xf ${{ env.ffmpeg_tar }}
+        cd ${{ env.ffmpeg_src }}
+        ./configure --prefix=${{ env.ffmpeg_install }} --disable-doc --disable-programs
         make -j4
         make install
         cd ..
 
     - name: Configure
-      run: cmake ${{ github.workspace }}/dlib/test -B build -DCMAKE_PREFIX_PATH=$ffmpeg_install
+      run: cmake ${{ github.workspace }}/dlib/test -B build -DCMAKE_PREFIX_PATH=${{ env.ffmpeg_install }}
 
     - name: Build just tests
       run: cmake --build build --config Release --target dtest --parallel 4
@@ -163,7 +163,7 @@ jobs:
 
     # Test cmake scrips can build standalone dlib as a shared library
     - name: Configure dlib as shared library  
-      run: cmake ${{ github.workspace }}/dlib -B build_dlib_shared -DBUILD_SHARED_LIBS=1 -DCMAKE_PREFIX_PATH=$ffmpeg_install
+      run: cmake ${{ github.workspace }}/dlib -B build_dlib_shared -DBUILD_SHARED_LIBS=1 -DCMAKE_PREFIX_PATH=${{ env.ffmpeg_install }}
 
     - name: Build dlib as shared library
       run: cmake --build build_dlib_shared --parallel 4
