@@ -1482,6 +1482,7 @@ namespace dlib
         template<class SampleFmt, std::size_t Channels>
         inline void convert(const audio<SampleFmt, Channels>& obj, frame& f)
         {
+            using namespace details;
             using sample = typename audio<SampleFmt, Channels>::sample;
 
             if (f.samplefmt()   != sample_traits<SampleFmt>::fmt ||
