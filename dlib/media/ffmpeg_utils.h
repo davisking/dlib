@@ -232,7 +232,6 @@ namespace dlib
         std::string get_pixel_fmt_str(AVPixelFormat fmt);
         std::string get_audio_fmt_str(AVSampleFormat fmt);
         std::string get_channel_layout_str(uint64_t layout);
-        uint64_t    get_layout_from_channels(std::size_t nchannels);
 
 // ---------------------------------------------------------------------------------------------------
 
