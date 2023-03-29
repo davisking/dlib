@@ -445,57 +445,60 @@ namespace dlib
         // Channel layout stuff 
         ///////////////////////////
 
-        inline uint64_t get_layout_from_channels(const std::size_t nchannels)
+        namespace details
         {
-            // This function is a bit ambiguous but good enough for dlib.
-            // Multiple layouts can have the same number of channels
-            switch(nchannels)
+            inline uint64_t get_layout_from_channels(const std::size_t nchannels)
             {
-                case 1: return AV_CH_LAYOUT_MONO;
-                case 2: return AV_CH_LAYOUT_STEREO;
-                default: DLIB_CASSERT(false, "Don't support " << nchannels << " yet"); return 0;
-            }
-        }
-
-        inline uint64_t get_channels_from_layout(const uint64_t channel_layout)
-        {
-            switch(channel_layout)
-            {
-                case AV_CH_LAYOUT_MONO:                 return 1;
-                case AV_CH_LAYOUT_STEREO:               return 2;
-                case AV_CH_LAYOUT_2POINT1:              return 3;
-                case AV_CH_LAYOUT_2_1:                  return 3;
-                case AV_CH_LAYOUT_SURROUND:             return 3;
-                case AV_CH_LAYOUT_3POINT1:              return 4;
-                case AV_CH_LAYOUT_4POINT0:              return 4;
-                case AV_CH_LAYOUT_4POINT1:              return 5;
-                case AV_CH_LAYOUT_2_2:                  return 4;
-                case AV_CH_LAYOUT_QUAD:                 return 4;
-                case AV_CH_LAYOUT_5POINT0:              return 5;
-                case AV_CH_LAYOUT_5POINT1:              return 6;
-                case AV_CH_LAYOUT_5POINT0_BACK:         return 5;
-                case AV_CH_LAYOUT_5POINT1_BACK:         return 6;
-                case AV_CH_LAYOUT_6POINT0:              return 6;
-                case AV_CH_LAYOUT_6POINT0_FRONT:        return 6;
-                case AV_CH_LAYOUT_HEXAGONAL:            return 6;
-                case AV_CH_LAYOUT_6POINT1:              return 7;
-                case AV_CH_LAYOUT_6POINT1_BACK:         return 7;
-                case AV_CH_LAYOUT_6POINT1_FRONT:        return 7;
-                case AV_CH_LAYOUT_7POINT0:              return 7;
-                case AV_CH_LAYOUT_7POINT0_FRONT:        return 7;
-                case AV_CH_LAYOUT_7POINT1:              return 8;
-                case AV_CH_LAYOUT_7POINT1_WIDE:         return 8;
-                case AV_CH_LAYOUT_7POINT1_WIDE_BACK:    return 8;
-                case AV_CH_LAYOUT_OCTAGONAL:            return 8;
-                case AV_CH_LAYOUT_HEXADECAGONAL:        return 16;
-                case AV_CH_LAYOUT_STEREO_DOWNMIX:       return 2;
-#if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(56, 58, 100)
-                case AV_CH_LAYOUT_22POINT2:             return 24;
-#endif
-                default: break;
+                // This function is a bit ambiguous but good enough for dlib.
+                // Multiple layouts can have the same number of channels
+                switch(nchannels)
+                {
+                    case 1: return AV_CH_LAYOUT_MONO;
+                    case 2: return AV_CH_LAYOUT_STEREO;
+                    default: DLIB_CASSERT(false, "Don't support " << nchannels << " yet"); return 0;
+                }
             }
 
-            return 0;
+            inline uint64_t get_channels_from_layout(const uint64_t channel_layout)
+            {
+                switch(channel_layout)
+                {
+                    case AV_CH_LAYOUT_MONO:                 return 1;
+                    case AV_CH_LAYOUT_STEREO:               return 2;
+                    case AV_CH_LAYOUT_2POINT1:              return 3;
+                    case AV_CH_LAYOUT_2_1:                  return 3;
+                    case AV_CH_LAYOUT_SURROUND:             return 3;
+                    case AV_CH_LAYOUT_3POINT1:              return 4;
+                    case AV_CH_LAYOUT_4POINT0:              return 4;
+                    case AV_CH_LAYOUT_4POINT1:              return 5;
+                    case AV_CH_LAYOUT_2_2:                  return 4;
+                    case AV_CH_LAYOUT_QUAD:                 return 4;
+                    case AV_CH_LAYOUT_5POINT0:              return 5;
+                    case AV_CH_LAYOUT_5POINT1:              return 6;
+                    case AV_CH_LAYOUT_5POINT0_BACK:         return 5;
+                    case AV_CH_LAYOUT_5POINT1_BACK:         return 6;
+                    case AV_CH_LAYOUT_6POINT0:              return 6;
+                    case AV_CH_LAYOUT_6POINT0_FRONT:        return 6;
+                    case AV_CH_LAYOUT_HEXAGONAL:            return 6;
+                    case AV_CH_LAYOUT_6POINT1:              return 7;
+                    case AV_CH_LAYOUT_6POINT1_BACK:         return 7;
+                    case AV_CH_LAYOUT_6POINT1_FRONT:        return 7;
+                    case AV_CH_LAYOUT_7POINT0:              return 7;
+                    case AV_CH_LAYOUT_7POINT0_FRONT:        return 7;
+                    case AV_CH_LAYOUT_7POINT1:              return 8;
+                    case AV_CH_LAYOUT_7POINT1_WIDE:         return 8;
+                    case AV_CH_LAYOUT_7POINT1_WIDE_BACK:    return 8;
+                    case AV_CH_LAYOUT_OCTAGONAL:            return 8;
+                    case AV_CH_LAYOUT_HEXADECAGONAL:        return 16;
+                    case AV_CH_LAYOUT_STEREO_DOWNMIX:       return 2;
+    #if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(56, 58, 100)
+                    case AV_CH_LAYOUT_22POINT2:             return 24;
+    #endif
+                    default: break;
+                }
+
+                return 0;
+            }
         }
 
 // ---------------------------------------------------------------------------------------------------
