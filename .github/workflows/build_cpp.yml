@@ -105,7 +105,7 @@ jobs:
     - name: Test BLAS bindings
       run: build_blas_bindings/dtest --runall -q
 
-   ubuntu-18_04-gcc-7:
+  ubuntu-18_04-gcc-7:
     runs-on: 'ubuntu-18.04'
     steps:
     - uses: actions/checkout@v2
