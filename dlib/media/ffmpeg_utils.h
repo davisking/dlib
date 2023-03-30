@@ -286,6 +286,7 @@ namespace dlib
 
             friend class details::resampler;
             friend class details::decoder_extractor;
+            friend class encoder;
 
             frame(
                 int                                     h,
@@ -550,9 +551,19 @@ namespace dlib
                 return frame->ch_layout.u.mask;
             }
 
+            inline void set_layout(AVCodecContext* pCodecCtx, const uint64_t channel_layout)
+            {
+                pCodecCtx->ch_layout = convert_layout(channel_layout);
+            }
+
             inline void set_layout(AVFrame* frame, const uint64_t channel_layout)
             {
                 frame->ch_layout = convert_layout(channel_layout);
+            }
+
+            inline int get_nchannels(const AVCodecContext* pCodecCtx)
+            {
+                return pCodecCtx->ch_layout.nb_channels;
             }
 
             inline int get_nchannels(const AVFrame* frame)
