@@ -18,6 +18,7 @@ static_assert(false, "This version of dlib isn't built with the FFMPEG wrappers"
 #include <vector>
 #include <array>
 #include <unordered_map>
+#include <iostream>
 #include "../image_processing/generic_image.h"
 #include "../pixel.h"
 #include "../assert.h"
@@ -43,7 +44,7 @@ namespace dlib
     namespace ffmpeg
     {
         class frame;
-        
+
         namespace details
         {
 
@@ -231,7 +232,6 @@ namespace dlib
         std::string get_pixel_fmt_str(AVPixelFormat fmt);
         std::string get_audio_fmt_str(AVSampleFormat fmt);
         std::string get_channel_layout_str(uint64_t layout);
-        uint64_t    get_layout_from_channels(std::size_t nchannels);
 
 // ---------------------------------------------------------------------------------------------------
 
@@ -342,9 +342,16 @@ namespace dlib
 
         struct codec_details
         {
+            AVCodecID   codec_id{AV_CODEC_ID_NONE};
             std::string codec_name;
             bool supports_encoding{false};
             bool supports_decoding{false};
+        };
+
+        struct muxer_details
+        {
+            std::string name;
+            std::vector<codec_details> supported_codecs;
         };
 
         struct device_details
@@ -361,13 +368,33 @@ namespace dlib
 
         std::vector<std::string>    list_protocols();
         std::vector<std::string>    list_demuxers();
-        std::vector<std::string>    list_muxers();
+        std::vector<muxer_details>  list_muxers();
         std::vector<codec_details>  list_codecs();
         std::vector<device_details> list_input_devices();
         std::vector<device_details> list_output_devices();
 
 // ---------------------------------------------------------------------------------------------------
     
+        struct video_enabled_t
+        {
+            constexpr explicit video_enabled_t(bool enabled_) : enabled{enabled_} {}
+            bool enabled{false};
+        };
+
+        constexpr video_enabled_t video_enabled{true};
+        constexpr video_enabled_t video_disabled{false};
+
+        struct audio_enabled_t
+        {
+            constexpr explicit audio_enabled_t(bool enabled_) : enabled{enabled_} {}
+            bool enabled{false};
+        };
+
+        constexpr audio_enabled_t audio_enabled{true};
+        constexpr audio_enabled_t audio_disabled{false};
+
+// ---------------------------------------------------------------------------------------------------
+
     }
 }
 
@@ -386,6 +413,23 @@ namespace dlib
 
         namespace details
         {
+            template<class... Args>
+            inline bool fail(std::ostream& out, Args&&... args)
+            {
+#ifdef __cpp_fold_expressions
+                ((out << args),...);
+#else
+                (void)std::initializer_list<int>{((out << args), 0)...};
+#endif
+                out << '\n';
+                return false;
+            }
+        }
+
+// ---------------------------------------------------------------------------------------------------
+
+        namespace details
+        {
             inline std::string get_av_error(int ret)
             {
                 char buf[128] = {0};
@@ -393,6 +437,197 @@ namespace dlib
                 return suc == 0 ? buf : "couldn't set error";
             }
         }
+
+// ---------------------------------------------------------------------------------------------------
+
+        ///////////////////////////
+        // Channel layout stuff 
+        ///////////////////////////
+
+        namespace details
+        {
+            inline uint64_t get_layout_from_channels(const std::size_t nchannels)
+            {
+                // This function is a bit ambiguous but good enough for dlib.
+                // Multiple layouts can have the same number of channels
+                switch(nchannels)
+                {
+                    case 1: return AV_CH_LAYOUT_MONO;
+                    case 2: return AV_CH_LAYOUT_STEREO;
+                    default: DLIB_CASSERT(false, "Don't support " << nchannels << " yet"); return 0;
+                }
+            }
+        }
+
+// ---------------------------------------------------------------------------------------------------
+
+#if FF_API_OLD_CHANNEL_LAYOUT
+
+        namespace details
+        {
+            inline AVChannelLayout convert_layout(const uint64_t channel_layout)
+            {
+                AVChannelLayout ch_layout;
+                ch_layout.order         = AV_CHANNEL_ORDER_NATIVE;
+                ch_layout.u.mask        = channel_layout;
+                ch_layout.nb_channels   = [=] 
+                {
+                    switch(channel_layout)
+                    {
+                        case AV_CH_LAYOUT_MONO:                 return 1;
+                        case AV_CH_LAYOUT_STEREO:               return 2;
+                        case AV_CH_LAYOUT_2POINT1:              return 3;
+                        case AV_CH_LAYOUT_2_1:                  return 3;
+                        case AV_CH_LAYOUT_SURROUND:             return 3;
+                        case AV_CH_LAYOUT_3POINT1:              return 4;
+                        case AV_CH_LAYOUT_4POINT0:              return 4;
+                        case AV_CH_LAYOUT_4POINT1:              return 5;
+                        case AV_CH_LAYOUT_2_2:                  return 4;
+                        case AV_CH_LAYOUT_QUAD:                 return 4;
+                        case AV_CH_LAYOUT_5POINT0:              return 5;
+                        case AV_CH_LAYOUT_5POINT1:              return 6;
+                        case AV_CH_LAYOUT_5POINT0_BACK:         return 5;
+                        case AV_CH_LAYOUT_5POINT1_BACK:         return 6;
+                        case AV_CH_LAYOUT_6POINT0:              return 6;
+                        case AV_CH_LAYOUT_6POINT0_FRONT:        return 6;
+                        case AV_CH_LAYOUT_HEXAGONAL:            return 6;
+                        case AV_CH_LAYOUT_6POINT1:              return 7;
+                        case AV_CH_LAYOUT_6POINT1_BACK:         return 7;
+                        case AV_CH_LAYOUT_6POINT1_FRONT:        return 7;
+                        case AV_CH_LAYOUT_7POINT0:              return 7;
+                        case AV_CH_LAYOUT_7POINT0_FRONT:        return 7;
+                        case AV_CH_LAYOUT_7POINT1:              return 8;
+                        case AV_CH_LAYOUT_7POINT1_WIDE:         return 8;
+                        case AV_CH_LAYOUT_7POINT1_WIDE_BACK:    return 8;
+                        case AV_CH_LAYOUT_OCTAGONAL:            return 8;
+                        case AV_CH_LAYOUT_HEXADECAGONAL:        return 16;
+                        case AV_CH_LAYOUT_STEREO_DOWNMIX:       return 2;
+#if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(56, 58, 100)
+                        case AV_CH_LAYOUT_22POINT2:             return 24;
+#endif
+                        default: break;
+                    }
+                    return 0;
+                }();
+
+                return ch_layout;
+            }
+
+            inline std::string get_channel_layout_str(const AVChannelLayout& ch_layout)
+            {
+                std::string str(32, '\0');
+                const int ret = av_channel_layout_describe(&ch_layout, &str[0], str.size());
+                if (ret > 0)
+                    str.resize(ret);
+                else
+                    str.clear();
+                
+                return str;
+            }
+
+            inline std::string get_channel_layout_str(const AVCodecContext* pCodecCtx)
+            {
+                return get_channel_layout_str(pCodecCtx->ch_layout);
+            }
+
+            inline bool channel_layout_empty(const AVCodecContext* pCodecCtx)
+            {
+                return av_channel_layout_check(&pCodecCtx->ch_layout) == 0;
+            }
+
+            inline bool channel_layout_empty(const AVFrame* frame)
+            {
+                return frame && av_channel_layout_check(&frame->ch_layout) == 0;
+            }
+
+            inline uint64_t get_layout(const AVCodecContext* pCodecCtx)
+            {
+                return pCodecCtx->ch_layout.u.mask;
+            }
+
+            inline uint64_t get_layout(const AVFrame* frame)
+            {
+                return frame->ch_layout.u.mask;
+            }
+
+            inline void set_layout(AVFrame* frame, const uint64_t channel_layout)
+            {
+                frame->ch_layout = convert_layout(channel_layout);
+            }
+
+            inline int get_nchannels(const AVFrame* frame)
+            {
+                return frame->ch_layout.nb_channels;
+            }
+
+            inline int get_nchannels(const uint64_t channel_layout)
+            {
+                return convert_layout(channel_layout).nb_channels;
+            }
+        }
+
+        inline std::string get_channel_layout_str(uint64_t channel_layout)
+        {
+            using namespace details;
+            return get_channel_layout_str(convert_layout(channel_layout));
+        }
+#else
+        inline std::string get_channel_layout_str(uint64_t channel_layout)
+        {
+            std::string str(32, '\0');
+            av_get_channel_layout_string(&str[0], str.size(), 0, channel_layout);
+            str.resize(strlen(str.data()));
+            return str;
+        }
+
+        namespace details
+        {
+            inline std::string get_channel_layout_str(const AVCodecContext* pCodecCtx)
+            {
+                return dlib::ffmpeg::get_channel_layout_str(pCodecCtx->channel_layout);
+            }
+
+            inline bool channel_layout_empty(const AVCodecContext* pCodecCtx)
+            {
+                return pCodecCtx->channel_layout == 0;
+            }
+
+            inline bool channel_layout_empty(const AVFrame* frame)
+            {
+                return frame->channel_layout == 0;
+            }
+
+            inline uint64_t get_layout(const AVCodecContext* pCodecCtx)
+            {
+                return pCodecCtx->channel_layout;
+            }
+
+            inline uint64_t get_layout(const AVFrame* frame)
+            {
+                return frame->channel_layout;
+            }
+
+            inline void set_layout(AVFrame* frame, const uint64_t channel_layout)
+            {
+                frame->channel_layout = channel_layout;
+            }
+
+            inline int get_nchannels(const uint64_t channel_layout)
+            {
+                return av_get_channel_layout_nb_channels(channel_layout);
+            }
+
+            inline int get_nchannels(const AVFrame* frame)
+            {
+                return get_nchannels(frame->channel_layout);
+            }            
+        }
+
+// ---------------------------------------------------------------------------------------------------
+        
+#endif 
+
+// ---------------------------------------------------------------------------------------------------
 
         inline std::string get_pixel_fmt_str(AVPixelFormat fmt)
         {
@@ -404,23 +639,6 @@ namespace dlib
         {
             const char* name = av_get_sample_fmt_name(fmt);
             return name ? std::string(name) : std::string("unknown");
-        }
-
-        inline std::string get_channel_layout_str(uint64_t layout)
-        {
-            std::string buf(32, '\0');
-            av_get_channel_layout_string(&buf[0], buf.size(), 0, layout);
-            return buf;
-        }
-
-        inline uint64_t get_layout_from_channels(std::size_t nchannels)
-        {
-            switch(nchannels)
-            {
-                case 1: return AV_CH_LAYOUT_MONO;
-                case 2: return AV_CH_LAYOUT_STEREO;
-                default: return 0;
-            }
         }
 
 // ---------------------------------------------------------------------------------------------------
@@ -625,6 +843,8 @@ namespace dlib
                 const int dst_sample_rate_, const uint64_t dst_channel_layout_, const AVSampleFormat dst_fmt_
             )
             {
+                using namespace details;
+
                 auto this_params = std::tie(src_sample_rate,
                                             src_channel_layout,
                                             src_fmt,
@@ -647,16 +867,26 @@ namespace dlib
                     if (std::tie(src_sample_rate, src_channel_layout, src_fmt) !=
                         std::tie(dst_sample_rate, dst_channel_layout, dst_fmt))
                     {
+#if FF_API_OLD_CHANNEL_LAYOUT
+                        AVChannelLayout layout_src = convert_layout(src_channel_layout);
+                        AVChannelLayout layout_dst = convert_layout(dst_channel_layout);
+                        
+                        SwrContext* ptr{nullptr};
+                        const int ret = swr_alloc_set_opts2(&ptr,
+                            &layout_dst, dst_fmt, dst_sample_rate,
+                            &layout_src, src_fmt, src_sample_rate,
+                            0, nullptr
+                        );
+                        DLIB_CASSERT(ret == 0, "swr_alloc_set_opts2() failed : " << get_av_error(ret));
+                        audioResamplerCtx.reset(ptr);
+#else
                         audioResamplerCtx.reset(swr_alloc_set_opts(NULL,
-                                                                dst_channel_layout_, dst_fmt_, dst_sample_rate_,
-                                                                src_channel_layout_, src_fmt_, src_sample_rate_,
-                                                                0, NULL));
-                        int ret = 0;
-                        if ((ret = swr_init(audioResamplerCtx.get())) < 0)
-                        {
-                            audioResamplerCtx = nullptr;
-                            throw std::runtime_error("swr_init() failed : " + get_av_error(ret));
-                        }
+                                                                   dst_channel_layout, dst_fmt_, dst_sample_rate_,
+                                                                   src_channel_layout, src_fmt_, src_sample_rate_,
+                                                                   0, NULL));
+                        const int ret =  swr_init(audioResamplerCtx.get());
+                        DLIB_CASSERT(ret == 0, "swr_init() failed : " << get_av_error(ret));
+#endif
                     }
                 }
             }
@@ -670,6 +900,7 @@ namespace dlib
             )
             {
                 using namespace std::chrono;
+                using namespace details;
 
                 DLIB_CASSERT(src.is_audio(), "src.is_audio() == false");
 
@@ -682,8 +913,8 @@ namespace dlib
                 {
                     av_ptr<AVFrame> tmp = make_avframe();
                     tmp->sample_rate    = dst_sample_rate;
-                    tmp->channel_layout = dst_channel_layout;
                     tmp->format         = (int)dst_fmt;
+                    set_layout(tmp.get(), dst_channel_layout);
 
                     const int ret = swr_convert_frame(audioResamplerCtx.get(), tmp.get(), &src.get_frame());
                     if (ret < 0)
@@ -797,10 +1028,10 @@ namespace dlib
             f->height           = h;
             f->width            = w;
             f->sample_rate      = sample_rate;
-            f->channel_layout   = channel_layout;
             f->nb_samples       = nb_samples;
             f->format           = h > 0 && w > 0 ? (int)pixfmt : (int)samplefmt;
             timestamp           = timestamp_;
+            set_layout(f.get(), channel_layout);
 
             // The ffmpeg documentation recommends you always use align==0.
             // However, in ffmpeg 3.2, there is a bug where if you do that, data buffers don't get allocated.
@@ -875,8 +1106,13 @@ namespace dlib
 
                 const bool same_audio_dims =
                         is_audio() &&
-                        std::tie(    f->sample_rate,     f->nb_samples,     f->channel_layout,     f->format) ==
-                        std::tie(ori.f->sample_rate, ori.f->nb_samples, ori.f->channel_layout, ori.f->format);
+                        std::tie(    f->sample_rate,     f->nb_samples,     f->format) ==
+                        std::tie(ori.f->sample_rate, ori.f->nb_samples, ori.f->format) &&
+#if FF_API_OLD_CHANNEL_LAYOUT
+                        av_channel_layout_compare(&f->ch_layout, &ori.f->ch_layout) == 0;
+#else
+                        f->channel_layout == ori.f->channel_layout;
+#endif
 
                 if (!same_image_dims && !same_audio_dims)
                 {
@@ -885,7 +1121,7 @@ namespace dlib
                                             (AVPixelFormat)ori.f->format,
                                             ori.f->sample_rate,
                                             ori.f->nb_samples,
-                                            ori.f->channel_layout,
+                                            ori.layout(),
                                             (AVSampleFormat)ori.f->format,
                                             ori.timestamp));
                 }
@@ -902,23 +1138,21 @@ namespace dlib
 
         inline bool frame::is_audio() const noexcept
         {
-            return f && f->nb_samples > 0 && f->channel_layout > 0 && f->sample_rate > 0 && f->format != AV_SAMPLE_FMT_NONE;
+            return f && f->nb_samples > 0 && f->sample_rate > 0 && f->format != AV_SAMPLE_FMT_NONE && !details::channel_layout_empty(f.get());
         }
 
-        inline bool            frame::is_empty()   const noexcept { return !is_image() && !is_audio(); }
-        inline AVPixelFormat   frame::pixfmt()     const noexcept { return is_image() ? (AVPixelFormat)f->format : AV_PIX_FMT_NONE; }
-        inline int             frame::height()     const noexcept { return is_image() ? f->height : 0; }
-        inline int             frame::width()      const noexcept { return is_image() ? f->width : 0; }
-        inline AVSampleFormat  frame::samplefmt()  const noexcept { return is_audio() ? (AVSampleFormat)f->format : AV_SAMPLE_FMT_NONE; }
-        inline int             frame::nsamples()   const noexcept { return is_audio() ? f->nb_samples : 0; }
-        inline uint64_t        frame::layout()     const noexcept { return is_audio() ? f->channel_layout : 0; }
-        inline int             frame::nchannels()  const noexcept { return is_audio() ? av_get_channel_layout_nb_channels(f->channel_layout) : 0; }
-        inline int             frame::sample_rate() const noexcept{ return is_audio() ? f->sample_rate : 0; }
-
+        inline bool                 frame::is_empty()   const noexcept { return !is_image() && !is_audio(); }
+        inline AVPixelFormat        frame::pixfmt()     const noexcept { return is_image() ? (AVPixelFormat)f->format : AV_PIX_FMT_NONE; }
+        inline int                  frame::height()     const noexcept { return is_image() ? f->height : 0; }
+        inline int                  frame::width()      const noexcept { return is_image() ? f->width : 0; }
+        inline AVSampleFormat       frame::samplefmt()  const noexcept { return is_audio() ? (AVSampleFormat)f->format : AV_SAMPLE_FMT_NONE; }
+        inline int                  frame::nsamples()   const noexcept { return is_audio() ? f->nb_samples : 0; }
+        inline int                  frame::sample_rate() const noexcept{ return is_audio() ? f->sample_rate : 0; }
+        inline uint64_t             frame::layout()     const noexcept { return is_audio() ? details::get_layout(f.get()) : 0; }
+        inline int                  frame::nchannels()  const noexcept { return is_audio() ? details::get_nchannels(f.get()) : 0; } 
+        inline const AVFrame&       frame::get_frame()  const { DLIB_CASSERT(f, "is_empty() == true"); return *f; }
+        inline AVFrame&             frame::get_frame()        { DLIB_CASSERT(f, "is_empty() == true"); return *f; }
         inline std::chrono::system_clock::time_point frame::get_timestamp() const noexcept { return timestamp; }
-
-        inline const AVFrame&  frame::get_frame() const { DLIB_CASSERT(f, "is_empty() == true"); return *f; }
-        inline AVFrame&        frame::get_frame()       { DLIB_CASSERT(f, "is_empty() == true"); return *f; }
 
 // ---------------------------------------------------------------------------------------------------
 
@@ -962,10 +1196,27 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-        inline std::vector<std::string> list_muxers()
+        inline std::vector<codec_details> list_codecs_for_muxer (
+            const AVOutputFormat*               oformat,
+            const std::vector<codec_details>&   all_codecs = list_codecs()
+        )
+        {
+            std::vector<codec_details> supported_codecs;
+
+            for (const auto& codec : all_codecs)
+                if (avformat_query_codec(oformat, codec.codec_id, FF_COMPLIANCE_STRICT) == 1)
+                    supported_codecs.push_back(codec);
+            
+            return supported_codecs;
+        }
+
+        inline std::vector<muxer_details> list_muxers()
         {
             const bool init = details::register_ffmpeg::get(); // Don't let this get optimized away
-            std::vector<std::string> muxers;
+
+            const auto codecs = list_codecs();
+
+            std::vector<muxer_details> all_details;
             const AVOutputFormat* muxer = nullptr;
 
     #if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100)
@@ -975,9 +1226,14 @@ namespace dlib
             void* opaque = nullptr;
             while (init && (muxer = av_muxer_iterate(&opaque)))
     #endif
-                muxers.push_back(muxer->name);
+            {
+                muxer_details details;
+                details.name                = muxer->name;
+                details.supported_codecs    = list_codecs_for_muxer(muxer, codecs);
+                all_details.push_back(details);
+            }      
         
-            return muxers;
+            return all_details;
         }
 
 // ---------------------------------------------------------------------------------------------------
@@ -998,7 +1254,8 @@ namespace dlib
     #endif
             {
                 codec_details detail;
-                detail.codec_name = codec->name;
+                detail.codec_id     = codec->id;
+                detail.codec_name   = codec->name;
                 detail.supports_encoding = av_codec_is_encoder(codec);
                 detail.supports_decoding = av_codec_is_decoder(codec);
                 details.push_back(std::move(detail));
@@ -1031,11 +1288,17 @@ namespace dlib
         {
             const bool init = details::register_ffmpeg::get(); // Don't let this get optimized away
             std::vector<device_details> devices;
-            AVInputFormat* device = nullptr;
 
+#if LIBAVDEVICE_VERSION_INT < AV_VERSION_INT(59, 0, 100)
+            using AVInputFormatPtr = AVInputFormat*;
+#else
+            using AVInputFormatPtr = const AVInputFormat*;
+#endif
+
+            AVInputFormatPtr device{nullptr};
             details::av_ptr<AVDeviceInfoList> managed;
 
-            const auto iter = [&](AVInputFormat* device)
+            const auto iter = [&](AVInputFormatPtr device)
             {
                 device_details details;
                 details.device_type = std::string(device->name);
@@ -1075,11 +1338,18 @@ namespace dlib
         {
             const bool init = details::register_ffmpeg::get(); // Don't let this get optimized away
             std::vector<device_details> devices;
-            AVOutputFormat* device = nullptr;
+
+#if LIBAVDEVICE_VERSION_INT < AV_VERSION_INT(59, 0, 100)
+            using AVOutputFormatPtr = AVOutputFormat*;
+#else
+            using AVOutputFormatPtr = const AVOutputFormat*;
+#endif
+
+            AVOutputFormatPtr device{nullptr};
 
             details::av_ptr<AVDeviceInfoList> managed;
 
-            const auto iter = [&](AVOutputFormat* device)
+            const auto iter = [&](AVOutputFormatPtr device)
             {
                 device_details details;
                 details.device_type = std::string(device->name);
@@ -1121,7 +1391,7 @@ namespace dlib
         >
         void convert(const frame& f, ImageContainer& image)
         {
-            using pixel = typename image_traits<ImageContainer>::pixel_type;
+            using pixel = pixel_type_t<ImageContainer>;
             
             DLIB_ASSERT(f.is_image(), "frame isn't an image type");
             DLIB_ASSERT(f.pixfmt() == pix_traits<pixel>::fmt, "frame doesn't have correct format");
@@ -1142,7 +1412,7 @@ namespace dlib
                                                     f.height(), 
                                                     1);    
             
-            DLIB_ASSERT(ret == (int)expsize, "av_image_copy_to_buffer()  error : " << details::get_av_error(ret));
+            DLIB_ASSERT(ret == (int)expsize, "av_image_copy_to_buffer() error : " << details::get_av_error(ret));
             (void)ret;
         }
 
@@ -1152,7 +1422,7 @@ namespace dlib
         >
         void convert(const ImageContainer& img, frame& f)
         {
-            using pixel = typename image_traits<ImageContainer>::pixel_type;
+            using pixel = pixel_type_t<ImageContainer>;
 
             if (f.height() != img.nr() ||
                 f.width()  != img.nc() ||
@@ -1209,6 +1479,7 @@ namespace dlib
         template<class SampleFmt, std::size_t Channels>
         inline void convert(const audio<SampleFmt, Channels>& obj, frame& f)
         {
+            using namespace details;
             using sample = typename audio<SampleFmt, Channels>::sample;
 
             if (f.samplefmt()   != sample_traits<SampleFmt>::fmt ||

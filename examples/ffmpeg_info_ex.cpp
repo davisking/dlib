@@ -20,54 +20,62 @@ int main()
     // List all codecs supported by this installation of ffmpeg libraries
     const auto codecs = ffmpeg::list_codecs();
     
-    std::cout << "Supported codecs:\n";
+    cout << "Supported codecs:\n";
     for (const auto& codec : codecs)
-        std::cout << "    name : " << std::left << std::setw(20) << codec.codec_name << " : encoding supported " << codec.supports_encoding << " decoding supported " << codec.supports_decoding << '\n';
-    std::cout << '\n';
+        cout << "    name : " << left << setw(20) << codec.codec_name << " id : " << codec.codec_id << " : encoding supported " << codec.supports_encoding << " decoding supported " << codec.supports_decoding << '\n';
+    cout << '\n';
 
     // List all demuxers supported by this installation of ffmpeg libraries
     const auto demuxers = ffmpeg::list_demuxers();
 
-    std::cout << "Supported demuxers:\n";
+    cout << "Supported demuxers:\n";
     for (const auto& demuxer : demuxers)
-        std::cout << "    name : " << demuxer << '\n';
-    std::cout << '\n';
+        cout << "    name : " << demuxer << '\n';
+    cout << '\n';
     
     // List all muxers supported by this installation of ffmpeg libraries
-    std::cout << "Supported muxers:\n";
-    for (const auto& muxer : ffmpeg::list_muxers())
-        std::cout << "    name : " << muxer << '\n';
-    std::cout << '\n';
+    cout << "Supported muxers:\n";
+    for (const auto& muxer : ffmpeg::list_muxers()) 
+    {
+        cout << "    name : " << muxer.name << '\n';
+        if (!muxer.supported_codecs.empty())
+        {
+            cout << "        supported codecs:\n";
+            for (const auto& codec : muxer.supported_codecs)
+                cout << "            " << codec.codec_name << '\n';
+        }
+    }
+    cout << '\n';
 
     // List all input devices supported by this installation of ffmpeg libraries
-    std::cout << "Supported input devices:\n";
+    cout << "Supported input devices:\n";
     for (const auto& device :  ffmpeg::list_input_devices())
     {
-        std::cout << "    device type : " << device.device_type << '\n';
+        cout << "    device type : " << device.device_type << '\n';
         if (!device.devices.empty())
         {
-            std::cout << "        instances :\n";
+            cout << "        instances :\n";
             for (const auto& instance : device.devices)
-                std::cout << "            name : " << std::left << std::setw(32) << instance.name << ", description : " << instance.description << '\n';
+                cout << "            name : " << left << setw(32) << instance.name << ", description : " << instance.description << '\n';
         }
     }
 
-    std::cout << '\n';
+    cout << '\n';
 
     // List all input devices supported by this installation of ffmpeg libraries
-    std::cout << "Supported output devices:\n";
+    cout << "Supported output devices:\n";
     for (const auto& device :  ffmpeg::list_output_devices())
     {
-        std::cout << "    device type : " << device.device_type << '\n';
+        cout << "    device type : " << device.device_type << '\n';
         if (!device.devices.empty())
         {
-            std::cout << "        instances :\n";
+            cout << "        instances :\n";
             for (const auto& instance : device.devices)
-                std::cout << "            name : " << std::left << std::setw(32) << instance.name << ", description : " << instance.description << '\n';
+                cout << "            name : " << left << setw(32) << instance.name << ", description : " << instance.description << '\n';
         }
     }
 
-    std::cout << '\n';
+    cout << '\n';
     
     const bool mp4_available = 
         std::find_if(begin(demuxers),   
@@ -79,7 +87,7 @@ int main()
                      end(codecs),   
                      [](const auto& codec) {return codec.codec_name == "h264" && codec.supports_decoding;}) != codecs.end();
 
-    std::cout << "Can read MP4 file with H264 encoded video stream? " << (mp4_available && h264_available) << '\n';
+    cout << "Can read MP4 file with H264 encoded video stream? " << (mp4_available && h264_available) << '\n';
 
     return EXIT_SUCCESS;
 }

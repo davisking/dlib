@@ -8,7 +8,8 @@ namespace dlib
 {
     namespace ffmpeg
     {
-        // ---------------------------------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------------------------------
 
         std::string get_pixel_fmt_str(AVPixelFormat fmt);
         /*!
@@ -28,7 +29,7 @@ namespace dlib
                 - Returns a string description of a channel layout, where layout is e.g. AV_CH_LAYOUT_STEREO
         !*/
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         class frame
         {
@@ -218,7 +219,7 @@ namespace dlib
             // Implementation details
         };
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         template<class PixelType>
         struct pix_traits 
@@ -235,7 +236,7 @@ namespace dlib
         template<> struct pix_traits<rgb_alpha_pixel>   {constexpr static AVPixelFormat fmt = AV_PIX_FMT_RGBA;  };
         template<> struct pix_traits<bgr_alpha_pixel>   {constexpr static AVPixelFormat fmt = AV_PIX_FMT_BGRA;  };
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         template<class SampleType>
         struct sample_traits 
@@ -252,7 +253,7 @@ namespace dlib
         template<> struct sample_traits<float>   {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_FLT; };
         template<> struct sample_traits<double>  {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_DBL; };
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         template<class SampleType, std::size_t Channels>
         struct audio
@@ -268,7 +269,7 @@ namespace dlib
             std::chrono::system_clock::time_point   timestamp{};
         };
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         struct codec_details
         {
@@ -276,9 +277,20 @@ namespace dlib
                 WHAT THIS OBJECT REPRESENTS
                     This object informs on available codecs provided by the installation of ffmpeg dlib is linked against.
             !*/
+            AVCodecID   codec_id;
             std::string codec_name;
             bool supports_encoding;
             bool supports_decoding;
+        };
+
+        struct muxer_details
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object informs on available muxers provided by the installation of ffmpeg dlib is linked against.
+            !*/
+            std::string name;
+            std::vector<codec_details> supported_codecs;
         };
 
         struct device_details
@@ -310,7 +322,7 @@ namespace dlib
                 - returns a list of all registered ffmpeg demuxers
         !*/
 
-        std::vector<std::string> list_muxers();
+        std::vector<muxer_details> list_muxers();
         /*!
             ensures
                 - returns a list of all registered ffmpeg muxers
@@ -336,7 +348,43 @@ namespace dlib
                 - returns a list of all registered ffmpeg output devices and available instances of those devices
         !*/
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
+
+        struct video_enabled_t
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This is a strong type which controls whether or not we want
+                    to enable video decoding in demuxer or video encoding in muxer.
+
+                    For example, you can now use the convenience constructor:
+
+                        demuxer cap(filename, video_enabled, audio_disabled);
+            !*/
+
+            constexpr explicit video_enabled_t(bool enabled_);
+            bool enabled{false};
+        };
+
+        constexpr video_enabled_t video_enabled{true};
+        constexpr video_enabled_t video_disabled{false};
+
+        struct audio_enabled_t
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This is a strong type which controls whether or not we want
+                    to enable audio decoding in demuxer or audio encoding in muxer
+            !*/
+
+            constexpr explicit audio_enabled_t(bool enabled_) : enabled{enabled_} {}
+            bool enabled{false};
+        };
+
+        constexpr audio_enabled_t audio_enabled{true};
+        constexpr audio_enabled_t audio_disabled{false};
+
+// ---------------------------------------------------------------------------------------------------
 
         template <class image_type>
         void convert(const frame& f, image_type& image)
@@ -380,7 +428,7 @@ namespace dlib
                 - converts a dlib audio object into a frame object
         !*/
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         struct decoder_image_args
         {
@@ -394,12 +442,18 @@ namespace dlib
                     format. The ffmpeg object used to do this can simultaneously resize the image.
                     Therefore, the API allows users to optionally resize the image, as well as convert to RGB,
                     before being presented to user, as a possible optimization.
+
                     In the case of demuxer, if:
                         - h > 0
                         - w > 0
                         - and the demuxer is a device like v4l2 or xcbgrab
                     then we attempt to set the video size of the device before decoding.
                     Otherwise, the image dimensions set the bilinear resizer which resizes frames AFTER decoding.
+
+                    Furthermore, in the case of demuxer, if:
+                        - framerate > 0
+                        - and the demuxer is a device like v4l2 or xcbgrab
+                    then we attempt to set the framerate of the input device before deocding.
             !*/
 
             // Height of extracted frames. If 0, use whatever comes out decoder
@@ -410,9 +464,12 @@ namespace dlib
 
             // Pixel format of extracted frames. If AV_PIX_FMT_NONE, use whatever comes out decoder. The default is AV_PIX_FMT_RGB24
             AVPixelFormat fmt{AV_PIX_FMT_RGB24};
+
+            // Sets the output framerate for any device that allows you to do so, e.g. webcam, x11grab, etc. Does not apply to files. If -1, ignored.
+            int framerate{-1};
         };
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         struct decoder_audio_args
         {
@@ -433,7 +490,7 @@ namespace dlib
             AVSampleFormat fmt{AV_SAMPLE_FMT_S16};
         };
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         struct decoder_codec_args
         {
@@ -464,7 +521,7 @@ namespace dlib
             int flags{0};
         };
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         enum decoder_status
         {
@@ -478,7 +535,7 @@ namespace dlib
             DECODER_FRAME_AVAILABLE
         };
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         class decoder
         {
@@ -665,7 +722,7 @@ namespace dlib
             !*/
         };
 
-        // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
 
         class demuxer
         {
@@ -699,6 +756,14 @@ namespace dlib
                         - this->filepath = filepath
                 !*/
 
+                args(const std::string& filepath, video_enabled_t video_on, audio_enabled_t audio_on);
+                /*!
+                    ensures
+                        - this->filepath        = filepath
+                        - this->enable_image    = video_on.enabled
+                        - this->enable_audio    = audio_on.enabled
+                !*/
+
                 // Filepath, URL or device
                 std::string filepath;
 
@@ -708,9 +773,6 @@ namespace dlib
                 // A dictionary filled with AVFormatContext and demuxer-private options. Used by "avformat_open_input()"".
                 // Please see libavformat documentation for more details
                 std::unordered_map<std::string, std::string> format_options;
-
-                // Sets the output framerate for any device that allows you to do so, e.g. webcam, x11grab, etc. Does not apply to files
-                int framerate{0};
 
                 // Sets AVFormatContext::probsize
                 // Please see libavformat documentation for more details
@@ -732,10 +794,10 @@ namespace dlib
                 std::function<bool()> interrupter;
 
                 // Video stream arguments
-                struct : decoder_codec_args, decoder_image_args{} image_options;
+                struct : decoder_codec_args, decoder_image_args{} args_image;
 
                 // Audio stream arguments
-                struct : decoder_codec_args, decoder_audio_args{} audio_options;
+                struct : decoder_codec_args, decoder_audio_args{} args_audio;
                 
                 // Whether or not to decode video stream.
                 bool enable_image{true};

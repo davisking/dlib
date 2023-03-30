@@ -139,9 +139,9 @@ namespace
         const bool has_audio    = sample_rate > 0;
 
         demuxer::args args;
-        args.filepath           = filepath;
-        args.image_options.fmt  = AV_PIX_FMT_RGB24;
-        args.audio_options.fmt  = AV_SAMPLE_FMT_S16;
+        args.filepath       = filepath;
+        args.args_image.fmt = AV_PIX_FMT_RGB24;
+        args.args_audio.fmt = AV_SAMPLE_FMT_S16;
 
         demuxer cap(args);
         DLIB_TEST(cap.is_open());
