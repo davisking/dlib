@@ -97,6 +97,17 @@ namespace dlib
 
  // ----------------------------------------------------------------------------------------
 
+    template<class Byte>
+    using is_byte = std::integral_constant<bool, std::is_same<Byte,char>::value
+                                              || std::is_same<Byte,int8_t>::value
+                                              || std::is_same<Byte,uint8_t>::value
+#ifdef __cpp_lib_byte
+                                              || std::is_same<Byte,std::byte>::value
+#endif
+                                          >;
+
+// ----------------------------------------------------------------------------------------
+
     template< class T >
     using remove_cvref_t = std::remove_cv_t<std::remove_reference_t<T>>;
 
