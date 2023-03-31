@@ -50,7 +50,7 @@ try
         return 0;
     }
 
-    const std::string filepath = get_option(parser, "i", "");
+    const std::string filepath = parser.option("i").argument();
 
     // Load input video.
     // Note, this uses a convenient constructor which (dis)enables audio and/or video.
