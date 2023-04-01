@@ -1313,7 +1313,6 @@ namespace dlib
                     - if is_image_encoder() == true, then f.is_image() == true
                     - if is_audio_encoder() == true, then f.is_audio() == true
                     - flush() has not been called
-
                 ensures
                     - If f does not have matching settings to the codec, it is either
                       resized or resampled before being pushed to the codec and encoded.
