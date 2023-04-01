@@ -1326,12 +1326,10 @@ namespace dlib
 
             void flush();
             /*!
-                requires
-                    - is_open() == true
-                
                 ensures
                     - Flushes the codec. Callback passed to constructor will likely be invoked.
                     - is_open() == false
+                    - Becomes a no-op after the first time you call this.
             !*/
         };
 
