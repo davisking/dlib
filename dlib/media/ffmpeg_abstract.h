@@ -1040,15 +1040,10 @@ namespace dlib
 
         DEDUCED sink(std::ostream& out);
         /*!
-            requires
-                - The lifetime of out must exceed the lifetime of the encoder 
-                  instance you are passing this to.
-
             ensures
-                - Creates a "view" type which type-erases &out and creates
-                  a suitable callback with signature bool(std::size_t, const char*)
-                  which can be passed to encoder.
-                - When the callback is invoked, packet data is added to the output stream.
+                - returns a function object with signature bool(std::size_t N, const char* data).  When
+                  called that function writes the first N bytes pointed to by data to out.
+                - The returned view is valid only as long as out exists.                 
         !*/
 
 // ---------------------------------------------------------------------------------------------------
