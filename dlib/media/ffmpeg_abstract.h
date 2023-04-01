@@ -1198,7 +1198,7 @@ namespace dlib
             /*!
                 ensures
                     - Destructor
-                    - flush() is called if it hasn't already
+                    - flush() is called if it hasn't been already
             !*/
 
             bool is_open() const noexcept;
