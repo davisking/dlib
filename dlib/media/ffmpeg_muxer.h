@@ -442,13 +442,6 @@ namespace dlib
             // Set pts based on tracked state. Ignore timestamps for now
             for (auto& f : frames)
             {
-                // if (f.get_timestamp() != std::chrono::system_clock::time_point{})
-                // {
-                //     f.f->pts = av_rescale_q(
-                //             f.timestamp.time_since_epoch().count(),
-                //             {decltype(f.timestamp)::period::num,decltype(f.timestamp)::period::den},
-                //             pCodecCtx->time_base);
-                // }
                 if (f.f)
                 {
                     f.f->pts = next_pts;
