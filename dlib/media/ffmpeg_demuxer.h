@@ -454,7 +454,7 @@ namespace dlib
 // ---------------------------------------------------------------------------------------------------
 
         inline decoder::decoder(const args &a)
-        : log(std::make_shared<logger>("ffpeg::decoder"))
+        : log(std::make_shared<logger>("ffmpeg::decoder"))
         {
             using namespace details;
 
