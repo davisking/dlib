@@ -1038,7 +1038,7 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-        DEDUCED sink(std::ostream& out);
+        auto sink(std::ostream& out);
         /*!
             ensures
                 - returns a function object with signature bool(std::size_t N, const char* data).  When
