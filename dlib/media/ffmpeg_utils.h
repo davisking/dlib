@@ -22,6 +22,7 @@ static_assert(false, "This version of dlib isn't built with the FFMPEG wrappers"
 #include "../image_processing/generic_image.h"
 #include "../pixel.h"
 #include "../assert.h"
+#include "../logger.h"
 #include "ffmpeg_abstract.h"
 
 extern "C" {
@@ -415,14 +416,14 @@ namespace dlib
         namespace details
         {
             template<class... Args>
-            inline bool fail(std::ostream& out, Args&&... args)
+            inline bool fail(logger& out, Args&&... args)
             {
+                auto ret = out << LERROR;
 #ifdef __cpp_fold_expressions
-                ((out << args),...);
+                ((ret << args),...);
 #else
-                (void)std::initializer_list<int>{((out << args), 0)...};
+                (void)std::initializer_list<int>{((ret << args), 0)...};
 #endif
-                out << '\n';
                 return false;
             }
         }

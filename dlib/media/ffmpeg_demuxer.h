@@ -73,9 +73,10 @@ namespace dlib
                 decoder_extractor() = default;
 
                 decoder_extractor(
-                    const args& a,
-                    av_ptr<AVCodecContext> pCodecCtx_,
-                    const AVCodec* codec
+                    const args&             a,
+                    av_ptr<AVCodecContext>  pCodecCtx_,
+                    const AVCodec*          codec,
+                    std::shared_ptr<logger> log_
                 );
 
                 bool            is_open()           const noexcept;
@@ -107,6 +108,7 @@ namespace dlib
                 resizer                 resizer_image;
                 resampler               resizer_audio;
                 std::queue<frame>       frame_queue;
+                std::shared_ptr<logger> log;
             };
         }
 
@@ -152,6 +154,7 @@ namespace dlib
             details::av_ptr<AVCodecParserContext>   parser;
             details::av_ptr<AVPacket>               packet;
             details::decoder_extractor              extractor;
+            std::shared_ptr<logger>                 log;
         };
 
 // ---------------------------------------------------------------------------------------------------
@@ -233,6 +236,7 @@ namespace dlib
                 int                                     stream_id_video{-1};
                 int                                     stream_id_audio{-1};
                 std::queue<frame>                       frame_queue;
+                std::shared_ptr<logger>                 log;
             } st;
         };
 
@@ -256,10 +260,11 @@ namespace dlib
         namespace details
         {
             inline decoder_extractor::decoder_extractor(
-                const args& a,
-                av_ptr<AVCodecContext> pCodecCtx_,
-                const AVCodec* codec
-            )
+                const args&             a,
+                av_ptr<AVCodecContext>  pCodecCtx_,
+                const AVCodec*          codec,
+                std::shared_ptr<logger> log_
+            ) : log(log_)
             {
                 args_   = a;
                 avframe = make_avframe();
@@ -274,7 +279,7 @@ namespace dlib
 
                 if (ret < 0)
                 {
-                    printf("avcodec_open2() failed : `%s`\n", get_av_error(ret).c_str());
+                    (*log) << LERROR << "avcodec_open2() failed : " << get_av_error(ret).c_str();
                     return;
                 }
                 
@@ -353,7 +358,7 @@ namespace dlib
                     } else {
                         pCodecCtx = nullptr;
                         state   = EXTRACT_ERROR;
-                        printf("avcodec_send_packet() failed : `%s`\n", get_av_error(ret).c_str());
+                        (*log) << LERROR << "avcodec_send_packet() failed : " << get_av_error(ret);
                     }
                 };
 
@@ -373,7 +378,7 @@ namespace dlib
                     {
                         pCodecCtx = nullptr;
                         state   = EXTRACT_ERROR;
-                        printf("avcodec_receive_frame() failed : %i - `%s`\n", ret, get_av_error(ret).c_str());
+                        (*log) << LERROR << "avcodec_receive_frame() failed : " << get_av_error(ret);
                     }
                     else
                     {
@@ -449,6 +454,7 @@ namespace dlib
 // ---------------------------------------------------------------------------------------------------
 
         inline decoder::decoder(const args &a)
+        : log(std::make_shared<logger>("ffpeg::decoder"))
         {
             using namespace details;
 
@@ -465,7 +471,12 @@ namespace dlib
 
             if (!pCodec)
             {
-                printf("Codec `%s` / `%s` not found\n", avcodec_get_name(a.args_codec.codec), a.args_codec.codec_name.c_str());
+                (*log) << LERROR 
+                    << "Codec "
+                    << avcodec_get_name(a.args_codec.codec)
+                    << " / "
+                    << a.args_codec.codec_name
+                    << " not found.";
                 return;
             }
 
@@ -473,14 +484,14 @@ namespace dlib
 
             if (!pCodecCtx)
             {
-                printf("avcodec_alloc_context3() failed to allocate codec context for `%s`\n", pCodec->name);
+                (*log) << LERROR << "avcodec_alloc_context3() failed to allocate codec context for " << pCodec->name;
                 return;
             }
 
             if (pCodecCtx->codec_id == AV_CODEC_ID_AAC)
                 pCodecCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
 
-            extractor = decoder_extractor{{a.args_codec, a.args_image, a.args_audio, pCodecCtx->time_base}, std::move(pCodecCtx), pCodec};
+            extractor = decoder_extractor{{a.args_codec, a.args_image, a.args_audio, pCodecCtx->time_base}, std::move(pCodecCtx), pCodec, log};
             if (!extractor.is_open())
                 return;
 
@@ -493,7 +504,7 @@ namespace dlib
                 parser.reset(av_parser_init(pCodec->id));
                 if (!parser)
                 {
-                    printf("av_parser_init() failed codec `%s` not found\n", pCodec->name);
+                    (*log) << LERROR << "av_parser_init() failed codec " << pCodec->name << " not found";
                     return;
                 }
             }
@@ -539,7 +550,7 @@ namespace dlib
                     );
 
                     if (ret < 0)
-                        return fail(cerr, "AV : error while parsing encoded buffer");
+                        return fail(*log, "AV : error while parsing encoded buffer");
 
                     encoded  += ret;
                     nencoded -= ret;
@@ -640,6 +651,8 @@ namespace dlib
 
         inline demuxer::demuxer(const args &a)
         {
+            st.log = std::make_shared<logger>("ffpeg::demuxer");
+
             if (!open(a))
                 st.pFormatCtx = nullptr;
         }
@@ -718,7 +731,7 @@ namespace dlib
                                         opts.get());
 
             if (ret != 0)
-                return fail(cerr, "avformat_open_input() failed with error : ", get_av_error(ret));
+                return fail(*st.log, "avformat_open_input() failed with error : ", get_av_error(ret));
 
             if (opts.size() > 0)
             {
@@ -732,7 +745,7 @@ namespace dlib
             ret = avformat_find_stream_info(st.pFormatCtx.get(), NULL);
 
             if (ret < 0)
-                return fail(cerr, "avformat_find_stream_info() failed with error : ", get_av_error(ret));
+                return fail(*st.log, "avformat_find_stream_info() failed with error : ", get_av_error(ret));
 
             const auto setup_stream = [&](bool is_video)
             {
@@ -745,26 +758,26 @@ namespace dlib
                     return true; //You might be asking for both video and audio but only video is available. That's OK. Just provide video.
 
                 else if (stream_id == AVERROR_DECODER_NOT_FOUND)
-                    return fail(cerr, "av_find_best_stream() : decoder not found for stream type : ", av_get_media_type_string(media_type));
+                    return fail(*st.log, "av_find_best_stream() : decoder not found for stream type : ", av_get_media_type_string(media_type));
 
                 else if (stream_id < 0)
-                    return fail(cerr, "av_find_best_stream() failed : ", get_av_error(stream_id));
+                    return fail(*st.log, "av_find_best_stream() failed : ", get_av_error(stream_id));
 
                 av_ptr<AVCodecContext> pCodecCtx{avcodec_alloc_context3(pCodec)};
 
                 if (!pCodecCtx)
-                    return fail(cerr, "avcodec_alloc_context3() failed to allocate codec context for ", pCodec->name);
+                    return fail(*st.log, "avcodec_alloc_context3() failed to allocate codec context for ", pCodec->name);
 
                 const int ret = avcodec_parameters_to_context(pCodecCtx.get(), st.pFormatCtx->streams[stream_id]->codecpar);
                 if (ret < 0)
-                    return fail(cerr, "avcodec_parameters_to_context() failed : ", get_av_error(ret));
+                    return fail(*st.log, "avcodec_parameters_to_context() failed : ", get_av_error(ret));
 
                 if (pCodecCtx->codec_type == AVMEDIA_TYPE_VIDEO)
                 {
                     if (pCodecCtx->height   == 0 ||
                         pCodecCtx->width    == 0 ||
                         pCodecCtx->pix_fmt  == AV_PIX_FMT_NONE)
-                        return fail(cerr, "Codec parameters look wrong : (h,w,pixel_fmt) : (",
+                        return fail(*st.log, "Codec parameters look wrong : (h,w,pixel_fmt) : (",
                                 pCodecCtx->height, ",",
                                 pCodecCtx->width,  ",",
                                 get_pixel_fmt_str(pCodecCtx->pix_fmt), ")");
@@ -774,13 +787,13 @@ namespace dlib
                     if (pCodecCtx->sample_rate == 0 ||
                         pCodecCtx->sample_fmt  == AV_SAMPLE_FMT_NONE ||
                         details::channel_layout_empty(pCodecCtx.get()))
-                        return fail(cerr,"Codec parameters look wrong :",
+                        return fail(*st.log,"Codec parameters look wrong :",
                             " sample_rate : ", pCodecCtx->sample_rate,
                             " sample format : ", get_audio_fmt_str(pCodecCtx->sample_fmt),
                             " channel layout : ", details::get_channel_layout_str(pCodecCtx.get()));
                 }
                 else
-                    return fail(cerr,"Unrecognized media type ", pCodecCtx->codec_type);
+                    return fail(*st.log,"Unrecognized media type ", pCodecCtx->codec_type);
 
                 if (is_video)
                 {
@@ -790,7 +803,7 @@ namespace dlib
                         args.args_image = st.args_.args_image;
                         args.time_base  = st.pFormatCtx->streams[stream_id]->time_base;
                         return args;
-                    }(), std::move(pCodecCtx), pCodec};
+                    }(), std::move(pCodecCtx), pCodec, st.log};
 
                     st.stream_id_video = stream_id;
                 }
@@ -802,7 +815,7 @@ namespace dlib
                         args.args_audio = st.args_.args_audio;
                         args.time_base  = st.pFormatCtx->streams[stream_id]->time_base;
                         return args;
-                    }(), std::move(pCodecCtx), pCodec};
+                    }(), std::move(pCodecCtx), pCodec, st.log};
 
                     st.stream_id_audio = stream_id;
                 }
@@ -817,7 +830,7 @@ namespace dlib
                 return false;
 
             if (!st.channel_audio.is_open() && !st.channel_video.is_open())
-                return fail(cerr, "At least one of video and audio channels must be enabled");
+                return fail(*st.log, "At least one of video and audio channels must be enabled");
 
             populate_metadata();
 
@@ -889,7 +902,7 @@ namespace dlib
                     return false;
    
                 else if (ret < 0)
-                    return fail(cerr, "av_read_frame() failed : ", get_av_error(ret));
+                    return fail(*st.log, "av_read_frame() failed : ", get_av_error(ret));
  
                 if (st.packet->stream_index == st.stream_id_video)
                     channel = &st.channel_video;
