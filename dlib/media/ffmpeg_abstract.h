@@ -1025,7 +1025,7 @@ namespace dlib
           class Allocator,
           std::enable_if_t<is_byte<Byte>::value, bool> = true
         >
-        DEDUCED sink(std::vector<Byte, Allocator>& buf);
+        auto sink(std::vector<Byte, Allocator>& buf);
         /*!
             requires
                 - Byte must be a byte type, e.g. char, int8_t or uint8_t
