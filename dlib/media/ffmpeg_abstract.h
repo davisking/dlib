@@ -1198,7 +1198,7 @@ namespace dlib
             /*!
                 ensures
                     - Destructor
-                    - flush() is called if it hasn't already
+                    - flush() is called if it hasn't been already
             !*/
 
             bool is_open() const noexcept;
@@ -1227,7 +1227,7 @@ namespace dlib
                     - returns the codec id. See ffmpeg documentation or libavcodec/codec_id.h
             !*/
 
-            std::string get_codec_name()    const noexcept;
+            std::string get_codec_name() const noexcept;
             /*!
                 requires
                     - is_open() == true
@@ -1313,7 +1313,6 @@ namespace dlib
                     - if is_image_encoder() == true, then f.is_image() == true
                     - if is_audio_encoder() == true, then f.is_audio() == true
                     - flush() has not been called
-
                 ensures
                     - If f does not have matching settings to the codec, it is either
                       resized or resampled before being pushed to the codec and encoded.
