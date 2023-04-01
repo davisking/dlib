@@ -122,6 +122,6 @@ try
 }
 catch (const std::exception& e)
 {
-    printf("%s\n", e.what());
+    cout << e.what() << endl;
     return EXIT_FAILURE;
 }
