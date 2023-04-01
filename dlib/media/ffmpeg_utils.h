@@ -22,6 +22,7 @@ static_assert(false, "This version of dlib isn't built with the FFMPEG wrappers"
 #include "../image_processing/generic_image.h"
 #include "../pixel.h"
 #include "../assert.h"
+#include "../logger.h"
 #include "ffmpeg_abstract.h"
 
 extern "C" {
@@ -286,6 +287,7 @@ namespace dlib
 
             friend class details::resampler;
             friend class details::decoder_extractor;
+            friend class encoder;
 
             frame(
                 int                                     h,
@@ -414,14 +416,14 @@ namespace dlib
         namespace details
         {
             template<class... Args>
-            inline bool fail(std::ostream& out, Args&&... args)
+            inline bool fail(logger& out, Args&&... args)
             {
+                auto ret = out << LERROR;
 #ifdef __cpp_fold_expressions
-                ((out << args),...);
+                ((ret << args),...);
 #else
-                (void)std::initializer_list<int>{((out << args), 0)...};
+                (void)std::initializer_list<int>{((ret << args), 0)...};
 #endif
-                out << '\n';
                 return false;
             }
         }
@@ -550,9 +552,19 @@ namespace dlib
                 return frame->ch_layout.u.mask;
             }
 
+            inline void set_layout(AVCodecContext* pCodecCtx, const uint64_t channel_layout)
+            {
+                pCodecCtx->ch_layout = convert_layout(channel_layout);
+            }
+
             inline void set_layout(AVFrame* frame, const uint64_t channel_layout)
             {
                 frame->ch_layout = convert_layout(channel_layout);
+            }
+
+            inline int get_nchannels(const AVCodecContext* pCodecCtx)
+            {
+                return pCodecCtx->ch_layout.nb_channels;
             }
 
             inline int get_nchannels(const AVFrame* frame)
@@ -607,6 +619,11 @@ namespace dlib
                 return frame->channel_layout;
             }
 
+            inline void set_layout(AVCodecContext* pCodecCtx, const uint64_t channel_layout)
+            {
+                pCodecCtx->channel_layout = channel_layout;
+            }
+
             inline void set_layout(AVFrame* frame, const uint64_t channel_layout)
             {
                 frame->channel_layout = channel_layout;
@@ -615,6 +632,11 @@ namespace dlib
             inline int get_nchannels(const uint64_t channel_layout)
             {
                 return av_get_channel_layout_nb_channels(channel_layout);
+            }
+
+            inline int get_nchannels(const AVCodecContext* pCodecCtx)
+            {
+                return get_nchannels(pCodecCtx->channel_layout);
             }
 
             inline int get_nchannels(const AVFrame* frame)

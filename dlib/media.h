@@ -11,5 +11,7 @@ static_assert(false, "This version of dlib isn't built with the FFMPEG wrappers"
 
 #include "media/ffmpeg_utils.h"
 #include "media/ffmpeg_demuxer.h"
+#include "media/ffmpeg_muxer.h"
+#include "media/sink.h"
 
 #endif // DLIB_MEDIA 

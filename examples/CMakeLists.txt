@@ -239,6 +239,7 @@ if (DLIB_USE_FFMPEG AND NOT DLIB_NO_GUI_SUPPORT)
    add_example(ffmpeg_video_decoding_ex)
    add_example(ffmpeg_info_ex)
    add_example(ffmpeg_screen_grab_ex)
+   add_example(ffmpeg_video_encoding_ex)
 endif()
 
 if (DLIB_NO_GUI_SUPPORT)
