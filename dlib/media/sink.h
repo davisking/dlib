@@ -35,7 +35,7 @@ namespace dlib
         {
             return [&](std::size_t ndata, const char* data) {
                 out.write(data, ndata);
-                return true;
+                return out.good();
             };
         }
 
