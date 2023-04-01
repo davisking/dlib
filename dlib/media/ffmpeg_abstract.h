@@ -1029,14 +1029,11 @@ namespace dlib
         /*!
             requires
                 - Byte must be a byte type, e.g. char, int8_t or uint8_t
-                - The lifetime of buf must exceed the lifetime of the encoder 
-                  instance you are passing this to.
-
             ensures
-                - Creates a "view" type which type-erases &buf and creates
-                  a suitable callback with signature bool(std::size_t, const char*)
-                  which can be passed to encoder.
-                - When the callback is invoked, packet data is appended to buf.
+                - returns a function object with signature bool(std::size_t N, const char* data).  When
+                  called that function appends the first N bytes pointed to by data onto the end of buf.
+                - The returned function is valid only as long as buf exists.
+                - The function always returns true.        
         !*/
 
 // ---------------------------------------------------------------------------------------------------
