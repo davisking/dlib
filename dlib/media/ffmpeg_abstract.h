@@ -1043,7 +1043,8 @@ namespace dlib
             ensures
                 - returns a function object with signature bool(std::size_t N, const char* data).  When
                   called that function writes the first N bytes pointed to by data to out.
-                - The returned view is valid only as long as out exists.                 
+                - The returned view is valid only as long as out exists.
+                - Returns out.good(). I.e. returns true if the write to the stream succeeded and false otherwise.       
         !*/
 
 // ---------------------------------------------------------------------------------------------------
