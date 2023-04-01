@@ -506,7 +506,7 @@ namespace dlib
                 {
                     open_   = false;
                     state   = ENCODE_ERROR;
-                    (*log) << LERROR << "avcodec_receive_packet() failed : " << ret << " `%s`", get_av_error(ret);
+                    (*log) << LERROR << "avcodec_receive_packet() failed : " << get_av_error(ret);
                 }
                 else
                 {
