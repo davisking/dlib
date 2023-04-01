@@ -1335,6 +1335,301 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
+        class muxer
+        {
+        public:
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This class is a libavformat wrapper which muxes video and/or audio streams to file.
+                    It is analoguous to OpenCV's cv::VideoWriter class but is more configurable, supports audio, 
+                    devices (X11, speaker, ...) and network streams such as RTSP, HTTP, and more.
+                    Note that a video file, e.g. MP4, can contain multiple streams: video, audio, subtitles, etc.
+                    This class can encode both video and audio at the same time.
+            !*/
+
+            struct args
+            {
+                /*!
+                    WHAT THIS OBJECT REPRESENTS
+                        This holds constructor arguments for demuxer.
+                !*/
+
+                args() = default;
+                /*!
+                    ensures
+                        - Default constructor.
+                !*/
+
+                args(const std::string& filepath);
+                /*!
+                    ensures
+                        - this->filepath = filepath
+                !*/
+
+                // Filepath, URL or device
+                std::string filepath;
+
+                // Output format hint. e.g. 'rtsp', 'X11', 'alsa', etc. 99% of the time, users are not required to specify this as libavformat tries to guess it.
+                std::string output_format;
+
+                // A dictionary filled with AVFormatContext and muxer-private options. Used by "avformat_write_header()"".
+                // Please see libavformat documentation for more details
+                std::unordered_map<std::string, std::string> format_options;
+
+                // An AVDictionary filled with protocol-private options. Used by avio_open2()
+                std::unordered_map<std::string, std::string> protocol_options;
+
+                // See documentation for AVFormatContext::max_delay
+                int max_delay{-1};
+
+                // Only relevant to network muxers such as RTSP, HTTP etc.
+                // Connection/listening timeout. 
+                std::chrono::milliseconds connect_timeout{std::chrono::milliseconds::max()};
+                
+                // Only relevant to network muxers such as RTSP, HTTP etc
+                // Read timeout. 
+                std::chrono::milliseconds read_timeout{std::chrono::milliseconds::max()};
+
+                // Only relevant to network muxers such as RTSP, HTTP etc
+                // Connection/listening interruption callback.
+                // The constructor periodially calls interrupter() while waiting on the network. If it returns true, then
+                // the connection is aborted and the muxer is closed.
+                // So user may use this in conjunction with some thread-safe shared state to signal an abort/interrupt.
+                std::function<bool()> interrupter;
+
+                // Video stream arguments
+                struct : encoder_codec_args, encoder_image_args{} args_image;
+
+                // Audio stream arguments
+                struct : encoder_codec_args, encoder_audio_args{} args_audio;
+                
+                // Whether or not to encode video stream.
+                bool enable_image{true};
+
+                // Whether or not to encode audio stream.
+                bool enable_audio{true};
+            };
+
+            muxer() = default;
+            /*!
+                ensures
+                    - is_open() == false
+            !*/
+
+            muxer(const args& a);
+            /*!
+                ensures
+                    - Constructs muxer using args
+            !*/
+
+            muxer(muxer&& other) noexcept;
+            /*!
+                ensures
+                    - Move constructor
+                    - After move, other.is_open() == false
+            !*/
+
+            muxer& operator=(muxer&& other) noexcept;
+            /*!
+                ensures
+                    - Move assignment
+                    - After move, other.is_open() == false
+            !*/
+
+            ~muxer();
+            /*!
+                ensures
+                    - Calls flush() if not already called
+                    - Closes the underlying file/socket
+            !*/
+
+            bool is_open() const noexcept;
+            /*!
+                ensures
+                    - Returns true if underlying container and codecs are open
+                    - User may call push()
+            !*/
+
+            bool audio_enabled() const noexcept;
+            /*!
+                requires
+                    - args.enable_audio == true
+
+                ensures
+                    - returns true if is_open() == true and an audio stream is available and open
+            !*/
+
+            bool video_enabled() const noexcept;
+            /*!
+                requires
+                    - args.enable_video == true
+
+                ensures
+                    - returns true if is_open() == true and a video stream is available and open
+            !*/
+
+            int height() const noexcept;
+            /*!
+                ensures
+                    - if (video_enabled())
+                        returns the height of the configured codec, not necessarily the
+                        height of frames passed to push(frame).
+                      else
+                        returns 0
+            !*/
+
+            int width() const noexcept;
+            /*!
+                ensures
+                    - if (video_enabled())
+                        returns the width of the configured codec, not necessarily the
+                        width of frames passed to push(frame).
+                      else
+                        returns 0
+            !*/
+
+            AVPixelFormat pixel_fmt() const noexcept;
+            /*!
+                ensures
+                    - if (video_enabled())
+                        returns the pixel format of the configured codec, not necessarily the
+                        pixel format of frames passed to push(frame).
+                      else
+                        returns AV_PIX_FMT_NONE
+            !*/
+
+            float fps() const noexcept;
+            /*!
+                ensures
+                    - if (video_enabled())
+                        returns the framerate of the configured codec
+                      else
+                        returns 0
+            !*/
+
+            int estimated_nframes() const noexcept;
+            /*!
+                ensures
+                    - returns ffmpeg's estimation of how many video frames are in the file without reading any frames
+                    - See ffmpeg's documentation for AVStream::nb_frames
+                    - Note, this is known to not always work with ffmpeg v3 with certain files. Most of the time it does
+                      Do not make your code rely on this
+            !*/
+
+            AVCodecID get_video_codec_id() const noexcept;
+            /*!
+                ensures 
+                    - if (video_enabled())
+                        returns codec ID of video stream
+                    else
+                        returns AV_CODEC_ID_NONE
+            !*/
+
+            std::string get_video_codec_name() const noexcept;
+            /*!
+                ensures 
+                    - if (video_enabled())
+                        returns codec name of video stream
+                    else
+                        returns ""
+            !*/
+
+            int sample_rate() const noexcept;
+            /*!
+                ensures
+                    - if (audio_enabled())
+                        returns the sample rate of the configured codec, not necessarily the
+                        sample rate of frames passed to push(frame).
+                      else
+                        returns 0
+            !*/
+
+            uint64_t channel_layout() const noexcept;
+            /*!
+                ensures
+                    - if (audio_enabled())
+                        returns the channel layout of the configured codec, not necessarily the
+                        channel layout of frames passed to push(frame).
+                      else
+                        returns 0
+            !*/
+
+            int nchannels() const noexcept;
+            /*!
+                ensures
+                    - if (audio_enabled())
+                        returns the number of audio channels in the configured codec, not necessarily the
+                        number of channels in frames passed to push(frame).
+                      else
+                        returns 0
+            !*/
+
+            AVSampleFormat sample_fmt() const noexcept;
+            /*!
+                ensures
+                    - if (audio_enabled())
+                        returns the sample format of the configured codec, not necessarily the
+                        sample format of frames passed to push(frame).
+                      else
+                        returns AV_SAMPLE_FMT_NONE
+            !*/
+
+            int estimated_total_samples() const noexcept;
+            /*!
+                ensures
+                    - if (audio_enabled())
+                        returns an estimation fo the total number of audio samples in the audio stream
+                      else
+                        returns 0
+            !*/
+
+            AVCodecID get_audio_codec_id() const noexcept;
+            /*!
+                ensures 
+                    - if (audio_enabled())
+                        returns codec ID of audio stream
+                    else
+                        returns AV_CODEC_ID_NONE
+            !*/
+
+            std::string get_audio_codec_name() const noexcept;
+            /*!
+                ensures 
+                    - if (audio_enabled())
+                        returns codec name of audio stream
+                    else
+                        returns ""
+            !*/
+
+            bool push(frame f);
+            /*!
+                requires
+                    - is_open() == true
+                    - if is_image_encoder() == true, then f.is_image() == true
+                    - if is_audio_encoder() == true, then f.is_audio() == true
+                    - flush() has not been called
+
+                ensures
+                    - If f does not have matching settings to the codec, it is either
+                      resized or resampled before being pushed to the muxer.
+                    - Encodes and writes the encoded data to file/socket
+                    - Returns true if successfully encoded.
+                    - Returns false if either EOF, i.e. flush() has been previously called,
+                      or an error occured, in which case is_open() == false.
+            !*/
+
+            void flush();
+            /*!
+                requires
+                    - is_open() == true
+                
+                ensures
+                    - Flushes the file.
+                    - is_open() == false
+            !*/
+        };
+
+// ---------------------------------------------------------------------------------------------------
     }
 }
 

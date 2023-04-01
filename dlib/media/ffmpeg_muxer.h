@@ -111,178 +111,260 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
+        class muxer
+        {
+        public:
+            struct args
+            {
+                args() = default;
+                args(const std::string& filepath);
+ 
+                std::string filepath;
+                std::string output_format;
+                std::unordered_map<std::string, std::string>  format_options;     //An AVDictionary filled with AVFormatContext and muxer-private options. Used by avformat_write_header()
+                std::unordered_map<std::string, std::string>  protocol_options;   //An AVDictionary filled with protocol-private options. Used by avio_open2()
+
+                int max_delay{-1};  //See documentation for AVFormatContext::max_delay
+                std::chrono::milliseconds   connect_timeout{std::chrono::milliseconds::max()};
+                std::chrono::milliseconds   read_timeout{std::chrono::milliseconds::max()};
+                std::function<bool()>       interrupter;
+                
+                struct : encoder_codec_args, encoder_image_args{} args_image;
+                struct : encoder_codec_args, encoder_audio_args{} args_audio;
+                bool enable_image{true};
+                bool enable_audio{true};
+            };
+
+            muxer() = default;
+            muxer(const args& a);
+            muxer(muxer&& other) noexcept;
+            muxer& operator=(muxer&& other) noexcept;
+            ~muxer();
+
+            bool is_open() const noexcept;
+            bool audio_enabled() const noexcept;
+            bool video_enabled() const noexcept;
+
+            int             height()                    const noexcept;
+            int             width()                     const noexcept;
+            AVPixelFormat   pixel_fmt()                 const noexcept;
+            float           fps()                       const noexcept;
+            int             estimated_nframes()         const noexcept;
+            AVCodecID       get_video_codec_id()        const noexcept;
+            std::string     get_video_codec_name()      const noexcept;
+
+            int             sample_rate()               const noexcept;
+            uint64_t        channel_layout()            const noexcept;
+            AVSampleFormat  sample_fmt()                const noexcept;
+            int             nchannels()                 const noexcept;
+            int             estimated_total_samples()   const noexcept;
+            AVCodecID       get_audio_codec_id()        const noexcept;
+            std::string     get_audio_codec_name()      const noexcept;
+
+            bool push(frame f);
+            void flush();
+
+        private:
+
+            bool open(const args& a);
+            bool interrupt_callback();
+
+            struct {
+                args                                    args_;
+                details::av_ptr<AVFormatContext>        pFormatCtx;
+                encoder                                 encoder_image;
+                encoder                                 encoder_audio;
+                std::chrono::system_clock::time_point   connecting_time{};
+                std::chrono::system_clock::time_point   connected_time{};
+                std::chrono::system_clock::time_point   last_read_time{};
+                std::shared_ptr<logger>                 log;
+            } st;
+        };
+
+// ---------------------------------------------------------------------------------------------------
+
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////// DECLARATIONS ////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        inline bool operator==(const AVRational& a, const AVRational& b) {return a.num == b.num && a.den == b.den;}
-        inline bool operator!=(const AVRational& a, const AVRational& b) {return !(a == b);}
-        inline bool operator==(const AVRational& a, int framerate)       {return a.den > 0 && (a.num / a.den) == framerate;}
-        inline bool operator!=(const AVRational& a, int framerate)       {return !(a == framerate);}
-        inline int  to_int(const AVRational& a)                          {return a.num / a.den;}
-        inline AVRational inv(const AVRational& a)                       {return {a.den, a.num};}
-
-        inline void check_properties(
-            const AVCodec*  pCodec,
-            AVCodecContext* pCodecCtx,
-            logger&         log
-        )
+namespace dlib
+{
+    namespace ffmpeg
+    {
+        namespace details
         {
-            // Video properties
-            if (pCodec->supported_framerates && pCodecCtx->framerate != 0)
-            {
-                bool framerate_supported = false;
+            inline bool operator==(const AVRational& a, const AVRational& b) {return a.num == b.num && a.den == b.den;}
+            inline bool operator!=(const AVRational& a, const AVRational& b) {return !(a == b);}
+            inline bool operator==(const AVRational& a, int framerate)       {return a.den > 0 && (a.num / a.den) == framerate;}
+            inline bool operator!=(const AVRational& a, int framerate)       {return !(a == framerate);}
+            inline int  to_int(const AVRational& a)                          {return a.num / a.den;}
+            inline AVRational inv(const AVRational& a)                       {return {a.den, a.num};}
 
-                for (int i = 0 ; pCodec->supported_framerates[i] != AVRational{0,0} ; i++)
+            inline void check_properties(
+                const AVCodec*  pCodec,
+                AVCodecContext* pCodecCtx,
+                logger&         log
+            )
+            {
+                // Video properties
+                if (pCodec->supported_framerates && pCodecCtx->framerate != 0)
                 {
-                    if (pCodecCtx->framerate == pCodec->supported_framerates[i])
+                    bool framerate_supported = false;
+
+                    for (int i = 0 ; pCodec->supported_framerates[i] != AVRational{0,0} ; i++)
                     {
-                        framerate_supported = true;
-                        break;
+                        if (pCodecCtx->framerate == pCodec->supported_framerates[i])
+                        {
+                            framerate_supported = true;
+                            break;
+                        }
+                    }
+
+                    if (!framerate_supported)
+                    {
+                        log << LINFO 
+                            << "Requested framerate "
+                            << pCodecCtx->framerate.num / pCodecCtx->framerate.den
+                            << " not supported. Changing to default "
+                            << pCodec->supported_framerates[0].num / pCodec->supported_framerates[0].den;
+
+                        pCodecCtx->framerate = pCodec->supported_framerates[0];
                     }
                 }
 
-                if (!framerate_supported)
+                if (pCodec->pix_fmts)
                 {
-                    log << LINFO 
-                        << "Requested framerate "
-                        << pCodecCtx->framerate.num / pCodecCtx->framerate.den
-                        << " not supported. Changing to default "
-                        << pCodec->supported_framerates[0].num / pCodec->supported_framerates[0].den;
+                    bool pix_fmt_supported = false;
 
-                    pCodecCtx->framerate = pCodec->supported_framerates[0];
-                }
-            }
-
-            if (pCodec->pix_fmts)
-            {
-                bool pix_fmt_supported = false;
-
-                for (int i = 0 ; pCodec->pix_fmts[i] != AV_PIX_FMT_NONE ; i++)
-                {
-                    if (pCodecCtx->pix_fmt == pCodec->pix_fmts[i])
+                    for (int i = 0 ; pCodec->pix_fmts[i] != AV_PIX_FMT_NONE ; i++)
                     {
-                        pix_fmt_supported = true;
-                        break;
+                        if (pCodecCtx->pix_fmt == pCodec->pix_fmts[i])
+                        {
+                            pix_fmt_supported = true;
+                            break;
+                        }
+                    }
+
+                    if (!pix_fmt_supported)
+                    {
+                        log << LINFO
+                            << "Requested pixel format "
+                            << av_get_pix_fmt_name(pCodecCtx->pix_fmt)
+                            << " not supported. Changing to default "
+                            << av_get_pix_fmt_name(pCodec->pix_fmts[0]);
+
+                        pCodecCtx->pix_fmt = pCodec->pix_fmts[0];
                     }
                 }
 
-                if (!pix_fmt_supported)
+                // Audio properties
+                if (pCodec->supported_samplerates)
                 {
-                    log << LINFO
-                        << "Requested pixel format "
-                        << av_get_pix_fmt_name(pCodecCtx->pix_fmt)
-                        << " not supported. Changing to default "
-                        << av_get_pix_fmt_name(pCodec->pix_fmts[0]);
+                    bool sample_rate_supported = false;
 
-                    pCodecCtx->pix_fmt = pCodec->pix_fmts[0];
-                }
-            }
-
-            // Audio properties
-            if (pCodec->supported_samplerates)
-            {
-                bool sample_rate_supported = false;
-
-                for (int i = 0 ; pCodec->supported_samplerates[i] != 0 ; i++)
-                {
-                    if (pCodecCtx->sample_rate == pCodec->supported_samplerates[i])
+                    for (int i = 0 ; pCodec->supported_samplerates[i] != 0 ; i++)
                     {
-                        sample_rate_supported = true;
-                        break;
+                        if (pCodecCtx->sample_rate == pCodec->supported_samplerates[i])
+                        {
+                            sample_rate_supported = true;
+                            break;
+                        }
+                    }
+
+                    if (!sample_rate_supported)
+                    {
+                        log << LINFO
+                            << "Requested sample rate "
+                            << pCodecCtx->sample_rate
+                            << " not supported. Changing to default "
+                            << pCodec->supported_samplerates[0];
+
+                        pCodecCtx->sample_rate = pCodec->supported_samplerates[0];
                     }
                 }
 
-                if (!sample_rate_supported)
+                if (pCodec->sample_fmts)
                 {
-                    log << LINFO
-                        << "Requested sample rate "
-                        << pCodecCtx->sample_rate
-                        << " not supported. Changing to default "
-                        << pCodec->supported_samplerates[0];
+                    bool sample_fmt_supported = false;
 
-                    pCodecCtx->sample_rate = pCodec->supported_samplerates[0];
-                }
-            }
-
-            if (pCodec->sample_fmts)
-            {
-                bool sample_fmt_supported = false;
-
-                for (int i = 0 ; pCodec->sample_fmts[i] != AV_SAMPLE_FMT_NONE ; i++)
-                {
-                    if (pCodecCtx->sample_fmt == pCodec->sample_fmts[i])
+                    for (int i = 0 ; pCodec->sample_fmts[i] != AV_SAMPLE_FMT_NONE ; i++)
                     {
-                        sample_fmt_supported = true;
-                        break;
+                        if (pCodecCtx->sample_fmt == pCodec->sample_fmts[i])
+                        {
+                            sample_fmt_supported = true;
+                            break;
+                        }
+                    }
+
+                    if (!sample_fmt_supported)
+                    {
+                        log << LINFO
+                            << "Requested sample format "
+                            << av_get_sample_fmt_name(pCodecCtx->sample_fmt)
+                            << " not supported. Changing to default "
+                            << av_get_sample_fmt_name(pCodec->sample_fmts[0]);
+
+                        pCodecCtx->sample_fmt = pCodec->sample_fmts[0];
                     }
                 }
-
-                if (!sample_fmt_supported)
-                {
-                    log << LINFO
-                        << "Requested sample format "
-                        << av_get_sample_fmt_name(pCodecCtx->sample_fmt)
-                        << " not supported. Changing to default "
-                        << av_get_sample_fmt_name(pCodec->sample_fmts[0]);
-
-                    pCodecCtx->sample_fmt = pCodec->sample_fmts[0];
-                }
-            }
 
 #if FF_API_OLD_CHANNEL_LAYOUT
-            if (pCodec->ch_layouts)
-            {
-                bool channel_layout_supported = false;
-
-                for (int i = 0 ; av_channel_layout_check(&pCodec->ch_layouts[i]) ; ++i)
+                if (pCodec->ch_layouts)
                 {
-                    if (av_channel_layout_compare(&pCodecCtx->ch_layout, &pCodec->ch_layouts[i]) == 0)
+                    bool channel_layout_supported = false;
+
+                    for (int i = 0 ; av_channel_layout_check(&pCodec->ch_layouts[i]) ; ++i)
                     {
-                        channel_layout_supported = true;
-                        break;
+                        if (av_channel_layout_compare(&pCodecCtx->ch_layout, &pCodec->ch_layouts[i]) == 0)
+                        {
+                            channel_layout_supported = true;
+                            break;
+                        }
+                    }
+
+                    if (!channel_layout_supported)
+                    {
+                        log << LINFO
+                            << "Channel layout "
+                            << details::get_channel_layout_str(pCodecCtx)
+                            << " not supported. Changing to default "
+                            << details::get_channel_layout_str(pCodec->ch_layouts[0]);
+
+                        av_channel_layout_copy(&pCodecCtx->ch_layout, &pCodec->ch_layouts[0]);
                     }
                 }
-
-                if (!channel_layout_supported)
-                {
-                    log << LINFO
-                        << "Channel layout "
-                        << details::get_channel_layout_str(pCodecCtx)
-                        << " not supported. Changing to default "
-                        << details::get_channel_layout_str(pCodec->ch_layouts[0]);
-
-                    av_channel_layout_copy(&pCodecCtx->ch_layout, &pCodec->ch_layouts[0]);
-                }
-            }
 #else
-            if (pCodec->channel_layouts)
-            {
-                bool channel_layout_supported = false;
-
-                for (int i = 0 ; pCodec->channel_layouts[i] != 0 ; i++)
+                if (pCodec->channel_layouts)
                 {
-                    if (pCodecCtx->channel_layout == pCodec->channel_layouts[i])
+                    bool channel_layout_supported = false;
+
+                    for (int i = 0 ; pCodec->channel_layouts[i] != 0 ; i++)
                     {
-                        channel_layout_supported = true;
-                        break;
+                        if (pCodecCtx->channel_layout == pCodec->channel_layouts[i])
+                        {
+                            channel_layout_supported = true;
+                            break;
+                        }
+                    }
+
+                    if (!channel_layout_supported)
+                    {
+                        log << LINFO 
+                            << "Channel layout "
+                            << details::get_channel_layout_str(pCodecCtx)
+                            << " not supported. Changing to default "
+                            << dlib::ffmpeg::get_channel_layout_str(pCodec->channel_layouts[0]);
+
+                        pCodecCtx->channel_layout = pCodec->channel_layouts[0];
                     }
                 }
-
-                if (!channel_layout_supported)
-                {
-                    log << LINFO 
-                        << "Channel layout "
-                        << get_channel_layout_str(pCodecCtx->channel_layout)
-                        << " not supported. Changing to default "
-                        << get_channel_layout_str(pCodec->channel_layouts[0]);
-
-                    pCodecCtx->channel_layout = pCodec->channel_layouts[0];
-                }
-            }
 #endif
+            }
         }
 
         inline encoder::encoder(
@@ -410,7 +492,7 @@ namespace dlib
         inline bool            encoder::is_audio_encoder() const noexcept { return pCodecCtx && pCodecCtx->codec_type == AVMEDIA_TYPE_AUDIO; }
         inline AVCodecID       encoder::get_codec_id()     const noexcept { return pCodecCtx ? pCodecCtx->codec_id : AV_CODEC_ID_NONE; }
         inline std::string     encoder::get_codec_name()   const noexcept { return pCodecCtx ? avcodec_get_name(pCodecCtx->codec_id) : "NONE"; }
-        inline int             encoder::fps()              const noexcept { return pCodecCtx ? to_int(pCodecCtx->framerate) : 0; }
+        inline int             encoder::fps()              const noexcept { return pCodecCtx ? details::to_int(pCodecCtx->framerate) : 0; }
         inline int             encoder::height()           const noexcept { return resizer_image.get_dst_h(); }
         inline int             encoder::width()            const noexcept { return resizer_image.get_dst_w(); }
         inline AVPixelFormat   encoder::pixel_fmt()        const noexcept { return resizer_image.get_dst_fmt(); }
@@ -537,6 +619,275 @@ namespace dlib
             push(frame{});
         }
 
+        inline muxer::muxer(const args &a)
+        {
+            if (!open(a))
+                st.pFormatCtx = nullptr;
+        }
+
+        inline muxer::muxer(muxer &&other) noexcept
+        : st{std::move(other.st)}
+        {
+            if (st.pFormatCtx)
+                st.pFormatCtx->opaque = this;
+        }
+
+        inline muxer& muxer::operator=(muxer &&other) noexcept
+        {
+            if (this != &other)
+            {
+                flush();
+                st = std::move(other.st);
+                if (st.pFormatCtx)
+                    st.pFormatCtx->opaque = this;
+            }
+            return *this;
+        }
+
+        inline muxer::~muxer()
+        {
+            flush();
+        }
+
+        bool muxer::open(const args& a)
+        {
+            using namespace std;
+            using namespace std::chrono;
+            using namespace details;
+
+            st = {};
+            st.log   = std::make_shared<logger>("ffmpeg::muxer");
+            st.args_ = a;
+
+            if (!st.args_.enable_audio && !st.args_.enable_image)
+                return fail(*st.log, "You need to set at least one of `enable_audio` or `enable_image`");
+
+            static const auto all_codecs = list_codecs();
+
+            {
+                st.connecting_time = system_clock::now();
+                st.connected_time  = system_clock::time_point::max();
+
+                const char* const format_name   = st.args_.output_format.empty() ? nullptr : st.args_.output_format.c_str();
+                const char* const filename      = st.args_.filepath.empty()      ? nullptr : st.args_.filepath.c_str();
+                AVFormatContext* pFormatCtx = nullptr;
+                int ret = avformat_alloc_output_context2(&pFormatCtx, nullptr, format_name, filename);
+
+                if (ret < 0)
+                    return fail(*st.log, "avformat_alloc_output_context2() failed : ", get_av_error(ret));
+
+                st.pFormatCtx.reset(pFormatCtx);
+            }
+
+            int stream_counter{0};
+
+            const auto setup_stream = [&](bool is_video)
+            {
+                // Setup encoder for this stream
+                auto& enc = is_video ? st.encoder_image : st.encoder_audio;
+
+                encoder::args args;
+
+                if (is_video)
+                {
+                    args.args_codec = st.args_.args_image;
+                    args.args_image = st.args_.args_image;
+                }
+                else
+                {
+                    args.args_codec = st.args_.args_audio;
+                    args.args_audio = st.args_.args_audio;
+                }
+
+                if (st.pFormatCtx->oformat->flags & AVFMT_GLOBALHEADER)
+                    args.args_codec.flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+
+                const auto handle_packet = 
+                [
+                    pFormatCtx = st.pFormatCtx.get(),
+                    stream_id = stream_counter,
+                    log = st.log
+                ]
+                (
+                    AVCodecContext* pCodecCtx,
+                    AVPacket*       pkt
+                )
+                {
+                    AVStream* stream = pFormatCtx->streams[stream_id];
+                    av_packet_rescale_ts(pkt, pCodecCtx->time_base, stream->time_base);
+                    pkt->stream_index = stream_id;
+                    int ret = av_interleaved_write_frame(pFormatCtx, pkt);
+                    if (ret < 0)
+                        (*log) << LERROR << "av_interleaved_write_frame() failed : " << get_av_error(ret);
+                    return ret == 0;
+                };
+
+                // Before we create the encoder, check the codec is supported by this muxer
+                const auto supported_codecs = list_codecs_for_muxer(st.pFormatCtx->oformat, all_codecs);
+
+                if (std::find_if(begin(supported_codecs), end(supported_codecs), [&](const auto& supported) {
+                    return args.args_codec.codec != AV_CODEC_ID_NONE ? 
+                                supported.codec_id   == args.args_codec.codec :
+                                supported.codec_name == args.args_codec.codec_name;
+                }) == end(supported_codecs))
+                {
+                    (*st.log) << LERROR
+                              << "Codec " << avcodec_get_name(args.args_codec.codec) << " or " << args.args_codec.codec_name
+                              << " cannot be stored in this file";
+                    (*st.log) << LINFO 
+                              << "List of supported codecs for muxer " << st.pFormatCtx->oformat->name << " in this installation of ffmpeg:";
+                    for (const auto& supported : supported_codecs)
+                        (*st.log) << LINFO << "    " << supported.codec_name;
+                    return false;
+                }
+
+                // Codec is supported by muxer, so create encoder
+                enc = encoder(args, handle_packet, st.log);
+
+                if (!enc.is_open())
+                    return false;
+
+                AVStream* stream = avformat_new_stream(st.pFormatCtx.get(), enc.pCodecCtx->codec);
+
+                if (!stream)
+                    return fail(*st.log, "avformat_new_stream() failed");
+
+                stream->id          = stream_counter;
+                stream->time_base   = enc.pCodecCtx->time_base;
+                ++stream_counter;
+
+                int ret = avcodec_parameters_from_context(stream->codecpar, enc.pCodecCtx.get());
+
+                if (ret < 0)
+                    return fail(*st.log, "avcodec_parameters_from_context() failed : ", get_av_error(ret));
+
+                return true;
+            };
+
+            if (st.args_.enable_image && !setup_stream(true))
+                return false;
+
+            if (st.args_.enable_audio && !setup_stream(false))
+                return false;
+
+            st.pFormatCtx->opaque = this;
+            st.pFormatCtx->interrupt_callback.opaque    = st.pFormatCtx.get();
+            st.pFormatCtx->interrupt_callback.callback  = [](void* ctx) -> int {
+                AVFormatContext* pFormatCtx = (AVFormatContext*)ctx;
+                muxer* me = (muxer*)pFormatCtx->opaque;
+                return me->interrupt_callback();
+            };
+
+            if (st.args_.max_delay > 0)
+                st.pFormatCtx->max_delay = st.args_.max_delay;
+
+            //st.pFormatCtx->flags = AVFMT_FLAG_NOBUFFER | AVFMT_FLAG_FLUSH_PACKETS;
+
+            if ((st.pFormatCtx->oformat->flags & AVFMT_NOFILE) == 0)
+            {
+                av_dict opt = st.args_.protocol_options;
+
+                int ret = avio_open2(&st.pFormatCtx->pb, st.args_.filepath.c_str(), AVIO_FLAG_WRITE, &st.pFormatCtx->interrupt_callback, opt.get());
+
+                if (ret < 0)
+                    return fail(*st.log, "avio_open2() failed : ", get_av_error(ret));
+            }
+
+            av_dict opt = st.args_.format_options;
+
+            int ret = avformat_write_header(st.pFormatCtx.get(), opt.get());
+
+            if (ret < 0)
+                return fail(*st.log, "avformat_write_header() failed : ", get_av_error(ret));
+
+            st.connected_time = system_clock::now();
+
+            return true;
+        }
+
+        bool muxer::interrupt_callback()
+        {
+            const auto now = std::chrono::system_clock::now();
+
+            if (st.args_.connect_timeout < std::chrono::milliseconds::max() && // check there is a timeout
+                now < st.connected_time &&                                     // we haven't already connected
+                now > (st.connecting_time + st.args_.connect_timeout)          // we've timed-out
+            )
+                return true;
+
+            if (st.args_.read_timeout < std::chrono::milliseconds::max() &&   // check there is a timeout
+                now > (st.last_read_time + st.args_.read_timeout)             // we've timed-out
+            )
+                return true;
+
+            if (st.args_.interrupter && st.args_.interrupter())               // check user-specified callback
+                return true;
+
+            return false;
+        }
+
+        bool muxer::push(frame f)
+        {
+            using namespace std;
+            using namespace details;
+
+            if (!is_open())
+                return false;
+
+            if (f.is_image())
+            {
+                if (!st.encoder_image.is_open())
+                    return fail(*st.log, "frame is an image type but image encoder is not initialized");
+
+                return st.encoder_image.push(std::move(f));
+            }
+
+            else if (f.is_audio())
+            {
+                if (!st.encoder_audio.is_open())
+                    return fail(*st.log, "frame is of audio type but audio encoder is not initialized");
+
+                return st.encoder_audio.push(std::move(f));
+            }
+
+            return false;
+        }
+
+        void muxer::flush()
+        {
+            if (!is_open())
+                return;
+
+            // Flush the encoder but don't actually close the underlying AVCodecContext
+            st.encoder_image.flush();
+            st.encoder_audio.flush();
+
+            const int ret = av_write_trailer(st.pFormatCtx.get());
+            if (ret < 0)
+                (*st.log) << LERROR << "av_write_trailer() failed : " << details::get_av_error(ret);
+
+            if ((st.pFormatCtx->oformat->flags & AVFMT_NOFILE) == 0)
+                avio_closep(&st.pFormatCtx->pb);
+
+            st.pFormatCtx = nullptr;
+            st.encoder_image = {};
+            st.encoder_audio = {};
+        }
+
+        inline bool             muxer::is_open()                const noexcept { return video_enabled() || audio_enabled(); }
+        inline bool             muxer::video_enabled()          const noexcept { return st.pFormatCtx != nullptr && st.encoder_image.is_image_encoder(); }
+        inline bool             muxer::audio_enabled()          const noexcept { return st.pFormatCtx != nullptr && st.encoder_audio.is_audio_encoder(); }
+        inline int              muxer::height()                 const noexcept { return st.encoder_image.height(); }
+        inline int              muxer::width()                  const noexcept { return st.encoder_image.width(); }
+        inline AVPixelFormat    muxer::pixel_fmt()              const noexcept { return st.encoder_image.pixel_fmt(); }
+        inline AVCodecID        muxer::get_video_codec_id()     const noexcept { return st.encoder_image.get_codec_id(); }
+        inline std::string      muxer::get_video_codec_name()   const noexcept { return st.encoder_image.get_codec_name(); }
+        inline int              muxer::sample_rate()            const noexcept { return st.encoder_audio.sample_rate(); }
+        uint64_t                muxer::channel_layout()         const noexcept { return st.encoder_audio.channel_layout(); }
+        int                     muxer::nchannels()              const noexcept { return st.encoder_audio.nchannels(); }
+        AVSampleFormat          muxer::sample_fmt()             const noexcept { return st.encoder_audio.sample_fmt(); }
+        inline AVCodecID        muxer::get_audio_codec_id()     const noexcept { return st.encoder_audio.get_codec_id(); }
+        inline std::string      muxer::get_audio_codec_name()   const noexcept { return st.encoder_audio.get_codec_name(); }
     }
 }
 
