@@ -1227,7 +1227,7 @@ namespace dlib
                     - returns the codec id. See ffmpeg documentation or libavcodec/codec_id.h
             !*/
 
-            std::string get_codec_name()    const noexcept;
+            std::string get_codec_name() const noexcept;
             /*!
                 requires
                     - is_open() == true
