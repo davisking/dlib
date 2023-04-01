@@ -651,7 +651,7 @@ namespace dlib
 
         inline demuxer::demuxer(const args &a)
         {
-            st.log = std::make_shared<logger>("ffpeg::demuxer");
+            st.log = std::make_shared<logger>("ffmpeg::demuxer");
 
             if (!open(a))
                 st.pFormatCtx = nullptr;
