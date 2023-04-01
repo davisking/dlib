@@ -1060,7 +1060,6 @@ namespace dlib
                     For example, if the codec is configured to use height 512, width 384 and RGB format,
                     using the variables below, and the frames already have these settings when pushed, 
                     then no resizing is performed. If however they don't, then they are first resized. 
-                    So users don't have to worry about that.
             !*/
 
             // Target height of codec.
