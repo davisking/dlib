@@ -138,7 +138,10 @@ jobs:
         cd ..
 
     - name: Configure
-      run: cmake ${{ github.workspace }}/dlib/test -B build -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n3.2.18_installation
+      run: |
+        export CC=/usr/bin/gcc-7
+        export CXX=/usr/bin/g++-7
+        cmake ${{ github.workspace }}/dlib/test -B build -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n3.2.18_installation
 
     - name: Build just tests
       run: cmake --build build --config Release --target dtest --parallel 4
