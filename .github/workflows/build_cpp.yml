@@ -105,8 +105,8 @@ jobs:
     - name: Test BLAS bindings
       run: build_blas_bindings/dtest --runall -q
 
-  ubuntu-18_04-gcc-7:
-    runs-on: 'ubuntu-18.04'
+  ubuntu-20_04-gcc-7:
+    runs-on: 'ubuntu-20.04'
     steps:
     - uses: actions/checkout@v2
 
@@ -138,7 +138,10 @@ jobs:
         cd ..
 
     - name: Configure
-      run: cmake ${{ github.workspace }}/dlib/test -B build -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n3.2.18_installation
+      run: |
+        export CC=/usr/bin/gcc-7
+        export CXX=/usr/bin/g++-7
+        cmake ${{ github.workspace }}/dlib/test -B build -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n3.2.18_installation
 
     - name: Build just tests
       run: cmake --build build --config Release --target dtest --parallel 4
