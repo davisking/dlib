@@ -3004,6 +3004,7 @@ namespace dlib
             pixel_traits<P>::grayscale,
             pixel_traits<P>::rgb,
             pixel_traits<P>::hsi,
+            pixel_traits<P>::hsv,
             pixel_traits<P>::rgb_alpha,
             pixel_traits<P>::lab
             >::value
@@ -3062,6 +3063,21 @@ namespace dlib
             const P& pixel
         )
         {
+            m(0) = static_cast<typename M::type>(pixel.h);
+            m(1) = static_cast<typename M::type>(pixel.s);
+            m(2) = static_cast<typename M::type>(pixel.v);
+        }
+    };
+
+    template <typename P>
+    struct pixel_to_vector_helper<P,5>
+    {
+        template <typename M>
+        static void assign (
+            M& m,
+            const P& pixel
+        )
+        {
             m(0) = static_cast<typename M::type>(pixel.red);
             m(1) = static_cast<typename M::type>(pixel.green);
             m(2) = static_cast<typename M::type>(pixel.blue);
@@ -3070,7 +3086,7 @@ namespace dlib
     };
 
     template <typename P>
-    struct pixel_to_vector_helper<P,5>
+    struct pixel_to_vector_helper<P,6>
     {
         template <typename M>
         static void assign (
@@ -3107,6 +3123,7 @@ namespace dlib
             pixel_traits<P>::grayscale,
             pixel_traits<P>::rgb,
             pixel_traits<P>::hsi,
+            pixel_traits<P>::hsv,
             pixel_traits<P>::rgb_alpha,
             pixel_traits<P>::lab
             >::value
@@ -3165,6 +3182,21 @@ namespace dlib
             const M& m
         )
         {
+            pixel.h = static_cast<unsigned char>(m(0));
+            pixel.s = static_cast<unsigned char>(m(1));
+            pixel.v = static_cast<unsigned char>(m(2));
+        }
+    };
+
+    template <typename P>
+    struct vector_to_pixel_helper<P,5>
+    {
+        template <typename M>
+        static void assign (
+            P& pixel,
+            const M& m
+        )
+        {
             pixel.red = static_cast<unsigned char>(m(0));
             pixel.green = static_cast<unsigned char>(m(1));
             pixel.blue = static_cast<unsigned char>(m(2));
@@ -3173,7 +3205,7 @@ namespace dlib
     };
 
     template <typename P>
-    struct vector_to_pixel_helper<P,5>
+    struct vector_to_pixel_helper<P,6>
     {
         template <typename M>
         static void assign (

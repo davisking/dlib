@@ -592,6 +592,7 @@ namespace dlib
         constexpr static bool rgb_alpha  = false;
         constexpr static bool grayscale = false;
         constexpr static bool hsi = false;
+        constexpr static bool hsv = false;
         constexpr static bool lab = false;
         enum { num = 3};
         typedef unsigned char basic_pixel_type;
@@ -939,6 +940,15 @@ namespace dlib
         }
 
         template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::hsv && pixel_traits<P2>::hsv>::type
+        assign(P1& dest, const P2& src) 
+        { 
+            dest.h = src.h; 
+            dest.s = src.s; 
+            dest.v = src.v; 
+        }
+
+        template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::lab && pixel_traits<P2>::lab>::type
         assign(P1& dest, const P2& src)
         {
@@ -1003,6 +1013,13 @@ namespace dlib
         assign(P1& dest, const P2& src) 
         { 
             assign_pixel(dest, src.i);
+        }
+
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::grayscale && pixel_traits<P2>::hsv>::type
+        assign(P1& dest, const P2& src) 
+        { 
+            assign_pixel(dest, src.v);
         }
 
         template < typename P1, typename P2 >
@@ -1480,7 +1497,7 @@ namespace dlib
             h.h = src.h;
             h.h = h.h/255.0*360;
             h.s = src.s/255.0;
-            h.x = src.i/255.0;
+            h.x = src.v/255.0;
             c = HSV2RGB(h);
 
             dest.red = static_cast<unsigned char>(c.r*255.0 + 0.5);
@@ -1649,6 +1666,18 @@ namespace dlib
         }
 
         template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::hsi && pixel_traits<P2>::hsv>::type
+        assign(P1& dest, const P2& src)
+        {
+            rgb_pixel temp;
+            // convert hsv value to our temp rgb pixel
+            assign_pixel_helpers::assign(temp,src);
+            // now we can just go assign the new rgb value to the
+            // hsi pixel
+            assign_pixel_helpers::assign(dest,temp);
+        }
+
+        template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::hsi && pixel_traits<P2>::lab>::type
         assign(P1& dest, const P2& src)
         {
@@ -1679,7 +1708,7 @@ namespace dlib
         { 
             dest.h = 0;
             dest.s = 0;
-            assign_pixel(dest.i, src);
+            assign_pixel(dest.v, src);
         }
 
         template < typename P1, typename P2 >
@@ -1709,6 +1738,18 @@ namespace dlib
             // now assign the rgb_alpha value to our temp rgb pixel
             assign_pixel_helpers::assign(temp,src);
 
+            // now we can just go assign the new rgb value to the
+            // hsv pixel
+            assign_pixel_helpers::assign(dest,temp);
+        }
+
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::hsv && pixel_traits<P2>::hsi>::type
+        assign(P1& dest, const P2& src)
+        {
+            rgb_pixel temp;
+            // convert hsi value to our temp rgb pixel
+            assign_pixel_helpers::assign(temp,src);
             // now we can just go assign the new rgb value to the
             // hsv pixel
             assign_pixel_helpers::assign(dest,temp);
