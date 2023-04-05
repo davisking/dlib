@@ -86,6 +86,16 @@ namespace dlib
                 - min() == 0 
                 - max() == 255
                 - is_unsigned == true
+            - else if (hsv == true) then
+                - The type T will be a struct with 3 public members of type
+                  unsigned char named "h" "s" and "v".
+                - This type of pixel represents the HSV color space.
+                - num == 3
+                - has_alpha == false
+                - basic_pixel_type == unsigned char
+                - min() == 0
+                - max() == 255
+                - is_unsigned == true
              - else if (lab == true) then
                 - The type T will be a struct with 3 public members of type
                   unsigned char named "l" "a" and "b".
@@ -324,6 +334,41 @@ namespace dlib
 
     };
 
+// ----------------------------------------------------------------------------------------
+
+    struct hsv_pixel
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple struct that represents an HSV colored graphical pixel.
+        !*/
+
+        hsv_pixel (
+        ) {}
+
+        hsv_pixel (
+            unsigned char h_,
+            unsigned char s_,
+            unsigned char v_
+        ) : h(h_), s(s_), v(v_) {}
+
+        unsigned char h;
+        unsigned char s;
+        unsigned char v;
+
+        bool operator == (const hsv_pixel& that) const
+        {
+            return this->h == that.h
+                && this->s == that.s
+                && this->v == that.v;
+        }
+
+        bool operator != (const hsv_pixel& that) const
+        {
+            return !(*this == that);
+        }
+    };
+
     // ----------------------------------------------------------------------------------------
 
     struct lab_pixel
@@ -547,6 +592,7 @@ namespace dlib
         constexpr static bool rgb_alpha  = false;
         constexpr static bool grayscale = false;
         constexpr static bool hsi = false;
+        constexpr static bool hsv = false;
         constexpr static bool lab = false;
         enum { num = 3};
         typedef unsigned char basic_pixel_type;
@@ -566,6 +612,7 @@ namespace dlib
         constexpr static bool rgb_alpha  = false;
         constexpr static bool grayscale = false;
         constexpr static bool hsi = false;
+        constexpr static bool hsv = false;
         constexpr static bool lab = false;
         constexpr static long num = 3;
         typedef unsigned char basic_pixel_type;
@@ -585,6 +632,7 @@ namespace dlib
         constexpr static bool rgb_alpha  = true;
         constexpr static bool grayscale = false;
         constexpr static bool hsi = false;
+        constexpr static bool hsv = false;
         constexpr static bool lab = false;
         constexpr static long num = 4;
         typedef unsigned char basic_pixel_type;
@@ -604,6 +652,7 @@ namespace dlib
         constexpr static bool rgb_alpha  = true;
         constexpr static bool grayscale = false;
         constexpr static bool hsi = false;
+        constexpr static bool hsv = false;
         constexpr static bool lab = false;
         constexpr static long num = 4;
         typedef unsigned char basic_pixel_type;
@@ -624,6 +673,28 @@ namespace dlib
         constexpr static bool rgb_alpha  = false;
         constexpr static bool grayscale = false;
         constexpr static bool hsi = true;
+        constexpr static bool hsv = false;
+        constexpr static bool lab = false;
+        constexpr static long num = 3;
+        typedef unsigned char basic_pixel_type;
+        static basic_pixel_type min() { return 0;}
+        static basic_pixel_type max() { return 255;}
+        constexpr static bool is_unsigned = true;
+        constexpr static bool has_alpha = false;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+
+    template <>
+    struct pixel_traits<hsv_pixel>
+    {
+        constexpr static bool rgb  = false;
+        constexpr static bool bgr_layout  = false;
+        constexpr static bool rgb_alpha  = false;
+        constexpr static bool grayscale = false;
+        constexpr static bool hsi = false;
+        constexpr static bool hsv = true;
         constexpr static bool lab = false;
         constexpr static long num = 3;
         typedef unsigned char basic_pixel_type;
@@ -644,6 +715,7 @@ namespace dlib
         constexpr static bool rgb_alpha  = false;
         constexpr static bool grayscale = false;
         constexpr static bool hsi = false;
+        constexpr static bool hsv = false;
         constexpr static bool lab = true;
         constexpr static long num = 3;
         typedef unsigned char basic_pixel_type;
@@ -663,6 +735,7 @@ namespace dlib
         constexpr static bool rgb_alpha  = false;
         constexpr static bool grayscale = true;
         constexpr static bool hsi = false;
+        constexpr static bool hsv = false;
         constexpr static bool lab = false;
         constexpr static long num = 1;
         constexpr static bool has_alpha = false;
@@ -696,6 +769,7 @@ namespace dlib
         constexpr static bool rgb_alpha  = false;
         constexpr static bool grayscale = true;
         constexpr static bool hsi = false;
+        constexpr static bool hsv = false;
         constexpr static bool lab = false;
         constexpr static long num = 1;
         constexpr static bool has_alpha = false;
@@ -866,6 +940,15 @@ namespace dlib
         }
 
         template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::hsv && pixel_traits<P2>::hsv>::type
+        assign(P1& dest, const P2& src) 
+        { 
+            dest.h = src.h; 
+            dest.s = src.s; 
+            dest.v = src.v; 
+        }
+
+        template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::lab && pixel_traits<P2>::lab>::type
         assign(P1& dest, const P2& src)
         {
@@ -933,6 +1016,13 @@ namespace dlib
         }
 
         template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::grayscale && pixel_traits<P2>::hsv>::type
+        assign(P1& dest, const P2& src) 
+        { 
+            assign_pixel(dest, src.v);
+        }
+
+        template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::grayscale && pixel_traits<P2>::lab>::type
         assign(P1& dest, const P2& src)
         {
@@ -947,6 +1037,13 @@ namespace dlib
             double h;
             double s;
             double l;
+        };
+
+        struct HSV
+        {
+            double h;
+            double s;
+            double v;
         };
 
         struct COLOUR
@@ -1035,6 +1132,120 @@ namespace dlib
             }
 
             return(c2);
+        }
+
+        /*
+            Calculate HSV from RGB
+            Hue is in degrees
+            Saturation is between 0 and 1
+            Value is between 0 and 1
+        */
+        inline HSV RGB2HSV(COLOUR in)
+        {
+            HSV out;
+
+            const double themin = std::min({in.r, in.g, in.b});
+            const double max = std::max({in.r, in.g, in.b});
+            const double delta = max - themin;
+
+            out.v = max;
+            if (delta < 0.00001)
+            {
+                out.s = 0;
+                out.h = 0;
+                return out;
+            }
+            if (max > 0.0)
+            {
+                out.s = (delta / max);
+            }
+            else
+            {
+                out.s = 0.0;
+                out.h = NAN;
+                return out;
+            }
+            if (in.r >= max)
+            {
+                out.h = (in.g - in.b) / delta;
+            }
+            else
+            {
+                if (in.g >= max)
+                    out.h = 2.0 + (in.b - in.r) / delta;
+                else
+                    out.h = 4.0 + (in.r - in.g) / delta;
+            }
+
+            out.h *= 60.0;
+
+            if (out.h < 0.0)
+                out.h += 360.0;
+
+            return out;
+        }
+
+        // -----------------------------
+
+        /*
+            Calculate RGB from HSV, reverse of RGB2HSV()
+            Hue is in degrees
+            Saturation is between 0 and 1
+            Value is between 0 and 1
+        */
+        inline COLOUR HSV2RGB(HSV in)
+        {
+            COLOUR out;
+
+            if (in.s <= 0.0)
+            {
+                out.r = in.v;
+                out.g = in.v;
+                out.b = in.v;
+                return out;
+            }
+
+            const double hh = (in.h >= 360 ? 0.0 : in.h) / 60.0;
+            const long i = static_cast<long>(hh);
+            const double ff = hh - i;
+            const double p = in.v * (1.0 - in.s);
+            const double q = in.v * (1.0 - (in.s * ff));
+            const double t = in.v * (1.0 - (in.s * (1.0 - ff)));
+
+            switch (i)
+            {
+            case 0:
+                out.r = in.v;
+                out.g = t;
+                out.b = p;
+                break;
+            case 1:
+                out.r = q;
+                out.g = in.v;
+                out.b = p;
+                break;
+            case 2:
+                out.r = p;
+                out.g = in.v;
+                out.b = t;
+                break;
+            case 3:
+                out.r = p;
+                out.g = q;
+                out.b = in.v;
+                break;
+            case 4:
+                out.r = t;
+                out.g = p;
+                out.b = in.v;
+                break;
+            default:
+                out.r = in.v;
+                out.g = p;
+                out.b = q;
+                break;
+            }
+            return out;
         }
 
         // -----------------------------
@@ -1275,6 +1486,23 @@ namespace dlib
         }
 
         template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::rgb && pixel_traits<P2>::hsv>::type
+        assign(P1& dest, const P2& src) 
+        { 
+            COLOUR c;
+            HSV h;
+            h.h = src.h;
+            h.h = h.h/255.0*360;
+            h.s = src.s/255.0;
+            h.v = src.v/255.0;
+            c = HSV2RGB(h);
+
+            dest.red = static_cast<unsigned char>(c.r*255.0 + 0.5);
+            dest.green = static_cast<unsigned char>(c.g*255.0 + 0.5);
+            dest.blue = static_cast<unsigned char>(c.b*255.0 + 0.5);
+        }
+
+        template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::rgb && pixel_traits<P2>::lab>::type
         assign(P1& dest, const P2& src)
         {
@@ -1339,6 +1567,24 @@ namespace dlib
             h.s = src.s/255.0;
             h.l = src.i/255.0;
             c = HSL2RGB(h);
+
+            dest.red = static_cast<unsigned char>(c.r*255.0 + 0.5);
+            dest.green = static_cast<unsigned char>(c.g*255.0 + 0.5);
+            dest.blue = static_cast<unsigned char>(c.b*255.0 + 0.5);
+            dest.alpha = 255;
+        }
+
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::rgb_alpha && pixel_traits<P2>::hsv>::type
+        assign(P1& dest, const P2& src) 
+        { 
+            COLOUR c;
+            HSV h;
+            h.h = src.h;
+            h.h = h.h/255.0*360;
+            h.s = src.s/255.0;
+            h.v = src.v/255.0;
+            c = HSV2RGB(h);
 
             dest.red = static_cast<unsigned char>(c.r*255.0 + 0.5);
             dest.green = static_cast<unsigned char>(c.g*255.0 + 0.5);
@@ -1417,6 +1663,18 @@ namespace dlib
         }
 
         template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::hsi && pixel_traits<P2>::hsv>::type
+        assign(P1& dest, const P2& src)
+        {
+            rgb_pixel temp;
+            // convert hsv value to our temp rgb pixel
+            assign_pixel_helpers::assign(temp,src);
+            // now we can just go assign the new rgb value to the
+            // hsi pixel
+            assign_pixel_helpers::assign(dest,temp);
+        }
+
+        template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::hsi && pixel_traits<P2>::lab>::type
         assign(P1& dest, const P2& src)
         {
@@ -1425,6 +1683,84 @@ namespace dlib
             assign_pixel_helpers::assign(temp,src);
             // now we can just go assign the new rgb value to the
             // hsi pixel
+            assign_pixel_helpers::assign(dest,temp);
+        }
+
+    // -----------------------------
+        // dest is an hsv pixel
+
+        template < typename P1>
+        typename enable_if_c<pixel_traits<P1>::hsv>::type
+        assign(P1& dest, const unsigned char& src) 
+        { 
+            dest.h = 0;
+            dest.s = 0;
+            dest.v = src;
+        }
+
+
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::hsv && pixel_traits<P2>::grayscale>::type
+        assign(P1& dest, const P2& src) 
+        { 
+            dest.h = 0;
+            dest.s = 0;
+            assign_pixel(dest.v, src);
+        }
+
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::hsv && pixel_traits<P2>::rgb>::type
+        assign(P1& dest, const P2& src) 
+        { 
+            COLOUR c1;
+            HSV c2;
+            c1.r = src.red/255.0;
+            c1.g = src.green/255.0;
+            c1.b = src.blue/255.0;
+            c2 = RGB2HSV(c1);
+
+            dest.h = static_cast<unsigned char>(c2.h/360.0*255.0 + 0.5);
+            dest.s = static_cast<unsigned char>(c2.s*255.0 + 0.5);
+            dest.v = static_cast<unsigned char>(c2.v*255.0 + 0.5);
+        }
+
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::hsv && pixel_traits<P2>::rgb_alpha>::type
+        assign(P1& dest, const P2& src) 
+        { 
+            rgb_pixel temp;
+            // convert target hsv pixel to rgb
+            assign_pixel_helpers::assign(temp,dest);
+
+            // now assign the rgb_alpha value to our temp rgb pixel
+            assign_pixel_helpers::assign(temp,src);
+
+            // now we can just go assign the new rgb value to the
+            // hsv pixel
+            assign_pixel_helpers::assign(dest,temp);
+        }
+
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::hsv && pixel_traits<P2>::hsi>::type
+        assign(P1& dest, const P2& src)
+        {
+            rgb_pixel temp;
+            // convert hsi value to our temp rgb pixel
+            assign_pixel_helpers::assign(temp,src);
+            // now we can just go assign the new rgb value to the
+            // hsv pixel
+            assign_pixel_helpers::assign(dest,temp);
+        }
+
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::hsv && pixel_traits<P2>::lab>::type
+        assign(P1& dest, const P2& src)
+        {
+            rgb_pixel temp;
+            // convert lab value to our temp rgb pixel
+            assign_pixel_helpers::assign(temp,src);
+            // now we can just go assign the new rgb value to the
+            // hsv pixel
             assign_pixel_helpers::assign(dest,temp);
         }
 
@@ -1488,6 +1824,20 @@ namespace dlib
             rgb_pixel temp;
 
             // convert hsi value to our temp rgb pixel
+            assign_pixel_helpers::assign(temp,src);
+
+            // now we can just go assign the new rgb value to the
+            // lab pixel
+            assign_pixel_helpers::assign(dest,temp);
+        }
+
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::lab && pixel_traits<P2>::hsv>::type
+        assign(P1& dest, const P2& src)
+        {
+            rgb_pixel temp;
+
+            // convert hsv value to our temp rgb pixel
             assign_pixel_helpers::assign(temp,src);
 
             // now we can just go assign the new rgb value to the
@@ -1772,6 +2122,44 @@ namespace dlib
         catch (serialization_error& e)
         {
             throw serialization_error(e.info + "\n   while deserializing object of type hsi_pixel"); 
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline void serialize (
+        const hsv_pixel& item, 
+        std::ostream& out 
+    )   
+    {
+        try
+        {
+            serialize(item.h,out);
+            serialize(item.s,out);
+            serialize(item.v,out);
+        }
+        catch (serialization_error& e)
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type hsv_pixel"); 
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline void deserialize (
+        hsv_pixel& item, 
+        std::istream& in
+    )   
+    {
+        try
+        {
+            deserialize(item.h,in);
+            deserialize(item.s,in);
+            deserialize(item.v,in);
+        }
+        catch (serialization_error& e)
+        {
+            throw serialization_error(e.info + "\n   while deserializing object of type hsv_pixel"); 
         }
     }
 
