@@ -1032,12 +1032,18 @@ namespace dlib
 
     // -----------------------------
 
-        // Helper struct used for HSL and HSV
-        struct HSX
+        struct HSL
         {
             double h;
             double s;
-            double x;
+            double l;
+        };
+
+        struct HSV
+        {
+            double h;
+            double s;
+            double v;
         };
 
         struct COLOUR
@@ -1057,19 +1063,19 @@ namespace dlib
             Lightness is between 0 and 1
             Saturation is between 0 and 1
         */
-        inline HSX RGB2HSL(COLOUR c1)
+        inline HSL RGB2HSL(COLOUR c1)
         {
             double themin,themax,delta;
-            HSX c2;
+            HSL c2;
             using namespace std;
 
             themin = std::min(c1.r,std::min(c1.g,c1.b));
             themax = std::max(c1.r,std::max(c1.g,c1.b));
             delta = themax - themin;
-            c2.x = (themin + themax) / 2;
+            c2.l = (themin + themax) / 2;
             c2.s = 0;
-            if (c2.x > 0 && c2.x < 1)
-                c2.s = delta / (c2.x < 0.5 ? (2*c2.x) : (2-2*c2.x));
+            if (c2.l > 0 && c2.l < 1)
+                c2.s = delta / (c2.l < 0.5 ? (2*c2.l) : (2-2*c2.l));
             c2.h = 0;
             if (delta > 0) {
                 if (themax == c1.r && themax != c1.g)
@@ -1089,7 +1095,7 @@ namespace dlib
             Lightness is between 0 and 1
             Saturation is between 0 and 1
         */
-        inline COLOUR HSL2RGB(HSX c1)
+        inline COLOUR HSL2RGB(HSL c1)
         {
             COLOUR c2,sat,ctmp;
             using namespace std;
@@ -1115,14 +1121,14 @@ namespace dlib
             ctmp.g = 2 * c1.s * sat.g + (1 - c1.s);
             ctmp.b = 2 * c1.s * sat.b + (1 - c1.s);
 
-            if (c1.x < 0.5) {
-                c2.r = c1.x * ctmp.r;
-                c2.g = c1.x * ctmp.g;
-                c2.b = c1.x * ctmp.b;
+            if (c1.l < 0.5) {
+                c2.r = c1.l * ctmp.r;
+                c2.g = c1.l * ctmp.g;
+                c2.b = c1.l * ctmp.b;
             } else {
-                c2.r = (1 - c1.x) * ctmp.r + 2 * c1.x - 1;
-                c2.g = (1 - c1.x) * ctmp.g + 2 * c1.x - 1;
-                c2.b = (1 - c1.x) * ctmp.b + 2 * c1.x - 1;
+                c2.r = (1 - c1.l) * ctmp.r + 2 * c1.l - 1;
+                c2.g = (1 - c1.l) * ctmp.g + 2 * c1.l - 1;
+                c2.b = (1 - c1.l) * ctmp.b + 2 * c1.l - 1;
             }
 
             return(c2);
@@ -1134,19 +1140,15 @@ namespace dlib
             Saturation is between 0 and 1
             Value is between 0 and 1
         */
-        inline HSX RGB2HSV(COLOUR in)
+        inline HSV RGB2HSV(COLOUR in)
         {
-            HSX out;
-            double min, max, delta;
+            HSV out;
 
-            min = in.r < in.g ? in.r : in.g;
-            min = min < in.b ? min : in.b;
+            const double themin = std::min({in.r, in.g, in.b});
+            const double max = std::max({in.r, in.g, in.b});
+            const double delta = max - themin;
 
-            max = in.r > in.g ? in.r : in.g;
-            max = max > in.b ? max : in.b;
-
-            out.x = max;
-            delta = max - min;
+            out.v = max;
             if (delta < 0.00001)
             {
                 out.s = 0;
@@ -1191,58 +1193,54 @@ namespace dlib
             Saturation is between 0 and 1
             Value is between 0 and 1
         */
-        inline COLOUR HSV2RGB(HSX in)
+        inline COLOUR HSV2RGB(HSV in)
         {
-            double hh, p, q, t, ff;
-            long i;
             COLOUR out;
 
             if (in.s <= 0.0)
             {
-                out.r = in.x;
-                out.g = in.x;
-                out.b = in.x;
+                out.r = in.v;
+                out.g = in.v;
+                out.b = in.v;
                 return out;
             }
-            hh = in.h;
-            if (hh >= 360.0)
-                hh = 0.0;
-            hh /= 60.0;
-            i = static_cast<long>(hh);
-            ff = hh - i;
-            p = in.x * (1.0 - in.s);
-            q = in.x * (1.0 - (in.s * ff));
-            t = in.x * (1.0 - (in.s * (1.0 - ff)));
+
+            const double hh = (in.h >= 360 ? 0.0 : in.h) / 60.0;
+            const long i = static_cast<long>(hh);
+            const double ff = hh - i;
+            const double p = in.v * (1.0 - in.s);
+            const double q = in.v * (1.0 - (in.s * ff));
+            const double t = in.v * (1.0 - (in.s * (1.0 - ff)));
 
             switch (i)
             {
             case 0:
-                out.r = in.x;
+                out.r = in.v;
                 out.g = t;
                 out.b = p;
                 break;
             case 1:
                 out.r = q;
-                out.g = in.x;
+                out.g = in.v;
                 out.b = p;
                 break;
             case 2:
                 out.r = p;
-                out.g = in.x;
+                out.g = in.v;
                 out.b = t;
                 break;
             case 3:
                 out.r = p;
                 out.g = q;
-                out.b = in.x;
+                out.b = in.v;
                 break;
             case 4:
                 out.r = t;
                 out.g = p;
-                out.b = in.x;
+                out.b = in.v;
                 break;
             default:
-                out.r = in.x;
+                out.r = in.v;
                 out.g = p;
                 out.b = q;
                 break;
@@ -1475,11 +1473,11 @@ namespace dlib
         assign(P1& dest, const P2& src) 
         { 
             COLOUR c;
-            HSX h;
+            HSL h;
             h.h = src.h;
             h.h = h.h/255.0*360;
             h.s = src.s/255.0;
-            h.x = src.i/255.0;
+            h.l = src.i/255.0;
             c = HSL2RGB(h);
 
             dest.red = static_cast<unsigned char>(c.r*255.0 + 0.5);
@@ -1492,11 +1490,11 @@ namespace dlib
         assign(P1& dest, const P2& src) 
         { 
             COLOUR c;
-            HSX h;
+            HSV h;
             h.h = src.h;
             h.h = h.h/255.0*360;
             h.s = src.s/255.0;
-            h.x = src.v/255.0;
+            h.v = src.v/255.0;
             c = HSV2RGB(h);
 
             dest.red = static_cast<unsigned char>(c.r*255.0 + 0.5);
@@ -1563,11 +1561,11 @@ namespace dlib
         assign(P1& dest, const P2& src) 
         { 
             COLOUR c;
-            HSX h;
+            HSL h;
             h.h = src.h;
             h.h = h.h/255.0*360;
             h.s = src.s/255.0;
-            h.x = src.i/255.0;
+            h.l = src.i/255.0;
             c = HSL2RGB(h);
 
             dest.red = static_cast<unsigned char>(c.r*255.0 + 0.5);
@@ -1581,11 +1579,11 @@ namespace dlib
         assign(P1& dest, const P2& src) 
         { 
             COLOUR c;
-            HSX h;
+            HSV h;
             h.h = src.h;
             h.h = h.h/255.0*360;
             h.s = src.s/255.0;
-            h.x = src.v/255.0;
+            h.v = src.v/255.0;
             c = HSV2RGB(h);
 
             dest.red = static_cast<unsigned char>(c.r*255.0 + 0.5);
@@ -1637,7 +1635,7 @@ namespace dlib
         assign(P1& dest, const P2& src) 
         { 
             COLOUR c1;
-            HSX c2;
+            HSL c2;
             c1.r = src.red/255.0;
             c1.g = src.green/255.0;
             c1.b = src.blue/255.0;
@@ -1645,7 +1643,7 @@ namespace dlib
 
             dest.h = static_cast<unsigned char>(c2.h/360.0*255.0 + 0.5);
             dest.s = static_cast<unsigned char>(c2.s*255.0 + 0.5);
-            dest.i = static_cast<unsigned char>(c2.x*255.0 + 0.5);
+            dest.i = static_cast<unsigned char>(c2.l*255.0 + 0.5);
         }
 
         template < typename P1, typename P2 >
@@ -1715,7 +1713,7 @@ namespace dlib
         assign(P1& dest, const P2& src) 
         { 
             COLOUR c1;
-            HSX c2;
+            HSV c2;
             c1.r = src.red/255.0;
             c1.g = src.green/255.0;
             c1.b = src.blue/255.0;
@@ -1723,7 +1721,7 @@ namespace dlib
 
             dest.h = static_cast<unsigned char>(c2.h/360.0*255.0 + 0.5);
             dest.s = static_cast<unsigned char>(c2.s*255.0 + 0.5);
-            dest.v = static_cast<unsigned char>(c2.x*255.0 + 0.5);
+            dest.v = static_cast<unsigned char>(c2.v*255.0 + 0.5);
         }
 
         template < typename P1, typename P2 >
