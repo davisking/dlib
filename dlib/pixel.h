@@ -1241,7 +1241,6 @@ namespace dlib
                 out.g = p;
                 out.b = in.x;
                 break;
-            case 5:
             default:
                 out.r = in.x;
                 out.g = p;
