@@ -198,14 +198,13 @@ void flip_dataset(const command_line_parser& parser)
     load_image_dataset_metadata(metadata,datasource);
     orig_metadata = metadata;
 
+    const string metadata_filename = get_parent_directory(file(datasource)).full_name() +
+        directory::get_separator() + "flipped_" + file(datasource).name();
+
     // Set the current directory to be the one that contains the
     // metadata file. We do this because the file might contain
     // file paths which are relative to this folder.
     set_current_dir(get_parent_directory(file(datasource)));
-
-    const string metadata_filename = get_parent_directory(file(datasource)).full_name() +
-        directory::get_separator() + "flipped_" + file(datasource).name();
-
 
     array2d<rgb_pixel> img, temp;
     for (unsigned long i = 0; i < metadata.images.size(); ++i)
