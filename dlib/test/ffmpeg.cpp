@@ -247,6 +247,52 @@ namespace
                 print_spinner();
             }
         }
+
+        // We're also going to mux then demux again
+        muxer writer([&] {
+            muxer::args args;
+            args.filepath = tmpfile;
+            args.enable_image = has_video;
+            args.enable_audio = has_audio;
+
+            if (has_video)
+            {
+                args.args_image.codec        = image_codec;
+                args.args_image.h            = cap.height();
+                args.args_image.w            = cap.width();
+                args.args_image.framerate    = cap.fps();
+                args.args_image.fmt          = AV_PIX_FMT_YUV420P;
+            }
+
+            if (has_audio)
+            {
+                args.args_audio.codec            = audio_codec;
+                args.args_audio.sample_rate      = cap.sample_rate();
+                args.args_audio.channel_layout   = cap.channel_layout();
+                args.args_audio.fmt              = cap.sample_fmt();
+            }
+
+            return args;
+        }());
+
+        DLIB_TEST(writer.is_open());
+        DLIB_TEST(writer.audio_enabled() == has_audio);
+        DLIB_TEST(writer.video_enabled() == has_video);
+
+        if (has_video)
+        {
+            DLIB_TEST(writer.get_video_codec_id()   == image_codec);
+            DLIB_TEST(writer.height()               == cap.height());
+            DLIB_TEST(writer.width()                == cap.width());
+        }
+
+        if (has_audio)
+        {
+            DLIB_TEST(writer.get_audio_codec_id() == audio_codec);
+            //You can't guarantee that the requested sample rate or sample format are supported.
+            //In which case, the object changes them to values that ARE supported. So we can't add
+            //tests that check the sample rate is set to what we asked for.
+        } 
         
         dlib::ffmpeg::frame frame, frame_copy;
         array2d<rgb_pixel>  img;
@@ -277,7 +323,10 @@ namespace
                 DLIB_TEST(frame_copy.pixfmt()   == frame.pixfmt());
 
                 // Push to encoder
-                DLIB_TEST(enc_image.push(std::move(frame)));
+                DLIB_TEST(enc_image.push(frame));
+
+                // Push to muxer
+                DLIB_TEST(writer.push(std::move(frame)));
                 
                 ++counter_images;
             }
@@ -311,7 +360,10 @@ namespace
                 counter_samples += frame.nsamples();
 
                 // Push to encoder
-                DLIB_TEST(enc_audio.push(std::move(frame))); 
+                DLIB_TEST(enc_audio.push(frame)); 
+
+                // Push to muxer
+                DLIB_TEST(writer.push(std::move(frame)));
             }
 
             ++iteration;
@@ -326,6 +378,7 @@ namespace
 
         enc_audio.flush();
         enc_image.flush();
+        writer.flush();
 
         print_spinner();
 
@@ -372,6 +425,56 @@ namespace
             DLIB_TEST(counter_samples >= estimated_samples_min); //within 1 second
             DLIB_TEST(counter_samples <= estimated_samples_max); //within 1 second
         }
+
+        // Demux remuxed frames
+        cap = demuxer([&] {
+            demuxer::args args;
+            args.filepath = tmpfile;
+            args.args_image.fmt         = AV_PIX_FMT_RGB24;
+            args.args_audio.fmt         = AV_SAMPLE_FMT_S16;
+            args.args_audio.sample_rate = sample_rate; // We do this because the muxed file may have changed the sample rate because the orginal requested sample rate wasn't supported. Convert back to expected.
+            return args;
+        }());
+        DLIB_TEST(cap.is_open());
+        DLIB_TEST(cap.video_enabled()       == has_video);
+        DLIB_TEST(cap.audio_enabled()       == has_audio);
+        DLIB_TEST(cap.height()              == height);
+        DLIB_TEST(cap.width()               == width);
+        DLIB_TEST(cap.sample_rate()         == sample_rate);
+        // DLIB_TEST(cap.estimated_nframes()   == nframes); This won't always work with ffmpeg v3
+        estimated_samples_min = cap.estimated_total_samples() - cap.sample_rate(); // - 1s
+        estimated_samples_max = cap.estimated_total_samples() + cap.sample_rate(); // + 1s
+
+        counter_images  = 0;
+        counter_samples = 0;
+        iteration       = 0;
+
+        while (cap.read(frame))
+        {
+            if (frame.is_image())
+            {
+                DLIB_TEST(frame.height()    == height);
+                DLIB_TEST(frame.width()     == width);
+                DLIB_TEST(frame.pixfmt()    == AV_PIX_FMT_RGB24);
+                ++counter_images;
+            }
+                
+            else if (frame.is_audio())
+            {
+                DLIB_TEST(frame.sample_rate() == sample_rate);
+                DLIB_TEST(frame.samplefmt()   == AV_SAMPLE_FMT_S16);
+                counter_samples += frame.nsamples();
+            }
+
+            ++iteration;
+            if (iteration % 10 == 0)
+                print_spinner();
+        }
+
+        DLIB_TEST(counter_images == nframes);
+        DLIB_TEST(counter_samples >= estimated_samples_min); //within 1 second
+        DLIB_TEST(counter_samples <= estimated_samples_max); //within 1 second
+        DLIB_TEST(!cap.is_open());
     }
 
     class video_tester : public tester

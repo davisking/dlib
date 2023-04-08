@@ -651,8 +651,6 @@ namespace dlib
 
         inline demuxer::demuxer(const args &a)
         {
-            st.log = std::make_shared<logger>("ffmpeg::demuxer");
-
             if (!open(a))
                 st.pFormatCtx = nullptr;
         }
@@ -681,6 +679,7 @@ namespace dlib
             const bool init = details::register_ffmpeg::get();
 
             st = {};
+            st.log   = std::make_shared<logger>("ffmpeg::demuxer");
             st.args_ = a;
 
             AVFormatContext* pFormatCtx = avformat_alloc_context();
