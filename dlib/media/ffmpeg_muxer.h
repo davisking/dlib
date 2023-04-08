@@ -188,7 +188,7 @@ namespace dlib
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////// DECLARATIONS ////////////////////////////////////////////
+//////////////////////////////////////////// DEFINITIONS  ////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -649,7 +649,7 @@ namespace dlib
             flush();
         }
 
-        bool muxer::open(const args& a)
+        inline bool muxer::open(const args& a)
         {
             using namespace std;
             using namespace std::chrono;
@@ -781,8 +781,6 @@ namespace dlib
             if (st.args_.max_delay > 0)
                 st.pFormatCtx->max_delay = st.args_.max_delay;
 
-            //st.pFormatCtx->flags = AVFMT_FLAG_NOBUFFER | AVFMT_FLAG_FLUSH_PACKETS;
-
             if ((st.pFormatCtx->oformat->flags & AVFMT_NOFILE) == 0)
             {
                 av_dict opt = st.args_.protocol_options;
@@ -805,7 +803,7 @@ namespace dlib
             return true;
         }
 
-        bool muxer::interrupt_callback()
+        inline bool muxer::interrupt_callback()
         {
             const auto now = std::chrono::system_clock::now();
 
@@ -826,7 +824,7 @@ namespace dlib
             return false;
         }
 
-        bool muxer::push(frame f)
+        inline bool muxer::push(frame f)
         {
             using namespace std;
             using namespace details;
@@ -853,7 +851,7 @@ namespace dlib
             return false;
         }
 
-        void muxer::flush()
+        inline void muxer::flush()
         {
             if (!is_open())
                 return;
@@ -883,9 +881,9 @@ namespace dlib
         inline AVCodecID        muxer::get_video_codec_id()     const noexcept { return st.encoder_image.get_codec_id(); }
         inline std::string      muxer::get_video_codec_name()   const noexcept { return st.encoder_image.get_codec_name(); }
         inline int              muxer::sample_rate()            const noexcept { return st.encoder_audio.sample_rate(); }
-        uint64_t                muxer::channel_layout()         const noexcept { return st.encoder_audio.channel_layout(); }
-        int                     muxer::nchannels()              const noexcept { return st.encoder_audio.nchannels(); }
-        AVSampleFormat          muxer::sample_fmt()             const noexcept { return st.encoder_audio.sample_fmt(); }
+        inline uint64_t         muxer::channel_layout()         const noexcept { return st.encoder_audio.channel_layout(); }
+        inline int              muxer::nchannels()              const noexcept { return st.encoder_audio.nchannels(); }
+        inline AVSampleFormat   muxer::sample_fmt()             const noexcept { return st.encoder_audio.sample_fmt(); }
         inline AVCodecID        muxer::get_audio_codec_id()     const noexcept { return st.encoder_audio.get_codec_id(); }
         inline std::string      muxer::get_audio_codec_name()   const noexcept { return st.encoder_audio.get_codec_name(); }
     }

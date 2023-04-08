@@ -60,8 +60,8 @@ try
         return 0;
     }
 
-    const std::string input_filepath    = get_option(parser, "i", "");
-    const std::string output_filepath   = get_option(parser, "o", "");
+    const std::string input_filepath    = parser.option("i").argument();
+    const std::string output_filepath   = parser.option("o").argument();
 
     demuxer cap(input_filepath);
 

@@ -402,7 +402,7 @@ namespace dlib
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////// DECLARATIONS ////////////////////////////////////////////
+//////////////////////////////////////////// DEFINITIONS  ////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1069,13 +1069,6 @@ namespace dlib
                 throw std::runtime_error("av_frame_get_buffer() failed : " + get_av_error(ret));
             }
 
-    //        ret = av_frame_make_writable(obj.frame.get());
-    //        if (ret < 0)
-    //        {
-    //            obj.frame.reset(nullptr);
-    //            throw std::runtime_error("av_frame_make_writable() failed : " + get_av_error(ret));
-    //        }
-
             if (is_audio())
                 f->pts = av_rescale_q(timestamp.time_since_epoch().count(),
                                       {decltype(timestamp)::period::num, (decltype(timestamp)::period::den)},
@@ -1231,6 +1224,8 @@ namespace dlib
             
             return supported_codecs;
         }
+
+// ---------------------------------------------------------------------------------------------------
 
         inline std::vector<muxer_details> list_muxers()
         {
@@ -1438,6 +1433,8 @@ namespace dlib
             (void)ret;
         }
 
+// ---------------------------------------------------------------------------------------------------
+
         template<
           class ImageContainer, 
           is_image_check<ImageContainer> = true
@@ -1470,6 +1467,8 @@ namespace dlib
                           f.height());
         }
 
+// ---------------------------------------------------------------------------------------------------
+
         template<class SampleFmt, std::size_t Channels>
         inline void convert(const frame& f, audio<SampleFmt, Channels>& obj)
         {
@@ -1497,6 +1496,8 @@ namespace dlib
 
             av_samples_copy(dst_pointers, f.get_frame().data, 0, 0, f.nsamples(), f.nchannels(), f.samplefmt());
         }
+
+// ---------------------------------------------------------------------------------------------------
 
         template<class SampleFmt, std::size_t Channels>
         inline void convert(const audio<SampleFmt, Channels>& obj, frame& f)
