@@ -112,19 +112,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    const ustring convert_wstring_to_utf32 (
-        const std::wstring &wstr
-    );
-    /*!
-        requires
-            - wstr is a valid UTF-16 string when sizeof(wchar_t) == 2
-            - wstr is a valid UTF-32 string when sizeof(wchar_t) == 4
-        ensures
-            - converts wstr into UTF-32 string
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
     const std::wstring convert_utf32_to_wstring (
         const ustring &str
     );
