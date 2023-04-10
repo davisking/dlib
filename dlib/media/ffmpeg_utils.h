@@ -576,6 +576,12 @@ namespace dlib
             {
                 return convert_layout(channel_layout).nb_channels;
             }
+
+            inline void check_layout(AVCodecContext* pCodecCtx)
+            {
+                if (get_layout(pCodecCtx) == 0 && pCodecCtx->ch_layout.nb_channels > 0)
+                    av_channel_layout_default(&pCodecCtx->ch_layout, pCodecCtx->ch_layout.nb_channels);
+            }
         }
 
         inline std::string get_channel_layout_str(uint64_t channel_layout)
@@ -642,7 +648,13 @@ namespace dlib
             inline int get_nchannels(const AVFrame* frame)
             {
                 return get_nchannels(frame->channel_layout);
-            }            
+            }    
+
+            inline void check_layout(AVCodecContext* pCodecCtx) 
+            {
+                if (pCodecCtx->channel_layout == 0 && pCodecCtx->channels > 0)
+                    pCodecCtx->channel_layout = av_get_default_channel_layout(pCodecCtx->channels);
+            }       
         }
 
 // ---------------------------------------------------------------------------------------------------
