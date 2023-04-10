@@ -208,201 +208,398 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
-#if defined(__GNUC__) && __GNUC__ >= 6
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmisleading-indentation"
-#endif
+
     template <typename T>
     bool is_combining_char(
         const T ch_
     )
     {
-        const unichar ch = zero_extend_cast<unichar>(ch_);
-        if ( ch < 0x300 ) return false;
-        if ( ch < 0x370 ) return true;
-
-        if ( ch < 0x800 )
-        {
-            if ( ch < 0x483 )return false;if ( ch < 0x48A )return true;
-
-            if ( ch < 0x591 )return false;if ( ch < 0x5D0 )
-            {
-                if ( ch == 0x5C0 )return false;
-                if ( ch == 0x5C3 )return false;
-                if ( ch == 0x5C6 )return false;
+            const unichar ch = zero_extend_cast<unichar>(ch_);
+            if (ch < 0x300)
+                return false;
+            if (ch < 0x370)
                 return true;
+            if (ch < 0x800) {
+                if (ch < 0x483)
+                    return false;
+                if (ch < 0x48A)
+                    return true;
+                if (ch < 0x591)
+                    return false;
+                if (ch < 0x5D0) {
+                    if (ch == 0x5C0)
+                        return false;
+                    if (ch == 0x5C3)
+                        return false;
+                    if (ch == 0x5C6)
+                        return false;
+                    return true;
+                }
+                if (ch < 0x610)
+                    return false;
+                if (ch < 0x616)
+                    return true;
+                if (ch < 0x64B)
+                    return false;
+                if (ch < 0x660)
+                    return true;
+                if (ch == 0x670)
+                    return true;
+                if (ch < 0x6D6)
+                    return false;
+                if (ch < 0x6EE) {
+                    if (ch == 0x6DD)
+                        return false;
+                    if (ch == 0x6E5)
+                        return false;
+                    if (ch == 0x6E6)
+                        return false;
+                    if (ch == 0x6E9)
+                        return false;
+                    return true;
+                }
+                if (ch == 0x711)
+                    return true;
+                if (ch < 0x730)
+                    return false;
+                if (ch < 0x74B)
+                    return true;
+                if (ch < 0x7A6)
+                    return false;
+                if (ch < 0x7B1)
+                    return true;
+                if (ch < 0x7EB)
+                    return false;
+                if (ch < 0x7F4)
+                    return true;
+                return false;
             }
-            if ( ch < 0x610 )return false;if ( ch < 0x616 )return true;
-            if ( ch < 0x64B )return false;if ( ch < 0x660 )return true;
-
-            if ( ch == 0x670 )return true;
-
-            if ( ch < 0x6D6 )return false;if ( ch < 0x6EE )
-            {
-                if ( ch == 0x6DD )return false;
-                if ( ch == 0x6E5 )return false;
-                if ( ch == 0x6E6 )return false;
-                if ( ch == 0x6E9 )return false;
+            if (ch < 0xA00) {
+                if (ch < 0x901)
+                    return false;
+                if (ch < 0x904)
+                    return true;
+                if (ch < 0x93C)
+                    return false;
+                if (ch < 0x955) {
+                    if (ch == 0x93D)
+                        return false;
+                    if (ch == 0x950)
+                        return false;
+                    return true;
+                }
+                if (ch < 0x962)
+                    return false;
+                if (ch < 0x964)
+                    return true;
+                if (ch < 0x981)
+                    return false;
+                if (ch < 0x984)
+                    return true;
+                if (ch < 0x9BC)
+                    return false;
+                if (ch < 0x9D8) {
+                    if (ch == 0x9BD)
+                        return false;
+                    if (ch == 0x9CE)
+                        return false;
+                    return true;
+                }
+                if (ch < 0x9E2)
+                    return false;
+                if (ch < 0x9E4)
+                    return true;
+                return false;
+            }
+            if (ch < 0xC00) {
+                if (ch < 0xA01)
+                    return false;
+                if (ch < 0xA04)
+                    return true;
+                if (ch < 0xA3C)
+                    return false;
+                if (ch < 0xA4E)
+                    return true;
+                if (ch < 0xA70)
+                    return false;
+                if (ch < 0xA72)
+                    return true;
+                if (ch < 0xA81)
+                    return false;
+                if (ch < 0xA84)
+                    return true;
+                if (ch < 0xABC)
+                    return false;
+                if (ch < 0xACE) {
+                    if (ch == 0xABD)
+                        return false;
+                    return true;
+                }
+                if (ch < 0xAE2)
+                    return false;
+                if (ch < 0xAE4)
+                    return true;
+                if (ch < 0xB01)
+                    return false;
+                if (ch < 0xB04)
+                    return true;
+                if (ch < 0xB3C)
+                    return false;
+                if (ch < 0xB58) {
+                    if (ch == 0xB3D)
+                        return false;
+                    return true;
+                }
+                if (ch == 0xB82)
+                    return true;
+                if (ch < 0xBBE)
+                    return false;
+                if (ch < 0xBD8)
+                    return true;
+                if (ch == 0xBF4)
+                    return true;
+                if (ch == 0xBF8)
+                    return true;
+                return false;
+            }
+            if (ch < 0xE00) {
+                if (ch < 0xC01)
+                    return false;
+                if (ch < 0xC04)
+                    return true;
+                if (ch < 0xC3E)
+                    return false;
+                if (ch < 0xC57)
+                    return true;
+                if (ch < 0xC82)
+                    return false;
+                if (ch < 0xC84)
+                    return true;
+                if (ch < 0xCBC)
+                    return false;
+                if (ch < 0xCD7) {
+                    if (ch == 0xCBD)
+                        return false;
+                    return true;
+                }
+                if (ch < 0xCE2)
+                    return false;
+                if (ch < 0xCE4)
+                    return true;
+                if (ch < 0xD02)
+                    return false;
+                if (ch < 0xD04)
+                    return true;
+                if (ch < 0xD3E)
+                    return false;
+                if (ch < 0xD58)
+                    return true;
+                if (ch < 0xD82)
+                    return false;
+                if (ch < 0xD84)
+                    return true;
+                if (ch < 0xDCA)
+                    return false;
+                if (ch < 0xDF4)
+                    return true;
+                return false;
+            }
+            if (ch < 0x1000) {
+                if (ch == 0xE31)
+                    return true;
+                if (ch < 0xE34)
+                    return false;
+                if (ch < 0xE3B)
+                    return true;
+                if (ch < 0xE47)
+                    return false;
+                if (ch < 0xE4F)
+                    return true;
+                if (ch == 0xEB1)
+                    return true;
+                if (ch < 0xEB4)
+                    return false;
+                if (ch < 0xEBD)
+                    return true;
+                if (ch < 0xEC8)
+                    return false;
+                if (ch < 0xECE)
+                    return true;
+                if (ch < 0xF18)
+                    return false;
+                if (ch < 0xF1A)
+                    return true;
+                if (ch == 0xF35)
+                    return true;
+                if (ch == 0xF37)
+                    return true;
+                if (ch == 0xF39)
+                    return true;
+                if (ch < 0xF3E)
+                    return false;
+                if (ch < 0xF40)
+                    return true;
+                if (ch < 0xF71)
+                    return false;
+                if (ch < 0xF88) {
+                    if (ch == 0xF85)
+                        return false;
+                    return true;
+                }
+                if (ch < 0xF90)
+                    return false;
+                if (ch < 0xFBD)
+                    return true;
+                if (ch == 0xFC6)
+                    return true;
+                return false;
+            }
+            if (ch < 0x1800) {
+                if (ch < 0x102C)
+                    return false;
+                if (ch < 0x1040)
+                    return true;
+                if (ch < 0x1056)
+                    return false;
+                if (ch < 0x105A)
+                    return true;
+                if (ch == 0x135F)
+                    return true;
+                if (ch < 0x1712)
+                    return false;
+                if (ch < 0x1715)
+                    return true;
+                if (ch < 0x1732)
+                    return false;
+                if (ch < 0x1735)
+                    return true;
+                if (ch < 0x1752)
+                    return false;
+                if (ch < 0x1754)
+                    return true;
+                if (ch < 0x1772)
+                    return false;
+                if (ch < 0x1774)
+                    return true;
+                if (ch < 0x17B6)
+                    return false;
+                if (ch < 0x17D4)
+                    return true;
+                if (ch == 0x17DD)
+                    return true;
+                return false;
+            }
+            if (ch < 0x2000) {
+                if (ch < 0x180B)
+                    return false;
+                if (ch < 0x180E)
+                    return true;
+                if (ch == 0x18A9)
+                    return true;
+                if (ch < 0x1920)
+                    return false;
+                if (ch < 0x193C)
+                    return true;
+                if (ch < 0x19B0)
+                    return false;
+                if (ch < 0x19C1)
+                    return true;
+                if (ch < 0x19C8)
+                    return false;
+                if (ch < 0x19CA)
+                    return true;
+                if (ch < 0x1A17)
+                    return false;
+                if (ch < 0x1A1C)
+                    return true;
+                if (ch < 0x1B00)
+                    return false;
+                if (ch < 0x1B05)
+                    return true;
+                if (ch < 0x1B34)
+                    return false;
+                if (ch < 0x1B45)
+                    return true;
+                if (ch < 0x1B6B)
+                    return false;
+                if (ch < 0x1B74)
+                    return true;
+                if (ch < 0x1DC0)
+                    return false;
+                if (ch < 0x1E00)
+                    return true;
+                return false;
+            }
+            if (ch < 0x20D0)
+                return false;
+            if (ch < 0x2100)
                 return true;
-            }
-            if ( ch == 0x711 )return true;
-
-            if ( ch < 0x730 )return false;if ( ch < 0x74B )return true;
-            if ( ch < 0x7A6 )return false;if ( ch < 0x7B1 )return true;
-            if ( ch < 0x7EB )return false;if ( ch < 0x7F4 )return true;
+            if (ch < 0x302A)
+                return false;
+            if (ch < 0x3030)
+                return true;
+            if (ch < 0x3099)
+                return false;
+            if (ch < 0x309B)
+                return true;
+            if (ch == 0xA802)
+                return true;
+            if (ch == 0xA806)
+                return true;
+            if (ch == 0xA80B)
+                return true;
+            if (ch < 0xA823)
+                return false;
+            if (ch < 0xA828)
+                return true;
+            if (ch == 0xFB1E)
+                return true;
+            if (ch < 0xFE00)
+                return false;
+            if (ch < 0xFE10)
+                return true;
+            if (ch < 0xFE20)
+                return false;
+            if (ch < 0xFE30)
+                return true;
+            if (ch < 0x10A01)
+                return false;
+            if (ch < 0x10A10)
+                return true;
+            if (ch < 0x10A38)
+                return false;
+            if (ch < 0x10A40)
+                return true;
+            if (ch < 0x1D165)
+                return false;
+            if (ch < 0x1D16A)
+                return true;
+            if (ch < 0x1D16D)
+                return false;
+            if (ch < 0x1D173)
+                return true;
+            if (ch < 0x1D17B)
+                return false;
+            if (ch < 0x1D183)
+                return true;
+            if (ch < 0x1D185)
+                return false;
+            if (ch < 0x1D18C)
+                return true;
+            if (ch < 0x1D1AA)
+                return false;
+            if (ch < 0x1D1AE)
+                return true;
+            if (ch < 0x1D242)
+                return false;
+            if (ch < 0x1D245)
+                return true;
+            if (ch < 0xE0100)
+                return false;
+            if (ch < 0xE01F0)
+                return true;
             return false;
-        }
-        if ( ch < 0xA00 )
-        {
-            if ( ch < 0x901 )return false;if ( ch < 0x904 )return true;
-            if ( ch < 0x93C )return false;if ( ch < 0x955 )
-            {
-                if ( ch == 0x93D )return false;
-                if ( ch == 0x950 )return false;
-                return true;
-            }
-            if ( ch < 0x962 )return false;if ( ch < 0x964 )return true;
-            if ( ch < 0x981 )return false;if ( ch < 0x984 )return true;
-            if ( ch < 0x9BC )return false;if ( ch < 0x9D8 )
-            {
-                if ( ch == 0x9BD )return false;
-                if ( ch == 0x9CE )return false;
-                return true;
-            }
-            if ( ch < 0x9E2 )return false;if ( ch < 0x9E4 )return true;
-            return false;
-        }
-        if ( ch < 0xC00 )
-        {
-            if ( ch < 0xA01 )return false;if ( ch < 0xA04 )return true;
-            if ( ch < 0xA3C )return false;if ( ch < 0xA4E )return true;
-            if ( ch < 0xA70 )return false;if ( ch < 0xA72 )return true;
-            if ( ch < 0xA81 )return false;if ( ch < 0xA84 )return true;
-            if ( ch < 0xABC )return false;if ( ch < 0xACE )
-            {
-                if ( ch == 0xABD )return false;
-                return true;
-            }
-            if ( ch < 0xAE2 )return false;if ( ch < 0xAE4 )return true;
-            if ( ch < 0xB01 )return false;if ( ch < 0xB04 )return true;
-            if ( ch < 0xB3C )return false;if ( ch < 0xB58 )
-            {
-                if ( ch == 0xB3D )return false;
-                return true;
-            }
-            if ( ch == 0xB82 )return true;
-
-            if ( ch < 0xBBE )return false;if ( ch < 0xBD8 )return true;
-
-            if ( ch == 0xBF4 )return true;
-            if ( ch == 0xBF8 )return true;
-            return false;
-        }
-        if(ch < 0xE00)
-        {
-            if ( ch < 0xC01 )return false;if ( ch < 0xC04 )return true;
-            if ( ch < 0xC3E )return false;if ( ch < 0xC57 )return true;
-            if ( ch < 0xC82 )return false;if ( ch < 0xC84 )return true;
-            if ( ch < 0xCBC )return false;if ( ch < 0xCD7 )
-            {
-                if ( ch == 0xCBD )return false;
-                return true;
-            }
-            if ( ch < 0xCE2 )return false;if ( ch < 0xCE4 )return true;
-            if ( ch < 0xD02 )return false;if ( ch < 0xD04 )return true;
-            if ( ch < 0xD3E )return false;if ( ch < 0xD58 )return true;
-            if ( ch < 0xD82 )return false;if ( ch < 0xD84 )return true;
-            if ( ch < 0xDCA )return false;if ( ch < 0xDF4 )return true;
-            return false;
-        }
-        if(ch < 0x1000)
-        {
-            if ( ch == 0xE31 )return true;
-
-            if ( ch < 0xE34 )return false;if ( ch < 0xE3B )return true;
-            if ( ch < 0xE47 )return false;if ( ch < 0xE4F )return true;
-
-            if ( ch == 0xEB1 )return true;
-
-            if ( ch < 0xEB4 )return false;if ( ch < 0xEBD )return true;
-            if ( ch < 0xEC8 )return false;if ( ch < 0xECE )return true;
-            if ( ch < 0xF18 )return false;if ( ch < 0xF1A )return true;
-
-            if ( ch == 0xF35 )return true;
-            if ( ch == 0xF37 )return true;
-            if ( ch == 0xF39 )return true;
-
-            if ( ch < 0xF3E )return false;if ( ch < 0xF40 )return true;
-            if ( ch < 0xF71 )return false;if ( ch < 0xF88 )
-            {
-                if ( ch == 0xF85 )return false;
-                return true;
-            }
-            if ( ch < 0xF90 )return false;if ( ch < 0xFBD )return true;
-
-            if ( ch == 0xFC6 )return true;
-            return false;
-        }
-        if ( ch < 0x1800 )
-        {
-            if ( ch < 0x102C )return false;if ( ch < 0x1040 )return true;
-            if ( ch < 0x1056 )return false;if ( ch < 0x105A )return true;
-
-            if ( ch == 0x135F )return true;
-
-            if ( ch < 0x1712 )return false;if ( ch < 0x1715 )return true;
-            if ( ch < 0x1732 )return false;if ( ch < 0x1735 )return true;
-            if ( ch < 0x1752 )return false;if ( ch < 0x1754 )return true;
-            if ( ch < 0x1772 )return false;if ( ch < 0x1774 )return true;
-            if ( ch < 0x17B6 )return false;if ( ch < 0x17D4 )return true;
-
-            if ( ch == 0x17DD )return true;
-            return false;
-        }
-        if(ch < 0x2000)
-        {
-            if ( ch < 0x180B )return false;if ( ch < 0x180E )return true;
-
-            if ( ch == 0x18A9 )return true;
-
-            if ( ch < 0x1920 )return false;if ( ch < 0x193C )return true;
-            if ( ch < 0x19B0 )return false;if ( ch < 0x19C1 )return true;
-            if ( ch < 0x19C8 )return false;if ( ch < 0x19CA )return true;
-            if ( ch < 0x1A17 )return false;if ( ch < 0x1A1C )return true;
-            if ( ch < 0x1B00 )return false;if ( ch < 0x1B05 )return true;
-            if ( ch < 0x1B34 )return false;if ( ch < 0x1B45 )return true;
-            if ( ch < 0x1B6B )return false;if ( ch < 0x1B74 )return true;
-            if ( ch < 0x1DC0 )return false;if ( ch < 0x1E00 )return true;
-            return false;
-        }
-        if ( ch < 0x20D0 )return false;if ( ch < 0x2100 )return true;
-        if ( ch < 0x302A )return false;if ( ch < 0x3030 )return true;
-        if ( ch < 0x3099 )return false;if ( ch < 0x309B )return true;
-
-        if ( ch == 0xA802 )return true;
-        if ( ch == 0xA806 )return true;
-        if ( ch == 0xA80B )return true;
-
-        if ( ch < 0xA823 )return false;if ( ch < 0xA828 )return true;
-
-        if ( ch == 0xFB1E )return true;
-
-        if ( ch < 0xFE00 )return false;if ( ch < 0xFE10 )return true;
-        if ( ch < 0xFE20 )return false;if ( ch < 0xFE30 )return true;
-        if ( ch < 0x10A01 )return false;if ( ch < 0x10A10 )return true;
-        if ( ch < 0x10A38 )return false;if ( ch < 0x10A40 )return true;
-        if ( ch < 0x1D165 )return false;if ( ch < 0x1D16A )return true;
-        if ( ch < 0x1D16D )return false;if ( ch < 0x1D173 )return true;
-        if ( ch < 0x1D17B )return false;if ( ch < 0x1D183 )return true;
-        if ( ch < 0x1D185 )return false;if ( ch < 0x1D18C )return true;
-        if ( ch < 0x1D1AA )return false;if ( ch < 0x1D1AE )return true;
-        if ( ch < 0x1D242 )return false;if ( ch < 0x1D245 )return true;
-        if ( ch < 0xE0100 )return false;if ( ch < 0xE01F0 )return true;
-        return false;
     }
-#if defined(__GNUC__) && __GNUC__ >= 6
-#pragma GCC diagnostic pop
-#endif
 
 // ----------------------------------------------------------------------------------------
 
