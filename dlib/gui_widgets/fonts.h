@@ -254,7 +254,7 @@ namespace dlib
             long y_offset = rect.top() + f.ascender() - 1;
             long pos = rect.left()+f.left_overflow();
 
-            convert_utf8_to_utf32(str.begin() + first, str.begin() + last, [&](unichar ch)
+            convert_to_utf32(str.begin() + first, str.begin() + last, [&](unichar ch)
             {
                 // ignore the '\r' character
                 if (ch == '\r')

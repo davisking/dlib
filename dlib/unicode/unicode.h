@@ -500,7 +500,7 @@ namespace dlib
     };
 
     template <typename forward_iterator, typename unary_op>
-    inline void convert_utf8_to_utf32(
+    inline void convert_to_utf32(
         forward_iterator ibegin,
         forward_iterator iend,
         unary_op op
@@ -525,34 +525,37 @@ namespace dlib
             return;
         }
 
-        unichar ch;
-        int status = 0;
-        while (ibegin != iend)
+        if (std::is_same<char_type, char>::value)
         {
-            status = unicode_helpers::u8_to_u32(ch, ibegin, iend);
-            if (status > 0)
+            unichar ch;
+            int status = 0;
+            while (ibegin != iend)
             {
-                op(ch);
-                ibegin += status;
+                status = unicode_helpers::u8_to_u32(ch, ibegin, iend);
+                if (status > 0)
+                {
+                    op(ch);
+                    ibegin += status;
+                }
+                else
+                {
+                    break;
+                }
             }
-            else
-            {
-                break;
-            }
-        }
 
-        if (status < 0)
-            throw invalid_utf8_error();
+            if (status < 0)
+                throw invalid_utf8_error();
+        }
     }
 
-    inline const ustring convert_utf8_to_utf32 (
+    inline const ustring convert_to_utf32 (
         const std::string& str
     )
     {
         ustring temp;
         temp.reserve(str.size());
 
-        convert_utf8_to_utf32(str.begin(), str.end(), [&](unichar ch)
+        convert_to_utf32(str.begin(), str.end(), [&](unichar ch)
         {
             temp.push_back(ch);
         });

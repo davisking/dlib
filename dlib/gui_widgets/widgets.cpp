@@ -892,7 +892,7 @@ namespace dlib
             {
                 // highlight the double clicked word
                 string::size_type first, last;
-                const ustring ustr = convert_utf8_to_utf32(std::string(" \t\n"));
+                const ustring ustr = convert_to_utf32(std::string(" \t\n"));
                 first = text_.substr(0,cursor_pos).find_last_of(ustr.c_str());
                 last = text_.find_first_of(ustr.c_str(),cursor_pos);
                 long f = static_cast<long>(first);
@@ -980,7 +980,7 @@ namespace dlib
         if (right_click_menu.popup_menu_visible())
             return;
 
-        const ustring space_str = convert_utf8_to_utf32(std::string(" \t\n"));
+        const ustring space_str = convert_to_utf32(std::string(" \t\n"));
         const bool shift = (state&base_window::KBD_MOD_SHIFT) != 0;
         const bool ctrl = (state&base_window::KBD_MOD_CONTROL) != 0;
         if (has_focus && enabled && !hidden)
@@ -5170,7 +5170,7 @@ namespace dlib
             {
                 // highlight the double clicked word
                 string::size_type first, last;
-                const ustring ustr = convert_utf8_to_utf32(std::string(" \t\n"));
+                const ustring ustr = convert_to_utf32(std::string(" \t\n"));
                 first = text_.substr(0,cursor_pos).find_last_of(ustr.c_str());
                 last = text_.find_first_of(ustr.c_str(),cursor_pos);
                 long f = static_cast<long>(first);
@@ -5260,7 +5260,7 @@ namespace dlib
 
         if (has_focus && enabled && !hidden)
         {
-            const ustring space_str = convert_utf8_to_utf32(std::string(" \t\n"));
+            const ustring space_str = convert_to_utf32(std::string(" \t\n"));
             const bool shift = (state&base_window::KBD_MOD_SHIFT) != 0;
             const bool ctrl = (state&base_window::KBD_MOD_CONTROL) != 0;
 

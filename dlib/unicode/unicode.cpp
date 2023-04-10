@@ -4,7 +4,6 @@
 #define DLIB_UNICODe_CPp_
 #include "unicode.h"
 #include <cwchar>
-#include "../string.h"
 #include <vector>
 
 namespace dlib
@@ -68,7 +67,8 @@ namespace dlib
             {
                 dest[i] = surrogate_pair_to_unichar(src[ii], src[ii+1]);
                 ii += 2;
-            }else
+            }
+            else
             {
                 dest[i] = zero_extend_cast<unichar>(src[ii]);
                 ii++;
