@@ -603,6 +603,14 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    bool is_surrogate(unichar ch);
+
+    unichar surrogate_pair_to_unichar(unichar first, unichar second);
+
+    void unichar_to_surrogate_pair(unichar unicode, unichar &first, unichar &second);
+
+// ----------------------------------------------------------------------------------------
+
     class invalid_utf8_error : public error
     {
     public:
@@ -632,7 +640,32 @@ namespace dlib
 
         if (std::is_same<char_type, wchar_t>::value)
         {
-            return;
+            // Unix
+            if (sizeof(wchar_t) == 4)
+            {
+                while (ibegin != iend)
+                    op(static_cast<unichar>(*(ibegin++)));
+                return;
+            }
+            // Win32
+            if (sizeof(wchar_t) == 2)
+            {
+                while (ibegin != iend)
+                {
+                    if (is_surrogate(*ibegin))
+                    {
+                        op(surrogate_pair_to_unichar(*ibegin, *(ibegin+ 1)));
+                        ibegin += 2;
+                    }
+                    else
+                    {
+                        op(zero_extend_cast<unichar>(*ibegin));
+                        ibegin += 1;
+                    }
+                }
+                return;
+            }
+            throw invalid_utf8_error();
         }
 
         if (std::is_same<char_type, char>::value)
@@ -658,33 +691,20 @@ namespace dlib
         }
     }
 
-    inline const ustring convert_to_utf32 (
-        const std::string& str
+    template <typename char_type, typename traits, typename alloc>
+    const ustring convert_to_utf32 (
+        const std::basic_string<char_type, traits, alloc>& str
     )
     {
         ustring temp;
         temp.reserve(str.size());
 
-        convert_to_utf32(str.begin(), str.end(), [&](unichar ch)
-        {
-            temp.push_back(ch);
-        });
+        convert_to_utf32(str.begin(), str.end(), [&](unichar ch) { temp.push_back(ch); });
 
         return temp;
     }
 
 // ----------------------------------------------------------------------------------------
-
-    bool is_surrogate(unichar ch);
-
-    unichar surrogate_pair_to_unichar(unichar first, unichar second);
-
-    void unichar_to_surrogate_pair(unichar unicode, unichar &first, unichar &second);
-
-
-    const ustring convert_wstring_to_utf32 (
-        const std::wstring &wstr
-    );
 
     const std::wstring convert_utf32_to_wstring (
         const ustring &src

@@ -4,6 +4,7 @@
 #define DLIB_UNICODe_CPp_
 #include "unicode.h"
 #include <cwchar>
+#include "../string.h"
 #include <vector>
 
 namespace dlib
@@ -42,47 +43,6 @@ namespace dlib
     {
         first = ((input - SMP_TOP) >> VALID_BITS) | SURROGATE_FIRST_TOP;
         second = (input & SURROGATE_CLEARING_MASK) | SURROGATE_SECOND_TOP;
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <int N> void wstr2ustring_t(const wchar_t *src, size_t src_len, ustring &dest);
-
-    template <> void wstr2ustring_t<4>(const wchar_t *src, size_t , ustring &dest)
-    {
-        dest.assign((const unichar *)(src));
-    }
-
-    template <> void wstr2ustring_t<2>(const wchar_t *src, size_t src_len, ustring &dest)
-    {
-        size_t wlen = 0;
-        for (size_t i = 0; i < src_len; i++)
-        {
-            is_surrogate(src[i]) ? i++, wlen++ : wlen++;
-        }
-        dest.resize(wlen);
-        for (size_t i = 0, ii = 0; ii < src_len; ++i)
-        {
-            if (is_surrogate(src[ii]))
-            {
-                dest[i] = surrogate_pair_to_unichar(src[ii], src[ii+1]);
-                ii += 2;
-            }
-            else
-            {
-                dest[i] = zero_extend_cast<unichar>(src[ii]);
-                ii++;
-            }
-        }
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    const ustring convert_wstring_to_utf32(const std::wstring &src)
-    {
-        ustring dest;
-        wstr2ustring_t<sizeof(wchar_t)>(src.c_str(), src.size(), dest);
-        return dest;
     }
 
 // ----------------------------------------------------------------------------------------

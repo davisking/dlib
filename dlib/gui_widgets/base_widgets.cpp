@@ -170,7 +170,7 @@ namespace dlib
         const std::wstring& name
     )
     {
-        set_name(convert_wstring_to_utf32(name));
+        set_name(convert_to_utf32(name));
     }
 
     void button::

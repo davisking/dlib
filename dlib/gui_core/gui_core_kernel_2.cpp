@@ -1398,7 +1398,7 @@ namespace dlib
     {
         std::wstring wstr;
         get_from_clipboard(wstr);
-        str = convert_wstring_to_utf32(wstr);
+        str = convert_to_utf32(wstr);
     }
 
     void get_from_clipboard (

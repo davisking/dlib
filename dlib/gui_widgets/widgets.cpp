@@ -198,7 +198,7 @@ namespace dlib
         const std::wstring& name
     )
     {
-        set_name(convert_wstring_to_utf32(name));
+        set_name(convert_to_utf32(name));
     }
 
     void toggle_button::
@@ -335,7 +335,7 @@ namespace dlib
         const std::wstring& text
     )
     {
-        set_text(convert_wstring_to_utf32(text));
+        set_text(convert_to_utf32(text));
     }
 
     void label::
@@ -683,7 +683,7 @@ namespace dlib
         const std::wstring& text
     )
     {
-        set_text(convert_wstring_to_utf32(text));
+        set_text(convert_to_utf32(text));
     }
 
     void text_field::
@@ -1222,7 +1222,7 @@ namespace dlib
     )
     {
         if (has_focus && enabled && !hidden){
-            ustring ustr = convert_wstring_to_utf32(str);
+            ustring ustr = convert_to_utf32(str);
             if (highlight_start <= highlight_end)
             {
                 text_ = text_.substr(0,highlight_start) + ustr +
@@ -1531,7 +1531,7 @@ namespace dlib
         const std::wstring& new_name
     )
     {
-        set_tab_name(idx, convert_wstring_to_utf32(new_name));
+        set_tab_name(idx, convert_to_utf32(new_name));
     }
 
     void tabbed_display::
@@ -1937,7 +1937,7 @@ namespace dlib
         const std::wstring& name
     )
     {
-        set_name(convert_wstring_to_utf32(name));
+        set_name(convert_to_utf32(name));
     }
 
     void named_rectangle::
@@ -3372,7 +3372,7 @@ namespace dlib
         char underline_ch 
     )
     {
-        set_menu_name(idx, convert_wstring_to_utf32(name), underline_ch);
+        set_menu_name(idx, convert_to_utf32(name), underline_ch);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -3957,7 +3957,7 @@ namespace dlib
         const std::wstring& str
     ) 
     {
-        set_text(row, col, convert_wstring_to_utf32(str));
+        set_text(row, col, convert_to_utf32(str));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -4970,7 +4970,7 @@ namespace dlib
         const std::wstring& text
     )
     {
-        set_text(convert_wstring_to_utf32(text));
+        set_text(convert_to_utf32(text));
     }
 
     void text_box::
@@ -5586,7 +5586,7 @@ namespace dlib
     {
         if (has_focus && enabled && !hidden)
         {
-            ustring ustr = convert_wstring_to_utf32(str);
+            ustring ustr = convert_to_utf32(str);
             if (highlight_start <= highlight_end)
             {
                 text_ = text_.substr(0,highlight_start) + ustr +

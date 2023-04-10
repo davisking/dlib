@@ -478,14 +478,14 @@ namespace dlib
             const std::string& str
         )
         {
-            set_text(convert_mbstring_to_wstring(str));
+            set_text(convert_to_utf32(str));
         }
 
         void set_text (
             const std::wstring& str
         )
         {
-            set_text(convert_wstring_to_utf32(str));
+            set_text(convert_to_utf32(str));
         }
 
         void set_text (
@@ -601,14 +601,14 @@ namespace dlib
                 const std::string& str
             )
             {
-                set_text(convert_mbstring_to_wstring(str));
+                set_text(convert_to_utf32(str));
             }
 
             void set_text (
                 const std::wstring& str
             )
             {
-                set_text(convert_wstring_to_utf32(str));
+                set_text(convert_to_utf32(str));
             }
 
             void set_text (
@@ -1510,7 +1510,7 @@ namespace dlib
             const std::string& str,
             unichar hk = 0
         ) : 
-            text(convert_wstring_to_utf32(convert_mbstring_to_wstring(str))),
+            text(convert_to_utf32(str)),
             f(default_font::get_font()),
             hotkey(hk)
         {
@@ -1521,7 +1521,7 @@ namespace dlib
             const std::wstring& str,
             unichar hk = 0
         ) : 
-            text(convert_wstring_to_utf32(str)),
+            text(convert_to_utf32(str)),
             f(default_font::get_font()),
             hotkey(hk)
         {
@@ -1668,7 +1668,7 @@ namespace dlib
             void (T::*event_handler_)(),
             unichar hk = 0
         ) : 
-            text(convert_wstring_to_utf32(convert_mbstring_to_wstring(str))),
+            text(convert_to_utf32(str)),
             f(default_font::get_font()),
             hotkey(hk)
         {
@@ -1680,7 +1680,7 @@ namespace dlib
             const any_function<void()>& event_handler_,
             unichar hk = 0
         ) : 
-            text(convert_wstring_to_utf32(convert_mbstring_to_wstring(str))),
+            text(convert_to_utf32(str)),
             f(default_font::get_font()),
             hotkey(hk)
         {
@@ -1694,7 +1694,7 @@ namespace dlib
             void (T::*event_handler_)(),
             unichar hk = 0
         ) : 
-            text(convert_wstring_to_utf32(str)),
+            text(convert_to_utf32(str)),
             f(default_font::get_font()),
             hotkey(hk)
         {
@@ -1706,7 +1706,7 @@ namespace dlib
             const any_function<void()>& event_handler_,
             unichar hk = 0
         ) : 
-            text(convert_wstring_to_utf32(str)),
+            text(convert_to_utf32(str)),
             f(default_font::get_font()),
             hotkey(hk)
         {
