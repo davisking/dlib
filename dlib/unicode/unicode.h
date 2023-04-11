@@ -147,7 +147,7 @@ namespace dlib
 
         protected:
 
-            typedef typename std::basic_streambuf<charT>::int_type int_type;
+            using int_type = typename std::basic_streambuf<charT>::int_type;
 
             // input functions
             int_type underflow( 
@@ -809,8 +809,8 @@ namespace dlib
         unicode_helpers::basic_utf8_streambuf<charT> buf;
     };
 
-    typedef basic_utf8_ifstream<unichar> utf8_uifstream;
-    typedef basic_utf8_ifstream<wchar_t> utf8_wifstream;
+    using utf8_uifstream = basic_utf8_ifstream<unichar>;
+    using utf8_wifstream = basic_utf8_ifstream<wchar_t>;
 
 // ----------------------------------------------------------------------------------------
 

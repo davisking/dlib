@@ -14,10 +14,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     // a typedef for an unsigned 32bit integer to hold our UNICODE characters 
-    typedef uint32 unichar;
+    using unichar = uint32;
 
     // a typedef for a string object to hold our UNICODE strings
-    typedef std::basic_string<unichar> ustring;
+    using ustring = std::basic_string<unichar>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -227,8 +227,8 @@ namespace dlib
         !*/
     };
 
-    typedef basic_utf8_ifstream<unichar> utf8_uifstream;
-    typedef basic_utf8_ifstream<wchar_t> utf8_wifstream;
+    using utf8_uifstream = basic_utf8_ifstream<unichar>;
+    using utf8_wifstream = basic_utf8_ifstream<wchar_t>;
 
 // ----------------------------------------------------------------------------------------
 
