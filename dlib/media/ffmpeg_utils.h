@@ -1450,7 +1450,6 @@ namespace dlib
                 f = frame(img.nr(), img.nc(), pix_traits<pixel>::fmt, {});
             }
 
-            const size_t imgsize            = img.nr()*img.nc()*sizeof(pixel);
             int         src_linesizes[4]    = {0};
             uint8_t*    src_pointers[4]     = {nullptr};
 
