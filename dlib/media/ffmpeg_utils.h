@@ -4,6 +4,8 @@
 #ifndef DLIB_FFMPEG_UTILS
 #define DLIB_FFMPEG_UTILS
 
+#include "../test_for_odr_violations.h"
+
 #ifndef DLIB_USE_FFMPEG
 static_assert(false, "This version of dlib isn't built with the FFMPEG wrappers");
 #endif
