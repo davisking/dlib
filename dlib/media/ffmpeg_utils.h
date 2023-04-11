@@ -1450,11 +1450,13 @@ namespace dlib
                 f = frame(img.nr(), img.nc(), pix_traits<pixel>::fmt, {});
             }
 
+            const size_t imgsize            = img.nr()*img.nc()*sizeof(pixel);
             int         src_linesizes[4]    = {0};
             uint8_t*    src_pointers[4]     = {nullptr};
 
             const int ret = av_image_fill_arrays(src_pointers, src_linesizes, (uint8_t*)img.begin(), f.pixfmt(), f.width(), f.height(), 1);
             DLIB_ASSERT(ret == imgsize, "av_image_fill_arrays()  error : " << details::get_av_error(ret));
+            (void)imgsize;
             (void)ret;
             
             av_image_copy(f.get_frame().data,
