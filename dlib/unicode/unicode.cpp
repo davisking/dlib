@@ -10,42 +10,12 @@
 namespace dlib
 {
 
-// ----------------------------------------------------------------------------------------
-
-    static const unichar SURROGATE_FIRST_TOP = 0xD800;
-    static const unichar SURROGATE_SECOND_TOP = 0xDC00;
-    static const unichar SURROGATE_CLEARING_MASK = 0x03FF;
-    static const unichar SURROGATE_TOP = SURROGATE_FIRST_TOP;
-    static const unichar SURROGATE_END = 0xE000;
-    static const unichar SMP_TOP = 0x10000;
-    static const int VALID_BITS = 10;
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename T> bool is_surrogate(T ch)
-    {
-        return (zero_extend_cast<unichar>(ch) >= SURROGATE_TOP && 
-                zero_extend_cast<unichar>(ch) < SURROGATE_END);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <typename T> unichar surrogate_pair_to_unichar(T first, T second)
-    {
-        return ((first & SURROGATE_CLEARING_MASK) << VALID_BITS) | ((second & SURROGATE_CLEARING_MASK) + SMP_TOP);
-    }
-    //110110 0000000000
-    //110111 0000000000
-
-// ----------------------------------------------------------------------------------------
-
     void unichar_to_surrogate_pair(unichar input, unichar &first, unichar &second)
     {
+        using namespace unicode_helpers;
         first = ((input - SMP_TOP) >> VALID_BITS) | SURROGATE_FIRST_TOP;
         second = (input & SURROGATE_CLEARING_MASK) | SURROGATE_SECOND_TOP;
     }
-
-// ----------------------------------------------------------------------------------------
 
     template <int N> struct ustring2wstr
     {
@@ -60,7 +30,7 @@ namespace dlib
             wlen = 0;
             for (size_t i = 0; i < src.length(); ++i)
             {
-                if (src[i] < SMP_TOP) wlen++;
+                if (src[i] < unicode_helpers::SMP_TOP) wlen++;
                 else wlen += 2;
             }
             wstr = new wchar_t[wlen+1];
@@ -69,10 +39,11 @@ namespace dlib
             size_t wi = 0;
             for (size_t i = 0; i < src.length(); ++i)
             {
-                if (src[i] < SMP_TOP)
+                if (src[i] < unicode_helpers::SMP_TOP)
                 {
                     wstr[wi++] = (wchar_t)src[i];
-                }else
+                }
+                else
                 {
                     unichar high, low;
                     unichar_to_surrogate_pair(src[i], high, low);
