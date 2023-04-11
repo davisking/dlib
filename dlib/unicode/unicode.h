@@ -727,6 +727,10 @@ namespace dlib
         return temp;
     }
 
+    const ustring convert_utf8_to_utf32(const std::string& str);
+
+    const ustring convert_wstring_to_utf32(const std::wstring& str);
+
 // ----------------------------------------------------------------------------------------
 
     const std::wstring convert_utf32_to_wstring (

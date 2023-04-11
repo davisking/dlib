@@ -71,6 +71,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const ustring convert_utf8_to_utf32(const std::string& str)
+    {
+        return convert_to_utf32<char>(str);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    const ustring convert_wstring_to_utf32(const std::wstring& str)
+    {
+        return convert_to_utf32<wchar_t>(str);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     const std::wstring convert_utf32_to_wstring(const ustring &src)
     {
         ustring2wstr<sizeof(wchar_t)> conv(src);

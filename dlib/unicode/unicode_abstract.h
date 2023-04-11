@@ -79,18 +79,6 @@ namespace dlib
         invalid_utf8_error():error(EUTF8_TO_UTF32) {}
     };
 
-    const ustring convert_utf8_to_utf32 (
-        const std::string& str
-    );
-    /*!
-        ensures
-            - if (str is a valid UTF-8 encoded string) then
-                - returns a copy of str that has been converted into a
-                  unichar string
-            - else
-                - throws invalid_utf8_error
-    !*/
-
     template <typename forward_iterator, typename unary_op>
     inline void convert_to_utf32 (
             forward_iterator ibegin,
@@ -105,9 +93,39 @@ namespace dlib
         ensures
             - visits the range [ibegin, iend) in order and converts the input
               characters into utf-32 characters.
-            - calls op(ch) on each converted utf-32 character.
+            - calls op(ch) on each converted UTF-32 character.
             - if (an error occurs while converting the characters)
                 - throws invalid_utf8_error
+    !*/
+
+    template <typename char_type, typename traits, typename alloc>
+    const ustring convert_to_utf32 (
+        const std::basic_string<char_type, traits, alloc>& str
+    );
+
+    const ustring convert_utf8_to_utf32 (
+        const std::string& str
+    );
+    /*!
+        ensures
+            - if (str is a valid UTF-8 encoded string) then
+                - returns a copy of str that has been converted into a
+                  unichar string
+            - else
+                - throws invalid_utf8_error
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const ustring convert_wstring_to_utf32 (
+        const std::wstring &wstr
+    );
+    /*!
+        requires
+            - wstr is a valid UTF-16 string when sizeof(wchar_t) == 2
+            - wstr is a valid UTF-32 string when sizeof(wchar_t) == 4
+        ensures
+            - converts wstr into UTF-32 string
     !*/
 
 // ----------------------------------------------------------------------------------------
