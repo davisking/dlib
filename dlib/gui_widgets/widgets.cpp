@@ -190,7 +190,7 @@ namespace dlib
         const std::string& name
     )
     {
-        set_name(convert_mbstring_to_wstring(name));
+        set_name(convert_to_utf32(name));
     }
 
     void toggle_button::
@@ -327,7 +327,7 @@ namespace dlib
         const std::string& text
     )
     {
-        set_text(convert_mbstring_to_wstring(text));
+        set_text(convert_to_utf32(text));
     }
 
     void label::
@@ -675,7 +675,7 @@ namespace dlib
         const std::string& text
     )
     {
-        set_text(convert_mbstring_to_wstring(text));
+        set_text(convert_to_utf32(text));
     }
 
     void text_field::
@@ -1522,7 +1522,7 @@ namespace dlib
         const std::string& new_name
     )
     {
-        set_tab_name(idx, convert_mbstring_to_wstring(new_name));
+        set_tab_name(idx, convert_to_utf32(new_name));
     }
 
     void tabbed_display::
@@ -1929,7 +1929,7 @@ namespace dlib
         const std::string& name
     )
     {
-        set_name(convert_mbstring_to_wstring(name));
+        set_name(convert_to_utf32(name));
     }
 
     void named_rectangle::
@@ -3360,7 +3360,7 @@ namespace dlib
         char underline_ch 
     )
     {
-        set_menu_name(idx, convert_mbstring_to_wstring(name), underline_ch);
+        set_menu_name(idx, convert_to_utf32(name), underline_ch);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -3945,7 +3945,7 @@ namespace dlib
         const std::string& str
     ) 
     {
-        set_text(row, col, convert_mbstring_to_wstring(str));
+        set_text(row, col, convert_to_utf32(str));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -4962,7 +4962,7 @@ namespace dlib
         const std::string& text
     )
     {
-        set_text(convert_mbstring_to_wstring(text));
+        set_text(convert_to_utf32(text));
     }
 
     void text_box::
