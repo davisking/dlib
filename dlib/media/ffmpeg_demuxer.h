@@ -1034,6 +1034,19 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
+        template <typename image_type>
+        std::enable_if_t<is_image_type<image_type>::value, void>
+        load_frame(image_type& image, const std::string& file_name)
+        {
+            demuxer reader(file_name);
+            frame f;
+            if (!reader.is_open() || !reader.read(f) || !f.is_image())
+            {
+                throw error("ffmpeg::load_frame: error while loading " + file_name);
+            }
+            convert(f, image);
+        }
+
     }
 }
 
