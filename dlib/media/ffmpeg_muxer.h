@@ -898,6 +898,13 @@ namespace dlib
             const std::unordered_map<std::string, std::string>& codec_options = {}
         )
         {
+            const auto codecs = list_codecs();
+            const auto p = std::find_if(codecs.begin(), codecs.end(), [&](const auto& codec){ return codec_name == codec.codec_name; });
+            if (p == codecs.end())
+                throw error("ffmpeg::save_frame: codec " + codec_name + " not found");
+            if (!p->supports_encoding)
+                throw error("ffmpeg::save_frame: codec " + codec_name + " does not support encoding");
+
             muxer writer(
                 [&]
                 {
