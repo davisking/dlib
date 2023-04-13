@@ -379,6 +379,23 @@ namespace dlib
 
     }
 
+    template <
+        typename image_type,
+        typename pixel_type
+    >
+    void draw_string (
+        image_type& c,
+        const dlib::point& p,
+        const char* str,
+        const pixel_type& color,
+        const std::shared_ptr<font>& f_ptr = default_font::get_font(),
+        typename std::string::size_type first = 0,
+        typename std::string::size_type last = std::string::npos
+    )
+    {
+        draw_string(c, p, std::string(str), color, f_ptr, first, last);
+    }
+
 // ----------------------------------------------------------------------------------------
 
     template <
