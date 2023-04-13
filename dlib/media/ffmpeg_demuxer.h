@@ -783,13 +783,15 @@ namespace dlib
                 }
                 else if (pCodecCtx->codec_type == AVMEDIA_TYPE_AUDIO)
                 {
+                    check_layout(pCodecCtx.get());
+
                     if (pCodecCtx->sample_rate == 0 ||
                         pCodecCtx->sample_fmt  == AV_SAMPLE_FMT_NONE ||
-                        details::channel_layout_empty(pCodecCtx.get()))
+                        channel_layout_empty(pCodecCtx.get()))
                         return fail(*st.log,"Codec parameters look wrong :",
                             " sample_rate : ", pCodecCtx->sample_rate,
                             " sample format : ", get_audio_fmt_str(pCodecCtx->sample_fmt),
-                            " channel layout : ", details::get_channel_layout_str(pCodecCtx.get()));
+                            " channel layout : ", get_channel_layout_str(pCodecCtx.get()));
                 }
                 else
                     return fail(*st.log,"Unrecognized media type ", pCodecCtx->codec_type);
