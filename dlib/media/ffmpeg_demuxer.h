@@ -1040,10 +1040,10 @@ namespace dlib
         {
             demuxer reader(file_name);
             frame f;
+
             if (!reader.is_open() || !reader.read(f) || !f.is_image())
-            {
                 throw error("ffmpeg::load_frame: error while loading " + file_name);
-            }
+
             convert(f, image);
         }
 

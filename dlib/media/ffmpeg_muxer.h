@@ -900,32 +900,34 @@ namespace dlib
         {
             const auto codecs = list_codecs();
             const auto p = std::find_if(codecs.begin(), codecs.end(), [&](const auto& codec){ return codec_name == codec.codec_name; });
+
             if (p == codecs.end())
                 throw error("ffmpeg::save_frame: codec " + codec_name + " not found");
+
             if (!p->supports_encoding)
                 throw error("ffmpeg::save_frame: codec " + codec_name + " does not support encoding");
 
-            muxer writer(
-                [&]
-                {
-                    muxer::args args;
-                    args.filepath = file_name;
-                    args.enable_image = true;
-                    args.enable_audio = false;
-                    args.args_image.codec_name = codec_name;
-                    args.args_image.h = num_rows(image);
-                    args.args_image.w = num_columns(image);
-                    args.args_image.framerate = 1;
-                    args.args_image.codec_options = codec_options;
-                    args.format_options["update"] = "1";
-                    return args;
-                }());
-            if (not writer.is_open())
-                throw error("ffmpeg::save_frame: error while saving" + file_name);
+            muxer writer([&] {
+                muxer::args args;
+                args.filepath = file_name;
+                args.enable_image = true;
+                args.enable_audio = false;
+                args.args_image.codec_name = codec_name;
+                args.args_image.h = num_rows(image);
+                args.args_image.w = num_columns(image);
+                args.args_image.framerate = 1;
+                args.args_image.codec_options = codec_options;
+                args.format_options["update"] = "1";
+                return args;
+            }());
+
+            if (!writer.is_open())
+                throw error("ffmpeg::save_frame: error while saving " + file_name);
+
             frame f;
             convert(image, f);
             if (!writer.push(std::move(f)))
-                throw error("ffmpeg::save_frame: error while saving" + file_name);
+                throw error("ffmpeg::save_frame: error while saving " + file_name);
         }
     }
 
