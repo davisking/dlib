@@ -1632,7 +1632,7 @@ namespace dlib
 // ---------------------------------------------------------------------------------------------------
 
         template <typename image_type>
-        std::enable_if_t<is_image_type<image_type>::value, void>
+        std::enable_if_t<is_rgb_image<image_type>::value, void>
         save_frame(
             const image_type& image,
             const std::string& file_name,

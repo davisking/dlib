@@ -890,7 +890,7 @@ namespace dlib
 // ---------------------------------------------------------------------------------------------------
 
         template <typename image_type>
-        std::enable_if_t<is_image_type<image_type>::value, void>
+        std::enable_if_t<is_rgb_image<image_type>::value, void>
         save_frame(
             const image_type& image,
             const std::string& file_name,
@@ -916,13 +916,23 @@ namespace dlib
                     args.args_image.h = num_rows(image);
                     args.args_image.w = num_columns(image);
                     args.args_image.framerate = 1;
-                    args.format_options["update"] = "1";
-                    if (pixel_traits<typename image_type::value_type>::has_alpha)
-                        args.args_image.codec_options["fmt"] = "rgba";
+                    args.args_image.codec_options = codec_options;
+                    using traits = pixel_traits<typename image_type::value_type>;
+                    if (traits::bgr_layout)
+                    {
+                        if (traits::has_alpha)
+                            args.args_image.fmt = AV_PIX_FMT_ABGR;
+                        else
+                            args.args_image.fmt = AV_PIX_FMT_BGR24;
+                    }
                     else
-                        args.args_image.codec_options["fmt"] = "rgb";
-                    for (const auto option : codec_options)
-                        args.args_image.codec_options[option.first] = option.second;
+                    {
+                        if (traits::has_alpha)
+                            args.args_image.fmt = AV_PIX_FMT_RGBA;
+                        else
+                            args.args_image.fmt = AV_PIX_FMT_RGB24;
+                    }
+                    args.format_options["update"] = "1";
                     return args;
                 }());
             if (not writer.is_open())
