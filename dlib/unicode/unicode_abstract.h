@@ -90,7 +90,7 @@ namespace dlib
             - forward_iterator points to either char, wchar_t or unichar types
             - ibegin == iterator pointing to the start of the range
             - iend == iterator pointing to the end of the range
-            - unary_op == a callable object that takes one parameter
+            - unary_op == a callable object that takes one unichar parameter
         ensures
             - visits the range [ibegin, iend) in order and converts the input
               characters into utf-32 characters.
