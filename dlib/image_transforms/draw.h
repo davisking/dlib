@@ -309,7 +309,7 @@ namespace dlib
                     << "\n\tstr.size():  " << (unsigned long)str.size());
 
         if (last == string::npos)
-            last = str.size()-1;
+            last = str.size();
 
         const rectangle rect(p, p);
         const font& f = *f_ptr;
@@ -317,51 +317,51 @@ namespace dlib
         long y_offset = rect.top() + f.ascender() - 1;
 
         long pos = rect.left()+f.left_overflow();
-        for (typename string::size_type i = first; i <= last; ++i)
+        convert_to_utf32(str.begin() + first, str.begin() + last, [&](unichar ch)
         {
             // ignore the '\r' character
-            if (str[i] == '\r')
-                continue;
+            if (ch == '\r')
+                return;
 
             // A combining character should be applied to the previous character, and we
             // therefore make one step back. If a combining comes right after a newline, 
             // then there must be some kind of error in the string, and we don't combine.
-            if(is_combining_char(str[i]) && 
+            if(is_combining_char(ch) &&
                pos > rect.left() + static_cast<long>(f.left_overflow()))
             {
-                pos -= f[str[i]].width();
+                pos -= f[ch].width();
             }
 
-            if (str[i] == '\n')
+            if (ch == '\n')
             {
                 y_offset += f.height();
                 pos = rect.left()+f.left_overflow();
-                continue;
+                return;
             }
 
             // only look at letters in the intersection area
             if (c.nr() + static_cast<long>(f.height()) < y_offset)
             {
                 // the string is now below our rectangle so we are done
-                break;
+                return;
             }
             else if (0 > pos - static_cast<long>(f.left_overflow()) && 
-                pos + static_cast<long>(f[str[i]].width() + f.right_overflow()) < 0)
+                pos + static_cast<long>(f[ch].width() + f.right_overflow()) < 0)
             {
-                pos += f[str[i]].width();
-                continue;
+                pos += f[ch].width();
+                return;
             }
             else if (c.nc() + static_cast<long>(f.right_overflow()) < pos)
             {
                 // keep looking because there might be a '\n' in the string that
                 // will wrap us around and put us back into our rectangle.
-                continue;
+                return;
             }
 
             // at this point in the loop we know that f[str[i]] overlaps 
             // horizontally with the intersection rectangle area.
 
-            const letter& l = f[str[i]];
+            const letter& l = f[ch];
             for (unsigned short i = 0; i < l.num_of_points(); ++i)
             {
                 const long x = l[i].x + pos;
@@ -375,8 +375,25 @@ namespace dlib
             }
 
             pos += l.width();
-        }
+        });
 
+    }
+
+    template <
+        typename image_type,
+        typename pixel_type
+    >
+    void draw_string (
+        image_type& c,
+        const dlib::point& p,
+        const char* str,
+        const pixel_type& color,
+        const std::shared_ptr<font>& f_ptr = default_font::get_font(),
+        typename std::string::size_type first = 0,
+        typename std::string::size_type last = std::string::npos
+    )
+    {
+        draw_string(c, p, std::string(str), color, f_ptr, first, last);
     }
 
 // ----------------------------------------------------------------------------------------
