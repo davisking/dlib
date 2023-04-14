@@ -656,7 +656,7 @@ on_overlay_rect_selected(
     const image_display::overlay_rect& orect
 )
 {
-    overlay_label.set_text(convert_to_utf32(orect.label));
+    overlay_label.set_text(orect.label);
     display.set_default_overlay_rect_label(orect.label);
     display.set_default_overlay_rect_color(string_to_color(orect.label));
 }
