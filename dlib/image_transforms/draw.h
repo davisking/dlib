@@ -291,7 +291,7 @@ namespace dlib
         typename pixel_type
     >
     void draw_string (
-        image_type& c,
+        image_type& image,
         const dlib::point& p,
         const std::basic_string<T,traits,alloc>& str,
         const pixel_type& color,
@@ -313,6 +313,7 @@ namespace dlib
 
         const rectangle rect(p, p);
         const font& f = *f_ptr;
+        image_view<image_type> img(image);
 
         long y_offset = rect.top() + f.ascender() - 1;
 
@@ -340,7 +341,7 @@ namespace dlib
             }
 
             // only look at letters in the intersection area
-            if (c.nr() + static_cast<long>(f.height()) < y_offset)
+            if (img.nr() + static_cast<long>(f.height()) < y_offset)
             {
                 // the string is now below our rectangle so we are done
                 return;
@@ -351,7 +352,7 @@ namespace dlib
                 pos += f[ch].width();
                 return;
             }
-            else if (c.nc() + static_cast<long>(f.right_overflow()) < pos)
+            else if (img.nc() + static_cast<long>(f.right_overflow()) < pos)
             {
                 // keep looking because there might be a '\n' in the string that
                 // will wrap us around and put us back into our rectangle.
@@ -368,9 +369,9 @@ namespace dlib
                 const long y = l[i].y + y_offset;
                 // draw each pixel of the letter if it is inside the intersection
                 // rectangle
-                if (x >= 0 && x < c.nc() && y >= 0 && y < c.nr())
+                if (x >= 0 && x < img.nc() && y >= 0 && y < img.nr())
                 {
-                    assign_pixel(c(y, x), color);
+                    assign_pixel(img[y][x], color);
                 }
             }
 
@@ -384,7 +385,7 @@ namespace dlib
         typename pixel_type
     >
     void draw_string (
-        image_type& c,
+        image_type& image,
         const dlib::point& p,
         const char* str,
         const pixel_type& color,
@@ -393,7 +394,7 @@ namespace dlib
         typename std::string::size_type last = std::string::npos
     )
     {
-        draw_string(c, p, std::string(str), color, f_ptr, first, last);
+        draw_string(image, p, std::string(str), color, f_ptr, first, last);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -435,7 +436,6 @@ namespace dlib
         using std::max;
         using std::min;
         const rectangle valid_area(get_rect(image).intersect(area));
-
         const rectangle bounding_box = poly.get_rect();
 
         // Don't do anything if the polygon is totally outside the area we can draw in
@@ -443,6 +443,7 @@ namespace dlib
         if (bounding_box.intersect(valid_area).is_empty())
             return;
 
+        image_view<image_type> img(image);
         rgb_alpha_pixel alpha_pixel;
         assign_pixel(alpha_pixel, color);
         const unsigned char max_alpha = alpha_pixel.alpha;
@@ -481,7 +482,7 @@ namespace dlib
                 for (long x = left_x; x <= right_x; ++x)
                 {
                     const long y = i+top;
-                    assign_pixel(image(y, x), color);
+                    assign_pixel(img[y][x], color);
                 }
             }
 
@@ -500,7 +501,7 @@ namespace dlib
                     rgb_alpha_pixel temp = alpha_pixel;
                     temp.alpha = max_alpha-static_cast<unsigned char>((left_boundary[i]-p.x())*max_alpha);
                     if (valid_area.contains(p))
-                        assign_pixel(image(p.y(), p.x()),temp);
+                        assign_pixel(img[p.y()][p.x()], temp);
                 }
             }
             else if (delta < 0)  // on the bottom side
@@ -511,7 +512,7 @@ namespace dlib
                     rgb_alpha_pixel temp = alpha_pixel;
                     temp.alpha = static_cast<unsigned char>((x-left_boundary[i-1])/std::abs(delta)*max_alpha);
                     if (valid_area.contains(p))
-                        assign_pixel(image(p.y(), p.x()),temp);
+                        assign_pixel(img[p.y()][p.x()], temp);
                 }
             }
             else // on the top side
@@ -523,7 +524,7 @@ namespace dlib
                     rgb_alpha_pixel temp = alpha_pixel;
                     temp.alpha = static_cast<unsigned char>((x-left_boundary[i])/delta*max_alpha);
                     if (valid_area.contains(p))
-                        assign_pixel(image(p.y(), p.x()),temp);
+                        assign_pixel(img[p.y()][p.x()],temp);
                 }
             }
 
@@ -538,7 +539,7 @@ namespace dlib
                     rgb_alpha_pixel temp = alpha_pixel;
                     temp.alpha = max_alpha-static_cast<unsigned char>((p.x()-right_boundary[i])*max_alpha);
                     if (valid_area.contains(p))
-                        assign_pixel(image(p.y(), p.x()),temp);
+                        assign_pixel(img[p.y()][p.x()],temp);
                 }
             }
             else if (delta < 0) // on the top side
@@ -549,7 +550,7 @@ namespace dlib
                     rgb_alpha_pixel temp = alpha_pixel;
                     temp.alpha = static_cast<unsigned char>((right_boundary[i]-x)/std::abs(delta)*max_alpha);
                     if (valid_area.contains(p))
-                        assign_pixel(image(p.y(), p.x()),temp);
+                        assign_pixel(img[p.y()][p.x()],temp);
                 }
             }
             else // on the bottom side
@@ -561,7 +562,7 @@ namespace dlib
                     rgb_alpha_pixel temp = alpha_pixel;
                     temp.alpha = static_cast<unsigned char>((right_boundary[i-1]-x)/delta*max_alpha);
                     if (valid_area.contains(p))
-                        assign_pixel(image(p.y(), p.x()),temp);
+                        assign_pixel(img[p.y()][p.x()],temp);
                 }
             }
         }
@@ -577,7 +578,7 @@ namespace dlib
 
     template <typename image_type, typename pixel_type>
     void draw_solid_polygon (
-        image_type& img,
+        image_type& image,
         const polygon& poly,
         const pixel_type& color,
         const bool antialias = true,
@@ -585,6 +586,7 @@ namespace dlib
                                           std::numeric_limits<long>::max(), std::numeric_limits<long>::max())
     )
     {
+        image_view<image_type> img(image);
         long height = img.nr();
         long width = img.nc();
 
