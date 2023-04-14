@@ -423,10 +423,10 @@ namespace dlib
 // ---------------------------------------------------------------------------------------
 
     template <typename image_type, typename pixel_type>
-    void fill_convex_polygon (
+    void draw_solid_convex_polygon (
         image_type& image,
         const polygon& poly,
-        const pixel_type& pixel,
+        const pixel_type& color,
         const bool antialias = true,
         const rectangle& area = rectangle(std::numeric_limits<long>::min(), std::numeric_limits<long>::min(),
                                           std::numeric_limits<long>::max(), std::numeric_limits<long>::max())
@@ -444,7 +444,7 @@ namespace dlib
             return;
 
         rgb_alpha_pixel alpha_pixel;
-        assign_pixel(alpha_pixel, pixel);
+        assign_pixel(alpha_pixel, color);
         const unsigned char max_alpha = alpha_pixel.alpha;
 
         // we will only want to loop over the part of left_boundary that is part of the
@@ -481,7 +481,7 @@ namespace dlib
                 for (long x = left_x; x <= right_x; ++x)
                 {
                     const long y = i+top;
-                    assign_pixel(image(y, x), pixel);
+                    assign_pixel(image(y, x), color);
                 }
             }
 
@@ -571,7 +571,63 @@ namespace dlib
     inline void draw_solid_convex_polygon (
         image_type& image,
         const polygon& poly
-    ) { fill_convex_polygon(image, poly, 0); }
+    ) { draw_solid_convex_polygon(image, poly, 0); }
+
+// ---------------------------------------------------------------------------------------
+
+    template <typename image_type, typename pixel_type>
+    void draw_solid_polygon (
+        image_type& img,
+        const polygon& poly,
+        const pixel_type& color,
+        const bool antialias = true,
+        const rectangle& area = rectangle(std::numeric_limits<long>::min(), std::numeric_limits<long>::min(),
+                                          std::numeric_limits<long>::max(), std::numeric_limits<long>::max())
+    )
+    {
+        long height = img.nr();
+        long width = img.nc();
+
+        long min_y = std::numeric_limits<long>::max();
+        long max_y = std::numeric_limits<long>::min();
+        for (const auto& v : poly)
+        {
+            min_y = std::min(min_y, v.y());
+            max_y = std::max(max_y, v.y());
+        }
+
+        for (long y = min_y; y <= max_y; ++y)
+        {
+            std::vector<long> intersections;
+            for (size_t i = 0; i < poly.size(); ++i)
+            {
+                const auto& p1 = poly[i];
+                const auto& p2 = poly[(i + 1) % poly.size()];
+                // Skip horizontal edges
+                if (p1.y() == p2.y())
+                    continue;
+
+                // Skip if there are no intersections at this position
+                if ((y <= p1.y() && y <= p2.y()) || (y > p1.y() && y > p2.y()))
+                    continue;
+
+                // Add intersecting x coordinates of intersecting points
+                intersections.push_back(p1.x() + (y - p1.y()) * (p2.x() - p1.x()) / (p2.y() - p1.y()));
+            }
+
+            std::sort(intersections.begin(), intersections.end());
+            for (size_t i = 0; i < intersections.size(); i += 2)
+            {
+                for (int x = intersections[i]; x < intersections[i + 1]; ++x)
+                {
+                    if (x >= 0 && x < width && y >= 0 && y < height)
+                    {
+                        img[y][x] = color;
+                    }
+                }
+            }
+        }
+    }
 
 // ---------------------------------------------------------------------------------------
 
