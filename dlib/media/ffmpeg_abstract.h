@@ -1015,6 +1015,22 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
+        template <typename image_type>
+        std::enable_if_t<is_image_type<image_type>::value, void>
+        load_frame(
+            image_type& image,
+            const std::string& file_name
+        );
+        /*!
+            requires
+                - image_type must be a type conforming to the generic image interface.
+            ensures
+                - reads the first frame of the image or video pointed by file_name and
+                  loads into image.
+        !*/
+
+// ---------------------------------------------------------------------------------------------------
+
         template <
           class Byte, 
           class Allocator,

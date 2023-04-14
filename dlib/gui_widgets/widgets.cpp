@@ -190,7 +190,7 @@ namespace dlib
         const std::string& name
     )
     {
-        set_name(convert_mbstring_to_wstring(name));
+        set_name(convert_to_utf32(name));
     }
 
     void toggle_button::
@@ -198,7 +198,7 @@ namespace dlib
         const std::wstring& name
     )
     {
-        set_name(convert_wstring_to_utf32(name));
+        set_name(convert_to_utf32(name));
     }
 
     void toggle_button::
@@ -327,7 +327,7 @@ namespace dlib
         const std::string& text
     )
     {
-        set_text(convert_mbstring_to_wstring(text));
+        set_text(convert_to_utf32(text));
     }
 
     void label::
@@ -335,7 +335,7 @@ namespace dlib
         const std::wstring& text
     )
     {
-        set_text(convert_wstring_to_utf32(text));
+        set_text(convert_to_utf32(text));
     }
 
     void label::
@@ -675,7 +675,7 @@ namespace dlib
         const std::string& text
     )
     {
-        set_text(convert_mbstring_to_wstring(text));
+        set_text(convert_to_utf32(text));
     }
 
     void text_field::
@@ -683,7 +683,7 @@ namespace dlib
         const std::wstring& text
     )
     {
-        set_text(convert_wstring_to_utf32(text));
+        set_text(convert_to_utf32(text));
     }
 
     void text_field::
@@ -892,7 +892,7 @@ namespace dlib
             {
                 // highlight the double clicked word
                 string::size_type first, last;
-                const ustring ustr = convert_utf8_to_utf32(std::string(" \t\n"));
+                const ustring ustr = convert_to_utf32(std::string(" \t\n"));
                 first = text_.substr(0,cursor_pos).find_last_of(ustr.c_str());
                 last = text_.find_first_of(ustr.c_str(),cursor_pos);
                 long f = static_cast<long>(first);
@@ -980,7 +980,7 @@ namespace dlib
         if (right_click_menu.popup_menu_visible())
             return;
 
-        const ustring space_str = convert_utf8_to_utf32(std::string(" \t\n"));
+        const ustring space_str = convert_to_utf32(std::string(" \t\n"));
         const bool shift = (state&base_window::KBD_MOD_SHIFT) != 0;
         const bool ctrl = (state&base_window::KBD_MOD_CONTROL) != 0;
         if (has_focus && enabled && !hidden)
@@ -1222,7 +1222,7 @@ namespace dlib
     )
     {
         if (has_focus && enabled && !hidden){
-            ustring ustr = convert_wstring_to_utf32(str);
+            ustring ustr = convert_to_utf32(str);
             if (highlight_start <= highlight_end)
             {
                 text_ = text_.substr(0,highlight_start) + ustr +
@@ -1522,7 +1522,7 @@ namespace dlib
         const std::string& new_name
     )
     {
-        set_tab_name(idx, convert_mbstring_to_wstring(new_name));
+        set_tab_name(idx, convert_to_utf32(new_name));
     }
 
     void tabbed_display::
@@ -1531,7 +1531,7 @@ namespace dlib
         const std::wstring& new_name
     )
     {
-        set_tab_name(idx, convert_wstring_to_utf32(new_name));
+        set_tab_name(idx, convert_to_utf32(new_name));
     }
 
     void tabbed_display::
@@ -1929,7 +1929,7 @@ namespace dlib
         const std::string& name
     )
     {
-        set_name(convert_mbstring_to_wstring(name));
+        set_name(convert_to_utf32(name));
     }
 
     void named_rectangle::
@@ -1937,7 +1937,7 @@ namespace dlib
         const std::wstring& name
     )
     {
-        set_name(convert_wstring_to_utf32(name));
+        set_name(convert_to_utf32(name));
     }
 
     void named_rectangle::
@@ -3360,7 +3360,7 @@ namespace dlib
         char underline_ch 
     )
     {
-        set_menu_name(idx, convert_mbstring_to_wstring(name), underline_ch);
+        set_menu_name(idx, convert_to_utf32(name), underline_ch);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -3372,7 +3372,7 @@ namespace dlib
         char underline_ch 
     )
     {
-        set_menu_name(idx, convert_wstring_to_utf32(name), underline_ch);
+        set_menu_name(idx, convert_to_utf32(name), underline_ch);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -3945,7 +3945,7 @@ namespace dlib
         const std::string& str
     ) 
     {
-        set_text(row, col, convert_mbstring_to_wstring(str));
+        set_text(row, col, convert_to_utf32(str));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -3957,7 +3957,7 @@ namespace dlib
         const std::wstring& str
     ) 
     {
-        set_text(row, col, convert_wstring_to_utf32(str));
+        set_text(row, col, convert_to_utf32(str));
     }
 
 // ----------------------------------------------------------------------------------------
@@ -4962,7 +4962,7 @@ namespace dlib
         const std::string& text
     )
     {
-        set_text(convert_mbstring_to_wstring(text));
+        set_text(convert_to_utf32(text));
     }
 
     void text_box::
@@ -4970,7 +4970,7 @@ namespace dlib
         const std::wstring& text
     )
     {
-        set_text(convert_wstring_to_utf32(text));
+        set_text(convert_to_utf32(text));
     }
 
     void text_box::
@@ -5170,7 +5170,7 @@ namespace dlib
             {
                 // highlight the double clicked word
                 string::size_type first, last;
-                const ustring ustr = convert_utf8_to_utf32(std::string(" \t\n"));
+                const ustring ustr = convert_to_utf32(std::string(" \t\n"));
                 first = text_.substr(0,cursor_pos).find_last_of(ustr.c_str());
                 last = text_.find_first_of(ustr.c_str(),cursor_pos);
                 long f = static_cast<long>(first);
@@ -5260,7 +5260,7 @@ namespace dlib
 
         if (has_focus && enabled && !hidden)
         {
-            const ustring space_str = convert_utf8_to_utf32(std::string(" \t\n"));
+            const ustring space_str = convert_to_utf32(std::string(" \t\n"));
             const bool shift = (state&base_window::KBD_MOD_SHIFT) != 0;
             const bool ctrl = (state&base_window::KBD_MOD_CONTROL) != 0;
 
@@ -5586,7 +5586,7 @@ namespace dlib
     {
         if (has_focus && enabled && !hidden)
         {
-            ustring ustr = convert_wstring_to_utf32(str);
+            ustring ustr = convert_to_utf32(str);
             if (highlight_start <= highlight_end)
             {
                 text_ = text_.substr(0,highlight_start) + ustr +

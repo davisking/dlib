@@ -4,6 +4,8 @@
 #ifndef DLIB_FFMPEG_UTILS
 #define DLIB_FFMPEG_UTILS
 
+#include "../test_for_odr_violations.h"
+
 #ifndef DLIB_USE_FFMPEG
 static_assert(false, "This version of dlib isn't built with the FFMPEG wrappers");
 #endif
@@ -311,22 +313,22 @@ namespace dlib
         template<class PixelType>
         struct pix_traits {};
 
-        template<> struct pix_traits<uint8_t>           {constexpr static AVPixelFormat fmt = AV_PIX_FMT_GRAY8; };
-        template<> struct pix_traits<rgb_pixel>         {constexpr static AVPixelFormat fmt = AV_PIX_FMT_RGB24; };
-        template<> struct pix_traits<bgr_pixel>         {constexpr static AVPixelFormat fmt = AV_PIX_FMT_BGR24; };
-        template<> struct pix_traits<rgb_alpha_pixel>   {constexpr static AVPixelFormat fmt = AV_PIX_FMT_RGBA;  };
-        template<> struct pix_traits<bgr_alpha_pixel>   {constexpr static AVPixelFormat fmt = AV_PIX_FMT_BGRA;  };
+        template<> struct pix_traits<uint8_t>           { constexpr static AVPixelFormat fmt = AV_PIX_FMT_GRAY8; };
+        template<> struct pix_traits<rgb_pixel>         { constexpr static AVPixelFormat fmt = AV_PIX_FMT_RGB24; };
+        template<> struct pix_traits<bgr_pixel>         { constexpr static AVPixelFormat fmt = AV_PIX_FMT_BGR24; };
+        template<> struct pix_traits<rgb_alpha_pixel>   { constexpr static AVPixelFormat fmt = AV_PIX_FMT_RGBA;  };
+        template<> struct pix_traits<bgr_alpha_pixel>   { constexpr static AVPixelFormat fmt = AV_PIX_FMT_BGRA;  };
 
 // ---------------------------------------------------------------------------------------------------
 
         template<class SampleType>
         struct sample_traits {};
 
-        template<> struct sample_traits<uint8_t> {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_U8; };
-        template<> struct sample_traits<int16_t> {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_S16; };
-        template<> struct sample_traits<int32_t> {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_S32; };
-        template<> struct sample_traits<float>   {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_FLT; };
-        template<> struct sample_traits<double>  {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_DBL; };
+        template<> struct sample_traits<uint8_t> { constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_U8; };
+        template<> struct sample_traits<int16_t> { constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_S16; };
+        template<> struct sample_traits<int32_t> { constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_S32; };
+        template<> struct sample_traits<float>   { constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_FLT; };
+        template<> struct sample_traits<double>  { constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_DBL; };
 
 // ---------------------------------------------------------------------------------------------------
 
@@ -1468,6 +1470,7 @@ namespace dlib
 
             const int ret = av_image_fill_arrays(src_pointers, src_linesizes, (uint8_t*)img.begin(), f.pixfmt(), f.width(), f.height(), 1);
             DLIB_ASSERT(ret == imgsize, "av_image_fill_arrays()  error : " << details::get_av_error(ret));
+            (void)imgsize;
             (void)ret;
             
             av_image_copy(f.get_frame().data,

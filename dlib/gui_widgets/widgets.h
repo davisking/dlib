@@ -2330,7 +2330,7 @@ namespace dlib
             const std::string& label
         )
         {
-            set_node_label(i, convert_mbstring_to_wstring(label));
+            set_node_label(i, convert_to_utf32(label));
         }
 
         void set_node_label (
@@ -2338,7 +2338,7 @@ namespace dlib
             const std::wstring& label
         )
         {
-            set_node_label(i, convert_wstring_to_utf32(label));
+            set_node_label(i, convert_to_utf32(label));
         }
 
         void set_node_label (

@@ -5,6 +5,8 @@
 #ifndef DLIB_MEDIA 
 #define DLIB_MEDIA
 
+#include "test_for_odr_violations.h"
+
 #ifndef DLIB_USE_FFMPEG
 static_assert(false, "This version of dlib isn't built with the FFMPEG wrappers");
 #endif

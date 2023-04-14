@@ -14,10 +14,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     // a typedef for an unsigned 32bit integer to hold our UNICODE characters 
-    typedef uint32 unichar;
+    using unichar = uint32;
 
     // a typedef for a string object to hold our UNICODE strings
-    typedef std::basic_string<unichar> ustring;
+    using ustring = std::basic_string<unichar>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -78,6 +78,31 @@ namespace dlib
     public:
         invalid_utf8_error():error(EUTF8_TO_UTF32) {}
     };
+
+    template <typename forward_iterator, typename unary_op>
+    inline void convert_to_utf32 (
+            forward_iterator ibegin,
+            forward_iterator iend,
+            unary_op op
+    );
+    /*!
+        requires
+            - forward_iterator points to either char, wchar_t or unichar types
+            - ibegin == iterator pointing to the start of the range
+            - iend == iterator pointing to the end of the range
+            - unary_op == a callable object that takes one unichar parameter
+        ensures
+            - visits the range [ibegin, iend) in order and converts the input
+              characters into utf-32 characters.
+            - calls op(ch) on each converted UTF-32 character.
+            - if (an error occurs while converting the characters)
+                - throws invalid_utf8_error
+    !*/
+
+    template <typename char_type, typename traits, typename alloc>
+    const ustring convert_to_utf32 (
+        const std::basic_string<char_type, traits, alloc>& str
+    );
 
     const ustring convert_utf8_to_utf32 (
         const std::string& str
@@ -221,8 +246,8 @@ namespace dlib
         !*/
     };
 
-    typedef basic_utf8_ifstream<unichar> utf8_uifstream;
-    typedef basic_utf8_ifstream<wchar_t> utf8_wifstream;
+    using utf8_uifstream = basic_utf8_ifstream<unichar>;
+    using utf8_wifstream = basic_utf8_ifstream<wchar_t>;
 
 // ----------------------------------------------------------------------------------------
 

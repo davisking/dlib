@@ -113,7 +113,7 @@ rectangle make_random_cropping_rect(
     return move_rect(rect, offset);
 }
 
-// A helper function to generate different kinds of augmentations depending on prime.
+// A helper function to generate different kinds of augmentations.
 matrix<rgb_pixel> augment(
     const matrix<rgb_pixel>& image,
     dlib::rand& rnd
