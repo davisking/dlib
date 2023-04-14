@@ -887,49 +887,6 @@ namespace dlib
         inline AVCodecID        muxer::get_audio_codec_id()     const noexcept { return st.encoder_audio.get_codec_id(); }
         inline std::string      muxer::get_audio_codec_name()   const noexcept { return st.encoder_audio.get_codec_name(); }
 
-// ---------------------------------------------------------------------------------------------------
-
-        template <typename image_type>
-        std::enable_if_t<is_image_type<image_type>::value, void>
-        save_frame(
-            const image_type& image,
-            const std::string& file_name,
-            const std::string& codec_name,
-            const std::unordered_map<std::string, std::string>& codec_options = {}
-        )
-        {
-            const auto codecs = list_codecs();
-            const auto p = std::find_if(codecs.begin(), codecs.end(), [&](const auto& codec){ return codec_name == codec.codec_name; });
-
-            if (p == codecs.end())
-                throw error("ffmpeg::save_frame: codec " + codec_name + " not found");
-
-            if (!p->supports_encoding)
-                throw error("ffmpeg::save_frame: codec " + codec_name + " does not support encoding");
-
-            muxer writer([&] {
-                muxer::args args;
-                args.filepath = file_name;
-                args.enable_image = true;
-                args.enable_audio = false;
-                args.args_image.codec_name = codec_name;
-                args.args_image.h = num_rows(image);
-                args.args_image.w = num_columns(image);
-                args.args_image.framerate = 1;
-                args.args_image.fmt = pix_traits<typename image_type::value_type>::fmt;
-                args.args_image.codec_options = codec_options;
-                args.format_options["update"] = "1";
-                return args;
-            }());
-
-            if (!writer.is_open())
-                throw error("ffmpeg::save_frame: error while saving " + file_name);
-
-            frame f;
-            convert(image, f);
-            if (!writer.push(std::move(f)))
-                throw error("ffmpeg::save_frame: error while saving " + file_name);
-        }
     }
 
 }
