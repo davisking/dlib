@@ -1631,6 +1631,25 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
+        template <typename image_type>
+        std::enable_if_t<is_image_type<image_type>::value, void>
+        save_frame(
+            const image_type& image,
+            const std::string& file_name,
+            const std::string& codec_name,
+            const std::unordered_map<std::string, std::string>& codec_options = {}
+        );
+        /*!
+            requires
+                - image_type must be a type conforming to the generic image interface.
+                - codec_name is a valid codec from FFmpeg that suppors encoding.
+            ensures
+                - encodes the image into the file pointed by file_name using codec_name
+                  and the options described in codec_options.
+        !*/
+
+// ---------------------------------------------------------------------------------------------------
+
     }
 }
 
