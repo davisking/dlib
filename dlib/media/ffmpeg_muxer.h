@@ -916,6 +916,7 @@ namespace dlib
                 args.args_image.h = num_rows(image);
                 args.args_image.w = num_columns(image);
                 args.args_image.framerate = 1;
+                args.args_image.fmt = pix_traits<typename image_type::value_type>::fmt;
                 args.args_image.codec_options = codec_options;
                 args.format_options["update"] = "1";
                 return args;
