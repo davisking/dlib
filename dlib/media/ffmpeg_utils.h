@@ -313,22 +313,22 @@ namespace dlib
         template<class PixelType>
         struct pix_traits {};
 
-        template<> struct pix_traits<uint8_t>           {constexpr static AVPixelFormat fmt = AV_PIX_FMT_GRAY8; };
-        template<> struct pix_traits<rgb_pixel>         {constexpr static AVPixelFormat fmt = AV_PIX_FMT_RGB24; };
-        template<> struct pix_traits<bgr_pixel>         {constexpr static AVPixelFormat fmt = AV_PIX_FMT_BGR24; };
-        template<> struct pix_traits<rgb_alpha_pixel>   {constexpr static AVPixelFormat fmt = AV_PIX_FMT_RGBA;  };
-        template<> struct pix_traits<bgr_alpha_pixel>   {constexpr static AVPixelFormat fmt = AV_PIX_FMT_BGRA;  };
+        template<> struct pix_traits<uint8_t>           { constexpr static AVPixelFormat fmt = AV_PIX_FMT_GRAY8; };
+        template<> struct pix_traits<rgb_pixel>         { constexpr static AVPixelFormat fmt = AV_PIX_FMT_RGB24; };
+        template<> struct pix_traits<bgr_pixel>         { constexpr static AVPixelFormat fmt = AV_PIX_FMT_BGR24; };
+        template<> struct pix_traits<rgb_alpha_pixel>   { constexpr static AVPixelFormat fmt = AV_PIX_FMT_RGBA;  };
+        template<> struct pix_traits<bgr_alpha_pixel>   { constexpr static AVPixelFormat fmt = AV_PIX_FMT_BGRA;  };
 
 // ---------------------------------------------------------------------------------------------------
 
         template<class SampleType>
         struct sample_traits {};
 
-        template<> struct sample_traits<uint8_t> {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_U8; };
-        template<> struct sample_traits<int16_t> {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_S16; };
-        template<> struct sample_traits<int32_t> {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_S32; };
-        template<> struct sample_traits<float>   {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_FLT; };
-        template<> struct sample_traits<double>  {constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_DBL; };
+        template<> struct sample_traits<uint8_t> { constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_U8; };
+        template<> struct sample_traits<int16_t> { constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_S16; };
+        template<> struct sample_traits<int32_t> { constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_S32; };
+        template<> struct sample_traits<float>   { constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_FLT; };
+        template<> struct sample_traits<double>  { constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_DBL; };
 
 // ---------------------------------------------------------------------------------------------------
 
