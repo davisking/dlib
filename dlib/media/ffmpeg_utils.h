@@ -345,22 +345,25 @@ namespace dlib
 
         struct device_details
         {
-            struct instance
-            {
-                std::string name;
-                std::string description;
-            };
-
             std::string device_type;
-            std::vector<instance> devices;
+            bool        is_audio_type{false};
+            bool        is_video_type{false};
         };
 
-        std::vector<std::string>    list_protocols();
-        std::vector<std::string>    list_demuxers();
-        std::vector<muxer_details>  list_muxers();
-        std::vector<codec_details>  list_codecs();
-        std::vector<device_details> list_input_devices();
-        std::vector<device_details> list_output_devices();
+        struct device_instance
+        {
+            std::string name;
+            std::string description;
+        };
+
+        const std::vector<std::string>&     list_protocols();
+        const std::vector<std::string>&     list_demuxers();
+        const std::vector<muxer_details>&   list_muxers();
+        const std::vector<codec_details>&   list_codecs();
+        const std::vector<device_details>&  list_input_device_types();
+        const std::vector<device_details>&  list_output_device_types();
+        std::vector<device_instance>        list_input_device_instances(const std::string& device_type);
+        std::vector<device_instance>        list_output_device_instances(const std::string& device_type);
 
 // ---------------------------------------------------------------------------------------------------
     
@@ -1231,40 +1234,50 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-        inline std::vector<std::string> list_protocols()
+        inline const std::vector<std::string>& list_protocols()
         {
-            std::ignore = details::register_ffmpeg(); // Don't let this get optimized away
-            std::vector<std::string> protocols;
-            void* opaque = nullptr;
-            const char* name = 0;
-            while ((name = avio_enum_protocols(&opaque, 0)))
-                protocols.emplace_back(name);
+            const static auto protocols = []
+            {
+                std::ignore = details::register_ffmpeg(); // Don't let this get optimized away
+                std::vector<std::string> protocols;
+                void* opaque = nullptr;
+                const char* name = 0;
+                while ((name = avio_enum_protocols(&opaque, 0)))
+                    protocols.emplace_back(name);
 
-            opaque  = nullptr;
-            name    = 0;
+                opaque  = nullptr;
+                name    = 0;
 
-            while ((name = avio_enum_protocols(&opaque, 1)))
-                protocols.emplace_back(name);
+                while ((name = avio_enum_protocols(&opaque, 1)))
+                    protocols.emplace_back(name);
+
+                return protocols;
+            }();
 
             return protocols;
         }
 
 // ---------------------------------------------------------------------------------------------------
 
-        inline std::vector<std::string> list_demuxers()
+        inline const std::vector<std::string>& list_demuxers()
         {
-            std::ignore = details::register_ffmpeg(); // Don't let this get optimized away
-            std::vector<std::string> demuxers;
-            const AVInputFormat* demuxer = nullptr;
+            const static auto demuxers = []
+            {
+                std::ignore = details::register_ffmpeg(); // Don't let this get optimized away
+                std::vector<std::string> demuxers;
+                const AVInputFormat* demuxer = nullptr;
 
-    #if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100)
-            // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L86
-            while (init && (demuxer = av_iformat_next(demuxer)))
-    #else
-            void* opaque = nullptr;
-            while ((demuxer = av_demuxer_iterate(&opaque)))
-    #endif
-                demuxers.push_back(demuxer->name);
+#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100)
+                // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L86
+                while ((demuxer = av_iformat_next(demuxer)))
+#else
+                void* opaque = nullptr;
+                while ((demuxer = av_demuxer_iterate(&opaque)))
+#endif
+                    demuxers.push_back(demuxer->name);
+
+                return demuxers;
+            }();
 
             return demuxers;
         }
@@ -1272,13 +1285,12 @@ namespace dlib
 // ---------------------------------------------------------------------------------------------------
 
         inline std::vector<codec_details> list_codecs_for_muxer (
-            const AVOutputFormat*               oformat,
-            const std::vector<codec_details>&   all_codecs = list_codecs()
+            const AVOutputFormat* oformat
         )
         {
             std::vector<codec_details> supported_codecs;
 
-            for (const auto& codec : all_codecs)
+            for (const auto& codec : list_codecs())
                 if (avformat_query_codec(oformat, codec.codec_id, FF_COMPLIANCE_STRICT) == 1)
                     supported_codecs.push_back(codec);
             
@@ -1287,177 +1299,226 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-        inline std::vector<muxer_details> list_muxers()
+        inline const std::vector<muxer_details>& list_muxers()
         {
-            std::ignore = details::register_ffmpeg(); // Don't let this get optimized away
-
-            const auto codecs = list_codecs();
-
-            std::vector<muxer_details> all_details;
-            const AVOutputFormat* muxer = nullptr;
-
-    #if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100)
-            // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L86
-            while (init && (muxer = av_oformat_next(muxer)))
-    #else
-            void* opaque = nullptr;
-            while ((muxer = av_muxer_iterate(&opaque)))
-    #endif
+            const static auto ret = []
             {
-                muxer_details details;
-                details.name                = muxer->name;
-                details.supported_codecs    = list_codecs_for_muxer(muxer, codecs);
-                all_details.push_back(details);
-            }      
-        
-            return all_details;
-        }
+                std::ignore = details::register_ffmpeg(); // Don't let this get optimized away
 
-// ---------------------------------------------------------------------------------------------------
+                std::vector<muxer_details> all_details;
+                const AVOutputFormat* muxer = nullptr;
 
-        inline std::vector<codec_details> list_codecs()
-        {
-            std::ignore = details::register_ffmpeg(); // Don't let this get optimized away
-            std::vector<codec_details> details;
-
-    #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 10, 100)
-            // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L91
-            AVCodec* codec = nullptr;
-            while (init && (codec = av_codec_next(codec)))
-    #else
-            const AVCodec* codec = nullptr;
-            void* opaque = nullptr;
-            while ((codec = av_codec_iterate(&opaque)))
-    #endif
-            {
-                codec_details detail;
-                detail.codec_id     = codec->id;
-                detail.codec_name   = codec->name;
-                detail.supports_encoding = av_codec_is_encoder(codec);
-                detail.supports_decoding = av_codec_is_decoder(codec);
-                details.push_back(std::move(detail));
-            }
-
-            //sort
-            std::sort(details.begin(), details.end(), [](const codec_details& a, const codec_details& b) {return a.codec_name < b.codec_name;});
-            //merge
-            for (size_t i = 0 ; i < details.size() ; ++i)
-            {
-                for (size_t j = i + 1 ; j < details.size() ; ++j)
+#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100)
+                // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L86
+                while ((muxer = av_oformat_next(muxer)))
+#else
+                void* opaque = nullptr;
+                while ((muxer = av_muxer_iterate(&opaque)))
+#endif
                 {
-                    if (details[i].codec_name == details[j].codec_name)
-                    {
-                        details[i].supports_encoding |= details[j].supports_encoding;
-                        details[i].supports_decoding |= details[j].supports_decoding;
-                        details[j] = {};
-                    }
-                }
-            }
+                    muxer_details details;
+                    details.name                = muxer->name;
+                    details.supported_codecs    = list_codecs_for_muxer(muxer);
+                    all_details.push_back(details);
+                }      
             
-            details.erase(std::remove_if(details.begin(), details.end(), [](const auto& d) {return d.codec_name.empty();}), details.end());
+                return all_details;
+            }();
 
-            return details;
+            return ret;
         }
 
 // ---------------------------------------------------------------------------------------------------
 
-        inline std::vector<device_details> list_input_devices()
+        inline const std::vector<codec_details>& list_codecs()
         {
-            std::ignore = details::register_ffmpeg(); // Don't let this get optimized away
-            std::vector<device_details> devices;
-
-#if LIBAVDEVICE_VERSION_INT < AV_VERSION_INT(59, 0, 100)
-            using AVInputFormatPtr = AVInputFormat*;
-#else
-            using AVInputFormatPtr = const AVInputFormat*;
-#endif
-
-            AVInputFormatPtr device{nullptr};
-            details::av_ptr<AVDeviceInfoList> managed;
-
-            const auto iter = [&](AVInputFormatPtr device)
+            const static auto ret = []
             {
-                device_details details;
-                details.device_type = std::string(device->name);
+                std::ignore = details::register_ffmpeg(); // Don't let this get optimized away
+                std::vector<codec_details> details;
 
-                AVDeviceInfoList* device_list = nullptr;
-                avdevice_list_input_sources(device, nullptr, nullptr, &device_list);
-                managed.reset(device_list);
-
-                if (device_list)
+        #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 10, 100)
+                // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L91
+                AVCodec* codec = nullptr;
+                while ((codec = av_codec_next(codec)))
+        #else
+                const AVCodec* codec = nullptr;
+                void* opaque = nullptr;
+                while ((codec = av_codec_iterate(&opaque)))
+        #endif
                 {
-                    for (int i = 0 ; i < device_list->nb_devices ; ++i)
-                    {
-                        device_details::instance instance;
-                        instance.name        = std::string(device_list->devices[i]->device_name);
-                        instance.description = std::string(device_list->devices[i]->device_description);
-                        details.devices.push_back(std::move(instance));
-                    }
+                    codec_details detail;
+                    detail.codec_id     = codec->id;
+                    detail.codec_name   = codec->name;
+                    detail.supports_encoding = av_codec_is_encoder(codec);
+                    detail.supports_decoding = av_codec_is_decoder(codec);
+                    details.push_back(std::move(detail));
                 }
 
-                devices.push_back(std::move(details));
-            };
+                //sort
+                std::sort(details.begin(), details.end(), [](const codec_details& a, const codec_details& b) {return a.codec_name < b.codec_name;});
+                //merge
+                for (size_t i = 0 ; i < details.size() ; ++i)
+                {
+                    for (size_t j = i + 1 ; j < details.size() ; ++j)
+                    {
+                        if (details[i].codec_name == details[j].codec_name)
+                        {
+                            details[i].supports_encoding |= details[j].supports_encoding;
+                            details[i].supports_decoding |= details[j].supports_decoding;
+                            details[j] = {};
+                        }
+                    }
+                }
+                
+                details.erase(std::remove_if(details.begin(), details.end(), [](const auto& d) {return d.codec_name.empty();}), details.end());
 
-            while ((device = av_input_audio_device_next(device)))
-                iter(device);
+                return details;
+            }();
 
-            device = nullptr;
-
-            while ((device = av_input_video_device_next(device)))
-                iter(device);
-
-            return devices;
+            return ret;
         }
 
 // ---------------------------------------------------------------------------------------------------
 
-        inline std::vector<device_details> list_output_devices()
+        inline const std::vector<device_details>& list_input_device_types()
         {
-            std::ignore = details::register_ffmpeg(); // Don't let this get optimized away
-            std::vector<device_details> devices;
+            const static auto ret = []
+            {
+                std::ignore = details::register_ffmpeg(); // Don't let this get optimized away
+                std::vector<device_details> devices;
 
 #if LIBAVDEVICE_VERSION_INT < AV_VERSION_INT(59, 0, 100)
-            using AVOutputFormatPtr = AVOutputFormat*;
+                using AVInputFormatPtr = AVInputFormat*;
 #else
-            using AVOutputFormatPtr = const AVOutputFormat*;
+                using AVInputFormatPtr = const AVInputFormat*;
 #endif
 
-            AVOutputFormatPtr device{nullptr};
+                AVInputFormatPtr device{nullptr};
 
-            details::av_ptr<AVDeviceInfoList> managed;
-
-            const auto iter = [&](AVOutputFormatPtr device)
-            {
-                device_details details;
-                details.device_type = std::string(device->name);
-
-                AVDeviceInfoList* device_list = nullptr;
-                avdevice_list_output_sinks(device, nullptr, nullptr, &device_list);
-                managed.reset(device_list);
-
-                if (device_list)
+                while ((device = av_input_audio_device_next(device)))
                 {
-                    for (int i = 0 ; i < device_list->nb_devices ; ++i)
-                    {
-                        device_details::instance instance;
-                        instance.name        = std::string(device_list->devices[i]->device_name);
-                        instance.description = std::string(device_list->devices[i]->device_description);
-                        details.devices.push_back(std::move(instance));
-                    }
+                    device_details details;
+                    details.device_type     = device->name;
+                    details.is_audio_type   = true;
+                    devices.push_back(std::move(details));
                 }
 
-                devices.push_back(std::move(details));
-            };
+                device = nullptr;
 
-            while ((device = av_output_audio_device_next(device)))
-                iter(device);
+                while ((device = av_input_video_device_next(device)))
+                {
+                    device_details details;
+                    details.device_type     = device->name;
+                    details.is_video_type   = true;
+                    devices.push_back(std::move(details));
+                }
 
-            device = nullptr;
+                return devices;
+            }();
 
-            while ((device = av_output_video_device_next(device)))
-                iter(device);
+            return ret;
+        }
 
-            return devices;
+// ---------------------------------------------------------------------------------------------------
+
+        inline std::vector<device_instance> list_input_device_instances(const std::string& device_type)
+        {
+            const auto& types = list_input_device_types();
+            auto ret = std::find_if(types.begin(), types.end(), [&](const auto& type) {return type.device_type == device_type;});
+            if (ret == types.end())
+                return {};
+
+            std::vector<device_instance> instances;
+
+            details::av_ptr<AVDeviceInfoList> managed;
+            AVDeviceInfoList* device_list = nullptr;
+            avdevice_list_input_sources(nullptr, ret->device_type.c_str(), nullptr, &device_list);
+            managed.reset(device_list);
+
+            if (device_list)
+            {
+                for (int i = 0 ; i < device_list->nb_devices ; ++i)
+                {
+                    device_instance instance;
+                    instance.name        = std::string(device_list->devices[i]->device_name);
+                    instance.description = std::string(device_list->devices[i]->device_description);
+                    instances.push_back(std::move(instance));
+                }
+            }
+
+            return instances;
+        }
+
+// ---------------------------------------------------------------------------------------------------
+
+        inline const std::vector<device_details>& list_output_device_types()
+        {
+            const static auto ret = []
+            {
+                std::ignore = details::register_ffmpeg(); // Don't let this get optimized away
+                std::vector<device_details> devices;
+
+    #if LIBAVDEVICE_VERSION_INT < AV_VERSION_INT(59, 0, 100)
+                using AVOutputFormatPtr = AVOutputFormat*;
+    #else
+                using AVOutputFormatPtr = const AVOutputFormat*;
+    #endif
+
+                AVOutputFormatPtr device{nullptr};
+
+                while ((device = av_output_audio_device_next(device)))
+                {
+                    device_details details;
+                    details.device_type     = std::string(device->name);
+                    details.is_audio_type   = true;
+                    devices.push_back(std::move(details));
+                }
+
+                device = nullptr;
+
+                while ((device = av_output_video_device_next(device)))
+                {
+                    device_details details;
+                    details.device_type     = std::string(device->name);
+                    details.is_video_type   = true;
+                    devices.push_back(std::move(details));
+                }
+
+                return devices;
+            }();
+
+            return ret;
+        }
+
+// ---------------------------------------------------------------------------------------------------
+
+        std::vector<device_instance> list_output_device_instances(const std::string& device_type)
+        {
+            const auto& types = list_output_device_types();
+            auto ret = std::find_if(types.begin(), types.end(), [&](const auto& type) {return type.device_type == device_type;});
+            if (ret == types.end())
+                return {};
+
+            std::vector<device_instance> instances;
+
+            details::av_ptr<AVDeviceInfoList> managed;
+            AVDeviceInfoList* device_list = nullptr;
+            avdevice_list_output_sinks(nullptr, ret->device_type.c_str(), nullptr, &device_list);
+            managed.reset(device_list);
+
+            if (device_list)
+            {
+                for (int i = 0 ; i < device_list->nb_devices ; ++i)
+                {
+                    device_instance instance;
+                    instance.name        = std::string(device_list->devices[i]->device_name);
+                    instance.description = std::string(device_list->devices[i]->device_description);
+                    instances.push_back(std::move(instance));
+                }
+            }
+
+            return instances;
         }
 
 // ---------------------------------------------------------------------------------------------------

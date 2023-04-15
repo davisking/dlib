@@ -655,8 +655,6 @@ namespace dlib
             if (!st.args_.enable_audio && !st.args_.enable_image)
                 return fail("You need to set at least one of `enable_audio` or `enable_image`");
 
-            static const auto all_codecs = list_codecs();
-
             {
                 st.connecting_time = system_clock::now();
                 st.connected_time  = system_clock::time_point::max();
@@ -715,7 +713,7 @@ namespace dlib
                 };
 
                 // Before we create the encoder, check the codec is supported by this muxer
-                const auto supported_codecs = list_codecs_for_muxer(st.pFormatCtx->oformat, all_codecs);
+                const auto supported_codecs = list_codecs_for_muxer(st.pFormatCtx->oformat);
 
                 if (std::find_if(begin(supported_codecs), end(supported_codecs), [&](const auto& supported) {
                     return args.args_codec.codec != AV_CODEC_ID_NONE ? 
