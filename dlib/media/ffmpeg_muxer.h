@@ -91,8 +91,7 @@ namespace dlib
 
             encoder(
                 const args& a,
-                std::function<bool(AVCodecContext*,AVPacket*)> sink,
-                std::shared_ptr<logger> log_
+                std::function<bool(AVCodecContext*,AVPacket*)> sink
             );
 
             bool open();
@@ -106,7 +105,6 @@ namespace dlib
             details::resampler              resizer_audio;
             details::audio_fifo             fifo;
             std::function<bool(AVCodecContext*,AVPacket*)> sink;
-            std::shared_ptr<logger>         log;
         };
 
 // ---------------------------------------------------------------------------------------------------
@@ -177,7 +175,6 @@ namespace dlib
                 std::chrono::system_clock::time_point   connecting_time{};
                 std::chrono::system_clock::time_point   connected_time{};
                 std::chrono::system_clock::time_point   last_read_time{};
-                std::shared_ptr<logger>                 log;
             } st;
         };
 
@@ -207,8 +204,7 @@ namespace dlib
 
             inline void check_properties(
                 const AVCodec*  pCodec,
-                AVCodecContext* pCodecCtx,
-                logger&         log
+                AVCodecContext* pCodecCtx
             )
             {
                 // Video properties
@@ -227,7 +223,7 @@ namespace dlib
 
                     if (!framerate_supported)
                     {
-                        log << LINFO 
+                        logger_dlib() << LINFO 
                             << "Requested framerate "
                             << pCodecCtx->framerate.num / pCodecCtx->framerate.den
                             << " not supported. Changing to default "
@@ -252,7 +248,7 @@ namespace dlib
 
                     if (!pix_fmt_supported)
                     {
-                        log << LINFO
+                        logger_dlib() << LINFO
                             << "Requested pixel format "
                             << av_get_pix_fmt_name(pCodecCtx->pix_fmt)
                             << " not supported. Changing to default "
@@ -278,7 +274,7 @@ namespace dlib
 
                     if (!sample_rate_supported)
                     {
-                        log << LINFO
+                        logger_dlib() << LINFO
                             << "Requested sample rate "
                             << pCodecCtx->sample_rate
                             << " not supported. Changing to default "
@@ -303,7 +299,7 @@ namespace dlib
 
                     if (!sample_fmt_supported)
                     {
-                        log << LINFO
+                        logger_dlib() << LINFO
                             << "Requested sample format "
                             << av_get_sample_fmt_name(pCodecCtx->sample_fmt)
                             << " not supported. Changing to default "
@@ -329,7 +325,7 @@ namespace dlib
 
                     if (!channel_layout_supported)
                     {
-                        log << LINFO
+                        logger_dlib() << LINFO
                             << "Channel layout "
                             << details::get_channel_layout_str(pCodecCtx)
                             << " not supported. Changing to default "
@@ -354,7 +350,7 @@ namespace dlib
 
                     if (!channel_layout_supported)
                     {
-                        log << LINFO 
+                        logger_dlib() << LINFO 
                             << "Channel layout "
                             << details::get_channel_layout_str(pCodecCtx)
                             << " not supported. Changing to default "
@@ -372,17 +368,15 @@ namespace dlib
             std::function<bool(std::size_t, const char*)> sink
         ) : encoder(a, [sink](AVCodecContext*, AVPacket* pkt) {
                 return sink(pkt->size, (const char*)pkt->data);
-            }, std::make_shared<logger>("ffmpeg::encoder"))
+            })
         {
         }
 
         inline encoder::encoder(
             const args& a,
-            std::function<bool(AVCodecContext*,AVPacket*)> sink_,
-            std::shared_ptr<logger> log_
+            std::function<bool(AVCodecContext*,AVPacket*)> sink_
         ) : args_(a),
-            sink(std::move(sink_)),
-            log(log_)
+            sink(std::move(sink_))
         {
             if (!open())
                 pCodecCtx = nullptr;
@@ -400,22 +394,22 @@ namespace dlib
 
             DLIB_CASSERT(sink != nullptr, "must provide an appriate sink callback");
 
-            const bool init = details::register_ffmpeg::get(); // This must be used somewhere otherwise compiler might optimize it away.
+            std::ignore = details::register_ffmpeg(); // Don't let this get optimized away
 
             packet = make_avpacket();
             const AVCodec* pCodec = nullptr;
 
             if (args_.args_codec.codec != AV_CODEC_ID_NONE)
-                pCodec = init ? avcodec_find_encoder(args_.args_codec.codec) : nullptr;
+                pCodec = avcodec_find_encoder(args_.args_codec.codec);
             else if (!args_.args_codec.codec_name.empty())
-                pCodec = init ? avcodec_find_encoder_by_name(args_.args_codec.codec_name.c_str()) : nullptr;
+                pCodec = avcodec_find_encoder_by_name(args_.args_codec.codec_name.c_str());
 
             if (!pCodec)
-                return fail(*log, "Codec ",  avcodec_get_name(args_.args_codec.codec), " or ", args_.args_codec.codec_name, " not found");
+                return fail("Codec ",  avcodec_get_name(args_.args_codec.codec), " or ", args_.args_codec.codec_name, " not found");
 
             pCodecCtx.reset(avcodec_alloc_context3(pCodec));
             if (!pCodecCtx)
-                return fail(*log, "AV : failed to allocate codec context for ", pCodec->name, " : likely ran out of memory");
+                return fail("AV : failed to allocate codec context for ", pCodec->name, " : likely ran out of memory");
 
             if (args_.args_codec.bitrate > 0)
                 pCodecCtx->bit_rate = args_.args_codec.bitrate;
@@ -431,14 +425,14 @@ namespace dlib
                     args_.args_image.fmt        == AV_PIX_FMT_NONE ||
                     args_.args_image.framerate  <= 0)
                 {
-                    return fail(*log, pCodec->name, " is an image codec. height, width, fmt (pixel format) and framerate must be set");
+                    return fail(pCodec->name, " is an image codec. height, width, fmt (pixel format) and framerate must be set");
                 }
 
                 pCodecCtx->height       = args_.args_image.h;
                 pCodecCtx->width        = args_.args_image.w;
                 pCodecCtx->pix_fmt      = args_.args_image.fmt;
                 pCodecCtx->framerate    = AVRational{args_.args_image.framerate, 1};
-                check_properties(pCodec, pCodecCtx.get(), *log);
+                check_properties(pCodec, pCodecCtx.get());
                 pCodecCtx->time_base    = inv(pCodecCtx->framerate);
 
                 //don't know what src options are, but at least dst options are set
@@ -451,13 +445,13 @@ namespace dlib
                     args_.args_audio.channel_layout <= 0 ||
                     args_.args_audio.fmt == AV_SAMPLE_FMT_NONE) 
                 {
-                    return fail(*log, pCodec->name, " is an audio codec. sample_rate, channel_layout and fmt (sample format) must be set");
+                    return fail(pCodec->name, " is an audio codec. sample_rate, channel_layout and fmt (sample format) must be set");
                 }
 
                 pCodecCtx->sample_rate      = args_.args_audio.sample_rate;
                 pCodecCtx->sample_fmt       = args_.args_audio.fmt;
                 set_layout(pCodecCtx.get(), args_.args_audio.channel_layout);
-                check_properties(pCodec, pCodecCtx.get(), *log);
+                check_properties(pCodec, pCodecCtx.get());
                 pCodecCtx->time_base        = AVRational{ 1, pCodecCtx->sample_rate };
 
                 if (pCodecCtx->codec_id == AV_CODEC_ID_AAC) {
@@ -474,7 +468,7 @@ namespace dlib
             av_dict opt = args_.args_codec.codec_options;
             const int ret = avcodec_open2(pCodecCtx.get(), pCodec, opt.get());
             if (ret < 0)
-                return fail(*log, "avcodec_open2() failed : ", get_av_error(ret));
+                return fail("avcodec_open2() failed : ", get_av_error(ret));
 
             if (pCodec->type == AVMEDIA_TYPE_AUDIO)
             {
@@ -561,7 +555,7 @@ namespace dlib
                 } else {
                     open_   = false;
                     state   = ENCODE_ERROR;
-                    (*log) << LERROR << "avcodec_send_frame() failed : " << get_av_error(ret);
+                    logger_dlib() << LERROR << "avcodec_send_frame() failed : " << get_av_error(ret);
                 }
             };
 
@@ -581,7 +575,7 @@ namespace dlib
                 {
                     open_   = false;
                     state   = ENCODE_ERROR;
-                    (*log) << LERROR << "avcodec_receive_packet() failed : " << get_av_error(ret);
+                    logger_dlib() << LERROR << "avcodec_receive_packet() failed : " << get_av_error(ret);
                 }
                 else
                 {
@@ -656,11 +650,10 @@ namespace dlib
             using namespace details;
 
             st = {};
-            st.log   = std::make_shared<logger>("ffmpeg::muxer");
             st.args_ = a;
 
             if (!st.args_.enable_audio && !st.args_.enable_image)
-                return fail(*st.log, "You need to set at least one of `enable_audio` or `enable_image`");
+                return fail("You need to set at least one of `enable_audio` or `enable_image`");
 
             static const auto all_codecs = list_codecs();
 
@@ -674,7 +667,7 @@ namespace dlib
                 int ret = avformat_alloc_output_context2(&pFormatCtx, nullptr, format_name, filename);
 
                 if (ret < 0)
-                    return fail(*st.log, "avformat_alloc_output_context2() failed : ", get_av_error(ret));
+                    return fail("avformat_alloc_output_context2() failed : ", get_av_error(ret));
 
                 st.pFormatCtx.reset(pFormatCtx);
             }
@@ -705,8 +698,7 @@ namespace dlib
                 const auto handle_packet = 
                 [
                     pFormatCtx = st.pFormatCtx.get(),
-                    stream_id = stream_counter,
-                    log = st.log
+                    stream_id = stream_counter
                 ]
                 (
                     AVCodecContext* pCodecCtx,
@@ -718,7 +710,7 @@ namespace dlib
                     pkt->stream_index = stream_id;
                     int ret = av_interleaved_write_frame(pFormatCtx, pkt);
                     if (ret < 0)
-                        (*log) << LERROR << "av_interleaved_write_frame() failed : " << get_av_error(ret);
+                        logger_dlib() << LERROR << "av_interleaved_write_frame() failed : " << get_av_error(ret);
                     return ret == 0;
                 };
 
@@ -731,18 +723,18 @@ namespace dlib
                                 supported.codec_name == args.args_codec.codec_name;
                 }) == end(supported_codecs))
                 {
-                    (*st.log) << LERROR
-                              << "Codec " << avcodec_get_name(args.args_codec.codec) << " or " << args.args_codec.codec_name
-                              << " cannot be stored in this file";
-                    (*st.log) << LINFO 
-                              << "List of supported codecs for muxer " << st.pFormatCtx->oformat->name << " in this installation of ffmpeg:";
+                    logger_dlib() << LERROR
+                        << "Codec " << avcodec_get_name(args.args_codec.codec) << " or " << args.args_codec.codec_name
+                        << " cannot be stored in this file";
+                    logger_dlib() << LINFO 
+                        << "List of supported codecs for muxer " << st.pFormatCtx->oformat->name << " in this installation of ffmpeg:";
                     for (const auto& supported : supported_codecs)
-                        (*st.log) << LINFO << "    " << supported.codec_name;
+                        logger_dlib() << LINFO << "    " << supported.codec_name;
                     return false;
                 }
 
                 // Codec is supported by muxer, so create encoder
-                enc = encoder(args, handle_packet, st.log);
+                enc = encoder(args, handle_packet);
 
                 if (!enc.is_open())
                     return false;
@@ -750,7 +742,7 @@ namespace dlib
                 AVStream* stream = avformat_new_stream(st.pFormatCtx.get(), enc.pCodecCtx->codec);
 
                 if (!stream)
-                    return fail(*st.log, "avformat_new_stream() failed");
+                    return fail("avformat_new_stream() failed");
 
                 stream->id          = stream_counter;
                 stream->time_base   = enc.pCodecCtx->time_base;
@@ -759,7 +751,7 @@ namespace dlib
                 int ret = avcodec_parameters_from_context(stream->codecpar, enc.pCodecCtx.get());
 
                 if (ret < 0)
-                    return fail(*st.log, "avcodec_parameters_from_context() failed : ", get_av_error(ret));
+                    return fail("avcodec_parameters_from_context() failed : ", get_av_error(ret));
 
                 return true;
             };
@@ -788,7 +780,7 @@ namespace dlib
                 int ret = avio_open2(&st.pFormatCtx->pb, st.args_.filepath.c_str(), AVIO_FLAG_WRITE, &st.pFormatCtx->interrupt_callback, opt.get());
 
                 if (ret < 0)
-                    return fail(*st.log, "avio_open2() failed : ", get_av_error(ret));
+                    return fail("avio_open2() failed : ", get_av_error(ret));
             }
 
             av_dict opt = st.args_.format_options;
@@ -796,7 +788,7 @@ namespace dlib
             int ret = avformat_write_header(st.pFormatCtx.get(), opt.get());
 
             if (ret < 0)
-                return fail(*st.log, "avformat_write_header() failed : ", get_av_error(ret));
+                return fail("avformat_write_header() failed : ", get_av_error(ret));
 
             st.connected_time = system_clock::now();
 
@@ -835,7 +827,7 @@ namespace dlib
             if (f.is_image())
             {
                 if (!st.encoder_image.is_open())
-                    return fail(*st.log, "frame is an image type but image encoder is not initialized");
+                    return fail("frame is an image type but image encoder is not initialized");
 
                 return st.encoder_image.push(std::move(f));
             }
@@ -843,7 +835,7 @@ namespace dlib
             else if (f.is_audio())
             {
                 if (!st.encoder_audio.is_open())
-                    return fail(*st.log, "frame is of audio type but audio encoder is not initialized");
+                    return fail("frame is of audio type but audio encoder is not initialized");
 
                 return st.encoder_audio.push(std::move(f));
             }
@@ -862,7 +854,7 @@ namespace dlib
 
             const int ret = av_write_trailer(st.pFormatCtx.get());
             if (ret < 0)
-                (*st.log) << LERROR << "av_write_trailer() failed : " << details::get_av_error(ret);
+                logger_dlib() << LERROR << "av_write_trailer() failed : " << details::get_av_error(ret);
 
             if ((st.pFormatCtx->oformat->flags & AVFMT_NOFILE) == 0)
                 avio_closep(&st.pFormatCtx->pb);

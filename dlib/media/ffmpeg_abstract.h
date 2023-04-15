@@ -31,6 +31,22 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
+        dlib::logger& logger_internal();
+        /*!
+            ensures
+                - Returns a global logger used by the internal ffmpeg libraries. 
+                - You may set the logging level using .set_level() to supress or enable certain logs.
+        !*/
+
+        dlib::logger& logger_dlib();
+        /*!
+            ensures
+                - Returns a global logger used by dlib's ffmpeg wrappers.
+                - You may set the logging level using .set_level() to supress or enable certain logs.
+        !*/
+
+// ---------------------------------------------------------------------------------------------------
+
         class frame
         {
         public:

@@ -20,10 +20,11 @@ int main(const int argc, const char** argv)
 try
 {
     command_line_parser parser;
-    parser.add_option("i",      "input video", 1);
+    parser.add_option("i",       "input video", 1);
+    parser.add_option("verbose", "enable all internal ffmpeg logging");
     parser.set_group_name("Help Options");
-    parser.add_option("h",      "alias of --help");
-    parser.add_option("help",   "display this message and exit");
+    parser.add_option("h",       "alias of --help");
+    parser.add_option("help",    "display this message and exit");
 
     parser.parse(argc, argv);
     const char* one_time_opts[] = {"i"};
@@ -33,6 +34,12 @@ try
     {
         parser.print_options();
         return 0;
+    }
+
+    if (parser.option("verbose"))
+    {
+        ffmpeg::logger_dlib().set_level(LALL);
+        ffmpeg::logger_internal().set_level(LALL);
     }
 
     const std::string filepath = get_option(parser, "i", "");
