@@ -720,7 +720,7 @@ namespace dlib
                         // Not sure if copying to vl2 is required by internal ffmpeg functions do this...
                         va_list vl2;
                         va_copy(vl2, vl);
-                        const int ret = av_log_format_line2(ptr, level, fmt, vl2, line.data(), line.size(), &print_prefix);
+                        const int ret = av_log_format_line2(ptr, level, fmt, vl2, &line[0], line.size(), &print_prefix);
                         va_end(vl2);
                         line.resize(ret);
 
