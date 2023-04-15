@@ -1642,7 +1642,7 @@ namespace dlib
         /*!
             requires
                 - image_type must be a type conforming to the generic image interface.
-                - codec_name is a valid codec from FFmpeg that suppors encoding.
+                - codec_name is a valid codec from FFmpeg that supports encoding.
             ensures
                 - encodes the image into the file pointed by file_name using codec_name
                   and the options described in codec_options.
