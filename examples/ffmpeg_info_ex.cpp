@@ -49,13 +49,15 @@ int main()
 
     // List all input devices supported by this installation of ffmpeg libraries
     cout << "Supported input devices:\n";
-    for (const auto& device :  ffmpeg::list_input_devices())
+    for (const auto& device :  ffmpeg::list_input_device_types())
     {
-        cout << "    device type : " << device.device_type << '\n';
-        if (!device.devices.empty())
+        cout << "    device type : `" << device.device_type << "` is audio " << device.is_audio_type << " is video " << device.is_video_type << '\n';
+
+        const auto instances = ffmpeg::list_input_device_instances(device.device_type);
+        if (!instances.empty())
         {
             cout << "        instances :\n";
-            for (const auto& instance : device.devices)
+            for (const auto& instance : instances)
                 cout << "            name : " << left << setw(32) << instance.name << ", description : " << instance.description << '\n';
         }
     }
@@ -64,13 +66,15 @@ int main()
 
     // List all input devices supported by this installation of ffmpeg libraries
     cout << "Supported output devices:\n";
-    for (const auto& device :  ffmpeg::list_output_devices())
+    for (const auto& device :  ffmpeg::list_output_device_types())
     {
-        cout << "    device type : " << device.device_type << '\n';
-        if (!device.devices.empty())
+        cout << "    device type : `" << device.device_type << "` is audio " << device.is_audio_type << " is video " << device.is_video_type << '\n';
+
+        const auto instances = ffmpeg::list_output_device_instances(device.device_type);
+        if (!instances.empty())
         {
             cout << "        instances :\n";
-            for (const auto& instance : device.devices)
+            for (const auto& instance : instances)
                 cout << "            name : " << left << setw(32) << instance.name << ", description : " << instance.description << '\n';
         }
     }
