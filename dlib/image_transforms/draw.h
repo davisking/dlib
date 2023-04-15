@@ -584,7 +584,6 @@ namespace dlib
         image_type& image,
         const polygon& poly,
         const pixel_type& color,
-        const bool antialias = true,
         const rectangle& area = rectangle(std::numeric_limits<long>::min(), std::numeric_limits<long>::min(),
                                           std::numeric_limits<long>::max(), std::numeric_limits<long>::max())
     )
