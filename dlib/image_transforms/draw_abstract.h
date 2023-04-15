@@ -197,7 +197,6 @@ namespace dlib
         image_type& image,
         const polygon& poly,
         const pixel_type& color,
-        const bool antialias = true,
         const rectangle& area = rectangle(std::numeric_limits<long>::min(), std::numeric_limits<long>::min(),
                                           std::numeric_limits<long>::max(), std::numeric_limits<long>::max())
     );
@@ -215,28 +214,6 @@ namespace dlib
             - When drawing the polygon, only the part of the polygon which overlaps both
               the given image and area rectangle is drawn.
             - Uses the given pixel color to draw the polygon.
-            - if (antialias == true) then we draw anti-aliased edges so they don't
-              look all pixely by alpha-blending them with the image.
-    !*/
-
-    template <typename image_type>
-    inline void draw_solid_convex_polygon (
-        image_type& image,
-        const polygon& poly
-    );
-    /*!
-        requires
-            - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h
-        ensures
-            - Interprets the given polygon object as defining a convex polygon shape.
-              In particular, the polygon is given by taking the points and drawing
-              lines between them.  That is, imagine drawing a line connecting polygon[i]
-              and polygon[(i+1)%polygon.size()], for all valid i, and then filling in
-              the interior of the polygon.  That is what this function does.
-            - It fills the inside of the convex_polygon with black.
-            - We draw anti-aliased edges so they don't look all pixely by alpha-blending
-              them with the image.
     !*/
 
 // ----------------------------------------------------------------------------------------

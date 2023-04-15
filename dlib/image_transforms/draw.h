@@ -433,8 +433,6 @@ namespace dlib
                                           std::numeric_limits<long>::max(), std::numeric_limits<long>::max())
     )
     {
-        using std::max;
-        using std::min;
         const rectangle valid_area(get_rect(image).intersect(area));
         const rectangle bounding_box = poly.get_rect();
 
@@ -450,18 +448,29 @@ namespace dlib
 
         // we will only want to loop over the part of left_boundary that is part of the
         // valid_area.
-        long top = max(valid_area.top(),bounding_box.top());
-        long bottom = min(valid_area.bottom(),bounding_box.bottom());
+        long left = std::max(valid_area.left(), bounding_box.left());
+        long top = std::max(valid_area.top(), bounding_box.top());
+        long right = std::min(valid_area.right(), bounding_box.right());
+        long bottom = std::min(valid_area.bottom(), bounding_box.bottom());
 
         // Since we look at the adjacent rows of boundary information when doing the alpha
         // blending, we want to make sure we always have some boundary information unless
         // we are at the absolute edge of the polygon.
-        const long top_offset = (top == bounding_box.top()) ? 0 : 1;
-        const long bottom_offset = (bottom == bounding_box.bottom()) ? 0 : 1;
-        if (top != bounding_box.top())
-            top -= 1;
-        if (bottom != bounding_box.bottom())
-            bottom += 1;
+        const long left_offset = (left == bounding_box.left() && antialias) ? 0 : 1;
+        const long top_offset = (top == bounding_box.top() && antialias) ? 0 : 1;
+        const long right_offset = (right == bounding_box.right() && antialias) ? 0 : 1;
+        const long bottom_offset = (bottom == bounding_box.bottom() && antialias) ? 0 : 1;
+        if (antialias)
+        {
+            if (left != bounding_box.left())
+                left -= 1;
+            if (top != bounding_box.top())
+                top -= 1;
+            if (right != bounding_box.right())
+                right += 1;
+            if (bottom != bounding_box.bottom())
+                bottom += 1;
+        }
 
         std::vector<double> left_boundary;
         std::vector<double> right_boundary;
@@ -473,13 +482,13 @@ namespace dlib
             long left_x = static_cast<long>(std::ceil(left_boundary[i]));
             long right_x = static_cast<long>(std::floor(right_boundary[i]));
 
-            left_x = max(left_x, valid_area.left());
-            right_x = min(right_x, valid_area.right());
+            left_x = std::max(left_x, valid_area.left());
+            right_x = std::min(right_x, valid_area.right());
 
-            if (i < left_boundary.size()-bottom_offset)
+            if (i < left_boundary.size() - bottom_offset)
             {
                 // draw the main body of the polygon
-                for (long x = left_x; x <= right_x; ++x)
+                for (long x = left_x + left_offset; x <= right_x - right_offset; ++x)
                 {
                     const long y = i+top;
                     assign_pixel(img[y][x], color);
@@ -568,12 +577,6 @@ namespace dlib
         }
     }
 
-    template <typename image_type>
-    inline void draw_solid_convex_polygon (
-        image_type& image,
-        const polygon& poly
-    ) { draw_solid_convex_polygon(image, poly, 0); }
-
 // ---------------------------------------------------------------------------------------
 
     template <typename image_type, typename pixel_type>
@@ -587,20 +590,21 @@ namespace dlib
     )
     {
         image_view<image_type> img(image);
-        long height = img.nr();
-        long width = img.nc();
+        const rectangle valid_area(get_rect(image).intersect(area));
+        const rectangle bounding_box = poly.get_rect();
+        if (bounding_box.intersect(valid_area).is_empty())
+            return;
 
-        long min_y = std::numeric_limits<long>::max();
-        long max_y = std::numeric_limits<long>::min();
-        for (const auto& v : poly)
-        {
-            min_y = std::min(min_y, v.y());
-            max_y = std::max(max_y, v.y());
-        }
+        const long left = std::max(valid_area.left(), bounding_box.left() + 1);
+        const long top = std::max(valid_area.top(), bounding_box.top() + 1);
+        const long right = std::min(valid_area.right(), bounding_box.right() - 1);
+        const long bottom = std::min(valid_area.bottom(), bounding_box.bottom() - 1);
 
-        for (long y = min_y; y <= max_y; ++y)
+        std::vector<double> prev_intersections;
+        for (long y = top; y <= bottom; ++y)
         {
-            std::vector<long> intersections;
+            // Compute the intersections with the scanline
+            std::vector<double> intersections;
             for (size_t i = 0; i < poly.size(); ++i)
             {
                 const auto& p1 = poly[i];
@@ -613,18 +617,25 @@ namespace dlib
                 if ((y <= p1.y() && y <= p2.y()) || (y > p1.y() && y > p2.y()))
                     continue;
 
-                // Add intersecting x coordinates of intersecting points
-                intersections.push_back(p1.x() + (y - p1.y()) * (p2.x() - p1.x()) / (p2.y() - p1.y()));
+                // Add x coordinates of intersecting points
+                intersections.push_back(p1.x() + (y - p1.y()) * (p2.x() - p1.x()) / static_cast<double>(p2.y() - p1.y()));
             }
 
             std::sort(intersections.begin(), intersections.end());
+
             for (size_t i = 0; i < intersections.size(); i += 2)
             {
-                for (int x = intersections[i]; x < intersections[i + 1]; ++x)
+                long left_x = static_cast<long>(std::ceil(intersections[i]));
+                long right_x = static_cast<long>(std::floor(intersections[i + 1]));
+                left_x = std::max(left_x, valid_area.left());
+                right_x = std::min(right_x, valid_area.right());
+
+                // Draw the main body of the polygon
+                for (long x = left_x; x <= right_x; ++x)
                 {
-                    if (x >= 0 && x < width && y >= 0 && y < height)
+                    if (x >= left && x <= right && y >= top && y <= bottom)
                     {
-                        img[y][x] = color;
+                        assign_pixel(img[y][x], color);
                     }
                 }
             }
