@@ -714,18 +714,20 @@ namespace dlib
                     {
                         auto& logger = details::logger_internal_private();
 
-                        std::string line(1024, '\0');
+                        char line[1024] = {0};
                         static int print_prefix = 1;
 
                         // Not sure if copying to vl2 is required by internal ffmpeg functions do this...
                         va_list vl2;
                         va_copy(vl2, vl);
-                        const int ret = av_log_format_line2(ptr, level, fmt, vl2, &line[0], line.size(), &print_prefix);
+                        int size = av_log_format_line2(ptr, level, fmt, vl2, &line[0], sizeof(line), &print_prefix);
                         va_end(vl2);
-                        line.resize(ret);
 
                         // Remove all '\n' since dlib's logger already adds one
-                        line.erase(std::remove(line.begin(), line.end(), '\n'), line.end());
+                        const char* beg = &line[0];
+                        const char* end = std::remove(&line[0], &line[size], '\n');
+                        size = std::distance(beg, end);
+                        line[size] = '\0';
 
                         switch(level)
                         {
