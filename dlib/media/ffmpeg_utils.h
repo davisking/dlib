@@ -714,7 +714,7 @@ namespace dlib
                     {
                         auto& logger = details::logger_internal_private();
 
-                        char line[1024] = {0};
+                        char line[256] = {0};
                         static int print_prefix = 1;
 
                         // Not sure if copying to vl2 is required by internal ffmpeg functions do this...
@@ -724,10 +724,11 @@ namespace dlib
                         va_end(vl2);
 
                         // Remove all '\n' since dlib's logger already adds one
-                        const char* beg = &line[0];
-                        const char* end = std::remove(&line[0], &line[size], '\n');
-                        size = std::distance(beg, end);
+                        size = std::min<int>(size, sizeof(line));
                         line[size] = '\0';
+                        for (int i = size - 1 ; i >= 0 ; --i)
+                            if (line[i] == '\n')
+                                line[i] = ' ';
 
                         switch(level)
                         {
