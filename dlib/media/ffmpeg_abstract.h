@@ -439,18 +439,6 @@ namespace dlib
                     format. The ffmpeg object used to do this can simultaneously resize the image.
                     Therefore, the API allows users to optionally resize the image, as well as convert to RGB,
                     before being presented to user, as a possible optimization.
-
-                    In the case of demuxer, if:
-                        - h > 0
-                        - w > 0
-                        - and the demuxer is a device like v4l2 or xcbgrab
-                    then we attempt to set the video size of the device before decoding.
-                    Otherwise, the image dimensions set the bilinear resizer which resizes frames AFTER decoding.
-
-                    Furthermore, in the case of demuxer, if:
-                        - framerate > 0
-                        - and the demuxer is a device like v4l2 or xcbgrab
-                    then we attempt to set the framerate of the input device before decoding.
             !*/
 
             // Height of extracted frames. If 0, use whatever comes out decoder
@@ -461,9 +449,6 @@ namespace dlib
 
             // Pixel format of extracted frames. If AV_PIX_FMT_NONE, use whatever comes out decoder. The default is AV_PIX_FMT_RGB24
             AVPixelFormat fmt{AV_PIX_FMT_RGB24};
-
-            // Sets the output frame rate for any device that allows you to do so, e.g. webcam, x11grab, etc. Does not apply to files. If -1, ignored.
-            int framerate{-1};
         };
 
 // ---------------------------------------------------------------------------------------------------
@@ -516,6 +501,10 @@ namespace dlib
 
             // OR-ed with AVCodecContext::flags if non-negative. Otherwise, ffmpeg's default is used.
             int flags{0};
+
+            // Sets AVCodecContext::thread_count if non-negative. Otherwise, ffmpeg's default is used.
+            // Note, some codecs are not multi-threaded, in which case setting this will have no effect.
+            int thread_count{-1};
         };
 
 // ---------------------------------------------------------------------------------------------------
@@ -554,8 +543,6 @@ namespace dlib
                 !*/
 
                 decoder_codec_args args_codec;
-                decoder_image_args args_image;
-                decoder_audio_args args_audio;
             };
 
             decoder() = default;
@@ -611,8 +598,7 @@ namespace dlib
                     - must have called push_encoded() enough times such that a call to read() would have returned a frame.
                       The height cannot be deduced from codec only. It can only be deduced from decoded data.
                 ensures 
-                    - returns height of images to be returned by read()
-                    - If decoder_image_args::h > 0, then frames returned by read() are automatically scaled.
+                    - returns height of encoded images
             !*/
 
             int width() const noexcept;
@@ -621,8 +607,7 @@ namespace dlib
                     - is_image_decoder() == true
                     - must have called push_encoded() enough times such that a call to read() would have returned a frame.
                 ensures
-                    - returns width of images to be returned by read()
-                    - If decoder_image_args::w > 0, then frames returned by read() are automatically scaled.
+                    - returns width of encoded images
             !*/
 
             AVPixelFormat pixel_fmt() const noexcept;
@@ -631,8 +616,7 @@ namespace dlib
                     - is_image_decoder() == true
                     - must have called push_encoded() enough times such that a call to read() would have returned a frame.
                 ensures
-                    - returns pixel format of images to be returned by read()
-                    - If decoder_image_args::fmt > 0, then frames returned by read() are automatically scaled and converted.
+                    - returns pixel format of encoded images
             !*/
 
             /*! audio properties !*/
@@ -643,8 +627,7 @@ namespace dlib
                     - is_audio_decoder() == true
                     - must have called push_encoded() enough times such that a call to read() would have returned a frame.
                 ensures
-                    - returns sample rate of audio frames to be returned by read()
-                    - If decoder_audio_args::sample_rate > 0, then frames returned by read() are automatically resampled.
+                    - returns sample rate of encoded audio frames
             !*/
 
             uint64_t channel_layout() const noexcept;
@@ -653,9 +636,7 @@ namespace dlib
                     - is_audio_decoder() == true
                     - must have called push_encoded() enough times such that a call to read() would have returned a frame.
                 ensures
-                    - returns channel_layout of audio frames to be returned by read()
-                    - If decoder_audio_args::channel_layout > 0, then frames returned by read() are automatically resampled and converted.
-                    - See documentation of AVFrame::channel_layout
+                    - returns channel_layout of encoded audio frames
             !*/
 
             AVSampleFormat sample_fmt() const noexcept;
@@ -664,8 +645,7 @@ namespace dlib
                     - is_audio_decoder() == true
                     - must have called push_encoded() enough times such that a call to read() would have returned a frame.
                 ensures
-                    - returns sample format (s16, u8, etc) of audio frames to be returned by read()
-                    - If decoder_audio_args::fmt > 0, then frames returned by read() are automatically resampled and converted.
+                    - returns sample format (s16, u8, etc) of encoded audio frames
             !*/
 
             int nchannels() const noexcept;
@@ -674,9 +654,7 @@ namespace dlib
                     - is_audio_decoder() == true
                     - must have called push_encoded() enough times such that a call to read() would have returned a frame.
                 ensures
-                    - returns number of channels of audio frames to be returned by read()
-                    - If decoder_audio_args::channel_layout > 0, then frames returned by read() are automatically resampled and converted.
-                    - See documentation of AVFrame::channel_layout
+                    - returns number of channels of encoded audio frames
             !*/
 
             bool push_encoded(const uint8_t *encoded, int nencoded);
@@ -684,11 +662,7 @@ namespace dlib
                 requires
                     - is_open() == true
                 ensures
-                    - encodes data.
-                    - if (returns true)
-                        return value of nframes_available() might change unless more input is required
-                    else
-                        decoder is closed but frames may still be available when calling read() so is_open() may still return true
+                    - encodes data
             !*/
 
             void flush();
@@ -700,13 +674,21 @@ namespace dlib
                     - calls push_encoded(nullptr, 0)
             !*/
 
-            decoder_status read(frame& dst_frame);
+            decoder_status read(
+                frame& dst_frame,
+                const decoder_image_args& args_image = decoder_image_args{}, 
+                const decoder_audio_args& args_audio = decoder_audio_args{}
+            );
             /*!
                 ensures
                     - Attempts to read a frame, storing the result in dst_frame.
-                    - If it is successful then returns DECODER_FRAME_AVAILABLE and 
-                      dst_frame.is_empty() == false.  Otherwise, returns one of the 
-                      following:
+                    - If it is successful then:
+                        - returns DECODER_FRAME_AVAILABLE
+                        - dst_frame.is_empty() == false
+                        - if dst_frame.is_image() == true then args_image is used to optionally convert dst_frame
+                        - if dst_frame_is_audio() == true then args_audio is used to optionally convert dst_frame
+
+                      Otherwise, returns one of the following:
                         - DECODER_EAGAIN: this indicates more encoded data is required to decode
                           additional frames.  In particular, you will need to keep calling
                           push_encoded() until this function returns DECODER_FRAME_AVAILABLE.
@@ -716,6 +698,31 @@ namespace dlib
                           DECODER_FRAME_AVAILABLE until it finally calls DECODER_CLOSED.
                         - DECODER_CLOSED: This indicates there aren't any more frames.  If this happens
                           then it also means that is_open() == false and you can no longer retrieve anymore frames.
+            !*/
+
+            template <class image_type>
+            decoder_status read (
+                image_type& img
+            );
+            /*!
+                ensures
+                    - Attempts to read a frame, storing the result in img.
+                    - If it is successful then:
+                        - returns DECODER_FRAME_AVAILABLE
+
+                      Otherwise, returns one of the following:
+                        - DECODER_EAGAIN: this indicates more encoded data is required to decode
+                          additional frames.  In particular, you will need to keep calling
+                          push_encoded() until this function returns DECODER_FRAME_AVAILABLE.
+                          Alternatively, if there is no more encoded data, call flush(). This will
+                          flush the decoder, resulting in additional frames being available.  After
+                          the decoder is flushed, this function function will return
+                          DECODER_FRAME_AVAILABLE until it finally calls DECODER_CLOSED.
+                        - DECODER_CLOSED: This indicates there aren't any more frames.  If this happens
+                          then it also means that is_open() == false and you can no longer retrieve anymore frames.
+
+                    - If an audio frame is found, it is ignored, destroyed and the next frame is read. So use with care
+                      if you're expecting to use audio frames.
             !*/
         };
 
@@ -790,17 +797,26 @@ namespace dlib
                 // So user may use this in conjunction with some thread-safe shared state to signal an abort/interrupt.
                 std::function<bool()> interrupter;
 
-                // Video stream arguments
-                struct : decoder_codec_args, decoder_image_args{} args_image;
+                // Video stream codec arguments
+                decoder_codec_args args_codec_image;
 
-                // Audio stream arguments
-                struct : decoder_codec_args, decoder_audio_args{} args_audio;
+                // Audio stream codec arguments
+                decoder_codec_args args_codec_audio;
                 
                 // Whether or not to decode video stream.
                 bool enable_image{true};
 
                 // Whether or not to decode audio stream.
                 bool enable_audio{true};
+
+                // Sets the output frame rate for any device that allows you to do so, e.g. webcam, x11grab, etc. Does not apply to files. If -1, ignored.
+                int framerate{-1};
+
+                // Sets output height for any device that allows you to do so, e.g. webcam, x11grab, etc. Dot not apply to files. If -1, ignored.
+                int height{-1};
+
+                // Sets output width for any device that allows you to do so, e.g. webcam, x11grab, etc. Dot not apply to files. If -1, ignored.
+                int width{-1};
             };
 
             demuxer() = default;
@@ -855,7 +871,7 @@ namespace dlib
             /*!
                 ensures 
                     - if (video_enabled())
-                        - returns height of images to be returned by read()
+                        - returns height of encoded images
                     - else
                         - returns 0
             !*/
@@ -864,7 +880,7 @@ namespace dlib
             /*!
                 ensures 
                     - if (video_enabled())
-                        - returns width of images to be returned by read()
+                        - returns width of encoded images
                     - else
                         - returns 0
             !*/
@@ -873,7 +889,7 @@ namespace dlib
             /*!
                 ensures 
                     - if (video_enabled())
-                        - returns pixel format of images to be returned by read()
+                        - returns pixel format of encoded images
                     - else
                         - returns AV_PIX_FMT_NONE
             !*/
@@ -918,7 +934,7 @@ namespace dlib
             /*!
                 ensures 
                     - if (audio_enabled())
-                        - returns sample rate of audio stream
+                        - returns sample rate of encoded audio stream
                     - else
                         - returns 0
             !*/
@@ -927,7 +943,7 @@ namespace dlib
             /*!
                 ensures 
                     - if (audio_enabled())
-                        - returns channel layout of audio stream (e.g. AV_CH_LAYOUT_STEREO)
+                        - returns channel layout of encoded audio stream (e.g. AV_CH_LAYOUT_STEREO)
                     - else
                         - returns 0
             !*/
@@ -936,7 +952,7 @@ namespace dlib
             /*!
                 ensures 
                     - if (audio_enabled())
-                        - returns sample format of audio stream (e.g. AV_SAMPLE_FMT_S16)
+                        - returns sample format of encoded audio stream (e.g. AV_SAMPLE_FMT_S16)
                     - else
                         - returns AV_SAMPLE_FMT_NONE
             !*/
@@ -945,7 +961,7 @@ namespace dlib
             /*!
                 ensures 
                     - if (audio_enabled())
-                        - returns number of audio channels in audio stream (e.g. 1 for mono, 2 for stereo)
+                        - returns number of audio channels in encoded audio stream (e.g. 1 for mono, 2 for stereo)
                     - else
                         - returns 0
             !*/
@@ -986,15 +1002,6 @@ namespace dlib
                         - returns 0
             !*/
 
-            bool read(frame& frame);
-            /*!
-                ensures 
-                    - if (is_open())
-                        - returns true and frame.is_empty() == false
-                    - else
-                        - returns false and frame.is_empty() == true
-            !*/
-
             /*! metadata! */
             const std::unordered_map<std::string, std::string>& get_metadata() const noexcept;
             /*!
@@ -1010,6 +1017,37 @@ namespace dlib
                         - returns video rotation angle from metadata if available
                     - else
                         - returns 0
+            !*/
+
+            bool read (
+                frame& frame,
+                const decoder_image_args& args_image = decoder_image_args{}, 
+                const decoder_audio_args& args_audio = decoder_audio_args{}
+            );
+            /*!
+                ensures 
+                    - if (is_open())
+                        - returns true
+                        - frame.is_empty() == false
+                        - optionally converts frame using args_image if frame.is_image() == true, or args_audio if frame.is_audio() == true
+
+                    - else
+                        - returns false and frame.is_empty() == true
+            !*/
+
+            template <class image_type>
+            bool read (
+                image_type& img
+            );
+            /*!
+                requires
+                    - image_type == an image object that implements the interface defined in
+                      dlib/image_processing/generic_image.h
+
+                ensures 
+                    - keeps reading the file until one of the following is true:
+                        - is_open() == false, in which case return false;
+                        - an image is found, in which case it is converted to image_type appropriately and returns true
             !*/
         };
 
