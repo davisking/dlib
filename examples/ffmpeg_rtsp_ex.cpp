@@ -100,17 +100,10 @@ try
         }
 
         image_window win;
-
-        // By default, demuxer converts images to RGB. So we can read() and convert() to RGB without
-        // having to specify demuxer::args::args_image::fmt = AV_PIX_FMT_RGB24
-        frame f;
         array2d<rgb_pixel> img;
 
-        while (cap.read(f))
-        {
-            convert(f, img);
+        while (cap.read(img))
             win.set_image(img);
-        }
     }};
 
     std::this_thread::sleep_for(1s);
