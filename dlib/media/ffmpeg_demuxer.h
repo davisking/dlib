@@ -274,7 +274,7 @@ namespace dlib
 
                 if (ret < 0)
                 {
-                    logger_dlib() << LERROR << "avcodec_open2() failed : " << get_av_error(ret).c_str();
+                    logger_dlib_wrapper() << LERROR << "avcodec_open2() failed : " << get_av_error(ret).c_str();
                     return;
                 }
                 
@@ -353,7 +353,7 @@ namespace dlib
                     } else {
                         pCodecCtx = nullptr;
                         state   = EXTRACT_ERROR;
-                        logger_dlib() << LERROR << "avcodec_send_packet() failed : " << get_av_error(ret);
+                        logger_dlib_wrapper() << LERROR << "avcodec_send_packet() failed : " << get_av_error(ret);
                     }
                 };
 
@@ -373,7 +373,7 @@ namespace dlib
                     {
                         pCodecCtx = nullptr;
                         state   = EXTRACT_ERROR;
-                        logger_dlib() << LERROR << "avcodec_receive_frame() failed : " << get_av_error(ret);
+                        logger_dlib_wrapper() << LERROR << "avcodec_receive_frame() failed : " << get_av_error(ret);
                     }
                     else
                     {
@@ -454,7 +454,7 @@ namespace dlib
 
             DLIB_ASSERT(a.args_codec.codec != AV_CODEC_ID_NONE || a.args_codec.codec_name != "", "At least args_codec.codec or args_codec.codec_name must be set");
             
-            std::ignore = details::register_ffmpeg(); // Don't let this get optimized away
+            details::register_ffmpeg();
             
             const AVCodec* pCodec = nullptr;
 
@@ -465,7 +465,7 @@ namespace dlib
 
             if (!pCodec)
             {
-                logger_dlib() << LERROR 
+                logger_dlib_wrapper() << LERROR 
                     << "Codec "
                     << avcodec_get_name(a.args_codec.codec)
                     << " / "
@@ -478,7 +478,7 @@ namespace dlib
 
             if (!pCodecCtx)
             {
-                logger_dlib() << LERROR << "avcodec_alloc_context3() failed to allocate codec context for " << pCodec->name;
+                logger_dlib_wrapper() << LERROR << "avcodec_alloc_context3() failed to allocate codec context for " << pCodec->name;
                 return;
             }
 
@@ -498,7 +498,7 @@ namespace dlib
                 parser.reset(av_parser_init(pCodec->id));
                 if (!parser)
                 {
-                    logger_dlib() << LERROR << "av_parser_init() failed codec " << pCodec->name << " not found";
+                    logger_dlib_wrapper() << LERROR << "av_parser_init() failed codec " << pCodec->name << " not found";
                     return;
                 }
             }
@@ -670,7 +670,7 @@ namespace dlib
             using namespace std::chrono;
             using namespace details;
 
-            std::ignore = details::register_ffmpeg(); // Don't let this get optimized away
+            details::register_ffmpeg();
 
             st = {};
             st.args_ = a;

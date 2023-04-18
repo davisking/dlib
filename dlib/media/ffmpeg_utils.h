@@ -54,7 +54,7 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-            bool register_ffmpeg();
+            void register_ffmpeg();
 
 // ---------------------------------------------------------------------------------------------------
 
@@ -218,8 +218,8 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-        dlib::logger& logger_internal();
-        dlib::logger& logger_dlib();
+        dlib::logger& logger_ffmpeg();
+        dlib::logger& logger_dlib_wrapper();
 
 // ---------------------------------------------------------------------------------------------------
 
@@ -408,7 +408,7 @@ namespace dlib
             template<class... Args>
             inline bool fail(Args&&... args)
             {
-                auto ret = logger_dlib() << LERROR;
+                auto ret = logger_dlib_wrapper() << LERROR;
 #ifdef __cpp_fold_expressions
                 ((ret << args),...);
 #else
@@ -669,21 +669,20 @@ namespace dlib
 
         namespace details
         {
-            inline dlib::logger& logger_internal_private()
+            inline dlib::logger& logger_ffmpeg_private()
             {
                 static dlib::logger GLOBAL("ffmpeg.internal");
                 return GLOBAL;
             }
         }
 
-        inline dlib::logger& logger_internal()
+        inline dlib::logger& logger_ffmpeg()
         {
-            auto& logger    = details::logger_internal_private();
-            std::ignore     = details::register_ffmpeg();
-            return logger;
+            details::register_ffmpeg();
+            return details::logger_ffmpeg_private();
         }
 
-        inline dlib::logger& logger_dlib()
+        inline dlib::logger& logger_dlib_wrapper()
         {
             static dlib::logger GLOBAL("ffmpeg.dlib");
             return GLOBAL;
@@ -696,7 +695,7 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-            inline bool register_ffmpeg()
+            inline void register_ffmpeg()
             {
                 static const bool REGISTERED = []
                 {
@@ -712,7 +711,7 @@ namespace dlib
 
                     av_log_set_callback([](void* ptr, int level, const char *fmt, va_list vl) 
                     {
-                        auto& logger = details::logger_internal_private();
+                        auto& logger = details::logger_ffmpeg_private();
 
                         char line[256] = {0};
                         static int print_prefix = 1;
@@ -746,8 +745,6 @@ namespace dlib
 
                     return true;
                 }();
-
-                return REGISTERED;
             }        
 
 // ---------------------------------------------------------------------------------------------------
@@ -1241,7 +1238,7 @@ namespace dlib
         {
             const static auto protocols = []
             {
-                std::ignore = details::register_ffmpeg(); // Don't let this get optimized away
+                details::register_ffmpeg();
                 std::vector<std::string> protocols;
                 void* opaque = nullptr;
                 const char* name = 0;
@@ -1266,7 +1263,7 @@ namespace dlib
         {
             const static auto demuxers = []
             {
-                std::ignore = details::register_ffmpeg(); // Don't let this get optimized away
+                details::register_ffmpeg();
                 std::vector<std::string> demuxers;
                 const AVInputFormat* demuxer = nullptr;
 
@@ -1306,7 +1303,7 @@ namespace dlib
         {
             const static auto ret = []
             {
-                std::ignore = details::register_ffmpeg(); // Don't let this get optimized away
+                details::register_ffmpeg();
 
                 std::vector<muxer_details> all_details;
                 const AVOutputFormat* muxer = nullptr;
@@ -1337,7 +1334,7 @@ namespace dlib
         {
             const static auto ret = []
             {
-                std::ignore = details::register_ffmpeg(); // Don't let this get optimized away
+                details::register_ffmpeg();
                 std::vector<codec_details> details;
 
         #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 10, 100)
@@ -1388,7 +1385,7 @@ namespace dlib
         {
             const static auto ret = []
             {
-                std::ignore = details::register_ffmpeg(); // Don't let this get optimized away
+                details::register_ffmpeg();
                 std::vector<device_details> devices;
 
 #if LIBAVDEVICE_VERSION_INT < AV_VERSION_INT(59, 0, 100)
@@ -1459,7 +1456,7 @@ namespace dlib
         {
             const static auto ret = []
             {
-                std::ignore = details::register_ffmpeg(); // Don't let this get optimized away
+                details::register_ffmpeg();
                 std::vector<device_details> devices;
 
     #if LIBAVDEVICE_VERSION_INT < AV_VERSION_INT(59, 0, 100)

@@ -9,12 +9,14 @@
 */
 
 #include <cstdio>
+#include <chrono>
 #include <dlib/media.h>
 #include <dlib/gui_widgets.h>
 #include <dlib/cmd_line_parser.h>
 
 using namespace std;
 using namespace dlib;
+using namespace std::chrono;
 
 int main(const int argc, const char** argv)
 try
@@ -38,8 +40,8 @@ try
 
     if (parser.option("verbose"))
     {
-        ffmpeg::logger_dlib().set_level(LALL);
-        ffmpeg::logger_internal().set_level(LALL);
+        ffmpeg::logger_dlib_wrapper().set_level(LALL);
+        ffmpeg::logger_ffmpeg().set_level(LALL);
     }
 
     const std::string filepath = get_option(parser, "i", "");
@@ -136,8 +138,10 @@ try
     array2d<rgb_pixel> img;
     size_t audio_samples{0};
 
+    const auto start = high_resolution_clock::now();
     while (cap.read(frame))
     {
+        convert(frame, img);
         if (frame.is_image() && frame.pixfmt() == AV_PIX_FMT_RGB24)
         {
             convert(frame, img);
@@ -150,6 +154,9 @@ try
             printf("\r\tDecoding %zu samples", audio_samples); fflush(stdout);
         }
     }
+    const auto stop = high_resolution_clock::now();
+    printf("Ran in %f s\n", duration_cast<microseconds>(stop - start).count() * 1e-6);
+
 
     printf("\n");
 

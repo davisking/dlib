@@ -223,7 +223,7 @@ namespace dlib
 
                     if (!framerate_supported)
                     {
-                        logger_dlib() << LINFO 
+                        logger_dlib_wrapper() << LINFO 
                             << "Requested framerate "
                             << pCodecCtx->framerate.num / pCodecCtx->framerate.den
                             << " not supported. Changing to default "
@@ -248,7 +248,7 @@ namespace dlib
 
                     if (!pix_fmt_supported)
                     {
-                        logger_dlib() << LINFO
+                        logger_dlib_wrapper() << LINFO
                             << "Requested pixel format "
                             << av_get_pix_fmt_name(pCodecCtx->pix_fmt)
                             << " not supported. Changing to default "
@@ -274,7 +274,7 @@ namespace dlib
 
                     if (!sample_rate_supported)
                     {
-                        logger_dlib() << LINFO
+                        logger_dlib_wrapper() << LINFO
                             << "Requested sample rate "
                             << pCodecCtx->sample_rate
                             << " not supported. Changing to default "
@@ -299,7 +299,7 @@ namespace dlib
 
                     if (!sample_fmt_supported)
                     {
-                        logger_dlib() << LINFO
+                        logger_dlib_wrapper() << LINFO
                             << "Requested sample format "
                             << av_get_sample_fmt_name(pCodecCtx->sample_fmt)
                             << " not supported. Changing to default "
@@ -325,7 +325,7 @@ namespace dlib
 
                     if (!channel_layout_supported)
                     {
-                        logger_dlib() << LINFO
+                        logger_dlib_wrapper() << LINFO
                             << "Channel layout "
                             << details::get_channel_layout_str(pCodecCtx)
                             << " not supported. Changing to default "
@@ -350,7 +350,7 @@ namespace dlib
 
                     if (!channel_layout_supported)
                     {
-                        logger_dlib() << LINFO 
+                        logger_dlib_wrapper() << LINFO 
                             << "Channel layout "
                             << details::get_channel_layout_str(pCodecCtx)
                             << " not supported. Changing to default "
@@ -394,7 +394,7 @@ namespace dlib
 
             DLIB_CASSERT(sink != nullptr, "must provide an appriate sink callback");
 
-            std::ignore = details::register_ffmpeg(); // Don't let this get optimized away
+            details::register_ffmpeg();
 
             packet = make_avpacket();
             const AVCodec* pCodec = nullptr;
@@ -555,7 +555,7 @@ namespace dlib
                 } else {
                     open_   = false;
                     state   = ENCODE_ERROR;
-                    logger_dlib() << LERROR << "avcodec_send_frame() failed : " << get_av_error(ret);
+                    logger_dlib_wrapper() << LERROR << "avcodec_send_frame() failed : " << get_av_error(ret);
                 }
             };
 
@@ -575,7 +575,7 @@ namespace dlib
                 {
                     open_   = false;
                     state   = ENCODE_ERROR;
-                    logger_dlib() << LERROR << "avcodec_receive_packet() failed : " << get_av_error(ret);
+                    logger_dlib_wrapper() << LERROR << "avcodec_receive_packet() failed : " << get_av_error(ret);
                 }
                 else
                 {
@@ -708,7 +708,7 @@ namespace dlib
                     pkt->stream_index = stream_id;
                     int ret = av_interleaved_write_frame(pFormatCtx, pkt);
                     if (ret < 0)
-                        logger_dlib() << LERROR << "av_interleaved_write_frame() failed : " << get_av_error(ret);
+                        logger_dlib_wrapper() << LERROR << "av_interleaved_write_frame() failed : " << get_av_error(ret);
                     return ret == 0;
                 };
 
@@ -721,13 +721,13 @@ namespace dlib
                                 supported.codec_name == args.args_codec.codec_name;
                 }) == end(supported_codecs))
                 {
-                    logger_dlib() << LERROR
+                    logger_dlib_wrapper() << LERROR
                         << "Codec " << avcodec_get_name(args.args_codec.codec) << " or " << args.args_codec.codec_name
                         << " cannot be stored in this file";
-                    logger_dlib() << LINFO 
+                    logger_dlib_wrapper() << LINFO 
                         << "List of supported codecs for muxer " << st.pFormatCtx->oformat->name << " in this installation of ffmpeg:";
                     for (const auto& supported : supported_codecs)
-                        logger_dlib() << LINFO << "    " << supported.codec_name;
+                        logger_dlib_wrapper() << LINFO << "    " << supported.codec_name;
                     return false;
                 }
 
@@ -852,7 +852,7 @@ namespace dlib
 
             const int ret = av_write_trailer(st.pFormatCtx.get());
             if (ret < 0)
-                logger_dlib() << LERROR << "av_write_trailer() failed : " << details::get_av_error(ret);
+                logger_dlib_wrapper() << LERROR << "av_write_trailer() failed : " << details::get_av_error(ret);
 
             if ((st.pFormatCtx->oformat->flags & AVFMT_NOFILE) == 0)
                 avio_closep(&st.pFormatCtx->pb);
