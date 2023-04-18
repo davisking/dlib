@@ -723,7 +723,7 @@ namespace dlib
                         va_end(vl2);
 
                         // Remove all '\n' since dlib's logger already adds one
-                        size = std::min<int>(size, sizeof(line));
+                        size = std::min<int>(size, sizeof(line) - 1);
                         line[size] = '\0';
                         for (int i = size - 1 ; i >= 0 ; --i)
                             if (line[i] == '\n')
