@@ -585,7 +585,6 @@ namespace dlib
 
         valid_area = shrink_rect(valid_area.intersect(bounding_box), 1);
 
-        std::vector<double> prev_intersections;
         for (long y = valid_area.top(); y <= valid_area.bottom(); ++y)
         {
             // Compute the intersections with the scanline
