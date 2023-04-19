@@ -31,7 +31,7 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-        dlib::logger& logger_internal();
+        dlib::logger& logger_ffmpeg();
         /*!
             ensures
                 - Returns a global logger used by the internal ffmpeg libraries. 
