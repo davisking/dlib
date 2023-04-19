@@ -219,7 +219,7 @@ namespace dlib::ffmpeg::details
 
     inline std::string get_channel_layout_str(uint64_t channel_layout)
     {
-        return get_channel_layout_str(convert(channel_layout));
+        return get_channel_layout_str(convert_layout(channel_layout));
     }
 
     inline std::string get_channel_layout_str(const AVCodecContext* pCodecCtx)
