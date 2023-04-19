@@ -433,8 +433,9 @@ namespace dlib
                                           std::numeric_limits<long>::max(), std::numeric_limits<long>::max())
     )
     {
-        const rectangle valid_area(get_rect(image).intersect(area));
+        const rectangle image_rect = get_rect(image);
         const rectangle bounding_box = poly.get_rect();
+        rectangle valid_area(image_rect.intersect(area));
 
         // Don't do anything if the polygon is totally outside the area we can draw in
         // right now.
@@ -448,33 +449,21 @@ namespace dlib
 
         // we will only want to loop over the part of left_boundary that is part of the
         // valid_area.
-        long left = std::max(valid_area.left(), bounding_box.left());
-        long top = std::max(valid_area.top(), bounding_box.top());
-        long right = std::min(valid_area.right(), bounding_box.right());
-        long bottom = std::min(valid_area.bottom(), bounding_box.bottom());
+        valid_area = shrink_rect(valid_area.intersect(bounding_box), 1);
 
         // Since we look at the adjacent rows of boundary information when doing the alpha
         // blending, we want to make sure we always have some boundary information unless
         // we are at the absolute edge of the polygon.
-        const long left_offset = (left == bounding_box.left() && antialias) ? 0 : 1;
-        const long top_offset = (top == bounding_box.top() && antialias) ? 0 : 1;
-        const long right_offset = (right == bounding_box.right() && antialias) ? 0 : 1;
-        const long bottom_offset = (bottom == bounding_box.bottom() && antialias) ? 0 : 1;
+        const long left_offset = (antialias && valid_area.left() == bounding_box.left()) ? 0 : 1;
+        const long top_offset = (antialias && valid_area.top() == bounding_box.top()) ? 0 : 1;
+        const long right_offset = (antialias && valid_area.right() == bounding_box.right()) ? 0 : 1;
+        const long bottom_offset = (antialias && valid_area.bottom() == bounding_box.bottom()) ? 0 : 1;
         if (antialias)
-        {
-            if (left != bounding_box.left())
-                left -= 1;
-            if (top != bounding_box.top())
-                top -= 1;
-            if (right != bounding_box.right())
-                right += 1;
-            if (bottom != bounding_box.bottom())
-                bottom += 1;
-        }
+            valid_area = grow_rect(valid_area, 1).intersect(image_rect);
 
         std::vector<double> left_boundary;
         std::vector<double> right_boundary;
-        poly.get_convex_shape(top, bottom, left_boundary, right_boundary);
+        poly.get_convex_shape(valid_area.top(), valid_area.bottom(), left_boundary, right_boundary);
 
         // draw the polygon row by row
         for (unsigned long i = top_offset; i < left_boundary.size(); ++i)
@@ -490,7 +479,7 @@ namespace dlib
                 // draw the main body of the polygon
                 for (long x = left_x + left_offset; x <= right_x - right_offset; ++x)
                 {
-                    const long y = i+top;
+                    const long y = i + valid_area.top();
                     assign_pixel(img[y][x], color);
                 }
             }
@@ -506,7 +495,7 @@ namespace dlib
             {
                 if (std::floor(left_boundary[i]) != left_x)
                 {
-                    const point p(static_cast<long>(std::floor(left_boundary[i])), i+top);
+                    const point p(static_cast<long>(std::floor(left_boundary[i])), i + valid_area.top());
                     rgb_alpha_pixel temp = alpha_pixel;
                     temp.alpha = max_alpha-static_cast<unsigned char>((left_boundary[i]-p.x())*max_alpha);
                     if (valid_area.contains(p))
@@ -517,7 +506,7 @@ namespace dlib
             {
                 for (long x = static_cast<long>(std::ceil(left_boundary[i-1])); x < left_x; ++x)
                 {
-                    const point p(x, i+top);
+                    const point p(x, i+valid_area.top());
                     rgb_alpha_pixel temp = alpha_pixel;
                     temp.alpha = static_cast<unsigned char>((x-left_boundary[i-1])/std::abs(delta)*max_alpha);
                     if (valid_area.contains(p))
@@ -529,7 +518,7 @@ namespace dlib
                 const long old_left_x = static_cast<long>(std::ceil(left_boundary[i-1]));
                 for (long x = left_x; x < old_left_x; ++x)
                 {
-                    const point p(x, i+top-1);
+                    const point p(x, i + valid_area.top()-1);
                     rgb_alpha_pixel temp = alpha_pixel;
                     temp.alpha = static_cast<unsigned char>((x-left_boundary[i])/delta*max_alpha);
                     if (valid_area.contains(p))
@@ -544,7 +533,7 @@ namespace dlib
             {
                 if (std::ceil(right_boundary[i]) != right_x)
                 {
-                    const point p(static_cast<long>(std::ceil(right_boundary[i])), i+top);
+                    const point p(static_cast<long>(std::ceil(right_boundary[i])), i + valid_area.top());
                     rgb_alpha_pixel temp = alpha_pixel;
                     temp.alpha = max_alpha-static_cast<unsigned char>((p.x()-right_boundary[i])*max_alpha);
                     if (valid_area.contains(p))
@@ -555,7 +544,7 @@ namespace dlib
             {
                 for (long x = static_cast<long>(std::floor(right_boundary[i-1]))+1; x <= right_x; ++x)
                 {
-                    const point p(x, i+top-1);
+                    const point p(x, i + valid_area.top() - 1);
                     rgb_alpha_pixel temp = alpha_pixel;
                     temp.alpha = static_cast<unsigned char>((right_boundary[i]-x)/std::abs(delta)*max_alpha);
                     if (valid_area.contains(p))
@@ -567,7 +556,7 @@ namespace dlib
                 const long old_right_x = static_cast<long>(std::floor(right_boundary[i-1]));
                 for (long x = right_x+1; x <= old_right_x; ++x)
                 {
-                    const point p(x, i+top);
+                    const point p(x, i + valid_area.top());
                     rgb_alpha_pixel temp = alpha_pixel;
                     temp.alpha = static_cast<unsigned char>((right_boundary[i-1]-x)/delta*max_alpha);
                     if (valid_area.contains(p))
@@ -589,18 +578,15 @@ namespace dlib
     )
     {
         image_view<image_type> img(image);
-        const rectangle valid_area(get_rect(image).intersect(area));
+        rectangle valid_area(get_rect(image).intersect(area));
         const rectangle bounding_box = poly.get_rect();
         if (bounding_box.intersect(valid_area).is_empty())
             return;
 
-        const long left = std::max(valid_area.left(), bounding_box.left() + 1);
-        const long top = std::max(valid_area.top(), bounding_box.top() + 1);
-        const long right = std::min(valid_area.right(), bounding_box.right() - 1);
-        const long bottom = std::min(valid_area.bottom(), bounding_box.bottom() - 1);
+        valid_area = shrink_rect(valid_area.intersect(bounding_box), 1);
 
         std::vector<double> prev_intersections;
-        for (long y = top; y <= bottom; ++y)
+        for (long y = valid_area.top(); y <= valid_area.bottom(); ++y)
         {
             // Compute the intersections with the scanline
             std::vector<double> intersections;
@@ -632,10 +618,8 @@ namespace dlib
                 // Draw the main body of the polygon
                 for (long x = left_x; x <= right_x; ++x)
                 {
-                    if (x >= left && x <= right && y >= top && y <= bottom)
-                    {
+                    if (valid_area.contains(x, y))
                         assign_pixel(img[y][x], color);
-                    }
                 }
             }
         }
