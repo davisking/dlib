@@ -64,7 +64,7 @@ extern "C" {
 #include <memory>
 #include "../logger.h"
 
-namespace dlib::ffmpeg::details
+namespace dlib { namespace ffmpeg { namespace details
 {
 
 // ---------------------------------------------------------------------------------------------------
@@ -482,6 +482,6 @@ namespace dlib::ffmpeg::details
 
 // ---------------------------------------------------------------------------------------------------
 
-}
+}}}
 
 #endif //DLIB_FFMPEG_DETAILS
