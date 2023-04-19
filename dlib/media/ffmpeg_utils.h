@@ -35,6 +35,7 @@ extern "C" {
 #include <libavutil/channel_layout.h>
 #include <libavutil/audio_fifo.h>
 #include <libavutil/imgutils.h>
+#include <libavutil/log.h>
 #include <libswscale/swscale.h>
 #include <libswresample/swresample.h>
 #include <libavformat/avformat.h>
@@ -53,28 +54,7 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-            class register_ffmpeg
-            {
-                /*!
-                    WHAT THIS OBJECT REPRESENTS
-                        The point of this class is to statically register ffmpeg globally
-                        and ensure its done only ONCE.
-                        In C++17 you can have inline variables and this can be done much easier.
-                        In C++14 and below you need something like this class.
-                !*/
-            
-            public:
-
-                static bool get()
-                {
-                    static const bool v = register_library();
-                    return v;
-                }
-            
-            private:
-
-                static bool register_library();
-            };
+            void register_ffmpeg();
 
 // ---------------------------------------------------------------------------------------------------
 
@@ -235,6 +215,11 @@ namespace dlib
         std::string get_pixel_fmt_str(AVPixelFormat fmt);
         std::string get_audio_fmt_str(AVSampleFormat fmt);
         std::string get_channel_layout_str(uint64_t layout);
+
+// ---------------------------------------------------------------------------------------------------
+
+        dlib::logger& logger_ffmpeg();
+        dlib::logger& logger_dlib_wrapper();
 
 // ---------------------------------------------------------------------------------------------------
 
@@ -421,9 +406,9 @@ namespace dlib
         namespace details
         {
             template<class... Args>
-            inline bool fail(logger& out, Args&&... args)
+            inline bool fail(Args&&... args)
             {
-                auto ret = out << LERROR;
+                auto ret = logger_dlib_wrapper() << LERROR;
 #ifdef __cpp_fold_expressions
                 ((ret << args),...);
 #else
@@ -684,22 +669,84 @@ namespace dlib
 
         namespace details
         {
+            inline dlib::logger& logger_ffmpeg_private()
+            {
+                static dlib::logger GLOBAL("ffmpeg.internal");
+                return GLOBAL;
+            }
+        }
+
+        inline dlib::logger& logger_ffmpeg()
+        {
+            details::register_ffmpeg();
+            return details::logger_ffmpeg_private();
+        }
+
+        inline dlib::logger& logger_dlib_wrapper()
+        {
+            static dlib::logger GLOBAL("ffmpeg.dlib");
+            return GLOBAL;
+        }
 
 // ---------------------------------------------------------------------------------------------------
 
-            inline bool register_ffmpeg::register_library()
+        namespace details
+        {
+
+// ---------------------------------------------------------------------------------------------------
+
+            inline void register_ffmpeg()
             {
-                avdevice_register_all();
+                static const bool REGISTERED = []
+                {
+                    avdevice_register_all();
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 10, 100)
-                // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L91
-                avcodec_register_all();
+                    // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L91
+                    avcodec_register_all();
 #endif
 #if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100) 
-                // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L86
-                av_register_all();
+                    // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L86
+                    av_register_all();
 #endif
-                return true;
-            }
+
+                    av_log_set_callback([](void* ptr, int level, const char *fmt, va_list vl) 
+                    {
+                        auto& logger = details::logger_ffmpeg_private();
+
+                        char line[256] = {0};
+                        static int print_prefix = 1;
+
+                        // Not sure if copying to vl2 is required by internal ffmpeg functions do this...
+                        va_list vl2;
+                        va_copy(vl2, vl);
+                        int size = av_log_format_line2(ptr, level, fmt, vl2, &line[0], sizeof(line), &print_prefix);
+                        va_end(vl2);
+
+                        // Remove all '\n' since dlib's logger already adds one
+                        size = std::min<int>(size, sizeof(line) - 1);
+                        line[size] = '\0';
+                        for (int i = size - 1 ; i >= 0 ; --i)
+                            if (line[i] == '\n')
+                                line[i] = ' ';
+
+                        switch(level)
+                        {
+                            case AV_LOG_PANIC:
+                            case AV_LOG_FATAL:      logger << LFATAL << line; break;
+                            case AV_LOG_ERROR:      logger << LERROR << line; break;
+                            case AV_LOG_WARNING:    logger << LWARN  << line; break;
+                            case AV_LOG_INFO:       
+                            case AV_LOG_VERBOSE:    logger << LINFO  << line; break;
+                            case AV_LOG_DEBUG:      logger << LDEBUG << line; break;
+                            case AV_LOG_TRACE:      logger << LTRACE << line; break;
+                            default: break;
+                        }
+                    });
+
+                    return true;
+                }();
+                (void)REGISTERED;
+            }        
 
 // ---------------------------------------------------------------------------------------------------
 
@@ -1192,17 +1239,17 @@ namespace dlib
         {
             const static auto protocols = []
             {
-                const bool init = details::register_ffmpeg::get(); // Don't let this get optimized away
+                details::register_ffmpeg();
                 std::vector<std::string> protocols;
                 void* opaque = nullptr;
                 const char* name = 0;
-                while (init && (name = avio_enum_protocols(&opaque, 0)))
+                while ((name = avio_enum_protocols(&opaque, 0)))
                     protocols.emplace_back(name);
 
                 opaque  = nullptr;
                 name    = 0;
 
-                while (init && (name = avio_enum_protocols(&opaque, 1)))
+                while ((name = avio_enum_protocols(&opaque, 1)))
                     protocols.emplace_back(name);
 
                 return protocols;
@@ -1217,16 +1264,16 @@ namespace dlib
         {
             const static auto demuxers = []
             {
-                const bool init = details::register_ffmpeg::get(); // Don't let this get optimized away
+                details::register_ffmpeg();
                 std::vector<std::string> demuxers;
                 const AVInputFormat* demuxer = nullptr;
 
 #if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100)
                 // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L86
-                while (init && (demuxer = av_iformat_next(demuxer)))
+                while ((demuxer = av_iformat_next(demuxer)))
 #else
                 void* opaque = nullptr;
-                while (init && (demuxer = av_demuxer_iterate(&opaque)))
+                while ((demuxer = av_demuxer_iterate(&opaque)))
 #endif
                     demuxers.push_back(demuxer->name);
 
@@ -1257,17 +1304,17 @@ namespace dlib
         {
             const static auto ret = []
             {
-                const bool init = details::register_ffmpeg::get(); // Don't let this get optimized away
+                details::register_ffmpeg();
 
                 std::vector<muxer_details> all_details;
                 const AVOutputFormat* muxer = nullptr;
 
 #if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100)
                 // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L86
-                while (init && (muxer = av_oformat_next(muxer)))
+                while ((muxer = av_oformat_next(muxer)))
 #else
                 void* opaque = nullptr;
-                while (init && (muxer = av_muxer_iterate(&opaque)))
+                while ((muxer = av_muxer_iterate(&opaque)))
 #endif
                 {
                     muxer_details details;
@@ -1288,17 +1335,17 @@ namespace dlib
         {
             const static auto ret = []
             {
-                const bool init = details::register_ffmpeg::get(); // Don't let this get optimized away
+                details::register_ffmpeg();
                 std::vector<codec_details> details;
 
         #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 10, 100)
                 // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L91
                 AVCodec* codec = nullptr;
-                while (init && (codec = av_codec_next(codec)))
+                while ((codec = av_codec_next(codec)))
         #else
                 const AVCodec* codec = nullptr;
                 void* opaque = nullptr;
-                while (init && (codec = av_codec_iterate(&opaque)))
+                while ((codec = av_codec_iterate(&opaque)))
         #endif
                 {
                     codec_details detail;
@@ -1339,7 +1386,7 @@ namespace dlib
         {
             const static auto ret = []
             {
-                const bool init = details::register_ffmpeg::get(); // Don't let this get optimized away
+                details::register_ffmpeg();
                 std::vector<device_details> devices;
 
 #if LIBAVDEVICE_VERSION_INT < AV_VERSION_INT(59, 0, 100)
@@ -1350,7 +1397,7 @@ namespace dlib
 
                 AVInputFormatPtr device{nullptr};
 
-                while (init && (device = av_input_audio_device_next(device)))
+                while ((device = av_input_audio_device_next(device)))
                 {
                     device_details details;
                     details.device_type     = device->name;
@@ -1360,7 +1407,7 @@ namespace dlib
 
                 device = nullptr;
 
-                while (init && (device = av_input_video_device_next(device)))
+                while ((device = av_input_video_device_next(device)))
                 {
                     device_details details;
                     details.device_type     = device->name;
@@ -1410,7 +1457,7 @@ namespace dlib
         {
             const static auto ret = []
             {
-                const bool init = details::register_ffmpeg::get(); // Don't let this get optimized away
+                details::register_ffmpeg();
                 std::vector<device_details> devices;
 
     #if LIBAVDEVICE_VERSION_INT < AV_VERSION_INT(59, 0, 100)
@@ -1421,7 +1468,7 @@ namespace dlib
 
                 AVOutputFormatPtr device{nullptr};
 
-                while (init && (device = av_output_audio_device_next(device)))
+                while ((device = av_output_audio_device_next(device)))
                 {
                     device_details details;
                     details.device_type     = std::string(device->name);
@@ -1431,7 +1478,7 @@ namespace dlib
 
                 device = nullptr;
 
-                while (init && (device = av_output_video_device_next(device)))
+                while ((device = av_output_video_device_next(device)))
                 {
                     device_details details;
                     details.device_type     = std::string(device->name);
