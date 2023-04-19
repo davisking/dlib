@@ -38,7 +38,7 @@ namespace dlib
                 - You may set the logging level using .set_level() to supress or enable certain logs.
         !*/
 
-        dlib::logger& logger_dlib();
+        dlib::logger& logger_dlib_wrapper();
         /*!
             ensures
                 - Returns a global logger used by dlib's ffmpeg wrappers.
