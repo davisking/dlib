@@ -618,8 +618,7 @@ namespace dlib
                 // Draw the main body of the polygon
                 for (long x = left_x; x <= right_x; ++x)
                 {
-                    if (valid_area.contains(x, y))
-                        assign_pixel(img[y][x], color);
+                    assign_pixel(img[y][x], color);
                 }
             }
         }
