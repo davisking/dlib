@@ -469,6 +469,30 @@ ensures \n\
 
 // ----------------------------------------------------------------------------------------
 
+template <typename T>
+void py_insert_image_chip (
+    numpy_image<T>& img,
+    const numpy_image<T>& chip,
+    const chip_details& chip_location
+)
+{
+    image_view<numpy_image<T>> vimg(img);
+    const_image_view<numpy_image<T>> vchip(chip);
+    DLIB_CASSERT(vchip.nr() == chip_location.rows && vchip.nc() == chip_location.cols,
+                 "The chip and the chip_location do not have the same size.")
+    const auto tf = inv(get_mapping_to_chip(chip_location));
+    for (long r = 0; r < vchip.nr(); ++r)
+    {
+        for (long c = 0; c < vchip.nc(); ++c)
+        {
+            const auto p = tf(dlib::vector<double, 2>(c, r));
+            assign_pixel(vimg[std::lround(p.y())][std::lround(p.x())], vchip[r][c]);
+        }
+    }
+}
+
+// ----------------------------------------------------------------------------------------
+
 py::array py_tile_images (
     const py::list& images
 )
@@ -578,6 +602,36 @@ void bind_image_classes2(py::module& m)
         );
 
     register_extract_image_chip(m);
+    m.def("insert_image_chip", &py_insert_image_chip<uint8_t>, py::arg("img"), py::arg("chip"), py::arg("chip_location"));
+    m.def("insert_image_chip", &py_insert_image_chip<uint16_t>, py::arg("img"), py::arg("chip"), py::arg("chip_location"));
+    m.def("insert_image_chip", &py_insert_image_chip<uint32_t>, py::arg("img"), py::arg("chip"), py::arg("chip_location"));
+    m.def("insert_image_chip", &py_insert_image_chip<uint64_t>, py::arg("img"), py::arg("chip"), py::arg("chip_location"));
+    m.def("insert_image_chip", &py_insert_image_chip<int8_t>, py::arg("img"), py::arg("chip"), py::arg("chip_location"));
+    m.def("insert_image_chip", &py_insert_image_chip<int16_t>, py::arg("img"), py::arg("chip"), py::arg("chip_location"));
+    m.def("insert_image_chip", &py_insert_image_chip<int32_t>, py::arg("img"), py::arg("chip"), py::arg("chip_location"));
+    m.def("insert_image_chip", &py_insert_image_chip<int64_t>, py::arg("img"), py::arg("chip"), py::arg("chip_location"));
+    m.def("insert_image_chip", &py_insert_image_chip<float>, py::arg("img"), py::arg("chip"), py::arg("chip_location"));
+    m.def("insert_image_chip", &py_insert_image_chip<double>, py::arg("img"), py::arg("chip"), py::arg("chip_location"));
+    m.def("insert_image_chip", &py_insert_image_chip<rgb_pixel>, py::arg("img"), py::arg("chip"), py::arg("chip_location"),
+        "Inserts chip into img applying the appropriate mapping using chip_location"
+"requires \n\
+    - img and chip numpy arrays that can be interpreted as images.  They \n\
+      must be the same type of image as well. \n\
+    - the number of rows and columns in chip match the ones in chip_location \n\
+ensures \n\
+    - This function takes the given chip and inserts it into img using an appropriate \n\
+      mapping, computed from chip_location."
+        /*!
+            requires
+                - img and chip numpy arrays that can be interpreted as images.  They
+                  must be the same type of image as well.
+                - the number of rows and columns in chip match the ones in chip_location.
+            ensures
+                - This function takes the given chip and inserts it into img using an appropriate
+                  mapping, computed from chip_location.
+        !*/
+        );
+
 
     m.def("sub_image", &py_sub_image, py::arg("img"), py::arg("rect"),
 "Returns a new numpy array that references the sub window in img defined by rect. \n\
