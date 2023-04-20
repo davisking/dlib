@@ -476,7 +476,6 @@ void py_insert_image_chip (
     const chip_details& chip_location
 )
 {
-    // numpy_image<T> out = img;
     image_view<numpy_image<T>> vimg(img);
     const_image_view<numpy_image<T>> vchip(chip);
     DLIB_CASSERT(vchip.nr() == chip_location.rows && vchip.nc() == chip_location.cols,
