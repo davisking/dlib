@@ -476,17 +476,21 @@ void py_insert_image_chip (
     const chip_details& chip_location
 )
 {
+    // numpy_image<T> out = img;
     image_view<numpy_image<T>> vimg(img);
     const_image_view<numpy_image<T>> vchip(chip);
     DLIB_CASSERT(vchip.nr() == chip_location.rows && vchip.nc() == chip_location.cols,
                  "The chip and the chip_location do not have the same size.")
-    const auto tf = inv(get_mapping_to_chip(chip_location));
-    for (long r = 0; r < vchip.nr(); ++r)
+    // Figure out which rectangle contains the rotated rectangle
+    const rectangle rect = grow_rect(chip_location.rect, chip_location.cols * 0.5 * std::cos(chip_location.angle));
+    const auto tf = get_mapping_to_chip(chip_location);
+    interpolate_bilinear interp;
+    for (long r = 0; r < vimg.nr(); ++r)
     {
-        for (long c = 0; c < vchip.nc(); ++c)
+        for (long c = 0; c < vimg.nc(); ++c)
         {
-            const auto p = tf(dlib::vector<double, 2>(c, r));
-            assign_pixel(vimg[std::lround(p.y())][std::lround(p.x())], vchip[r][c]);
+            if (rect.contains(c, r))
+                interp(vchip, tf(dlib::vector<double, 2>(c, r)), vimg[r][c]);
         }
     }
 }
@@ -602,6 +606,7 @@ void bind_image_classes2(py::module& m)
         );
 
     register_extract_image_chip(m);
+
     m.def("insert_image_chip", &py_insert_image_chip<uint8_t>, py::arg("img"), py::arg("chip"), py::arg("chip_location"));
     m.def("insert_image_chip", &py_insert_image_chip<uint16_t>, py::arg("img"), py::arg("chip"), py::arg("chip_location"));
     m.def("insert_image_chip", &py_insert_image_chip<uint32_t>, py::arg("img"), py::arg("chip"), py::arg("chip_location"));
