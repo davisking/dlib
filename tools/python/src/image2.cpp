@@ -476,22 +476,7 @@ void py_insert_image_chip (
     const chip_details& chip_location
 )
 {
-    image_view<numpy_image<T>> vimg(img);
-    const_image_view<numpy_image<T>> vchip(chip);
-    DLIB_CASSERT(vchip.nr() == chip_location.rows && vchip.nc() == chip_location.cols,
-                 "The chip and the chip_location do not have the same size.")
-    // Figure out which rectangle contains the rotated rectangle
-    const rectangle rect = grow_rect(chip_location.rect, chip_location.cols * 0.5 * std::cos(chip_location.angle));
-    const auto tf = get_mapping_to_chip(chip_location);
-    interpolate_bilinear interp;
-    for (long r = 0; r < vimg.nr(); ++r)
-    {
-        for (long c = 0; c < vimg.nc(); ++c)
-        {
-            if (rect.contains(c, r))
-                interp(vchip, tf(dlib::vector<double, 2>(c, r)), vimg[r][c]);
-        }
-    }
+    insert_image_chip(img, chip, chip_location);
 }
 
 // ----------------------------------------------------------------------------------------

@@ -1345,6 +1345,50 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename image_type1,
+        typename image_type2,
+        typename interpolation_type
+    >
+    void insert_image_chip (
+        image_type1& image,
+        const image_type2& chip,
+        const chip_details& location,
+        const interpolation_type& interp
+    );
+    /*!
+        requires
+            - image_type1 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h
+            - image_type2 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h
+            - pixel_traits<typename image_traits<image_type1>::pixel_type>::has_alpha == false
+            - num_rows(chip) == location.rows && num_columns(chip) == location.cols
+            - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear, 
+              interpolate_quadratic, or a type with a compatible interface.
+        ensures
+            - This function inserts chip into the image according to the location and the
+              interpolation method supplied as a parameter.
+    !*/
+
+    template <
+        typename image_type1,
+        typename image_type2
+    >
+    void insert_image_chip (
+        image_type1& image,
+        const image_type2& chip,
+        const chip_details& location
+    );
+    /*!
+        ensures
+            - This function is a simple convenience / compatibility wrapper that calls the
+              above-defined insert_image_chip() function using bilinear interpolation.
+    !*/
+
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename image_type
         >
     struct sub_image_proxy

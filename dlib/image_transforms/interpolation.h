@@ -2003,6 +2003,50 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename image_type1,
+        typename image_type2,
+        typename interpolation_type
+    >
+    void insert_image_chip (
+        image_type1& image,
+        const image_type2& chip,
+        const chip_details& location,
+        const interpolation_type& interp
+    )
+    {
+        image_view<image_type1> img(image);
+        const_image_view<image_type2> chp(chip);
+        DLIB_CASSERT(chp.nr() == location.rows && chp.nc() == location.cols,
+                     "The chip and the location do not have the same size.")
+        // Figure out which rectangle contains the rotated rectangle
+        const auto tf = get_mapping_to_chip(location);
+        for (long r = 0; r < img.nr(); ++r)
+        {
+            for (long c = 0; c < img.nc(); ++c)
+            {
+                interp(chip, tf(dlib::vector<double, 2>(c, r)), img[r][c]);
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type1,
+        typename image_type2
+    >
+    void insert_image_chip (
+        image_type1& image,
+        const image_type2& chip,
+        const chip_details& location
+    )
+    {
+        insert_image_chip(image, chip, location, interpolate_bilinear());
+    }
+
+// ----------------------------------------------------------------------------------------
+
     inline chip_details get_face_chip_details (
         const full_object_detection& det,
         const unsigned long size = 200,
