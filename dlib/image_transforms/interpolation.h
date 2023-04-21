@@ -2015,17 +2015,16 @@ namespace dlib
         const interpolation_type& interp
     )
     {
-        image_view<image_type1> img(image);
-        const_image_view<image_type2> chp(chip);
-        DLIB_CASSERT(chp.nr() == location.rows && chp.nc() == location.cols,
+        image_view<image_type1> vimg(image);
+        const_image_view<image_type2> vchip(chip);
+        DLIB_CASSERT(vchip.nr() == location.rows && vchip.nc() == location.cols,
                      "The chip and the location do not have the same size.")
-        // Figure out which rectangle contains the rotated rectangle
         const auto tf = get_mapping_to_chip(location);
-        for (long r = 0; r < img.nr(); ++r)
+        for (long r = 0; r < vimg.nr(); ++r)
         {
-            for (long c = 0; c < img.nc(); ++c)
+            for (long c = 0; c < vimg.nc(); ++c)
             {
-                interp(chip, tf(dlib::vector<double, 2>(c, r)), img[r][c]);
+                interp(vchip, tf(dlib::vector<double, 2>(c, r)), vimg[r][c]);
             }
         }
     }
