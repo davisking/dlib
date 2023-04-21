@@ -2017,7 +2017,8 @@ namespace dlib
     {
         image_view<image_type1> vimg(image);
         const_image_view<image_type2> vchip(chip);
-        DLIB_CASSERT(vchip.nr() == location.rows && vchip.nc() == location.cols,
+        DLIB_CASSERT(static_cast<unsigned long>(vchip.nr()) == location.rows &&
+                     static_cast<unsigned long>(vchip.nc()) == location.cols,
                      "The chip and the location do not have the same size.")
         const auto tf = get_mapping_to_chip(location);
         for (long r = 0; r < vimg.nr(); ++r)
