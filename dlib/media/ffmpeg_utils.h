@@ -12,7 +12,6 @@ static_assert(false, "This version of dlib isn't built with the FFMPEG wrappers"
 
 #include <cstdint>
 #include <stdexcept>
-#include <cassert>
 #include <memory>
 #include <algorithm>
 #include <string>
@@ -24,77 +23,564 @@ static_assert(false, "This version of dlib isn't built with the FFMPEG wrappers"
 #include "../image_processing/generic_image.h"
 #include "../pixel.h"
 #include "../assert.h"
-#include "../logger.h"
-#include "ffmpeg_abstract.h"
-
-extern "C" {
-#include <libavutil/dict.h>
-#include <libavutil/opt.h>
-#include <libavutil/pixdesc.h>
-#include <libavutil/frame.h>
-#include <libavutil/channel_layout.h>
-#include <libavutil/audio_fifo.h>
-#include <libavutil/imgutils.h>
-#include <libavutil/log.h>
-#include <libswscale/swscale.h>
-#include <libswresample/swresample.h>
-#include <libavformat/avformat.h>
-#include <libavdevice/avdevice.h>
-#include <libavcodec/avcodec.h>
-}
+#include "ffmpeg_details.h"
 
 namespace dlib
 {
     namespace ffmpeg
     {
-        class frame;
+
+// ---------------------------------------------------------------------------------------------------
+
+        std::string get_pixel_fmt_str(AVPixelFormat fmt);
+        /*!
+            ensures
+                - Returns a string description of AVPixelFormat
+        !*/
+
+        std::string get_audio_fmt_str(AVSampleFormat fmt);
+        /*!
+            ensures
+                - Returns a string description of AVSampleFormat
+        !*/
+
+        std::string get_channel_layout_str(uint64_t layout);
+        /*!
+            ensures
+                - Returns a string description of a channel layout, where layout is e.g. AV_CH_LAYOUT_STEREO
+        !*/
+
+// ---------------------------------------------------------------------------------------------------
+
+        dlib::logger& logger_ffmpeg();
+        /*!
+            ensures
+                - Returns a global logger used by the internal ffmpeg libraries. 
+                - You may set the logging level using .set_level() to supress or enable certain logs.
+        !*/
+
+        dlib::logger& logger_dlib_wrapper();
+        /*!
+            ensures
+                - Returns a global logger used by dlib's ffmpeg wrappers.
+                - You may set the logging level using .set_level() to supress or enable certain logs.
+        !*/
+
+// ---------------------------------------------------------------------------------------------------
+
+        namespace details { class resampler; }
+
+        class frame
+        {
+        public:
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This class wraps AVFrame* into a std::unique_ptr with an appropriate deleter.
+                    It also has a std::chrono timestamp which closely matches the AVFrame's internal pts.
+                    It has a bunch of helper functions for retrieving the frame's properties.
+                    We strongly recommend you read ffmegs documentation on AVFrame.
+
+                    FFmpeg's AVFrame object is basically a type-erased frame object, which can contain, 
+                    image, audio or other types of streamable data.
+                    The pixel format (image), sample format (audio), number of channels (audio), 
+                    pixel/sample type (u8, s16, f32, etc) are also erased and defined as runtime parameters.
+
+                    Users should avoid using this object directly if they can, instead use the conversion functions
+                    dlib::ffmpeg::convert() which will convert to and back appropriate dlib objects.
+                    For example, when using dlib::ffmpeg::decoder or dlib::ffmpeg::demuxer, directly after calling
+                    .read(), use convert() to get a dlib object which you can then use for your computer vision,
+                    or DNN application.
+
+                    If users need to use frame objects directly, maybe because RGB or BGR aren't appropriate, 
+                    and they would rather use the default format returned by their codec, then use
+                    frame::get_frame().data and frame::get_frame().linesize to iterate or copy the data.
+                    Please carefully read FFMpeg's documentation on how to interpret those fields.
+                    Also, users must not copy AVFrame directly. It is a C object, and therefore does not
+                    support RAII. If you need to make copies, use the frame object (which wraps AVFrame)
+                    which has well defined copy (and move) semantics.
+            !*/
+
+            frame() = default;
+            /*!
+                ensures
+                    - is_empty() == true
+            !*/
+
+            frame(frame&& ori) = default;
+            /*!
+                ensures
+                    - Move constructor
+                    - After move, ori.is_empty() == true
+            !*/
+
+            frame& operator=(frame&& ori) = default;
+            /*!
+                ensures
+                    - Move assign operator
+                    - After move, ori.is_empty() == true
+            !*/
+
+            frame(const frame& ori);
+            /*!
+                ensures
+                    - Copy constructor
+            !*/
+
+            frame& operator=(const frame& ori);
+            /*!
+                ensures
+                    - Copy assign operator
+            !*/
+
+            frame(
+                int                                     h,
+                int                                     w,
+                AVPixelFormat                           pixfmt,
+                std::chrono::system_clock::time_point   timestamp_us
+            );
+            /*!
+                ensures
+                    - Create a an image frame object with these parameters.
+                    - is_image() == true
+                    - is_audio() == false
+                    - is_empty() == false
+            !*/
+
+            frame(
+                int                                     sample_rate,
+                int                                     nb_samples,
+                uint64_t                                channel_layout,
+                AVSampleFormat                          samplefmt,
+                std::chrono::system_clock::time_point   timestamp
+            );
+            /*!
+                ensures
+                    - Create a an audio frame object with these parameters.
+                    - is_image() == false
+                    - is_audio() == true
+                    - is_empty() == false
+            !*/
+
+            bool is_empty() const noexcept;
+            /*!
+                ensures
+                    - Returns true if is_image() == false and is_audio() == false
+            !*/
+
+            bool is_image() const noexcept;
+            /*!
+                ensures
+                    - Returns true if underlying AVFrame* != nullptr, height() > 0, width() > 0 and pixfmt() != AV_PIX_FMT_NONE
+            !*/
+
+            bool is_audio() const noexcept;
+            /*!
+                ensures
+                    - Returns true if underlying AVFrame* != nullptr, height() > 0, width() > 0 and pixfmt() != AV_PIX_FMT_NONE
+            !*/
+
+            AVPixelFormat pixfmt() const noexcept;
+            /*!
+                ensures
+                    - If underlying AVFrame* is image type, returns pixel format, otherwise, returns AV_PIX_FMT_NONE
+            !*/
+
+            int height() const noexcept;
+            /*!
+                ensures
+                    - If underlying AVFrame* is image type, returns height, otherwise 0
+            !*/
+
+            int width() const noexcept;
+            /*!
+                ensures
+                    - If underlying AVFrame* is image type, returns width, otherwise 0
+            !*/
+
+            int nsamples() const noexcept;
+            /*!
+                ensures
+                    - If underlying AVFrame* is audio type, returns number of samples, otherwise 0
+            !*/
+
+            int  nchannels() const noexcept;
+            /*!
+                ensures
+                    - If underlying AVFrame* is audio type, returns number of channels, e.g. 1 for mono, 2 for stereo, otherwise 0
+            !*/
+
+            uint64_t layout() const noexcept;
+            /*!
+                ensures
+                    - If underlying AVFrame* is audio type, returns channel layout, e.g. AV_CH_LAYOUT_MONO or AV_CH_LAYOUT_STEREO, otherwise 0
+            !*/
+
+            AVSampleFormat samplefmt() const noexcept;
+            /*!
+                ensures
+                    - If underlying AVFrame* is audio type, returns sample format, otherwise, returns AV_SAMPLE_FMT_NONE
+            !*/
+
+            int sample_rate() const noexcept;
+            /*!
+                ensures
+                    - If underlying AVFrame* is audio type, returns sample rate, otherwise, returns 0
+            !*/
+
+            std::chrono::system_clock::time_point get_timestamp() const noexcept;
+            /*!
+                ensures
+                    - If possible, returns a timestamp associtated with this frame. This is not always possible, it depends on whether the information
+                      is provided by the codec and/or the muxer. dlib will do it's best to get a timestamp for you.
+            !*/
+
+            const AVFrame& get_frame() const;
+            /*!
+                requires
+                    - is_empty() == false
+
+                ensures
+                    - Returns a const reference to the underyling AVFrame object. DO NOT COPY THIS OBJECT! RAII is not supported on this sub-object.
+                      Use with care! Prefer to use dlib's convert() functions to convert to and back dlib objects.
+            !*/
+
+            AVFrame& get_frame();
+            /*!
+                requires
+                    - is_empty() == false
+                ensures
+                    - Returns a non-const reference to the underlying AVFrame object. DO NOT COPY THIS OBJECT! RAII is not supported on this sub-object.
+                      Use with care! Prefer to use dlib's convert() functions to convert to and back dlib objects.
+            !*/
+
+        private:
+
+            friend class details::resampler;
+            friend class encoder;
+            friend class decoder;
+
+            frame(
+                int                                     h,
+                int                                     w,
+                AVPixelFormat                           pixfmt,
+                int                                     sample_rate,
+                int                                     nb_samples,
+                uint64_t                                channel_layout,
+                AVSampleFormat                          samplefmt,
+                std::chrono::system_clock::time_point   timestamp
+            );
+
+            void copy_from(const frame& other);
+
+            details::av_ptr<AVFrame> f;
+            std::chrono::system_clock::time_point timestamp;
+        };
+
+// ---------------------------------------------------------------------------------------------------
+
+        template<class PixelType>
+        struct pix_traits
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This is a type trait for converting a sample type to ffmpeg's AVPixelFormat obj.
+            !*/
+        };
+
+        template<> struct pix_traits<uint8_t>           { constexpr static AVPixelFormat fmt = AV_PIX_FMT_GRAY8; };
+        template<> struct pix_traits<rgb_pixel>         { constexpr static AVPixelFormat fmt = AV_PIX_FMT_RGB24; };
+        template<> struct pix_traits<bgr_pixel>         { constexpr static AVPixelFormat fmt = AV_PIX_FMT_BGR24; };
+        template<> struct pix_traits<rgb_alpha_pixel>   { constexpr static AVPixelFormat fmt = AV_PIX_FMT_RGBA;  };
+        template<> struct pix_traits<bgr_alpha_pixel>   { constexpr static AVPixelFormat fmt = AV_PIX_FMT_BGRA;  };
+
+// ---------------------------------------------------------------------------------------------------
+
+        template<class SampleType>
+        struct sample_traits 
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This is a type trait for converting a sample type to ffmpeg's AVSampleFormat obj.
+            !*/
+        };
+
+        template<> struct sample_traits<uint8_t> { constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_U8; };
+        template<> struct sample_traits<int16_t> { constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_S16; };
+        template<> struct sample_traits<int32_t> { constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_S32; };
+        template<> struct sample_traits<float>   { constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_FLT; };
+        template<> struct sample_traits<double>  { constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_DBL; };
+
+// ---------------------------------------------------------------------------------------------------
+
+        template<class SampleType, std::size_t Channels>
+        struct audio
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object is a typed audio buffer which can convert to and back dlib::ffmpeg::frame.
+            !*/
+
+            using sample = std::array<SampleType, Channels>;
+
+            std::vector<sample>                     samples;
+            float                                   sample_rate{0};
+            std::chrono::system_clock::time_point   timestamp{};
+        };
+
+// ---------------------------------------------------------------------------------------------------
+
+        struct codec_details
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object informs on available codecs provided by the installation of ffmpeg dlib is linked against.
+            !*/
+
+            AVCodecID   codec_id{AV_CODEC_ID_NONE};
+            std::string codec_name;
+            bool supports_encoding{false};
+            bool supports_decoding{false};
+        };
+
+        struct muxer_details
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object informs on available muxers provided by the installation of ffmpeg dlib is linked against.
+            !*/
+
+            std::string name;
+            std::vector<codec_details> supported_codecs;
+        };
+
+        struct device_details
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object informs on available device types provided by the installation of ffmpeg dlib is linked against.
+            !*/
+
+            std::string device_type;
+            bool        is_audio_type{false};
+            bool        is_video_type{false};
+        };
+
+        struct device_instance
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object informs on the currently available device instances readable by ffmpeg.
+            !*/
+
+            std::string name;
+            std::string description;
+        };
+
+        const std::vector<std::string>& list_protocols();
+        /*!
+            ensures
+                - returns a list of all available ffmpeg protocols
+        !*/
+
+        const std::vector<std::string>& list_demuxers();
+        /*!
+            ensures
+                - returns a list of all available ffmpeg demuxers
+        !*/
+
+        const std::vector<muxer_details>& list_muxers();
+        /*!
+            ensures
+                - returns a list of all available ffmpeg muxers
+        !*/
+        
+        const std::vector<codec_details>& list_codecs();
+        /*!
+            ensures
+                - returns a list of all available ffmpeg codecs with information on whether decoding and/or encoding is supported.
+                  Note that not all codecs support encoding, unless your installation of ffmpeg is built with third party library
+                  dependencies like libx264, libx265, etc.
+        !*/
+
+        const std::vector<device_details>& list_input_device_types();
+        /*!
+            ensures
+                - returns a list of all available ffmpeg input device types (e.g. alsa, v4l2, etc)
+        !*/
+
+        const std::vector<device_details>& list_output_device_types();
+        /*!
+            ensures
+                - returns a list of all available ffmpeg output device types (e.g. alsa, v4l2, etc)
+        !*/
+
+        std::vector<device_instance> list_input_device_instances(const std::string& device_type);
+        /*!
+            ensures
+                - returns a list of all available ffmpeg input device instances for device type *device_type (e.g. hw:0,0, /dev/video0, etc)
+        !*/
+
+        std::vector<device_instance> list_output_device_instances(const std::string& device_type);
+        /*!
+            ensures
+                - returns a list of all available ffmpeg output device instances for device type *device_type (e.g. hw:0,0, /dev/video0, etc)
+        !*/
+
+// ---------------------------------------------------------------------------------------------------
+    
+        struct video_enabled_t
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This is a strong type which controls whether or not we want
+                    to enable video decoding in demuxer or video encoding in muxer.
+
+                    For example, you can now use the convenience constructor:
+
+                        demuxer cap(filename, video_enabled, audio_disabled);
+            !*/
+
+            constexpr explicit video_enabled_t(bool enabled_) : enabled{enabled_} {}
+            bool enabled{false};
+        };
+
+        constexpr video_enabled_t video_enabled{true};
+        constexpr video_enabled_t video_disabled{false};
+
+        struct audio_enabled_t
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This is a strong type which controls whether or not we want
+                    to enable audio decoding in demuxer or audio encoding in muxer
+            !*/
+
+            constexpr explicit audio_enabled_t(bool enabled_) : enabled{enabled_} {}
+            bool enabled{false};
+        };
+
+        constexpr audio_enabled_t audio_enabled{true};
+        constexpr audio_enabled_t audio_disabled{false};
+
+// ---------------------------------------------------------------------------------------------------
+
+        template <
+          class image_type, 
+          is_image_check<image_type> = true
+        >
+        void convert(const frame& f, image_type& image);
+        /*!
+            requires
+                - image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
+                - f.is_image() == true
+                - f.pixfmt() == pix_traits<pixel_type_t<image_type>>::fmt
+            ensures
+                - converts a frame object into array2d<rgb_pixel>
+        !*/
+
+        template <
+          class image_type, 
+          is_image_check<image_type> = true
+        >
+        void convert(const image_type& img, frame& f);
+        /*!
+            requires
+                - image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h
+            ensures
+                - converts a dlib image into a frame object
+        !*/
+
+        template<class SampleFmt, std::size_t Channels>
+        void convert(const frame& f, audio<SampleFmt, Channels>& obj);
+        /*!
+            requires
+                - f.is_audio()  == true
+                - f.samplefmt() == sample_traits<SampleFmt>::fmt
+                - f.nchannels() == Channels
+            ensures
+                - converts a frame object into audio object
+        !*/
+
+        template<class SampleFmt, std::size_t Channels>
+        void convert(const audio<SampleFmt, Channels>& audio, frame& b);
+        /*!
+            ensures
+                - converts a dlib audio object into a frame object
+        !*/
+
+// ---------------------------------------------------------------------------------------------------
+
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////// DEFINITIONS  ////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+namespace dlib
+{
+    namespace ffmpeg
+    {
+
+// ---------------------------------------------------------------------------------------------------
 
         namespace details
         {
-
-// ---------------------------------------------------------------------------------------------------
-
-            void register_ffmpeg();
-
-// ---------------------------------------------------------------------------------------------------
-
-            struct av_deleter
+            template<class... Args>
+            inline bool fail(Args&&... args)
             {
-                void operator()(AVFrame* ptr)               const;
-                void operator()(AVPacket* ptr)              const;
-                void operator()(AVAudioFifo* ptr)           const;
-                void operator()(SwsContext* ptr)            const;
-                void operator()(SwrContext* ptr)            const;
-                void operator()(AVCodecContext* ptr)        const;
-                void operator()(AVCodecParserContext* ptr)  const;
-                void operator()(AVFormatContext* ptr)       const;
-                void operator()(AVDeviceInfoList* ptr)      const;
-            };
-
-            template<class AVObject>
-            using av_ptr = std::unique_ptr<AVObject, details::av_deleter>;
-
-            av_ptr<AVFrame>  make_avframe();
-            av_ptr<AVPacket> make_avpacket();
+                auto ret = logger_dlib_wrapper() << LERROR;
+#ifdef __cpp_fold_expressions
+                ((ret << args),...);
+#else
+                (void)std::initializer_list<int>{((ret << args), 0)...};
+#endif
+                return false;
+            }
+        }
 
 // ---------------------------------------------------------------------------------------------------
 
-            struct av_dict
-            {
-                av_dict() = default;
-                av_dict(const std::unordered_map<std::string, std::string> &options);
-                av_dict(const av_dict &ori);
-                av_dict &operator=(const av_dict &ori);
-                av_dict(av_dict &&ori) noexcept;
-                av_dict &operator=(av_dict &&ori) noexcept;
-                ~av_dict();
-                size_t size() const;
-                void print() const;
-                AVDictionary** get();
+        inline std::string get_pixel_fmt_str(AVPixelFormat fmt)
+        {
+            const char* name = av_get_pix_fmt_name(fmt);
+            return name ? std::string(name) : std::string("unknown");
+        }
 
-                AVDictionary *avdic = nullptr;
-            };
+        inline std::string get_audio_fmt_str(AVSampleFormat fmt)
+        {
+            const char* name = av_get_sample_fmt_name(fmt);
+            return name ? std::string(name) : std::string("unknown");
+        }
 
+        inline std::string get_channel_layout_str(uint64_t channel_layout)
+        {
+            return details::get_channel_layout_str(channel_layout);
+        }    
+
+// ---------------------------------------------------------------------------------------------------
+
+        inline dlib::logger& logger_ffmpeg()
+        {
+            details::register_ffmpeg();
+            return details::logger_ffmpeg_private();
+        }
+
+        inline dlib::logger& logger_dlib_wrapper()
+        {
+            static dlib::logger GLOBAL("ffmpeg.dlib");
+            return GLOBAL;
+        }
+
+// ---------------------------------------------------------------------------------------------------
+
+        namespace details
+        {
+        
 // ---------------------------------------------------------------------------------------------------
 
             class resizer
@@ -133,722 +619,6 @@ namespace dlib
                 AVPixelFormat       dst_fmt{AV_PIX_FMT_NONE};
                 av_ptr<SwsContext>  imgConvertCtx;
             };
-
-// ---------------------------------------------------------------------------------------------------
-
-            class resampler
-            {
-            public:
-                void reset(
-                    const int src_sample_rate, const uint64_t src_channel_layout, const AVSampleFormat src_fmt,
-                    const int dst_sample_rate, const uint64_t dst_channel_layout, const AVSampleFormat dst_fmt
-                );
-
-                void resize(
-                    const frame &src,
-                    const int dst_sample_rate, const uint64_t dst_channel_layout, const AVSampleFormat dst_fmt,
-                    frame &dst
-                );
-
-                void resize(
-                    const frame &src,
-                    frame &dst
-                );
-
-                int             get_src_rate()   const noexcept { return src_sample_rate; }
-                uint64_t        get_src_layout() const noexcept { return src_channel_layout; }
-                AVSampleFormat  get_src_fmt()    const noexcept { return src_fmt; }
-                int             get_dst_rate()   const noexcept { return dst_sample_rate; }
-                uint64_t        get_dst_layout() const noexcept { return dst_channel_layout; }
-                AVSampleFormat  get_dst_fmt()    const noexcept { return dst_fmt; }
-
-            private:
-
-                int             src_sample_rate{0};
-                uint64_t        src_channel_layout{AV_CH_LAYOUT_STEREO};
-                AVSampleFormat  src_fmt{AV_SAMPLE_FMT_NONE};
-
-                int             dst_sample_rate{0};
-                uint64_t        dst_channel_layout{AV_CH_LAYOUT_STEREO};
-                AVSampleFormat  dst_fmt{AV_SAMPLE_FMT_NONE};
-
-                av_ptr<SwrContext>  audioResamplerCtx;
-                uint64_t            tracked_samples{0};
-            };
-
-// ---------------------------------------------------------------------------------------------------
-
-            class audio_fifo
-            {
-            public:
-                audio_fifo() = default;
-
-                audio_fifo(
-                    const int            codec_frame_size,
-                    const AVSampleFormat sample_format,
-                    const int            nchannels
-                );
-
-                std::vector<frame> push_pull(
-                    frame &&in
-                );
-
-            private:
-
-                int                 frame_size{0};
-                AVSampleFormat      fmt{AV_SAMPLE_FMT_NONE};
-                int                 nchannels{0};
-                uint64_t            sample_count{0};
-                av_ptr<AVAudioFifo> fifo;
-            };
-
-// ---------------------------------------------------------------------------------------------------
-
-            std::string get_av_error(int ret);
-
-// ---------------------------------------------------------------------------------------------------
-
-        }
-
-// ---------------------------------------------------------------------------------------------------
-
-        std::string get_pixel_fmt_str(AVPixelFormat fmt);
-        std::string get_audio_fmt_str(AVSampleFormat fmt);
-        std::string get_channel_layout_str(uint64_t layout);
-
-// ---------------------------------------------------------------------------------------------------
-
-        dlib::logger& logger_ffmpeg();
-        dlib::logger& logger_dlib_wrapper();
-
-// ---------------------------------------------------------------------------------------------------
-
-        namespace details
-        {
-            class decoder_extractor;
-        }
-
-        class frame
-        {
-        public:
-            frame()                         = default;
-            frame(frame&& ori)              = default;
-            frame& operator=(frame&& ori)   = default;
-            frame(const frame& ori);
-            frame& operator=(const frame& ori);
-
-            frame(
-                int                                     h,
-                int                                     w,
-                AVPixelFormat                           pixfmt,
-                std::chrono::system_clock::time_point   timestamp_us
-            );
-
-            frame(
-                int                                     sample_rate,
-                int                                     nb_samples,
-                uint64_t                                channel_layout,
-                AVSampleFormat                          samplefmt,
-                std::chrono::system_clock::time_point   timestamp
-            );
-
-            bool            is_empty()      const noexcept;
-            bool            is_image()      const noexcept;
-            bool            is_audio()      const noexcept;
-            /*image*/
-            AVPixelFormat   pixfmt()        const noexcept;
-            int             height()        const noexcept;
-            int             width()         const noexcept;
-            /*audio*/
-            int             nsamples()      const noexcept;
-            int             nchannels()     const noexcept;
-            uint64_t        layout()        const noexcept;
-            AVSampleFormat  samplefmt()     const noexcept;
-            int             sample_rate()   const noexcept;
-
-            std::chrono::system_clock::time_point get_timestamp() const noexcept;
-            const AVFrame&  get_frame() const;
-            AVFrame&        get_frame();
-
-        private:
-
-            friend class details::resampler;
-            friend class details::decoder_extractor;
-            friend class encoder;
-
-            frame(
-                int                                     h,
-                int                                     w,
-                AVPixelFormat                           pixfmt,
-                int                                     sample_rate,
-                int                                     nb_samples,
-                uint64_t                                channel_layout,
-                AVSampleFormat                          samplefmt,
-                std::chrono::system_clock::time_point   timestamp
-            );
-
-            void copy_from(const frame& other);
-
-            details::av_ptr<AVFrame> f;
-            std::chrono::system_clock::time_point timestamp;
-        };
-
-// ---------------------------------------------------------------------------------------------------
-
-        template<class PixelType>
-        struct pix_traits {};
-
-        template<> struct pix_traits<uint8_t>           { constexpr static AVPixelFormat fmt = AV_PIX_FMT_GRAY8; };
-        template<> struct pix_traits<rgb_pixel>         { constexpr static AVPixelFormat fmt = AV_PIX_FMT_RGB24; };
-        template<> struct pix_traits<bgr_pixel>         { constexpr static AVPixelFormat fmt = AV_PIX_FMT_BGR24; };
-        template<> struct pix_traits<rgb_alpha_pixel>   { constexpr static AVPixelFormat fmt = AV_PIX_FMT_RGBA;  };
-        template<> struct pix_traits<bgr_alpha_pixel>   { constexpr static AVPixelFormat fmt = AV_PIX_FMT_BGRA;  };
-
-// ---------------------------------------------------------------------------------------------------
-
-        template<class SampleType>
-        struct sample_traits {};
-
-        template<> struct sample_traits<uint8_t> { constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_U8; };
-        template<> struct sample_traits<int16_t> { constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_S16; };
-        template<> struct sample_traits<int32_t> { constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_S32; };
-        template<> struct sample_traits<float>   { constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_FLT; };
-        template<> struct sample_traits<double>  { constexpr static AVSampleFormat fmt = AV_SAMPLE_FMT_DBL; };
-
-// ---------------------------------------------------------------------------------------------------
-
-        template<class SampleType, std::size_t Channels>
-        struct audio
-        {
-            using sample = std::array<SampleType, Channels>;
-
-            std::vector<sample>                     samples;
-            float                                   sample_rate{0};
-            std::chrono::system_clock::time_point   timestamp{};
-        };
-
-// ---------------------------------------------------------------------------------------------------
-
-        struct codec_details
-        {
-            AVCodecID   codec_id{AV_CODEC_ID_NONE};
-            std::string codec_name;
-            bool supports_encoding{false};
-            bool supports_decoding{false};
-        };
-
-        struct muxer_details
-        {
-            std::string name;
-            std::vector<codec_details> supported_codecs;
-        };
-
-        struct device_details
-        {
-            std::string device_type;
-            bool        is_audio_type{false};
-            bool        is_video_type{false};
-        };
-
-        struct device_instance
-        {
-            std::string name;
-            std::string description;
-        };
-
-        const std::vector<std::string>&     list_protocols();
-        const std::vector<std::string>&     list_demuxers();
-        const std::vector<muxer_details>&   list_muxers();
-        const std::vector<codec_details>&   list_codecs();
-        const std::vector<device_details>&  list_input_device_types();
-        const std::vector<device_details>&  list_output_device_types();
-        std::vector<device_instance>        list_input_device_instances(const std::string& device_type);
-        std::vector<device_instance>        list_output_device_instances(const std::string& device_type);
-
-// ---------------------------------------------------------------------------------------------------
-    
-        struct video_enabled_t
-        {
-            constexpr explicit video_enabled_t(bool enabled_) : enabled{enabled_} {}
-            bool enabled{false};
-        };
-
-        constexpr video_enabled_t video_enabled{true};
-        constexpr video_enabled_t video_disabled{false};
-
-        struct audio_enabled_t
-        {
-            constexpr explicit audio_enabled_t(bool enabled_) : enabled{enabled_} {}
-            bool enabled{false};
-        };
-
-        constexpr audio_enabled_t audio_enabled{true};
-        constexpr audio_enabled_t audio_disabled{false};
-
-// ---------------------------------------------------------------------------------------------------
-
-    }
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////// DEFINITIONS  ////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-
-namespace dlib
-{
-    namespace ffmpeg
-    {
-
-// ---------------------------------------------------------------------------------------------------
-
-        namespace details
-        {
-            template<class... Args>
-            inline bool fail(Args&&... args)
-            {
-                auto ret = logger_dlib_wrapper() << LERROR;
-#ifdef __cpp_fold_expressions
-                ((ret << args),...);
-#else
-                (void)std::initializer_list<int>{((ret << args), 0)...};
-#endif
-                return false;
-            }
-        }
-
-// ---------------------------------------------------------------------------------------------------
-
-        namespace details
-        {
-            inline std::string get_av_error(int ret)
-            {
-                char buf[128] = {0};
-                int suc = av_strerror(ret, buf, sizeof(buf));
-                return suc == 0 ? buf : "couldn't set error";
-            }
-        }
-
-// ---------------------------------------------------------------------------------------------------
-
-        ///////////////////////////
-        // Channel layout stuff 
-        ///////////////////////////
-
-        namespace details
-        {
-            inline uint64_t get_layout_from_channels(const std::size_t nchannels)
-            {
-                // This function is a bit ambiguous but good enough for dlib.
-                // Multiple layouts can have the same number of channels
-                switch(nchannels)
-                {
-                    case 1: return AV_CH_LAYOUT_MONO;
-                    case 2: return AV_CH_LAYOUT_STEREO;
-                    default: DLIB_CASSERT(false, "Don't support " << nchannels << " yet"); return 0;
-                }
-            }
-        }
-
-// ---------------------------------------------------------------------------------------------------
-
-#if FF_API_OLD_CHANNEL_LAYOUT
-
-        namespace details
-        {
-            inline AVChannelLayout convert_layout(const uint64_t channel_layout)
-            {
-                AVChannelLayout ch_layout;
-                ch_layout.order         = AV_CHANNEL_ORDER_NATIVE;
-                ch_layout.u.mask        = channel_layout;
-                ch_layout.nb_channels   = [=] 
-                {
-                    switch(channel_layout)
-                    {
-                        case AV_CH_LAYOUT_MONO:                 return 1;
-                        case AV_CH_LAYOUT_STEREO:               return 2;
-                        case AV_CH_LAYOUT_2POINT1:              return 3;
-                        case AV_CH_LAYOUT_2_1:                  return 3;
-                        case AV_CH_LAYOUT_SURROUND:             return 3;
-                        case AV_CH_LAYOUT_3POINT1:              return 4;
-                        case AV_CH_LAYOUT_4POINT0:              return 4;
-                        case AV_CH_LAYOUT_4POINT1:              return 5;
-                        case AV_CH_LAYOUT_2_2:                  return 4;
-                        case AV_CH_LAYOUT_QUAD:                 return 4;
-                        case AV_CH_LAYOUT_5POINT0:              return 5;
-                        case AV_CH_LAYOUT_5POINT1:              return 6;
-                        case AV_CH_LAYOUT_5POINT0_BACK:         return 5;
-                        case AV_CH_LAYOUT_5POINT1_BACK:         return 6;
-                        case AV_CH_LAYOUT_6POINT0:              return 6;
-                        case AV_CH_LAYOUT_6POINT0_FRONT:        return 6;
-                        case AV_CH_LAYOUT_HEXAGONAL:            return 6;
-                        case AV_CH_LAYOUT_6POINT1:              return 7;
-                        case AV_CH_LAYOUT_6POINT1_BACK:         return 7;
-                        case AV_CH_LAYOUT_6POINT1_FRONT:        return 7;
-                        case AV_CH_LAYOUT_7POINT0:              return 7;
-                        case AV_CH_LAYOUT_7POINT0_FRONT:        return 7;
-                        case AV_CH_LAYOUT_7POINT1:              return 8;
-                        case AV_CH_LAYOUT_7POINT1_WIDE:         return 8;
-                        case AV_CH_LAYOUT_7POINT1_WIDE_BACK:    return 8;
-                        case AV_CH_LAYOUT_OCTAGONAL:            return 8;
-                        case AV_CH_LAYOUT_HEXADECAGONAL:        return 16;
-                        case AV_CH_LAYOUT_STEREO_DOWNMIX:       return 2;
-#if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(56, 58, 100)
-                        case AV_CH_LAYOUT_22POINT2:             return 24;
-#endif
-                        default: break;
-                    }
-                    return 0;
-                }();
-
-                return ch_layout;
-            }
-
-            inline std::string get_channel_layout_str(const AVChannelLayout& ch_layout)
-            {
-                std::string str(32, '\0');
-                const int ret = av_channel_layout_describe(&ch_layout, &str[0], str.size());
-                if (ret > 0)
-                    str.resize(ret);
-                else
-                    str.clear();
-                
-                return str;
-            }
-
-            inline std::string get_channel_layout_str(const AVCodecContext* pCodecCtx)
-            {
-                return get_channel_layout_str(pCodecCtx->ch_layout);
-            }
-
-            inline bool channel_layout_empty(const AVCodecContext* pCodecCtx)
-            {
-                return av_channel_layout_check(&pCodecCtx->ch_layout) == 0;
-            }
-
-            inline bool channel_layout_empty(const AVFrame* frame)
-            {
-                return frame && av_channel_layout_check(&frame->ch_layout) == 0;
-            }
-
-            inline uint64_t get_layout(const AVCodecContext* pCodecCtx)
-            {
-                return pCodecCtx->ch_layout.u.mask;
-            }
-
-            inline uint64_t get_layout(const AVFrame* frame)
-            {
-                return frame->ch_layout.u.mask;
-            }
-
-            inline void set_layout(AVCodecContext* pCodecCtx, const uint64_t channel_layout)
-            {
-                pCodecCtx->ch_layout = convert_layout(channel_layout);
-            }
-
-            inline void set_layout(AVFrame* frame, const uint64_t channel_layout)
-            {
-                frame->ch_layout = convert_layout(channel_layout);
-            }
-
-            inline int get_nchannels(const AVCodecContext* pCodecCtx)
-            {
-                return pCodecCtx->ch_layout.nb_channels;
-            }
-
-            inline int get_nchannels(const AVFrame* frame)
-            {
-                return frame->ch_layout.nb_channels;
-            }
-
-            inline int get_nchannels(const uint64_t channel_layout)
-            {
-                return convert_layout(channel_layout).nb_channels;
-            }
-
-            inline void check_layout(AVCodecContext* pCodecCtx)
-            {
-                if (get_layout(pCodecCtx) == 0 && pCodecCtx->ch_layout.nb_channels > 0)
-                    av_channel_layout_default(&pCodecCtx->ch_layout, pCodecCtx->ch_layout.nb_channels);
-            }
-        }
-
-        inline std::string get_channel_layout_str(uint64_t channel_layout)
-        {
-            using namespace details;
-            return get_channel_layout_str(convert_layout(channel_layout));
-        }
-#else
-        inline std::string get_channel_layout_str(uint64_t channel_layout)
-        {
-            std::string str(32, '\0');
-            av_get_channel_layout_string(&str[0], str.size(), 0, channel_layout);
-            str.resize(strlen(str.data()));
-            return str;
-        }
-
-        namespace details
-        {
-            inline std::string get_channel_layout_str(const AVCodecContext* pCodecCtx)
-            {
-                return dlib::ffmpeg::get_channel_layout_str(pCodecCtx->channel_layout);
-            }
-
-            inline bool channel_layout_empty(const AVCodecContext* pCodecCtx)
-            {
-                return pCodecCtx->channel_layout == 0;
-            }
-
-            inline bool channel_layout_empty(const AVFrame* frame)
-            {
-                return frame->channel_layout == 0;
-            }
-
-            inline uint64_t get_layout(const AVCodecContext* pCodecCtx)
-            {
-                return pCodecCtx->channel_layout;
-            }
-
-            inline uint64_t get_layout(const AVFrame* frame)
-            {
-                return frame->channel_layout;
-            }
-
-            inline void set_layout(AVCodecContext* pCodecCtx, const uint64_t channel_layout)
-            {
-                pCodecCtx->channel_layout = channel_layout;
-            }
-
-            inline void set_layout(AVFrame* frame, const uint64_t channel_layout)
-            {
-                frame->channel_layout = channel_layout;
-            }
-
-            inline int get_nchannels(const uint64_t channel_layout)
-            {
-                return av_get_channel_layout_nb_channels(channel_layout);
-            }
-
-            inline int get_nchannels(const AVCodecContext* pCodecCtx)
-            {
-                return get_nchannels(pCodecCtx->channel_layout);
-            }
-
-            inline int get_nchannels(const AVFrame* frame)
-            {
-                return get_nchannels(frame->channel_layout);
-            }    
-
-            inline void check_layout(AVCodecContext* pCodecCtx) 
-            {
-                if (pCodecCtx->channel_layout == 0 && pCodecCtx->channels > 0)
-                    pCodecCtx->channel_layout = av_get_default_channel_layout(pCodecCtx->channels);
-            }       
-        }
-
-// ---------------------------------------------------------------------------------------------------
-        
-#endif 
-
-// ---------------------------------------------------------------------------------------------------
-
-        inline std::string get_pixel_fmt_str(AVPixelFormat fmt)
-        {
-            const char* name = av_get_pix_fmt_name(fmt);
-            return name ? std::string(name) : std::string("unknown");
-        }
-
-        inline std::string get_audio_fmt_str(AVSampleFormat fmt)
-        {
-            const char* name = av_get_sample_fmt_name(fmt);
-            return name ? std::string(name) : std::string("unknown");
-        }
-
-// ---------------------------------------------------------------------------------------------------
-
-        namespace details
-        {
-            inline dlib::logger& logger_ffmpeg_private()
-            {
-                static dlib::logger GLOBAL("ffmpeg.internal");
-                return GLOBAL;
-            }
-        }
-
-        inline dlib::logger& logger_ffmpeg()
-        {
-            details::register_ffmpeg();
-            return details::logger_ffmpeg_private();
-        }
-
-        inline dlib::logger& logger_dlib_wrapper()
-        {
-            static dlib::logger GLOBAL("ffmpeg.dlib");
-            return GLOBAL;
-        }
-
-// ---------------------------------------------------------------------------------------------------
-
-        namespace details
-        {
-
-// ---------------------------------------------------------------------------------------------------
-
-            inline void register_ffmpeg()
-            {
-                static const bool REGISTERED = []
-                {
-                    avdevice_register_all();
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 10, 100)
-                    // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L91
-                    avcodec_register_all();
-#endif
-#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100) 
-                    // See https://github.com/FFmpeg/FFmpeg/blob/70d25268c21cbee5f08304da95be1f647c630c15/doc/APIchanges#L86
-                    av_register_all();
-#endif
-
-                    av_log_set_callback([](void* ptr, int level, const char *fmt, va_list vl) 
-                    {
-                        auto& logger = details::logger_ffmpeg_private();
-
-                        char line[256] = {0};
-                        static int print_prefix = 1;
-
-                        // Not sure if copying to vl2 is required by internal ffmpeg functions do this...
-                        va_list vl2;
-                        va_copy(vl2, vl);
-                        int size = av_log_format_line2(ptr, level, fmt, vl2, &line[0], sizeof(line), &print_prefix);
-                        va_end(vl2);
-
-                        // Remove all '\n' since dlib's logger already adds one
-                        size = std::min<int>(size, sizeof(line) - 1);
-                        line[size] = '\0';
-                        for (int i = size - 1 ; i >= 0 ; --i)
-                            if (line[i] == '\n')
-                                line[i] = ' ';
-
-                        switch(level)
-                        {
-                            case AV_LOG_PANIC:
-                            case AV_LOG_FATAL:      logger << LFATAL << line; break;
-                            case AV_LOG_ERROR:      logger << LERROR << line; break;
-                            case AV_LOG_WARNING:    logger << LWARN  << line; break;
-                            case AV_LOG_INFO:       
-                            case AV_LOG_VERBOSE:    logger << LINFO  << line; break;
-                            case AV_LOG_DEBUG:      logger << LDEBUG << line; break;
-                            case AV_LOG_TRACE:      logger << LTRACE << line; break;
-                            default: break;
-                        }
-                    });
-
-                    return true;
-                }();
-                (void)REGISTERED;
-            }        
-
-// ---------------------------------------------------------------------------------------------------
-
-            inline void av_deleter::operator()(AVFrame *ptr)               const { if (ptr) av_frame_free(&ptr); }
-            inline void av_deleter::operator()(AVPacket *ptr)              const { if (ptr) av_packet_free(&ptr); }
-            inline void av_deleter::operator()(AVAudioFifo *ptr)           const { if (ptr) av_audio_fifo_free(ptr); }
-            inline void av_deleter::operator()(SwsContext *ptr)            const { if (ptr) sws_freeContext(ptr); }
-            inline void av_deleter::operator()(SwrContext *ptr)            const { if (ptr) swr_free(&ptr); }
-            inline void av_deleter::operator()(AVCodecContext *ptr)        const { if (ptr) avcodec_free_context(&ptr); }
-            inline void av_deleter::operator()(AVCodecParserContext *ptr)  const { if (ptr) av_parser_close(ptr); }
-            inline void av_deleter::operator()(AVDeviceInfoList* ptr)      const { if (ptr) avdevice_free_list_devices(&ptr); }
-            inline void av_deleter::operator()(AVFormatContext *ptr)       const 
-            { 
-                if (ptr) 
-                {
-                    if (ptr->iformat)
-                        avformat_close_input(&ptr); 
-                    else if (ptr->oformat)
-                        avformat_free_context(ptr);
-                }
-            }
-
-            inline av_ptr<AVFrame> make_avframe()
-            {
-                av_ptr<AVFrame> obj(av_frame_alloc());
-                if (!obj)
-                    throw std::runtime_error("Failed to allocate AVframe");
-                return obj;
-            }
-
-            inline av_ptr<AVPacket> make_avpacket()
-            {
-                av_ptr<AVPacket> obj(av_packet_alloc());
-                if (!obj)
-                    throw std::runtime_error("Failed to allocate AVPacket");
-                return obj;
-            }
-
-// ---------------------------------------------------------------------------------------------------
-
-            inline av_dict::av_dict(const std::unordered_map<std::string, std::string>& options)
-            {
-                int ret = 0;
-
-                for (const auto& opt : options) {
-                    if ((ret = av_dict_set(&avdic, opt.first.c_str(), opt.second.c_str(), 0)) < 0) {
-                        printf("av_dict_set() failed : %s\n", get_av_error(ret).c_str());
-                        break;
-                    }
-                }
-            }
-
-            inline av_dict::av_dict(const av_dict& ori)
-            {
-                av_dict_copy(&avdic, ori.avdic, 0);
-            }
-
-            inline av_dict& av_dict::operator=(const av_dict& ori)
-            {
-                *this = std::move(av_dict{ori});
-                return *this;
-            }
-
-            inline av_dict::av_dict(av_dict &&ori) noexcept
-            : avdic{std::exchange(ori.avdic, nullptr)}
-            {
-            }
-
-            inline av_dict &av_dict::operator=(av_dict &&ori) noexcept
-            {
-                if (this != &ori)
-                    avdic = std::exchange(ori.avdic, nullptr);
-                return *this;
-            }
-
-            inline av_dict::~av_dict()
-            {
-                if (avdic)
-                    av_dict_free(&avdic);
-            }
-
-            inline AVDictionary** av_dict::get()
-            {
-                return avdic ? &avdic: nullptr;
-            }
-
-            inline std::size_t av_dict::size() const
-            {
-                return avdic ? av_dict_count(avdic) : 0;
-            }
-
-            inline void av_dict::print() const
-            {
-                if (avdic)
-                {
-                    AVDictionaryEntry *tag = nullptr;
-                    while ((tag = av_dict_get(avdic, "", tag, AV_DICT_IGNORE_SUFFIX)))
-                        printf("%s : %s\n", tag->key, tag->value);
-                }
-            }
-        
-// ---------------------------------------------------------------------------------------------------
 
             inline void resizer::reset (
                 const int src_h_, const int src_w_, const AVPixelFormat src_fmt_,
@@ -923,6 +693,46 @@ namespace dlib
             }
 
 // ---------------------------------------------------------------------------------------------------
+
+            class resampler
+            {
+            public:
+                void reset(
+                    const int src_sample_rate, const uint64_t src_channel_layout, const AVSampleFormat src_fmt,
+                    const int dst_sample_rate, const uint64_t dst_channel_layout, const AVSampleFormat dst_fmt
+                );
+
+                void resize(
+                    const frame &src,
+                    const int dst_sample_rate, const uint64_t dst_channel_layout, const AVSampleFormat dst_fmt,
+                    frame &dst
+                );
+
+                void resize(
+                    const frame &src,
+                    frame &dst
+                );
+
+                int             get_src_rate()   const noexcept { return src_sample_rate; }
+                uint64_t        get_src_layout() const noexcept { return src_channel_layout; }
+                AVSampleFormat  get_src_fmt()    const noexcept { return src_fmt; }
+                int             get_dst_rate()   const noexcept { return dst_sample_rate; }
+                uint64_t        get_dst_layout() const noexcept { return dst_channel_layout; }
+                AVSampleFormat  get_dst_fmt()    const noexcept { return dst_fmt; }
+
+            private:
+
+                int             src_sample_rate{0};
+                uint64_t        src_channel_layout{AV_CH_LAYOUT_STEREO};
+                AVSampleFormat  src_fmt{AV_SAMPLE_FMT_NONE};
+
+                int             dst_sample_rate{0};
+                uint64_t        dst_channel_layout{AV_CH_LAYOUT_STEREO};
+                AVSampleFormat  dst_fmt{AV_SAMPLE_FMT_NONE};
+
+                av_ptr<SwrContext>  audioResamplerCtx;
+                uint64_t            tracked_samples{0};
+            };
 
             inline void resampler::reset(
                 const int src_sample_rate_, const uint64_t src_channel_layout_, const AVSampleFormat src_fmt_,
@@ -1030,6 +840,30 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
+            class audio_fifo
+            {
+            public:
+                audio_fifo() = default;
+
+                audio_fifo(
+                    const int            codec_frame_size,
+                    const AVSampleFormat sample_format,
+                    const int            nchannels
+                );
+
+                std::vector<frame> push_pull(
+                    frame &&in
+                );
+
+            private:
+
+                int                 frame_size{0};
+                AVSampleFormat      fmt{AV_SAMPLE_FMT_NONE};
+                int                 nchannels{0};
+                uint64_t            sample_count{0};
+                av_ptr<AVAudioFifo> fifo;
+            };
+
             inline audio_fifo::audio_fifo(
                 const int            codec_frame_size_,
                 const AVSampleFormat sample_format_,
@@ -1051,7 +885,7 @@ namespace dlib
             )
             {
                 using namespace std::chrono;
-                assert(in.is_audio());
+                DLIB_ASSERT(in.is_audio(), "this isn't an audio frame");
 
                 std::vector<frame> outs;
 
@@ -1494,7 +1328,7 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-        std::vector<device_instance> list_output_device_instances(const std::string& device_type)
+        inline std::vector<device_instance> list_output_device_instances(const std::string& device_type)
         {
             const auto& types = list_output_device_types();
             auto ret = std::find_if(types.begin(), types.end(), [&](const auto& type) {return type.device_type == device_type;});
@@ -1525,12 +1359,12 @@ namespace dlib
 // ---------------------------------------------------------------------------------------------------
 
         template <
-          class ImageContainer, 
-          is_image_check<ImageContainer> = true
+          class image_type, 
+          is_image_check<image_type>
         >
-        void convert(const frame& f, ImageContainer& image)
+        inline void convert(const frame& f, image_type& image)
         {
-            using pixel = pixel_type_t<ImageContainer>;
+            using pixel = pixel_type_t<image_type>;
             
             DLIB_ASSERT(f.is_image(), "frame isn't an image type");
             DLIB_ASSERT(f.pixfmt() == pix_traits<pixel>::fmt, "frame doesn't have correct format");
@@ -1558,12 +1392,12 @@ namespace dlib
 // ---------------------------------------------------------------------------------------------------
 
         template<
-          class ImageContainer, 
-          is_image_check<ImageContainer> = true
+          class image_type, 
+          is_image_check<image_type>
         >
-        void convert(const ImageContainer& img, frame& f)
+        inline void convert(const image_type& img, frame& f)
         {
-            using pixel = pixel_type_t<ImageContainer>;
+            using pixel = pixel_type_t<image_type>;
 
             if (f.height() != img.nr() ||
                 f.width()  != img.nc() ||

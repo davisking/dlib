@@ -22,6 +22,15 @@ namespace dlib
           std::enable_if_t<is_byte<Byte>::value, bool> = true
         >
         auto sink(std::vector<Byte, Allocator>& buf)
+        /*!
+            requires
+                - Byte must be a byte type, e.g. char, int8_t or uint8_t
+            ensures
+                - returns a function object with signature bool(std::size_t N, const char* data).  When
+                  called that function appends the first N bytes pointed to by data onto the end of buf.
+                - The returned function is valid only as long as buf exists.
+                - The function always returns true.        
+        !*/
         {
             return [&](std::size_t ndata, const char* data) {
                 buf.insert(buf.end(), data, data + ndata);
@@ -32,6 +41,13 @@ namespace dlib
 // ---------------------------------------------------------------------------------------------------
 
         inline auto sink(std::ostream& out)
+        /*!
+            ensures
+                - returns a function object with signature bool(std::size_t N, const char* data).  When
+                  called that function writes the first N bytes pointed to by data to out.
+                - The returned view is valid only as long as out exists.
+                - Returns out.good(). I.e. returns true if the write to the stream succeeded and false otherwise.       
+        !*/
         {
             return [&](std::size_t ndata, const char* data) {
                 out.write(data, ndata);
