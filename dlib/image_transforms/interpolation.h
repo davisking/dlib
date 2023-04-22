@@ -325,7 +325,7 @@ namespace dlib
         // fit a quadratic to these 9 pixels and then use that quadratic to find the interpolated 
         // value at point p.
         inline double interpolate(
-            const dlib::vector<double,2>& p,
+            const dpoint& p,
             double tl, double tm, double tr, 
             double ml, double mm, double mr, 
             double bl, double bm, double br
@@ -416,7 +416,7 @@ namespace dlib
         {
             for (long c = area.left(); c <= area.right(); ++c)
             {
-                if (!interp(imgv, map_point(dlib::vector<double,2>(c,r)), out_imgv[r][c]))
+                if (!interp(imgv, map_point(dpoint(c,r)), out_imgv[r][c]))
                     set_background(out_imgv[r][c]);
             }
         }
@@ -551,11 +551,11 @@ namespace dlib
                 y_scale(y_scale_)
             {}
 
-            dlib::vector<double,2> operator() (
-                const dlib::vector<double,2>& p
+            dpoint operator() (
+                const dpoint& p
             ) const
             {
-                return dlib::vector<double,2>(p.x()*x_scale, p.y()*y_scale);
+                return dpoint(p.x()*x_scale, p.y()*y_scale);
             }
 
         private:
@@ -1048,7 +1048,7 @@ namespace dlib
             );
 
         assign_image(out_img, fliplr(mat(in_img)));
-        std::vector<dlib::vector<double,2> > from, to;
+        std::vector<dpoint> from, to;
         rectangle r = get_rect(in_img);
         from.push_back(r.tl_corner()); to.push_back(r.tr_corner());
         from.push_back(r.bl_corner()); to.push_back(r.br_corner());
@@ -1685,7 +1685,7 @@ namespace dlib
             );
 
             const point_transform_affine tform = find_similarity_transform(chip_points,img_points);
-            dlib::vector<double,2> p(1,0);
+            dpoint p(1,0);
             p = tform.get_m()*p;
 
             // There are only 3 things happening in a similarity transform.  There is a
@@ -1737,7 +1737,7 @@ namespace dlib
         const chip_details& details
     )
     {
-        std::vector<dlib::vector<double,2> > from, to;
+        std::vector<dpoint> from, to;
         point p1(0,0);
         point p2(details.cols-1,0);
         point p3(details.cols-1, details.rows-1);
@@ -1895,7 +1895,7 @@ namespace dlib
         for (unsigned long i = 1; i < levels.size(); ++i)
             pyr(levels[i-1],levels[i]);
 
-        std::vector<dlib::vector<double,2> > from, to;
+        std::vector<dpoint> from, to;
 
         // now pull out the chips
         chips.resize(chip_locations.size());
@@ -2025,7 +2025,7 @@ namespace dlib
         {
             for (long c = 0; c < vimg.nc(); ++c)
             {
-                interp(vchip, tf(dlib::vector<double, 2>(c, r)), vimg[r][c]);
+                interp(vchip, tf(dpoint(c, r)), vimg[r][c]);
             }
         }
     }
