@@ -585,10 +585,11 @@ namespace dlib
 
         valid_area = shrink_rect(valid_area.intersect(bounding_box), 1);
 
+        std::vector<double> intersections;
         for (long y = valid_area.top(); y <= valid_area.bottom(); ++y)
         {
-            // Compute the intersections with the scanline
-            std::vector<double> intersections;
+            // Compute the intersections with the scanline.
+            intersections.clear();
             for (size_t i = 0; i < poly.size(); ++i)
             {
                 const auto& p1 = poly[i];
