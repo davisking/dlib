@@ -15,7 +15,7 @@ namespace dlib
     {
 // ---------------------------------------------------------------------------------------------------
 
-        struct encoder_image_args
+        struct encoder_image_args : resizing_args
         {
             /*!
                 WHAT THIS OBJECT REPRESENTS
@@ -29,22 +29,13 @@ namespace dlib
                     then no resizing is performed. If however they don't, then they are first resized. 
             !*/
 
-            // Target height of codec.
-            int h{0};
-
-            // Target width of codec.
-            int w{0};
-            
-            // Target pixel format of codec.
-            AVPixelFormat fmt{AV_PIX_FMT_YUV420P};
-
             // Target framerate of codec/muxer
             int framerate{0};
         };
 
 // ---------------------------------------------------------------------------------------------------
 
-        struct encoder_audio_args
+        struct encoder_audio_args : resampling_args
         {
             /*!
                 WHAT THIS OBJECT REPRESENTS
@@ -54,15 +45,6 @@ namespace dlib
                     Any frame that is pushed to encoder or muxer instances is resampled to the codec's
                     pre-configured settings if their sample format, sample rate or channel layout, don't match.
             !*/
-
-            // Target sample rate of codec
-            int sample_rate{0};
-
-            // Target channel layout of codec
-            uint64_t channel_layout{AV_CH_LAYOUT_STEREO};
-
-            // Target sample format of codec
-            AVSampleFormat fmt{AV_SAMPLE_FMT_S16};
         };
 
 // ---------------------------------------------------------------------------------------------------
