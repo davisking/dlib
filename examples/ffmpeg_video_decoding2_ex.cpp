@@ -5,33 +5,7 @@
     in this case the decoding API.
 
     This is a pretty simple example. It loads a raw codec file, parses chunks of 
-    data to the decoder and plots images to a GUI window.
-
-    Background about video files:
-
-        Using FFMpeg's terminology, a video/audio file has the following structure:
-            - container:
-                - stream 0
-                - stream 1
-                - stream ...
-        A `container` is a file format like MP4, MP3, WAV.
-        A `stream` is encoded media like video, audio ( or subtitles) 
-        using a codec like H264, H265, VP9, AAC, A3C, etc.
-
-        MP4 isn't a codec and H264 isn't (strictly speaking) a file format. 
-        The first describes a packet structure for saving encoded streams to file, 
-        it contains header information, trailer information, and describes how to 
-        interleave multiple streams in a file.
-        The later is a protocol for compressing raw media streams into something smaller in size, 
-        suitable for saving to file, transmitting over a network connection or adding
-        to a `container` file.
-        Note, FFMpeg treats network protocols like HTTP, RTMP, RTSP as containers.
-
-        Dlib's dlib::ffmpeg::demuxer class reads `container` files like MP4, MP3 or RTSP streams, 
-        extracts and decodes each stream.
-
-        Dlib's dlib::ffmpeg::decoder class reads raw encoded DATA like H264 or PCM data
-        and decodes it to images or audio frames.
+    data to the decoder, plots images to a GUI window, and counts audio samples.
 */
 
 #include <cstdio>
@@ -78,14 +52,30 @@ try
         return EXIT_FAILURE;
     }
 
+    frame                   f;
     array2d<rgb_pixel>      img;
     ffmpeg::decoder_status  status{ffmpeg::DECODER_EAGAIN};
-    image_window            win;
+    int                     samples{0};
+
+    resizing_args args_image;
+    args_image.fmt = pix_traits<rgb_pixel>::fmt;
+
+    image_window win;
 
     const auto pull = [&]
     {
-        while ((status = dec.read(img)) == ffmpeg::DECODER_FRAME_AVAILABLE)
-            win.set_image(img);
+        while ((status = dec.read(f, args_image)) == ffmpeg::DECODER_FRAME_AVAILABLE)
+        {
+            if (f.is_image())
+            {
+                convert(f, img);
+                win.set_image(img);
+            }
+            else if (f.is_audio())
+            {
+                samples += f.nsamples();
+            }
+        }
     };
 
     ifstream fin{filepath, std::ios::binary};
@@ -101,6 +91,8 @@ try
 
     dec.flush();
     pull();
+
+    printf("Read %i audio samples\n", samples);
 
     return EXIT_SUCCESS;
 }
