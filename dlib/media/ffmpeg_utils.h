@@ -321,6 +321,8 @@ namespace dlib
             !*/
 
             using sample = std::array<SampleType, Channels>;
+            using format = SampleType;
+            constexpr static std::size_t nchannels = Channels;
 
             std::vector<sample>                     samples;
             float                                   sample_rate{0};
@@ -509,6 +511,48 @@ namespace dlib
             ensures
                 - converts a dlib audio object into a frame object
         !*/
+
+// ---------------------------------------------------------------------------------------------------
+
+        struct resizing_args
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This class groups a set of arguments used for resizing an image frame.
+                    When all arguments are zero or defaulted, then no resizing is undertaken,
+                    and the src frame is memcpy'd to the dst frame.
+
+                    Note:
+                        - "fmt" can take any value starting with AV_PIX_FMT_
+                          See libavutil/pixfmt.h for options.
+            !*/
+
+            int             h{0};
+            int             w{0};
+            AVPixelFormat   fmt{AV_PIX_FMT_NONE};
+        };
+
+// ---------------------------------------------------------------------------------------------------
+
+        struct resampling_args
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This class groups a set of arguments used for resampling an audio frame.
+                    When all arguments are zero or defaulted, then no resampling is undertaken,
+                    and the src frame is memcpy'd to the dst frame.
+
+                    Note:
+                        - "channel_layout" can take values starting with AV_CH_LAYOUT_ 
+                          See libavutil/channel_layout.h for options.
+                        - "fmt" can take any value starting with AV_SAMPLE_FMT_
+                          See libavutil/samplefmt.h for options.
+            !*/
+
+            int             sample_rate{0};
+            uint64_t        channel_layout{0};
+            AVSampleFormat  fmt{AV_SAMPLE_FMT_NONE};
+        };
 
 // ---------------------------------------------------------------------------------------------------
 
