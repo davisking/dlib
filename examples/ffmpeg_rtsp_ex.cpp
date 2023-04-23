@@ -46,13 +46,6 @@ try
         return 0;
     }
 
-    if (!parser.option("i"))
-    {
-        cout << "Missing -i" << endl;
-        parser.print_options();
-        return 0;
-    }
-
     const std::string input_filepath = parser.option("i").argument();
 
     // First, we open a video which we use to transmit and receive images over RTSP.
@@ -100,17 +93,10 @@ try
         }
 
         image_window win;
-
-        // By default, demuxer converts images to RGB. So we can read() and convert() to RGB without
-        // having to specify demuxer::args::args_image::fmt = AV_PIX_FMT_RGB24
-        frame f;
         array2d<rgb_pixel> img;
 
-        while (cap.read(f))
-        {
-            convert(f, img);
+        while (cap.read(img))
             win.set_image(img);
-        }
     }};
 
     std::this_thread::sleep_for(1s);
