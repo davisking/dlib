@@ -80,7 +80,7 @@ try
 
     const std::string filepath = parser.option("i").argument();
 
-    // In this example, we are only reading images.
+    // In this example, we only read images.
     // This constructor allows you to concisely enabled images and disable audio frames.
     demuxer cap({filepath, video_enabled, audio_disabled});
     if (!cap.is_open())
