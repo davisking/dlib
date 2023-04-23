@@ -20,15 +20,15 @@
         - ffmpeg_details.h  : contains implementations details only and everything must be in the
                               dlib::ffmpeg::details namespace
         
-        - ffmpeg_utils.h    : contains common public API. Declarations go at the bottom of the file
+        - ffmpeg_utils.h    : contains common public API. Definitions go at the bottom of the file
                               underneath a block comment saying "DEFINITIONS"
                               Also contains implementation details that depend on the public API.
                               This must still go in the dlib::ffmpeg::details namespace
         
-        - ffmpeg_demuxer.h  : contains public API for all things decoding. Similarly, declarations go 
+        - ffmpeg_demuxer.h  : contains public API for all things decoding. Similarly, definitions go 
                               at the bottom of the file underneath a block comment saying "DEFINITIONS".
 
-        - ffmpeg_muxer.h  :   contains public API for all things encoding. Similarly, declarations go 
+        - ffmpeg_muxer.h  :   contains public API for all things encoding. Similarly, definitions go 
                               at the bottom of the file underneath a block comment saying "DEFINITIONS".
                             
 */
