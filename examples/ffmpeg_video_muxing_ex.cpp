@@ -46,20 +46,6 @@ try
         return 0;
     }
 
-    if (!parser.option("i"))
-    {
-        cout << "Missing -i" << endl;
-        parser.print_options();
-        return 0;
-    }
-
-    if (!parser.option("o"))
-    {
-        cout << "Missing -o" << endl;
-        parser.print_options();
-        return 0;
-    }
-
     const std::string input_filepath    = parser.option("i").argument();
     const std::string output_filepath   = parser.option("o").argument();
 

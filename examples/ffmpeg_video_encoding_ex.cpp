@@ -43,13 +43,6 @@ try
         return 0;
     }
 
-    if (!parser.option("i"))
-    {
-        cout << "Missing -i" << endl;
-        parser.print_options();
-        return 0;
-    }
-
     const std::string filepath = parser.option("i").argument();
 
     // Load input video.
@@ -71,6 +64,7 @@ try
             args.args_codec.codec_name  = get_option(parser, "codec", "mpeg4");
             args.args_image.h           = get_option(parser, "height", cap.height());
             args.args_image.w           = get_option(parser, "width",  cap.width());
+            args.args_image.fmt         = cap.pixel_fmt();
             args.args_image.framerate   = cap.fps();
             return args;
         }(), sink(out));
