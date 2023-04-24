@@ -1519,11 +1519,13 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-        template <typename image_type>
-        std::enable_if_t<is_image_type<image_type>::value, void>
-        load_frame(image_type& image, const std::string& file_name)
+        template <
+          class image_type,
+          is_image_check<image_type>
+        >
+        inline void load_frame(image_type& image, const std::string& file_name)
         {
-            if (!demuxer(image, video_enabled, audio_disabled).read(image))
+            if (!demuxer({file_name, video_enabled, audio_disabled}).read(image))
                 throw error("ffmpeg::load_frame: error while loading " + file_name);
         }
 
