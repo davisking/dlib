@@ -1453,9 +1453,11 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-        template <typename image_type>
-        std::enable_if_t<is_image_type<image_type>::value, void>
-        load_frame(image_type& image, const std::string& file_name)
+        template <
+          class image_type,
+          is_image_check<image_type>
+        >
+        void load_frame(image_type& image, const std::string& file_name)
         {
             demuxer reader(file_name);
             frame f;
@@ -1465,7 +1467,6 @@ namespace dlib
 
             convert(f, image);
         }
-
     }
 }
 
