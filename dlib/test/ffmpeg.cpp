@@ -5,11 +5,13 @@
 
 #include <fstream>
 #include <vector>
+#include <chrono>
 #include <dlib/dir_nav.h>
 #include <dlib/config_reader.h>
 #include <dlib/media.h>
 #include <dlib/array2d.h>
 #include <dlib/matrix.h>
+#include <dlib/rand.h>
 #include "tester.h"
 
 #ifndef DLIB_FFMPEG_DATA
@@ -19,11 +21,98 @@ static_assert(false, "Build is faulty. DLIB_VIDEOS_FILEPATH should be defined by
 namespace  
 {
     using namespace std;
+    using namespace std::chrono;
     using namespace test;
     using namespace dlib;
     using namespace dlib::ffmpeg;
     
     logger dlog("test.video");
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+// UTILS
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    dlib::rand rng(10000);
+
+    template <class pixel>
+    matrix<pixel> get_random_image()
+    {
+        matrix<pixel> img;
+
+        img.set_size(rng.get_integer_in_range(1, 128),
+                     rng.get_integer_in_range(1, 128));
+
+        for (long i = 0 ; i < img.nr() ; ++i)
+            for (long j = 0 ; j < img.nc() ; ++j)
+                assign_pixel(img(i,j), rng.get_random_8bit_number());
+
+        return img;
+    }
+
+    template <class pixel>
+    void check_image (
+        const frame& f,
+        const matrix<pixel>& img
+    )
+    {
+        DLIB_TEST(!f.is_empty());
+        DLIB_TEST(f.is_image());
+        DLIB_TEST(!f.is_audio());
+        DLIB_TEST(f.samplefmt()    == AV_SAMPLE_FMT_NONE);
+        DLIB_TEST(f.sample_rate()  == 0);
+        DLIB_TEST(f.nsamples()     == 0);
+        DLIB_TEST(f.layout()       == 0);
+        DLIB_TEST(f.nchannels()    == 0);
+        DLIB_TEST(f.pixfmt()       == pix_traits<pixel>::fmt);
+        DLIB_TEST(f.height()       == img.nr());
+        DLIB_TEST(f.width()        == img.nc());
+
+        matrix<pixel> dummy;
+        convert(f, dummy);
+        DLIB_TEST(dummy.nc() == img.nc());
+        DLIB_TEST(dummy.nr() == img.nr());
+        DLIB_TEST(img == dummy);
+    }
+
+    template <class pixel>
+    void test_frame()
+    {
+        const matrix<pixel> img1 = get_random_image<pixel>();
+        const matrix<pixel> img2 = get_random_image<pixel>();
+
+        // Create a frame
+        frame f1(img1.nr(), img1.nc(), pix_traits<pixel>::fmt, system_clock::time_point{});
+        convert(img1, f1);
+
+        // Check frame is correct
+        check_image(f1, img1);
+
+        // Copy
+        frame f2(f1);
+
+        // Check it's a deepcopy, i.e. pointers are different but values are the same
+        check_image(f2, img1);
+
+        // Check pointers are different
+        DLIB_TEST(f1.get_frame().data[0] != f2.get_frame().data[0]);
+
+        // Set f2 and check this doesn't affect f1
+        f2 = frame(img2.nr(), img2.nc(), pix_traits<pixel>::fmt, system_clock::time_point{});
+        convert(img2, f2);
+
+        check_image(f2, img2);
+        check_image(f1, img1);
+        DLIB_TEST(f1.get_frame().data[0] != f2.get_frame().data[0]);
+
+        // Move
+        f2 = std::move(f1);
+        check_image(f2, img1);
+        DLIB_TEST(f1.is_empty());
+
+        print_spinner();
+    }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,7 +155,7 @@ namespace
             {
                 DLIB_TEST(img.nr()      == height);
                 DLIB_TEST(img.nc()      == width);
-                DLIB_TEST_MSG(dec.height()  == height, dec.height() << " " << height << " " << filepath << " counter");
+                DLIB_TEST(dec.height()  == height);
                 DLIB_TEST(dec.width()   == width);
                 ++counter;
                 
@@ -123,13 +212,17 @@ namespace
         int                         iteration{0};
         decoder_status              status{DECODER_EAGAIN};
 
-        resizing_args args_image;
-        args_image.fmt = pix_traits<pixel_type_t<image_type>>::fmt;
+        const resizing_args args_image {
+            0,
+            0,
+            pix_traits<pixel_type_t<image_type>>::fmt
+        };
 
-        resampling_args args_audio;
-        args_audio.fmt              = sample_traits<decltype(audio_buf)::format>::fmt;
-        args_audio.channel_layout   = dlib::ffmpeg::details::get_layout_from_channels(decltype(audio_buf)::nchannels);
-        args_audio.sample_rate      = sample_rate;
+        const resampling_args args_audio {
+            sample_rate,
+            dlib::ffmpeg::details::get_layout_from_channels(decltype(audio_buf)::nchannels),
+            sample_traits<decltype(audio_buf)::format>::fmt
+        };
 
         ifstream fin{filepath, std::ios::binary};
         std::vector<char> buf(1024);
@@ -605,6 +698,14 @@ namespace
         void perform_test (
         )
         {
+            for (int i = 0 ; i < 10 ; ++i)
+            {
+                test_frame<rgb_pixel>();
+                test_frame<bgr_pixel>();
+                test_frame<rgb_alpha_pixel>();
+                test_frame<bgr_alpha_pixel>();
+            }
+
             dlib::file f(DLIB_FFMPEG_DATA);
             dlib::config_reader cfg(f.full_name());
 
