@@ -745,7 +745,7 @@ namespace dlib
         {
             using namespace details;
 
-            DLIB_ASSERT(a.args_codec.codec != AV_CODEC_ID_NONE || a.args_codec.codec_name != "", "At least args_codec.codec or args_codec.codec_name must be set");
+            DLIB_ASSERT(a.codec != AV_CODEC_ID_NONE || a.codec_name != "", "At least args_codec.codec or args_codec.codec_name must be set");
             
             register_ffmpeg();
             
