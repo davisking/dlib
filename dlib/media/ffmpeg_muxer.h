@@ -857,10 +857,6 @@ namespace dlib
                 pCodecCtx->framerate    = AVRational{args_.args_image.framerate, 1};
                 check_properties(pCodec, pCodecCtx.get());
                 pCodecCtx->time_base    = inv(pCodecCtx->framerate);
-
-                //don't know what src options are, but at least dst options are set
-                resizer_image.reset(pCodecCtx->height, pCodecCtx->width, pCodecCtx->pix_fmt,
-                                    pCodecCtx->height, pCodecCtx->width, pCodecCtx->pix_fmt);
             }
             else if (pCodec->type == AVMEDIA_TYPE_AUDIO)
             {
@@ -880,12 +876,6 @@ namespace dlib
                 if (pCodecCtx->codec_id == AV_CODEC_ID_AAC) {
                     pCodecCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
                 }
-
-                //don't know what src options are, but at least dst options are set
-                resizer_audio.reset(
-                        pCodecCtx->sample_rate, get_layout(pCodecCtx.get()), pCodecCtx->sample_fmt,
-                        pCodecCtx->sample_rate, get_layout(pCodecCtx.get()), pCodecCtx->sample_fmt
-                );
             }
 
             av_dict opt = args_.args_codec.codec_options;
@@ -910,13 +900,13 @@ namespace dlib
         inline AVCodecID       encoder::get_codec_id()     const noexcept { return pCodecCtx ? pCodecCtx->codec_id : AV_CODEC_ID_NONE; }
         inline std::string     encoder::get_codec_name()   const noexcept { return pCodecCtx ? avcodec_get_name(pCodecCtx->codec_id) : "NONE"; }
         inline int             encoder::fps()              const noexcept { return pCodecCtx ? details::to_int(pCodecCtx->framerate) : 0; }
-        inline int             encoder::height()           const noexcept { return resizer_image.get_dst_h(); }
-        inline int             encoder::width()            const noexcept { return resizer_image.get_dst_w(); }
-        inline AVPixelFormat   encoder::pixel_fmt()        const noexcept { return resizer_image.get_dst_fmt(); }
-        inline int             encoder::sample_rate()      const noexcept { return resizer_audio.get_dst_rate(); }
-        inline uint64_t        encoder::channel_layout()   const noexcept { return resizer_audio.get_dst_layout(); }
-        inline AVSampleFormat  encoder::sample_fmt()       const noexcept { return resizer_audio.get_dst_fmt(); }
-        inline int             encoder::nchannels()        const noexcept { return details::get_nchannels(channel_layout()); }
+        inline int             encoder::height()           const noexcept { return pCodecCtx ? pCodecCtx->height            : 0; }
+        inline int             encoder::width()            const noexcept { return pCodecCtx ? pCodecCtx->width             : 0; }
+        inline AVPixelFormat   encoder::pixel_fmt()        const noexcept { return pCodecCtx ? pCodecCtx->pix_fmt           : AV_PIX_FMT_NONE; }
+        inline int             encoder::sample_rate()      const noexcept { return pCodecCtx ? pCodecCtx->sample_rate       : 0; }
+        inline AVSampleFormat  encoder::sample_fmt()       const noexcept { return pCodecCtx ? pCodecCtx->sample_fmt        : AV_SAMPLE_FMT_NONE; }
+        inline uint64_t        encoder::channel_layout()   const noexcept { return details::get_layout(pCodecCtx.get()); }
+        inline int             encoder::nchannels()        const noexcept { return details::get_nchannels(pCodecCtx.get()); }
 
         enum encoding_state
         {
@@ -940,12 +930,12 @@ namespace dlib
             // Resize if image. Resample if audio. Push through audio fifo if necessary (some audio codecs requires fixed size frames)
             if (f_.is_image())
             {
-                resizer_image.resize(f_, f_);
+                resizer_image.resize(f_, pCodecCtx->height, pCodecCtx->width, pCodecCtx->pix_fmt, f_);
                 frames.push_back(std::move(f_));
             }
             else if (f_.is_audio())
             {
-                resizer_audio.resize(f_, f_);
+                resizer_audio.resize(f_, pCodecCtx->sample_rate, get_layout(pCodecCtx.get()), pCodecCtx->sample_fmt, f_);
                 frames = fifo.push_pull(std::move(f_));
             }
             else
