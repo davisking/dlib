@@ -1052,21 +1052,24 @@ namespace dlib
             image_type& img
         )
         {
-            const auto args = details::args_from_image(img);
-            
-            frame f;
-            decoder_status status{DECODER_EAGAIN};
+            using namespace details;
 
-            while ((status = read(f, args, {})) == DECODER_FRAME_AVAILABLE)
+            while (!frame_queue.empty())
             {
-                if (f.is_image())
+                frame tmp = std::move(frame_queue.front());
+                frame_queue.pop();
+
+                if (tmp.is_image())
                 {
-                    convert(f, img);
-                    break;
+                    resizer_image.resize(tmp, img);
+                    return DECODER_FRAME_AVAILABLE;
                 }
             }
 
-            return status;
+            if (!is_open())
+                return DECODER_CLOSED;
+
+            return DECODER_EAGAIN;
         }
 
         inline bool             decoder::is_open()          const noexcept { return (pCodecCtx && open_) || !frame_queue.empty(); }
