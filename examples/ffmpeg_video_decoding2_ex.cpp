@@ -57,8 +57,11 @@ try
     ffmpeg::decoder_status  status{ffmpeg::DECODER_EAGAIN};
     int                     samples{0};
 
-    resizing_args args_image;
-    args_image.fmt = pix_traits<rgb_pixel>::fmt;
+    // When reading frames, we get exactly what's in the codec by default.
+    // To resize, change pixel format, resample or change sample format, 
+    // you have to pass extra arguments to read() which either resize or resample
+    // the frame. Since we want rgb_pixel, we need to set the pixel format appropriately.
+    const resizing_args args_image {0, 0, pix_traits<rgb_pixel>::fmt};
 
     image_window win;
 

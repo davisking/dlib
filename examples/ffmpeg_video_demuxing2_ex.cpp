@@ -58,9 +58,7 @@ try
     // To resize, change pixel format, resample or change sample format, 
     // you have to pass extra arguments to read() which either resize or resample
     // the frame. Since we want rgb_pixel, we need to set the pixel format appropriately.
-    resizing_args args_image;
-    args_image.fmt = pix_traits<rgb_pixel>::fmt;
-
+    const resizing_args args_image {0, 0, pix_traits<rgb_pixel>::fmt};
 
     while (cap.read(f, args_image))
     {

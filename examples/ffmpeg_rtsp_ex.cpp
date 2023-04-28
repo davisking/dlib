@@ -7,7 +7,9 @@
     Please see all the other ffmpeg examples:
         - ffmpeg_info_ex.cpp
         - ffmpeg_video_decoding_ex.cpp
+        - ffmpeg_video_decoding2_ex.cpp
         - ffmpeg_video_demuxing_ex.cpp
+        - ffmpeg_video_demuxing2_ex.cpp
         - ffmpeg_video_encoding_ex.cpp
         - ffmpeg_video_muxing_ex.cpp
 */

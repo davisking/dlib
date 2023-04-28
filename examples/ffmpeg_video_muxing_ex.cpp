@@ -9,7 +9,9 @@
     Please see the following examples on how to decode, demux, and get information on your installation of ffmpeg:
         - ffmpeg_info_ex.cpp
         - ffmpeg_video_decoding_ex.cpp
+        - ffmpeg_video_decoding2_ex.cpp
         - ffmpeg_video_demuxing_ex.cpp
+        - ffmpeg_video_demuxing2_ex.cpp
 */
 
 #include <cstdio>
