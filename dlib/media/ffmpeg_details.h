@@ -239,12 +239,12 @@ namespace dlib { namespace ffmpeg { namespace details
 
     inline uint64_t get_layout(const AVCodecContext* pCodecCtx)
     {
-        return pCodecCtx->ch_layout.u.mask;
+        return pCodecCtx ? pCodecCtx->ch_layout.u.mask : 0;
     }
 
     inline uint64_t get_layout(const AVFrame* frame)
     {
-        return frame->ch_layout.u.mask;
+        return frame ? frame->ch_layout.u.mask : 0;
     }
 
     inline void set_layout(AVCodecContext* pCodecCtx, const uint64_t channel_layout)
@@ -259,12 +259,12 @@ namespace dlib { namespace ffmpeg { namespace details
 
     inline int get_nchannels(const AVCodecContext* pCodecCtx)
     {
-        return pCodecCtx->ch_layout.nb_channels;
+        return pCodecCtx ? pCodecCtx->ch_layout.nb_channels : 0;
     }
 
     inline int get_nchannels(const AVFrame* frame)
     {
-        return frame->ch_layout.nb_channels;
+        return frame ? frame->ch_layout.nb_channels : 0;
     }
 
     inline int get_nchannels(const uint64_t channel_layout)
@@ -305,12 +305,12 @@ namespace dlib { namespace ffmpeg { namespace details
 
     inline uint64_t get_layout(const AVCodecContext* pCodecCtx)
     {
-        return pCodecCtx->channel_layout;
+        return pCodecCtx ? pCodecCtx->channel_layout : 0;
     }
 
     inline uint64_t get_layout(const AVFrame* frame)
     {
-        return frame->channel_layout;
+        return frame ? frame->channel_layout : 0;
     }
 
     inline void set_layout(AVCodecContext* pCodecCtx, const uint64_t channel_layout)
@@ -330,12 +330,12 @@ namespace dlib { namespace ffmpeg { namespace details
 
     inline int get_nchannels(const AVCodecContext* pCodecCtx)
     {
-        return get_nchannels(pCodecCtx->channel_layout);
+        return pCodecCtx ? get_nchannels(pCodecCtx->channel_layout) : 0;
     }
 
     inline int get_nchannels(const AVFrame* frame)
     {
-        return get_nchannels(frame->channel_layout);
+        return frame ? get_nchannels(frame->channel_layout) : 0;
     }    
 
     inline void check_layout(AVCodecContext* pCodecCtx) 
