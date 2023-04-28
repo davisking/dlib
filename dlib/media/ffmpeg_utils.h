@@ -259,7 +259,7 @@ namespace dlib
             friend class encoder;
             friend class decoder;
 
-            frame(
+            void set_params(
                 int                                     h,
                 int                                     w,
                 AVPixelFormat                           pixfmt,
@@ -975,7 +975,7 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-        inline frame::frame(
+        inline void frame::set_params(
             int             h,
             int             w,
             AVPixelFormat   pixfmt,
@@ -1022,8 +1022,9 @@ namespace dlib
             int w,
             AVPixelFormat fmt,
             std::chrono::system_clock::time_point timestamp
-        ) : frame(h, w, fmt, 0, 0, 0, AV_SAMPLE_FMT_NONE, timestamp)
+        )
         {
+            set_params(h, w, fmt, 0, 0, 0, AV_SAMPLE_FMT_NONE, timestamp);
         }
 
         inline frame::frame(
@@ -1032,8 +1033,9 @@ namespace dlib
             uint64_t        channel_layout,
             AVSampleFormat  fmt,
             std::chrono::system_clock::time_point timestamp
-        ) : frame(0,0,AV_PIX_FMT_NONE, sample_rate, nb_samples, channel_layout, fmt, timestamp)
+        )
         {
+            set_params(0,0,AV_PIX_FMT_NONE, sample_rate, nb_samples, channel_layout, fmt, timestamp);
         }
 
         inline frame::frame(const frame &ori)
@@ -1050,41 +1052,34 @@ namespace dlib
 
         inline void frame::copy_from(const frame& ori)
         {
+            using namespace details;
+
             if (ori.is_empty())
             {
                 frame empty{std::move(*this)};
             }
             else
             {
-                const bool same_image_dims =
-                        is_image() &&
-                        std::tie(    f->height,     f->width,     f->format) ==
-                        std::tie(ori.f->height, ori.f->width, ori.f->format);
-
-                const bool same_audio_dims =
-                        is_audio() &&
-                        std::tie(    f->sample_rate,     f->nb_samples,     f->format) ==
-                        std::tie(ori.f->sample_rate, ori.f->nb_samples, ori.f->format) &&
-#if FF_API_OLD_CHANNEL_LAYOUT
-                        av_channel_layout_compare(&f->ch_layout, &ori.f->ch_layout) == 0;
-#else
-                        f->channel_layout == ori.f->channel_layout;
-#endif
-
-                if (!same_image_dims && !same_audio_dims)
+                if (is_empty() ||
+                    std::tie(    f->height,     f->width,     f->format,     f->sample_rate,     f->nb_samples) !=
+                    std::tie(ori.f->height, ori.f->width, ori.f->format, ori.f->sample_rate, ori.f->nb_samples) ||
+                    get_layout(f.get()) != get_layout(ori.f.get()))
                 {
-                    *this = std::move(frame(ori.f->height,
-                                            ori.f->width,
-                                            (AVPixelFormat)ori.f->format,
-                                            ori.f->sample_rate,
-                                            ori.f->nb_samples,
-                                            ori.layout(),
-                                            (AVSampleFormat)ori.f->format,
-                                            ori.timestamp));
+                    set_params(ori.f->height,
+                               ori.f->width,
+                               (AVPixelFormat)ori.f->format,
+                               ori.f->sample_rate,
+                               ori.f->nb_samples,
+                               ori.layout(),
+                               (AVSampleFormat)ori.f->format,
+                               ori.timestamp);
                 }
 
                 av_frame_copy(f.get(), ori.f.get());
-                av_frame_copy_props(f.get(), ori.f.get());
+                // We don't actually need to copy every single property.
+                // We only care about dimensions and data.
+                // For now, we comment out the following line.
+                // av_frame_copy_props(f.get(), ori.f.get());
             }
         }
 
