@@ -646,12 +646,24 @@ namespace dlib
                     frame &dst
                 );
 
-                int             get_src_h()    const noexcept { return src_h; }
-                int             get_src_w()    const noexcept { return src_w; }
-                AVPixelFormat   get_src_fmt()  const noexcept { return src_fmt; }
-                int             get_dst_h()    const noexcept { return dst_h; }
-                int             get_dst_w()    const noexcept { return dst_w; }
-                AVPixelFormat   get_dst_fmt()  const noexcept { return dst_fmt; }
+                template <
+                  class image_type,
+                  is_image_check<image_type> = true
+                >
+                void resize(
+                    const frame &src,
+                    const int dst_h, const int dst_w,
+                    image_type& img
+                );
+
+                template <
+                  class image_type,
+                  is_image_check<image_type> = true
+                >
+                void resize(
+                    const frame &src,
+                    image_type& img
+                );
 
             private:
 
@@ -736,6 +748,76 @@ namespace dlib
                 resize(src, dst_h, dst_w, dst_fmt, dst);
             }
 
+            template <
+                class image_type,
+                is_image_check<image_type>
+            >
+            void resizer::resize (
+                const frame &src,
+                const int dst_h_, const int dst_w_,
+                image_type& img
+            )
+            {
+                DLIB_CASSERT(src.is_image(), "src.is_image() == false");
+
+                reset(src.height(), src.width(), src.pixfmt(),
+                      dst_h_ > 0 ? dst_h_ : (img.nr() > 0 ? img.nr() : src.height()),
+                      dst_w_ > 0 ? dst_w_ : (img.nc() > 0 ? img.nc() : src.width()),
+                      pix_traits<pixel_type_t<image_type>>::fmt);
+
+                img.set_size(dst_h, dst_w);
+
+                const size_t imgsize = img.nr()*img.nc()*sizeof(pixel_type_t<image_type>);
+                
+                if (imgConvertCtx)
+                {     
+                    int         dst_linesizes[4]    = {0};
+                    uint8_t*    dst_pointers[4]     = {nullptr};
+
+                    const int ret = av_image_fill_arrays(dst_pointers, 
+                                                         dst_linesizes, 
+                                                         (uint8_t*)img.begin(), 
+                                                         pix_traits<pixel_type_t<image_type>>::fmt,
+                                                         img.nc(), 
+                                                         img.nr(), 
+                                                         1);
+                    DLIB_ASSERT(ret == imgsize, "av_image_fill_arrays()  error : " << details::get_av_error(ret));
+                    (void)imgsize;
+                    (void)ret;
+
+                    sws_scale(imgConvertCtx.get(),
+                              src.get_frame().data,  src.get_frame().linesize, 0, src.height(),
+                              dst_pointers, dst_linesizes);
+                }
+                else
+                {
+                    const int ret = av_image_copy_to_buffer((uint8_t*)img.begin(), 
+                                                            imgsize, 
+                                                            src.get_frame().data, 
+                                                            src.get_frame().linesize, 
+                                                            src.pixfmt(), 
+                                                            src.width(), 
+                                                            src.height(), 
+                                                            1);   
+                    
+                    DLIB_ASSERT(ret == imgsize, "av_image_copy_to_buffer()  error : " << details::get_av_error(ret));
+                    (void)imgsize;
+                    (void)ret;
+                }
+            }
+
+            template <
+                class image_type,
+                is_image_check<image_type>
+            >
+            void resizer::resize (
+                const frame &src,
+                image_type& img
+            )
+            {
+                resize(src, 0, 0, img);
+            }
+
 // ---------------------------------------------------------------------------------------------------
 
             class resampler
@@ -756,13 +838,6 @@ namespace dlib
                     const frame &src,
                     frame &dst
                 );
-
-                int             get_src_rate()   const noexcept { return src_sample_rate; }
-                uint64_t        get_src_layout() const noexcept { return src_channel_layout; }
-                AVSampleFormat  get_src_fmt()    const noexcept { return src_fmt; }
-                int             get_dst_rate()   const noexcept { return dst_sample_rate; }
-                uint64_t        get_dst_layout() const noexcept { return dst_channel_layout; }
-                AVSampleFormat  get_dst_fmt()    const noexcept { return dst_fmt; }
 
             private:
 
