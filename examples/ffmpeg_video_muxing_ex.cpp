@@ -28,8 +28,8 @@ try
     command_line_parser parser;
     parser.add_option("i",              "input video", 1);
     parser.add_option("o",              "output file", 1);
-    parser.add_option("codec_video",    "video codec name. e.g. `h264`. Defaults to `mpeg4`", 1);
-    parser.add_option("codec_audio",    "audio codec name. e.g. `aac`. Defaults to `ac3`", 1);
+    parser.add_option("codec_video",    "video codec name. e.g. `h264`", 1);
+    parser.add_option("codec_audio",    "audio codec name. e.g. `aac`", 1);
     parser.add_option("height",         "height of encoded stream. Defaults to whatever is in the video file", 1);
     parser.add_option("width",          "width of encoded stream. Defaults to whatever is in the video file", 1);
     parser.add_option("sample_rate",    "sample rate of encoded stream. Defaults to whatever is in the video file", 1);
@@ -66,7 +66,7 @@ try
         args.enable_audio = cap.audio_enabled();
         if (args.enable_image)
         {
-            args.args_image.codec_name  = get_option(parser, "codec_video", "mpeg4");;
+            args.args_image.codec_name  = get_option(parser, "codec_video", "");;
             args.args_image.h           = get_option(parser, "height", cap.height());
             args.args_image.w           = get_option(parser, "width",  cap.width());
             args.args_image.fmt         = cap.pixel_fmt();
@@ -74,7 +74,7 @@ try
         }
         if (args.enable_audio)
         {
-            args.args_audio.codec_name      = get_option(parser, "codec_audio", "aac");;
+            args.args_audio.codec_name      = get_option(parser, "codec_audio", "");;
             args.args_audio.sample_rate     = get_option(parser, "sample_rate", cap.sample_rate());
             args.args_audio.channel_layout  = cap.channel_layout();
             args.args_audio.fmt             = cap.sample_fmt();

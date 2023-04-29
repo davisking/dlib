@@ -1134,14 +1134,27 @@ namespace dlib
                                 supported.codec_name == args.args_codec.codec_name;
                 }) == end(supported_codecs))
                 {
-                    logger_dlib_wrapper() << LERROR
+                    logger_dlib_wrapper() << LINFO
                         << "Codec " << avcodec_get_name(args.args_codec.codec) << " or " << args.args_codec.codec_name
                         << " cannot be stored in this file";
-                    logger_dlib_wrapper() << LINFO 
-                        << "List of supported codecs for muxer " << st.pFormatCtx->oformat->name << " in this installation of ffmpeg:";
-                    for (const auto& supported : supported_codecs)
-                        logger_dlib_wrapper() << LINFO << "    " << supported.codec_name;
-                    return false;
+                    
+                    args.args_codec.codec = is_video ? st.pFormatCtx->oformat->video_codec : 
+                                                       st.pFormatCtx->oformat->audio_codec;
+                    
+                    if (args.args_codec.codec != AV_CODEC_ID_NONE)
+                    {
+                        logger_dlib_wrapper() << LINFO 
+                            << "Picking default codec " << avcodec_get_name(args.args_codec.codec);
+                    }
+                    else
+                    {
+                        logger_dlib_wrapper() << LINFO 
+                            << "List of supported codecs for muxer " << st.pFormatCtx->oformat->name << " in this installation of ffmpeg:";
+                        for (const auto& supported : supported_codecs)
+                            logger_dlib_wrapper() << LINFO << "    " << supported.codec_name;
+                        
+                        return false;
+                    }    
                 }
 
                 // Codec is supported by muxer, so create encoder
