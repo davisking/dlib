@@ -287,7 +287,7 @@ namespace dlib
             );
 
             bool push_encoded_padded(const uint8_t *encoded, int nencoded);
-            bool push(const details::av_ptr<AVPacket>& pkt);
+            bool push(const details::av_ptr<AVPacket>& pkt, std::queue<frame>& frame_queue);
 
             args                                    args_;
             bool                                    open_{false};
@@ -693,23 +693,6 @@ namespace dlib
 
         namespace details
         {
-            template <
-              class image_type,
-              is_image_check<image_type> = true
-            >
-            inline resizing_args args_from_image(
-                const image_type& img
-            )
-            {
-                resizing_args args;
-                args.fmt = pix_traits<pixel_type_t<image_type>>::fmt;
-                if (num_rows(img) > 0)
-                    args.h = num_rows(img);
-                if (num_columns(img) > 0)
-                    args.w = num_columns(img);
-                return args;
-            }
-
             inline void convert (
                 frame&                  dst_frame,
                 resizer&                resizer,
@@ -845,7 +828,10 @@ namespace dlib
             EXTRACT_ERROR = -1
         };
 
-        inline bool decoder::push(const details::av_ptr<AVPacket>& pkt)
+        inline bool decoder::push(
+            const details::av_ptr<AVPacket>& pkt,
+            std::queue<frame>& queue
+        )
         {
             using namespace std::chrono;
             using namespace details;
@@ -892,7 +878,7 @@ namespace dlib
                     const uint64_t pts          = avframe.is_image() ? avframe.f->pts : next_pts;
                     avframe.timestamp           = system_clock::time_point{nanoseconds{av_rescale_q(pts, tb, {1,1000000000})}};
                     next_pts                    += avframe.is_image() ? 1 : avframe.f->nb_samples;
-                    frame_queue.push(avframe);
+                    queue.push(avframe);
                 }
             };
 
@@ -963,7 +949,7 @@ namespace dlib
 
                 // If data is available, decode
                 if (ok && packet->size > 0)
-                    ok = push(packet);
+                    ok = push(packet, frame_queue);
                 
                 // If flushing, only flush parser once, so break
                 if (flushing)
@@ -973,7 +959,7 @@ namespace dlib
             if (flushing)
             {
                 // Flush codec. After this, pCodecCtx == nullptr since AVERROR_EOF will be returned at some point.
-                ok = push(nullptr);
+                ok = push(nullptr, frame_queue);
             }
         
             return ok;
@@ -1056,14 +1042,25 @@ namespace dlib
 
             while (!frame_queue.empty())
             {
-                frame tmp = std::move(frame_queue.front());
+                frame f = std::move(frame_queue.front());
                 frame_queue.pop();
 
-                if (tmp.is_image())
+                if (f.is_image())
                 {
-                    resizer_image.resize(tmp, img);
+                    convert (
+                        f,
+                        resizer_image,
+                        resizer_audio,
+                        {img.nr() > 0 ? (int)img.nr() : f.height(),
+                         img.nc() > 0 ? (int)img.nc() : f.width(),
+                         pix_traits<pixel_type_t<image_type>>::fmt},
+                        {}
+                    );
+
+                    convert(f, img);
+                    
                     return DECODER_FRAME_AVAILABLE;
-                }
+                } 
             }
 
             if (!is_open())
@@ -1373,32 +1370,15 @@ namespace dlib
                 if (ok && st.packet->size > 0)
                 {
                     // Decode
-                    ok = channel->push(st.packet);
-
-                    // Pull all frames from extractor to (*this).st.frame_queue
-                    decoder_status suc;
-                    frame frame;
-
-                    while ((suc = channel->read(frame)) == DECODER_FRAME_AVAILABLE)
-                        st.frame_queue.push(std::move(frame));
+                    ok = channel->push(st.packet, st.frame_queue);
                 }
             }
 
             if (!ok)
             {
                 // Flush
-                st.channel_video.push(nullptr);
-                st.channel_audio.push(nullptr);
-
-                // Pull remaining frames
-                decoder_status suc;
-                frame frame;
-
-                while ((suc = st.channel_video.read(frame)) == DECODER_FRAME_AVAILABLE)
-                    st.frame_queue.push(std::move(frame));   
-                
-                while ((suc = st.channel_audio.read(frame)) == DECODER_FRAME_AVAILABLE)
-                    st.frame_queue.push(std::move(frame)); 
+                st.channel_video.push(nullptr, st.frame_queue);
+                st.channel_audio.push(nullptr, st.frame_queue);
             }
 
             return !st.frame_queue.empty();
@@ -1415,23 +1395,18 @@ namespace dlib
             if (!fill_queue())
                 return false;
 
-            if (!st.frame_queue.empty())
-            {
-                dst_frame = std::move(st.frame_queue.front());
-                st.frame_queue.pop();
+            dst_frame = std::move(st.frame_queue.front());
+            st.frame_queue.pop();
 
-                convert (
-                    dst_frame,
-                    st.channel_video.resizer_image,
-                    st.channel_audio.resizer_audio,
-                    args_image,
-                    args_audio
-                );
+            convert (
+                dst_frame,
+                st.channel_video.resizer_image,
+                st.channel_audio.resizer_audio,
+                args_image,
+                args_audio
+            );
 
-                return true;
-            }
-
-            return false;
+            return true;
         }
 
         template <
@@ -1442,18 +1417,31 @@ namespace dlib
             image_type& img
         )
         {
-            const auto args = details::args_from_image(img);
-            
-            frame f;
-            while (read(f, args, {}))
+            using namespace details;
+
+            while (fill_queue())
             {
+                frame f = std::move(st.frame_queue.front());
+                st.frame_queue.pop();
+
                 if (f.is_image())
                 {
+                    convert (
+                        f,
+                        st.channel_video.resizer_image,
+                        st.channel_audio.resizer_audio,
+                        {img.nr() > 0 ? (int)img.nr() : f.height(),
+                         img.nc() > 0 ? (int)img.nc() : f.width(),
+                         pix_traits<pixel_type_t<image_type>>::fmt},
+                        {}
+                    );
+
                     convert(f, img);
+                    
                     return true;
                 } 
             }
-            
+
             return false;
         }
 
