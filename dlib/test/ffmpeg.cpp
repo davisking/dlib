@@ -12,6 +12,8 @@
 #include <dlib/array2d.h>
 #include <dlib/matrix.h>
 #include <dlib/rand.h>
+#include <dlib/image_transforms.h>
+#include <dlib/image_io.h>
 #include "tester.h"
 
 #ifndef DLIB_FFMPEG_DATA
@@ -112,6 +114,36 @@ namespace
         DLIB_TEST(f1.is_empty());
 
         print_spinner();
+    }
+
+    template <typename pixel_type>
+    static double psnr(const matrix<pixel_type>& img1, const matrix<pixel_type>& img2)
+    {
+        DLIB_TEST(have_same_dimensions(img1, img2));
+        const long nk           = width_step(img1) / img1.nc();
+        const long data_size    = img1.size() * nk;
+        auto* data1             = reinterpret_cast<const uint8_t*>(image_data(img1));
+        auto* data2             = reinterpret_cast<const uint8_t*>(image_data(img2));
+
+        double mse = 0;
+        for (long i = 0; i < data_size; i += nk)
+        {
+            for (long k = 0; k < nk; ++k)
+                mse += std::pow(static_cast<double>(data1[i + k]) - static_cast<double>(data2[i + k]), 2);
+        }
+        mse /= data_size;
+        return 20 * std::log10(pixel_traits<pixel_type>::max()) - 10 * std::log10(mse);
+    }
+
+    void test_load_frame(const std::string& filename)
+    {
+        matrix<rgb_pixel> img1, img2;
+        load_image(img1, filename);
+        load_frame(img2, filename);
+        DLIB_TEST(img1.nr() == img2.nr());
+        DLIB_TEST(img1.nc() == img2.nc());
+        const double similarity = psnr(img1, img2);
+        DLIB_TEST_MSG(similarity > 25.0, "psnr " << similarity);
     }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -708,6 +740,20 @@ namespace
 
             dlib::file f(DLIB_FFMPEG_DATA);
             dlib::config_reader cfg(f.full_name());
+
+            {
+                const auto& image_block = cfg.block("images");
+                std::vector<string> blocks;
+                image_block.get_blocks(blocks);
+
+                for (const auto& block : blocks)
+                {
+                    const auto& sublock = image_block.block(block);
+                    const std::string filepath = get_parent_directory(f).full_name() + "/" + sublock["file"];
+
+                    test_load_frame(filepath);
+                }
+            }
 
             {
                 const auto& video_raw_block = cfg.block("decoding");
