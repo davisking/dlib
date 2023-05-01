@@ -797,7 +797,6 @@ namespace dlib
             args_       = a;
             timebase    = timebase_;
             packet      = make_avpacket();
-            avframe.f   = make_avframe();
 
             if (args_.bitrate > 0)
                 pCodecCtx_->bit_rate = args_.bitrate;
@@ -856,6 +855,7 @@ namespace dlib
 
             const auto recv_frame = [&](extract_state& state, bool resend)
             {
+                avframe.f = make_avframe();
                 const int ret = avcodec_receive_frame(pCodecCtx.get(), avframe.f.get());
 
                 if (ret == AVERROR(EAGAIN) && resend)
@@ -878,7 +878,8 @@ namespace dlib
                     const uint64_t pts          = avframe.is_image() ? avframe.f->pts : next_pts;
                     avframe.timestamp           = system_clock::time_point{nanoseconds{av_rescale_q(pts, tb, {1,1000000000})}};
                     next_pts                    += avframe.is_image() ? 1 : avframe.f->nb_samples;
-                    queue.push(avframe);
+                    avframe.f->pict_type = AV_PICTURE_TYPE_NONE;
+                    queue.push(std::move(avframe));
                 }
             };
 

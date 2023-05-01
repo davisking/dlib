@@ -1058,10 +1058,9 @@ namespace dlib
                 }
 
                 av_frame_copy(f.get(), ori.f.get());
-                // We don't actually need to copy every single property.
-                // We only care about dimensions and data.
-                // For now, we comment out the following line.
-                // av_frame_copy_props(f.get(), ori.f.get());
+                av_frame_copy_props(f.get(), ori.f.get());
+                // The following silences a warning message about too many b-frames.
+                f->pict_type = AV_PICTURE_TYPE_NONE;
             }
         }
 
@@ -1424,7 +1423,7 @@ namespace dlib
                 f.width()  != img.nc() ||
                 f.pixfmt() != pix_traits<pixel>::fmt)
             {
-                f = frame(img.nr(), img.nc(), pix_traits<pixel>::fmt, {});
+                f.set_params(img.nr(), img.nc(), pix_traits<pixel>::fmt, 0, 0, 0, AV_SAMPLE_FMT_NONE, {});
             }
 
             const size_t imgsize            = img.nr()*img.nc()*sizeof(pixel);
