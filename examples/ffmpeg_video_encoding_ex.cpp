@@ -59,7 +59,7 @@ try
 
     // This is a small functor that creates an encoder using the command line arguments
     // and different types of output buffers using the convenient sink() overload.
-    const auto make_encoder = [&](auto& out) 
+    const auto make_encoder = [&]
     {
         return encoder([&] {
             encoder::args args;
@@ -69,7 +69,7 @@ try
             args.args_image.fmt         = cap.pixel_fmt();
             args.args_image.framerate   = cap.fps();
             return args;
-        }(), sink(out));
+        }());
     };
 
     // Encode to multiple different types of buffers.
@@ -80,33 +80,27 @@ try
     std::ofstream           buf5("encoded.dat", std::ios::binary);
 
     // Different encoders for different buffers
-    auto enc1 = make_encoder(buf1);
-    auto enc2 = make_encoder(buf2);
-    auto enc3 = make_encoder(buf3);
-    auto enc4 = make_encoder(buf4);
-    auto enc5 = make_encoder(buf5);
+    auto enc1 = make_encoder();
+    auto enc2 = make_encoder();
+    auto enc3 = make_encoder();
+    auto enc4 = make_encoder();
+    auto enc5 = make_encoder();
 
     frame f;
     while (cap.read(f))
     {
-        enc1.push(f);
-        enc2.push(f);
-        enc3.push(f);
-        enc4.push(f);
-        enc5.push(f);
+        enc1.push(f, sink(buf1));
+        enc2.push(f, sink(buf2));
+        enc3.push(f, sink(buf3));
+        enc4.push(f, sink(buf4));
+        enc5.push(f, sink(buf5));
     }
 
-    // Flush all the encoders
-    // Note, encoder::~encoder calls flush()
-    // So if the encoders were going out of scope at this point, you wouldn't have to call flush()
-    // Also note, flush() becomes a no-op after the 1st time you call it. 
-    // Calling it more than once is safe but has no effect.
-    // After calling flush(), push() will always return false.
-    enc1.flush();
-    enc2.flush();
-    enc3.flush();
-    enc4.flush();
-    enc5.flush();
+    enc1.flush(sink(buf1));
+    enc2.flush(sink(buf2));
+    enc3.flush(sink(buf3));
+    enc4.flush(sink(buf4));
+    enc5.flush(sink(buf5));
 
     cout << "vector<char>       size " << buf1.size() << endl;
     cout << "vector<int8_t>     size " << buf2.size() << endl;
