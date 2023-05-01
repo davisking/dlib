@@ -618,12 +618,17 @@ namespace dlib
     {
         namespace details
         {
+
+// ---------------------------------------------------------------------------------------------------
+
             inline bool operator==(const AVRational& a, const AVRational& b) {return a.num == b.num && a.den == b.den;}
             inline bool operator!=(const AVRational& a, const AVRational& b) {return !(a == b);}
             inline bool operator==(const AVRational& a, int framerate)       {return a.den > 0 && (a.num / a.den) == framerate;}
             inline bool operator!=(const AVRational& a, int framerate)       {return !(a == framerate);}
             inline int  to_int(const AVRational& a)                          {return a.num / a.den;}
             inline AVRational inv(const AVRational& a)                       {return {a.den, a.num};}
+
+// ---------------------------------------------------------------------------------------------------
 
             inline void check_properties(
                 const AVCodec*  pCodec,
@@ -785,6 +790,8 @@ namespace dlib
 #endif
             }
         }
+
+// ---------------------------------------------------------------------------------------------------
 
         inline encoder::encoder(
             const args &a,
@@ -1026,6 +1033,8 @@ namespace dlib
             push(frame{});
         }
 
+// ---------------------------------------------------------------------------------------------------
+
         inline muxer::muxer(const args &a)
         {
             if (!open(a))
@@ -1134,7 +1143,7 @@ namespace dlib
                                 supported.codec_name == args.args_codec.codec_name;
                 }) == end(supported_codecs))
                 {
-                    logger_dlib_wrapper() << LINFO
+                    logger_dlib_wrapper() << LWARN
                         << "Codec " << avcodec_get_name(args.args_codec.codec) << " or " << args.args_codec.codec_name
                         << " cannot be stored in this file";
                     
@@ -1143,15 +1152,15 @@ namespace dlib
                     
                     if (args.args_codec.codec != AV_CODEC_ID_NONE)
                     {
-                        logger_dlib_wrapper() << LINFO 
+                        logger_dlib_wrapper() << LWARN 
                             << "Picking default codec " << avcodec_get_name(args.args_codec.codec);
                     }
                     else
                     {
-                        logger_dlib_wrapper() << LINFO 
+                        logger_dlib_wrapper() << LWARN 
                             << "List of supported codecs for muxer " << st.pFormatCtx->oformat->name << " in this installation of ffmpeg:";
                         for (const auto& supported : supported_codecs)
-                            logger_dlib_wrapper() << LINFO << "    " << supported.codec_name;
+                            logger_dlib_wrapper() << LWARN << "    " << supported.codec_name;
                         
                         return false;
                     }    
@@ -1302,6 +1311,9 @@ namespace dlib
         inline AVSampleFormat   muxer::sample_fmt()             const noexcept { return st.encoder_audio.sample_fmt(); }
         inline AVCodecID        muxer::get_audio_codec_id()     const noexcept { return st.encoder_audio.get_codec_id(); }
         inline std::string      muxer::get_audio_codec_name()   const noexcept { return st.encoder_audio.get_codec_name(); }
+
+// ---------------------------------------------------------------------------------------------------
+
     }
 }
 
