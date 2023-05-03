@@ -227,9 +227,7 @@ namespace dlib
                     - returns the number of audio channels in the configured codec.
             !*/
 
-            template <
-              class Callback
-            >
+            template <class Callback>
             bool push (
                 frame f,
                 Callback&& sink
@@ -246,14 +244,12 @@ namespace dlib
                       resized or resampled before being pushed to the codec and encoded.
                     - The sink callback may or may not be invoked as the underlying resampler, 
                       audio fifo and codec all have their own buffers.
-                    - Returns true if successfully encoded, even if callback wasn't invoked.
+                    - Returns true if successfully encoded, even if sink wasn't invoked.
                     - Returns false if either EOF, i.e. flush() has been previously called,
                       or an error occurred, in which case is_open() == false.
             !*/
 
-            template <
-              class Callback
-            >
+            template <class Callback>
             void flush (
                 Callback&& sink
             );
@@ -263,7 +259,7 @@ namespace dlib
                       for writing packet data. dlib/media/sink.h contains callback wrappers for
                       different buffer types.
                 ensures
-                    - Flushes the codec. 
+                    - Flushes the codec. This must be called when there are no more frames to be encoded.
                     - sink will likely be invoked.
                     - is_open() == false
                     - Becomes a no-op after the first time you call this.
@@ -894,9 +890,7 @@ namespace dlib
             ENCODE_ERROR = -1
         };
         
-        template <
-          class Callback
-        >
+        template <class Callback>
         inline bool encoder::push (
             frame f_,
             Callback&& clb
@@ -1016,9 +1010,7 @@ namespace dlib
             return state != ENCODE_ERROR;
         }
 
-        template <
-          class Callback
-        >
+        template <class Callback>
         inline void encoder::flush(Callback&& clb)
         {
             push(frame{}, std::forward<Callback>(clb));
