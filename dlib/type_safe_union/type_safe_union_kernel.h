@@ -45,23 +45,11 @@ namespace dlib
 
     // ---------------------------------------------------------------------
 
-    namespace detail
-    {
-        template<size_t I, typename... Ts>
-        struct nth_type;
-
-        template<size_t I, typename T0, typename... Ts>
-        struct nth_type<I, T0, Ts...> : nth_type<I-1, Ts...> {};
-
-        template<typename T0, typename... Ts>
-        struct nth_type<0, T0, Ts...> { using type = T0; };
-    }
-
     template <size_t I, typename TSU>
     struct type_safe_union_alternative;
 
     template <size_t I, typename... Types>
-    struct type_safe_union_alternative<I, type_safe_union<Types...>> : detail::nth_type<I, Types...>{};
+    struct type_safe_union_alternative<I, type_safe_union<Types...>> : nth_type<I, Types...>{};
 
     template<size_t I, typename TSU>
     using type_safe_union_alternative_t = typename type_safe_union_alternative<I, TSU>::type;

@@ -23,16 +23,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template<typename... T>
-    struct types_ {};
-    /*!
-        WHAT THIS OBJECT REPRESENTS
-            This is a type list. Use this to pass types to the switch_() function as
-            compile-time initial conditions.
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
     template<bool... v>
     constexpr auto bools(std::integral_constant<bool, v>...)
     /*!
