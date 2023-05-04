@@ -224,6 +224,10 @@ namespace dlib
 
     namespace details
     {
+#if defined(__has_builtin) && __has_builtin(__type_pack_element)
+        template<std::size_t I, class... Ts>
+        struct nth_type { using type = __type_pack_element<I,Ts...>; };
+#else
         template<std::size_t I, class... Ts>
         struct nth_type;
 
@@ -232,6 +236,7 @@ namespace dlib
 
         template<class T0, class... Ts>
         struct nth_type<0, T0, Ts...> { using type = T0; };
+#endif
     }
 
     template<std::size_t I, class... Ts>
