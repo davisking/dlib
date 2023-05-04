@@ -271,6 +271,7 @@ namespace dlib
     {
         using return_type = R;
         using args        = types_<Args...>;
+        constexpr static std::size_t nargs = sizeof...(Args);
     };  
 
     template<class R, class... Args>
@@ -285,9 +286,10 @@ namespace dlib
     template<class F>
     struct callable_traits
     {
-        using call_type     = callable_traits<decltype(&F::operator())>;
+        using call_type     = callable_traits<decltype(&std::decay_t<F>::operator())>;
         using return_type   = typename call_type::return_type;
         using args          = typename call_type::args;
+        constexpr static std::size_t nargs = call_type::nargs;
     };
 
     template<class Callable>
@@ -295,6 +297,9 @@ namespace dlib
 
     template<std::size_t I, class Callable>
     using callable_arg = nth_type_t<I, callable_args<Callable>>;
+
+    template<class Callable>
+    using callable_nargs = std::integral_constant<std::size_t, callable_traits<Callable>::nargs>;
 
     template<class Callable>
     using callable_return = typename callable_traits<Callable>::return_type;

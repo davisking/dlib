@@ -74,6 +74,8 @@ namespace
         static_assert(std::is_same<dlib::callable_args<decltype(func_testargs)>,
                                    dlib::types_<int, std::string, const std::string&, const std::string&, std::string&>
                                    >::value, "make this correct");
+        
+        static_assert(dlib::callable_nargs<decltype(func_testargs)>::value == 5, "bad");
 
         static_assert(std::is_same<dlib::callable_arg<0, decltype(func_testargs)>,
                                    int>::value, "make this correct");
@@ -96,6 +98,8 @@ namespace
         static_assert(std::is_same<dlib::callable_args<decltype(func_return_addition)>,
                                    dlib::types_<int, int>
                                    >::value, "make this correct");
+        
+        static_assert(dlib::callable_nargs<decltype(func_return_addition)>::value == 2, "bad");
 
         static_assert(std::is_same<dlib::callable_arg<0, decltype(func_return_addition)>,
                                    int
@@ -142,6 +146,8 @@ namespace
             static_assert(std::is_same<dlib::callable_args<decltype(f)>,
                                        dlib::types_<int, float*, std::string&>
                                       >::value, "make this correct");
+            
+            static_assert(dlib::callable_nargs<decltype(f)>::value == 3, "bad");
 
             static_assert(std::is_same<dlib::callable_arg<0, decltype(f)>,
                                        int>::value, "make this correct");
@@ -213,6 +219,8 @@ namespace
 
     static_assert(std::is_same<dlib::callable_args<example_struct>,
                                dlib::types_<const char*>>::value, "make this correct");
+    
+    static_assert(dlib::callable_nargs<example_struct>::value == 1, "bad");
 
     static_assert(std::is_same<dlib::callable_arg<0, example_struct>,
                                 const char*>::value, "make this correct");
@@ -470,6 +478,73 @@ namespace
 
     // ----------------------------------------------------------------------------------------
 
+    namespace test_callable_traits
+    {
+        template <
+          class Callable,
+          std::enable_if_t<callable_nargs<Callable>::value >= 1, bool> = true,
+          std::enable_if_t<std::is_floating_point<callable_arg<0, Callable>>::value, bool> = true
+        >
+        auto wrap (
+            Callable&& clb,
+            int& i
+        )
+        {
+            i = 1;
+
+            return [pclb = std::forward<Callable>(clb)](float a, int b, long c) {
+                pclb(a, b, c);
+            };
+        }
+
+        template <
+          class Callable,
+          std::enable_if_t<callable_nargs<Callable>::value >= 1, bool> = true,
+          std::enable_if_t<std::is_integral<callable_arg<0, Callable>>::value, bool> = true
+        >
+        auto wrap (
+            Callable&& clb,
+            int& i
+        )
+        {
+            i = 2;
+
+            return [pclb = std::forward<Callable>(clb)](int a, float b, double c) {
+                pclb(a, b, c);
+            };
+        }
+
+        template <
+          class Callable,
+          std::enable_if_t<callable_nargs<Callable>::value < 1, bool> = true
+        >
+        auto wrap (
+            Callable&& clb,
+            int& i
+        )
+        {
+            i = 3;
+
+            return [pclb = std::forward<Callable>(clb)] {
+                pclb();
+            };
+        }
+
+        void test()
+        {
+            const auto f1 = [](float a, int b, long c) { return a + b + c;};
+            const auto f2 = [](int a, float b, double c) { return a + b + c;};
+            const auto f3 = [] {};
+            int i{0};
+            const auto f4 = wrap(f1, i);
+            DLIB_TEST(i == 1);
+            const auto f5 = wrap(f2, i);
+            DLIB_TEST(i == 2);
+            const auto f6 = wrap(f3, i);
+            DLIB_TEST(i == 3);
+        }
+    }
+
     class invoke_tester : public tester
     {
     public:
@@ -490,6 +565,7 @@ namespace
             test_constexpr();
             test_bind_front();
             test_bind_back();
+            test_callable_traits::test();
         }
     } a;
 }
