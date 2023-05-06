@@ -265,6 +265,21 @@ namespace dlib
 
     template<class F>
     struct callable_traits;
+    /*!
+        WHAT THIS OBJECT REPRESENTS
+            This is a type trait for callable types like function pointers, functors and lambdas.
+            It provides the following types:
+                return_type : the return type of the callable object
+                args        : a parameter pack packaged in a types_<> meta container containing
+                              all the function argument types
+            It also provides the following static members:
+                nargs       : the number of function arguments
+            
+            For example, a function type F with signature R(T1, T2, T3) has the following traits:
+                callable_traits<F>::return_type == R
+                callable_traits<F>::args        == types_<T1,T2,T3>
+                callable_traits<F>::nargs       == 3
+    !*/
 
     template<class R, class... Args>
     struct callable_traits<R(Args...)>
