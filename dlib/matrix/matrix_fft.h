@@ -8,35 +8,10 @@
 #include "../hash.h"
 #include "../algs.h"
 #include "../math.h"
-
-#ifdef DLIB_USE_MKL_FFT
-#include "mkl_fft.h"
-#else
-#include "kiss_fft.h"
-#endif
+#include "../fft/fft.h"
 
 namespace dlib
 {     
-// ----------------------------------------------------------------------------------------
-    
-    constexpr bool is_power_of_two (const unsigned long n)
-    {
-        return n == 0 ? true : (n & (n - 1)) == 0;
-    }
-    
-// ----------------------------------------------------------------------------------------
-    
-    constexpr long fftr_nc_size(long nc)
-    {
-        return nc == 0 ? 0 : nc/2+1;
-    }
-    
-// ----------------------------------------------------------------------------------------   
-    
-    constexpr long ifftr_nc_size(long nc)
-    {
-        return nc == 0 ? 0 : 2*(nc-1);
-    }
   
 // ----------------------------------------------------------------------------------------
     
@@ -47,13 +22,7 @@ namespace dlib
         static_assert(std::is_floating_point<T>::value, "only support floating point types");
         matrix<std::complex<T>,0,1> out(in.size());
         if (in.size() != 0)
-        {
-#ifdef DLIB_USE_MKL_FFT
-            mkl_fft({(long)in.size()}, &in[0], &out(0,0), false);
-#else
-            kiss_fft({(long)in.size()}, &in[0], &out(0,0), false);
-#endif
-        }
+            fft({(long)in.size()}, &in[0], &out(0,0), false);
         return out;
     }
     
@@ -66,13 +35,7 @@ namespace dlib
         static_assert(std::is_floating_point<T>::value, "only support floating point types");
         matrix<std::complex<T>,NR,NC,MM,L> out(in.nr(), in.nc());
         if (in.size() != 0)
-        {
-#ifdef DLIB_USE_MKL_FFT
-            mkl_fft({in.nr(),in.nc()}, &in(0,0), &out(0,0), false);
-#else
-            kiss_fft({in.nr(),in.nc()}, &in(0,0), &out(0,0), false);
-#endif
-        }
+            fft({in.nr(),in.nc()}, &in(0,0), &out(0,0), false);
         return out;
     }
     
@@ -97,11 +60,7 @@ namespace dlib
         matrix<std::complex<T>,0,1> out(in.size());
         if (in.size() != 0)
         {
-#ifdef DLIB_USE_MKL_FFT
-            mkl_fft({(long)in.size()}, &in[0], &out(0,0), true);
-#else
-            kiss_fft({(long)in.size()}, &in[0], &out(0,0), true);
-#endif
+            fft({(long)in.size()}, &in[0], &out(0,0), true);
             out /= out.size();
         }
         return out;
@@ -117,11 +76,7 @@ namespace dlib
         matrix<std::complex<T>,NR,NC,MM,L> out(in.nr(), in.nc());
         if (in.size() != 0)
         {
-#ifdef DLIB_USE_MKL_FFT
-            mkl_fft({in.nr(),in.nc()}, &in(0,0), &out(0,0), true);
-#else
-            kiss_fft({in.nr(),in.nc()}, &in(0,0), &out(0,0), true);
-#endif
+            fft({in.nr(),in.nc()}, &in(0,0), &out(0,0), true);
             out /= out.size();
         }
         return out;
@@ -148,13 +103,7 @@ namespace dlib
         DLIB_ASSERT(in.nc() % 2 == 0, "last dimension " << in.nc() << " needs to be even otherwise ifftr(fftr(data)) won't have matching dimensions");
         matrix<std::complex<T>,NR,fftr_nc_size(NC),MM,L> out(in.nr(), fftr_nc_size(in.nc()));
         if (in.size() != 0)
-        {
-#ifdef DLIB_USE_MKL_FFT
-            mkl_fftr({in.nr(),in.nc()}, &in(0,0), &out(0,0));
-#else
-            kiss_fftr({in.nr(),in.nc()}, &in(0,0), &out(0,0));
-#endif
-        }
+            fftr({in.nr(),in.nc()}, &in(0,0), &out(0,0));
         return out;
     }
     
@@ -179,11 +128,7 @@ namespace dlib
         matrix<T,NR,ifftr_nc_size(NC),MM,L> out(in.nr(), ifftr_nc_size(in.nc()));
         if (in.size() != 0)
         {
-#ifdef DLIB_USE_MKL_FFT
-            mkl_ifftr({out.nr(),out.nc()}, &in(0,0), &out(0,0));
-#else
-            kiss_ifftr({out.nr(),out.nc()}, &in(0,0), &out(0,0));
-#endif
+            ifftr({out.nr(),out.nc()}, &in(0,0), &out(0,0));
             out /= out.size();
         }
         return out;
@@ -207,13 +152,7 @@ namespace dlib
     {
         static_assert(std::is_floating_point<T>::value, "only support floating point types");
         if (data.size() != 0)
-        {
-#ifdef DLIB_USE_MKL_FFT
-            mkl_fft({(long)data.size()}, &data[0], &data[0], false);
-#else
-            kiss_fft({(long)data.size()}, &data[0], &data[0], false);
-#endif
-        }
+            fft({(long)data.size()}, &data[0], &data[0], false);
     }
     
 // ----------------------------------------------------------------------------------------
@@ -223,13 +162,7 @@ namespace dlib
     {
         static_assert(std::is_floating_point<T>::value, "only support floating point types");
         if (data.size() != 0)
-        {
-#ifdef DLIB_USE_MKL_FFT
-            mkl_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), false);
-#else
-            kiss_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), false);
-#endif
-        }
+            fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), false);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -239,13 +172,7 @@ namespace dlib
     {
         static_assert(std::is_floating_point<T>::value, "only support floating point types");
         if (data.size() != 0)
-        {
-#ifdef DLIB_USE_MKL_FFT
-            mkl_fft({(long)data.size()}, &data[0], &data[0], true);
-#else
-            kiss_fft({(long)data.size()}, &data[0], &data[0], true);
-#endif
-        }
+            fft({(long)data.size()}, &data[0], &data[0], true);
     }
     
 // ----------------------------------------------------------------------------------------
@@ -255,13 +182,7 @@ namespace dlib
     {
         static_assert(std::is_floating_point<T>::value, "only support floating point types");
         if (data.size() != 0)
-        {
-#ifdef DLIB_USE_MKL_FFT
-            mkl_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), true);
-#else
-            kiss_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), true);
-#endif
-        }
+            fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), true);
     }
 
 // ----------------------------------------------------------------------------------------

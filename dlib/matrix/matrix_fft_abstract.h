@@ -8,37 +8,6 @@
 
 namespace dlib
 {
-
-// ----------------------------------------------------------------------------------------
-
-    constexpr bool is_power_of_two (
-        const unsigned long value
-    );
-    /*!
-        ensures
-            - returns true if value contains a power of two and false otherwise.  As a
-              special case, we also consider 0 to be a power of two.
-    !*/
-
-// ----------------------------------------------------------------------------------------
-   
-    constexpr long fftr_nc_size(
-        long nc
-    );
-    /*!
-        ensures
-            - returns the output dimension of a 1D real FFT
-    !*/
-
-// ----------------------------------------------------------------------------------------
-    
-    constexpr long ifftr_nc_size(
-        long nc
-    );
-    /*!
-        ensures
-            - returns the output dimension of an inverse 1D real FFT
-    !*/
     
 // ----------------------------------------------------------------------------------------
     
