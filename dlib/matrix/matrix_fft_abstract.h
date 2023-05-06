@@ -144,21 +144,6 @@ namespace dlib
               That is, after this function executes we will have:
                 - #data == fft(data)
     !*/
-
-// ----------------------------------------------------------------------------------------
-    
-    template < typename T, typename Alloc >
-    void fft_inplace (
-        std::vector<std::complex<T>, Alloc>& data
-    )
-    /*!
-        requires
-            - data contains elements of type std::complex<> that itself contains double, float, or long double.
-        ensures
-            - This function is identical to fft() except that it does the FFT in-place.
-              That is, after this function executes we will have:
-                - #data == fft(data)
-    !*/
     
 // ----------------------------------------------------------------------------------------
 
@@ -171,23 +156,6 @@ namespace dlib
         >
     void ifft_inplace (
         matrix<std::complex<T>,NR,NC,MM,L>& data
-    );
-    /*!
-        requires
-            - data contains elements of type std::complex<> that itself contains double, float, or long double.
-        ensures
-            - This function is identical to ifft() except that it does the inverse FFT
-              in-place.  That is, after this function executes we will have:
-                - #data == ifft(data)*data.size()
-                - Note that the output needs to be divided by data.size() to complete the 
-                  inverse transformation.  
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template < typename T, typename Alloc >
-    void ifft_inplace (
-        std::vector<std::complex<T>, Alloc>& data
     );
     /*!
         requires

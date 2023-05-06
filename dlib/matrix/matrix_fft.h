@@ -9,6 +9,7 @@
 #include "../algs.h"
 #include "../math.h"
 #include "../fft/fft.h"
+#include "../fft/fft_stl.h"
 
 namespace dlib
 {     
@@ -147,16 +148,6 @@ namespace dlib
     
 // ----------------------------------------------------------------------------------------
     
-    template < typename T, typename Alloc >
-    void fft_inplace (std::vector<std::complex<T>, Alloc>& data)
-    {
-        static_assert(std::is_floating_point<T>::value, "only support floating point types");
-        if (data.size() != 0)
-            fft({(long)data.size()}, &data[0], &data[0], false);
-    }
-    
-// ----------------------------------------------------------------------------------------
-    
     template < typename T, long NR, long NC, typename MM, typename L >
     void fft_inplace (matrix<std::complex<T>,NR,NC,MM,L>& data)
     {
@@ -165,16 +156,6 @@ namespace dlib
             fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), false);
     }
 
-// ----------------------------------------------------------------------------------------
-
-    template < typename T, typename Alloc >
-    void ifft_inplace (std::vector<std::complex<T>, Alloc>& data)
-    {
-        static_assert(std::is_floating_point<T>::value, "only support floating point types");
-        if (data.size() != 0)
-            fft({(long)data.size()}, &data[0], &data[0], true);
-    }
-    
 // ----------------------------------------------------------------------------------------
 
     template < typename T, long NR, long NC, typename MM, typename L >
