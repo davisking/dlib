@@ -250,6 +250,7 @@ namespace dlib
     /*!
         WHAT THIS OBJECT REPRESENTS
             This is a type trait for getting the n'th argument of a parameter pack.
+            In particular, nth_type<n, some_types...>::type is the nth type in some_types.
     !*/
 
     template<std::size_t I, class... Ts>
