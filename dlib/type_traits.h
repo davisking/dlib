@@ -310,33 +310,15 @@ namespace dlib
 
     template<class Callable>
     using callable_args = typename callable_traits<Callable>::args;
-    /*!
-        WHAT THIS OBJECT REPRESENTS
-            This is a type alias for callable_traits::args
-    !*/
-
 
     template<std::size_t I, class Callable>
     using callable_arg = nth_type_t<I, callable_args<Callable>>;
-    /*!
-        WHAT THIS OBJECT REPRESENTS
-            This is a type alias for nth_type_t<callable_traits::args>
-    !*/
-
+    
     template<class Callable>
     using callable_nargs = std::integral_constant<std::size_t, callable_traits<Callable>::nargs>;
-    /*!
-        WHAT THIS OBJECT REPRESENTS
-            This returns a compile-time constant for callable_traits::nargs 
-            packaged in a std::integral_constant.
-    !*/
 
     template<class Callable>
     using callable_return = typename callable_traits<Callable>::return_type;
-    /*!
-        WHAT THIS OBJECT REPRESENTS
-            This is a type alias for callable_traits::return_type
-    !*/
 
 // ----------------------------------------------------------------------------------------
 
