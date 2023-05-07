@@ -22,6 +22,11 @@ namespace dlib
         const point& operator[](const size_type idx) const { return points[idx]; }
         const point& at(const size_type idx) const { return points.at(idx); }
 
+        std::vector<point>::iterator begin() { return points.begin(); }
+        std::vector<point>::iterator end() { return points.end(); }
+        const std::vector<point>::const_iterator begin() const { return points.begin(); }
+        const std::vector<point>::const_iterator end() const { return points.end(); }
+
         rectangle get_rect() const
         {
             rectangle rect;

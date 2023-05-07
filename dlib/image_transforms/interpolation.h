@@ -325,7 +325,7 @@ namespace dlib
         // fit a quadratic to these 9 pixels and then use that quadratic to find the interpolated 
         // value at point p.
         inline double interpolate(
-            const dlib::vector<double,2>& p,
+            const dpoint& p,
             double tl, double tm, double tr, 
             double ml, double mm, double mr, 
             double bl, double bm, double br
@@ -416,7 +416,7 @@ namespace dlib
         {
             for (long c = area.left(); c <= area.right(); ++c)
             {
-                if (!interp(imgv, map_point(dlib::vector<double,2>(c,r)), out_imgv[r][c]))
+                if (!interp(imgv, map_point(dpoint(c,r)), out_imgv[r][c]))
                     set_background(out_imgv[r][c]);
             }
         }
@@ -551,11 +551,11 @@ namespace dlib
                 y_scale(y_scale_)
             {}
 
-            dlib::vector<double,2> operator() (
-                const dlib::vector<double,2>& p
+            dpoint operator() (
+                const dpoint& p
             ) const
             {
-                return dlib::vector<double,2>(p.x()*x_scale, p.y()*y_scale);
+                return dpoint(p.x()*x_scale, p.y()*y_scale);
             }
 
         private:
@@ -1048,7 +1048,7 @@ namespace dlib
             );
 
         assign_image(out_img, fliplr(mat(in_img)));
-        std::vector<dlib::vector<double,2> > from, to;
+        std::vector<dpoint> from, to;
         rectangle r = get_rect(in_img);
         from.push_back(r.tl_corner()); to.push_back(r.tr_corner());
         from.push_back(r.bl_corner()); to.push_back(r.br_corner());
@@ -1685,7 +1685,7 @@ namespace dlib
             );
 
             const point_transform_affine tform = find_similarity_transform(chip_points,img_points);
-            dlib::vector<double,2> p(1,0);
+            dpoint p(1,0);
             p = tform.get_m()*p;
 
             // There are only 3 things happening in a similarity transform.  There is a
@@ -1737,7 +1737,7 @@ namespace dlib
         const chip_details& details
     )
     {
-        std::vector<dlib::vector<double,2> > from, to;
+        std::vector<dpoint> from, to;
         point p1(0,0);
         point p2(details.cols-1,0);
         point p3(details.cols-1, details.rows-1);
@@ -1895,7 +1895,7 @@ namespace dlib
         for (unsigned long i = 1; i < levels.size(); ++i)
             pyr(levels[i-1],levels[i]);
 
-        std::vector<dlib::vector<double,2> > from, to;
+        std::vector<dpoint> from, to;
 
         // now pull out the chips
         chips.resize(chip_locations.size());
@@ -1999,6 +1999,50 @@ namespace dlib
     )
     {
         extract_image_chip(img, location, chip, interpolate_bilinear());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type1,
+        typename image_type2,
+        typename interpolation_type
+    >
+    void insert_image_chip (
+        image_type1& image,
+        const image_type2& chip,
+        const chip_details& location,
+        const interpolation_type& interp
+    )
+    {
+        image_view<image_type1> vimg(image);
+        const_image_view<image_type2> vchip(chip);
+        DLIB_CASSERT(static_cast<unsigned long>(vchip.nr()) == location.rows &&
+                     static_cast<unsigned long>(vchip.nc()) == location.cols,
+                     "The chip and the location do not have the same size.")
+        const auto tf = get_mapping_to_chip(location);
+        for (long r = 0; r < vimg.nr(); ++r)
+        {
+            for (long c = 0; c < vimg.nc(); ++c)
+            {
+                interp(vchip, tf(dpoint(c, r)), vimg[r][c]);
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type1,
+        typename image_type2
+    >
+    void insert_image_chip (
+        image_type1& image,
+        const image_type2& chip,
+        const chip_details& location
+    )
+    {
+        insert_image_chip(image, chip, location, interpolate_bilinear());
     }
 
 // ----------------------------------------------------------------------------------------

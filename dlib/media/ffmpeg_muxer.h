@@ -17,31 +17,83 @@ namespace dlib
 
         struct encoder_image_args
         {
-            int             h{0};
-            int             w{0};
-            AVPixelFormat   fmt{AV_PIX_FMT_YUV420P};
-            int             framerate{0};
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This class groups a set of arguments passed to the encoder and muxer classes.
+                    These must be set to non-zero or non-trivial values as they are used to configure 
+                    the underlying codec and optionally, an internal image scaler.
+                    Any frame that is pushed to encoder or muxer instances is resized to the codec's 
+                    pre-configured settings if their dimensions or pixel format don't match.
+                    For example, if the codec is configured to use height 512, width 384 and RGB format,
+                    using the variables below, and the frames already have these settings when pushed, 
+                    then no resizing is performed. If however they don't, then they are first resized. 
+            !*/
+
+            // Target height of codec.
+            int h{0};
+
+            // Target width of codec.
+            int w{0};
+            
+            // Target pixel format of codec.
+            AVPixelFormat fmt{AV_PIX_FMT_YUV420P};
+
+            // Target framerate of codec/muxer
+            int framerate{0};
         };
 
 // ---------------------------------------------------------------------------------------------------
 
         struct encoder_audio_args
         {
-            int             sample_rate{0};
-            uint64_t        channel_layout{AV_CH_LAYOUT_STEREO};
-            AVSampleFormat  fmt{AV_SAMPLE_FMT_S16};
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This class groups a set of arguments passed to the encoder and muxer classes.
+                    These must be set to non-zero or non-trivial values as they are used to configure 
+                    the underlying codec and optionally, an internal audio resampler.
+                    Any frame that is pushed to encoder or muxer instances is resampled to the codec's
+                    pre-configured settings if their sample format, sample rate or channel layout, don't match.
+            !*/
+
+            // Target sample rate of codec
+            int sample_rate{0};
+
+            // Target channel layout of codec
+            uint64_t channel_layout{AV_CH_LAYOUT_STEREO};
+
+            // Target sample format of codec
+            AVSampleFormat fmt{AV_SAMPLE_FMT_S16};
         };
 
 // ---------------------------------------------------------------------------------------------------
 
         struct encoder_codec_args
         {
-            AVCodecID                                    codec{AV_CODEC_ID_NONE};
-            std::string                                  codec_name;
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This class groups a set of arguments passed to the encoder and muxer classes.
+                    Some of these must be set to non-zero or non-trivial values as they are used 
+                    to configure the underlying codec. Others will only be used if non-zero or
+                    non-trivial.
+            !*/
+
+            // Codec ID used to configure the encoder. Either codec or codec_name MUST be set.
+            AVCodecID codec{AV_CODEC_ID_NONE};
+
+            // Codec name used to configure the encoder. This is used if codec == AV_CODEC_ID_NONE.
+            std::string codec_name;
+
+            // A dictionary of AVCodecContext and codec-private options. Used by "avcodec_open2()"
             std::unordered_map<std::string, std::string> codec_options;
-            int64_t                                      bitrate{-1};
-            int                                          gop_size{-1};
-            int                                          flags{0};
+
+            // Sets AVCodecContext::bit_rate if non-negative.
+            int64_t bitrate{-1};
+
+            // Sets AVCodecContext::gop_size if non-negative.
+            int gop_size{-1};
+
+            // OR-ed with AVCodecContext::flags if non-negative.
+            int flags{0};
         };
 
 // ---------------------------------------------------------------------------------------------------
@@ -49,50 +101,206 @@ namespace dlib
         class encoder
         {
         public:
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This class is a libavcodec wrapper which encodes video or audio to raw memory.
+                    Note, if you are creating a media file, it is easier to use the muxer object
+                    as it also works with raw codec files like .h264 files.
+                    This class is suitable for example if you need to send raw packets over a socket
+                    or interface with another library that requires encoded data, not raw images
+                    or raw audio samples.
+            !*/
+
             struct args
             {
+                /*!
+                    WHAT THIS OBJECT REPRESENTS
+                        This holds constructor arguments for encoder.
+                !*/
                 encoder_codec_args args_codec;
                 encoder_image_args args_image;
                 encoder_audio_args args_audio;
             };
 
-            encoder()                             = default;
-            encoder(encoder&& other)              = default;
-            encoder& operator=(encoder&& other)   = default;
+            encoder() = default;
+            /*!
+                ensures
+                    - is_open() == false
+            !*/
 
             encoder(
                 const args& a,
                 std::function<bool(std::size_t, const char*)> sink
             );
+            /*!
+                requires
+                    - a.args_codec.codec or a.args_codec.codec_name are set
+                    - Either a.args_image or a.args_audio is fully set
+                    - sink is set to a valid callback for writing packet data.
+                      dlib/media/sink.h contains callback wrappers for
+                      different buffer types.
+                ensures
+                    - Constructs encoder from args and sink
+                    - is_open() == true
+            !*/
 
+            encoder(encoder&& other) = default;
+            /*!
+                ensures
+                    - Move constructor
+                    - other is in an empty but otherwise valid state after move
+                    - other.is_open() == false after move
+            !*/
+
+            encoder& operator=(encoder&& other) = default;
+            /*!
+                ensures
+                    - Move assignment operator
+                    - other is in an empty but otherwise valid state after move
+                    - other.is_open() == false after move
+            !*/
+            
             ~encoder();
+            /*!
+                ensures
+                    - Destructor
+                    - flush() is called if it hasn't been already
+            !*/
 
-            bool            is_open()           const noexcept;
-            bool            is_image_encoder()  const noexcept;
-            bool            is_audio_encoder()  const noexcept;
-            AVCodecID       get_codec_id()      const noexcept;
-            std::string     get_codec_name()    const noexcept;
-            /*! video properties !*/
-            int             height()            const noexcept;
-            int             width()             const noexcept;
-            AVPixelFormat   pixel_fmt()         const noexcept;
-            int             fps()               const noexcept;
-            /*! audio properties !*/
-            int             sample_rate()       const noexcept;
-            uint64_t        channel_layout()    const noexcept;
-            AVSampleFormat  sample_fmt()        const noexcept;
-            int             nchannels()         const noexcept;
+            bool is_open() const noexcept;
+            /*!
+                ensures
+                    - Returns true if the codec is open and user may call push()
+            !*/
 
-            bool push(frame frame);
+            bool is_image_encoder() const noexcept;
+            /*!
+                ensures
+                    - Returns true if the codec is an image encoder.
+            !*/
+
+            bool is_audio_encoder() const noexcept;
+            /*!
+                ensures
+                    - Returns true if the codec is an audio encoder.
+            !*/
+
+            AVCodecID get_codec_id() const noexcept;
+            /*!
+                requires
+                    - is_open() == true
+                ensures
+                    - returns the codec id. See ffmpeg documentation or libavcodec/codec_id.h
+            !*/
+
+            std::string get_codec_name() const noexcept;
+            /*!
+                requires
+                    - is_open() == true
+                ensures
+                    - returns string representation of codec id.
+            !*/
+
+            int height() const noexcept;
+            /*!
+                requires
+                    - is_image_encoder() == true
+                ensures
+                    - returns the height of the configured codec, not necessarily the
+                      height of frames passed to push(frame)
+            !*/
+
+            int width() const noexcept;
+            /*!
+                requires
+                    - is_image_encoder() == true
+                ensures
+                    - returns the width of the configured codec, not necessarily the
+                      width of frames passed to push(frame)
+            !*/
+
+            AVPixelFormat pixel_fmt() const noexcept;
+            /*!
+                requires
+                    - is_image_encoder() == true
+                ensures
+                    - returns the pixel format of the configured codec, not necessarily the
+                      pixel format of frames passed to push(frame)
+            !*/
+
+            int fps() const noexcept;
+             /*!
+                requires
+                    - is_image_encoder() == true
+                ensures
+                    - returns the configured framerate of the codec.
+            !*/
+
+            int sample_rate() const noexcept;
+            /*!
+                requires
+                    - is_audio_encoder() == true
+                ensures
+                    - returns the sample rate of the configured codec, not necessarily the
+                      sample rate of frames passed to push(frame)
+            !*/
+
+            uint64_t channel_layout() const noexcept;
+            /*!
+                requires
+                    - is_audio_encoder() == true
+                ensures
+                    - returns the channel layout of the configured codec, not necessarily the
+                      channel layout of frames passed to push(frame).
+                      e.g. AV_CH_LAYOUT_STEREO, AV_CH_LAYOUT_MONO etc.
+            !*/
+
+            AVSampleFormat sample_fmt() const noexcept;
+            /*!
+                requires
+                    - is_audio_encoder() == true
+                ensures
+                    - returns the sample format of the configured codec, not necessarily the
+                      sample format of frames passed to push(frame)
+            !*/
+
+            int nchannels() const noexcept;
+            /*!
+                requires
+                    - is_audio_encoder() == true
+                ensures
+                    - returns the number of audio channels in the configured codec.
+            !*/
+
+            bool push(frame f);
+            /*!
+                requires
+                    - if is_image_encoder() == true, then f.is_image() == true
+                    - if is_audio_encoder() == true, then f.is_audio() == true
+                ensures
+                    - If f does not have matching settings to the codec, it is either
+                      resized or resampled before being pushed to the codec and encoded.
+                    - The callback passed to the constructor may or may not be invoked
+                      as the underlying resampler, audio fifo and codec may buffer.
+                    - Returns true if successfully encoded, even if callback wasn't invoked.
+                    - Returns false if either EOF, i.e. flush() has been previously called,
+                      or an error occurred, in which case is_open() == false.
+            !*/
+
             void flush();
+            /*!
+                ensures
+                    - Flushes the codec. Callback passed to constructor will likely be invoked.
+                    - is_open() == false
+                    - Becomes a no-op after the first time you call this.
+            !*/
 
         private:
             friend class muxer;
 
             encoder(
                 const args& a,
-                std::function<bool(AVCodecContext*,AVPacket*)> sink,
-                std::shared_ptr<logger> log_
+                std::function<bool(AVCodecContext*,AVPacket*)> sink
             );
 
             bool open();
@@ -106,7 +314,6 @@ namespace dlib
             details::resampler              resizer_audio;
             details::audio_fifo             fifo;
             std::function<bool(AVCodecContext*,AVPacket*)> sink;
-            std::shared_ptr<logger>         log;
         };
 
 // ---------------------------------------------------------------------------------------------------
@@ -114,55 +321,287 @@ namespace dlib
         class muxer
         {
         public:
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This class is a libavformat wrapper which muxes video and/or audio streams to file.
+                    It is analogous to OpenCV's cv::VideoWriter class but is more configurable, supports audio, 
+                    devices (X11, speaker, ...) and network streams such as RTSP, HTTP, and more.
+                    Note that a video file, e.g. MP4, can contain multiple streams: video, audio, subtitles, etc.
+                    This class can encode both video and audio at the same time.
+            !*/
+
             struct args
             {
-                args() = default;
-                args(const std::string& filepath);
- 
-                std::string filepath;
-                std::string output_format;
-                std::unordered_map<std::string, std::string>  format_options;     //An AVDictionary filled with AVFormatContext and muxer-private options. Used by avformat_write_header()
-                std::unordered_map<std::string, std::string>  protocol_options;   //An AVDictionary filled with protocol-private options. Used by avio_open2()
+                /*!
+                    WHAT THIS OBJECT REPRESENTS
+                        This holds constructor arguments for muxer.
+                !*/
 
-                int max_delay{-1};  //See documentation for AVFormatContext::max_delay
-                std::chrono::milliseconds   connect_timeout{std::chrono::milliseconds::max()};
-                std::chrono::milliseconds   read_timeout{std::chrono::milliseconds::max()};
-                std::function<bool()>       interrupter;
+                args() = default;
+                /*!
+                    ensures
+                        - Default constructor.
+                !*/
+
+                args(const std::string& filepath);
+                /*!
+                    ensures
+                        - this->filepath = filepath
+                !*/
+
+                // Filepath, URL or device this object will write data to.
+                std::string filepath;
+
+                // Output format hint. e.g. 'rtsp', 'X11', 'alsa', etc. 99% of the time, users are not required to specify this as libavformat tries to guess it.
+                std::string output_format;
+
+                // A dictionary filled with AVFormatContext and muxer-private options. Used by "avformat_write_header()"".
+                // Please see libavformat documentation for more details
+                std::unordered_map<std::string, std::string> format_options;
+
+                // An AVDictionary filled with protocol-private options. Used by avio_open2()
+                std::unordered_map<std::string, std::string> protocol_options;
+
+                // See documentation for AVFormatContext::max_delay
+                int max_delay{-1};
+
+                // Only relevant to network muxers such as RTSP, HTTP etc.
+                // Connection/listening timeout. 
+                std::chrono::milliseconds connect_timeout{std::chrono::milliseconds::max()};
                 
+                // Only relevant to network muxers such as RTSP, HTTP etc
+                // Read timeout. 
+                std::chrono::milliseconds read_timeout{std::chrono::milliseconds::max()};
+
+                // Only relevant to network muxers such as RTSP, HTTP etc
+                // Connection/listening interruption callback.
+                // The constructor periodically calls interrupter() while waiting on the network. If it returns true, then
+                // the connection is aborted and the muxer is closed.
+                // So user may use this in conjunction with some thread-safe shared state to signal an abort/interrupt.
+                std::function<bool()> interrupter;
+
+                // Video stream arguments
                 struct : encoder_codec_args, encoder_image_args{} args_image;
+
+                // Audio stream arguments
                 struct : encoder_codec_args, encoder_audio_args{} args_audio;
+                
+                // Whether or not to encode video stream.
                 bool enable_image{true};
+
+                // Whether or not to encode audio stream.
                 bool enable_audio{true};
             };
 
             muxer() = default;
+            /*!
+                ensures
+                    - is_open() == false
+            !*/
+
             muxer(const args& a);
+            /*!
+                ensures
+                    - Constructs muxer using args
+            !*/
+
             muxer(muxer&& other) noexcept;
+            /*!
+                ensures
+                    - Move constructor
+                    - After move, other.is_open() == false
+            !*/
+
             muxer& operator=(muxer&& other) noexcept;
+            /*!
+                ensures
+                    - Move assignment
+                    - After move, other.is_open() == false
+            !*/
+
             ~muxer();
+            /*!
+                ensures
+                    - Calls flush() if not already called
+                    - Closes the underlying file/socket
+            !*/
 
             bool is_open() const noexcept;
+            /*!
+                ensures
+                    - Returns true if underlying container and codecs are open
+                    - User may call push()
+            !*/
+
             bool audio_enabled() const noexcept;
+            /*!
+                requires
+                    - args.enable_audio == true
+                ensures
+                    - returns true if is_open() == true and an audio stream is available and open
+            !*/
+
             bool video_enabled() const noexcept;
+            /*!
+                requires
+                    - args.enable_video == true
+                ensures
+                    - returns true if is_open() == true and a video stream is available and open
+            !*/
 
-            int             height()                    const noexcept;
-            int             width()                     const noexcept;
-            AVPixelFormat   pixel_fmt()                 const noexcept;
-            float           fps()                       const noexcept;
-            int             estimated_nframes()         const noexcept;
-            AVCodecID       get_video_codec_id()        const noexcept;
-            std::string     get_video_codec_name()      const noexcept;
+            int height() const noexcept;
+            /*!
+                ensures
+                    - if (video_enabled())
+                        - returns the height of the configured codec, not necessarily the height of
+                          frames passed to push(frame).
+                    - else
+                        - returns 0
+            !*/
 
-            int             sample_rate()               const noexcept;
-            uint64_t        channel_layout()            const noexcept;
-            AVSampleFormat  sample_fmt()                const noexcept;
-            int             nchannels()                 const noexcept;
-            int             estimated_total_samples()   const noexcept;
-            AVCodecID       get_audio_codec_id()        const noexcept;
-            std::string     get_audio_codec_name()      const noexcept;
+            int width() const noexcept;
+            /*!
+                ensures
+                    - if (video_enabled())
+                        - returns the width of the configured codec, not necessarily the
+                          width of frames passed to push(frame).
+                    - else
+                        - returns 0
+            !*/
+
+            AVPixelFormat pixel_fmt() const noexcept;
+            /*!
+                ensures
+                    - if (video_enabled())
+                        - returns the pixel format of the configured codec, not necessarily the
+                          pixel format of frames passed to push(frame).
+                    - else
+                        - returns AV_PIX_FMT_NONE
+            !*/
+
+            float fps() const noexcept;
+            /*!
+                ensures
+                    - if (video_enabled())
+                        - returns the framerate of the configured codec
+                    - else
+                        - returns 0
+            !*/
+
+            int estimated_nframes() const noexcept;
+            /*!
+                ensures
+                    - returns ffmpeg's estimation of how many video frames are in the file without reading any frames
+                    - See ffmpeg's documentation for AVStream::nb_frames
+                    - Note, this is known to not always work with ffmpeg v3 with certain files. Most of the time it does
+                      Do not make your code rely on this
+            !*/
+
+            AVCodecID get_video_codec_id() const noexcept;
+            /*!
+                ensures 
+                    - if (video_enabled())
+                        - returns codec ID of video stream
+                    - else
+                        - returns AV_CODEC_ID_NONE
+            !*/
+
+            std::string get_video_codec_name() const noexcept;
+            /*!
+                ensures 
+                    - if (video_enabled())
+                        - returns codec name of video stream
+                    - else
+                        - returns ""
+            !*/
+
+            int sample_rate() const noexcept;
+            /*!
+                ensures
+                    - if (audio_enabled())
+                        - returns the sample rate of the configured codec, not necessarily the
+                          sample rate of frames passed to push(frame).
+                    - else
+                        - returns 0
+            !*/
+
+            uint64_t channel_layout() const noexcept;
+            /*!
+                ensures
+                    - if (audio_enabled())
+                        - returns the channel layout of the configured codec, not necessarily the
+                          channel layout of frames passed to push(frame).
+                    - else
+                        - returns 0
+            !*/
+
+            int nchannels() const noexcept;
+            /*!
+                ensures
+                    - if (audio_enabled())
+                        - returns the number of audio channels in the configured codec, not necessarily the
+                          number of channels in frames passed to push(frame).
+                    - else
+                        - returns 0
+            !*/
+
+            AVSampleFormat sample_fmt() const noexcept;
+            /*!
+                ensures
+                    - if (audio_enabled())
+                        - returns the sample format of the configured codec, not necessarily the
+                          sample format of frames passed to push(frame).
+                    - else
+                        - returns AV_SAMPLE_FMT_NONE
+            !*/
+
+            int estimated_total_samples() const noexcept;
+            /*!
+                ensures
+                    - if (audio_enabled())
+                        - returns an estimation fo the total number of audio samples in the audio stream
+                    - else
+                        - returns 0
+            !*/
+
+            AVCodecID get_audio_codec_id() const noexcept;
+            /*!
+                ensures 
+                    - if (audio_enabled())
+                        - returns codec ID of audio stream
+                    - else
+                        - returns AV_CODEC_ID_NONE
+            !*/
+
+            std::string get_audio_codec_name() const noexcept;
+            /*!
+                ensures 
+                    - if (audio_enabled())
+                        - returns codec name of audio stream
+                    - else
+                        - returns ""
+            !*/
 
             bool push(frame f);
+            /*!
+                requires
+                    - if is_image_encoder() == true, then f.is_image() == true
+                    - if is_audio_encoder() == true, then f.is_audio() == true
+                ensures
+                    - If f does not have matching settings to the codec, it is either
+                      resized or resampled before being pushed to the muxer.
+                    - Encodes and writes the encoded data to file/socket
+                    - Returns true if successfully encoded.
+                    - Returns false if either EOF, i.e. flush() has been previously called,
+                      or an error occurred, in which case is_open() == false.
+            !*/
+
             void flush();
+            /*!
+                ensures
+                    - Flushes the file.
+                    - is_open() == false
+            !*/
 
         private:
 
@@ -177,7 +616,6 @@ namespace dlib
                 std::chrono::system_clock::time_point   connecting_time{};
                 std::chrono::system_clock::time_point   connected_time{};
                 std::chrono::system_clock::time_point   last_read_time{};
-                std::shared_ptr<logger>                 log;
             } st;
         };
 
@@ -207,8 +645,7 @@ namespace dlib
 
             inline void check_properties(
                 const AVCodec*  pCodec,
-                AVCodecContext* pCodecCtx,
-                logger&         log
+                AVCodecContext* pCodecCtx
             )
             {
                 // Video properties
@@ -227,7 +664,7 @@ namespace dlib
 
                     if (!framerate_supported)
                     {
-                        log << LINFO 
+                        logger_dlib_wrapper() << LINFO 
                             << "Requested framerate "
                             << pCodecCtx->framerate.num / pCodecCtx->framerate.den
                             << " not supported. Changing to default "
@@ -252,7 +689,7 @@ namespace dlib
 
                     if (!pix_fmt_supported)
                     {
-                        log << LINFO
+                        logger_dlib_wrapper() << LINFO
                             << "Requested pixel format "
                             << av_get_pix_fmt_name(pCodecCtx->pix_fmt)
                             << " not supported. Changing to default "
@@ -278,7 +715,7 @@ namespace dlib
 
                     if (!sample_rate_supported)
                     {
-                        log << LINFO
+                        logger_dlib_wrapper() << LINFO
                             << "Requested sample rate "
                             << pCodecCtx->sample_rate
                             << " not supported. Changing to default "
@@ -303,7 +740,7 @@ namespace dlib
 
                     if (!sample_fmt_supported)
                     {
-                        log << LINFO
+                        logger_dlib_wrapper() << LINFO
                             << "Requested sample format "
                             << av_get_sample_fmt_name(pCodecCtx->sample_fmt)
                             << " not supported. Changing to default "
@@ -329,7 +766,7 @@ namespace dlib
 
                     if (!channel_layout_supported)
                     {
-                        log << LINFO
+                        logger_dlib_wrapper() << LINFO
                             << "Channel layout "
                             << details::get_channel_layout_str(pCodecCtx)
                             << " not supported. Changing to default "
@@ -354,7 +791,7 @@ namespace dlib
 
                     if (!channel_layout_supported)
                     {
-                        log << LINFO 
+                        logger_dlib_wrapper() << LINFO 
                             << "Channel layout "
                             << details::get_channel_layout_str(pCodecCtx)
                             << " not supported. Changing to default "
@@ -372,17 +809,15 @@ namespace dlib
             std::function<bool(std::size_t, const char*)> sink
         ) : encoder(a, [sink](AVCodecContext*, AVPacket* pkt) {
                 return sink(pkt->size, (const char*)pkt->data);
-            }, std::make_shared<logger>("ffmpeg::encoder"))
+            })
         {
         }
 
         inline encoder::encoder(
             const args& a,
-            std::function<bool(AVCodecContext*,AVPacket*)> sink_,
-            std::shared_ptr<logger> log_
+            std::function<bool(AVCodecContext*,AVPacket*)> sink_
         ) : args_(a),
-            sink(std::move(sink_)),
-            log(log_)
+            sink(std::move(sink_))
         {
             if (!open())
                 pCodecCtx = nullptr;
@@ -400,22 +835,22 @@ namespace dlib
 
             DLIB_CASSERT(sink != nullptr, "must provide an appriate sink callback");
 
-            const bool init = details::register_ffmpeg::get(); // This must be used somewhere otherwise compiler might optimize it away.
+            details::register_ffmpeg();
 
             packet = make_avpacket();
             const AVCodec* pCodec = nullptr;
 
             if (args_.args_codec.codec != AV_CODEC_ID_NONE)
-                pCodec = init ? avcodec_find_encoder(args_.args_codec.codec) : nullptr;
+                pCodec = avcodec_find_encoder(args_.args_codec.codec);
             else if (!args_.args_codec.codec_name.empty())
-                pCodec = init ? avcodec_find_encoder_by_name(args_.args_codec.codec_name.c_str()) : nullptr;
+                pCodec = avcodec_find_encoder_by_name(args_.args_codec.codec_name.c_str());
 
             if (!pCodec)
-                return fail(*log, "Codec ",  avcodec_get_name(args_.args_codec.codec), " or ", args_.args_codec.codec_name, " not found");
+                return fail("Codec ",  avcodec_get_name(args_.args_codec.codec), " or ", args_.args_codec.codec_name, " not found");
 
             pCodecCtx.reset(avcodec_alloc_context3(pCodec));
             if (!pCodecCtx)
-                return fail(*log, "AV : failed to allocate codec context for ", pCodec->name, " : likely ran out of memory");
+                return fail("AV : failed to allocate codec context for ", pCodec->name, " : likely ran out of memory");
 
             if (args_.args_codec.bitrate > 0)
                 pCodecCtx->bit_rate = args_.args_codec.bitrate;
@@ -431,14 +866,14 @@ namespace dlib
                     args_.args_image.fmt        == AV_PIX_FMT_NONE ||
                     args_.args_image.framerate  <= 0)
                 {
-                    return fail(*log, pCodec->name, " is an image codec. height, width, fmt (pixel format) and framerate must be set");
+                    return fail(pCodec->name, " is an image codec. height, width, fmt (pixel format) and framerate must be set");
                 }
 
                 pCodecCtx->height       = args_.args_image.h;
                 pCodecCtx->width        = args_.args_image.w;
                 pCodecCtx->pix_fmt      = args_.args_image.fmt;
                 pCodecCtx->framerate    = AVRational{args_.args_image.framerate, 1};
-                check_properties(pCodec, pCodecCtx.get(), *log);
+                check_properties(pCodec, pCodecCtx.get());
                 pCodecCtx->time_base    = inv(pCodecCtx->framerate);
 
                 //don't know what src options are, but at least dst options are set
@@ -451,13 +886,13 @@ namespace dlib
                     args_.args_audio.channel_layout <= 0 ||
                     args_.args_audio.fmt == AV_SAMPLE_FMT_NONE) 
                 {
-                    return fail(*log, pCodec->name, " is an audio codec. sample_rate, channel_layout and fmt (sample format) must be set");
+                    return fail(pCodec->name, " is an audio codec. sample_rate, channel_layout and fmt (sample format) must be set");
                 }
 
                 pCodecCtx->sample_rate      = args_.args_audio.sample_rate;
                 pCodecCtx->sample_fmt       = args_.args_audio.fmt;
                 set_layout(pCodecCtx.get(), args_.args_audio.channel_layout);
-                check_properties(pCodec, pCodecCtx.get(), *log);
+                check_properties(pCodec, pCodecCtx.get());
                 pCodecCtx->time_base        = AVRational{ 1, pCodecCtx->sample_rate };
 
                 if (pCodecCtx->codec_id == AV_CODEC_ID_AAC) {
@@ -474,7 +909,7 @@ namespace dlib
             av_dict opt = args_.args_codec.codec_options;
             const int ret = avcodec_open2(pCodecCtx.get(), pCodec, opt.get());
             if (ret < 0)
-                return fail(*log, "avcodec_open2() failed : ", get_av_error(ret));
+                return fail("avcodec_open2() failed : ", get_av_error(ret));
 
             if (pCodec->type == AVMEDIA_TYPE_AUDIO)
             {
@@ -561,7 +996,7 @@ namespace dlib
                 } else {
                     open_   = false;
                     state   = ENCODE_ERROR;
-                    (*log) << LERROR << "avcodec_send_frame() failed : " << get_av_error(ret);
+                    logger_dlib_wrapper() << LERROR << "avcodec_send_frame() failed : " << get_av_error(ret);
                 }
             };
 
@@ -581,7 +1016,7 @@ namespace dlib
                 {
                     open_   = false;
                     state   = ENCODE_ERROR;
-                    (*log) << LERROR << "avcodec_receive_packet() failed : " << get_av_error(ret);
+                    logger_dlib_wrapper() << LERROR << "avcodec_receive_packet() failed : " << get_av_error(ret);
                 }
                 else
                 {
@@ -656,11 +1091,10 @@ namespace dlib
             using namespace details;
 
             st = {};
-            st.log   = std::make_shared<logger>("ffmpeg::muxer");
             st.args_ = a;
 
             if (!st.args_.enable_audio && !st.args_.enable_image)
-                return fail(*st.log, "You need to set at least one of `enable_audio` or `enable_image`");
+                return fail("You need to set at least one of `enable_audio` or `enable_image`");
 
             {
                 st.connecting_time = system_clock::now();
@@ -672,7 +1106,7 @@ namespace dlib
                 int ret = avformat_alloc_output_context2(&pFormatCtx, nullptr, format_name, filename);
 
                 if (ret < 0)
-                    return fail(*st.log, "avformat_alloc_output_context2() failed : ", get_av_error(ret));
+                    return fail("avformat_alloc_output_context2() failed : ", get_av_error(ret));
 
                 st.pFormatCtx.reset(pFormatCtx);
             }
@@ -703,8 +1137,7 @@ namespace dlib
                 const auto handle_packet = 
                 [
                     pFormatCtx = st.pFormatCtx.get(),
-                    stream_id = stream_counter,
-                    log = st.log
+                    stream_id = stream_counter
                 ]
                 (
                     AVCodecContext* pCodecCtx,
@@ -716,7 +1149,7 @@ namespace dlib
                     pkt->stream_index = stream_id;
                     int ret = av_interleaved_write_frame(pFormatCtx, pkt);
                     if (ret < 0)
-                        (*log) << LERROR << "av_interleaved_write_frame() failed : " << get_av_error(ret);
+                        logger_dlib_wrapper() << LERROR << "av_interleaved_write_frame() failed : " << get_av_error(ret);
                     return ret == 0;
                 };
 
@@ -729,18 +1162,18 @@ namespace dlib
                                 supported.codec_name == args.args_codec.codec_name;
                 }) == end(supported_codecs))
                 {
-                    (*st.log) << LERROR
-                              << "Codec " << avcodec_get_name(args.args_codec.codec) << " or " << args.args_codec.codec_name
-                              << " cannot be stored in this file";
-                    (*st.log) << LINFO 
-                              << "List of supported codecs for muxer " << st.pFormatCtx->oformat->name << " in this installation of ffmpeg:";
+                    logger_dlib_wrapper() << LERROR
+                        << "Codec " << avcodec_get_name(args.args_codec.codec) << " or " << args.args_codec.codec_name
+                        << " cannot be stored in this file";
+                    logger_dlib_wrapper() << LINFO 
+                        << "List of supported codecs for muxer " << st.pFormatCtx->oformat->name << " in this installation of ffmpeg:";
                     for (const auto& supported : supported_codecs)
-                        (*st.log) << LINFO << "    " << supported.codec_name;
+                        logger_dlib_wrapper() << LINFO << "    " << supported.codec_name;
                     return false;
                 }
 
                 // Codec is supported by muxer, so create encoder
-                enc = encoder(args, handle_packet, st.log);
+                enc = encoder(args, handle_packet);
 
                 if (!enc.is_open())
                     return false;
@@ -748,7 +1181,7 @@ namespace dlib
                 AVStream* stream = avformat_new_stream(st.pFormatCtx.get(), enc.pCodecCtx->codec);
 
                 if (!stream)
-                    return fail(*st.log, "avformat_new_stream() failed");
+                    return fail("avformat_new_stream() failed");
 
                 stream->id          = stream_counter;
                 stream->time_base   = enc.pCodecCtx->time_base;
@@ -757,7 +1190,7 @@ namespace dlib
                 int ret = avcodec_parameters_from_context(stream->codecpar, enc.pCodecCtx.get());
 
                 if (ret < 0)
-                    return fail(*st.log, "avcodec_parameters_from_context() failed : ", get_av_error(ret));
+                    return fail("avcodec_parameters_from_context() failed : ", get_av_error(ret));
 
                 return true;
             };
@@ -786,7 +1219,7 @@ namespace dlib
                 int ret = avio_open2(&st.pFormatCtx->pb, st.args_.filepath.c_str(), AVIO_FLAG_WRITE, &st.pFormatCtx->interrupt_callback, opt.get());
 
                 if (ret < 0)
-                    return fail(*st.log, "avio_open2() failed : ", get_av_error(ret));
+                    return fail("avio_open2() failed : ", get_av_error(ret));
             }
 
             av_dict opt = st.args_.format_options;
@@ -794,7 +1227,7 @@ namespace dlib
             int ret = avformat_write_header(st.pFormatCtx.get(), opt.get());
 
             if (ret < 0)
-                return fail(*st.log, "avformat_write_header() failed : ", get_av_error(ret));
+                return fail("avformat_write_header() failed : ", get_av_error(ret));
 
             st.connected_time = system_clock::now();
 
@@ -833,7 +1266,7 @@ namespace dlib
             if (f.is_image())
             {
                 if (!st.encoder_image.is_open())
-                    return fail(*st.log, "frame is an image type but image encoder is not initialized");
+                    return fail("frame is an image type but image encoder is not initialized");
 
                 return st.encoder_image.push(std::move(f));
             }
@@ -841,7 +1274,7 @@ namespace dlib
             else if (f.is_audio())
             {
                 if (!st.encoder_audio.is_open())
-                    return fail(*st.log, "frame is of audio type but audio encoder is not initialized");
+                    return fail("frame is of audio type but audio encoder is not initialized");
 
                 return st.encoder_audio.push(std::move(f));
             }
@@ -860,7 +1293,7 @@ namespace dlib
 
             const int ret = av_write_trailer(st.pFormatCtx.get());
             if (ret < 0)
-                (*st.log) << LERROR << "av_write_trailer() failed : " << details::get_av_error(ret);
+                logger_dlib_wrapper() << LERROR << "av_write_trailer() failed : " << details::get_av_error(ret);
 
             if ((st.pFormatCtx->oformat->flags & AVFMT_NOFILE) == 0)
                 avio_closep(&st.pFormatCtx->pb);

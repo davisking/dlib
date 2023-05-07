@@ -277,6 +277,7 @@ if (NOT TARGET dlib)
       tokenizer/tokenizer_kernel_1.cpp
       unicode/unicode.cpp
       test_for_odr_violations.cpp
+      fft/fft.cpp
       )
 
    set(dlib_needed_public_libraries)
