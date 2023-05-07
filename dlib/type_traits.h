@@ -95,7 +95,7 @@ namespace dlib
     template <typename T> 
     using is_built_in_scalar_type = std::is_arithmetic<T>;
 
- // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     template<class Byte>
     using is_byte = std::integral_constant<bool, std::is_same<Byte,char>::value
@@ -114,7 +114,7 @@ namespace dlib
     template <typename T>
     struct basic_type { using type = remove_cvref_t<T>; };
 
- // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     template<class...>
     struct conjunction : std::true_type {};
@@ -125,32 +125,32 @@ namespace dlib
     template<class B1, class... Bn>
     struct conjunction<B1, Bn...> : std::conditional_t<bool(B1::value), conjunction<Bn...>, B1> {};
 
- // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     template <typename ...Types>
     struct are_nothrow_move_constructible : And<std::is_nothrow_move_constructible<Types>::value...> {};
 
- // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     template <typename ...Types>
     struct are_nothrow_move_assignable : And<std::is_nothrow_move_assignable<Types>::value...> {};
 
- // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     template <typename ...Types>
     struct are_nothrow_copy_constructible : And<std::is_nothrow_copy_constructible<Types>::value...> {};
 
- // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     template <typename ...Types>
     struct are_nothrow_copy_assignable : And<std::is_nothrow_copy_assignable<Types>::value...> {};
 
- // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     template< class... >
     using void_t = void;
 
- // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     namespace swappable_details
     {
@@ -171,12 +171,12 @@ namespace dlib
         };
     }
 
- // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     template<class T>
     using is_swappable = std::integral_constant<bool, swappable_details::swap_traits<T>::is_swappable>;
 
- // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     template<class T>
     using is_nothrow_swappable = std::integral_constant<bool, swappable_details::swap_traits<T>::is_nothrow>;
@@ -186,17 +186,17 @@ namespace dlib
     template <typename ...Types>
     struct are_nothrow_swappable : And<is_nothrow_swappable<Types>::value...> {};
 
- // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     template<std::size_t I>
     using size_ = std::integral_constant<std::size_t, I>;
 
- // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     template <typename from, typename to>
     using is_convertible = std::is_convertible<from, to>;
 
- // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     namespace details
     {
@@ -210,8 +210,118 @@ namespace dlib
     template<class T>
     using is_complete_type = details::is_complete_type<T>;
 
- // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
  
+    template<typename... T>
+    struct types_ {};
+    /*!
+        WHAT THIS OBJECT REPRESENTS
+            This is a type list. You can use this for general-purpose meta-programming
+            and it's used to pass types to the switch_() function.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    namespace details
+    {
+#if defined(__has_builtin)
+#if __has_builtin(__type_pack_element)
+    #define HAS_TYPE_PACK_ELEMENT 1
+#endif
+#endif
+
+#if HAS_TYPE_PACK_ELEMENT
+        template<std::size_t I, class... Ts>
+        struct nth_type { using type = __type_pack_element<I,Ts...>; };
+#else
+        template<std::size_t I, class... Ts>
+        struct nth_type;
+
+        template<std::size_t I, class T0, class... Ts>
+        struct nth_type<I, T0, Ts...> { using type = typename nth_type<I-1, Ts...>::type; };
+
+        template<class T0, class... Ts>
+        struct nth_type<0, T0, Ts...> { using type = T0; };
+#endif
+    }
+
+    template<std::size_t I, class... Ts>
+    struct nth_type;
+    /*!
+        WHAT THIS OBJECT REPRESENTS
+            This is a type trait for getting the n'th argument of a parameter pack.
+            In particular, nth_type<n, some_types...>::type is the nth type in some_types.
+    !*/
+
+    template<std::size_t I, class... Ts>
+    struct nth_type<I, types_<Ts...>> : details::nth_type<I,Ts...> {};
+
+    template<std::size_t I, class... Ts>
+    struct nth_type : details::nth_type<I,Ts...> {};
+
+    template<std::size_t I, class... Ts>
+    using nth_type_t = typename nth_type<I,Ts...>::type;
+
+// ----------------------------------------------------------------------------------------
+
+    template<class F>
+    struct callable_traits;
+    /*!
+        WHAT THIS OBJECT REPRESENTS
+            This is a type trait for callable types like function pointers, functors and lambdas.
+            It provides the following types:
+                return_type : the return type of the callable object
+                args        : a parameter pack packaged in a types_<> meta container containing
+                              all the function argument types
+            It also provides the following static members:
+                nargs       : the number of function arguments
+            
+            For example, a function type F with signature R(T1, T2, T3) has the following traits:
+                callable_traits<F>::return_type == R
+                callable_traits<F>::args        == types_<T1,T2,T3>
+                callable_traits<F>::nargs       == 3
+    !*/
+
+    template<class R, class... Args>
+    struct callable_traits<R(Args...)>
+    {
+        using return_type = R;
+        using args        = types_<Args...>;
+        constexpr static std::size_t nargs = sizeof...(Args);
+    };  
+
+    template<class R, class... Args>
+    struct callable_traits<R(*)(Args...)> : public callable_traits<R(Args...)>{};
+
+    template<class C, class R, class... Args>
+    struct callable_traits<R(C::*)(Args...)> : public callable_traits<R(Args...)>{};
+
+    template<class C, class R, class... Args>
+    struct callable_traits<R(C::*)(Args...) const> : public callable_traits<R(Args...)>{};
+
+    template<class F>
+    struct callable_traits
+    {
+        using call_type     = callable_traits<decltype(&std::decay_t<F>::operator())>;
+        using return_type   = typename call_type::return_type;
+        using args          = typename call_type::args;
+        constexpr static std::size_t nargs = call_type::nargs;
+    };
+
+    template<class Callable>
+    using callable_args = typename callable_traits<Callable>::args;
+
+    template<std::size_t I, class Callable>
+    using callable_arg = nth_type_t<I, callable_args<Callable>>;
+    
+    template<class Callable>
+    using callable_nargs = std::integral_constant<std::size_t, callable_traits<Callable>::nargs>;
+
+    template<class Callable>
+    using callable_return = typename callable_traits<Callable>::return_type;
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif //DLIB_TYPE_TRAITS_H_
