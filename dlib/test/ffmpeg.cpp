@@ -176,37 +176,30 @@ namespace
 
         image_type      img;
         int             counter{0};
-        decoder_status  status{DECODER_EAGAIN};
 
         ifstream fin{filepath, std::ios::binary};
         std::vector<char> buf(1024);
 
-        const auto pull = [&]
+        const auto callback = [&](image_type& img) mutable
         {
-            while ((status = dec.read(img)) == DECODER_FRAME_AVAILABLE)
-            {
-                DLIB_TEST(img.nr()      == height);
-                DLIB_TEST(img.nc()      == width);
-                DLIB_TEST(dec.height()  == height);
-                DLIB_TEST(dec.width()   == width);
-                ++counter;
-                
-                if (counter % 10 == 0)
-                    print_spinner();
-            }
+            DLIB_TEST(img.nr()      == height);
+            DLIB_TEST(img.nc()      == width);
+            DLIB_TEST(dec.height()  == height);
+            DLIB_TEST(dec.width()   == width);
+            ++counter;
+            
+            if (counter % 10 == 0)
+                print_spinner();
         };
 
-        while (fin && status != DECODER_CLOSED)
+        while (fin)
         {
             fin.read(buf.data(), buf.size());
             size_t ret = fin.gcount();
-
-            DLIB_TEST(dec.push_encoded((const uint8_t*)buf.data(), ret));
-            pull();
+            DLIB_TEST(dec.push((const uint8_t*)buf.data(), ret, wrap(callback)));
         }
 
-        dec.flush();
-        pull();
+        dec.flush(wrap(callback));
         DLIB_TEST(counter == nframes);
         DLIB_TEST(!dec.is_open());
     }
@@ -238,11 +231,13 @@ namespace
 
         image_type                  img;
         audio<int16_t, 2>           audio_buf;
-        dlib::ffmpeg::frame         frame, frame_copy;
+        frame                       frame_copy;
         int                         count{0};
         int                         nsamples{0};
         int                         iteration{0};
-        decoder_status              status{DECODER_EAGAIN};
+
+        ifstream fin{filepath, std::ios::binary};
+        std::vector<char> buf(1024);
 
         const resizing_args args_image {
             0,
@@ -256,68 +251,59 @@ namespace
             sample_traits<decltype(audio_buf)::format>::fmt
         };
 
-        ifstream fin{filepath, std::ios::binary};
-        std::vector<char> buf(1024);
-
-        const auto pull = [&]
+        const auto callback = [&](frame& f)
         {
-            while ((status = dec.read(frame, args_image, args_audio)) == DECODER_FRAME_AVAILABLE)
+            if (has_audio)
             {
-                if (has_audio)
-                {
-                    convert(frame, audio_buf);
-                    convert(audio_buf, frame_copy);
-                    DLIB_TEST(frame.is_audio());
-                    DLIB_TEST(frame.sample_rate() == sample_rate);
-                    DLIB_TEST(frame.samplefmt() == args_audio.fmt);
-                    DLIB_TEST(frame_copy.is_audio());
-                    DLIB_TEST(frame_copy.sample_rate() == sample_rate);
-                    DLIB_TEST(frame_copy.samplefmt() == args_audio.fmt);
+                convert(f, audio_buf);
+                convert(audio_buf, frame_copy);
+                DLIB_TEST(f.is_audio());
+                DLIB_TEST(f.sample_rate() == sample_rate);
+                DLIB_TEST(f.samplefmt() == args_audio.fmt);
+                DLIB_TEST(frame_copy.is_audio());
+                DLIB_TEST(frame_copy.sample_rate() == sample_rate);
+                DLIB_TEST(frame_copy.samplefmt() == args_audio.fmt);
 
-                    nsamples += frame.nsamples();
+                nsamples += f.nsamples();
 
-                    DLIB_TEST(dec.sample_rate() == sample_rate);
-                    DLIB_TEST(dec.sample_fmt() == args_audio.fmt);
-                }
-                else
-                {
-                    convert(frame, img);
-                    convert(img, frame_copy);
-                    DLIB_TEST(frame.is_image());
-                    DLIB_TEST(frame.height() == height);
-                    DLIB_TEST(frame.width()  == width);
-                    DLIB_TEST(frame.pixfmt() == args_image.fmt);
-                    DLIB_TEST(frame_copy.is_image());
-                    DLIB_TEST(frame_copy.height() == height);
-                    DLIB_TEST(frame_copy.width()  == width);
-                    DLIB_TEST(frame_copy.pixfmt() == args_image.fmt);
-
-                    DLIB_TEST(img.nr() == height);
-                    DLIB_TEST(img.nc() == width);
-                    ++count;
-
-                    DLIB_TEST(dec.height() == height);
-                    DLIB_TEST(dec.width() == width);
-                }
-
-                ++iteration;
-                
-                if (iteration % 10 == 0)
-                    print_spinner();
+                DLIB_TEST(dec.sample_rate() == sample_rate);
+                DLIB_TEST(dec.sample_fmt() == args_audio.fmt);
             }
+            else
+            {
+                convert(f, img);
+                convert(img, frame_copy);
+                DLIB_TEST(f.is_image());
+                DLIB_TEST(f.height() == height);
+                DLIB_TEST(f.width()  == width);
+                DLIB_TEST(f.pixfmt() == args_image.fmt);
+                DLIB_TEST(frame_copy.is_image());
+                DLIB_TEST(frame_copy.height() == height);
+                DLIB_TEST(frame_copy.width()  == width);
+                DLIB_TEST(frame_copy.pixfmt() == args_image.fmt);
+
+                DLIB_TEST(img.nr() == height);
+                DLIB_TEST(img.nc() == width);
+                ++count;
+
+                DLIB_TEST(dec.height() == height);
+                DLIB_TEST(dec.width() == width);
+            }
+
+            ++iteration;
+            
+            if (iteration % 10 == 0)
+                print_spinner();
         };
 
-        while (fin && status != DECODER_CLOSED)
+        while (fin)
         {
             fin.read(buf.data(), buf.size());
             size_t ret = fin.gcount();
-
-            DLIB_TEST(dec.push_encoded((const uint8_t*)buf.data(), ret));
-            pull();
+            DLIB_TEST(dec.push((const uint8_t*)buf.data(), ret, wrap(callback, args_image, args_audio)));
         }
 
-        dec.flush();
-        pull();
+        dec.flush(wrap(callback, args_image, args_audio));
         DLIB_TEST(count == nframes);
         DLIB_TEST(!dec.is_open());
     }
@@ -479,7 +465,7 @@ namespace
                 args.args_image.framerate   = fps;
                 args.args_image.fmt         = AV_PIX_FMT_YUV420P;
                 return args;
-            }(), sink(buf_image));
+            }());
 
             DLIB_TEST(enc_image.is_open());
             DLIB_TEST(enc_image.is_image_encoder());
@@ -499,7 +485,7 @@ namespace
                 args.args_audio.channel_layout  = layout;
                 args.args_audio.fmt             = samplefmt;
                 return args;
-            }(), sink(buf_audio));
+            }());
 
             DLIB_TEST(enc_audio.is_open());
             DLIB_TEST(enc_audio.is_audio_encoder());
@@ -512,21 +498,22 @@ namespace
         for (auto& f : frames)
         {
             if (f.is_image())
-                DLIB_TEST(enc_image.push(std::move(f)));
+                DLIB_TEST(enc_image.push(std::move(f), sink(buf_image)));
             
             if (f.is_audio())
-                DLIB_TEST(enc_audio.push(std::move(f)));
+                DLIB_TEST(enc_audio.push(std::move(f), sink(buf_audio)));
 
             if ((iteration++ % 10) == 0)
                 print_spinner();
         }
 
-        enc_image.flush();
-        enc_audio.flush();
+        enc_image.flush(sink(buf_image));
+        enc_audio.flush(sink(buf_audio));
         print_spinner();
 
-        // Decoder everything back
+        // Decode everything back
         decoder dec_image, dec_audio;
+        std::queue<frame> queue;
 
         if (has_video)
         {
@@ -539,14 +526,16 @@ namespace
             DLIB_TEST(dec_image.is_open());
             DLIB_TEST(dec_image.is_image_decoder());
             DLIB_TEST(dec_image.get_codec_id() == image_codec);
-            DLIB_TEST(dec_image.push_encoded(buf_image.data(), buf_image.size()));
-            dec_image.flush();
+            DLIB_TEST(dec_image.push(buf_image.data(), buf_image.size(), wrap(queue)));
+            dec_image.flush(wrap(queue));
 
             int images = 0;
-            decoder_status status;
 
-            while ((status = dec_image.read(f)) == DECODER_FRAME_AVAILABLE)
+            while (!queue.empty())
             {
+                auto f = std::move(queue.front());
+                queue.pop();
+
                 ++images;
                 DLIB_TEST(f.height()            == height);
                 DLIB_TEST(f.width()             == width);
@@ -569,14 +558,16 @@ namespace
             DLIB_TEST(dec_audio.is_open());
             DLIB_TEST(dec_audio.is_audio_decoder());
             DLIB_TEST(dec_audio.get_codec_id()  == audio_codec);
-            DLIB_TEST(dec_audio.push_encoded(buf_audio.data(), buf_audio.size()));
-            dec_audio.flush();
+            DLIB_TEST(dec_audio.push(buf_audio.data(), buf_audio.size(), wrap(queue, {}, {rate})));
+            dec_audio.flush(wrap(queue, {}, {rate}));
 
             int samples = 0;
-            decoder_status status;
 
-            while ((status = dec_audio.read(f, {}, {rate})) == DECODER_FRAME_AVAILABLE)
+            while (!queue.empty())
             {
+                auto f = std::move(queue.front());
+                queue.pop();
+
                 samples += f.nsamples();
                 DLIB_TEST(f.sample_rate() == rate);
                 print_spinner();
