@@ -26,36 +26,109 @@ namespace dlib
           is_frame_callback<Callback> = true
         >
         auto wrap (
-            Callback&& clb,
-            const resizing_args& args_image,
-            const resampling_args& args_audio
+            Callback&&              clb,
+            const resizing_args&    args_image = resizing_args{},
+            const resampling_args&  args_audio = resampling_args{}
         );
+        /*!
+            requires
+                - Callback is a callback type with signature void(frame&)
+            ensures
+                - returns a new conforming callback which can be passed to
+                    decoder::push()
+                    decoder::flush()
+                - The callback returned by wrap() captures `clb`, `args_image` and `args_audio` by VALUE
+                - When a new frame object `f` is decoded it is optionally resized or resampled then 
+                  the callback `clb` is invoked by passing `f` by reference like so: clb(f)
+                - It is safe for the callback `clb` to swap or move `f` when passed by reference in clb(f).
+                - Resizing is performed if:
+                    - the decoded frame `f` satisfies f.is_image() == true
+                    - args_image is non-empty
+                    - args_image.h      != f.height() or 
+                      args_image.w      != f.width() or 
+                      args_image.fmt    != f.pixfmt() 
+                - Resampling is performed if:
+                    - the decoded frame `f` satisfies f.is_audio() == true
+                    - args_audio is non-empty
+                    - args_audio.sample_rate    != f.sample_rate() or 
+                      args_audio.channel_layout != f.layout() or 
+                      args_audio.fmt            != f.samplefmt()
+        !*/
 
 // ---------------------------------------------------------------------------------------------------
 
-        template <class Callback, class image_type>
-        using is_image_callback = std::enable_if_t<is_image_type<image_type>::value && 
-                                                   dlib::is_invocable<Callback, image_type&>::value, 
-                                                   bool>;
+        template <class Callback>
+        using is_image_callback = is_image_check<std::remove_reference_t<callable_arg<0, Callback>>>;
 
-        // template <
-        //   class Callback,
-        //   class image_type,
-        //   is_image_callback<Callback, image_type> = true
-        // >
-        // auto wrap (
-        //     Callback&& clb,
-        //     image_type& img
-        // );
+        template <
+          class Callback,
+          is_image_callback<Callback> = true
+        >
+        auto wrap (
+            Callback&& clb
+        );
+        /*!
+            requires
+                - Callback is a callback type with signature void(image_type&)
+                  where image_type is an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h
+            ensures
+                - returns a new conforming callback which can be passed to
+                    decoder::push()
+                    decoder::flush()
+                - The callback returned by wrap() captures `clb` by VALUE.
+                - When a new frame object is decoded, it is converted to an image_type object `img`,
+                  then the callback `clb` is invoked like so: `clb(img)`
+        !*/
 
-        // template <
-        //   class Callback,
-        //   class image_type,
-        //   is_image_callback<Callback, image_type> = true
-        // >
-        // auto wrap (
-        //     Callback&& clb
-        // );
+// ---------------------------------------------------------------------------------------------------
+
+        auto wrap (
+            std::queue<frame>& queue,
+            const resizing_args& args_image = resizing_args{},
+            const resampling_args& args_audio = resampling_args{}
+        );
+        /*!
+            ensures
+                - returns a new conforming callback which can be passed to
+                    decoder::push()
+                    decoder::flush()
+                - The callback returned by wrap() captures `queue` by REFERENCE, 
+                  both `args_image` and `args_audio` by VALUE.
+                - When a new frame object `f` is decoded, it is optionally resized or resampled,
+                  then added to `queue`.
+                - Resizing is performed if:
+                    - the decoded frame `f` satisfies f.is_image() == true
+                    - args_image is non-empty
+                    - args_image.h != f.height() or 
+                      args_image.w != f.width() or 
+                      args_image.fmt != f.pixfmt() 
+                - Resampling is performed if:
+                    - the decoded frame `f` satisfied f.is_audio() == true
+                    - args_audio is non-empty
+                    - args_audio.sample_rate != f.sample_rate() or 
+                      args_audio.channel_layout != f.layout() or 
+                      args_audio.fmt != f.samplefmt()
+        !*/
+
+// ---------------------------------------------------------------------------------------------------
+
+        template<class image_type>
+        auto wrap (
+            std::queue<image_type>& queue
+        );
+        /*!
+            requires
+                - image_type is an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h
+            ensures
+                - returns a new conforming callback which can be passed to
+                    decoder::push()
+                    decoder::flush()
+                - The callback returned by wrap() captures `queue` by REFERENCE.
+                - When a new frame object is decoded, it is converted to an image_type object `img`,
+                  then added to `queue`
+        !*/
 
 // ---------------------------------------------------------------------------------------------------
 
@@ -274,7 +347,6 @@ namespace dlib
             details::resizer                        resizer_image;
             details::resampler                      resizer_audio;
             std::vector<uint8_t>                    encoded_buffer;
-            std::queue<frame>                       frame_queue;
             uint64_t                                next_pts{0};
         };
 
@@ -712,14 +784,14 @@ namespace dlib
         {
             using namespace details;
 
-            return [=] (
+            return [=, pclb = std::forward<Callback>(clb)] (
                 frame&      f, 
                 resizer&    resizer, 
                 resampler&  resampler
             ) mutable
             {
                 convert(f, f, resizer, resampler, args_image, args_audio);
-                clb(f);
+                pclb(f);
             };
         }
 
@@ -727,52 +799,16 @@ namespace dlib
 
         template <
           class Callback,
-          class image_type,
-          is_image_callback<Callback, image_type>
+          is_image_callback<Callback>
         >
-        auto wrap (
-            Callback&& clb,
-            image_type& img
-        )
-        {
-            using namespace details;
-
-            return [=, &img] (
-                frame&      f, 
-                resizer&    resizer, 
-                resampler&  resampler
-            ) mutable
-            {
-                if (f.is_image())
-                {
-                    convert (
-                        f, f,
-                        resizer,
-                        resampler,
-                        {img.nr() > 0 ? (int)img.nr() : f.height(),
-                         img.nc() > 0 ? (int)img.nc() : f.width(),
-                         pix_traits<pixel_type_t<image_type>>::fmt},
-                        {}
-                    );
-
-                    convert(f, img);
-                    clb(img);
-                } 
-            };
-        }
-
-        template <
-          class Callback,
-          class image_type,
-          is_image_callback<Callback, image_type>
-        >
-        auto wrap (
+        inline auto wrap (
             Callback&& clb
         )
         {
             using namespace details;
+            using image_type = std::remove_reference_t<callable_arg<0, Callback>>;
 
-            return [=, img = image_type{}] (
+            return [img = image_type{}, pclb = std::forward<Callback>(clb)] (
                 frame&      f, 
                 resizer&    resizer, 
                 resampler&  resampler
@@ -784,14 +820,65 @@ namespace dlib
                         f, f,
                         resizer,
                         resampler,
-                        {img.nr() > 0 ? (int)img.nr() : f.height(),
-                         img.nc() > 0 ? (int)img.nc() : f.width(),
-                         pix_traits<pixel_type_t<image_type>>::fmt},
+                        {0,0,pix_traits<pixel_type_t<image_type>>::fmt},
                         {}
                     );
 
                     convert(f, img);
-                    clb(img);
+                    pclb(img);
+                } 
+            };
+        }
+
+// ---------------------------------------------------------------------------------------------------
+
+        inline auto wrap (
+            std::queue<frame>& queue,
+            const resizing_args& args_image,
+            const resampling_args& args_audio
+        )
+        {
+            using namespace details;
+
+            return [&queue, args_image, args_audio] (
+                frame&      f, 
+                resizer&    resizer, 
+                resampler&  resampler
+            ) mutable
+            {
+                convert(f, f, resizer, resampler, args_image, args_audio);
+                queue.push(std::move(f));
+            };
+        }
+
+// ---------------------------------------------------------------------------------------------------
+
+        template<class image_type>
+        inline auto wrap (
+            std::queue<image_type>& queue
+        )
+        {
+            using namespace details;
+
+            return [&queue] (
+                frame&      f, 
+                resizer&    resizer, 
+                resampler&  resampler
+            ) mutable
+            {
+                if (f.is_image())
+                {
+                    convert (
+                        f, f,
+                        resizer,
+                        resampler,
+                        {0,0,pix_traits<pixel_type_t<image_type>>::fmt},
+                        {}
+                    );
+
+                    image_type img;
+                    convert(f, img);
+                    queue.push(std::move(img));
                 } 
             };
         }
@@ -1088,7 +1175,7 @@ namespace dlib
             push(nullptr, 0, std::forward<Callback>(clb));
         }
 
-        inline bool             decoder::is_open()          const noexcept { return (pCodecCtx && open_) || !frame_queue.empty(); }
+        inline bool             decoder::is_open()          const noexcept { return pCodecCtx && open_; }
         inline bool             decoder::is_image_decoder() const noexcept { return pCodecCtx && pCodecCtx->codec_type == AVMEDIA_TYPE_VIDEO; }
         inline bool             decoder::is_audio_decoder() const noexcept { return pCodecCtx && pCodecCtx->codec_type == AVMEDIA_TYPE_AUDIO; }
         inline AVCodecID        decoder::get_codec_id()     const noexcept { return pCodecCtx ? pCodecCtx->codec_id : AV_CODEC_ID_NONE; }
@@ -1358,8 +1445,6 @@ namespace dlib
 
             decoder* channel{nullptr};
 
-            const auto clb = [&](frame& f, resizer&, resampler&) {st.frame_queue.push(std::move(f));};
-
             const auto parse = [&]
             {
                 channel = nullptr;
@@ -1391,15 +1476,15 @@ namespace dlib
                 if (ok && st.packet->size > 0)
                 {
                     // Decode
-                    ok = channel->push(st.packet, clb);
+                    ok = channel->push(st.packet, wrap(st.frame_queue));
                 }
             }
 
             if (!ok)
             {
                 // Flush
-                st.channel_video.push(nullptr, clb);
-                st.channel_audio.push(nullptr, clb);
+                st.channel_video.push(nullptr, wrap(st.frame_queue));
+                st.channel_audio.push(nullptr, wrap(st.frame_queue));
             }
 
             return !st.frame_queue.empty();
