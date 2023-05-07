@@ -78,29 +78,24 @@ try
         return EXIT_FAILURE;
     }
 
-    array2d<rgb_pixel>      img;
-    ffmpeg::decoder_status  status{ffmpeg::DECODER_EAGAIN};
-    image_window            win;
+    image_window win;
 
-    const auto pull = [&]
+    const auto callback = [&](array2d<rgb_pixel>& img)
     {
-        while ((status = dec.read(img)) == ffmpeg::DECODER_FRAME_AVAILABLE)
-            win.set_image(img);
+        win.set_image(img);
     };
 
     ifstream fin{filepath, std::ios::binary};
     std::vector<char> buf(1024);
 
-    while (fin && status != ffmpeg::DECODER_CLOSED)
+    while (fin)
     {
         fin.read(buf.data(), buf.size());
         size_t ret = fin.gcount();
-        dec.push_encoded((const uint8_t*)buf.data(), ret);
-        pull();
+        dec.push((const uint8_t*)buf.data(), ret, wrap(callback));
     }
 
-    dec.flush();
-    pull();
+    dec.flush(wrap(callback));
 
     return EXIT_SUCCESS;
 }

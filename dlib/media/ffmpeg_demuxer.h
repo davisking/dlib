@@ -8,11 +8,54 @@
 #include <functional>
 #include <unordered_map>
 #include "ffmpeg_utils.h"
+#include "../functional.h"
+#include "../constexpr_if.h"
 
 namespace dlib
 {
     namespace ffmpeg
     {
+
+// ---------------------------------------------------------------------------------------------------
+
+        template <class Callback>
+        using is_frame_callback = std::enable_if_t<dlib::is_invocable<Callback, frame&>::value, bool>;
+
+        template <
+          class Callback,
+          is_frame_callback<Callback> = true
+        >
+        auto wrap (
+            Callback&& clb,
+            const resizing_args& args_image,
+            const resampling_args& args_audio
+        );
+
+// ---------------------------------------------------------------------------------------------------
+
+        template <class Callback, class image_type>
+        using is_image_callback = std::enable_if_t<is_image_type<image_type>::value && 
+                                                   dlib::is_invocable<Callback, image_type&>::value, 
+                                                   bool>;
+
+        // template <
+        //   class Callback,
+        //   class image_type,
+        //   is_image_callback<Callback, image_type> = true
+        // >
+        // auto wrap (
+        //     Callback&& clb,
+        //     image_type& img
+        // );
+
+        // template <
+        //   class Callback,
+        //   class image_type,
+        //   is_image_callback<Callback, image_type> = true
+        // >
+        // auto wrap (
+        //     Callback&& clb
+        // );
 
 // ---------------------------------------------------------------------------------------------------
 
@@ -48,20 +91,6 @@ namespace dlib
             // Some codecs can be multi-threaded. Setting this enables this and controls the size of the thread pool.
             // Not all codecs can be parallelised.
             int thread_count{-1};
-        };
-
-// ---------------------------------------------------------------------------------------------------
-
-        enum decoder_status
-        {
-            /*!
-                WHAT THIS OBJECT REPRESENTS
-                    This enum describes the return value of decoder::read()
-            !*/
-
-            DECODER_CLOSED = -1,
-            DECODER_EAGAIN,
-            DECODER_FRAME_AVAILABLE
         };
 
 // ---------------------------------------------------------------------------------------------------
@@ -196,84 +225,30 @@ namespace dlib
                     - returns the number of channels (e.g. 2 if stereo, 1 if mono) of encoded audio frames
             !*/
 
-            bool push_encoded(const uint8_t *encoded, int nencoded);
+            template <class Callback> 
+            bool push (
+                const uint8_t*  encoded, 
+                int             nencoded,
+                Callback&&      clb
+            );
             /*!
                 requires
                     - is_open() == true
+                    - clb is a valid callback created using one of the dlib::ffmpeg::wrap() global functions
                 ensures
-                    - encodes data.
-                    - if (returns true)
-                        more frames may be available and a call to read() could return DECODER_FRAME_AVAILABLE
-                    else
-                        decoder is closed but frames may still be available when calling read() so is_open() may still return true
+                    - encodes data
+                    - clb may get invoked with new frames
             !*/
 
-            void flush();
+            template <class Callback>
+            void flush(Callback&& clb);
             /*!
                 requires
                     - is_open() == true
+                    - clb is a valid callback created using one of the dlib::ffmpeg::wrap() global functions
                 ensures
                     - Flushes the decoder. This must be called when there is no more data to be decoded. Last remaining frames will be available.
                     - calls push_encoded(nullptr, 0)
-            !*/
-
-            decoder_status read (
-                frame&                  dst_frame,
-                const resizing_args&    args_image = resizing_args{},
-                const resampling_args&  args_audio = resampling_args{}
-            );
-            /*!
-                ensures
-                    - Attempts to read a frame, storing the result in dst_frame.
-                    - If dst_frame.is_image() == true and args_image has non-default parameters,
-                      then dst_frame is resized accordingly.
-                    - If dst_frame.is_audio() == true and args_audio has non-default parameters,
-                      then dst_frame is resampled accordingly.
-                    - If it is successful then returns DECODER_FRAME_AVAILABLE and 
-                      dst_frame.is_empty() == false.  Otherwise, returns one of the 
-                      following:
-                        - DECODER_EAGAIN: this indicates more encoded data is required to decode
-                          additional frames.  In particular, you will need to keep calling
-                          push_encoded() until this function returns DECODER_FRAME_AVAILABLE.
-                          Alternatively, if there is no more encoded data, call flush(). This will
-                          flush the decoder, resulting in additional frames being available.  After
-                          the decoder is flushed, this function function will return
-                          DECODER_FRAME_AVAILABLE until it finally calls DECODER_CLOSED.
-                        - DECODER_CLOSED: This indicates there aren't any more frames.  If this happens
-                          then it also means that is_open() == false and you can no longer retrieve anymore frames.
-            !*/
-
-            template <
-                class image_type,
-                is_image_check<image_type> = true
-            >
-            inline decoder_status read (
-                image_type& img
-            );
-            /*!
-                requires
-                    - image_type == an image object that implements the interface defined in
-                      dlib/image_processing/generic_image.h
-                ensures
-                    - Attempts to read a frame, storing the result in img.
-                    - If num_rows(img) > 0 or num_cols(img) > 0 :
-                        then the frame is resized to fit those dimensions.
-                    - If num_rows(img) == 0 and num_cols(img) == 0:
-                        then the frame is copied to "img"
-                    - If an audio frame is found, it is ignored, destroyed and the next frame is read. So use with care
-                      if you're expecting to use audio frames. Use read(frame&) instead if you want both images and audio
-                    - If it is successful then returns DECODER_FRAME_AVAILABLE and 
-                      dst_frame.is_empty() == false.  Otherwise, returns one of the 
-                      following:
-                        - DECODER_EAGAIN: this indicates more encoded data is required to decode
-                          additional frames.  In particular, you will need to keep calling
-                          push_encoded() until this function returns DECODER_FRAME_AVAILABLE.
-                          Alternatively, if there is no more encoded data, call flush(). This will
-                          flush the decoder, resulting in additional frames being available.  After
-                          the decoder is flushed, this function function will return
-                          DECODER_FRAME_AVAILABLE until it finally calls DECODER_CLOSED.
-                        - DECODER_CLOSED: This indicates there aren't any more frames.  If this happens
-                          then it also means that is_open() == false and you can no longer retrieve anymore frames.
             !*/
 
         private:
@@ -286,8 +261,8 @@ namespace dlib
                 AVRational                      timebase_
             );
 
-            bool push_encoded_padded(const uint8_t *encoded, int nencoded);
-            bool push(const details::av_ptr<AVPacket>& pkt, std::queue<frame>& frame_queue);
+            template <class Callback> bool push_padded(const uint8_t *encoded, int nencoded, Callback&& clb);
+            template <class Callback> bool push(const details::av_ptr<AVPacket>& pkt, Callback&& clb);
 
             args                                    args_;
             bool                                    open_{false};
@@ -635,22 +610,22 @@ namespace dlib
         private:
             bool open(const args& a);
             bool object_alive() const noexcept;
-            bool fill_queue();
             bool interrupt_callback();
             void populate_metadata();
+            bool fill_queue();
 
             struct {
                 args                                    args_;
                 details::av_ptr<AVFormatContext>        pFormatCtx;
                 details::av_ptr<AVPacket>               packet;
-                std::chrono::system_clock::time_point   connecting_time{};
-                std::chrono::system_clock::time_point   connected_time{};
-                std::chrono::system_clock::time_point   last_read_time{};
-                std::unordered_map<std::string, std::string> metadata;
                 decoder                                 channel_video;
                 decoder                                 channel_audio;
                 int                                     stream_id_video{-1};
                 int                                     stream_id_audio{-1};
+                std::chrono::system_clock::time_point   connecting_time{};
+                std::chrono::system_clock::time_point   connected_time{};
+                std::chrono::system_clock::time_point   last_read_time{};
+                std::unordered_map<std::string, std::string> metadata;
                 std::queue<frame>                       frame_queue;
             } st;
         };
@@ -694,6 +669,7 @@ namespace dlib
         namespace details
         {
             inline void convert (
+                const frame&            src_frame,
                 frame&                  dst_frame,
                 resizer&                resizer,
                 resampler&              resampler,
@@ -701,25 +677,123 @@ namespace dlib
                 const resampling_args&  args_audio
             )
             {
-                if (dst_frame.is_image())
+                if (src_frame.is_image())
                 {
                     resizer.resize(
-                        dst_frame,
-                        args_image.h > 0                  ? args_image.h :   dst_frame.height(),
-                        args_image.w > 0                  ? args_image.w :   dst_frame.width(),
-                        args_image.fmt != AV_PIX_FMT_NONE ? args_image.fmt : dst_frame.pixfmt(),
+                        src_frame,
+                        args_image.h > 0                  ? args_image.h :   src_frame.height(),
+                        args_image.w > 0                  ? args_image.w :   src_frame.width(),
+                        args_image.fmt != AV_PIX_FMT_NONE ? args_image.fmt : src_frame.pixfmt(),
                         dst_frame);
                 }
                 else
                 {
                     resampler.resize(
-                        dst_frame,
-                        args_audio.sample_rate > 0            ? args_audio.sample_rate      : dst_frame.sample_rate(),
-                        args_audio.channel_layout > 0         ? args_audio.channel_layout   : dst_frame.layout(),
-                        args_audio.fmt != AV_SAMPLE_FMT_NONE  ? args_audio.fmt              : dst_frame.samplefmt(),
+                        src_frame,
+                        args_audio.sample_rate > 0            ? args_audio.sample_rate      : src_frame.sample_rate(),
+                        args_audio.channel_layout > 0         ? args_audio.channel_layout   : src_frame.layout(),
+                        args_audio.fmt != AV_SAMPLE_FMT_NONE  ? args_audio.fmt              : src_frame.samplefmt(),
                         dst_frame);
                 }
             }
+        }
+
+// ---------------------------------------------------------------------------------------------------
+
+        template <
+          class Callback,
+          is_frame_callback<Callback>
+        >
+        inline auto wrap (
+            Callback&&              clb,
+            const resizing_args&    args_image,
+            const resampling_args&  args_audio
+        )
+        {
+            using namespace details;
+
+            return [=] (
+                frame&      f, 
+                resizer&    resizer, 
+                resampler&  resampler
+            ) mutable
+            {
+                convert(f, f, resizer, resampler, args_image, args_audio);
+                clb(f);
+            };
+        }
+
+// ---------------------------------------------------------------------------------------------------
+
+        template <
+          class Callback,
+          class image_type,
+          is_image_callback<Callback, image_type>
+        >
+        auto wrap (
+            Callback&& clb,
+            image_type& img
+        )
+        {
+            using namespace details;
+
+            return [=, &img] (
+                frame&      f, 
+                resizer&    resizer, 
+                resampler&  resampler
+            ) mutable
+            {
+                if (f.is_image())
+                {
+                    convert (
+                        f, f,
+                        resizer,
+                        resampler,
+                        {img.nr() > 0 ? (int)img.nr() : f.height(),
+                         img.nc() > 0 ? (int)img.nc() : f.width(),
+                         pix_traits<pixel_type_t<image_type>>::fmt},
+                        {}
+                    );
+
+                    convert(f, img);
+                    clb(img);
+                } 
+            };
+        }
+
+        template <
+          class Callback,
+          class image_type,
+          is_image_callback<Callback, image_type>
+        >
+        auto wrap (
+            Callback&& clb
+        )
+        {
+            using namespace details;
+
+            return [=, img = image_type{}] (
+                frame&      f, 
+                resizer&    resizer, 
+                resampler&  resampler
+            ) mutable
+            {
+                if (f.is_image())
+                {
+                    convert (
+                        f, f,
+                        resizer,
+                        resampler,
+                        {img.nr() > 0 ? (int)img.nr() : f.height(),
+                         img.nc() > 0 ? (int)img.nc() : f.width(),
+                         pix_traits<pixel_type_t<image_type>>::fmt},
+                        {}
+                    );
+
+                    convert(f, img);
+                    clb(img);
+                } 
+            };
         }
 
 // ---------------------------------------------------------------------------------------------------
@@ -827,9 +901,10 @@ namespace dlib
             EXTRACT_ERROR = -1
         };
 
-        inline bool decoder::push(
+        template<class Callback>
+        inline bool decoder::push (
             const details::av_ptr<AVPacket>& pkt,
-            std::queue<frame>& queue
+            Callback&& clb
         )
         {
             using namespace std::chrono;
@@ -855,7 +930,8 @@ namespace dlib
 
             const auto recv_frame = [&](extract_state& state, bool resend)
             {
-                avframe.f = make_avframe();
+                if (!avframe.f)
+                    avframe.f = make_avframe();
                 const int ret = avcodec_receive_frame(pCodecCtx.get(), avframe.f.get());
 
                 if (ret == AVERROR(EAGAIN) && resend)
@@ -879,7 +955,7 @@ namespace dlib
                     avframe.timestamp           = system_clock::time_point{nanoseconds{av_rescale_q(pts, tb, {1,1000000000})}};
                     next_pts                    += avframe.is_image() ? 1 : avframe.f->nb_samples;
                     avframe.f->pict_type = AV_PICTURE_TYPE_NONE;
-                    queue.push(std::move(avframe));
+                    std::forward<Callback>(clb)(avframe, resizer_image, resizer_audio);
                 }
             };
 
@@ -899,7 +975,12 @@ namespace dlib
             return state != EXTRACT_ERROR;
         }
 
-        inline bool decoder::push_encoded_padded(const uint8_t *encoded, int nencoded)
+        template <class Callback>
+        inline bool decoder::push_padded (
+            const uint8_t*  encoded, 
+            int             nencoded,
+            Callback&&      clb
+        )
         {
             using namespace std;
             using namespace details;
@@ -950,7 +1031,7 @@ namespace dlib
 
                 // If data is available, decode
                 if (ok && packet->size > 0)
-                    ok = push(packet, frame_queue);
+                    ok = push(packet, std::forward<Callback>(clb));
                 
                 // If flushing, only flush parser once, so break
                 if (flushing)
@@ -960,19 +1041,24 @@ namespace dlib
             if (flushing)
             {
                 // Flush codec. After this, pCodecCtx == nullptr since AVERROR_EOF will be returned at some point.
-                ok = push(nullptr, frame_queue);
+                ok = push(nullptr, std::forward<Callback>(clb));
             }
         
             return ok;
         }
 
-        inline bool decoder::push_encoded(const uint8_t *encoded, int nencoded)
+        template <class Callback>
+        inline bool decoder::push (
+            const uint8_t*  encoded, 
+            int             nencoded,
+            Callback&&      clb
+        )
         {
             bool ok = true;
 
             if (encoded == nullptr && nencoded == 0)
             {
-                ok = push_encoded_padded(nullptr, 0);
+                ok = push_padded(nullptr, 0, std::forward<Callback>(clb));
             }
             else
             {
@@ -980,7 +1066,7 @@ namespace dlib
                 {
                     const int blocksize = nencoded - AV_INPUT_BUFFER_PADDING_SIZE;
 
-                    ok = push_encoded_padded(encoded, blocksize);
+                    ok = push_padded(encoded, blocksize, std::forward<Callback>(clb));
                     encoded  += blocksize;
                     nencoded -= blocksize; // == AV_INPUT_BUFFER_PADDING_SIZE
                 }
@@ -989,85 +1075,17 @@ namespace dlib
                 {
                     encoded_buffer.resize(nencoded + AV_INPUT_BUFFER_PADDING_SIZE);
                     std::memcpy(encoded_buffer.data(), encoded, nencoded);
-                    ok = push_encoded_padded(encoded_buffer.data(), nencoded);
+                    ok = push_padded(encoded_buffer.data(), nencoded, std::forward<Callback>(clb));
                 }
             }
 
             return ok;
         }
 
-        inline void decoder::flush()
+        template<class Callback>
+        inline void decoder::flush(Callback&& clb)
         {
-            push_encoded(nullptr, 0);
-        }
-
-        inline decoder_status decoder::read (
-            frame&                  dst_frame,
-            const resizing_args&    args_image,
-            const resampling_args&  args_audio
-        )
-        {
-            using namespace details;
-
-            if (!frame_queue.empty())
-            {
-                dst_frame = std::move(frame_queue.front());
-                frame_queue.pop();
-
-                convert (
-                    dst_frame,
-                    resizer_image,
-                    resizer_audio,
-                    args_image,
-                    args_audio
-                );
-
-                return DECODER_FRAME_AVAILABLE;
-            }
-
-            if (!is_open())
-                return DECODER_CLOSED;
-
-            return DECODER_EAGAIN;
-        }
-
-        template <
-            class image_type,
-            is_image_check<image_type>
-        >
-        inline decoder_status decoder::read (
-            image_type& img
-        )
-        {
-            using namespace details;
-
-            while (!frame_queue.empty())
-            {
-                frame f = std::move(frame_queue.front());
-                frame_queue.pop();
-
-                if (f.is_image())
-                {
-                    convert (
-                        f,
-                        resizer_image,
-                        resizer_audio,
-                        {img.nr() > 0 ? (int)img.nr() : f.height(),
-                         img.nc() > 0 ? (int)img.nc() : f.width(),
-                         pix_traits<pixel_type_t<image_type>>::fmt},
-                        {}
-                    );
-
-                    convert(f, img);
-                    
-                    return DECODER_FRAME_AVAILABLE;
-                } 
-            }
-
-            if (!is_open())
-                return DECODER_CLOSED;
-
-            return DECODER_EAGAIN;
+            push(nullptr, 0, std::forward<Callback>(clb));
         }
 
         inline bool             decoder::is_open()          const noexcept { return (pCodecCtx && open_) || !frame_queue.empty(); }
@@ -1340,6 +1358,8 @@ namespace dlib
 
             decoder* channel{nullptr};
 
+            const auto clb = [&](frame& f, resizer&, resampler&) {st.frame_queue.push(std::move(f));};
+
             const auto parse = [&]
             {
                 channel = nullptr;
@@ -1371,15 +1391,15 @@ namespace dlib
                 if (ok && st.packet->size > 0)
                 {
                     // Decode
-                    ok = channel->push(st.packet, st.frame_queue);
+                    ok = channel->push(st.packet, clb);
                 }
             }
 
             if (!ok)
             {
                 // Flush
-                st.channel_video.push(nullptr, st.frame_queue);
-                st.channel_audio.push(nullptr, st.frame_queue);
+                st.channel_video.push(nullptr, clb);
+                st.channel_audio.push(nullptr, clb);
             }
 
             return !st.frame_queue.empty();
@@ -1400,6 +1420,7 @@ namespace dlib
             st.frame_queue.pop();
 
             convert (
+                dst_frame,
                 dst_frame,
                 st.channel_video.resizer_image,
                 st.channel_audio.resizer_audio,
@@ -1428,6 +1449,7 @@ namespace dlib
                 if (f.is_image())
                 {
                     convert (
+                        f,
                         f,
                         st.channel_video.resizer_image,
                         st.channel_audio.resizer_audio,
