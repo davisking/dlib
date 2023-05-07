@@ -54,46 +54,39 @@ try
 
     frame                   f;
     array2d<rgb_pixel>      img;
-    ffmpeg::decoder_status  status{ffmpeg::DECODER_EAGAIN};
     int                     samples{0};
+    image_window            win;
 
     // When reading frames, we get exactly what's in the codec by default.
     // To resize, change pixel format, resample or change sample format, 
-    // you have to pass extra arguments to read() which either resize or resample
+    // you have to pass extra arguments to wrap() which either resizes or resamples
     // the frame. Since we want rgb_pixel, we need to set the pixel format appropriately.
     const resizing_args args_image {0, 0, pix_traits<rgb_pixel>::fmt};
 
-    image_window win;
-
-    const auto pull = [&]
+    const auto callback = [&](frame& f)
     {
-        while ((status = dec.read(f, args_image)) == ffmpeg::DECODER_FRAME_AVAILABLE)
+        if (f.is_image())
         {
-            if (f.is_image())
-            {
-                convert(f, img);
-                win.set_image(img);
-            }
-            else if (f.is_audio())
-            {
-                samples += f.nsamples();
-            }
+            convert(f, img);
+            win.set_image(img);
+        }
+        else if (f.is_audio())
+        {
+            samples += f.nsamples();
         }
     };
 
     ifstream fin{filepath, std::ios::binary};
     std::vector<char> buf(1024);
 
-    while (fin && status != ffmpeg::DECODER_CLOSED)
+    while (fin)
     {
         fin.read(buf.data(), buf.size());
         size_t ret = fin.gcount();
-        dec.push_encoded((const uint8_t*)buf.data(), ret);
-        pull();
+        dec.push((const uint8_t*)buf.data(), ret, wrap(callback, args_image));
     }
 
-    dec.flush();
-    pull();
+    dec.flush(wrap(callback, args_image));
 
     printf("Read %i audio samples\n", samples);
 
