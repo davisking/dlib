@@ -95,6 +95,8 @@ namespace
         static_assert(std::is_same<dlib::callable_return<decltype(func_testargs)>,
                                    void>::value, "make this correct");
 
+        static_assert(is_callable<decltype(func_testargs)>::value, "bad");
+
         static_assert(std::is_same<dlib::callable_args<decltype(func_return_addition)>,
                                    dlib::types_<int, int>
                                    >::value, "make this correct");
@@ -111,6 +113,8 @@ namespace
 
         static_assert(std::is_same<dlib::callable_return<decltype(func_return_addition)>,
                                    int>::value, "make this correct");
+        
+        static_assert(is_callable<decltype(func_return_addition)>::value, "bad");
 
         {
             std::string str = run1_str4;
@@ -160,6 +164,8 @@ namespace
             
             static_assert(std::is_same<dlib::callable_return<decltype(f)>,
                                        long>::value, "make this correct");
+            
+            static_assert(is_callable<decltype(f)>::value, "bad");
         }
                 
         {
@@ -227,6 +233,8 @@ namespace
     
     static_assert(std::is_same<dlib::callable_return<example_struct>,
                                 float>::value, "make this correct");
+
+    static_assert(is_callable<example_struct>::value, "bad");
 
     void test_member_functions_and_data()
     {
@@ -482,6 +490,7 @@ namespace
     {
         template <
           class Callable,
+          std::enable_if_t<is_callable<Callable>::value, bool> = true,
           std::enable_if_t<callable_nargs<Callable>::value >= 1, bool> = true,
           std::enable_if_t<std::is_floating_point<callable_arg<0, Callable>>::value, bool> = true
         >
@@ -499,6 +508,7 @@ namespace
 
         template <
           class Callable,
+          std::enable_if_t<is_callable<Callable>::value, bool> = true,
           std::enable_if_t<callable_nargs<Callable>::value >= 1, bool> = true,
           std::enable_if_t<std::is_integral<callable_arg<0, Callable>>::value, bool> = true
         >
@@ -516,6 +526,7 @@ namespace
 
         template <
           class Callable,
+          std::enable_if_t<is_callable<Callable>::value, bool> = true,
           std::enable_if_t<callable_nargs<Callable>::value < 1, bool> = true
         >
         auto wrap (
@@ -543,6 +554,8 @@ namespace
             const auto f6 = wrap(f3, i);
             DLIB_TEST(i == 3);
         }
+
+        static_assert(!is_callable<int>::value, "bad");
     }
 
     class invoke_tester : public tester
