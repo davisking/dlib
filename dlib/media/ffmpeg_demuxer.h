@@ -62,6 +62,8 @@ namespace dlib
 
         template <
           class Callback,
+          std::enable_if_t<is_callable<Callback>::value, bool> = true,
+          std::enable_if_t<callable_nargs<Callback>::value == 1, bool> = true,
           is_image_callback<Callback> = true
         >
         auto wrap (
@@ -799,6 +801,8 @@ namespace dlib
 
         template <
           class Callback,
+          std::enable_if_t<is_callable<Callback>::value, bool>,
+          std::enable_if_t<callable_nargs<Callback>::value == 1, bool>,
           is_image_callback<Callback>
         >
         inline auto wrap (
