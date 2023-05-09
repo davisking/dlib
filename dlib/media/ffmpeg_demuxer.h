@@ -18,12 +18,9 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-        template <class Callback>
-        using is_frame_callback = std::enable_if_t<dlib::is_invocable<Callback, frame&>::value, bool>;
-
         template <
           class Callback,
-          is_frame_callback<Callback> = true
+          std::enable_if_t<dlib::is_invocable<Callback, frame&>::value, bool> = true
         >
         auto wrap (
             Callback&&              clb,
@@ -57,14 +54,11 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-        template <class Callback>
-        using is_image_callback = is_image_check<std::remove_reference_t<callable_arg<0, Callback>>>;
-
         template <
           class Callback,
           std::enable_if_t<is_callable<Callback>::value, bool> = true,
           std::enable_if_t<callable_nargs<Callback>::value == 1, bool> = true,
-          is_image_callback<Callback> = true
+          std::enable_if_t<is_image_type<std::remove_reference_t<callable_arg<0, Callback>>>::value, bool> = true
         >
         auto wrap (
             Callback&& clb
@@ -341,6 +335,7 @@ namespace dlib
 
             args                                    args_;
             bool                                    open_{false};
+            bool                                    decoding{false};
             AVRational                              timebase;
             details::av_ptr<AVCodecParserContext>   parser;
             details::av_ptr<AVCodecContext>         pCodecCtx;
@@ -776,7 +771,7 @@ namespace dlib
 
         template <
           class Callback,
-          is_frame_callback<Callback>
+          std::enable_if_t<dlib::is_invocable<Callback, frame&>::value, bool>
         >
         inline auto wrap (
             Callback&&              clb,
@@ -803,7 +798,7 @@ namespace dlib
           class Callback,
           std::enable_if_t<is_callable<Callback>::value, bool>,
           std::enable_if_t<callable_nargs<Callback>::value == 1, bool>,
-          is_image_callback<Callback>
+          std::enable_if_t<is_image_type<std::remove_reference_t<callable_arg<0, Callback>>>::value, bool>
         >
         inline auto wrap (
             Callback&& clb
@@ -1145,6 +1140,9 @@ namespace dlib
             Callback&&      clb
         )
         {
+            DLIB_ASSERT(!decoding, "Recursion in push() no supported");
+            decoding = true;
+
             bool ok = true;
 
             if (encoded == nullptr && nencoded == 0)
@@ -1170,6 +1168,7 @@ namespace dlib
                 }
             }
 
+            decoding = false;
             return ok;
         }
 
@@ -1189,7 +1188,7 @@ namespace dlib
         inline AVPixelFormat    decoder::pixel_fmt()        const noexcept { return pCodecCtx ? pCodecCtx->pix_fmt      : AV_PIX_FMT_NONE; }
         inline int              decoder::sample_rate()      const noexcept { return pCodecCtx ? pCodecCtx->sample_rate  : 0; }
         inline AVSampleFormat   decoder::sample_fmt()       const noexcept { return pCodecCtx ? pCodecCtx->sample_fmt   : AV_SAMPLE_FMT_NONE; }
-        inline uint64_t         decoder::channel_layout()   const noexcept { return pCodecCtx ? details::get_layout(pCodecCtx.get()) : 0; }
+        inline uint64_t         decoder::channel_layout()   const noexcept { return details::get_layout(pCodecCtx.get()); }
         inline int              decoder::nchannels()        const noexcept { return details::get_nchannels(channel_layout()); }
 
 // ---------------------------------------------------------------------------------------------------

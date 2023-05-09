@@ -272,6 +272,7 @@ namespace dlib
 
             args                            args_;
             bool                            open_{false};
+            bool                            encoding{false};
             details::av_ptr<AVCodecContext> pCodecCtx;
             details::av_ptr<AVPacket>       packet;
             int                             next_pts{0};
@@ -902,6 +903,9 @@ namespace dlib
             if (!is_open())
                 return false;
 
+            DLIB_ASSERT(!encoding, "Recursion in push() not supported");
+            encoding = true;
+
             std::vector<frame> frames;
 
             // Resize if image. Resample if audio. Push through audio fifo if necessary (some audio codecs requires fixed size frames)
@@ -1007,6 +1011,7 @@ namespace dlib
                 }
             }
 
+            encoding = false;
             return state != ENCODE_ERROR;
         }
 
