@@ -115,9 +115,6 @@ namespace dlib
         const image_scanner_type& get_scanner (
         ) const;
 
-				image_scanner_type& get_scanner (
-				);
-
         object_detector& operator= (
             const object_detector& item 
         );
@@ -619,16 +616,6 @@ namespace dlib
     {
         return scanner;
     }
-
-		template <
-			typename image_scanner_type
-			>
-		image_scanner_type& object_detector<image_scanner_type>::
-			get_scanner (
-			)
-		{
-				return scanner;
-		}
 
 // ----------------------------------------------------------------------------------------
 
