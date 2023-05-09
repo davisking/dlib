@@ -691,10 +691,9 @@ namespace dlib
                 frame tmp;
 
                 if (is_same_object)
-                {
-                    tmp.set_params(dst_h, dst_w, dst_fmt, 0, 0, 0, AV_SAMPLE_FMT_NONE, src.get_timestamp());
                     ptr = &tmp;
-                }
+                
+                ptr->set_params(dst_h, dst_w, dst_fmt, 0, 0, 0, AV_SAMPLE_FMT_NONE, src.get_timestamp());
 
                 sws_scale(imgConvertCtx.get(),
                           src.get_frame().data,  src.get_frame().linesize, 0, src.height(),
