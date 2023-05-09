@@ -876,7 +876,7 @@ namespace dlib
                     frame decoded;
                     frame src;
                     src.f           = std::move(avframe); //make sure you move it back when you're done
-                    src.timestamp   = system_clock::time_point{nanoseconds{timestamp_ns}};
+                    src.timestamp   = system_clock::time_point{duration_cast<system_clock::duration>(nanoseconds{timestamp_ns})};
 
                     if (src.is_image())
                     {
