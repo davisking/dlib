@@ -13,12 +13,6 @@ namespace dlib
     namespace detail
     {
         const auto _ = [](auto&& arg) -> decltype(auto) { return std::forward<decltype(arg)>(arg); };
-
-        template<typename Void, template <class...> class Op, class... Args>
-        struct is_detected : std::false_type{};
-
-        template<template <class...> class Op, class... Args>
-        struct is_detected<dlib::void_t<Op<Args...>>, Op, Args...> : std::true_type {};
     }
 
 // ----------------------------------------------------------------------------------------
@@ -111,16 +105,9 @@ namespace dlib
     {
         return overloaded(std::forward<Cases>(cases)...)(types_<T>{}..., detail::_);
     }
-// ----------------------------------------------------------------------------------------
-
-    template<template <class...> class Op, class... Args>
-    using is_detected = detail::is_detected<void, Op, Args...>;
-    /*!
-        ensures
-            - This is exactly the same as std::experimental::is_detected from library fundamentals v
-    !*/
 
 // ----------------------------------------------------------------------------------------
+
 }
 
 #endif //DLIB_IF_CONSTEXPR_H

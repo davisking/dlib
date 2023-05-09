@@ -211,6 +211,24 @@ namespace dlib
     using is_complete_type = details::is_complete_type<T>;
 
 // ----------------------------------------------------------------------------------------
+
+    namespace details
+    {
+        template<typename Void, template <class...> class Op, class... Args>
+        struct is_detected : std::false_type{};
+
+        template<template <class...> class Op, class... Args>
+        struct is_detected<dlib::void_t<Op<Args...>>, Op, Args...> : std::true_type {};
+    }
+
+    template<template <class...> class Op, class... Args>
+    using is_detected = details::is_detected<void, Op, Args...>;
+    /*!
+        ensures
+            - This is exactly the same as std::experimental::is_detected from library fundamentals v
+    !*/
+
+// ----------------------------------------------------------------------------------------
  
     template<typename... T>
     struct types_ {};
@@ -264,49 +282,70 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace details
+    {
+        template<class AlwaysVoid, class F>
+        struct callable_traits
+        {
+            constexpr static bool is_callable = false;
+        };
+
+        template<class AlwaysVoid, class R, class... Args>
+        struct callable_traits<AlwaysVoid, R(Args...)>
+        {
+            using return_type = R;
+            using args        = types_<Args...>;
+            constexpr static std::size_t    nargs       = sizeof...(Args);
+            constexpr static bool           is_callable = true;
+        }; 
+
+        template<class AlwaysVoid, class R, class... Args>
+        struct callable_traits<AlwaysVoid, R(*)(Args...)> 
+        : public callable_traits<AlwaysVoid, R(Args...)>{};
+
+        template<class AlwaysVoid, class C, class R, class... Args>
+        struct callable_traits<AlwaysVoid, R(C::*)(Args...)> 
+        : public callable_traits<AlwaysVoid, R(Args...)>{};
+
+        template<class AlwaysVoid, class C, class R, class... Args>
+        struct callable_traits<AlwaysVoid, R(C::*)(Args...) const> 
+        : public callable_traits<AlwaysVoid, R(Args...)>{};
+
+        template<class F>
+        struct callable_traits<void_t<decltype(&std::decay_t<F>::operator())>, F>
+        : public callable_traits<void, decltype(&std::decay_t<F>::operator())>{};
+    }
+   
     template<class F>
-    struct callable_traits;
+    struct callable_traits : details::callable_traits<void, F> {};
     /*!
         WHAT THIS OBJECT REPRESENTS
-            This is a type trait for callable types like function pointers, functors and lambdas.
-            It provides the following types:
+            This is a type trait for callable types.
+
+            If the template parameter F is function pointer, functor or lambda then
+            it provides the following types:
                 return_type : the return type of the callable object
                 args        : a parameter pack packaged in a types_<> meta container containing
                               all the function argument types
             It also provides the following static members:
                 nargs       : the number of function arguments
+                is_callable : a boolean which determines whether F is callable. In this case, it is true
+            
+            If the template parameter F is not function-like object, then it provides:
+                is_callable : false
             
             For example, a function type F with signature R(T1, T2, T3) has the following traits:
                 callable_traits<F>::return_type == R
                 callable_traits<F>::args        == types_<T1,T2,T3>
                 callable_traits<F>::nargs       == 3
+                callable_traits<F>::is_callable == true
+
+            Another example:
+                callable_traits<int>::is_callable == false
+                callable_traits<int>::return_type == does not exist. Compile error
+                callable_traits<int>::args        == does not exist. Compile error
+                callable_traits<int>::nargs       == does not exist. Compile error
     !*/
-
-    template<class R, class... Args>
-    struct callable_traits<R(Args...)>
-    {
-        using return_type = R;
-        using args        = types_<Args...>;
-        constexpr static std::size_t nargs = sizeof...(Args);
-    };  
-
-    template<class R, class... Args>
-    struct callable_traits<R(*)(Args...)> : public callable_traits<R(Args...)>{};
-
-    template<class C, class R, class... Args>
-    struct callable_traits<R(C::*)(Args...)> : public callable_traits<R(Args...)>{};
-
-    template<class C, class R, class... Args>
-    struct callable_traits<R(C::*)(Args...) const> : public callable_traits<R(Args...)>{};
-
-    template<class F>
-    struct callable_traits
-    {
-        using call_type     = callable_traits<decltype(&std::decay_t<F>::operator())>;
-        using return_type   = typename call_type::return_type;
-        using args          = typename call_type::args;
-        constexpr static std::size_t nargs = call_type::nargs;
-    };
 
     template<class Callable>
     using callable_args = typename callable_traits<Callable>::args;
@@ -319,6 +358,9 @@ namespace dlib
 
     template<class Callable>
     using callable_return = typename callable_traits<Callable>::return_type;
+
+    template<class F>
+    using is_callable = std::integral_constant<bool, callable_traits<F>::is_callable>;
 
 // ----------------------------------------------------------------------------------------
 
