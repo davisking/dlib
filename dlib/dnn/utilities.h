@@ -73,7 +73,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    static inline size_t tensor_index(
+    inline size_t tensor_index(
         const tensor& t,
         const long sample,
         const long k,
