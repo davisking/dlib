@@ -304,6 +304,7 @@ namespace dlib
                 requires
                     - is_open() == true
                     - clb is a valid callback created using one of the dlib::ffmpeg::wrap() global functions
+                    - clb must not call decoder::push() or decoder::flush(), i.e. the callback does not exhibit recursion.
                 ensures
                     - encodes data
                     - clb may get invoked with new frames
@@ -315,6 +316,7 @@ namespace dlib
                 requires
                     - is_open() == true
                     - clb is a valid callback created using one of the dlib::ffmpeg::wrap() global functions
+                    - clb must not call decoder::push() or decoder::flush(), i.e. the callback does not exhibit recursion.
                 ensures
                     - Flushes the decoder. This must be called when there is no more data to be decoded. Last remaining frames will be available.
                     - calls push_encoded(nullptr, 0)

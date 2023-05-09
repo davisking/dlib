@@ -239,6 +239,8 @@ namespace dlib
                     - sink is set to a valid callback with signature bool(size_t, const char*)
                       for writing packet data. dlib/media/sink.h contains callback wrappers for
                       different buffer types.
+                    - sink does not call encoder::push() or encoder::flush(),
+                      i.e., the callback does not create a recursive loop. 
                 ensures
                     - If f does not have matching settings to the codec, it is either
                       resized or resampled before being pushed to the codec and encoded.
@@ -258,6 +260,8 @@ namespace dlib
                     - sink is set to a valid callback with signature bool(size_t, const char*)
                       for writing packet data. dlib/media/sink.h contains callback wrappers for
                       different buffer types.
+                    - sink does not call encoder::push() or encoder::flush(),
+                      i.e., the callback does not create a recursive loop. 
                 ensures
                     - Flushes the codec. This must be called when there are no more frames to be encoded.
                     - sink will likely be invoked.
