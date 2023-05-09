@@ -1040,7 +1040,7 @@ namespace dlib
                 {
                     const AVRational tb         = avframe.is_image() ? timebase : AVRational{1, avframe.sample_rate()};
                     const uint64_t pts          = avframe.is_image() ? avframe.f->pts : next_pts;
-                    avframe.timestamp           = system_clock::time_point{nanoseconds{av_rescale_q(pts, tb, {1,1000000000})}};
+                    avframe.timestamp           = system_clock::time_point{duration_cast<system_clock::duration>(nanoseconds{av_rescale_q(pts, tb, {1,1000000000})})};
                     next_pts                    += avframe.is_image() ? 1 : avframe.f->nb_samples;
                     avframe.f->pict_type = AV_PICTURE_TYPE_NONE;
                     std::forward<Callback>(clb)(avframe, resizer_image, resizer_audio);
