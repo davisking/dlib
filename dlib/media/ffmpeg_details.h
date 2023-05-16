@@ -20,15 +20,15 @@
         - ffmpeg_details.h  : contains implementations details only and everything must be in the
                               dlib::ffmpeg::details namespace
         
-        - ffmpeg_utils.h    : contains common public API. Declarations go at the bottom of the file
+        - ffmpeg_utils.h    : contains common public API. Definitions go at the bottom of the file
                               underneath a block comment saying "DEFINITIONS"
                               Also contains implementation details that depend on the public API.
                               This must still go in the dlib::ffmpeg::details namespace
         
-        - ffmpeg_demuxer.h  : contains public API for all things decoding. Similarly, declarations go 
+        - ffmpeg_demuxer.h  : contains public API for all things decoding. Similarly, definitions go 
                               at the bottom of the file underneath a block comment saying "DEFINITIONS".
 
-        - ffmpeg_muxer.h  :   contains public API for all things encoding. Similarly, declarations go 
+        - ffmpeg_muxer.h  :   contains public API for all things encoding. Similarly, definitions go 
                               at the bottom of the file underneath a block comment saying "DEFINITIONS".
                             
 */
@@ -239,12 +239,12 @@ namespace dlib { namespace ffmpeg { namespace details
 
     inline uint64_t get_layout(const AVCodecContext* pCodecCtx)
     {
-        return pCodecCtx->ch_layout.u.mask;
+        return pCodecCtx ? pCodecCtx->ch_layout.u.mask : 0;
     }
 
     inline uint64_t get_layout(const AVFrame* frame)
     {
-        return frame->ch_layout.u.mask;
+        return frame ? frame->ch_layout.u.mask : 0;
     }
 
     inline void set_layout(AVCodecContext* pCodecCtx, const uint64_t channel_layout)
@@ -259,12 +259,12 @@ namespace dlib { namespace ffmpeg { namespace details
 
     inline int get_nchannels(const AVCodecContext* pCodecCtx)
     {
-        return pCodecCtx->ch_layout.nb_channels;
+        return pCodecCtx ? pCodecCtx->ch_layout.nb_channels : 0;
     }
 
     inline int get_nchannels(const AVFrame* frame)
     {
-        return frame->ch_layout.nb_channels;
+        return frame ? frame->ch_layout.nb_channels : 0;
     }
 
     inline int get_nchannels(const uint64_t channel_layout)
@@ -305,12 +305,12 @@ namespace dlib { namespace ffmpeg { namespace details
 
     inline uint64_t get_layout(const AVCodecContext* pCodecCtx)
     {
-        return pCodecCtx->channel_layout;
+        return pCodecCtx ? pCodecCtx->channel_layout : 0;
     }
 
     inline uint64_t get_layout(const AVFrame* frame)
     {
-        return frame->channel_layout;
+        return frame ? frame->channel_layout : 0;
     }
 
     inline void set_layout(AVCodecContext* pCodecCtx, const uint64_t channel_layout)
@@ -330,12 +330,12 @@ namespace dlib { namespace ffmpeg { namespace details
 
     inline int get_nchannels(const AVCodecContext* pCodecCtx)
     {
-        return get_nchannels(pCodecCtx->channel_layout);
+        return pCodecCtx ? get_nchannels(pCodecCtx->channel_layout) : 0;
     }
 
     inline int get_nchannels(const AVFrame* frame)
     {
-        return get_nchannels(frame->channel_layout);
+        return frame ? get_nchannels(frame->channel_layout) : 0;
     }    
 
     inline void check_layout(AVCodecContext* pCodecCtx) 

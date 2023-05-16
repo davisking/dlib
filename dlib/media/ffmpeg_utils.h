@@ -253,13 +253,7 @@ namespace dlib
                       Use with care! Prefer to use dlib's convert() functions to convert to and back dlib objects.
             !*/
 
-        private:
-
-            friend class details::resampler;
-            friend class encoder;
-            friend class decoder;
-
-            frame(
+            void set_params(
                 int                                     h,
                 int                                     w,
                 AVPixelFormat                           pixfmt,
@@ -269,6 +263,35 @@ namespace dlib
                 AVSampleFormat                          samplefmt,
                 std::chrono::system_clock::time_point   timestamp
             );
+            /*!
+                requires
+                    - For images, set sample_rate = nb_samples = channel_layout = 0, and samplefmt = AV_SAMPLE_FMT_NONE
+                    - For audio, set h = w = 0 and pixfmt = AV_PIX_FMT_NONE
+                ensures
+                    - Resizes the frame to the corresponding dims.
+                    - is_empty()        == false
+                    - is_image()        == (h > 0 && w > 0 && pixfmt != AV_PIX_FMT_NONE)
+                    - is_audio()        == (sample_rate > 0 && nb_samples > 0 && channel_layout > 0 && samplefmt != AV_SAMPLE_FMT_NONE)
+                    - height()          == h
+                    - width()           == w
+                    - pixfmt()          == pixfmt
+                    - sample_rate()     == sample_rate
+                    - layout()          == channel_layout
+                    - samplefmt()       == samplefmt
+                    - get_timestamp()   == timestamp
+            !*/
+
+            void clear();
+            /*!
+                ensures
+                    - is_empty() == true
+            !*/
+
+        private:
+
+            friend class details::resampler;
+            friend class encoder;
+            friend class decoder;
 
             void copy_from(const frame& other);
 
@@ -321,6 +344,8 @@ namespace dlib
             !*/
 
             using sample = std::array<SampleType, Channels>;
+            using format = SampleType;
+            constexpr static std::size_t nchannels = Channels;
 
             std::vector<sample>                     samples;
             float                                   sample_rate{0};
@@ -512,6 +537,48 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
+        struct resizing_args
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This class groups a set of arguments used for resizing an image frame.
+                    When all arguments are zero or defaulted, then no resizing is undertaken,
+                    and the src frame is memcpy'd to the dst frame.
+
+                    Note:
+                        - "fmt" can take any value starting with AV_PIX_FMT_
+                          See libavutil/pixfmt.h for options.
+            !*/
+
+            int             h{0};
+            int             w{0};
+            AVPixelFormat   fmt{AV_PIX_FMT_NONE};
+        };
+
+// ---------------------------------------------------------------------------------------------------
+
+        struct resampling_args
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This class groups a set of arguments used for resampling an audio frame.
+                    When all arguments are zero or defaulted, then no resampling is undertaken,
+                    and the src frame is memcpy'd to the dst frame.
+
+                    Note:
+                        - "channel_layout" can take values starting with AV_CH_LAYOUT_ 
+                          See libavutil/channel_layout.h for options.
+                        - "fmt" can take any value starting with AV_SAMPLE_FMT_
+                          See libavutil/samplefmt.h for options.
+            !*/
+
+            int             sample_rate{0};
+            uint64_t        channel_layout{0};
+            AVSampleFormat  fmt{AV_SAMPLE_FMT_NONE};
+        };
+
+// ---------------------------------------------------------------------------------------------------
+
     }
 }
 
@@ -586,11 +653,6 @@ namespace dlib
             class resizer
             {
             public:
-                void reset(
-                    const int src_h, const int src_w, const AVPixelFormat src_fmt,
-                    const int dst_h, const int dst_w, const AVPixelFormat dst_fmt
-                );
-
                 void resize(
                     const frame &src,
                     const int dst_h, const int dst_w, const AVPixelFormat dst_fmt,
@@ -602,86 +664,43 @@ namespace dlib
                     frame &dst
                 );
 
-                int             get_src_h()    const noexcept { return src_h; }
-                int             get_src_w()    const noexcept { return src_w; }
-                AVPixelFormat   get_src_fmt()  const noexcept { return src_fmt; }
-                int             get_dst_h()    const noexcept { return dst_h; }
-                int             get_dst_w()    const noexcept { return dst_w; }
-                AVPixelFormat   get_dst_fmt()  const noexcept { return dst_fmt; }
-
             private:
-
-                int                 src_h{0};
-                int                 src_w{0};
-                AVPixelFormat       src_fmt{AV_PIX_FMT_NONE};
-                int                 dst_h{0};
-                int                 dst_w{0};
-                AVPixelFormat       dst_fmt{AV_PIX_FMT_NONE};
-                av_ptr<SwsContext>  imgConvertCtx;
+                av_ptr<SwsContext> imgConvertCtx;
             };
-
-            inline void resizer::reset (
-                const int src_h_, const int src_w_, const AVPixelFormat src_fmt_,
-                const int dst_h_, const int dst_w_, const AVPixelFormat dst_fmt_
-            )
-            {
-                auto this_params = std::tie(src_h,  src_w,  src_fmt,  dst_h,  dst_w,  dst_fmt);
-                auto new_params  = std::tie(src_h_, src_w_, src_fmt_, dst_h_, dst_w_, dst_fmt_);
-
-                if (this_params != new_params)
-                {
-                    this_params = new_params;
-
-                    imgConvertCtx = nullptr;
-
-                    if (std::tie(src_h, src_w, src_fmt) != 
-                        std::tie(dst_h, dst_w, dst_fmt))
-                    {
-                        imgConvertCtx.reset(sws_getContext(src_w, src_h, src_fmt,
-                                                           dst_w, dst_h, dst_fmt,
-                                                           SWS_FAST_BILINEAR, NULL, NULL, NULL));
-                    }
-                }
-            }
 
             inline void resizer::resize (
                 const frame& src,
-                const int dst_h_, const int dst_w_, const AVPixelFormat dst_pixfmt_,
+                const int dst_h, const int dst_w, const AVPixelFormat dst_fmt,
                 frame& dst
             )
             {
                 DLIB_CASSERT(src.is_image(), "src.is_image() == false");
 
-                const bool is_same_object = std::addressof(src) == std::addressof(dst);
+                imgConvertCtx.reset(sws_getCachedContext(imgConvertCtx.release(),
+                                                         src.width(), src.height(), src.pixfmt(),
+                                                         dst_w,       dst_h,        dst_fmt,
+                                                         SWS_FAST_BILINEAR, NULL, NULL, NULL));
 
-                reset(src.height(), src.width(), src.pixfmt(),
-                      dst_h_, dst_w_, dst_pixfmt_);
+                const bool is_same_object = &src == &dst;
+                const bool is_copy = std::make_tuple(src.height(), src.width(), src.pixfmt()) == std::tie(dst_h, dst_w, dst_fmt);
 
-                if (imgConvertCtx)
-                {
-                    frame tmp;
-                    frame* ptr = std::addressof(dst);
+                if (is_same_object && is_copy)
+                    return;
 
-                    if (is_same_object ||
-                        !dst.is_image() ||
-                        std::make_tuple(dst.height(), dst.width(), dst.pixfmt()) !=
-                        std::make_tuple(dst_h,        dst_w,       dst_fmt))
-                    {
-                        tmp = frame(dst_h, dst_w, dst_fmt, src.get_timestamp());
-                        ptr = std::addressof(tmp);
-                    }
+                frame* ptr = &dst;
+                frame tmp;
 
-                    sws_scale(imgConvertCtx.get(),
-                               src.get_frame().data,  src.get_frame().linesize, 0, src.height(),
-                              ptr->get_frame().data, ptr->get_frame().linesize);
+                if (is_same_object)
+                    ptr = &tmp;
+                
+                ptr->set_params(dst_h, dst_w, dst_fmt, 0, 0, 0, AV_SAMPLE_FMT_NONE, src.get_timestamp());
 
-                    if (ptr != std::addressof(dst))
-                        dst = std::move(tmp);
-                }
-                else if (!is_same_object)
-                {
-                    dst = src;
-                }
+                sws_scale(imgConvertCtx.get(),
+                          src.get_frame().data,  src.get_frame().linesize, 0, src.height(),
+                          ptr->get_frame().data, ptr->get_frame().linesize);
+
+                if (is_same_object)
+                    dst = std::move(tmp);
             }
 
             inline void resizer::resize(
@@ -689,7 +708,7 @@ namespace dlib
                 frame& dst
             )
             {
-                resize(src, dst_h, dst_w, dst_fmt, dst);
+                resize(src, src.height(), src.width(), src.pixfmt(), dst);
             }
 
 // ---------------------------------------------------------------------------------------------------
@@ -712,13 +731,6 @@ namespace dlib
                     const frame &src,
                     frame &dst
                 );
-
-                int             get_src_rate()   const noexcept { return src_sample_rate; }
-                uint64_t        get_src_layout() const noexcept { return src_channel_layout; }
-                AVSampleFormat  get_src_fmt()    const noexcept { return src_fmt; }
-                int             get_dst_rate()   const noexcept { return dst_sample_rate; }
-                uint64_t        get_dst_layout() const noexcept { return dst_channel_layout; }
-                AVSampleFormat  get_dst_fmt()    const noexcept { return dst_fmt; }
 
             private:
 
@@ -930,8 +942,13 @@ namespace dlib
         }
 
 // ---------------------------------------------------------------------------------------------------
+        inline void frame::clear()
+        {
+            f = nullptr;
+            timestamp = std::chrono::system_clock::time_point{};
+        }
 
-        inline frame::frame(
+        inline void frame::set_params(
             int             h,
             int             w,
             AVPixelFormat   pixfmt,
@@ -944,29 +961,37 @@ namespace dlib
         {
             using namespace details;
 
-            f = make_avframe();
-            f->height           = h;
-            f->width            = w;
-            f->sample_rate      = sample_rate;
-            f->nb_samples       = nb_samples;
-            f->format           = h > 0 && w > 0 ? (int)pixfmt : (int)samplefmt;
-            timestamp           = timestamp_;
-            set_layout(f.get(), channel_layout);
+            const int format = (h > 0 && w > 0) ? (int)pixfmt : (int)samplefmt;
 
-            // The ffmpeg documentation recommends you always use align==0.
-            // However, in ffmpeg 3.2, there is a bug where if you do that, data buffers don't get allocated.
-            // So workaround is to manually set align==32
-            // Not ideal, but i've checked the source code in ffmpeg 3.3, 4.4 and 5.0 libavutil/frame.c
-            // and in every case, if align==0, then align=32
-            const int align = 32;
-
-            const int ret = av_frame_get_buffer(f.get(), align);
-            if (ret < 0)
+            if (!f ||
+                std::tie(f->height, f->width, f->sample_rate, f->nb_samples, f->format) != 
+                std::tie(   h,         w,        sample_rate,    nb_samples,    format) ||
+                get_layout(f.get()) != channel_layout)
             {
-                f = nullptr;
-                throw std::runtime_error("av_frame_get_buffer() failed : " + get_av_error(ret));
+                f = make_avframe();
+                f->height           = h;
+                f->width            = w;
+                f->sample_rate      = sample_rate;
+                f->nb_samples       = nb_samples;
+                f->format           = h > 0 && w > 0 ? (int)pixfmt : (int)samplefmt;
+                set_layout(f.get(), channel_layout);
+
+                // The ffmpeg documentation recommends you always use align==0.
+                // However, in ffmpeg 3.2, there is a bug where if you do that, data buffers don't get allocated.
+                // So workaround is to manually set align==32
+                // Not ideal, but i've checked the source code in ffmpeg 3.3, 4.4 and 5.0 libavutil/frame.c
+                // and in every case, if align==0, then align=32
+                const int align = 32;
+
+                const int ret = av_frame_get_buffer(f.get(), align);
+                if (ret < 0)
+                {
+                    f = nullptr;
+                    throw std::runtime_error("av_frame_get_buffer() failed : " + get_av_error(ret));
+                }
             }
 
+            timestamp = timestamp_;
             if (is_audio())
                 f->pts = av_rescale_q(timestamp.time_since_epoch().count(),
                                       {decltype(timestamp)::period::num, (decltype(timestamp)::period::den)},
@@ -978,8 +1003,9 @@ namespace dlib
             int w,
             AVPixelFormat fmt,
             std::chrono::system_clock::time_point timestamp
-        ) : frame(h, w, fmt, 0, 0, 0, AV_SAMPLE_FMT_NONE, timestamp)
+        )
         {
+            set_params(h, w, fmt, 0, 0, 0, AV_SAMPLE_FMT_NONE, timestamp);
         }
 
         inline frame::frame(
@@ -988,8 +1014,9 @@ namespace dlib
             uint64_t        channel_layout,
             AVSampleFormat  fmt,
             std::chrono::system_clock::time_point timestamp
-        ) : frame(0,0,AV_PIX_FMT_NONE, sample_rate, nb_samples, channel_layout, fmt, timestamp)
+        )
         {
+            set_params(0,0,AV_PIX_FMT_NONE, sample_rate, nb_samples, channel_layout, fmt, timestamp);
         }
 
         inline frame::frame(const frame &ori)
@@ -1006,41 +1033,33 @@ namespace dlib
 
         inline void frame::copy_from(const frame& ori)
         {
+            using namespace details;
+
             if (ori.is_empty())
             {
-                frame empty{std::move(*this)};
+                clear();
             }
             else
             {
-                const bool same_image_dims =
-                        is_image() &&
-                        std::tie(    f->height,     f->width,     f->format) ==
-                        std::tie(ori.f->height, ori.f->width, ori.f->format);
-
-                const bool same_audio_dims =
-                        is_audio() &&
-                        std::tie(    f->sample_rate,     f->nb_samples,     f->format) ==
-                        std::tie(ori.f->sample_rate, ori.f->nb_samples, ori.f->format) &&
-#if FF_API_OLD_CHANNEL_LAYOUT
-                        av_channel_layout_compare(&f->ch_layout, &ori.f->ch_layout) == 0;
-#else
-                        f->channel_layout == ori.f->channel_layout;
-#endif
-
-                if (!same_image_dims && !same_audio_dims)
+                if (is_empty() ||
+                    std::tie(    f->height,     f->width,     f->format,     f->sample_rate,     f->nb_samples) !=
+                    std::tie(ori.f->height, ori.f->width, ori.f->format, ori.f->sample_rate, ori.f->nb_samples) ||
+                    get_layout(f.get()) != get_layout(ori.f.get()))
                 {
-                    *this = std::move(frame(ori.f->height,
-                                            ori.f->width,
-                                            (AVPixelFormat)ori.f->format,
-                                            ori.f->sample_rate,
-                                            ori.f->nb_samples,
-                                            ori.layout(),
-                                            (AVSampleFormat)ori.f->format,
-                                            ori.timestamp));
+                    set_params(ori.f->height,
+                               ori.f->width,
+                               (AVPixelFormat)ori.f->format,
+                               ori.f->sample_rate,
+                               ori.f->nb_samples,
+                               ori.layout(),
+                               (AVSampleFormat)ori.f->format,
+                               ori.timestamp);
                 }
 
                 av_frame_copy(f.get(), ori.f.get());
                 av_frame_copy_props(f.get(), ori.f.get());
+                // The following silences a warning message about too many b-frames.
+                f->pict_type = AV_PICTURE_TYPE_NONE;
             }
         }
 
@@ -1403,7 +1422,7 @@ namespace dlib
                 f.width()  != img.nc() ||
                 f.pixfmt() != pix_traits<pixel>::fmt)
             {
-                f = frame(img.nr(), img.nc(), pix_traits<pixel>::fmt, {});
+                f.set_params(img.nr(), img.nc(), pix_traits<pixel>::fmt, 0, 0, 0, AV_SAMPLE_FMT_NONE, {});
             }
 
             const size_t imgsize            = img.nr()*img.nc()*sizeof(pixel);

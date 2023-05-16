@@ -22,8 +22,8 @@ try
     command_line_parser parser;
     parser.add_option("t",      "capture time in seconds", 1);
     parser.add_option("i",      "input microphone device. E.g. hw:0,0", 1);
-    parser.add_option("o",      "output audio file. E.g. recording.m4a, recording.wav", 1);
-    parser.add_option("codec",  "audio codec. E.g. aac, pcm_s16le", 1);
+    parser.add_option("o",      "output audio file. E.g. recording.m4a, recording.wav. Default: recording.m4a", 1);
+    parser.add_option("codec",  "audio codec. E.g. `aac`, `pcm_s16le`. Recommend `pcm_s16le` for WAV files and `aac` for `M4A` files. Default: `aac`", 1);
 
     parser.set_group_name("Help Options");
     parser.add_option("h",      "alias of --help");
