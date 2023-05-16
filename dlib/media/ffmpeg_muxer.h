@@ -251,6 +251,33 @@ namespace dlib
                       or an error occurred, in which case is_open() == false.
             !*/
 
+            template <
+              class image_type,
+              class Callback,
+              is_image_check<image_type> = true
+            >
+            bool push (
+                const image_type& img,
+                Callback&& sink
+            );
+            /*!
+                requires
+                    - if is_image_encoder() == true
+                    - sink is set to a valid callback with signature bool(size_t, const char*)
+                      for writing packet data. dlib/media/sink.h contains callback wrappers for
+                      different buffer types.
+                    - sink does not call encoder::push() or encoder::flush(),
+                      i.e., the callback does not create a recursive loop. 
+                ensures
+                    - Encodes img using the constructor arguments, which may incur a resizing
+                      operation if the image dimensions and pixel type don't match the codec. 
+                    - The sink callback may or may not be invoked as the underlying codec 
+                      can buffer if necessary.
+                    - Returns true if successfully encoded, even if sink wasn't invoked.
+                    - Returns false if either EOF, i.e. flush() has been previously called,
+                      or an error occurred, in which case is_open() == false.
+            !*/
+
             template <class Callback>
             void flush (
                 Callback&& sink
@@ -559,6 +586,23 @@ namespace dlib
                 ensures
                     - If f does not have matching settings to the codec, it is either
                       resized or resampled before being pushed to the muxer.
+                    - Encodes and writes the encoded data to file/socket
+                    - Returns true if successfully encoded.
+                    - Returns false if either EOF, i.e. flush() has been previously called,
+                      or an error occurred, in which case is_open() == false.
+            !*/
+
+            template <
+              class image_type,
+              is_image_check<image_type> = true
+            >
+            bool push(const image_type& img);
+            /*!
+                requires
+                    - if is_image_encoder() == true, then f.is_image() == true
+                ensures
+                    - Encodes img using the constructor arguments, which may incur a resizing
+                      operation if the image dimensions and pixel type don't match the codec. 
                     - Encodes and writes the encoded data to file/socket
                     - Returns true if successfully encoded.
                     - Returns false if either EOF, i.e. flush() has been previously called,
@@ -1019,6 +1063,27 @@ namespace dlib
             return state != ENCODE_ERROR;
         }
 
+        template <
+            class image_type,
+            class Callback,
+            is_image_check<image_type>
+        >
+        inline bool encoder::push (
+            const image_type& img,
+            Callback&& sink
+        )
+        {
+            // Unfortunately, FFmpeg assumes all data is over-aligned, and therefore,
+            // even though the API has facilities to convert img directly to a frame object,
+            // we cannot use it because it assumes the data in img is over-aligned, and of 
+            // course, it is not. Shame. At some point, I'll more digging to see if we 
+            // can get around this without doing a brute force copy like below.
+            using namespace details;
+            frame f;
+            convert(img, f);
+            return push(std::move(f), std::forward<Callback>(sink));
+        }
+
         template <class Callback>
         inline void encoder::flush(Callback&& clb)
         {
@@ -1266,6 +1331,20 @@ namespace dlib
             }
 
             return false;
+        }
+
+        template <
+            class image_type,
+            is_image_check<image_type>
+        >
+        bool muxer::push(const image_type& img)
+        {
+            using namespace std;
+            using namespace details;
+
+            return is_open() &&
+                   st.encoder_image.is_open() &&
+                   st.encoder_image.push(img, muxer_sink(st.pFormatCtx.get(), st.stream_id_video));
         }
 
         inline void muxer::flush()
