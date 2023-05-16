@@ -707,7 +707,7 @@ namespace dlib
 
                 cuda_data_ptr<float> loss_buf = static_pointer_cast<float>(buf, 1);
                 buf = buf+sizeof(float);
-                const auto weights_offset = subnetwork_output.num_samples() * bytes_per_plane;
+                const auto truth_offset = subnetwork_output.num_samples() * weight_bytes_per_plane;
                 // copy the truth data into a cuda buffer.
                 for (long i = 0; i < subnetwork_output.num_samples(); ++i, ++truth)
                 {
@@ -722,13 +722,13 @@ namespace dlib
                             weights(r, c) = t(r, c).weight;
                         }
                     }
-                    memcpy(buf + i*bytes_per_plane, &labels(0,0), bytes_per_plane);
-                    memcpy(buf + weights_offset + i*weight_bytes_per_plane, &weights(0, 0), weight_bytes_per_plane);
+                    memcpy(buf + truth_offset + i*bytes_per_plane, &labels(0,0), bytes_per_plane);
+                    memcpy(buf + i*weight_bytes_per_plane, &weights(0, 0), weight_bytes_per_plane);
                 }
 
-                auto truth_buf = static_pointer_cast<const uint16_t>(buf, subnetwork_output.num_samples()*image_size);
-                buf = buf+weights_offset;
                 auto weights_buf = static_pointer_cast<const float>(buf, subnetwork_output.num_samples()*image_size);
+                buf = buf+truth_offset;
+                auto truth_buf = static_pointer_cast<const uint16_t>(buf, subnetwork_output.num_samples()*image_size);
 
                 do_work(loss_buf, truth_buf, weights_buf, subnetwork_output, gradient, loss);
             }
