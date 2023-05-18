@@ -10,6 +10,7 @@
 */
 
 #include <type_traits>
+#include <cstdint>
 
 namespace dlib
 {
