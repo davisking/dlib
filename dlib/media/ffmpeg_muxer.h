@@ -262,7 +262,7 @@ namespace dlib
             );
             /*!
                 requires
-                    - if is_image_encoder() == true
+                    - is_image_encoder() == true
                     - sink is set to a valid callback with signature bool(size_t, const char*)
                       for writing packet data. dlib/media/sink.h contains callback wrappers for
                       different buffer types.
