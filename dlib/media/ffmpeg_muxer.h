@@ -599,7 +599,7 @@ namespace dlib
             bool push(const image_type& img);
             /*!
                 requires
-                    - if is_image_encoder() == true, then f.is_image() == true
+                    - is_image_encoder() == true
                 ensures
                     - Encodes img using the constructor arguments, which may incur a resizing
                       operation if the image dimensions and pixel type don't match the codec. 
