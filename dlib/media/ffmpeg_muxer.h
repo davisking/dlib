@@ -836,7 +836,6 @@ namespace dlib
 
         inline bool encoder::open()
         {
-            using namespace std;
             using namespace details;
 
             register_ffmpeg();
@@ -1141,7 +1140,6 @@ namespace dlib
 
         inline bool muxer::open(const args& a)
         {
-            using namespace std;
             using namespace std::chrono;
             using namespace details;
 
@@ -1308,7 +1306,6 @@ namespace dlib
 
         inline bool muxer::push(frame f)
         {
-            using namespace std;
             using namespace details;
 
             if (!is_open())
@@ -1339,7 +1336,6 @@ namespace dlib
         >
         bool muxer::push(const image_type& img)
         {
-            using namespace std;
             using namespace details;
 
             return is_open() &&
