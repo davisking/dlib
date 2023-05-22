@@ -40,7 +40,7 @@ try
     
     const std::string filename  = get_option(parser, "i",       "");
     const std::string device    = get_option(parser, "o",       "hw:0,0");
-    const std::string codec     = get_option(parser, "codec",   "pcm_s16le");
+    const std::string codec     = get_option(parser, "codec",   "");
 
     if (device.empty())
     {
@@ -65,7 +65,7 @@ try
         args.enable_image               = false;
         args.args_audio.codec_name      = codec;
         args.args_audio.sample_rate     = 44100;
-        args.args_audio.channel_layout  = cap.channel_layout();
+        args.args_audio.channel_layout  = AV_CH_LAYOUT_STEREO;
         args.args_audio.fmt             = cap.sample_fmt();
         return args;
     }());

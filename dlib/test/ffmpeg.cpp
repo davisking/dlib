@@ -146,6 +146,21 @@ namespace
         DLIB_TEST_MSG(similarity > 25.0, "psnr " << similarity);
     }
 
+    template<class pixel_type>
+    void test_load_save_frame(const std::string& filename)
+    {
+        matrix<pixel_type> img1;
+        img1 = get_random_image<pixel_type>();
+
+        save_frame(img1, filename);
+        load_frame(img2, filename);
+
+        DLIB_TEST(img1.nr() == img2.nr());
+        DLIB_TEST(img1.nc() == img2.nc());
+        const double similarity = psnr(img1, img2);
+        DLIB_TEST_MSG(similarity > 25.0, "psnr " << similarity);
+    }
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // DECODER
@@ -802,6 +817,14 @@ namespace
                 test_frame<bgr_pixel>();
                 test_frame<rgb_alpha_pixel>();
                 test_frame<bgr_alpha_pixel>();
+                test_load_save_frame<rgb_pixel>("dummy.png");
+                test_load_save_frame<bgr_pixel>("dummy.png");
+                test_load_save_frame<rgb_pixel>("dummy.jpg");
+                test_load_save_frame<bgr_pixel>("dummy.jpg");
+                test_load_save_frame<rgb_pixel>("dummy.bmp");
+                test_load_save_frame<bgr_pixel>("dummy.bmp");
+                test_load_save_frame<rgb_pixel>("dummy.tiff");
+                test_load_save_frame<bgr_pixel>("dummy.tiff");
             }
 
             dlib::file f(DLIB_FFMPEG_DATA);
