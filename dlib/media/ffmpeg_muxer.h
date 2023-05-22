@@ -822,9 +822,67 @@ namespace dlib
                 }
 #endif
             }
-        }
 
 // ---------------------------------------------------------------------------------------------------
+
+            inline bool check_codecs (
+                const bool              is_video,
+                const std::string&      ext,
+                const AVOutputFormat*   oformat,
+                encoder::args&          args
+            )
+            {
+                // Check the codec is supported by this muxer
+                const auto supported_codecs = list_codecs_for_muxer(oformat);
+
+                if (std::find_if(begin(supported_codecs), end(supported_codecs), [&](const auto& supported) {
+                    return args.args_codec.codec != AV_CODEC_ID_NONE ? 
+                                supported.codec_id   == args.args_codec.codec :
+                                supported.codec_name == args.args_codec.codec_name;
+                }) == end(supported_codecs))
+                {
+                    logger_dlib_wrapper() << LWARN
+                        << "Codec " << avcodec_get_name(args.args_codec.codec) << " or " << args.args_codec.codec_name
+                        << " cannot be stored in this file";
+                    
+                    // Pick the default codec as suggested by FFmpeg
+                    args.args_codec.codec = is_video ? oformat->video_codec : 
+                                                       oformat->audio_codec;
+
+                    // If image2, pick codec based on file extension
+                    if (std::strcmp(oformat->name, "image2") == 0)
+                    {
+                        if (ext == "png" || ext == "PNG")
+                            args.args_codec.codec = AV_CODEC_ID_PNG;
+                        else if (ext == "jpeg" || ext == "jpg" || ext == "JPEG")
+                            args.args_codec.codec = AV_CODEC_ID_MJPEG;
+                        else if (ext == "tiff")
+                            args.args_codec.codec = AV_CODEC_ID_TIFF;
+                    }
+                    
+                    if (args.args_codec.codec != AV_CODEC_ID_NONE)
+                    {
+                        logger_dlib_wrapper() << LWARN 
+                            << "Picking default codec " << avcodec_get_name(args.args_codec.codec);
+                    }
+                    else
+                    {
+                        logger_dlib_wrapper() << LWARN 
+                            << "List of supported codecs for muxer " << oformat->name << " in this installation of ffmpeg:";
+
+                        for (const auto& supported : supported_codecs)
+                            logger_dlib_wrapper() << LWARN << "    " << supported.codec_name;
+                        
+                        return false;
+                    }    
+                }
+
+                return true;
+            }
+
+// ---------------------------------------------------------------------------------------------------
+
+        }
 
         inline encoder::encoder(
             const args& a
@@ -1188,37 +1246,8 @@ namespace dlib
                 if (st.pFormatCtx->oformat->flags & AVFMT_GLOBALHEADER)
                     args.args_codec.flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 
-                // Before we create the encoder, check the codec is supported by this muxer
-                const auto supported_codecs = list_codecs_for_muxer(st.pFormatCtx->oformat);
-
-                if (std::find_if(begin(supported_codecs), end(supported_codecs), [&](const auto& supported) {
-                    return args.args_codec.codec != AV_CODEC_ID_NONE ? 
-                                supported.codec_id   == args.args_codec.codec :
-                                supported.codec_name == args.args_codec.codec_name;
-                }) == end(supported_codecs))
-                {
-                    logger_dlib_wrapper() << LWARN
-                        << "Codec " << avcodec_get_name(args.args_codec.codec) << " or " << args.args_codec.codec_name
-                        << " cannot be stored in this file";
-                    
-                    args.args_codec.codec = is_video ? st.pFormatCtx->oformat->video_codec : 
-                                                       st.pFormatCtx->oformat->audio_codec;
-                    
-                    if (args.args_codec.codec != AV_CODEC_ID_NONE)
-                    {
-                        logger_dlib_wrapper() << LWARN 
-                            << "Picking default codec " << avcodec_get_name(args.args_codec.codec);
-                    }
-                    else
-                    {
-                        logger_dlib_wrapper() << LWARN 
-                            << "List of supported codecs for muxer " << st.pFormatCtx->oformat->name << " in this installation of ffmpeg:";
-                        for (const auto& supported : supported_codecs)
-                            logger_dlib_wrapper() << LWARN << "    " << supported.codec_name;
-                        
-                        return false;
-                    }    
-                }
+                if (!check_codecs(is_video, st.pFormatCtx->oformat, args))
+                    return false;
 
                 // Codec is supported by muxer, so create encoder
                 enc = encoder(args);
