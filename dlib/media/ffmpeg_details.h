@@ -508,6 +508,14 @@ namespace dlib { namespace ffmpeg { namespace details
                 return AV_CODEC_ID_AAC;
             else if (ext == "ac3")
                 return AV_CODEC_ID_AC3;
+            else if (ext == "jls")
+                return AV_CODEC_ID_JPEGLS;
+            else if (ext == "jp2")
+                return AV_CODEC_ID_JPEG2000;
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(59, 37, 100)
+            else if (ext == "jxl")
+                return AV_CODEC_ID_JPEGXL;
+#endif
         }
 
         return AV_CODEC_ID_NONE;
