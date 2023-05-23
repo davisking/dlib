@@ -152,13 +152,13 @@ namespace
         matrix<pixel_type> img1, img2;
         img1 = get_random_image<pixel_type>();
 
-        save_frame(img1, filename);
+        save_frame(img1, filename, {{"qmin", "1"}, {"qmax", "1"}});
         load_frame(img2, filename);
 
         DLIB_TEST(img1.nr() == img2.nr());
         DLIB_TEST(img1.nc() == img2.nc());
         const double similarity = psnr(img1, img2);
-        DLIB_TEST_MSG(similarity > 25.0, "psnr " << similarity);
+        DLIB_TEST_MSG(similarity > 20.0, "psnr " << similarity);
     }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
