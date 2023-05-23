@@ -149,7 +149,7 @@ namespace
     template<class pixel_type>
     void test_load_save_frame(const std::string& filename)
     {
-        matrix<pixel_type> img1;
+        matrix<pixel_type> img1, img2;
         img1 = get_random_image<pixel_type>();
 
         save_frame(img1, filename);
