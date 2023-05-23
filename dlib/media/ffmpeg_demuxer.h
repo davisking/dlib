@@ -1627,7 +1627,7 @@ namespace dlib
         inline void load_frame(image_type& image, const std::string& file_name)
         {
             if (!demuxer({file_name, video_enabled, audio_disabled}).read(image))
-                throw error("ffmpeg::load_frame: error while loading " + file_name);
+                throw error(EIMAGE_LOAD, "ffmpeg::load_frame: error while loading " + file_name);
         }
 
 // ---------------------------------------------------------------------------------------------------

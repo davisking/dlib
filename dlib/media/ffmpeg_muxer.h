@@ -1450,11 +1450,8 @@ namespace dlib
                 return args;
             }());
 
-            if (!writer.is_open())
-                throw error("ffmpeg::save_frame: error while saving " + file_name);
-
             if (!writer.push(image))
-                throw error("ffmpeg::save_frame: error while saving " + file_name);
+                throw error(EIMAGE_SAVE, "ffmpeg::save_frame: error while saving " + file_name);
         }
 
 // ---------------------------------------------------------------------------------------------------
