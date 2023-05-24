@@ -146,6 +146,21 @@ namespace
         DLIB_TEST_MSG(similarity > 25.0, "psnr " << similarity);
     }
 
+    template<class pixel_type>
+    void test_load_save_frame(const std::string& filename)
+    {
+        matrix<pixel_type> img1, img2;
+        img1 = get_random_image<pixel_type>();
+
+        save_frame(img1, filename, {{"qmin", "1"}, {"qmax", "1"}});
+        load_frame(img2, filename);
+
+        DLIB_TEST(img1.nr() == img2.nr());
+        DLIB_TEST(img1.nc() == img2.nc());
+        const double similarity = psnr(img1, img2);
+        DLIB_TEST_MSG(similarity > 20.0, "psnr " << similarity);
+    }
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // DECODER
@@ -784,6 +799,13 @@ namespace
         DLIB_TEST(samples <= (nsamples + rate));
     }
 
+    const auto codec_supported = [](const AVCodecID id)
+    {
+        return std::find_if(begin(list_codecs()), end(list_codecs()), [=](const auto& supported) {
+            return supported.codec_id == id && supported.supports_encoding;
+        }) != end(list_codecs());
+    };
+
     class video_tester : public tester
     {
     public:
@@ -802,6 +824,30 @@ namespace
                 test_frame<bgr_pixel>();
                 test_frame<rgb_alpha_pixel>();
                 test_frame<bgr_alpha_pixel>();
+
+                if (codec_supported(AV_CODEC_ID_PNG))
+                {
+                    test_load_save_frame<rgb_pixel>("dummy.png");
+                    test_load_save_frame<bgr_pixel>("dummy.png");
+                }
+
+                if (codec_supported(AV_CODEC_ID_MJPEG))
+                {
+                    test_load_save_frame<rgb_pixel>("dummy.jpg");
+                    test_load_save_frame<bgr_pixel>("dummy.jpg");
+                }
+
+                if (codec_supported(AV_CODEC_ID_BMP))
+                {
+                    test_load_save_frame<rgb_pixel>("dummy.bmp");
+                    test_load_save_frame<bgr_pixel>("dummy.bmp");
+                }
+
+                if (codec_supported(AV_CODEC_ID_TIFF))
+                {
+                    test_load_save_frame<rgb_pixel>("dummy.tiff");
+                    test_load_save_frame<bgr_pixel>("dummy.tiff");
+                }
             }
 
             dlib::file f(DLIB_FFMPEG_DATA);

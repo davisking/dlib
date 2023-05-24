@@ -482,6 +482,47 @@ namespace dlib { namespace ffmpeg { namespace details
 
 // ---------------------------------------------------------------------------------------------------
 
+    inline AVCodecID pick_codec_from_filename(const std::string& filename)
+    {
+        const auto ext_pos = filename.find_last_of(".");
+
+        if (ext_pos != std::string::npos)
+        {
+            const std::string ext = filename.substr(ext_pos + 1);
+
+            if (ext == "png" || ext == "PNG")
+                return AV_CODEC_ID_PNG;
+            else if (ext == "jpeg" || ext == "jpg" || ext == "JPEG")
+                return AV_CODEC_ID_MJPEG;
+            else if (ext == "tiff")
+                return AV_CODEC_ID_TIFF;
+            else if (ext == "webp")
+                return AV_CODEC_ID_WEBP;
+            else if (ext == "bmp")
+                return AV_CODEC_ID_BMP;
+            else if (ext == "h264")
+                return AV_CODEC_ID_H264;
+            else if (ext == "h265" || ext == "hevc")
+                return AV_CODEC_ID_H265;
+            else if (ext == "aac")
+                return AV_CODEC_ID_AAC;
+            else if (ext == "ac3")
+                return AV_CODEC_ID_AC3;
+            else if (ext == "jls")
+                return AV_CODEC_ID_JPEGLS;
+            else if (ext == "jp2")
+                return AV_CODEC_ID_JPEG2000;
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(59, 37, 100)
+            else if (ext == "jxl")
+                return AV_CODEC_ID_JPEGXL;
+#endif
+        }
+
+        return AV_CODEC_ID_NONE;
+    }
+
+// ---------------------------------------------------------------------------------------------------
+
 }}}
 
 #endif //DLIB_FFMPEG_DETAILS

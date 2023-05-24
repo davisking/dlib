@@ -636,6 +636,24 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
+        template <
+          class image_type,
+          is_image_check<image_type> = true
+        >
+        void save_frame(
+            const image_type& image,
+            const std::string& file_name,
+            const std::unordered_map<std::string, std::string>& codec_options = {}
+        );
+        /*!
+            requires
+                - image_type must be a type conforming to the generic image interface.
+            ensures
+                - encodes the image into the file pointed by file_name using options described in codec_options.
+        !*/
+
+// ---------------------------------------------------------------------------------------------------
+
     }
 }
 
@@ -822,9 +840,63 @@ namespace dlib
                 }
 #endif
             }
-        }
 
 // ---------------------------------------------------------------------------------------------------
+
+            inline bool check_codecs (
+                const bool              is_video,
+                const std::string&      filename,
+                const AVOutputFormat*   oformat,
+                encoder::args&          args
+            )
+            {
+                // Check the codec is supported by this muxer
+                const auto supported_codecs = list_codecs_for_muxer(oformat);
+
+                const auto codec_supported = [&](AVCodecID id, const std::string& name)
+                {
+                    return std::find_if(begin(supported_codecs), end(supported_codecs), [&](const auto& supported) {
+                        return id != AV_CODEC_ID_NONE ? id == supported.codec_id : name == supported.codec_name;
+                    }) != end(supported_codecs);
+                };
+
+                if (codec_supported(args.args_codec.codec, args.args_codec.codec_name))
+                    return true;
+
+                logger_dlib_wrapper() << LWARN
+                    << "Codec " << avcodec_get_name(args.args_codec.codec) << " or " << args.args_codec.codec_name
+                    << " cannot be stored in this file";
+
+                // Pick codec based on file extension
+                args.args_codec.codec = pick_codec_from_filename(filename);
+
+                if (codec_supported(args.args_codec.codec, ""))
+                {
+                    logger_dlib_wrapper() << LWARN  << "Picking codec " << avcodec_get_name(args.args_codec.codec);
+                    return true;
+                }
+                    
+                // Pick the default codec as suggested by FFmpeg
+                args.args_codec.codec = is_video ? oformat->video_codec : oformat->audio_codec;
+
+                if (args.args_codec.codec != AV_CODEC_ID_NONE)
+                {
+                    logger_dlib_wrapper() << LWARN  << "Picking default codec " << avcodec_get_name(args.args_codec.codec);
+                    return true;
+                }
+                    
+                logger_dlib_wrapper() << LWARN 
+                    << "List of supported codecs for muxer " << oformat->name << " in this installation of ffmpeg:";
+
+                for (const auto& supported : supported_codecs)
+                    logger_dlib_wrapper() << LWARN << "    " << supported.codec_name;
+                        
+                return false;
+            }
+
+// ---------------------------------------------------------------------------------------------------
+
+        }
 
         inline encoder::encoder(
             const args& a
@@ -1188,37 +1260,8 @@ namespace dlib
                 if (st.pFormatCtx->oformat->flags & AVFMT_GLOBALHEADER)
                     args.args_codec.flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 
-                // Before we create the encoder, check the codec is supported by this muxer
-                const auto supported_codecs = list_codecs_for_muxer(st.pFormatCtx->oformat);
-
-                if (std::find_if(begin(supported_codecs), end(supported_codecs), [&](const auto& supported) {
-                    return args.args_codec.codec != AV_CODEC_ID_NONE ? 
-                                supported.codec_id   == args.args_codec.codec :
-                                supported.codec_name == args.args_codec.codec_name;
-                }) == end(supported_codecs))
-                {
-                    logger_dlib_wrapper() << LWARN
-                        << "Codec " << avcodec_get_name(args.args_codec.codec) << " or " << args.args_codec.codec_name
-                        << " cannot be stored in this file";
-                    
-                    args.args_codec.codec = is_video ? st.pFormatCtx->oformat->video_codec : 
-                                                       st.pFormatCtx->oformat->audio_codec;
-                    
-                    if (args.args_codec.codec != AV_CODEC_ID_NONE)
-                    {
-                        logger_dlib_wrapper() << LWARN 
-                            << "Picking default codec " << avcodec_get_name(args.args_codec.codec);
-                    }
-                    else
-                    {
-                        logger_dlib_wrapper() << LWARN 
-                            << "List of supported codecs for muxer " << st.pFormatCtx->oformat->name << " in this installation of ffmpeg:";
-                        for (const auto& supported : supported_codecs)
-                            logger_dlib_wrapper() << LWARN << "    " << supported.codec_name;
-                        
-                        return false;
-                    }    
-                }
+                if (!check_codecs(is_video, st.args_.filepath, st.pFormatCtx->oformat, args))
+                    return false;
 
                 // Codec is supported by muxer, so create encoder
                 enc = encoder(args);
@@ -1380,6 +1423,36 @@ namespace dlib
         inline AVSampleFormat   muxer::sample_fmt()             const noexcept { return st.encoder_audio.sample_fmt(); }
         inline AVCodecID        muxer::get_audio_codec_id()     const noexcept { return st.encoder_audio.get_codec_id(); }
         inline std::string      muxer::get_audio_codec_name()   const noexcept { return st.encoder_audio.get_codec_name(); }
+
+// ---------------------------------------------------------------------------------------------------
+
+        template <
+          class image_type,
+          is_image_check<image_type>
+        >
+        inline void save_frame(
+            const image_type& image,
+            const std::string& file_name,
+            const std::unordered_map<std::string, std::string>& codec_options
+        )
+        {
+            muxer writer([&] {
+                muxer::args args;
+                args.filepath               = file_name;
+                args.enable_image           = true;
+                args.enable_audio           = false;
+                args.args_image.h           = num_rows(image);
+                args.args_image.w           = num_columns(image);
+                args.args_image.framerate   = 1;
+                args.args_image.fmt         = pix_traits<pixel_type_t<image_type>>::fmt;
+                args.args_image.codec_options = codec_options;
+                args.format_options["update"] = "1";
+                return args;
+            }());
+
+            if (!writer.push(image))
+                throw error(EIMAGE_SAVE, "ffmpeg::save_frame: error while saving " + file_name);
+        }
 
 // ---------------------------------------------------------------------------------------------------
 
