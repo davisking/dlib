@@ -39,7 +39,7 @@ import multiprocessing
 from distutils import log
 from math import ceil,floor
 
-from setuptools import setup, Extension
+from setuptools import find_packages, setup, Extension
 from setuptools.command.build_ext import build_ext
 from distutils.version import LooseVersion
 
@@ -234,7 +234,8 @@ setup(
     # We need an older more-itertools version because v6 broke pytest (for everyone, not just dlib)
     tests_require=['pytest==3.8', 'more-itertools<6.0.0'],
     #install_requires=['cmake'], # removed because the pip cmake package is busted, maybe someday it will be usable.
-    packages=['dlib'],
+    # packages=['dlib'], # removed because pyproject.toml requires exclusion rather than inclusion as it looks at the default directory structure.
+    packages=find_packages(exclude=['python_examples']),
     package_dir={'': 'tools/python'},
     keywords=['dlib', 'Computer Vision', 'Machine Learning'],
     classifiers=[
