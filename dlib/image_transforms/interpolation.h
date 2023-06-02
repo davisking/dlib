@@ -310,7 +310,9 @@ namespace dlib
                     pixel_to_vector<double>(img[r+1][c  ])(i),
                     pixel_to_vector<double>(img[r+1][c+1])(i));
             typename image_view_type::pixel_type temp;
-            vector_to_pixel(temp, pvout);
+            const auto min_val = pixel_traits<pixel_type_t<image_view_type>>::min();
+            const auto max_val = pixel_traits<pixel_type_t<image_view_type>>::max();
+            vector_to_pixel(temp, clamp(pvout, min_val, max_val));
             assign_pixel(result, temp);
             return true;
         }
