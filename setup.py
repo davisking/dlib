@@ -6,14 +6,10 @@ This file basically just uses CMake to compile the dlib python bindings project
 located in the tools/python folder and then puts the outputs into standard
 python packages.
 
-To build the dlib:
+To build dlib:
     python setup.py build
 To build and install:
     python setup.py install
-To package the wheel (after pip installing twine and wheel):
-    python setup.py bdist_wheel
-To upload the binary wheel to PyPi
-    twine upload dist/*.whl
 To upload the source distribution to PyPi
     python setup.py sdist 
     twine upload dist/dlib-*.tar.gz
@@ -234,7 +230,6 @@ setup(
     # We need an older more-itertools version because v6 broke pytest (for everyone, not just dlib)
     tests_require=['pytest==3.8', 'more-itertools<6.0.0'],
     #install_requires=['cmake'], # removed because the pip cmake package is busted, maybe someday it will be usable.
-    # packages=['dlib'], # removed because pyproject.toml requires exclusion rather than inclusion as it looks at the default directory structure.
     packages=find_packages(exclude=['python_examples']),
     package_dir={'': 'tools/python'},
     keywords=['dlib', 'Computer Vision', 'Machine Learning'],
@@ -249,13 +244,6 @@ setup(
         'Operating System :: Microsoft :: Windows',
         'Programming Language :: C++',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
         'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
         'Topic :: Scientific/Engineering :: Image Recognition',
