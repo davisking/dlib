@@ -107,7 +107,7 @@ try
     {
         // The muxer acts as an RTSP client, so we don't use {"rtsp_flags", "listen"}
         // When using RTSP, it is usually a good idea to specify muxer::args::output_format = "rtsp"
-        // even though the URL has rtsp:// in its address. Whether or not you need to specify args.output_formt = "rtsp"
+        // even though the URL has rtsp:// in its address. Whether or not you need to specify args.output_format = "rtsp"
         // depends on your version of ffmpeg.
         muxer writer([&] {
             muxer::args args;

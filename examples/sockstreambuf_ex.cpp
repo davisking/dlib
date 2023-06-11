@@ -79,7 +79,7 @@ int main()
         // In any case, this function is provided to allow you to perform a graceful 
         // close if you so choose.  
         // 
-        // Also note that the timeout can be changed by suppling an optional argument 
+        // Also note that the timeout can be changed by supplying an optional argument 
         // to this function.
         close_gracefully(con);
     }

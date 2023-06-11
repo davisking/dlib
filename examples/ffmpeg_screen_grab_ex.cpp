@@ -44,7 +44,7 @@ try
     }
     else
     {
-        printf("Sorry your installation of ffmpeg doens't support screen grab\n");
+        printf("Sorry your installation of ffmpeg doesn't support screen grab\n");
     }
 
     return EXIT_SUCCESS;

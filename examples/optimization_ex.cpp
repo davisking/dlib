@@ -67,7 +67,7 @@ const column_vector rosen_derivative (const column_vector& m)
     return res;
 }
 
-// This function computes the Hessian matrix for the rosen() fuction.  This is
+// This function computes the Hessian matrix for the rosen() function.  This is
 // the matrix of second derivatives.
 matrix<double> rosen_hessian (const column_vector& m)
 {

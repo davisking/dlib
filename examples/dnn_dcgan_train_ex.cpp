@@ -20,7 +20,7 @@
     the discriminator to update the generator.
 
     In this example, we are going to learn how to generate digits from the MNIST dataset, but
-    the same code can be run using the Fashion MNIST datset:
+    the same code can be run using the Fashion MNIST dataset:
     https://github.com/zalandoresearch/fashion-mnist
 */
 
