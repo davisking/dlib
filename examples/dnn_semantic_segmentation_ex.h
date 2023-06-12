@@ -41,7 +41,7 @@
 // Introduce the building blocks used to define the segmentation network.
 // The network first does residual downsampling (similar to the dnn_imagenet_(train_)ex
 // example program), and then residual upsampling. In addition, U-Net style skip
-// connections are used, so that not every simple detail needs to reprented on the low
+// connections are used, so that not every simple detail needs to represented on the low
 // levels. (See Ronneberger et al. (2015), U-Net: Convolutional Networks for Biomedical
 // Image Segmentation, https://arxiv.org/pdf/1505.04597.pdf)
 
