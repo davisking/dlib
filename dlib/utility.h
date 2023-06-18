@@ -67,6 +67,15 @@ namespace dlib
     using pop_front_t = typename pop_front<Sequence>::type;
 
     // ---------------------------------------------------------------------
+
+    struct in_place_t 
+    {
+        explicit in_place_t() = default;
+    };
+
+    static constexpr in_place_t in_place{};
+
+    // ---------------------------------------------------------------------
 }
 
 #endif //DLIB_UTILITY_Hh_

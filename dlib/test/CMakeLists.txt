@@ -161,6 +161,7 @@ add_executable(${target_name} main.cpp tester.cpp
    elastic_net.cpp
    te.cpp
    ffmpeg.cpp
+   optional.cpp
 )
 
 get_filename_component(DLIB_FFMPEG_DATA ${CMAKE_SOURCE_DIR}/ffmpeg_data/details.cfg REALPATH)
