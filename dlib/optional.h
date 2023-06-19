@@ -37,9 +37,8 @@ namespace dlib
     private:
 
 // ---------------------------------------------------------------------------------------------------
-
         template<class U>
-        using is_assignable_base = And<
+        using is_constructible_base = And<
             !std::is_constructible<T,       dlib::optional<U>&>::value,
             !std::is_constructible<T, const dlib::optional<U>&>::value,
             !std::is_constructible<T,       dlib::optional<U>&&>::value,
@@ -47,7 +46,26 @@ namespace dlib
             !std::is_convertible<      dlib::optional<U>&, T>::value,
             !std::is_convertible<const dlib::optional<U>&, T>::value,
             !std::is_convertible<      dlib::optional<U>&&, T>::value,
-            !std::is_convertible<const dlib::optional<U>&&, T>::value,
+            !std::is_convertible<const dlib::optional<U>&&, T>::value
+        >;
+
+        template<class U>
+        using is_copy_constructible_from = std::enable_if_t<
+            std::is_constructible<T, const U&>::value &&
+            is_constructible_base<U>::value,
+            bool
+        >;
+
+        template<class U>
+        using is_move_constructible_from = std::enable_if_t<
+            std::is_constructible<T, U&&>::value &&
+            is_constructible_base<U>::value,
+            bool
+        >;
+
+        template<class U>
+        using is_assignable_base = And<
+            is_constructible_base<U>::value,
             !std::is_assignable<T&,       dlib::optional<U>&>::value,
             !std::is_assignable<T&, const dlib::optional<U>&>::value,
             !std::is_assignable<T&,       dlib::optional<U>&&>::value,
@@ -56,17 +74,17 @@ namespace dlib
 
         template<class U>
         using is_copy_assignable_from = std::enable_if_t<
-            is_assignable_base<U>::value &&
             std::is_constructible<T, const U&>::value &&
-            std::is_assignable<T&, const U&>::value,
+            std::is_assignable<T&, const U&>::value &&
+            is_assignable_base<U>::value,
             bool
         >;
 
         template<class U>
         using is_move_assignable_from = std::enable_if_t<
-            is_assignable_base<U>::value &&
             std::is_constructible<T, U>::value &&
-            std::is_assignable<T&, U>::value,
+            std::is_assignable<T&, U>::value &&
+            is_assignable_base<U>::value,
             bool
         >;
 
@@ -84,17 +102,9 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-        constexpr optional& operator=(dlib::nullopt_t) noexcept
-        {
-            reset();
-            return *this;
-        }
-
-// ---------------------------------------------------------------------------------------------------
-
         template <
           class U,
-          std::enable_if_t<std::is_constructible<T, const U&>::value, bool> = true
+          is_copy_constructible_from<U> = true
         >
         constexpr optional (const optional<U>& other) noexcept(std::is_nothrow_constructible<T, const U&>::value)
         {
@@ -104,50 +114,14 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-        template < 
-          class U,
-          is_copy_assignable_from<U> = true
-        >
-        constexpr optional& operator=( const optional<U>& other ) noexcept(std::is_nothrow_constructible<T, const U&>::value &&
-                                                                           std::is_nothrow_assignable<T&, const U&>::value)
-        {
-            if (!has_value() && other)
-                construct(*other);
-            else if (has_value() && other)
-                **this = *other;
-            else if (has_value() && !other)
-                reset();
-            return *this;
-        }
-
-// ---------------------------------------------------------------------------------------------------
-
         template <
           class U,
-          std::enable_if_t<std::is_constructible<T, U&&>::value, bool> = true
+          is_move_constructible_from<U> = true
         >
         constexpr optional( optional<U>&& other ) noexcept(std::is_nothrow_constructible<T, U&&>::value)
         {
-            if (other.has_value())
-                construct(std::move(other.value()));  
-        }
-
-// ---------------------------------------------------------------------------------------------------
-
-        template < 
-          class U,
-          is_move_assignable_from<U> = true
-        >
-        constexpr optional& operator=( optional<U>&& other ) noexcept(std::is_nothrow_constructible<T, U&&>::value &&
-                                                                      std::is_nothrow_assignable<T&, U&&>::value)
-        {
-            if (!has_value() && other)
-                construct(std::move(*other));
-            else if (has_value() && other)
-                **this = std::move(*other);
-            else if (has_value() && !other)
-                reset();
-            return *this;
+            if (other)
+                construct(std::move(*other));  
         }
 
 // ---------------------------------------------------------------------------------------------------
@@ -160,19 +134,9 @@ namespace dlib
             dlib::in_place_t,
             Args&&... args
         ) 
-        noexcept(std::is_nothrow_constructible<T, Args&&...>::value)
+        noexcept(std::is_nothrow_constructible<T, Args...>::value)
         {
             construct(std::forward<Args>(args)...);
-        }
-
-// ---------------------------------------------------------------------------------------------------
-
-        template< class... Args >
-        constexpr T& emplace( Args&&... args )
-        {
-            reset();
-            construct(std::forward<Args>(args)...);
-            return **this;
         }
 
 // ---------------------------------------------------------------------------------------------------
@@ -187,18 +151,9 @@ namespace dlib
             std::initializer_list<U> ilist,
             Args&&... args 
         )
+        noexcept(std::is_nothrow_constructible<T, std::initializer_list<U>&, Args&&...>::value)
         {
             construct(ilist, std::forward<Args>(args)...);
-        }
-
-// ---------------------------------------------------------------------------------------------------
-
-        template< class U, class... Args >
-        constexpr T& emplace( std::initializer_list<U> ilist, Args&&... args )
-        {
-            reset();
-            construct(ilist, std::forward<Args>(args)...);
-            return **this;
         }
 
 // ---------------------------------------------------------------------------------------------------
@@ -217,20 +172,93 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
+        constexpr optional& operator=(dlib::nullopt_t) noexcept
+        {
+            reset();
+            return *this;
+        }
+
+// ---------------------------------------------------------------------------------------------------
+
         template < 
           class U,
-          class U_ = dlib::remove_cvref_t<U>,
-          std::enable_if_t<std::is_constructible<T, U>::value &&
-                           std::is_assignable<T&, U>::value &&
-                           !std::is_same<U_, dlib::optional<T>>::value,bool> = true
+          is_copy_assignable_from<U> = true
         >
-        constexpr optional& operator=( U&& u ) noexcept(std::is_nothrow_constructible<T, U&&>::value &&
-                                                        std::is_nothrow_assignable<T,U&&>::value)
+        constexpr optional& operator=( const optional<U>& other ) noexcept(std::is_nothrow_constructible<T, const U&>::value &&
+                                                                           std::is_nothrow_assignable<T&, const U&>::value)
         {
-            if (has_value())
+            if (!*this && other)
+                construct(*other);
+            else if (*this && other)
+                **this = *other;
+            else if (*this && !other)
+                reset();
+            return *this;
+        }
+
+// ---------------------------------------------------------------------------------------------------
+
+        template < 
+          class U,
+          is_move_assignable_from<U> = true
+        >
+        constexpr optional& operator=( optional<U>&& other ) noexcept(std::is_nothrow_constructible<T, U>::value &&
+                                                                      std::is_nothrow_assignable<T&, U>::value)
+        {
+            if (!*this && other)
+                construct(std::move(*other));
+            else if (*this && other)
+                **this = std::move(*other);
+            else if (*this && !other)
+                reset();
+            return *this;
+        }
+
+// ---------------------------------------------------------------------------------------------------
+
+        template < 
+          class U,
+          class U_ = std::decay_t<U>,
+          std::enable_if_t<!std::is_same<U_, dlib::optional<T>>::value &&
+                           !std::is_same<U_, T>::value &&
+                           std::is_constructible<T, U>::value &&
+                           std::is_assignable<T&, U>::value,
+                           bool> = true
+        >
+        constexpr optional& operator=( U&& u ) noexcept(std::is_nothrow_constructible<T, U>::value &&
+                                                        std::is_nothrow_assignable<T&,U>::value)
+        {
+            if (*this)
                 **this = std::forward<U>(u);
             else
                 construct(std::forward<U>(u));
+        }
+
+// ---------------------------------------------------------------------------------------------------
+
+        template< class... Args >
+        constexpr T& emplace ( 
+            Args&&... args 
+        ) 
+        nothrow(std::is_nothrow_constructible<T,Args&&...>::value)
+        {
+            reset();
+            construct(std::forward<Args>(args)...);
+            return **this;
+        }
+
+// ---------------------------------------------------------------------------------------------------
+
+        template< class U, class... Args >
+        constexpr T& emplace ( 
+            std::initializer_list<U> ilist, 
+            Args&&... args 
+        )
+        nothrow(std::is_nothrow_constructible<T, std::initializer_list<U>&, Args&&...>::value)
+        {
+            reset();
+            construct(ilist, std::forward<Args>(args)...);
+            return **this;
         }
 
 // ---------------------------------------------------------------------------------------------------
@@ -244,7 +272,7 @@ namespace dlib
 
         constexpr void reset() noexcept(std::is_nothrow_destructible<T>::value)
         {
-            if (has_value())
+            if (*this)
             {
                 (**this).~T();
                 has_value_ = false;
@@ -273,14 +301,14 @@ namespace dlib
 
         constexpr T& value() 
         {
-            if (has_value())
+            if (*this)
                 return **this;
             throw bad_optional_access();
         }
         
         constexpr const T& value() const
         {
-            if (has_value())
+            if (*this)
                 return **this;
             throw bad_optional_access();
         }
@@ -290,13 +318,13 @@ namespace dlib
         template< class U >
         constexpr T value_or( U&& u ) const&
         {
-            return has_value_ ? **this : static_cast<T>(std::forward<U>(u));
+            return *this ? **this : static_cast<T>(std::forward<U>(u));
         }
 
         template< class U >
         constexpr T value_or( U&& u ) &&
         {
-            return has_value_ ? std::move(**this) : static_cast<T>(std::forward<U>(u));
+            return *this ? std::move(**this) : static_cast<T>(std::forward<U>(u));
         }
 
 // ---------------------------------------------------------------------------------------------------
@@ -304,11 +332,11 @@ namespace dlib
         constexpr void swap( optional& other ) noexcept(std::is_nothrow_move_constructible<T>::value &&
                                                         dlib::is_nothrow_swappable<T>::value)
         {
-            if (has_value() && other.has_value())
+            if (*this && other)
                 std::swap(**this, *other);
-            else if (has_value() && !other.has_value())
+            else if (*this && !other)
                 other = std::move(*this);
-            else if (!has_value() && other.has_value())
+            else if (!*this && other)
                 *this = std::move(other);
         }
 
@@ -316,7 +344,9 @@ namespace dlib
 
     private:
 
-        static_assert(!std::is_reference<T>::value, "optional of reference is forbidden");
+        static_assert(!std::is_reference<T>::value,                 "optional of reference is forbidden");
+        static_assert(!std::is_same<T, dlib::in_place_t>::value,    "optional of in_place_t is forbidden");
+        static_assert(!std::is_same<T, dlib::nullopt_t>::value,     "optional of nullopt is forbidden");
 
 // ---------------------------------------------------------------------------------------------------
 
