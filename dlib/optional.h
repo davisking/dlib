@@ -239,8 +239,8 @@ namespace dlib
         template< class... Args >
         constexpr T& emplace ( 
             Args&&... args 
-        ) 
-        nothrow(std::is_nothrow_constructible<T,Args&&...>::value)
+        )
+        noexcept(std::is_nothrow_constructible<T,Args&&...>::value)
         {
             reset();
             construct(std::forward<Args>(args)...);
@@ -254,7 +254,7 @@ namespace dlib
             std::initializer_list<U> ilist, 
             Args&&... args 
         )
-        nothrow(std::is_nothrow_constructible<T, std::initializer_list<U>&, Args&&...>::value)
+        noexcept(std::is_nothrow_constructible<T, std::initializer_list<U>&, Args&&...>::value)
         {
             reset();
             construct(ilist, std::forward<Args>(args)...);
