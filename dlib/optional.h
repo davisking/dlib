@@ -98,7 +98,7 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-        constexpr optional(dlib::nullopt_t) noexcept = default;
+        constexpr optional(dlib::nullopt_t) noexcept {};
 
 // ---------------------------------------------------------------------------------------------------
 
@@ -106,7 +106,7 @@ namespace dlib
           class U,
           is_copy_constructible_from<U> = true
         >
-        constexpr optional (const optional<U>& other) noexcept(std::is_nothrow_constructible<T, const U&>::value)
+        constexpr explicit optional (const optional<U>& other) noexcept(std::is_nothrow_constructible<T, const U&>::value)
         {
             if (other)
                 construct(*other);                
@@ -118,7 +118,7 @@ namespace dlib
           class U,
           is_move_constructible_from<U> = true
         >
-        constexpr optional( optional<U>&& other ) noexcept(std::is_nothrow_constructible<T, U&&>::value)
+        constexpr explicit optional( optional<U>&& other ) noexcept(std::is_nothrow_constructible<T, U&&>::value)
         {
             if (other)
                 construct(std::move(*other));  
@@ -160,12 +160,12 @@ namespace dlib
 
         template < 
           class U,
-          class U_ = dlib::remove_cvref_t<U>,
+          class U_ = std::decay_t<U>,
           std::enable_if_t<std::is_constructible<T, U&&>::value &&
                            !std::is_same<U_, dlib::in_place_t>::value &&
                            !std::is_same<U_, dlib::optional<T>>::value, bool> = true
         >
-        constexpr optional( U&& u ) noexcept(std::is_nothrow_constructible<T, U&&>::value)
+        constexpr explicit optional( U&& u ) noexcept(std::is_nothrow_constructible<T, U&&>::value)
         {
             construct(std::forward<U>(u));
         }
@@ -219,8 +219,8 @@ namespace dlib
         template < 
           class U,
           class U_ = std::decay_t<U>,
-          std::enable_if_t<!std::is_same<U_, dlib::optional<T>>::value &&
-                           !std::is_same<U_, T>::value &&
+          std::enable_if_t<!std::is_same<U_, dlib::in_place_t>::value &&
+                           !std::is_same<U_, dlib::optional<T>>::value &&
                            std::is_constructible<T, U>::value &&
                            std::is_assignable<T&, U>::value,
                            bool> = true
@@ -232,6 +232,7 @@ namespace dlib
                 **this = std::forward<U>(u);
             else
                 construct(std::forward<U>(u));
+            return *this;
         }
 
 // ---------------------------------------------------------------------------------------------------
@@ -290,12 +291,12 @@ namespace dlib
 // ---------------------------------------------------------------------------------------------------
 
         constexpr const T*  operator->()    const noexcept { return reinterpret_cast<const T*>(&mem); }
-        constexpr T*        operator->()          noexcept { return reinterpret_cast<const T*>(&mem); }
+        constexpr T*        operator->()          noexcept { return reinterpret_cast<T*>(&mem); }
 
 // ---------------------------------------------------------------------------------------------------
 
         constexpr const T&  operator*()     const noexcept { return *reinterpret_cast<const T*>(&mem); }
-        constexpr T&        operator*()           noexcept { return *reinterpret_cast<const T*>(&mem); }
+        constexpr T&        operator*()           noexcept { return *reinterpret_cast<T*>(&mem); }
 
 // ---------------------------------------------------------------------------------------------------
 
