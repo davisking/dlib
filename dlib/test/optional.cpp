@@ -11,6 +11,43 @@ namespace
 
     logger dlog("test.optional");
 
+// ---------------------------------------------------------------------------------------------------
+
+    void test_optional_int()
+    {
+        dlib::optional<int> o1;
+        DLIB_TEST(!o1);
+
+        dlib::optional<int> o2 = dlib::nullopt;
+        DLIB_TEST(!o2);
+
+        dlib::optional<int> o3 = 42;
+        DLIB_TEST(*o3 == 42);
+
+        dlib::optional<int> o4 = o3;
+        DLIB_TEST(*o3 == 42);
+        DLIB_TEST(*o4 == 42);
+
+        dlib::optional<int> o5 = o1;
+        DLIB_TEST(!o1);
+        DLIB_TEST(!o5);
+
+        dlib::optional<int> o6 = std::move(o3);
+        DLIB_TEST(*o6 == 42);
+
+        dlib::optional<short> o7 = (short)42;
+        DLIB_TEST(*o7 == 42);
+
+        dlib::optional<int> o8 = o7;
+        DLIB_TEST(*o7 == 42);
+        DLIB_TEST(*o8 == 42);
+
+        dlib::optional<int> o9 = std::move(o7);
+        DLIB_TEST(*o9 == 42);
+    }
+
+// ---------------------------------------------------------------------------------------------------
+
     static int constructor_count{0};
     static int copy_constructor_count{0};
     static int move_constructor_count{0};
@@ -43,6 +80,8 @@ namespace
         DLIB_TEST(move_assign_count == 0);
     }
 
+// ---------------------------------------------------------------------------------------------------
+
     class optional_tester : public tester
     {
     public:
@@ -55,6 +94,7 @@ namespace
         void perform_test (
         )
         {
+            test_optional_int();
             test_constructors();
         }
     } a;

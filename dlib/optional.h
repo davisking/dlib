@@ -32,59 +32,73 @@ namespace dlib
 // ---------------------------------------------------------------------------------------------------
 
     template<class T>
+    class optional;
+
+// ---------------------------------------------------------------------------------------------------
+
+    namespace details
+    {
+        template<class T>
+        struct is_optional : std::false_type{};
+
+        template<class T>
+        struct is_optional<dlib::optional<T>> : std::true_type{};
+    }
+
+// ---------------------------------------------------------------------------------------------------
+
+    template<class T>
     class optional
     {
     private:
 
 // ---------------------------------------------------------------------------------------------------
-        template<class U>
-        using is_constructible_base = And<
-            !std::is_constructible<T,       dlib::optional<U>&>::value,
-            !std::is_constructible<T, const dlib::optional<U>&>::value,
-            !std::is_constructible<T,       dlib::optional<U>&&>::value,
-            !std::is_constructible<T, const dlib::optional<U>&&>::value,
-            !std::is_convertible<      dlib::optional<U>&, T>::value,
-            !std::is_convertible<const dlib::optional<U>&, T>::value,
-            !std::is_convertible<      dlib::optional<U>&&, T>::value,
-            !std::is_convertible<const dlib::optional<U>&&, T>::value
-        >;
 
         template<class U>
         using is_copy_constructible_from = std::enable_if_t<
-            std::is_constructible<T, const U&>::value &&
-            is_constructible_base<U>::value,
+            std::is_constructible<T, U const&>::value,
             bool
-        >;
-
-        template<class U>
-        using is_move_constructible_from = std::enable_if_t<
-            std::is_constructible<T, U&&>::value &&
-            is_constructible_base<U>::value,
-            bool
-        >;
-
-        template<class U>
-        using is_assignable_base = And<
-            is_constructible_base<U>::value,
-            !std::is_assignable<T&,       dlib::optional<U>&>::value,
-            !std::is_assignable<T&, const dlib::optional<U>&>::value,
-            !std::is_assignable<T&,       dlib::optional<U>&&>::value,
-            !std::is_assignable<T&, const dlib::optional<U>&&>::value
         >;
 
         template<class U>
         using is_copy_assignable_from = std::enable_if_t<
             std::is_constructible<T, const U&>::value &&
-            std::is_assignable<T&, const U&>::value &&
-            is_assignable_base<U>::value,
+            std::is_assignable<T&, const U&>::value,
+            bool
+        >;
+
+        template<class U>
+        using is_move_constructible_from = std::enable_if_t<
+            std::is_constructible<T, U&&>::value,
             bool
         >;
 
         template<class U>
         using is_move_assignable_from = std::enable_if_t<
             std::is_constructible<T, U>::value &&
-            std::is_assignable<T&, U>::value &&
-            is_assignable_base<U>::value,
+            std::is_assignable<T&, U>::value,
+            bool
+        >;
+
+        template<class U, class U_ = std::decay_t<U>>
+        using is_convertible_from_base = And<
+            !std::is_same<U_, dlib::in_place_t>::value,
+            !std::is_same<U_, dlib::nullopt_t>::value,
+            !details::is_optional<U_>::value
+        >;
+
+        template<class U, class U_ = std::decay_t<U>>
+        using is_convert_constructible_from = std::enable_if_t<
+            std::is_constructible<T, U&&>::value &&
+            is_convertible_from_base<U>::value,
+            bool
+        >;
+
+        template<class U, class U_ = std::decay_t<U>>
+        using is_convert_assignable_from = std::enable_if_t<
+            std::is_constructible<T, U>::value  &&
+            std::is_assignable<T&, U>::value    &&
+            is_convertible_from_base<U>::value,
             bool
         >;
 
@@ -102,11 +116,7 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-        template <
-          class U,
-          is_copy_constructible_from<U> = true
-        >
-        constexpr explicit optional (const optional<U>& other) noexcept(std::is_nothrow_constructible<T, const U&>::value)
+        constexpr optional (const optional& other) noexcept(std::is_nothrow_copy_constructible<T>::value)
         {
             if (other)
                 construct(*other);                
@@ -116,12 +126,43 @@ namespace dlib
 
         template <
           class U,
-          is_move_constructible_from<U> = true
+          is_copy_constructible_from<U> = true
         >
-        constexpr explicit optional( optional<U>&& other ) noexcept(std::is_nothrow_constructible<T, U&&>::value)
+        constexpr optional (const optional<U>& other) noexcept(std::is_nothrow_constructible<T, const U&>::value)
+        {
+            if (other)
+                construct(*other);                
+        }
+
+// ---------------------------------------------------------------------------------------------------
+
+        constexpr optional( optional&& other ) noexcept(std::is_nothrow_move_constructible<T>::value)
         {
             if (other)
                 construct(std::move(*other));  
+        }
+
+// ---------------------------------------------------------------------------------------------------
+
+        template <
+          class U,
+          is_move_constructible_from<U> = true
+        >
+        constexpr optional( optional<U>&& other ) noexcept(std::is_nothrow_constructible<T, U&&>::value)
+        {
+            if (other)
+                construct(std::move(*other));  
+        }
+
+// ---------------------------------------------------------------------------------------------------
+
+        template < 
+          class U,
+          is_convert_constructible_from<U> = true
+        >
+        constexpr optional( U&& u ) noexcept(std::is_nothrow_constructible<T, U&&>::value)
+        {
+            construct(std::forward<U>(u));
         }
 
 // ---------------------------------------------------------------------------------------------------
@@ -154,20 +195,6 @@ namespace dlib
         noexcept(std::is_nothrow_constructible<T, std::initializer_list<U>&, Args&&...>::value)
         {
             construct(ilist, std::forward<Args>(args)...);
-        }
-
-// ---------------------------------------------------------------------------------------------------
-
-        template < 
-          class U,
-          class U_ = std::decay_t<U>,
-          std::enable_if_t<std::is_constructible<T, U&&>::value &&
-                           !std::is_same<U_, dlib::in_place_t>::value &&
-                           !std::is_same<U_, dlib::optional<T>>::value, bool> = true
-        >
-        constexpr explicit optional( U&& u ) noexcept(std::is_nothrow_constructible<T, U&&>::value)
-        {
-            construct(std::forward<U>(u));
         }
 
 // ---------------------------------------------------------------------------------------------------
@@ -218,12 +245,7 @@ namespace dlib
 
         template < 
           class U,
-          class U_ = std::decay_t<U>,
-          std::enable_if_t<!std::is_same<U_, dlib::in_place_t>::value &&
-                           !std::is_same<U_, dlib::optional<T>>::value &&
-                           std::is_constructible<T, U>::value &&
-                           std::is_assignable<T&, U>::value,
-                           bool> = true
+          is_convert_assignable_from<U> = true
         >
         constexpr optional& operator=( U&& u ) noexcept(std::is_nothrow_constructible<T, U>::value &&
                                                         std::is_nothrow_assignable<T&,U>::value)
