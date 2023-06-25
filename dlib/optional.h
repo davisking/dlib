@@ -159,6 +159,8 @@ namespace dlib
         bool active{false};
     };
 
+// ---------------------------------------------------------------------------------------------------
+
     template <class T>
     struct optional_ops : optional_storage<T> 
     {
@@ -199,6 +201,8 @@ namespace dlib
         constexpr bool      has_value() const   {return this->active;}
     };
 
+// ---------------------------------------------------------------------------------------------------
+
     template <class T, bool = std::is_trivially_copy_constructible<T>::value>
     struct optional_copy : optional_ops<T> 
     {
@@ -223,6 +227,8 @@ namespace dlib
         }
     };
 
+// ---------------------------------------------------------------------------------------------------
+
     template <class T, bool = std::is_trivially_move_constructible<T>::value>
     struct optional_move : optional_copy<T> 
     {
@@ -245,6 +251,8 @@ namespace dlib
                 this->construct(std::move(rhs.get()));
         }
     };
+
+// ---------------------------------------------------------------------------------------------------
 
     template <
       class T, 
@@ -276,6 +284,8 @@ namespace dlib
         }        
     };
 
+// ---------------------------------------------------------------------------------------------------
+
     template <
       class T, 
       bool = std::is_trivially_destructible<T>::value       &&
@@ -305,6 +315,8 @@ namespace dlib
             return *this;
         }
     };
+
+// ---------------------------------------------------------------------------------------------------
 
     template <
       class T, 
@@ -350,6 +362,8 @@ namespace dlib
         constexpr optional_delete_constructors& operator=(optional_delete_constructors &&)      = default;
     };
 
+// ---------------------------------------------------------------------------------------------------
+
     template <
       class T,
       bool copyable = (std::is_copy_constructible<T>::value && std::is_copy_assignable<T>::value),
@@ -393,6 +407,8 @@ namespace dlib
         constexpr optional_delete_assign& operator=(const optional_delete_assign &) = delete;
         constexpr optional_delete_assign& operator=(optional_delete_assign &&)      = delete;
     };
+
+// ---------------------------------------------------------------------------------------------------
 
     template <class T>
     class optional : private optional_move_assign<T>,
