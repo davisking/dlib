@@ -24,7 +24,8 @@ namespace dlib
 
     struct nullopt_t 
     {
-        explicit constexpr nullopt_t(int) noexcept {}
+        nullopt_t() = delete;
+        constexpr explicit nullopt_t(int) noexcept {}
     };
 
     static constexpr nullopt_t nullopt{int{}};
@@ -43,355 +44,807 @@ namespace dlib
 
         template<class T>
         struct is_optional<dlib::optional<T>> : std::true_type{};
-    }
 
-// ---------------------------------------------------------------------------------------------------
+        template<class T, class U>
+        using is_constructible_from = And<
+            !std::is_constructible<T,       dlib::optional<U>&>::value,
+            !std::is_constructible<T, const dlib::optional<U>&>::value,
+            !std::is_constructible<T,       dlib::optional<U>&&>::value,
+            !std::is_constructible<T, const dlib::optional<U>&&>::value,
+            !std::is_convertible<      dlib::optional<U>&, T>::value,
+            !std::is_convertible<const dlib::optional<U>&, T>::value,
+            !std::is_convertible<      dlib::optional<U>&&, T>::value,
+            !std::is_convertible<const dlib::optional<U>&&, T>::value
+        >;
 
-    template<class T>
-    class optional
-    {
-    private:
+        template<class T, class U>
+        using is_assignable_from = And<
+            is_constructible_from<T,U>::value,
+            std::is_assignable<T&,       dlib::optional<U>&>::value,
+            std::is_assignable<T&, const dlib::optional<U>&>::value,
+            std::is_assignable<T&,       dlib::optional<U>&&>::value,
+            std::is_assignable<T&, const dlib::optional<U>&&>::value
+        >;
 
-// ---------------------------------------------------------------------------------------------------
-
-        template<class U>
-        using is_copy_constructible_from = std::enable_if_t<
-            std::is_constructible<T, U const&>::value,
+        template<class T, class U>
+        using is_copy_convertible = std::enable_if_t<
+            is_constructible_from<T,U>::value &&
+            std::is_constructible<T, const U&>::value,
             bool
         >;
 
-        template<class U>
-        using is_copy_assignable_from = std::enable_if_t<
-            std::is_constructible<T, const U&>::value &&
-            std::is_assignable<T&, const U&>::value,
-            bool
-        >;
-
-        template<class U>
-        using is_move_constructible_from = std::enable_if_t<
+        template<class T, class U>
+        using is_move_convertible = std::enable_if_t<
+            is_constructible_from<T,U>::value &&
             std::is_constructible<T, U&&>::value,
             bool
         >;
 
-        template<class U>
-        using is_move_assignable_from = std::enable_if_t<
-            std::is_constructible<T, U>::value &&
+        template<class T, class U>
+        using is_copy_assignable = std::enable_if_t<
+            is_assignable_from<T,U>::value              &&
+            std::is_constructible<T, const U&>::value   &&
+            std::is_assignable<T&, const U&>::value,
+            bool
+        >;
+
+        template<class T, class U>
+        using is_move_assignable = std::enable_if_t<
+            is_assignable_from<T,U>::value      &&
+            std::is_constructible<T, U>::value  &&
             std::is_assignable<T&, U>::value,
             bool
         >;
 
-        template<class U, class U_ = std::decay_t<U>>
-        using is_convertible_from_base = And<
-            !std::is_same<U_, dlib::in_place_t>::value,
-            !std::is_same<U_, dlib::nullopt_t>::value,
-            !details::is_optional<U_>::value
-        >;
-
-        template<class U, class U_ = std::decay_t<U>>
-        using is_convert_constructible_from = std::enable_if_t<
+        template<class T, class U, class U_ = std::decay_t<U>>
+        using is_construct_convertible_from = std::enable_if_t<
             std::is_constructible<T, U&&>::value &&
-            is_convertible_from_base<U>::value,
+            !std::is_same<U_, in_place_t>::value &&
+            !std::is_same<U_, dlib::optional<T>>::value,
             bool
         >;
 
-        template<class U, class U_ = std::decay_t<U>>
-        using is_convert_assignable_from = std::enable_if_t<
-            std::is_constructible<T, U>::value  &&
+        template <class T, class U, class U_ = std::decay_t<U>>
+        using is_assign_convertible_from = std::enable_if_t<
+            std::is_constructible<T, U>::value  && 
             std::is_assignable<T&, U>::value    &&
-            is_convertible_from_base<U>::value,
+            !std::is_same<U_, dlib::optional<T>>::value &&
+            (!std::is_scalar<T>::value || !std::is_same<T, U_>::value),
             bool
         >;
+    }
 
-// ---------------------------------------------------------------------------------------------------
+    template <
+      class T,
+      bool = std::is_trivially_destructible<T>::value
+    >
+    struct optional_storage
+    {
+        ~optional_storage() noexcept(std::is_nothrow_destructible<T>::value)
+        {
+            destruct();
+        }   
+
+        template <class... U> 
+        constexpr void construct(U&&... u) noexcept(std::is_nothrow_constructible<T,U...>::value)
+        {
+            new (&mem) T(std::forward<U>(u)...);
+            m_has_value = true;
+        }
+
+        constexpr void destruct() noexcept(std::is_nothrow_destructible<T>::value)
+        {
+            if (m_has_value)
+            {
+                this->ptr()->~T();
+                m_has_value = false;
+            }
+        }
+
+        constexpr const T*  ptr() const {return reinterpret_cast<const T*>(&mem);}
+        constexpr T*        ptr()       {return reinterpret_cast<T*>(&mem);}
+        constexpr const T&  get() const {return *ptr();}
+        constexpr T&        get()       {return *ptr();}
+        constexpr bool      has_value() const {return m_has_value;}
+
+        std::aligned_storage_t<sizeof(T), alignof(T)> mem;
+        bool m_has_value{false};
+    };
+
+    template <class T>
+    struct optional_storage<T, true>
+    {
+        template <class... U> 
+        constexpr void construct(U&&... u) noexcept(std::is_nothrow_constructible<T,U...>::value)
+        {
+            new (&mem) T(std::forward<U>(u)...);
+            m_has_value = true;
+        }
+
+        constexpr void destruct() noexcept
+        {
+            m_has_value = false;
+        }
+
+        constexpr const T*  ptr() const {return reinterpret_cast<const T*>(&mem);}
+        constexpr T*        ptr()       {return reinterpret_cast<T*>(&mem);}
+        constexpr const T&  get() const {return *ptr();}
+        constexpr T&        get()       {return *ptr();}
+        constexpr bool      has_value() const {return m_has_value;}
+
+        std::aligned_storage_t<sizeof(T), alignof(T)> mem;
+        bool m_has_value{false};
+    };
+
+    template <class T, bool = std::is_trivially_copy_constructible<T>::value>
+    struct optional_copy : optional_storage<T> 
+    {
+        using optional_storage<T>::optional_storage;
+    };
+
+    template <class T>
+    struct optional_copy<T, false> : optional_storage<T> 
+    {
+        using optional_storage<T>::optional_storage;
+
+        constexpr optional_copy()                                       = default;
+        constexpr optional_copy(optional_copy&& rhs)                    = default;
+        constexpr optional_copy &operator=(const optional_copy& rhs)    = default;
+        constexpr optional_copy &operator=(optional_copy&& rhs)         = default;
+
+        constexpr optional_copy(const optional_copy& rhs) noexcept(std::is_nothrow_copy_constructible<T>::value)
+        : optional_storage<T>() 
+        {
+            if (rhs.has_value()) 
+                construct(rhs.get());
+        }
+    };
+
+    template <class T, bool = std::is_trivially_move_constructible<T>::value>
+    struct optional_move : optional_copy<T> 
+    {
+        using optional_copy<T>::optional_copy;
+    };
+
+    template <class T> 
+    struct optional_move<T, false> : optional_copy<T> 
+    {
+        using optional_copy<T>::optional_copy;
+
+        constexpr optional_move()                                       = default;
+        constexpr optional_move(const optional_move& rhs)               = default;
+        constexpr optional_move& operator=(const optional_move& rhs)    = default;
+        constexpr optional_move& operator=(optional_move&& rhs)         = default;
+
+        constexpr optional_move(optional_move&& rhs) noexcept(std::is_nothrow_move_constructible<T>::value)
+        {
+            if (rhs.has_value())
+                construct(std::move(rhs.get()));
+        }
+    };
+
+    template <
+      class T, 
+      bool = std::is_trivially_copy_assignable<T>::value       &&
+             std::is_trivially_copy_constructible<T>::value    &&
+             std::is_trivially_destructible<T>::value
+    >
+    struct optional_copy_assign : optional_move<T> 
+    {
+        using optional_move<T>::optional_move;
+    };
+
+    template <class T>
+    struct optional_copy_assign<T, false> : optional_move<T> 
+    {
+        using optional_move<T>::optional_move;
+
+        constexpr optional_copy_assign()                                        = default;
+        constexpr optional_copy_assign(const optional_copy_assign& rhs)         = default;
+        constexpr optional_copy_assign(optional_copy_assign&& rhs)              = default;
+        constexpr optional_copy_assign& operator=(optional_copy_assign &&rhs)   = default;
+
+        constexpr optional_copy_assign& operator=(const optional_copy_assign &rhs) 
+        noexcept(std::is_nothrow_copy_constructible<T>::value && 
+                 std::is_nothrow_copy_assignable<T>::value)
+        {
+            if (this->has_value() && rhs.has_value())
+                this->get() = rhs.get();
+            else if (!this->has_value() && rhs.has_value())
+                construct(rhs.get());
+            else if (this->has_value() && !rhs.has_value())
+                this->destruct();
+            return *this;
+        }        
+    };
+
+    template <
+      class T, 
+      bool = std::is_trivially_destructible<T>::value       &&
+             std::is_trivially_move_constructible<T>::value &&
+             std::is_trivially_move_assignable<T>::value
+    >
+    struct optional_move_assign : optional_copy_assign<T> 
+    {
+        using optional_copy_assign<T>::optional_copy_assign;
+    };
+
+    template <class T>
+    struct optional_move_assign<T, false> : optional_copy_assign<T> 
+    {
+        using optional_copy_assign<T>::optional_copy_assign;
+
+        constexpr optional_move_assign()                                              = default;
+        constexpr optional_move_assign(const optional_move_assign &rhs)               = default;
+        constexpr optional_move_assign(optional_move_assign &&rhs)                    = default;
+        constexpr optional_move_assign& operator=(const optional_move_assign &rhs)    = default;
+
+        constexpr optional_move_assign& operator=(optional_move_assign &&rhs) 
+        noexcept(std::is_nothrow_move_constructible<T>::value && 
+                 std::is_nothrow_move_assignable<T>::value)
+        {
+            if (this->has_value() && rhs.has_value())
+                this->get() = std::move(rhs.get());
+            else if (!this->has_value() && rhs.has_value())
+                construct(std::move(rhs.get()));
+            else if (this->has_value() && !rhs.has_value())
+                this->destruct();
+            return *this;
+        }
+    };
+
+    template <
+      class T, 
+      bool copyable = std::is_copy_constructible<T>::value,
+      bool moveable = std::is_move_constructible<T>::value
+    >
+    struct optional_delete_constructors
+    {
+        constexpr optional_delete_constructors()                                                = default;
+        constexpr optional_delete_constructors(const optional_delete_constructors&)             = default;
+        constexpr optional_delete_constructors(optional_delete_constructors&&)                  = default;
+        constexpr optional_delete_constructors& operator=(const optional_delete_constructors &) = default;
+        constexpr optional_delete_constructors& operator=(optional_delete_constructors &&)      = default;
+    };
+
+    template <class T> 
+    struct optional_delete_constructors<T, true, false> 
+    {
+        constexpr optional_delete_constructors()                                                = default;
+        constexpr optional_delete_constructors(const optional_delete_constructors&)             = default;
+        constexpr optional_delete_constructors(optional_delete_constructors&&)                  = delete;
+        constexpr optional_delete_constructors& operator=(const optional_delete_constructors &) = default;
+        constexpr optional_delete_constructors& operator=(optional_delete_constructors &&)      = default;
+    };
+
+    template <class T> 
+    struct optional_delete_constructors<T, false, true>
+    {
+        constexpr optional_delete_constructors()                                                = default;
+        constexpr optional_delete_constructors(const optional_delete_constructors&)             = delete;
+        constexpr optional_delete_constructors(optional_delete_constructors&&)                  = default;
+        constexpr optional_delete_constructors& operator=(const optional_delete_constructors &) = default;
+        constexpr optional_delete_constructors& operator=(optional_delete_constructors &&)      = default;
+    };
+
+    template <class T> 
+    struct optional_delete_constructors<T, false, false>
+    {
+        constexpr optional_delete_constructors()                                                = default;
+        constexpr optional_delete_constructors(const optional_delete_constructors&)             = delete;
+        constexpr optional_delete_constructors(optional_delete_constructors&&)                  = delete;
+        constexpr optional_delete_constructors& operator=(const optional_delete_constructors&)  = default;
+        constexpr optional_delete_constructors& operator=(optional_delete_constructors &&)      = default;
+    };
+
+    template <
+      class T,
+      bool copyable = (std::is_copy_constructible<T>::value && std::is_copy_assignable<T>::value),
+      bool moveable = (std::is_move_constructible<T>::value && std::is_move_assignable<T>::value)
+    >
+    struct optional_delete_assign
+    {
+        constexpr optional_delete_assign()                                          = default;
+        constexpr optional_delete_assign(const optional_delete_assign &)            = default;
+        constexpr optional_delete_assign(optional_delete_assign &&)                 = default;
+        constexpr optional_delete_assign& operator=(const optional_delete_assign &) = default;
+        constexpr optional_delete_assign& operator=(optional_delete_assign &&)      = default;
+    };
+
+    template <class T> 
+    struct optional_delete_assign<T, true, false>
+    {
+        constexpr optional_delete_assign()                                          = default;
+        constexpr optional_delete_assign(const optional_delete_assign &)            = default;
+        constexpr optional_delete_assign(optional_delete_assign &&)                 = default;
+        constexpr optional_delete_assign& operator=(const optional_delete_assign &) = default;
+        constexpr optional_delete_assign& operator=(optional_delete_assign &&)      = delete;
+    };
+
+    template <class T> 
+    struct optional_delete_assign<T, false, true>
+    {
+        constexpr optional_delete_assign()                                          = default;
+        constexpr optional_delete_assign(const optional_delete_assign &)            = default;
+        constexpr optional_delete_assign(optional_delete_assign &&)                 = default;
+        constexpr optional_delete_assign& operator=(const optional_delete_assign &) = delete;
+        constexpr optional_delete_assign& operator=(optional_delete_assign &&)      = default;
+    };
+
+    template <class T> 
+    struct optional_delete_assign<T, false, false>
+    {
+        constexpr optional_delete_assign()                                          = default;
+        constexpr optional_delete_assign(const optional_delete_assign &)            = default;
+        constexpr optional_delete_assign(optional_delete_assign &&)                 = default;
+        constexpr optional_delete_assign& operator=(const optional_delete_assign &) = delete;
+        constexpr optional_delete_assign& operator=(optional_delete_assign &&)      = delete;
+    };
+
+    template <class T>
+    class optional : private optional_move_assign<T>,
+                     private optional_delete_constructors<T>,
+                     private optional_delete_assign<T> 
+    {
+        using base = optional_move_assign<T>;
+
+        static_assert(!std::is_reference<T>::value,         "optional<T&> not allowed");
+        static_assert(!std::is_same<T, in_place_t>::value,  "optional<in_place_t> not allowed");
+        static_assert(!std::is_same<T, nullopt_t>::value,   "optional<nullopt_t> not allowed");
 
     public:
+        using value_type = T;
+        
+        constexpr optional() noexcept               = default;
+        constexpr optional(const optional &rhs)     = default;
+        constexpr optional(optional &&rhs)          = default;
+        optional& operator=(const optional &rhs)    = default;
+        optional& operator=(optional &&rhs)         = default;
+        ~optional()                                 = default;
 
-// ---------------------------------------------------------------------------------------------------
+        constexpr optional(nullopt_t) noexcept {}
 
-        constexpr optional() noexcept = default;
-
-// ---------------------------------------------------------------------------------------------------
-
-        constexpr optional(dlib::nullopt_t) noexcept {};
-
-// ---------------------------------------------------------------------------------------------------
-
-        constexpr optional (const optional& other) noexcept(std::is_nothrow_copy_constructible<T>::value)
+        optional& operator=(nullopt_t) noexcept 
         {
-            if (other)
-                construct(*other);                
+            if (*this)
+                this->destroy();
+            return *this;
         }
-
-// ---------------------------------------------------------------------------------------------------
 
         template <
-          class U,
-          is_copy_constructible_from<U> = true
+          class U, 
+          details::is_copy_convertible<T,U> = true,
+          std::enable_if_t<!std::is_convertible<const U&, T>::value, bool> = true
         >
-        constexpr optional (const optional<U>& other) noexcept(std::is_nothrow_constructible<T, const U&>::value)
+        constexpr explicit optional(const optional<U> &rhs)
         {
-            if (other)
-                construct(*other);                
+            if (rhs)
+                this->construct(*rhs);
         }
-
-// ---------------------------------------------------------------------------------------------------
-
-        constexpr optional( optional&& other ) noexcept(std::is_nothrow_move_constructible<T>::value)
-        {
-            if (other)
-                construct(std::move(*other));  
-        }
-
-// ---------------------------------------------------------------------------------------------------
 
         template <
-          class U,
-          is_move_constructible_from<U> = true
+          class U, 
+          details::is_copy_convertible<T,U> = true,
+          std::enable_if_t<std::is_convertible<const U&, T>::value, bool> = true
         >
-        constexpr optional( optional<U>&& other ) noexcept(std::is_nothrow_constructible<T, U&&>::value)
+        constexpr optional(const optional<U> &rhs)
         {
-            if (other)
-                construct(std::move(*other));  
+            if (rhs)
+                this->construct(*rhs);
         }
 
-// ---------------------------------------------------------------------------------------------------
-
-        template < 
-          class U,
-          is_convert_constructible_from<U> = true
+        template <
+          class U, 
+          details::is_move_convertible<T,U> = true,
+          std::enable_if_t<!std::is_convertible<U&&, T>::value, bool> = true
         >
-        constexpr optional( U&& u ) noexcept(std::is_nothrow_constructible<T, U&&>::value)
+        constexpr explicit optional(optional<U>&& rhs)
         {
-            construct(std::forward<U>(u));
+            if (rhs)
+                this->construct(std::move(*rhs));
         }
 
-// ---------------------------------------------------------------------------------------------------
+        template <
+          class U, 
+          details::is_move_convertible<T,U> = true,
+          std::enable_if_t<std::is_convertible<U&&, T>::value, bool> = true
+        >
+        constexpr optional(optional<U>&& rhs)
+        {
+            if (rhs)
+                this->construct(std::move(*rhs));
+        }
 
-        template < 
+        template <
           class... Args,
           std::enable_if_t<std::is_constructible<T, Args...>::value, bool> = true
         >
-        constexpr explicit optional ( 
-            dlib::in_place_t,
+        constexpr explicit optional (
+            in_place_t,
             Args&&... args
-        ) 
-        noexcept(std::is_nothrow_constructible<T, Args...>::value)
+        )
         {
-            construct(std::forward<Args>(args)...);
+            this->construct(std::forward<Args>(args)...);
         }
 
-// ---------------------------------------------------------------------------------------------------
-
-        template < 
+        template <
           class U, 
           class... Args,
           std::enable_if_t<std::is_constructible<T, std::initializer_list<U>&, Args&&...>::value, bool> = true
         >
-        constexpr explicit optional ( 
-            dlib::in_place_t,
-            std::initializer_list<U> ilist,
-            Args&&... args 
-        )
-        noexcept(std::is_nothrow_constructible<T, std::initializer_list<U>&, Args&&...>::value)
+        constexpr explicit optional (
+            in_place_t,
+            std::initializer_list<U> il,
+            Args &&... args
+        ) 
         {
-            construct(ilist, std::forward<Args>(args)...);
+            this->construct(il, std::forward<Args>(args)...);
         }
 
-// ---------------------------------------------------------------------------------------------------
-
-        constexpr optional& operator=(dlib::nullopt_t) noexcept
-        {
-            reset();
-            return *this;
-        }
-
-// ---------------------------------------------------------------------------------------------------
-
-        template < 
+        template<
           class U,
-          is_copy_assignable_from<U> = true
+          details::is_construct_convertible_from<T,U> = true,
+          std::enable_if_t<!std::is_convertible<U&&, T>::value, bool> = true
         >
-        constexpr optional& operator=( const optional<U>& other ) noexcept(std::is_nothrow_constructible<T, const U&>::value &&
-                                                                           std::is_nothrow_assignable<T&, const U&>::value)
+        constexpr explicit optional(U &&u)
         {
-            if (!*this && other)
-                construct(*other);
-            else if (*this && other)
-                **this = *other;
-            else if (*this && !other)
+            this->construct(std::forward<U>(u));
+        }
+
+        template<
+          class U,
+          details::is_construct_convertible_from<T,U> = true,
+          std::enable_if_t<std::is_convertible<U&&, T>::value, bool> = true
+        >
+        constexpr optional(U &&u)
+        {
+            this->construct(std::forward<U>(u));
+        }      
+
+        template <
+          class U,
+          details::is_copy_assignable<T, U> = true
+        >
+        constexpr optional &operator=(const optional<U> &rhs) 
+        {
+            if (*this && rhs)
+                **this = *rhs;
+            else if (!*this && rhs)
+                construct(*rhs);
+            else if (*this && !*rhs)
                 reset();
             return *this;
         }
 
-// ---------------------------------------------------------------------------------------------------
-
-        template < 
+        template <
           class U,
-          is_move_assignable_from<U> = true
+          details::is_move_assignable<T, U> = true
         >
-        constexpr optional& operator=( optional<U>&& other ) noexcept(std::is_nothrow_constructible<T, U>::value &&
-                                                                      std::is_nothrow_assignable<T&, U>::value)
+        constexpr optional &operator=(optional<U>&& rhs) 
         {
-            if (!*this && other)
-                construct(std::move(*other));
-            else if (*this && other)
-                **this = std::move(*other);
-            else if (*this && !other)
+            if (*this && rhs)
+                **this = std::move(*rhs);
+            else if (!*this && rhs)
+                construct(std::move(*rhs));
+            else if (*this && !*rhs)
                 reset();
             return *this;
         }
-
-// ---------------------------------------------------------------------------------------------------
-
-        template < 
-          class U,
-          is_convert_assignable_from<U> = true
+        
+        template <
+          class U, 
+          details::is_assign_convertible_from<T,U> = true
         >
-        constexpr optional& operator=( U&& u ) noexcept(std::is_nothrow_constructible<T, U>::value &&
-                                                        std::is_nothrow_assignable<T&,U>::value)
+        constexpr optional& operator=(U &&u)
         {
             if (*this)
-                **this = std::forward<U>(u);
-            else
-                construct(std::forward<U>(u));
+                reset();
+            **this = std::forward<U>(u);
             return *this;
         }
 
-// ---------------------------------------------------------------------------------------------------
-
-        template< class... Args >
-        constexpr T& emplace ( 
-            Args&&... args 
-        )
-        noexcept(std::is_nothrow_constructible<T,Args&&...>::value)
+        template <class... Args> 
+        constexpr T& emplace(Args &&... args) noexcept(std::is_nothrow_constructible<T, Args...>::value)
         {
             reset();
             construct(std::forward<Args>(args)...);
             return **this;
         }
 
-// ---------------------------------------------------------------------------------------------------
-
-        template< class U, class... Args >
-        constexpr T& emplace ( 
-            std::initializer_list<U> ilist, 
-            Args&&... args 
-        )
-        noexcept(std::is_nothrow_constructible<T, std::initializer_list<U>&, Args&&...>::value)
+        template <class U, class... Args>
+        constexpr T& emplace(std::initializer_list<U> il, Args &&... args) 
         {
             reset();
-            construct(ilist, std::forward<Args>(args)...);
-            return **this;
+            construct(il, std::forward<Args>(args)...);
+            return **this;   
         }
 
-// ---------------------------------------------------------------------------------------------------
-
-        ~optional() noexcept
+        void swap(optional& rhs) noexcept(std::is_nothrow_move_constructible<T>::value &&
+                                          dlib::is_nothrow_swappable<T>::value) 
         {
-            reset();
+            using std::swap;
+
+            if (*this && rhs)
+                swap(**this, *rhs);
+
+            else if (*this && !rhs)
+                rhs = std::move(**this);
+            
+            else if (!*this && rhs)
+                *this = std::move(*rhs);
         }
 
-// ---------------------------------------------------------------------------------------------------
+        constexpr const T*  operator->() const  noexcept { return this->ptr(); }
+        constexpr T*        operator->()        noexcept { return this->ptr(); }
+        constexpr T&        operator*() &       noexcept { return this->get(); }
+        constexpr const T&  operator*() const&  noexcept { return this->get(); }
+        constexpr T&&       operator*() &&      noexcept { return std::move(this->get()); }
+        constexpr const T&& operator*() const&& noexcept { return std::move(this->get()); }
+        constexpr explicit  operator bool() const noexcept { return this->m_has_value; }
 
-        constexpr void reset() noexcept(std::is_nothrow_destructible<T>::value)
-        {
-            if (*this)
-            {
-                (**this).~T();
-                has_value_ = false;
-            }
-        }
-
-// ---------------------------------------------------------------------------------------------------
-
-        constexpr explicit  operator bool() const noexcept { return has_value_; }
-
-// ---------------------------------------------------------------------------------------------------
-
-        constexpr bool      has_value()     const noexcept { return has_value_; }
-
-// ---------------------------------------------------------------------------------------------------
-
-        constexpr const T*  operator->()    const noexcept { return reinterpret_cast<const T*>(&mem); }
-        constexpr T*        operator->()          noexcept { return reinterpret_cast<T*>(&mem); }
-
-// ---------------------------------------------------------------------------------------------------
-
-        constexpr const T&  operator*()     const noexcept { return *reinterpret_cast<const T*>(&mem); }
-        constexpr T&        operator*()           noexcept { return *reinterpret_cast<T*>(&mem); }
-
-// ---------------------------------------------------------------------------------------------------
-
-        constexpr T& value() 
-        {
-            if (*this)
-                return **this;
-            throw bad_optional_access();
-        }
-        
-        constexpr const T& value() const
+        constexpr T& value() & 
         {
             if (*this)
                 return **this;
             throw bad_optional_access();
         }
 
-// ---------------------------------------------------------------------------------------------------
+        constexpr const T& value() const & 
+        {
+            if (*this)
+                return **this;
+            throw bad_optional_access();
+        }
 
-        template< class U >
-        constexpr T value_or( U&& u ) const&
+        constexpr T&& value() && 
+        {
+            if (*this)
+                return std::move(**this);
+            throw bad_optional_access();
+        }
+
+        constexpr const T&& value() const && 
+        {
+            if (*this)
+                return std::move(**this);
+            throw bad_optional_access();
+        }
+
+        template <class U> 
+        constexpr T value_or(U &&u) const & 
         {
             return *this ? **this : static_cast<T>(std::forward<U>(u));
         }
 
-        template< class U >
-        constexpr T value_or( U&& u ) &&
+        template <class U> 
+        constexpr T value_or(U &&u) && 
         {
             return *this ? std::move(**this) : static_cast<T>(std::forward<U>(u));
         }
 
-// ---------------------------------------------------------------------------------------------------
-
-        constexpr void swap( optional& other ) noexcept(std::is_nothrow_move_constructible<T>::value &&
-                                                        dlib::is_nothrow_swappable<T>::value)
+        void reset() noexcept 
         {
-            if (*this && other)
-                std::swap(**this, *other);
-            else if (*this && !other)
-                other = std::move(*this);
-            else if (!*this && other)
-                *this = std::move(other);
+            this->destruct();
         }
-
-// ---------------------------------------------------------------------------------------------------
-
-    private:
-
-        static_assert(!std::is_reference<T>::value,                 "optional of reference is forbidden");
-        static_assert(!std::is_same<T, dlib::in_place_t>::value,    "optional of in_place_t is forbidden");
-        static_assert(!std::is_same<T, dlib::nullopt_t>::value,     "optional of nullopt is forbidden");
-
-// ---------------------------------------------------------------------------------------------------
-
-        template< class... Args>
-        constexpr void construct(Args&&... args) noexcept(std::is_nothrow_constructible<T,Args&&...>::value)
-        {
-            new (&mem) T{std::forward<Args>(args)...};
-            has_value_ = true;
-        }
-
-// ---------------------------------------------------------------------------------------------------
-
-        std::aligned_storage_t<sizeof(T), alignof(T)> mem;
-        bool has_value_{false};
     };
 
 // ---------------------------------------------------------------------------------------------------
 
-    template<class T>
-    void swap(dlib::optional<T>& a, dlib::optional<T>& b)
+    template <class T, class U>
+    constexpr bool operator==(const optional<T> &lhs, const optional<U> &rhs) noexcept(noexcept(std::declval<T>() == std::declval<T>()))
+    {        
+        return bool(lhs) == bool(rhs) && (!bool(lhs) || *lhs == *rhs);
+    }
+
+    template <class T, class U> 
+    constexpr bool operator!=(const optional<T> &lhs, const optional<U> &rhs) noexcept(noexcept(std::declval<T>() != std::declval<T>()))
+    { 
+        return !(lhs == rhs); 
+    }
+        
+    template <class T, class U> 
+    constexpr bool operator<(const optional<T> &lhs, const optional<U> &rhs) noexcept(noexcept(std::declval<T>() < std::declval<T>()))
     {
-        a.swap(b);
+        return bool(rhs) && (!bool(lhs) || *lhs < *rhs);
+    }
+
+    template <class T, class U>
+    constexpr bool operator>=(const optional<T> &lhs, const optional<U> &rhs) noexcept(noexcept(std::declval<T>() >= std::declval<T>()))
+    {
+        return !(lhs < rhs);
+    }
+    
+    template <class T, class U>
+    constexpr bool operator>(const optional<T> &lhs, const optional<U> &rhs) noexcept(noexcept(std::declval<T>() > std::declval<T>()))
+    {
+        return bool(lhs) && (!bool(rhs) || *lhs > *rhs);
+    }
+
+    template <class T, class U>
+    constexpr bool operator<=(const optional<T> &lhs, const optional<U> &rhs) noexcept(noexcept(std::declval<T>() <= std::declval<T>()))
+    {
+        return !(lhs > rhs);
+    }
+
+// ---------------------------------------------------------------------------------------------------
+
+    template <class T>
+    constexpr bool operator==(const optional<T> &lhs, nullopt_t) noexcept
+    {
+        return !bool(lhs);
+    }
+
+    template <class T>
+    constexpr bool operator==(nullopt_t, const optional<T> &rhs) noexcept 
+    {
+        return !bool(rhs);
+    }
+        
+    template <class T>
+    constexpr bool operator!=(const optional<T> &lhs, nullopt_t) noexcept 
+    {
+        return bool(lhs);
+    }
+
+    template <class T>
+    constexpr bool operator!=(nullopt_t, const optional<T> &rhs) noexcept 
+    {
+        return bool(rhs);
+    }
+        
+    template <class T>
+    constexpr bool operator<(const optional<T> &, nullopt_t) noexcept 
+    {
+        return false;
+    }
+        
+    template <class T>
+    constexpr bool operator<(nullopt_t, const optional<T> &rhs) noexcept 
+    {
+        return bool(rhs);
+    }
+
+    template <class T>
+    constexpr bool operator<=(const optional<T> &lhs, nullopt_t) noexcept
+    {
+        return !bool(lhs);
+    }
+
+    template <class T>
+    constexpr bool operator<=(nullopt_t, const optional<T> &) noexcept 
+    {
+        return true;
+    }
+
+    template <class T>
+    constexpr bool operator>(const optional<T> &lhs, nullopt_t) noexcept
+    {
+        return bool(lhs);
+    }
+
+    template <class T>
+    constexpr bool operator>(nullopt_t, const optional<T> &) noexcept 
+    {
+        return false;
+    }
+
+    template <class T>
+    constexpr bool operator>=(const optional<T> &, nullopt_t) noexcept 
+    {
+        return true;
+    }
+
+    template <class T>
+    constexpr bool operator>=(nullopt_t, const optional<T> &rhs) noexcept {
+    return !rhs.has_value();
+    }
+
+// ---------------------------------------------------------------------------------------------------
+
+    template <class T, class U>
+    constexpr bool operator==(const optional<T> &lhs, const U &rhs) 
+    {
+        return bool(lhs) ? *lhs == rhs : false;
+    }
+
+    template <class T, class U>
+    constexpr bool operator==(const U &lhs, const optional<T> &rhs) 
+    {
+        return bool(rhs) ? lhs == *rhs : false;
+    }
+
+    template <class T, class U>
+    constexpr bool operator!=(const optional<T> &lhs, const U &rhs) 
+    {
+        return bool(lhs) ? *lhs != rhs : true;
+    }
+
+    template <class T, class U>
+    constexpr bool operator!=(const U &lhs, const optional<T> &rhs) 
+    {
+        return bool(rhs) ? lhs != *rhs : true;
+    }
+
+    template <class T, class U>
+    constexpr bool operator<(const optional<T> &lhs, const U &rhs) 
+    {
+        return bool(lhs) ? *lhs < rhs : true;
+    }
+
+    template <class T, class U>
+    constexpr bool operator<(const U &lhs, const optional<T> &rhs) 
+    {
+        return bool(rhs) ? lhs < *rhs : false;
+    }
+
+    template <class T, class U>
+    constexpr bool operator<=(const optional<T> &lhs, const U &rhs)
+    {
+        return bool(lhs) ? *lhs <= rhs : true;
+    }
+
+    template <class T, class U>
+    constexpr bool operator<=(const U &lhs, const optional<T> &rhs)
+    {
+        return bool(rhs) ? lhs <= *rhs : false;
+    }
+
+    template <class T, class U>
+    constexpr bool operator>(const optional<T> &lhs, const U &rhs) 
+    {
+        return bool(lhs) ? *lhs > rhs : false;
+    }
+
+    template <class T, class U>
+    constexpr bool operator>(const U &lhs, const optional<T> &rhs)
+    {
+        return bool(rhs) ? lhs > *rhs : true;
+    }
+
+    template <class T, class U>
+    constexpr bool operator>=(const optional<T> &lhs, const U &rhs) 
+    {
+        return bool(lhs) ? *lhs >= rhs : false;
+    }
+
+    template <class T, class U>
+    constexpr bool operator>=(const U &lhs, const optional<T> &rhs)
+    {
+        return bool(rhs) ? lhs >= *rhs : true;
+    }
+
+// ---------------------------------------------------------------------------------------------------
+
+    template <
+        class T,
+        std::enable_if_t<
+        std::is_move_constructible<T>::value &&
+        dlib::is_swappable<T>::value,
+        bool> = true
+    >
+    void swap(dlib::optional<T>& lhs, dlib::optional<T>& rhs) noexcept(noexcept(lhs.swap(rhs))) 
+    {
+        return lhs.swap(rhs);
+    }
+
+// ---------------------------------------------------------------------------------------------------
+
+    template< class T >
+    constexpr dlib::optional<std::decay_t<T>> make_optional( T&& value )
+    {
+        return dlib::optional<std::decay_t<T>>(std::forward<T>(value));
+    }
+
+    template< class T, class... Args >
+    constexpr dlib::optional<T> make_optional( Args&&... args )
+    {
+        return dlib::optional<T>(dlib::in_place, std::forward<Args>(args)...);
+    }
+
+    template< class T, class U, class... Args >
+    constexpr dlib::optional<T> make_optional( std::initializer_list<U> il, Args&&... args )
+    {
+        return dlib::optional<T>(dlib::in_place, il, std::forward<Args>(args)...);
     }
 
 // ---------------------------------------------------------------------------------------------------
