@@ -122,72 +122,93 @@ namespace dlib
     >
     struct optional_storage
     {
+        constexpr optional_storage() noexcept
+        : e{}, active{false}
+        {}
+
+        template<class ...U>
+        constexpr optional_storage(in_place_t, U&& ...u) noexcept(std::is_nothrow_constructible<T,U...>::value)
+        : val{std::forward<U>(u)...}, active{true} 
+        {}
+
         ~optional_storage() noexcept(std::is_nothrow_destructible<T>::value)
         {
-            destruct();
-        }   
+            if (active)
+                val.~T();
+        }           
 
-        template <class... U> 
-        constexpr void construct(U&&... u) noexcept(std::is_nothrow_constructible<T,U...>::value)
-        {
-            new (&mem) T(std::forward<U>(u)...);
-            m_has_value = true;
-        }
-
-        constexpr void destruct() noexcept(std::is_nothrow_destructible<T>::value)
-        {
-            if (m_has_value)
-            {
-                this->ptr()->~T();
-                m_has_value = false;
-            }
-        }
-
-        constexpr const T*  ptr() const {return reinterpret_cast<const T*>(&mem);}
-        constexpr T*        ptr()       {return reinterpret_cast<T*>(&mem);}
-        constexpr const T&  get() const {return *ptr();}
-        constexpr T&        get()       {return *ptr();}
-        constexpr bool      has_value() const {return m_has_value;}
-
-        std::aligned_storage_t<sizeof(T), alignof(T)> mem;
-        bool m_has_value{false};
+        struct empty{};
+        union {T val; empty e;};
+        bool active{false};
     };
 
     template <class T>
     struct optional_storage<T, true>
     {
-        template <class... U> 
-        constexpr void construct(U&&... u) noexcept(std::is_nothrow_constructible<T,U...>::value)
-        {
-            new (&mem) T(std::forward<U>(u)...);
-            m_has_value = true;
-        }
+        constexpr optional_storage() noexcept
+        : e{}, active{false}
+        {}
 
-        constexpr void destruct() noexcept
-        {
-            m_has_value = false;
-        }
+        template<class ...U>
+        constexpr optional_storage(in_place_t, U&& ...u) noexcept(std::is_nothrow_constructible<T,U...>::value)
+        : val{std::forward<U>(u)...}, active{true} 
+        {}
 
-        constexpr const T*  ptr() const {return reinterpret_cast<const T*>(&mem);}
-        constexpr T*        ptr()       {return reinterpret_cast<T*>(&mem);}
-        constexpr const T&  get() const {return *ptr();}
-        constexpr T&        get()       {return *ptr();}
-        constexpr bool      has_value() const {return m_has_value;}
-
-        std::aligned_storage_t<sizeof(T), alignof(T)> mem;
-        bool m_has_value{false};
-    };
-
-    template <class T, bool = std::is_trivially_copy_constructible<T>::value>
-    struct optional_copy : optional_storage<T> 
-    {
-        using optional_storage<T>::optional_storage;
+        struct empty{};
+        union {T val; empty e;};
+        bool active{false};
     };
 
     template <class T>
-    struct optional_copy<T, false> : optional_storage<T> 
+    struct optional_ops : optional_storage<T> 
     {
         using optional_storage<T>::optional_storage;
+
+        template <class... U> 
+        constexpr void construct(U&&... u) noexcept(std::is_nothrow_constructible<T,U...>::value)
+        {
+            new (std::addressof(this->val)) T(std::forward<U>(u)...);
+            this->active = true;
+        }
+
+        template<class Optional>
+        constexpr void assign(Optional&& rhs) noexcept(std::is_nothrow_constructible<T,Optional>::value &&
+                                                     std::is_nothrow_assignable<T&,Optional>::value)
+        {
+            if (has_value() && rhs.has_value())
+                this->val = std::forward<Optional>(rhs).get();
+            else if (!has_value() && rhs.has_value())
+                construct(std::forward<Optional>(rhs).get());
+            else if (has_value() && !rhs.has_value())
+                destruct();
+        }
+
+        constexpr void destruct() noexcept(std::is_nothrow_destructible<T>::value)
+        {
+            if (this->active)
+            {
+                this->val.~T();
+                this->active = false;
+            }
+        }
+
+        constexpr const T&  get() const&        {return this->val;}
+        constexpr T&        get() &             {return this->val;}
+        constexpr const T&& get() const&&       {return std::move(this->val);}
+        constexpr T&&       get() &&            {return std::move(this->val);}
+        constexpr bool      has_value() const   {return this->active;}
+    };
+
+    template <class T, bool = std::is_trivially_copy_constructible<T>::value>
+    struct optional_copy : optional_ops<T> 
+    {
+        using optional_ops<T>::optional_ops;
+    };
+
+    template <class T>
+    struct optional_copy<T, false> : optional_ops<T> 
+    {
+        using optional_ops<T>::optional_ops;
 
         constexpr optional_copy()                                       = default;
         constexpr optional_copy(optional_copy&& rhs)                    = default;
@@ -197,8 +218,8 @@ namespace dlib
         constexpr optional_copy(const optional_copy& rhs) noexcept(std::is_nothrow_copy_constructible<T>::value)
         : optional_storage<T>() 
         {
-            if (rhs.has_value()) 
-                construct(rhs.get());
+            if (rhs.has_value())
+                this->construct(rhs.get());
         }
     };
 
@@ -221,7 +242,7 @@ namespace dlib
         constexpr optional_move(optional_move&& rhs) noexcept(std::is_nothrow_move_constructible<T>::value)
         {
             if (rhs.has_value())
-                construct(std::move(rhs.get()));
+                this->construct(std::move(rhs.get()));
         }
     };
 
@@ -250,12 +271,7 @@ namespace dlib
         noexcept(std::is_nothrow_copy_constructible<T>::value && 
                  std::is_nothrow_copy_assignable<T>::value)
         {
-            if (this->has_value() && rhs.has_value())
-                this->get() = rhs.get();
-            else if (!this->has_value() && rhs.has_value())
-                construct(rhs.get());
-            else if (this->has_value() && !rhs.has_value())
-                this->destruct();
+            this->assign(rhs);
             return *this;
         }        
     };
@@ -285,12 +301,7 @@ namespace dlib
         noexcept(std::is_nothrow_move_constructible<T>::value && 
                  std::is_nothrow_move_assignable<T>::value)
         {
-            if (this->has_value() && rhs.has_value())
-                this->get() = std::move(rhs.get());
-            else if (!this->has_value() && rhs.has_value())
-                construct(std::move(rhs.get()));
-            else if (this->has_value() && !rhs.has_value())
-                this->destruct();
+            this->assign(std::move(rhs));
             return *this;
         }
     };
@@ -409,7 +420,7 @@ namespace dlib
         optional& operator=(nullopt_t) noexcept 
         {
             if (*this)
-                this->destroy();
+                reset();
             return *this;
         }
 
@@ -464,9 +475,8 @@ namespace dlib
         constexpr explicit optional (
             in_place_t,
             Args&&... args
-        )
+        ) : base(in_place, std::forward<Args>(args)...)
         {
-            this->construct(std::forward<Args>(args)...);
         }
 
         template <
@@ -489,8 +499,8 @@ namespace dlib
           std::enable_if_t<!std::is_convertible<U&&, T>::value, bool> = true
         >
         constexpr explicit optional(U &&u)
+        : base(in_place, std::forward<U>(u))
         {
-            this->construct(std::forward<U>(u));
         }
 
         template<
@@ -499,8 +509,8 @@ namespace dlib
           std::enable_if_t<std::is_convertible<U&&, T>::value, bool> = true
         >
         constexpr optional(U &&u)
+        : base(in_place, std::forward<U>(u))
         {
-            this->construct(std::forward<U>(u));
         }      
 
         template <
@@ -540,8 +550,9 @@ namespace dlib
         constexpr optional& operator=(U &&u)
         {
             if (*this)
-                reset();
-            **this = std::forward<U>(u);
+                **this = std::forward<U>(u);
+            else
+                this->construct(std::forward<U>(u));
             return *this;
         }
 
@@ -582,7 +593,7 @@ namespace dlib
         constexpr const T&  operator*() const&  noexcept { return this->get(); }
         constexpr T&&       operator*() &&      noexcept { return std::move(this->get()); }
         constexpr const T&& operator*() const&& noexcept { return std::move(this->get()); }
-        constexpr explicit  operator bool() const noexcept { return this->m_has_value; }
+        constexpr explicit  operator bool() const noexcept { return this->active; }
 
         constexpr T& value() & 
         {

@@ -137,6 +137,36 @@ namespace
 
         dlib::optional<int> o9 = std::move(o7);
         DLIB_TEST(*o9 == 42);
+
+        dlib::optional<int> o10;
+        DLIB_TEST(!o10);
+        o10 = o3;
+        DLIB_TEST(*o10 == 42);
+        o10 = dlib::nullopt;
+        DLIB_TEST(!o10);
+
+        dlib::optional<int> o11;
+        o11 = std::move(o3);
+        DLIB_TEST(*o11 == 42);
+        o11 = (short)12;
+        DLIB_TEST(*o11 == 12);
+    }
+
+    void test_optional_int_constexpr()
+    {
+        {
+            constexpr dlib::optional<int> o2{};
+            constexpr dlib::optional<int> o3 = {};
+            constexpr dlib::optional<int> o4 = dlib::nullopt;
+            constexpr dlib::optional<int> o5 = {dlib::nullopt};
+            constexpr dlib::optional<int> o6(dlib::nullopt);
+
+            static_assert(!o2, "bad");
+            static_assert(!o3, "bad");
+            static_assert(!o4, "bad");
+            static_assert(!o5, "bad");
+            static_assert(!o6, "bad");
+        }
     }
 
 // ---------------------------------------------------------------------------------------------------
