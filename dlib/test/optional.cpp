@@ -34,6 +34,21 @@ namespace
     static_assert(std::is_trivially_move_assignable<dlib::optional<trivial_type>>::value,    "bad");
     static_assert(std::is_trivially_destructible<dlib::optional<trivial_type>>::value,       "bad");
 
+    struct non_trivial_type
+    {
+        non_trivial_type(const non_trivial_type&)               {}
+        non_trivial_type(non_trivial_type&&)                    {};
+        non_trivial_type& operator=(const non_trivial_type&)    { return *this; }
+        non_trivial_type& operator=(non_trivial_type&&)         { return *this; };
+        ~non_trivial_type()                                     {}
+    };
+
+    static_assert(!std::is_trivially_copy_constructible<dlib::optional<non_trivial_type>>::value, "bad");
+    static_assert(!std::is_trivially_copy_assignable<dlib::optional<non_trivial_type>>::value,    "bad");
+    static_assert(!std::is_trivially_move_constructible<dlib::optional<non_trivial_type>>::value, "bad");
+    static_assert(!std::is_trivially_move_assignable<dlib::optional<non_trivial_type>>::value,    "bad");
+    static_assert(!std::is_trivially_destructible<dlib::optional<non_trivial_type>>::value,       "bad");
+
 // ---------------------------------------------------------------------------------------------------
 
     void test_optional_int()
