@@ -13,6 +13,29 @@ namespace
 
 // ---------------------------------------------------------------------------------------------------
 
+    static_assert(std::is_trivially_copy_constructible<dlib::optional<int>>::value, "bad");
+    static_assert(std::is_trivially_copy_assignable<dlib::optional<int>>::value,    "bad");
+    static_assert(std::is_trivially_move_constructible<dlib::optional<int>>::value, "bad");
+    static_assert(std::is_trivially_move_assignable<dlib::optional<int>>::value,    "bad");
+    static_assert(std::is_trivially_destructible<dlib::optional<int>>::value,       "bad");
+
+    struct trivial_type 
+    {
+        trivial_type(const trivial_type&)             = default;
+        trivial_type(trivial_type&&)                  = default;
+        trivial_type& operator=(const trivial_type&)  = default;
+        trivial_type& operator=(trivial_type&&)       = default;
+        ~trivial_type() = default;
+    };
+
+    static_assert(std::is_trivially_copy_constructible<dlib::optional<trivial_type>>::value, "bad");
+    static_assert(std::is_trivially_copy_assignable<dlib::optional<trivial_type>>::value,    "bad");
+    static_assert(std::is_trivially_move_constructible<dlib::optional<trivial_type>>::value, "bad");
+    static_assert(std::is_trivially_move_assignable<dlib::optional<trivial_type>>::value,    "bad");
+    static_assert(std::is_trivially_destructible<dlib::optional<trivial_type>>::value,       "bad");
+
+// ---------------------------------------------------------------------------------------------------
+
     void test_optional_int()
     {
         dlib::optional<int> o1;

@@ -114,6 +114,8 @@ namespace dlib
         >;
     }
 
+// ---------------------------------------------------------------------------------------------------
+
     template <
       class T,
       bool = std::is_trivially_destructible<T>::value
