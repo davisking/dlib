@@ -13,6 +13,12 @@ namespace
 
 // ---------------------------------------------------------------------------------------------------
 
+    static_assert(std::is_copy_constructible<dlib::optional<int>>::value, "bad");
+    static_assert(std::is_copy_assignable<dlib::optional<int>>::value,    "bad");
+    static_assert(std::is_move_constructible<dlib::optional<int>>::value, "bad");
+    static_assert(std::is_move_assignable<dlib::optional<int>>::value,    "bad");
+    static_assert(std::is_destructible<dlib::optional<int>>::value,       "bad");
+
     static_assert(std::is_trivially_copy_constructible<dlib::optional<int>>::value, "bad");
     static_assert(std::is_trivially_copy_assignable<dlib::optional<int>>::value,    "bad");
     static_assert(std::is_trivially_move_constructible<dlib::optional<int>>::value, "bad");
@@ -27,6 +33,12 @@ namespace
         trivial_type& operator=(trivial_type&&)       = default;
         ~trivial_type() = default;
     };
+
+    static_assert(std::is_copy_constructible<dlib::optional<trivial_type>>::value, "bad");
+    static_assert(std::is_copy_assignable<dlib::optional<trivial_type>>::value,    "bad");
+    static_assert(std::is_move_constructible<dlib::optional<trivial_type>>::value, "bad");
+    static_assert(std::is_move_assignable<dlib::optional<trivial_type>>::value,    "bad");
+    static_assert(std::is_destructible<dlib::optional<trivial_type>>::value,       "bad");
 
     static_assert(std::is_trivially_copy_constructible<dlib::optional<trivial_type>>::value, "bad");
     static_assert(std::is_trivially_copy_assignable<dlib::optional<trivial_type>>::value,    "bad");
@@ -43,11 +55,54 @@ namespace
         ~non_trivial_type()                                     {}
     };
 
+    static_assert(std::is_copy_constructible<dlib::optional<non_trivial_type>>::value, "bad");
+    static_assert(std::is_copy_assignable<dlib::optional<non_trivial_type>>::value,    "bad");
+    static_assert(std::is_move_constructible<dlib::optional<non_trivial_type>>::value, "bad");
+    static_assert(std::is_move_assignable<dlib::optional<non_trivial_type>>::value,    "bad");
+    static_assert(std::is_destructible<dlib::optional<non_trivial_type>>::value,       "bad");
+
     static_assert(!std::is_trivially_copy_constructible<dlib::optional<non_trivial_type>>::value, "bad");
     static_assert(!std::is_trivially_copy_assignable<dlib::optional<non_trivial_type>>::value,    "bad");
     static_assert(!std::is_trivially_move_constructible<dlib::optional<non_trivial_type>>::value, "bad");
     static_assert(!std::is_trivially_move_assignable<dlib::optional<non_trivial_type>>::value,    "bad");
     static_assert(!std::is_trivially_destructible<dlib::optional<non_trivial_type>>::value,       "bad");
+
+    struct nothing_works
+    {
+        nothing_works(const nothing_works&)             = delete;
+        nothing_works(nothing_works&&)                  = delete;
+        nothing_works& operator=(const nothing_works&)  = delete;
+        nothing_works& operator=(nothing_works&&)       = delete;
+    };
+
+    static_assert(!std::is_copy_constructible<dlib::optional<nothing_works>>::value,    "bad");
+    static_assert(!std::is_copy_assignable<dlib::optional<nothing_works>>::value,       "bad");
+    static_assert(!std::is_move_constructible<dlib::optional<nothing_works>>::value,    "bad");
+    static_assert(!std::is_move_assignable<dlib::optional<nothing_works>>::value,       "bad");
+
+    struct copyable_type 
+    {
+        copyable_type(const copyable_type&)             = default;
+        copyable_type(copyable_type&&)                  = delete;
+        copyable_type& operator=(const copyable_type&)  = default;
+        copyable_type& operator=(copyable_type&&)       = delete;
+    };
+
+    static_assert(std::is_copy_constructible<dlib::optional<copyable_type>>::value,     "bad");
+    static_assert(std::is_copy_assignable<dlib::optional<copyable_type>>::value,        "bad");
+
+    struct moveable_type 
+    {
+        moveable_type(const moveable_type&)             = delete;
+        moveable_type(moveable_type&&)                  = default;
+        moveable_type& operator=(const moveable_type&)  = delete;
+        moveable_type& operator=(moveable_type&&)       = default;
+    };
+
+    static_assert(!std::is_copy_constructible<dlib::optional<moveable_type>>::value,     "bad");
+    static_assert(!std::is_copy_assignable<dlib::optional<moveable_type>>::value,        "bad");
+    static_assert(std::is_move_constructible<dlib::optional<moveable_type>>::value,     "bad");
+    static_assert(std::is_move_assignable<dlib::optional<moveable_type>>::value,        "bad");
 
 // ---------------------------------------------------------------------------------------------------
 
