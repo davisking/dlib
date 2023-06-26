@@ -5,8 +5,7 @@
 
 #include <exception>
 #include <initializer_list>
-#include "type_traits.h"
-#include "utility.h"
+#include "functional.h"
 
 namespace dlib
 {
@@ -652,6 +651,42 @@ namespace dlib
         void reset() noexcept(std::is_nothrow_destructible<T>::value)
         {
             this->destruct();
+        }
+
+        template<class F>
+        constexpr auto and_then(F&& f) &
+        {
+            if (*this)
+                return dlib::invoke(std::forward<F>(f), **this);
+            else
+                return dlib::remove_cvref_t<dlib::invoke_result_t<F,T&>>();
+        }
+
+        template<class F>
+        constexpr auto and_then(F&& f) const&
+        {
+            if (*this)
+                return dlib::invoke(std::forward<F>(f), **this);
+            else
+                return dlib::remove_cvref_t<dlib::invoke_result_t<F,const T&>>();
+        }
+
+        template<class F>
+        constexpr auto and_then(F&& f) &&
+        {
+            if (*this)
+                return dlib::invoke(std::forward<F>(f), std::move(**this));
+            else
+                return dlib::remove_cvref_t<dlib::invoke_result_t<F,T>>();
+        }
+
+        template<class F>
+        constexpr auto and_then(F&& f) const&&
+        {
+            if (*this)
+                return dlib::invoke(std::forward<F>(f), std::move(**this));
+            else
+                return dlib::remove_cvref_t<dlib::invoke_result_t<F,const T>>();
         }
     };
 
