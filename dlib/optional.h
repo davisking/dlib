@@ -704,6 +704,62 @@ namespace dlib
             else
                 return Return{};
         }
+
+        template <
+            class F,
+            class U = dlib::remove_cvref_t<dlib::invoke_result_t<F, T&>>,
+            std::enable_if_t<!std::is_same<U, dlib::in_place_t>::value, bool> = true,
+            std::enable_if_t<!std::is_same<U, dlib::nullopt_t>::value, bool> = true
+        >
+        constexpr dlib::optional<U> transform(F&& f) &
+        {
+            if (*this)
+                return dlib::invoke(std::forward<F>(f), **this);
+            else
+                return dlib::optional<U>{};
+        }
+
+        template <
+            class F,
+            class U = dlib::remove_cvref_t<dlib::invoke_result_t<F, const T&>>,
+            std::enable_if_t<!std::is_same<U, dlib::in_place_t>::value, bool> = true,
+            std::enable_if_t<!std::is_same<U, dlib::nullopt_t>::value, bool> = true
+        >
+        constexpr dlib::optional<U> transform(F&& f) const&
+        {
+            if (*this)
+                return dlib::invoke(std::forward<F>(f), **this);
+            else
+                return dlib::optional<U>{};
+        }
+
+        template <
+            class F,
+            class U = dlib::remove_cvref_t<dlib::invoke_result_t<F,T>>,
+            std::enable_if_t<!std::is_same<U, dlib::in_place_t>::value, bool> = true,
+            std::enable_if_t<!std::is_same<U, dlib::nullopt_t>::value, bool> = true
+        >
+        constexpr dlib::optional<U> transform(F&& f) &&
+        {
+            if (*this)
+                return dlib::invoke(std::forward<F>(f), std::move(**this));
+            else
+                return dlib::optional<U>{};
+        }
+
+        template <
+            class F,
+            class U = dlib::remove_cvref_t<dlib::invoke_result_t<F,const T>>,
+            std::enable_if_t<!std::is_same<U, dlib::in_place_t>::value, bool> = true,
+            std::enable_if_t<!std::is_same<U, dlib::nullopt_t>::value, bool> = true
+        >
+        constexpr dlib::optional<U> transform(F&& f) const&&
+        {
+            if (*this)
+                return dlib::invoke(std::forward<F>(f), std::move(**this));
+            else
+                return dlib::optional<U>{};
+        }
     };
 
 // ---------------------------------------------------------------------------------------------------
