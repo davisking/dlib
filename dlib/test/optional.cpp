@@ -110,23 +110,36 @@ namespace
     {
         dlib::optional<int> o1;
         DLIB_TEST(!o1);
+        DLIB_TEST(!o1.has_value());
+        int throw_counter{0};
+        try  {
+            o1.value();
+        } catch(const std::exception& e) {
+            throw_counter++;
+        }
+        DLIB_TEST(throw_counter == 1);
 
         dlib::optional<int> o2 = dlib::nullopt;
         DLIB_TEST(!o2);
+        DLIB_TEST(!o2.has_value());
 
         dlib::optional<int> o3 = 42;
         DLIB_TEST(*o3 == 42);
+        DLIB_TEST(o3.value() == 42);
 
         dlib::optional<int> o4 = o3;
         DLIB_TEST(*o3 == 42);
         DLIB_TEST(*o4 == 42);
+        DLIB_TEST(o4.value() == 42);
 
         dlib::optional<int> o5 = o1;
         DLIB_TEST(!o1);
         DLIB_TEST(!o5);
+        DLIB_TEST(!o5.has_value());
 
         dlib::optional<int> o6 = std::move(o3);
         DLIB_TEST(*o6 == 42);
+        DLIB_TEST(o6.value() == 42);
 
         dlib::optional<short> o7 = (short)42;
         DLIB_TEST(*o7 == 42);
@@ -150,6 +163,11 @@ namespace
         DLIB_TEST(*o11 == 42);
         o11 = (short)12;
         DLIB_TEST(*o11 == 12);
+
+        dlib::optional<int> o12;
+        swap(o12, o4);
+        DLIB_TEST(o12);
+        DLIB_TEST(*o12 == 42);
     }
 
     void test_optional_int_constexpr()
@@ -218,6 +236,7 @@ namespace
         )
         {
             test_optional_int();
+            test_optional_int_constexpr();
             test_constructors();
         }
     } a;

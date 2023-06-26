@@ -607,6 +607,7 @@ namespace dlib
         constexpr T&&       operator*() &&      noexcept { return std::move(this->get()); }
         constexpr const T&& operator*() const&& noexcept { return std::move(this->get()); }
         constexpr explicit  operator bool() const noexcept { return this->active; }
+        using details::optional_ops<T>::has_value;
 
         constexpr T& value() & 
         {
