@@ -654,9 +654,9 @@ namespace dlib
         }
 
         template <
-            class F,
-            class Return = dlib::remove_cvref_t<dlib::invoke_result_t<F,T&>>,
-            std::enable_if_t<details::is_optional<Return>::value, bool> = true
+          class F,
+          class Return = dlib::remove_cvref_t<dlib::invoke_result_t<F,T&>>,
+          std::enable_if_t<details::is_optional<Return>::value, bool> = true
         >
         constexpr auto and_then(F&& f) &
         {
@@ -667,9 +667,9 @@ namespace dlib
         }
 
         template <
-            class F,
-            class Return = dlib::remove_cvref_t<dlib::invoke_result_t<F,const T&>>,
-            std::enable_if_t<details::is_optional<Return>::value, bool> = true
+          class F,
+          class Return = dlib::remove_cvref_t<dlib::invoke_result_t<F,const T&>>,
+          std::enable_if_t<details::is_optional<Return>::value, bool> = true
         >
         constexpr auto and_then(F&& f) const&
         {
@@ -680,9 +680,9 @@ namespace dlib
         }
 
         template <
-            class F,
-            class Return = dlib::remove_cvref_t<dlib::invoke_result_t<F,T>>,
-            std::enable_if_t<details::is_optional<Return>::value, bool> = true
+          class F,
+          class Return = dlib::remove_cvref_t<dlib::invoke_result_t<F,T>>,
+          std::enable_if_t<details::is_optional<Return>::value, bool> = true
         >
         constexpr auto and_then(F&& f) &&
         {
@@ -693,9 +693,9 @@ namespace dlib
         }
 
         template <
-            class F,
-            class Return = dlib::remove_cvref_t<dlib::invoke_result_t<F,const T>>,
-            std::enable_if_t<details::is_optional<Return>::value, bool> = true
+          class F,
+          class Return = dlib::remove_cvref_t<dlib::invoke_result_t<F,const T>>,
+          std::enable_if_t<details::is_optional<Return>::value, bool> = true
         >
         constexpr auto and_then(F&& f) const&&
         {
@@ -706,10 +706,10 @@ namespace dlib
         }
 
         template <
-            class F,
-            class U = dlib::remove_cvref_t<dlib::invoke_result_t<F, T&>>,
-            std::enable_if_t<!std::is_same<U, dlib::in_place_t>::value, bool> = true,
-            std::enable_if_t<!std::is_same<U, dlib::nullopt_t>::value, bool> = true
+          class F,
+          class U = dlib::remove_cvref_t<dlib::invoke_result_t<F, T&>>,
+          std::enable_if_t<!std::is_same<U, dlib::in_place_t>::value, bool> = true,
+          std::enable_if_t<!std::is_same<U, dlib::nullopt_t>::value, bool> = true
         >
         constexpr dlib::optional<U> transform(F&& f) &
         {
@@ -720,10 +720,10 @@ namespace dlib
         }
 
         template <
-            class F,
-            class U = dlib::remove_cvref_t<dlib::invoke_result_t<F, const T&>>,
-            std::enable_if_t<!std::is_same<U, dlib::in_place_t>::value, bool> = true,
-            std::enable_if_t<!std::is_same<U, dlib::nullopt_t>::value, bool> = true
+          class F,
+          class U = dlib::remove_cvref_t<dlib::invoke_result_t<F, const T&>>,
+          std::enable_if_t<!std::is_same<U, dlib::in_place_t>::value, bool> = true,
+          std::enable_if_t<!std::is_same<U, dlib::nullopt_t>::value, bool> = true
         >
         constexpr dlib::optional<U> transform(F&& f) const&
         {
@@ -734,10 +734,10 @@ namespace dlib
         }
 
         template <
-            class F,
-            class U = dlib::remove_cvref_t<dlib::invoke_result_t<F,T>>,
-            std::enable_if_t<!std::is_same<U, dlib::in_place_t>::value, bool> = true,
-            std::enable_if_t<!std::is_same<U, dlib::nullopt_t>::value, bool> = true
+          class F,
+          class U = dlib::remove_cvref_t<dlib::invoke_result_t<F,T>>,
+          std::enable_if_t<!std::is_same<U, dlib::in_place_t>::value, bool> = true,
+          std::enable_if_t<!std::is_same<U, dlib::nullopt_t>::value, bool> = true
         >
         constexpr dlib::optional<U> transform(F&& f) &&
         {
@@ -748,10 +748,10 @@ namespace dlib
         }
 
         template <
-            class F,
-            class U = dlib::remove_cvref_t<dlib::invoke_result_t<F,const T>>,
-            std::enable_if_t<!std::is_same<U, dlib::in_place_t>::value, bool> = true,
-            std::enable_if_t<!std::is_same<U, dlib::nullopt_t>::value, bool> = true
+          class F,
+          class U = dlib::remove_cvref_t<dlib::invoke_result_t<F,const T>>,
+          std::enable_if_t<!std::is_same<U, dlib::in_place_t>::value, bool> = true,
+          std::enable_if_t<!std::is_same<U, dlib::nullopt_t>::value, bool> = true
         >
         constexpr dlib::optional<U> transform(F&& f) const&&
         {
@@ -759,6 +759,26 @@ namespace dlib
                 return dlib::invoke(std::forward<F>(f), std::move(**this));
             else
                 return dlib::optional<U>{};
+        }
+
+        template < 
+          class F,
+          class U = dlib::remove_cvref_t<dlib::invoke_result_t<F>>,
+          std::enable_if_t<std::is_same<U, dlib::optional<T>>::value, bool> = true
+        >
+        constexpr optional or_else( F&& f ) const&
+        {
+            return *this ? *this : std::forward<F>(f)();
+        }
+
+        template < 
+          class F,
+          class U = dlib::remove_cvref_t<dlib::invoke_result_t<F>>,
+          std::enable_if_t<std::is_same<U, dlib::optional<T>>::value, bool> = true
+        >
+        constexpr optional or_else( F&& f ) &&
+        {
+            return *this ? std::move(*this) : std::forward<F>(f)();
         }
     };
 
