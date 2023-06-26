@@ -653,40 +653,56 @@ namespace dlib
             this->destruct();
         }
 
-        template<class F>
+        template <
+            class F,
+            class Return = dlib::remove_cvref_t<dlib::invoke_result_t<F,T&>>,
+            std::enable_if_t<details::is_optional<Return>::value, bool> = true
+        >
         constexpr auto and_then(F&& f) &
         {
             if (*this)
                 return dlib::invoke(std::forward<F>(f), **this);
             else
-                return dlib::remove_cvref_t<dlib::invoke_result_t<F,T&>>();
+                return Return{};
         }
 
-        template<class F>
+        template <
+            class F,
+            class Return = dlib::remove_cvref_t<dlib::invoke_result_t<F,const T&>>,
+            std::enable_if_t<details::is_optional<Return>::value, bool> = true
+        >
         constexpr auto and_then(F&& f) const&
         {
             if (*this)
                 return dlib::invoke(std::forward<F>(f), **this);
             else
-                return dlib::remove_cvref_t<dlib::invoke_result_t<F,const T&>>();
+                return Return{};
         }
 
-        template<class F>
+        template <
+            class F,
+            class Return = dlib::remove_cvref_t<dlib::invoke_result_t<F,T>>,
+            std::enable_if_t<details::is_optional<Return>::value, bool> = true
+        >
         constexpr auto and_then(F&& f) &&
         {
             if (*this)
                 return dlib::invoke(std::forward<F>(f), std::move(**this));
             else
-                return dlib::remove_cvref_t<dlib::invoke_result_t<F,T>>();
+                return Return{};
         }
 
-        template<class F>
+        template <
+            class F,
+            class Return = dlib::remove_cvref_t<dlib::invoke_result_t<F,const T>>,
+            std::enable_if_t<details::is_optional<Return>::value, bool> = true
+        >
         constexpr auto and_then(F&& f) const&&
         {
             if (*this)
                 return dlib::invoke(std::forward<F>(f), std::move(**this));
             else
-                return dlib::remove_cvref_t<dlib::invoke_result_t<F,const T>>();
+                return Return{};
         }
     };
 
