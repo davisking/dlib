@@ -25,6 +25,12 @@ namespace
     static_assert(std::is_trivially_move_assignable<dlib::optional<int>>::value,    "bad");
     static_assert(std::is_trivially_destructible<dlib::optional<int>>::value,       "bad");
 
+    static_assert(std::is_nothrow_copy_constructible<dlib::optional<int>>::value, "bad");
+    static_assert(std::is_nothrow_copy_assignable<dlib::optional<int>>::value,    "bad");
+    static_assert(std::is_nothrow_move_constructible<dlib::optional<int>>::value, "bad");
+    static_assert(std::is_nothrow_move_assignable<dlib::optional<int>>::value,    "bad");
+    static_assert(std::is_nothrow_destructible<dlib::optional<int>>::value,       "bad");
+
     struct trivial_type 
     {
         trivial_type(const trivial_type&)             = default;
@@ -46,6 +52,12 @@ namespace
     static_assert(std::is_trivially_move_assignable<dlib::optional<trivial_type>>::value,    "bad");
     static_assert(std::is_trivially_destructible<dlib::optional<trivial_type>>::value,       "bad");
 
+    static_assert(std::is_nothrow_copy_constructible<dlib::optional<trivial_type>>::value, "bad");
+    static_assert(std::is_nothrow_copy_assignable<dlib::optional<trivial_type>>::value,    "bad");
+    static_assert(std::is_nothrow_move_constructible<dlib::optional<trivial_type>>::value, "bad");
+    static_assert(std::is_nothrow_move_assignable<dlib::optional<trivial_type>>::value,    "bad");
+    static_assert(std::is_nothrow_destructible<dlib::optional<trivial_type>>::value,       "bad");
+
     struct non_trivial_type
     {
         non_trivial_type(const non_trivial_type&)               {}
@@ -66,6 +78,11 @@ namespace
     static_assert(!std::is_trivially_move_constructible<dlib::optional<non_trivial_type>>::value, "bad");
     static_assert(!std::is_trivially_move_assignable<dlib::optional<non_trivial_type>>::value,    "bad");
     static_assert(!std::is_trivially_destructible<dlib::optional<non_trivial_type>>::value,       "bad");
+
+    static_assert(!std::is_nothrow_copy_constructible<dlib::optional<non_trivial_type>>::value, "bad");
+    static_assert(!std::is_nothrow_copy_assignable<dlib::optional<non_trivial_type>>::value,    "bad");
+    static_assert(!std::is_nothrow_move_constructible<dlib::optional<non_trivial_type>>::value, "bad");
+    static_assert(!std::is_nothrow_move_assignable<dlib::optional<non_trivial_type>>::value,    "bad");
 
     struct nothing_works
     {
@@ -90,6 +107,7 @@ namespace
 
     static_assert(std::is_copy_constructible<dlib::optional<copyable_type>>::value,     "bad");
     static_assert(std::is_copy_assignable<dlib::optional<copyable_type>>::value,        "bad");
+    //copyable_type can still be moved, but it will just copy.
 
     struct moveable_type 
     {
@@ -99,8 +117,8 @@ namespace
         moveable_type& operator=(moveable_type&&)       = default;
     };
 
-    static_assert(!std::is_copy_constructible<dlib::optional<moveable_type>>::value,     "bad");
-    static_assert(!std::is_copy_assignable<dlib::optional<moveable_type>>::value,        "bad");
+    static_assert(!std::is_copy_constructible<dlib::optional<moveable_type>>::value,    "bad");
+    static_assert(!std::is_copy_assignable<dlib::optional<moveable_type>>::value,       "bad");
     static_assert(std::is_move_constructible<dlib::optional<moveable_type>>::value,     "bad");
     static_assert(std::is_move_assignable<dlib::optional<moveable_type>>::value,        "bad");
 
@@ -119,9 +137,10 @@ namespace
             throw_counter++;
         }
         DLIB_TEST(throw_counter == 1);
+        DLIB_TEST(o1 == dlib::nullopt);
 
         dlib::optional<int> o2 = dlib::nullopt;
-        DLIB_TEST(noexcept(o2 = dlib::nullopt));
+        static_assert(noexcept(o2 = dlib::nullopt), "bad");
         DLIB_TEST(!o2);
         DLIB_TEST(!o2.has_value());
         DLIB_TEST(o2.value_or(3) == 3);
@@ -130,26 +149,30 @@ namespace
         DLIB_TEST(*o3 == 42);
         DLIB_TEST(o3.value() == 42);
         DLIB_TEST(o3.value_or(3) == 42);
+        DLIB_TEST(o3 == 42);
+        DLIB_TEST(42 == o3);
 
         dlib::optional<int> o4 = o3;
-        DLIB_TEST(noexcept(o4 = o3));
+        static_assert(noexcept(o4 = o3), "bad");
         DLIB_TEST(*o3 == 42);
         DLIB_TEST(*o4 == 42);
+        DLIB_TEST(o4 == 42);
+        DLIB_TEST(42 == o4);
         DLIB_TEST(o4.value() == 42);
 
         dlib::optional<int> o5 = o1;
-        DLIB_TEST(noexcept(o5 = o1));
+        static_assert(noexcept(o5 = o1), "bad");
         DLIB_TEST(!o1);
         DLIB_TEST(!o5);
         DLIB_TEST(!o5.has_value());
 
         dlib::optional<int> o6 = std::move(o3);
-        DLIB_TEST(noexcept(o6 = std::move(o3)));
+        static_assert(noexcept(o6 = std::move(o3)), "bad");
         DLIB_TEST(*o6 == 42);
         DLIB_TEST(o6.value() == 42);
 
         dlib::optional<short> o7 = (short)42;
-        DLIB_TEST(noexcept(o7 = (short)42));
+        static_assert(noexcept(o7 = (short)42), "bad");
         DLIB_TEST(*o7 == 42);
 
         dlib::optional<int> o8 = o7;
@@ -177,7 +200,10 @@ namespace
         DLIB_TEST(o12);
         DLIB_TEST(!o4);
         DLIB_TEST(*o12 == 42);
-        DLIB_TEST(noexcept(swap(o12, o4)));
+        static_assert(noexcept(swap(o12, o4)), "bad");
+
+        o4.reset();
+        DLIB_TEST(!o4);
     }
 
 // ---------------------------------------------------------------------------------------------------
@@ -202,6 +228,9 @@ namespace
             static_assert(o4.value_or(1) == 1, "bad");
             static_assert(o5.value_or(1) == 1, "bad");
             static_assert(o6.value_or(1) == 1, "bad");
+
+            static_assert(o2 != 1, "bad");
+            static_assert(1 != o2, "bad");
         }
     }
 
@@ -385,17 +414,32 @@ namespace
         DLIB_TEST(o2->f_ == 5.1f);
         DLIB_TEST(o2->str_ == "general kenobi");
 
-        dlib::optional<std::string> o3(dlib::in_place, {'a', 'b', 'c'});
+        auto o3 = dlib::make_optional<A>(3, 3.141592f, "from a certain point of view");
         DLIB_TEST(o3);
-        DLIB_TEST(*o3 == "abc");
+        DLIB_TEST(o3->i_ == 3);
+        DLIB_TEST(o3->f_ == 3.141592f);
+        DLIB_TEST(o3->str_ == "from a certain point of view");
 
-        dlib::optional<std::string> o4;
-        o4.emplace({'a', 'b', 'c'});
+        dlib::optional<std::string> o4(dlib::in_place, {'a', 'b', 'c'});
         DLIB_TEST(o4);
         DLIB_TEST(*o4 == "abc");
+        DLIB_TEST(o4 == "abc");
+
+        dlib::optional<std::string> o5;
+        o5.emplace({'a', 'b', 'c'});
+        DLIB_TEST(o5);
+        DLIB_TEST(*o5 == "abc");
     }
 
 // ---------------------------------------------------------------------------------------------------
+
+    void test_make_optional()
+    {
+        constexpr auto o1 = dlib::make_optional(1);
+        static_assert(std::is_same<std::decay_t<decltype(o1)>, dlib::optional<int>>::value, "bad");
+        static_assert(o1 == 1, "bad");
+        static_assert(1 == o1, "bad");
+    }
 
     class optional_tester : public tester
     {
@@ -415,6 +459,7 @@ namespace
             test_optional_int_constexpr_monads();
             test_constructors();
             test_emplace();
+            test_make_optional();
         }
     } a;
 }
