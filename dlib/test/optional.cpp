@@ -177,6 +177,8 @@ namespace
         DLIB_TEST(noexcept(swap(o12, o4)));
     }
 
+// ---------------------------------------------------------------------------------------------------
+
     void test_optional_int_constexpr()
     {
         {
@@ -191,6 +193,41 @@ namespace
             static_assert(!o4, "bad");
             static_assert(!o5, "bad");
             static_assert(!o6, "bad");
+        }
+    }
+
+// ---------------------------------------------------------------------------------------------------
+
+    void test_optional_int_monads()
+    {
+        dlib::optional<int> o1{42};
+
+        {
+            auto res = o1.and_then([](int i) { return dlib::optional<long>(i); });
+
+            static_assert(std::is_same<decltype(res), dlib::optional<long>>::value, "bad map");
+            DLIB_TEST(*res == 42);
+        }
+
+        {
+            auto res = o1.transform([](int i) { return (long)i; });
+
+            static_assert(std::is_same<decltype(res), dlib::optional<long>>::value, "bad map");
+            DLIB_TEST(*res == 42);
+        }
+
+        {
+            auto res = o1.and_then([](int i) { return dlib::optional<std::string>(std::to_string(i)); });
+
+            static_assert(std::is_same<decltype(res), dlib::optional<std::string>>::value, "bad map");
+            DLIB_TEST(*res == "42");
+        }
+
+        {
+            auto res = o1.transform([](int i) { return std::to_string(i); });
+
+            static_assert(std::is_same<decltype(res), dlib::optional<std::string>>::value, "bad map");
+            DLIB_TEST(*res == "42");
         }
     }
 
@@ -244,6 +281,7 @@ namespace
         {
             test_optional_int();
             test_optional_int_constexpr();
+            test_optional_int_monads();
             test_constructors();
         }
     } a;
