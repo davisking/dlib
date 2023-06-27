@@ -351,6 +351,43 @@ namespace
 
 // ---------------------------------------------------------------------------------------------------
 
+    void test_emplace()
+    {
+        struct A
+        {
+            A() = default;
+            explicit A(int i, float f, const std::string& str) : i_{i}, f_{f}, str_{str} {}
+
+            int         i_{0};
+            float       f_{0.0f};
+            std::string str_;
+        };
+
+        dlib::optional<A> o1(dlib::in_place, 1, 2.5f, "hello there");
+        DLIB_TEST(o1);
+        DLIB_TEST(o1->i_ == 1);
+        DLIB_TEST(o1->f_ == 2.5f);
+        DLIB_TEST(o1->str_ == "hello there");
+
+        dlib::optional<A> o2;
+        o2.emplace(2, 5.1f, "general kenobi");
+        DLIB_TEST(o2);
+        DLIB_TEST(o2->i_ == 2);
+        DLIB_TEST(o2->f_ == 5.1f);
+        DLIB_TEST(o2->str_ == "general kenobi");
+
+        dlib::optional<std::string> o3(dlib::in_place, {'a', 'b', 'c'});
+        DLIB_TEST(o3);
+        DLIB_TEST(*o3 == "abc");
+
+        dlib::optional<std::string> o4;
+        o4.emplace({'a', 'b', 'c'});
+        DLIB_TEST(o4);
+        DLIB_TEST(*o4 == "abc");
+    }
+
+// ---------------------------------------------------------------------------------------------------
+
     class optional_tester : public tester
     {
     public:
@@ -368,6 +405,7 @@ namespace
             test_optional_int_monads();
             test_optional_int_constexpr_monads();
             test_constructors();
+            test_emplace();
         }
     } a;
 }

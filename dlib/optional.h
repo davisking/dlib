@@ -572,7 +572,7 @@ namespace dlib
         constexpr T& emplace(Args &&... args) noexcept(std::is_nothrow_constructible<T, Args...>::value)
         {
             reset();
-            construct(std::forward<Args>(args)...);
+            this->construct(std::forward<Args>(args)...);
             return **this;
         }
 
@@ -580,7 +580,7 @@ namespace dlib
         constexpr T& emplace(std::initializer_list<U> il, Args &&... args) 
         {
             reset();
-            construct(il, std::forward<Args>(args)...);
+            this->construct(il, std::forward<Args>(args)...);
             return **this;   
         }
 
@@ -607,8 +607,8 @@ namespace dlib
             }
         }
 
-        constexpr const T*  operator->() const  noexcept { return this->val; }
-        constexpr T*        operator->()        noexcept { return this->val; }
+        constexpr const T*  operator->() const  noexcept { return &this->val; }
+        constexpr T*        operator->()        noexcept { return &this->val; }
         constexpr T&        operator*() &       noexcept { return this->val; }
         constexpr const T&  operator*() const&  noexcept { return this->val; }
         constexpr T&&       operator*() &&      noexcept { return std::move(this->val); }
