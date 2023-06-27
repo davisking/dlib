@@ -120,6 +120,7 @@ namespace
         DLIB_TEST(throw_counter == 1);
 
         dlib::optional<int> o2 = dlib::nullopt;
+        DLIB_TEST(noexcept(o2 = dlib::nullopt));
         DLIB_TEST(!o2);
         DLIB_TEST(!o2.has_value());
 
@@ -128,20 +129,24 @@ namespace
         DLIB_TEST(o3.value() == 42);
 
         dlib::optional<int> o4 = o3;
+        DLIB_TEST(noexcept(o4 = o3));
         DLIB_TEST(*o3 == 42);
         DLIB_TEST(*o4 == 42);
         DLIB_TEST(o4.value() == 42);
 
         dlib::optional<int> o5 = o1;
+        DLIB_TEST(noexcept(o5 = o1));
         DLIB_TEST(!o1);
         DLIB_TEST(!o5);
         DLIB_TEST(!o5.has_value());
 
         dlib::optional<int> o6 = std::move(o3);
+        DLIB_TEST(noexcept(o6 = std::move(o3)));
         DLIB_TEST(*o6 == 42);
         DLIB_TEST(o6.value() == 42);
 
         dlib::optional<short> o7 = (short)42;
+        DLIB_TEST(noexcept(o7 = (short)42));
         DLIB_TEST(*o7 == 42);
 
         dlib::optional<int> o8 = o7;
@@ -169,6 +174,7 @@ namespace
         DLIB_TEST(o12);
         DLIB_TEST(!o4);
         DLIB_TEST(*o12 == 42);
+        DLIB_TEST(noexcept(swap(o12, o4)));
     }
 
     void test_optional_int_constexpr()
