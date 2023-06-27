@@ -229,6 +229,48 @@ namespace
             static_assert(std::is_same<decltype(res), dlib::optional<std::string>>::value, "bad map");
             DLIB_TEST(*res == "42");
         }
+
+        {
+            auto res = o1.transform([](int i)                   {return i+1;})
+                         .transform([](int i)                   {return i*2;})
+                         .transform([](int i)                   {return std::to_string(i);})
+                         .transform([](const std::string& str)  {return std::stoi(str);})
+                         .transform([](int i)                   {return i - 2;})
+                         .or_else([]                            {return dlib::make_optional<int>(0);});
+
+            static_assert(std::is_same<decltype(res), dlib::optional<int>>::value, "bad map");
+            DLIB_TEST(*res == 84);
+        }
+
+        dlib::optional<int> o2;
+
+        {
+            auto res = o2.transform([](int i)   {return i+1;})
+                         .or_else([]            {return dlib::make_optional<int>(0);});
+
+            static_assert(std::is_same<decltype(res), dlib::optional<int>>::value, "bad map");
+            DLIB_TEST(*res == 0);
+        }
+    }
+
+// ---------------------------------------------------------------------------------------------------
+
+    void test_optional_int_constexpr_monads()
+    {
+        constexpr dlib::optional<int> o1{42};
+
+        {
+            struct callback
+            {
+                constexpr auto operator()(int i) {return dlib::optional<long>{i}; };
+            };
+
+            constexpr auto res = o1.and_then(callback{});
+
+            static_assert(std::is_same<std::decay_t<decltype(res)>, dlib::optional<long>>::value, "bad map");
+            static_assert(*res == 42, "bad");
+            DLIB_TEST(*res == 42);
+        }
     }
 
 // ---------------------------------------------------------------------------------------------------
@@ -282,6 +324,7 @@ namespace
             test_optional_int();
             test_optional_int_constexpr();
             test_optional_int_monads();
+            test_optional_int_constexpr_monads();
             test_constructors();
         }
     } a;
