@@ -115,8 +115,8 @@ namespace dlib
 // ---------------------------------------------------------------------------------------------------
 
         template <
-        class T,
-        bool = std::is_trivially_destructible<T>::value
+          class T,
+          bool = std::is_trivially_destructible<T>::value
         >
         struct optional_storage
         {
@@ -173,13 +173,13 @@ namespace dlib
 
             template<class Optional>
             constexpr void assign(Optional&& rhs) noexcept(std::is_nothrow_constructible<T,Optional>::value &&
-                                                        std::is_nothrow_assignable<T&,Optional>::value)
+                                                           std::is_nothrow_assignable<T&,Optional>::value)
             {
-                if (has_value() && rhs.has_value())
-                    this->val = std::forward<Optional>(rhs).get();
-                else if (!has_value() && rhs.has_value())
-                    construct(std::forward<Optional>(rhs).get());
-                else if (has_value() && !rhs.has_value())
+                if (this->active && rhs.active)
+                    this->val = std::forward<Optional>(rhs).active;
+                else if (!this->active && rhs.active)
+                    construct(std::forward<Optional>(rhs).active);
+                else if (this->active && !rhs.has_value())
                     destruct();
             }
 
@@ -191,12 +191,6 @@ namespace dlib
                     this->active = false;
                 }
             }
-
-            constexpr const T&  get() const&        {return this->val;}
-            constexpr T&        get() &             {return this->val;}
-            constexpr const T&& get() const&&       {return std::move(this->val);}
-            constexpr T&&       get() &&            {return std::move(this->val);}
-            constexpr bool      has_value() const   {return this->active;}
         };
 
 // ---------------------------------------------------------------------------------------------------
@@ -590,23 +584,31 @@ namespace dlib
             using std::swap;
 
             if (*this && rhs)
+            {
                 swap(**this, *rhs);
-
+            }
+                
             else if (*this && !rhs)
+            {
                 rhs = std::move(**this);
+                reset();
+            }
             
             else if (!*this && rhs)
+            {
                 *this = std::move(*rhs);
+                rhs.reset();
+            }
         }
 
-        constexpr const T*  operator->() const  noexcept { return this->ptr(); }
-        constexpr T*        operator->()        noexcept { return this->ptr(); }
-        constexpr T&        operator*() &       noexcept { return this->get(); }
-        constexpr const T&  operator*() const&  noexcept { return this->get(); }
-        constexpr T&&       operator*() &&      noexcept { return std::move(this->get()); }
-        constexpr const T&& operator*() const&& noexcept { return std::move(this->get()); }
+        constexpr const T*  operator->() const  noexcept { return this->val; }
+        constexpr T*        operator->()        noexcept { return this->val; }
+        constexpr T&        operator*() &       noexcept { return this->val; }
+        constexpr const T&  operator*() const&  noexcept { return this->val; }
+        constexpr T&&       operator*() &&      noexcept { return std::move(this->val); }
+        constexpr const T&& operator*() const&& noexcept { return std::move(this->val); }
         constexpr explicit  operator bool() const noexcept { return this->active; }
-        using details::optional_ops<T>::has_value;
+        constexpr bool      has_value()     const noexcept { return this->active; }
 
         constexpr T& value() & 
         {

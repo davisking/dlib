@@ -167,6 +167,7 @@ namespace
         dlib::optional<int> o12;
         swap(o12, o4);
         DLIB_TEST(o12);
+        DLIB_TEST(!o4);
         DLIB_TEST(*o12 == 42);
     }
 
