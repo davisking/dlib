@@ -411,6 +411,12 @@ namespace dlib
                      private details::optional_delete_constructors<T>,
                      private details::optional_delete_assign<T> 
     {
+        /*!
+            WHAT THIS OBJECT REPRESENTS 
+                This is a standard's compliant backport of std::optional that works with C++14.
+                It includes C++23 monadic interfaces
+        !*/
+
         using base = details::optional_move_assign<T>;
 
         static_assert(!std::is_reference<T>::value,         "optional<T&> not allowed");
