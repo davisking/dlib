@@ -281,12 +281,20 @@ namespace
     static int copy_assign_count{0};
     static int move_assign_count{0};
 
+    static void reset_counters()
+    {
+        constructor_count           = 0;
+        copy_constructor_count      = 0;
+        move_constructor_count      = 0;
+        copy_assign_count           = 0;
+        move_assign_count           = 0;
+    }
+
     struct optional_dummy
     {
         optional_dummy() {++constructor_count;}
-        ~optional_dummy() {--constructor_count;}
-        optional_dummy(const optional_dummy&) {++constructor_count; ++copy_constructor_count;}
-        optional_dummy(optional_dummy&&) {++constructor_count; ++move_constructor_count;}
+        optional_dummy(const optional_dummy&) {++copy_constructor_count;}
+        optional_dummy(optional_dummy&&) {++move_constructor_count;}
         optional_dummy& operator=(const optional_dummy&) {++copy_assign_count; return *this;}
         optional_dummy& operator=(optional_dummy&&) {++move_assign_count; return *this;}
     };
@@ -299,12 +307,46 @@ namespace
         DLIB_TEST(move_constructor_count == 0);
         DLIB_TEST(copy_assign_count == 0);
         DLIB_TEST(move_assign_count == 0);
+
         val = optional_dummy{};
         DLIB_TEST(constructor_count == 1);
         DLIB_TEST(copy_constructor_count == 0);
         DLIB_TEST(move_constructor_count == 1);
         DLIB_TEST(copy_assign_count == 0);
         DLIB_TEST(move_assign_count == 0);
+        reset_counters();
+
+        dlib::optional<optional_dummy> val2{val};
+        DLIB_TEST(constructor_count == 0);
+        DLIB_TEST(copy_constructor_count == 1);
+        DLIB_TEST(move_constructor_count == 0);
+        DLIB_TEST(copy_assign_count == 0);
+        DLIB_TEST(move_assign_count == 0);
+        reset_counters();
+
+        dlib::optional<optional_dummy> val3{std::move(val)};
+        DLIB_TEST(constructor_count == 0);
+        DLIB_TEST(copy_constructor_count == 0);
+        DLIB_TEST(move_constructor_count == 1);
+        DLIB_TEST(copy_assign_count == 0);
+        DLIB_TEST(move_assign_count == 0);
+        reset_counters();
+
+        val2 = val;
+        DLIB_TEST(constructor_count == 0);
+        DLIB_TEST(copy_constructor_count == 0);
+        DLIB_TEST(move_constructor_count == 0);
+        DLIB_TEST(copy_assign_count == 1);
+        DLIB_TEST(move_assign_count == 0);
+        reset_counters();
+
+        val3 = std::move(val);
+        DLIB_TEST(constructor_count == 0);
+        DLIB_TEST(copy_constructor_count == 0);
+        DLIB_TEST(move_constructor_count == 0);
+        DLIB_TEST(copy_assign_count == 0);
+        DLIB_TEST(move_assign_count == 1);
+        reset_counters();
     }
 
 // ---------------------------------------------------------------------------------------------------

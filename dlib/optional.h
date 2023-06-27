@@ -176,9 +176,9 @@ namespace dlib
                                                            std::is_nothrow_assignable<T&,Optional>::value)
             {
                 if (this->active && rhs.active)
-                    this->val = std::forward<Optional>(rhs).active;
+                    this->val = std::forward<Optional>(rhs).val;
                 else if (!this->active && rhs.active)
-                    construct(std::forward<Optional>(rhs).active);
+                    construct(std::forward<Optional>(rhs).val);
                 else if (this->active && !rhs.active)
                     destruct();
             }
@@ -212,7 +212,7 @@ namespace dlib
             constexpr optional_copy &operator=(optional_copy&& rhs)         = default;
 
             constexpr optional_copy(const optional_copy& rhs) noexcept(std::is_nothrow_copy_constructible<T>::value)
-            : optional_storage<T>() 
+            : optional_ops<T>() 
             {
                 if (rhs.active)
                     this->construct(rhs.val);
