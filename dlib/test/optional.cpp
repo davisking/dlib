@@ -111,6 +111,7 @@ namespace
         dlib::optional<int> o1;
         DLIB_TEST(!o1);
         DLIB_TEST(!o1.has_value());
+        DLIB_TEST(o1.value_or(2) == 2);
         int throw_counter{0};
         try  {
             o1.value();
@@ -123,10 +124,12 @@ namespace
         DLIB_TEST(noexcept(o2 = dlib::nullopt));
         DLIB_TEST(!o2);
         DLIB_TEST(!o2.has_value());
+        DLIB_TEST(o2.value_or(3) == 3);
 
         dlib::optional<int> o3 = 42;
         DLIB_TEST(*o3 == 42);
         DLIB_TEST(o3.value() == 42);
+        DLIB_TEST(o3.value_or(3) == 42);
 
         dlib::optional<int> o4 = o3;
         DLIB_TEST(noexcept(o4 = o3));
@@ -193,6 +196,12 @@ namespace
             static_assert(!o4, "bad");
             static_assert(!o5, "bad");
             static_assert(!o6, "bad");
+
+            static_assert(o2.value_or(1) == 1, "bad");
+            static_assert(o3.value_or(1) == 1, "bad");
+            static_assert(o4.value_or(1) == 1, "bad");
+            static_assert(o5.value_or(1) == 1, "bad");
+            static_assert(o6.value_or(1) == 1, "bad");
         }
     }
 
