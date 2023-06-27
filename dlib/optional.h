@@ -179,7 +179,7 @@ namespace dlib
                     this->val = std::forward<Optional>(rhs).active;
                 else if (!this->active && rhs.active)
                     construct(std::forward<Optional>(rhs).active);
-                else if (this->active && !rhs.has_value())
+                else if (this->active && !rhs.active)
                     destruct();
             }
 
@@ -214,8 +214,8 @@ namespace dlib
             constexpr optional_copy(const optional_copy& rhs) noexcept(std::is_nothrow_copy_constructible<T>::value)
             : optional_storage<T>() 
             {
-                if (rhs.has_value())
-                    this->construct(rhs.get());
+                if (rhs.active)
+                    this->construct(rhs.val);
             }
         };
 
@@ -239,18 +239,18 @@ namespace dlib
 
             constexpr optional_move(optional_move&& rhs) noexcept(std::is_nothrow_move_constructible<T>::value)
             {
-                if (rhs.has_value())
-                    this->construct(std::move(rhs.get()));
+                if (rhs.active)
+                    this->construct(std::move(rhs.val));
             }
         };
 
 // ---------------------------------------------------------------------------------------------------
 
         template <
-        class T, 
-        bool = std::is_trivially_copy_assignable<T>::value       &&
-                std::is_trivially_copy_constructible<T>::value    &&
-                std::is_trivially_destructible<T>::value
+          class T, 
+          bool = std::is_trivially_copy_assignable<T>::value       &&
+                 std::is_trivially_copy_constructible<T>::value    &&
+                 std::is_trivially_destructible<T>::value
         >
         struct optional_copy_assign : optional_move<T> 
         {
@@ -279,10 +279,10 @@ namespace dlib
 // ---------------------------------------------------------------------------------------------------
 
         template <
-        class T, 
-        bool = std::is_trivially_destructible<T>::value       &&
-                std::is_trivially_move_constructible<T>::value &&
-                std::is_trivially_move_assignable<T>::value
+          class T, 
+          bool = std::is_trivially_destructible<T>::value       &&
+                 std::is_trivially_move_constructible<T>::value &&
+                 std::is_trivially_move_assignable<T>::value
         >
         struct optional_move_assign : optional_copy_assign<T> 
         {
@@ -311,9 +311,9 @@ namespace dlib
 // ---------------------------------------------------------------------------------------------------
 
         template <
-        class T, 
-        bool copyable = std::is_copy_constructible<T>::value,
-        bool moveable = std::is_move_constructible<T>::value
+          class T, 
+          bool copyable = std::is_copy_constructible<T>::value,
+          bool moveable = std::is_move_constructible<T>::value
         >
         struct optional_delete_constructors
         {
@@ -357,9 +357,9 @@ namespace dlib
 // ---------------------------------------------------------------------------------------------------
 
         template <
-        class T,
-        bool copyable = (std::is_copy_constructible<T>::value && std::is_copy_assignable<T>::value),
-        bool moveable = (std::is_move_constructible<T>::value && std::is_move_assignable<T>::value)
+          class T,
+          bool copyable = (std::is_copy_constructible<T>::value && std::is_copy_assignable<T>::value),
+          bool moveable = (std::is_move_constructible<T>::value && std::is_move_assignable<T>::value)
         >
         struct optional_delete_assign
         {
@@ -891,8 +891,9 @@ namespace dlib
     }
 
     template <class T>
-    constexpr bool operator>=(nullopt_t, const optional<T> &rhs) noexcept {
-    return !rhs.has_value();
+    constexpr bool operator>=(nullopt_t, const optional<T> &rhs) noexcept 
+    {
+        return !rhs.has_value();
     }
 
 // ---------------------------------------------------------------------------------------------------
