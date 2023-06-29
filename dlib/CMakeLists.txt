@@ -589,7 +589,7 @@ if (NOT TARGET dlib)
 
          if (DLIB_USE_BLAS)
             if (blas_found)
-               list (APPEND dlib_needed_private_libraries ${blas_libraries})
+               list (APPEND dlib_needed_public_libraries ${blas_libraries})
             else()
                set(DLIB_USE_BLAS OFF CACHE STRING ${DLIB_USE_BLAS_STR} FORCE )
                toggle_preprocessor_switch(DLIB_USE_BLAS)
