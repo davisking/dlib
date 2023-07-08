@@ -4,7 +4,7 @@
 #define DLIB_UTILITY_Hh_
 
 #include <cstddef>
-#include <type_traits>
+#include <utility>
 
 /*
     This header contains back-ports of C++14/17 functions and type traits
@@ -65,6 +65,15 @@ namespace dlib
 
     template<class Sequence>
     using pop_front_t = typename pop_front<Sequence>::type;
+
+    // ---------------------------------------------------------------------
+
+    struct in_place_t 
+    {
+        explicit in_place_t() = default;
+    };
+
+    static constexpr in_place_t in_place{};
 
     // ---------------------------------------------------------------------
 }
