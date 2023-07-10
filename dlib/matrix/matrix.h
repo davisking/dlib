@@ -1525,12 +1525,12 @@ namespace dlib
         )
         {
             DLIB_ASSERT((NR == 0 || nr() == op.nr()) && (NC == 0 || nc() == op.nc()),
-                "\tmatrix& matrix::operator=(const matrix_exp& m)"
+                "\tmatrix& matrix::operator=(const matrix_op<op_pointer_to_mat<T>>& op)"
                 << "\n\tYou are trying to assign a dynamically sized matrix to a statically sized matrix with the wrong size"
                 << "\n\tnr():   " << nr()
                 << "\n\tnc():   " << nc()
-                << "\n\tm.nr(): " << op.nr()
-                << "\n\tm.nc(): " << op.nc()
+                << "\n\top.nr(): " << op.nr()
+                << "\n\top.nc(): " << op.nc()
                 << "\n\tthis:   " << this
             );
 
