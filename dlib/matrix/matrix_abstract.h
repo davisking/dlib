@@ -537,6 +537,18 @@ namespace dlib
                 - returns *this
         !*/
 
+        matrix& operator= (
+            const matrix_op<op_pointer_to_mat<T>>& op
+        );
+        /*!
+            requires
+                - if (NR != 0) then NR == m.nr()
+                - if (NC != 0) then NC == m.nc()
+            ensures
+                - copies the given matrix to *this using the pointer inside op_pointer_to_mat
+                - returns *this
+        !*/
+
         template <typename EXP>
         matrix& operator += (
             const matrix_exp<EXP>& m
