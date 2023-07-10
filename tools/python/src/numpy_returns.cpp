@@ -82,8 +82,9 @@ py::list get_jitter_images(numpy_image<rgb_pixel> img, size_t num_jitters = 1, b
 
 // ----------------------------------------------------------------------------------------
 
+template <typename T>
 py::list get_face_chips (
-    numpy_image<rgb_pixel> img,
+    numpy_image<T> img,
     const std::vector<full_object_detection>& faces,
     size_t size = 150,
     float padding = 0.25
@@ -99,7 +100,7 @@ py::list get_face_chips (
     std::vector<chip_details> dets;
     for (const auto& f : faces)
         dets.push_back(get_face_chip_details(f, size, padding));
-    dlib::array<numpy_image<rgb_pixel>> face_chips;
+    dlib::array<numpy_image<T>> face_chips;
     extract_image_chips(img, dets, face_chips);
 
     for (const auto& chip : face_chips) 
@@ -110,14 +111,15 @@ py::list get_face_chips (
     return chips_list;
 }
 
-numpy_image<rgb_pixel> get_face_chip (
-    numpy_image<rgb_pixel> img,
+template <typename T>
+numpy_image<T> get_face_chip (
+    numpy_image<T> img,
     const full_object_detection& face,
     size_t size = 150,
     float padding = 0.25
 )
 {
-    numpy_image<rgb_pixel> chip;
+    numpy_image<T> chip;
     extract_image_chip(img, get_face_chip_details(face, size, padding), chip);
     return chip;
 }
@@ -152,13 +154,33 @@ void bind_numpy_returns(py::module &m)
     py::arg("img"), py::arg("num_jitters")=1, py::arg("disturb_colors")=false
     );
 
-    m.def("get_face_chip", &get_face_chip, 
-	"Takes an image and a full_object_detection that references a face in that image and returns the face as a Numpy array representing the image.  The face will be rotated upright and scaled to 150x150 pixels or with the optional specified size and padding.", 
-	py::arg("img"), py::arg("face"), py::arg("size")=150, py::arg("padding")=0.25
-    );
+    {
+        const char* docs = "Takes an image and a full_object_detection that references a face in that image and returns the face as a Numpy array representing the image.  The face will be rotated upright and scaled to 150x150 pixels or with the optional specified size and padding.";
+        m.def("get_face_chip", &get_face_chip<uint8_t>, docs, py::arg("img"), py::arg("face"), py::arg("size")=150, py::arg("padding")=0.25);
+        m.def("get_face_chip", &get_face_chip<uint16_t>, docs, py::arg("img"), py::arg("face"), py::arg("size")=150, py::arg("padding")=0.25);
+        m.def("get_face_chip", &get_face_chip<uint32_t>, docs, py::arg("img"), py::arg("face"), py::arg("size")=150, py::arg("padding")=0.25);
+        m.def("get_face_chip", &get_face_chip<uint64_t>, docs, py::arg("img"), py::arg("face"), py::arg("size")=150, py::arg("padding")=0.25);
+        m.def("get_face_chip", &get_face_chip<int8_t>, docs, py::arg("img"), py::arg("face"), py::arg("size")=150, py::arg("padding")=0.25);
+        m.def("get_face_chip", &get_face_chip<int16_t>, docs, py::arg("img"), py::arg("face"), py::arg("size")=150, py::arg("padding")=0.25);
+        m.def("get_face_chip", &get_face_chip<int32_t>, docs, py::arg("img"), py::arg("face"), py::arg("size")=150, py::arg("padding")=0.25);
+        m.def("get_face_chip", &get_face_chip<int64_t>, docs, py::arg("img"), py::arg("face"), py::arg("size")=150, py::arg("padding")=0.25);
+        m.def("get_face_chip", &get_face_chip<float>, docs, py::arg("img"), py::arg("face"), py::arg("size")=150, py::arg("padding")=0.25);
+        m.def("get_face_chip", &get_face_chip<double>, docs, py::arg("img"), py::arg("face"), py::arg("size")=150, py::arg("padding")=0.25);
+        m.def("get_face_chip", &get_face_chip<rgb_pixel>, docs, py::arg("img"), py::arg("face"), py::arg("size")=150, py::arg("padding")=0.25);
+    }
 
-    m.def("get_face_chips", &get_face_chips, 
-	"Takes an image and a full_object_detections object that reference faces in that image and returns the faces as a list of Numpy arrays representing the image.  The faces will be rotated upright and scaled to 150x150 pixels or with the optional specified size and padding.",
-	py::arg("img"), py::arg("faces"), py::arg("size")=150, py::arg("padding")=0.25
-    );
+    {
+        const char* docs = "Takes an image and a full_object_detections object that reference faces in that image and returns the faces as a list of Numpy arrays representing the image.  The faces will be rotated upright and scaled to 150x150 pixels or with the optional specified size and padding.";
+        m.def("get_face_chips", &get_face_chips<uint8_t>, docs, py::arg("img"), py::arg("faces"), py::arg("size")=150, py::arg("padding")=0.25);
+        m.def("get_face_chips", &get_face_chips<uint16_t>, docs, py::arg("img"), py::arg("faces"), py::arg("size")=150, py::arg("padding")=0.25);
+        m.def("get_face_chips", &get_face_chips<uint32_t>, docs, py::arg("img"), py::arg("faces"), py::arg("size")=150, py::arg("padding")=0.25);
+        m.def("get_face_chips", &get_face_chips<uint64_t>, docs, py::arg("img"), py::arg("faces"), py::arg("size")=150, py::arg("padding")=0.25);
+        m.def("get_face_chips", &get_face_chips<int8_t>, docs, py::arg("img"), py::arg("faces"), py::arg("size")=150, py::arg("padding")=0.25);
+        m.def("get_face_chips", &get_face_chips<int16_t>, docs, py::arg("img"), py::arg("faces"), py::arg("size")=150, py::arg("padding")=0.25);
+        m.def("get_face_chips", &get_face_chips<int32_t>, docs, py::arg("img"), py::arg("faces"), py::arg("size")=150, py::arg("padding")=0.25);
+        m.def("get_face_chips", &get_face_chips<int64_t>, docs, py::arg("img"), py::arg("faces"), py::arg("size")=150, py::arg("padding")=0.25);
+        m.def("get_face_chips", &get_face_chips<float>, docs, py::arg("img"), py::arg("faces"), py::arg("size")=150, py::arg("padding")=0.25);
+        m.def("get_face_chips", &get_face_chips<double>, docs, py::arg("img"), py::arg("faces"), py::arg("size")=150, py::arg("padding")=0.25);
+        m.def("get_face_chips", &get_face_chips<rgb_pixel>, docs,py::arg("img"), py::arg("faces"), py::arg("size")=150, py::arg("padding")=0.25);
+    }
 }
