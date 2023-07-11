@@ -295,10 +295,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-	template <typename T>
-	struct op_pointer_to_mat;
-	template <typename OP>
-	class matrix_op;
+    template <typename T>
+    struct op_pointer_to_mat;
+    template <typename OP>
+    class matrix_op;
 
     template <
         typename T
