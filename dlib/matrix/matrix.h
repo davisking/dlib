@@ -1520,30 +1520,6 @@ namespace dlib
             return *this;
         }
 
-        matrix& operator= (
-            const matrix_op<op_pointer_to_mat<T>>& op
-        )
-        {
-            DLIB_ASSERT((NR == 0 || nr() == op.nr()) && (NC == 0 || nc() == op.nc()),
-                "\tmatrix& matrix::operator=(const matrix_op<op_pointer_to_mat<T>>& op)"
-                << "\n\tYou are trying to assign a dynamically sized matrix to a statically sized matrix with the wrong size"
-                << "\n\tnr():   " << nr()
-                << "\n\tnc():   " << nc()
-                << "\n\top.nr(): " << op.nr()
-                << "\n\top.nc(): " << op.nc()
-                << "\n\tthis:   " << this
-            );
-
-            if (data.nr() != op.nr() || data.nc() == op.nc())
-                data.set_size(op.nr(), op.nc());
-            const long size = data.nr() * data.nc();
-            T* data_ptr = &data(0, 0);
-            const T* op_ptr = op.op.ptr;
-            for (long i = 0; i < size; i++)
-                *data_ptr++ = *op_ptr++;
-            return *this;
-        }
-
         template <typename EXP>
         matrix& operator += (
             const matrix_exp<EXP>& m
