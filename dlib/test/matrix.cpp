@@ -1422,6 +1422,17 @@ namespace
 
         {
             const long n = 5;
+            matrix<double> m1, m2;
+            m1 = randm(n,n);
+            m2 = randm(n,n);
+
+            m2 = mat(&m1(0,0),n,n);
+
+            DLIB_TEST(m1 == m2);
+        }
+
+        {
+            const long n = 5;
             matrix<double> m1, m2, m3, truth;
             m1 = randm(n,n);
             m2 = randm(n,n);
