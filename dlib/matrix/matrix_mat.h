@@ -469,6 +469,9 @@ namespace dlib
         // it.
         if (dest.size() != 0 && src.ref().op.stride == dest.nc()) {
             std::memcpy(&dest(0, 0), src.ref().op.ptr, dest.nr() * dest.nc() * sizeof(T));
+        } else if (dest.size() != 0 && src.ref().op.stride != dest.nc()) {
+            for (int i=0; i<dest.nr(); i++)
+                std::memcpy(&dest(0, 0)+i*src.ref().op.cols, src.ref().op.ptr+i*src.ref().op.stride, src.ref().op.cols * sizeof(T));
         } else {
             matrix_assign_default(dest, src);
         }
