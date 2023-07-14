@@ -448,6 +448,32 @@ namespace dlib
         return matrix_op<op>(op(ptr,nr,nc,stride));
     }
 
+    template <
+        typename T,
+        long NR,
+        long NC,
+        typename MM,
+        typename L
+        >
+    typename enable_if<std::is_trivially_copyable<T>>::type matrix_assign (
+        matrix<T,NR,NC,MM,L>& dest,
+        const matrix_exp<matrix_op<op_pointer_to_mat<T>>>& src
+    )
+    /*!
+        An overload to catch statements of the form:
+           some_matrix = mat(ptr,rows,cols)
+        and convert them into a memcpy(), which is a faster way to do the copy.
+    !*/
+    {
+        // If the op_pointer_to_mat is referring to a contiguous block of memory then just memcopy
+        // it.
+        if (dest.size() != 0 && src.ref().op.stride == dest.nc()) {
+            std::memcpy(&dest(0, 0), src.ref().op.ptr, dest.nr() * dest.nc() * sizeof(T));
+        } else {
+            matrix_assign_default(dest, src);
+        }
+    }
+
 // ----------------------------------------------------------------------------------------
 
 }

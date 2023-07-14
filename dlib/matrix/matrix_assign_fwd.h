@@ -295,31 +295,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename T>
-    struct op_pointer_to_mat;
-    template <typename OP>
-    class matrix_op;
-
-    template <
-        typename T
-        >
-    inline void matrix_assign (
-        matrix<T>& dest,
-        const matrix_exp<matrix_op<op_pointer_to_mat<T> > >& op
-    )
-    /*!
-        requires
-            - dest.nr() == src.nr()
-            - dest.nc() == src.nc()
-        ensures
-            - #dest == src
-    !*/
-    {
-        std::memcpy(&dest(0, 0), op.ref().op.ptr, dest.nr() * dest.nc() * sizeof(T));
-    }
-
-// ----------------------------------------------------------------------------------------
-
     template <
         typename matrix_dest_type,
         typename src_exp 
