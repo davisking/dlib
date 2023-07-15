@@ -18,7 +18,7 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-    namespace details
+    namespace expected_details
     {
         template<class E>
         struct is_unexpected_type : std::false_type{};
@@ -36,7 +36,7 @@ namespace dlib
         constexpr unexpected()                      = delete;
         constexpr unexpected( const unexpected& )   = default;
         constexpr unexpected( unexpected&& )        = default;
-        constexpr ~unexpected()                     = default;
+        ~unexpected()                     = default;
 
         template < 
           class Err = E,
@@ -95,17 +95,17 @@ namespace dlib
 
     private:
 
-        static_assert(!details::is_unexpected_type<E>::value,   "E cannot be of type unexpected<>");
+        static_assert(!expected_details::is_unexpected_type<E>::value,   "E cannot be of type unexpected<>");
         static_assert(std::is_object<E>::value,                 "E must be an object type");
         static_assert(!std::is_array<E>::value,                 "E cannot be an array type");
-        static_assert(!std::is_reference<T>::value,             "E cannot be a reference type");
+        static_assert(!std::is_reference<E>::value,             "E cannot be a reference type");
         E v;
     };
 
     template< class E1, class E2 >
     constexpr bool operator==(unexpected<E1>& x, unexpected<E2>& y)
     {
-        return x.error() == y.error()
+        return x.error() == y.error();
     }
 
     template < 
@@ -172,7 +172,7 @@ namespace dlib
           class U, class G, 
           class UF, class GF
         >
-        using is_constructible = And<
+        using is_constructible = std::enable_if_t<And<
             ((std::is_void<T>::value && std::is_void<U>::value) || std::is_constructible<T, UF>::value),
             std::is_constructible<E, GF>::value,
             !std::is_constructible<T,       dlib::expected<U, G>&>::value,
@@ -187,44 +187,20 @@ namespace dlib
             !std::is_constructible<dlib::unexpected<E>, const dlib::expected<U, G>&>::value,
             !std::is_constructible<dlib::unexpected<E>,       dlib::expected<U, G>&&>::value,
             !std::is_constructible<dlib::unexpected<E>, const dlib::expected<U, G>&&>::value 
-        >;
+        >::value,
+        bool>;
 
         template <
           class T, class E,
           class U
         >
-        using is_convert_constructible = And<
+        using is_convert_constructible = std::enable_if_t<And<
             std::is_constructible<T, U>::value,
             !std::is_same<dlib::remove_cvref_t<U>, in_place_t>::value,
             !std::is_same<expected<T, E>, dlib::remove_cvref_t<U>>::value,
-            !std::is_same<unexpected<E>, dlib::remove_cvref_t<U>>::value>
-        >;
-
-        template<class T, class U>
-        using is_assignable_from = And<
-            is_constructible_from<T,U>::value,
-            std::is_assignable<T&,       dlib::expected<U>&>::value,
-            std::is_assignable<T&, const dlib::expected<U>&>::value,
-            std::is_assignable<T&,       dlib::expected<U>&&>::value,
-            std::is_assignable<T&, const dlib::expected<U>&&>::value
-        >;
-
-        template<class T, class U, class U_ = std::decay_t<U>>
-        using is_construct_convertible_from = std::enable_if_t<
-            std::is_constructible<T, U&&>::value &&
-            !std::is_same<U_, in_place_t>::value &&
-            !std::is_same<U_, dlib::expected<T>>::value,
-            bool
-        >;
-
-        template <class T, class U, class U_ = std::decay_t<U>>
-        using is_assign_convertible_from = std::enable_if_t<
-            std::is_constructible<T, U>::value  && 
-            std::is_assignable<T&, U>::value    &&
-            !std::is_same<U_, dlib::expected<T>>::value &&
-            (!std::is_scalar<T>::value || !std::is_same<T, U_>::value),
-            bool
-        >;
+            !std::is_same<unexpected<E>, dlib::remove_cvref_t<U>>::value
+        >::value,
+        bool>;
 
 // ---------------------------------------------------------------------------------------------------
 
@@ -242,7 +218,7 @@ namespace dlib
         struct expected_base
         {
             constexpr expected_base(empty_initialization_tag) noexcept
-            : empty{}, state{IS_EMPTY}
+            : e{}, state{IS_EMPTY}
             {}
 
             constexpr expected_base() noexcept(std::is_nothrow_default_constructible<T>::value)
@@ -285,12 +261,11 @@ namespace dlib
             }    
 
             template<class Expected>
-            constexpr void assign(Expected&& rhs) noexcept(std::is_nothrow_constructible<T,expected>::value &&
-                                                           std::is_nothrow_assignable<T&,expected>::value)
+            constexpr void assign(Expected&& rhs)
             {
                 /* This is screaming for pattern matching. */
 
-                const uint8_t combined = state | (rhs.state << 4)
+                const uint8_t combined = state | (rhs.state << 4);
                 
                 switch(combined)
                 {
@@ -334,7 +309,7 @@ namespace dlib
             }   
 
             struct empty{};
-            union {T val; unexpected<E> error; empty empty;};
+            union {T val; unexpected<E> error; empty e;};
             uint8_t state{IS_EMPTY};
         };
 
@@ -347,8 +322,7 @@ namespace dlib
         {
             using expected_base<T,E>::expected_base;
 
-            constexpr ~expected_destructor() noexcept(std::is_nothrow_destructible<T>::value &&
-                                                      std::is_nothrow_destructible<E>::value)
+            ~expected_destructor() noexcept
             {
                 this->destruct();
             }  
@@ -637,10 +611,10 @@ namespace dlib
 // ---------------------------------------------------------------------------------------------------
 
     template <class T, class E>
-    class expected : private details::expected_move_assign<T,E>,
-                     private details::expected_delete_default_constructor<T>,
-                     private details::expected_delete_constructors<T,E>,
-                     private details::expected_delete_assign<T,E> 
+    class expected : private expected_details::expected_move_assign<T,E>,
+                     private expected_details::expected_delete_default_constructor<T,E>,
+                     private expected_details::expected_delete_constructors<T,E>,
+                     private expected_details::expected_delete_assign<T,E> 
     {
         /*!
             WHAT THIS OBJECT REPRESENTS 
@@ -648,7 +622,7 @@ namespace dlib
                 It includes C++23 monadic interfaces
         !*/
 
-        using base = details::expected_move_assign<T,E>;
+        using base = expected_details::expected_move_assign<T,E>;
 
         static_assert(!std::is_reference<T>::value,             "expected<T&,E&> not allowed");
         static_assert(!std::is_reference<E>::value,             "expected<T&,E&> not allowed");
@@ -676,13 +650,13 @@ namespace dlib
           class G,
           class UF = std::add_lvalue_reference_t<const U>,
           class GF = const G&,
-          details::is_convertible<T,E,U,G,UF,GF> = true,
+          expected_details::is_constructible<T,E,U,G,UF,GF> = true,
           std::enable_if_t<!std::is_convertible<UF, T>::value || !std::is_convertible<GF, E>::value, bool> = true
         >
         constexpr explicit expected(const expected<U,G> &rhs)
         {
             if (rhs)
-                this->contruct(std::forward<UF>(*rhs))
+                this->contruct(std::forward<UF>(*rhs));
             else
                 this->construct_error(std::forward<GF>(rhs.error()));
         }
@@ -692,13 +666,13 @@ namespace dlib
           class G,
           class UF = std::add_lvalue_reference_t<const U>,
           class GF = const G&,
-          details::is_constructible<T,E,U,G,UF,GF> = true,
+          expected_details::is_constructible<T,E,U,G,UF,GF> = true,
           std::enable_if_t<std::is_convertible<UF, T>::value && std::is_convertible<GF, E>::value, bool> = true
         >
         constexpr expected(const expected<U,G> &rhs)
         {
             if (rhs)
-                this->contruct(std::forward<UF>(*rhs))
+                this->contruct(std::forward<UF>(*rhs));
             else
                 this->construct_error(std::forward<GF>(rhs.error()));
         }
@@ -708,13 +682,13 @@ namespace dlib
           class G,
           class UF = U,
           class GF = G,
-          details::is_constructible<T,E,U,G,UF,GF> = true,
+          expected_details::is_constructible<T,E,U,G,UF,GF> = true,
           std::enable_if_t<!std::is_convertible<UF, T>::value || !std::is_convertible<GF, E>::value, bool> = true
         >
-        constexpr explicit expected(expected<U>&& rhs)
+        constexpr explicit expected(expected<U,G>&& rhs)
         {
             if (rhs)
-                this->contruct(std::forward<UF>(*rhs))
+                this->contruct(std::forward<UF>(*rhs));
             else
                 this->construct_error(std::forward<GF>(rhs.error()));
         }
@@ -724,34 +698,34 @@ namespace dlib
           class G,
           class UF = U,
           class GF = G,
-          details::is_constructible<T,E,U,G,UF,GF> = true,
+          expected_details::is_constructible<T,E,U,G,UF,GF> = true,
           std::enable_if_t<std::is_convertible<UF, T>::value && std::is_convertible<GF, E>::value, bool> = true
         >
-        constexpr expected(expected<U>&& rhs)
+        constexpr expected(expected<U,G>&& rhs)
         {
             if (rhs)
-                this->contruct(std::forward<UF>(*rhs))
+                this->contruct(std::forward<UF>(*rhs));
             else
                 this->construct_error(std::forward<GF>(rhs.error()));
         }
 
         template< 
           class U = T,
-          std::enable_if_t<is_convert_constructible<T, E, U>::value, bool> = true,
+          expected_details::is_convert_constructible<T, E, U> = true,
           std::enable_if_t<!std::is_convertible<U, T>::value, bool> = true
         >
         constexpr explicit expected( U&& v )
-        : base(in_place_t, std::forward<U>(v))
+        : base(in_place, std::forward<U>(v))
         {
         }
 
         template< 
           class U = T,
-          std::enable_if_t<is_convert_constructible<T, E, U>::value, bool> = true,
+          expected_details::is_convert_constructible<T, E, U> = true,
           std::enable_if_t<std::is_convertible<U, T>::value, bool> = true
         >
         constexpr expected( U&& v )
-        : base(in_place_t, std::forward<U>(v))
+        : base(in_place, std::forward<U>(v))
         {
         }
 
@@ -839,14 +813,14 @@ namespace dlib
 
         template < 
           class U, 
-          class... Args 
+          class... Args,
           std::enable_if_t<std::is_constructible<E, std::initializer_list<U>&, Args...>::value, bool> = true
         >
         constexpr explicit expected( 
             unexpect_t,
             std::initializer_list<U> il,
             Args&&... args 
-        ) noexcept(std::is_nothrow_constructible_v<E, std::initializer_list<U>&, Args...>::value)
+        ) noexcept(std::is_nothrow_constructible<E, std::initializer_list<U>&, Args...>::value)
         : base(unexpect, il, std::forward<Args>(args)...)
         {
         }
@@ -857,8 +831,8 @@ namespace dlib
         constexpr const T&  operator*() const&  noexcept { return this->val; }
         constexpr T&&       operator*() &&      noexcept { return std::move(this->val); }
         constexpr const T&& operator*() const&& noexcept { return std::move(this->val); }
-        constexpr explicit  operator bool() const noexcept { return this->state == IS_VAL; }
-        constexpr bool      has_value()     const noexcept { return this->state == IS_VAL; }
+        constexpr explicit  operator bool() const noexcept { return this->state == expected_details::IS_VAL; }
+        constexpr bool      has_value()     const noexcept { return this->state == expected_details::IS_VAL; }
         constexpr T&        error() &       noexcept { return this->error; }
         constexpr const T&  error() const&  noexcept { return this->error; }
         constexpr T&&       error() &&      noexcept { return std::move(this->error); }
@@ -868,28 +842,28 @@ namespace dlib
         {
             if (*this)
                 return **this;
-            throw bad_expected_access();
+            throw bad_expected_access<E>(error());
         }
 
         constexpr const T& value() const & 
         {
             if (*this)
                 return **this;
-            throw bad_expected_access();
+            throw bad_expected_access<E>(error());
         }
 
         constexpr T&& value() && 
         {
             if (*this)
                 return std::move(**this);
-            throw bad_expected_access();
+            throw bad_expected_access<E>(error());
         }
 
         constexpr const T&& value() const && 
         {
             if (*this)
                 return std::move(**this);
-            throw bad_expected_access();
+            throw bad_expected_access<E>(error());
         }
 
         template <class U> 
@@ -908,355 +882,7 @@ namespace dlib
         {
             this->destruct();
         }
-
-        template <
-          class F,
-          class Return = dlib::remove_cvref_t<dlib::invoke_result_t<F,T&>>,
-          std::enable_if_t<details::is_expected<Return>::value, bool> = true
-        >
-        constexpr auto and_then(F&& f) &
-        {
-            if (*this)
-                return dlib::invoke(std::forward<F>(f), **this);
-            else
-                return Return{};
-        }
-
-        template <
-          class F,
-          class Return = dlib::remove_cvref_t<dlib::invoke_result_t<F,const T&>>,
-          std::enable_if_t<details::is_expected<Return>::value, bool> = true
-        >
-        constexpr auto and_then(F&& f) const&
-        {
-            if (*this)
-                return dlib::invoke(std::forward<F>(f), **this);
-            else
-                return Return{};
-        }
-
-        template <
-          class F,
-          class Return = dlib::remove_cvref_t<dlib::invoke_result_t<F,T>>,
-          std::enable_if_t<details::is_expected<Return>::value, bool> = true
-        >
-        constexpr auto and_then(F&& f) &&
-        {
-            if (*this)
-                return dlib::invoke(std::forward<F>(f), std::move(**this));
-            else
-                return Return{};
-        }
-
-        template <
-          class F,
-          class Return = dlib::remove_cvref_t<dlib::invoke_result_t<F,const T>>,
-          std::enable_if_t<details::is_expected<Return>::value, bool> = true
-        >
-        constexpr auto and_then(F&& f) const&&
-        {
-            if (*this)
-                return dlib::invoke(std::forward<F>(f), std::move(**this));
-            else
-                return Return{};
-        }
-
-        template <
-          class F,
-          class U = dlib::remove_cvref_t<dlib::invoke_result_t<F, T&>>,
-          std::enable_if_t<!std::is_same<U, dlib::in_place_t>::value, bool> = true,
-          std::enable_if_t<!std::is_same<U, dlib::nullopt_t>::value, bool> = true
-        >
-        constexpr dlib::expected<U> transform(F&& f) &
-        {
-            if (*this)
-                return dlib::invoke(std::forward<F>(f), **this);
-            else
-                return dlib::expected<U>{};
-        }
-
-        template <
-          class F,
-          class U = dlib::remove_cvref_t<dlib::invoke_result_t<F, const T&>>,
-          std::enable_if_t<!std::is_same<U, dlib::in_place_t>::value, bool> = true,
-          std::enable_if_t<!std::is_same<U, dlib::nullopt_t>::value, bool> = true
-        >
-        constexpr dlib::expected<U> transform(F&& f) const&
-        {
-            if (*this)
-                return dlib::invoke(std::forward<F>(f), **this);
-            else
-                return dlib::expected<U>{};
-        }
-
-        template <
-          class F,
-          class U = dlib::remove_cvref_t<dlib::invoke_result_t<F,T>>,
-          std::enable_if_t<!std::is_same<U, dlib::in_place_t>::value, bool> = true,
-          std::enable_if_t<!std::is_same<U, dlib::nullopt_t>::value, bool> = true
-        >
-        constexpr dlib::expected<U> transform(F&& f) &&
-        {
-            if (*this)
-                return dlib::invoke(std::forward<F>(f), std::move(**this));
-            else
-                return dlib::expected<U>{};
-        }
-
-        template <
-          class F,
-          class U = dlib::remove_cvref_t<dlib::invoke_result_t<F,const T>>,
-          std::enable_if_t<!std::is_same<U, dlib::in_place_t>::value, bool> = true,
-          std::enable_if_t<!std::is_same<U, dlib::nullopt_t>::value, bool> = true
-        >
-        constexpr dlib::expected<U> transform(F&& f) const&&
-        {
-            if (*this)
-                return dlib::invoke(std::forward<F>(f), std::move(**this));
-            else
-                return dlib::expected<U>{};
-        }
-
-        template < 
-          class F,
-          class U = dlib::remove_cvref_t<dlib::invoke_result_t<F>>,
-          std::enable_if_t<std::is_same<U, dlib::expected<T>>::value, bool> = true
-        >
-        constexpr expected or_else( F&& f ) const&
-        {
-            return *this ? *this : std::forward<F>(f)();
-        }
-
-        template < 
-          class F,
-          class U = dlib::remove_cvref_t<dlib::invoke_result_t<F>>,
-          std::enable_if_t<std::is_same<U, dlib::expected<T>>::value, bool> = true
-        >
-        constexpr expected or_else( F&& f ) &&
-        {
-            return *this ? std::move(*this) : std::forward<F>(f)();
-        }
     };
-
-// ---------------------------------------------------------------------------------------------------
-
-    template <class T, class U>
-    constexpr bool operator==(const expected<T> &lhs, const expected<U> &rhs) noexcept(noexcept(std::declval<T>() == std::declval<T>()))
-    {        
-        return bool(lhs) == bool(rhs) && (!bool(lhs) || *lhs == *rhs);
-    }
-
-    template <class T, class U> 
-    constexpr bool operator!=(const expected<T> &lhs, const expected<U> &rhs) noexcept(noexcept(std::declval<T>() != std::declval<T>()))
-    { 
-        return !(lhs == rhs); 
-    }
-        
-    template <class T, class U> 
-    constexpr bool operator<(const expected<T> &lhs, const expected<U> &rhs) noexcept(noexcept(std::declval<T>() < std::declval<T>()))
-    {
-        return bool(rhs) && (!bool(lhs) || *lhs < *rhs);
-    }
-
-    template <class T, class U>
-    constexpr bool operator>=(const expected<T> &lhs, const expected<U> &rhs) noexcept(noexcept(std::declval<T>() >= std::declval<T>()))
-    {
-        return !(lhs < rhs);
-    }
-    
-    template <class T, class U>
-    constexpr bool operator>(const expected<T> &lhs, const expected<U> &rhs) noexcept(noexcept(std::declval<T>() > std::declval<T>()))
-    {
-        return bool(lhs) && (!bool(rhs) || *lhs > *rhs);
-    }
-
-    template <class T, class U>
-    constexpr bool operator<=(const expected<T> &lhs, const expected<U> &rhs) noexcept(noexcept(std::declval<T>() <= std::declval<T>()))
-    {
-        return !(lhs > rhs);
-    }
-
-// ---------------------------------------------------------------------------------------------------
-
-    template <class T>
-    constexpr bool operator==(const expected<T> &lhs, nullopt_t) noexcept
-    {
-        return !bool(lhs);
-    }
-
-    template <class T>
-    constexpr bool operator==(nullopt_t, const expected<T> &rhs) noexcept 
-    {
-        return !bool(rhs);
-    }
-        
-    template <class T>
-    constexpr bool operator!=(const expected<T> &lhs, nullopt_t) noexcept 
-    {
-        return bool(lhs);
-    }
-
-    template <class T>
-    constexpr bool operator!=(nullopt_t, const expected<T> &rhs) noexcept 
-    {
-        return bool(rhs);
-    }
-        
-    template <class T>
-    constexpr bool operator<(const expected<T> &, nullopt_t) noexcept 
-    {
-        return false;
-    }
-        
-    template <class T>
-    constexpr bool operator<(nullopt_t, const expected<T> &rhs) noexcept 
-    {
-        return bool(rhs);
-    }
-
-    template <class T>
-    constexpr bool operator<=(const expected<T> &lhs, nullopt_t) noexcept
-    {
-        return !bool(lhs);
-    }
-
-    template <class T>
-    constexpr bool operator<=(nullopt_t, const expected<T> &) noexcept 
-    {
-        return true;
-    }
-
-    template <class T>
-    constexpr bool operator>(const expected<T> &lhs, nullopt_t) noexcept
-    {
-        return bool(lhs);
-    }
-
-    template <class T>
-    constexpr bool operator>(nullopt_t, const expected<T> &) noexcept 
-    {
-        return false;
-    }
-
-    template <class T>
-    constexpr bool operator>=(const expected<T> &, nullopt_t) noexcept 
-    {
-        return true;
-    }
-
-    template <class T>
-    constexpr bool operator>=(nullopt_t, const expected<T> &rhs) noexcept 
-    {
-        return !rhs.has_value();
-    }
-
-// ---------------------------------------------------------------------------------------------------
-
-    template <class T, class U>
-    constexpr bool operator==(const expected<T> &lhs, const U &rhs) 
-    {
-        return bool(lhs) ? *lhs == rhs : false;
-    }
-
-    template <class T, class U>
-    constexpr bool operator==(const U &lhs, const expected<T> &rhs) 
-    {
-        return bool(rhs) ? lhs == *rhs : false;
-    }
-
-    template <class T, class U>
-    constexpr bool operator!=(const expected<T> &lhs, const U &rhs) 
-    {
-        return bool(lhs) ? *lhs != rhs : true;
-    }
-
-    template <class T, class U>
-    constexpr bool operator!=(const U &lhs, const expected<T> &rhs) 
-    {
-        return bool(rhs) ? lhs != *rhs : true;
-    }
-
-    template <class T, class U>
-    constexpr bool operator<(const expected<T> &lhs, const U &rhs) 
-    {
-        return bool(lhs) ? *lhs < rhs : true;
-    }
-
-    template <class T, class U>
-    constexpr bool operator<(const U &lhs, const expected<T> &rhs) 
-    {
-        return bool(rhs) ? lhs < *rhs : false;
-    }
-
-    template <class T, class U>
-    constexpr bool operator<=(const expected<T> &lhs, const U &rhs)
-    {
-        return bool(lhs) ? *lhs <= rhs : true;
-    }
-
-    template <class T, class U>
-    constexpr bool operator<=(const U &lhs, const expected<T> &rhs)
-    {
-        return bool(rhs) ? lhs <= *rhs : false;
-    }
-
-    template <class T, class U>
-    constexpr bool operator>(const expected<T> &lhs, const U &rhs) 
-    {
-        return bool(lhs) ? *lhs > rhs : false;
-    }
-
-    template <class T, class U>
-    constexpr bool operator>(const U &lhs, const expected<T> &rhs)
-    {
-        return bool(rhs) ? lhs > *rhs : true;
-    }
-
-    template <class T, class U>
-    constexpr bool operator>=(const expected<T> &lhs, const U &rhs) 
-    {
-        return bool(lhs) ? *lhs >= rhs : false;
-    }
-
-    template <class T, class U>
-    constexpr bool operator>=(const U &lhs, const expected<T> &rhs)
-    {
-        return bool(rhs) ? lhs >= *rhs : true;
-    }
-
-// ---------------------------------------------------------------------------------------------------
-
-    template <
-        class T,
-        std::enable_if_t<
-        std::is_move_constructible<T>::value &&
-        dlib::is_swappable<T>::value,
-        bool> = true
-    >
-    void swap(dlib::expected<T>& lhs, dlib::expected<T>& rhs) noexcept(noexcept(lhs.swap(rhs))) 
-    {
-        return lhs.swap(rhs);
-    }
-
-// ---------------------------------------------------------------------------------------------------
-
-    template< class T >
-    constexpr dlib::expected<std::decay_t<T>> make_expected( T&& value )
-    {
-        return dlib::expected<std::decay_t<T>>(std::forward<T>(value));
-    }
-
-    template< class T, class... Args >
-    constexpr dlib::expected<T> make_expected( Args&&... args )
-    {
-        return dlib::expected<T>(dlib::in_place, std::forward<Args>(args)...);
-    }
-
-    template< class T, class U, class... Args >
-    constexpr dlib::expected<T> make_expected( std::initializer_list<U> il, Args&&... args )
-    {
-        return dlib::expected<T>(dlib::in_place, il, std::forward<Args>(args)...);
-    }
 
 // ---------------------------------------------------------------------------------------------------
 
