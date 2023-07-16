@@ -1433,14 +1433,13 @@ namespace
 
         {
             const long n = 5;
-            matrix<double> m1, m2, m3;
-            m1 = ones_matrix<double>(n,n);
-            m2 = zeros_matrix<double>(n,n);
-            m3 = ones_matrix<double>(n,n-1);
+            matrix<double> m1, m2;
+            m1 = randm(n,n);
+            m2 = randm(n,n);
 
             m2 = mat(&m1(0,0),n,n-1,n);
 
-            DLIB_TEST(m2 == m3);
+            DLIB_TEST(m2 == subm(m1, 0, 0, n, n-1));
         }
 
         {

@@ -452,28 +452,33 @@ namespace dlib
         typename T,
         long NR,
         long NC,
-        typename MM,
-        typename L
+        typename MM
         >
     typename enable_if<std::is_trivially_copyable<T>>::type matrix_assign (
-        matrix<T,NR,NC,MM,L>& dest,
+        matrix<T,NR,NC,MM,row_major_layout>& dest,
         const matrix_exp<matrix_op<op_pointer_to_mat<T>>>& src
     )
     /*!
         An overload to catch statements of the form:
-           some_matrix = mat(ptr,rows,cols)
+           some_matrix = mat(ptr,rows,cols, stride)
         and convert them into a memcpy(), which is a faster way to do the copy.
     !*/
     {
-        // If the op_pointer_to_mat is referring to a contiguous block of memory then just memcopy
-        // it.
-        if (dest.size() != 0 && src.ref().op.stride == dest.nc()) {
+        if (dest.size() == 0) return;
+
+        // If the op_pointer_to_mat is referring to a contiguous block of memory then just one memcopy
+        // is needed.
+        if (src.ref().op.stride == dest.nc()) 
+        {
             std::memcpy(&dest(0, 0), src.ref().op.ptr, dest.nr() * dest.nc() * sizeof(T));
-        } else if (dest.size() != 0 && src.ref().op.stride != dest.nc()) {
-            for (int i=0; i<dest.nr(); i++)
-                std::memcpy(&dest(0, 0)+i*src.ref().op.cols, src.ref().op.ptr+i*src.ref().op.stride, src.ref().op.cols * sizeof(T));
-        } else {
-            matrix_assign_default(dest, src);
+        } 
+        else 
+        {
+            // Otherwise memcpy() each row separately.
+            for (long r=0; r<dest.nr(); r++)
+            {
+                std::memcpy(&dest(r, 0), &src(r,0), src.nc() * sizeof(T));
+            }
         }
     }
 
