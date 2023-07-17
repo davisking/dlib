@@ -1,3 +1,33 @@
 [build-system]
 requires = ["setuptools", "wheel", "cmake"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "dlib"
+version = "19.24.99"
+description = "A toolkit for making real world machine learning and data analysis applications"
+keywords = ["dlib", "Computer Vision", "Machine Learning"]
+readme = "README.md"
+authors = [
+    {name = "Davis King", email = "davis@dlib.net"},
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: C++",
+    "Programming Language :: Python",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Image Recognition",
+    "Topic :: Software Development",
+]
+license = {text = "Boost Software License"}
+
+[project.urls]
+Homepage = "https://github.com/davisking/dlib"
