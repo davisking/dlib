@@ -927,8 +927,8 @@ namespace dlib
             {
                 backward_filters_best_algo = CUDNN_CONVOLUTION_BWD_FILTER_ALGO_0;
             }
-            backward_filters_algo = backward_filters_best_algo;
 #endif
+	    backward_filters_algo = backward_filters_best_algo;
 
             // Save this algorithm selection in the cache
             config_to_algo_cache[cache_key] = std::make_tuple(forward_algo, backward_data_algo, backward_filters_algo);
