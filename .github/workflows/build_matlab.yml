@@ -31,6 +31,6 @@ jobs:
     - name: Run example script
       uses: matlab-actions/run-command@v1
       with:
-        command: cd matlab; example
+        command: cd dlib/matlab; example
 
 
