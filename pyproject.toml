@@ -31,3 +31,5 @@ license = {text = "Boost Software License"}
 
 [project.urls]
 Homepage = "https://github.com/davisking/dlib"
+Documentation = "http://dlib.net"
+Changelog = "http://dlib.net/release_notes.html"
