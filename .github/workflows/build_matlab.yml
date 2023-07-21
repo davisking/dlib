@@ -32,5 +32,9 @@ jobs:
       uses: matlab-actions/run-command@v1
       with:
         command: example
+    - name: Run pwd in matlab 
+      uses: matlab-actions/run-command@v1
+      with:
+        command: pwd 
 
 
