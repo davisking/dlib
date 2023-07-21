@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dlib"
-version = "19.24.99"
+# version = "19.24.99"
 description = "A toolkit for making real world machine learning and data analysis applications"
 keywords = ["dlib", "Computer Vision", "Machine Learning"]
 readme = "README.md"
