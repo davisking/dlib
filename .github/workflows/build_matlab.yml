@@ -31,5 +31,5 @@ jobs:
     - name: run mex example
       run: |
         cd ..
-        matlab -nodisplay -r "./example ; exit"
+        matlab -nodisplay -r 'addpath("build"); try, example(), catch, exit(1); end; exit'
 
