@@ -4,9 +4,25 @@ on:
   push:
     branches:
     - master
+    paths:
+    - ".github/workflows/build_cpp.yml"
+    - "**.cpp"
+    - "**.h"
+    - "**.c"
+    - "**.cu"
+    - "**.cmake"
+    - "**CMakeLists.txt"
   pull_request:
     branches:
     - master
+    paths:
+    - ".github/workflows/build_cpp.yml"
+    - "**.cpp"
+    - "**.h"
+    - "**.c"
+    - "**.cu"
+    - "**.cmake"
+    - "**CMakeLists.txt"
 
 defaults:
   run:
