@@ -30,10 +30,7 @@ jobs:
         cmake --build . --config Release --target install --parallel 4
     - name: run mex example
       run: |
-        cd ..
-        matlab -nodisplay -h
-        matlab -h
-        which matlab
+        pwd
         matlab -nodisplay -r 'try, example(), catch, exit(1); end; exit'
 
 
