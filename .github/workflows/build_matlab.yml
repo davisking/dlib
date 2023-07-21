@@ -28,3 +28,8 @@ jobs:
         cd build
         cmake ..
         cmake --build . --config Release --target install --parallel 4
+    - name: run mex example
+      run: |
+        cd ..
+        matlab -nodisplay -r "./example ; exit"
+
