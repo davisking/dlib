@@ -28,8 +28,36 @@ classifiers = [
     "Topic :: Software Development",
 ]
 license = {text = "Boost Software License"}
+# dynamic = ["version"]
 
 [project.urls]
 Homepage = "https://github.com/davisking/dlib"
 Documentation = "http://dlib.net"
 Changelog = "http://dlib.net/release_notes.html"
+
+
+# # Select all upto end, then toggle coment in VSCode only once
+# # This will uncomment the probably correct code
+
+# # https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html#dynamic-metadata
+# [tool.setuptools.dynamic]
+# version = {attr = "my_package.VERSION"}
+
+# [tool.setuptools]
+# zip-safe = false
+
+# # package_dir={'': 'tools/python'},
+# [tools.setuptools.package-dir]
+# "" = "tools/python"
+
+# # packages=find_packages(exclude=['python_examples']),
+# [tool.setuptools.packages.find]
+# exclude = ["python_examples"]  # exclude packages matching these glob patterns (empty by default)
+
+
+# # ext_modules=[CMakeExtension('_dlib_pybind11','tools/python')],
+# # https://stackoverflow.com/questions/74409966/#74421415
+# # cmdclass=dict(build_ext=CMakeBuild, test=PyTest),
+# # # We need an older more-itertools version because v6 broke pytest (for everyone, not just dlib)
+# # tests_require=['pytest==3.8', 'more-itertools<6.0.0'],
+# # #install_requires=['cmake'], # removed because the pip cmake package is busted, maybe someday it will be usable.
