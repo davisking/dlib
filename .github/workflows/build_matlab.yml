@@ -28,13 +28,13 @@ jobs:
         cd build
         cmake ..
         cmake --build . --config Release --target install --parallel 4
-    - name: Run example script
-      uses: matlab-actions/run-command@v1
-      with:
-        command: example
     - name: Run pwd in matlab 
       uses: matlab-actions/run-command@v1
       with:
         command: pwd 
+    - name: Run example script
+      uses: matlab-actions/run-command@v1
+      with:
+        command: example
 
 
