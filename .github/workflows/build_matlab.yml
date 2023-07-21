@@ -31,6 +31,9 @@ jobs:
     - name: run mex example
       run: |
         cd ..
+        matlab -nodisplay -h
+        matlab -h
+        which matlab
         matlab -nodisplay -r 'try, example(), catch, exit(1); end; exit'
 
 
