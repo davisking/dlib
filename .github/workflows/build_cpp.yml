@@ -247,3 +247,16 @@ jobs:
       run: build/dtest --runall --no_test_timer -q
     - name: Build examples, etc
       run: cmake --build build --config Release --parallel 2
+
+  mex-wrapper:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Compile mex wrappers 
+      uses: matlab-actions/run-command@v1 
+      run: |
+        cd ../matlab
+        mkdir build
+        cd build
+        cmake ..
+        cmake --build build --config Release --target install --parallel 4
