@@ -3,6 +3,7 @@ requires = ["setuptools", "wheel", "cmake"]
 build-backend = "setuptools.build_meta"
 
 [project]
+# https://packaging.python.org/en/latest/specifications/declaring-project-metadata/
 name = "dlib"
 # version = "19.24.99"
 description = "A toolkit for making real world machine learning and data analysis applications"
