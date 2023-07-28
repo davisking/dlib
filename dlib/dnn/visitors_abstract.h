@@ -42,6 +42,11 @@ namespace dlib
             - Disables all the affine_ layers that have a convolution as an input.
             - Updates the convolution weights beneath the affine_ layers to produce the same
               output as with the affine_ layers enabled.
+            - Disables all the relu_ layers that have a convolution as input.
+            - Disables all the relu_ layers that have an affine_ layer as input, with a
+              convolution as input.
+            - Updates the convolution to apply a relu activation function, to produce the same
+              output as with the relu_ layer enabled.
     !*/
 
 // ----------------------------------------------------------------------------------------

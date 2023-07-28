@@ -1047,8 +1047,9 @@ namespace dlib { namespace tt
             tensor& output,
             const tensor& data,
             const tensor& filters,
-            const tensor& biases
-        ) { impl(add_to_output,output,data,filters,biases); }
+            const tensor& biases,
+            bool use_relu
+        ) { impl(add_to_output,output,data,filters,biases,use_relu); }
         /*!
             requires
                 - setup() has been called.  Specifically, setup() has been called like this:
@@ -1069,6 +1070,8 @@ namespace dlib { namespace tt
                   previous values in output.
                 - Adds biases to the result of the convolved data
                 - filters contains filters.num_samples() filters.
+                - If use_relu==true, then a relu activation will be applied to the result
+                  of convolution+bias.
         !*/
 
         void operator() (
@@ -1076,8 +1079,9 @@ namespace dlib { namespace tt
             resizable_tensor& output,
             const tensor& data,
             const tensor& filters,
-            const tensor& biases
-        ) { impl(add_to_output,output,data,filters, biases); }
+            const tensor& biases,
+            bool use_relu
+        ) { impl(add_to_output,output,data,filters,biases,use_relu); }
         /*!
             requires
                 - setup() has been called.  Specifically, setup() has been called like this:

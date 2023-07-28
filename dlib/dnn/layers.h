@@ -60,7 +60,8 @@ namespace dlib
             num_filters_(o.num_outputs),
             padding_y_(_padding_y),
             padding_x_(_padding_x),
-            use_bias(true)
+            use_bias(true),
+            use_relu(false)
         {
             DLIB_CASSERT(num_filters_ > 0);
         }
@@ -107,7 +108,21 @@ namespace dlib
         double get_bias_weight_decay_multiplier () const   { return bias_weight_decay_multiplier; }
         void set_bias_learning_rate_multiplier(double val) { bias_learning_rate_multiplier = val; }
         void set_bias_weight_decay_multiplier(double val)  { bias_weight_decay_multiplier  = val; }
+
+        bool relu_is_disabled() const { return !use_relu; }
+
+        void disable_relu()
+        {
+            use_relu = false;
+        }
+
+        void enable_relu()
+        {
+            use_relu = true;
+        }
+
         bool bias_is_disabled() const { return !use_bias; }
+
         void disable_bias()
         {
             if (use_bias == false)
@@ -123,6 +138,7 @@ namespace dlib
             std::copy(temp.begin(), temp.end() - num_filters_, params.begin());
             biases = alias_tensor();
         }
+
         void enable_bias()
         {
             if (use_bias == true)
@@ -238,7 +254,8 @@ namespace dlib
                 conv(false, output,
                      sub.get_output(),
                      filters(params,0),
-                     biases(params, filters.size()));
+                     biases(params, filters.size()),
+                     use_relu);
             }
             else
             {
@@ -391,6 +408,7 @@ namespace dlib
         int padding_y_;
         int padding_x_;
         bool use_bias;
+        bool use_relu;
     };
 
     template <
@@ -2962,9 +2980,17 @@ namespace dlib
     class relu_
     {
     public:
-        relu_() 
+        relu_()
         {
         }
+
+        void disable()
+        {
+            params.clear();
+            disabled = true;
+        }
+
+        bool is_disabled() const { return disabled; }
 
         template <typename SUBNET>
         void setup (const SUBNET& /*sub*/)
@@ -2973,6 +2999,9 @@ namespace dlib
 
         void forward_inplace(const tensor& input, tensor& output)
         {
+            if (disabled)
+                return;
+
             tt::relu(output, input);
         } 
 
@@ -2983,6 +3012,9 @@ namespace dlib
             tensor& 
         )
         {
+            if (disabled)
+                return;
+
             tt::relu_gradient(data_grad, computed_output, gradient_input);
         }
 
@@ -2992,32 +3024,48 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const relu_& /*item*/, std::ostream& out)
+        friend void serialize(const relu_& item, std::ostream& out)
         {
-            serialize("relu_", out);
+            serialize("relu_2", out);
+            serialize(item.disabled, out);
         }
 
-        friend void deserialize(relu_& /*item*/, std::istream& in)
+        friend void deserialize(relu_& item, std::istream& in)
         {
             std::string version;
             deserialize(version, in);
-            if (version != "relu_")
+            if (version == "relu_2")
+            {
+                deserialize(item.disabled, in);
+                return;
+            }
+            if (version != "relu_" && version != "relu_2")
                 throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::relu_.");
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const relu_& /*item*/)
+        friend std::ostream& operator<<(std::ostream& out, const relu_& item)
         {
             out << "relu";
+            if (item.disabled)
+            {
+                out << "\t (disabled)";
+            }
             return out;
         }
 
-        friend void to_xml(const relu_& /*item*/, std::ostream& out)
+        friend void to_xml(const relu_& item, std::ostream& out)
         {
-            out << "<relu/>\n";
+            out << "<relu";
+            if (item.disabled)
+            {
+                out << " disabled='"<< std::boolalpha << item.disabled << "'";
+            }
+            out << "/>\n";
         }
 
     private:
         resizable_tensor params;
+        bool disabled = false;
     };
 
 

@@ -939,6 +939,30 @@ namespace dlib
                 - #get_bias_weight_decay_multiplier() == val
         !*/
 
+        void disable_relu(
+        );
+        /*!
+            ensures
+                - relu_is_disabled() returns true
+                - a relu activation will be applied after convolution when calling forward()
+        !*/
+
+        void enable_relu(
+        );
+        /*!
+            ensures
+                - relu_is_disabled() returns false
+                - no relu activation will be applied after convolution when calling forward()
+        !*/
+
+        bool relu_is_disabled(
+        ) const;
+        /*!
+            ensures
+                - returns true if relu is disabled for this layer. This means no activation function
+                  will be applied after the convolution when calling forward.
+        !*/
+
         void disable_bias(
         );
         /*!
@@ -2273,6 +2297,15 @@ namespace dlib
 
         relu_(
         );
+
+        void disable(
+        );
+        /*!
+            ensures
+                - #get_layer_params().size() == 0.
+                - when forward_inplace and backward_inplace are called, they return immediately doing nothing.
+                  Causing this layer to trivially perform the an identity transform.
+        !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
