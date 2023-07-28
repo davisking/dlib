@@ -187,7 +187,8 @@ namespace dlib
             num_filters_(item.num_filters_),
             padding_y_(item.padding_y_),
             padding_x_(item.padding_x_),
-            use_bias(item.use_bias)
+            use_bias(item.use_bias),
+            use_relu(item.use_relu)
         {
             // this->conv is non-copyable and basically stateless, so we have to write our
             // own copy to avoid trying to copy it and getting an error.
@@ -213,6 +214,7 @@ namespace dlib
             bias_weight_decay_multiplier = item.bias_weight_decay_multiplier;
             num_filters_ = item.num_filters_;
             use_bias = item.use_bias;
+            use_relu = item.use_relu;
             return *this;
         }
 
