@@ -287,7 +287,7 @@ namespace dlib
 
         friend void serialize(const con_& item, std::ostream& out)
         {
-            serialize("con_5", out);
+            serialize("con_6", out);
             serialize(item.params, out);
             serialize(item.num_filters_, out);
             serialize(_nr, out);
@@ -303,6 +303,7 @@ namespace dlib
             serialize(item.bias_learning_rate_multiplier, out);
             serialize(item.bias_weight_decay_multiplier, out);
             serialize(item.use_bias, out);
+            serialize(item.use_relu, out);
         }
 
         friend void deserialize(con_& item, std::istream& in)
@@ -313,7 +314,7 @@ namespace dlib
             long nc;
             int stride_y;
             int stride_x;
-            if (version == "con_4" || version == "con_5")
+            if (version == "con_4" || version == "con_5" || version == "con_6")
             {
                 deserialize(item.params, in);
                 deserialize(item.num_filters_, in);
@@ -335,9 +336,13 @@ namespace dlib
                 if (nc != _nc) throw serialization_error("Wrong nc found while deserializing dlib::con_");
                 if (stride_y != _stride_y) throw serialization_error("Wrong stride_y found while deserializing dlib::con_");
                 if (stride_x != _stride_x) throw serialization_error("Wrong stride_x found while deserializing dlib::con_");
-                if (version == "con_5")
+                if (version == "con_5" || version == "con_6")
                 {
                     deserialize(item.use_bias, in);
+                }
+                if (version == "con_6")
+                {
+                    deserialize(item.use_relu, in);
                 }
             }
             else
@@ -369,6 +374,10 @@ namespace dlib
             {
                 out << " use_bias=false";
             }
+            if (item.use_relu)
+            {
+                out << " use_relu="<< std::boolalpha << item.use_relu;
+            }
             return out;
         }
 
@@ -386,7 +395,9 @@ namespace dlib
                 << " weight_decay_mult='"<<item.weight_decay_multiplier<<"'"
                 << " bias_learning_rate_mult='"<<item.bias_learning_rate_multiplier<<"'"
                 << " bias_weight_decay_mult='"<<item.bias_weight_decay_multiplier<<"'"
-                << " use_bias='"<<(item.use_bias?"true":"false")<<"'>\n";
+                << " use_bias='"<<(item.use_bias?"true":"false")<<"'"
+                << " use_relu='"<<(item.use_relu?"true":"false")<<"'"
+                << ">\n";
             out << mat(item.params);
             out << "</con>\n";
         }
