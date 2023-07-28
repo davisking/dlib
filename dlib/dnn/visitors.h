@@ -3,6 +3,7 @@
 #ifndef DLIB_DNn_VISITORS_H_
 #define DLIB_DNn_VISITORS_H_
 
+#include "visitors_abstract.h"
 #include "input.h"
 #include "layers.h"
 #include "loss.h"
