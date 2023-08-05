@@ -944,7 +944,6 @@ namespace dlib
         /*!
             ensures
                 - relu_is_disabled() returns true
-                - a relu activation will be applied after convolution when calling forward()
         !*/
 
         void enable_relu(
@@ -952,7 +951,6 @@ namespace dlib
         /*!
             ensures
                 - relu_is_disabled() returns false
-                - no relu activation will be applied after convolution when calling forward()
         !*/
 
         bool relu_is_disabled(
