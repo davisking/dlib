@@ -19,10 +19,10 @@ namespace
     {
         using std::swap;
 
-        unexpected<int> e1{1};
+        dlib::unexpected<int> e1{1};
         DLIB_TEST(e1.error() == 1);
 
-        unexpected<int> e2{2};
+        dlib::unexpected<int> e2{2};
         e1.swap(e2);
         DLIB_TEST(e1.error() == 2);
         DLIB_TEST(e2.error() == 1);
@@ -30,7 +30,7 @@ namespace
         DLIB_TEST(e1.error() == 1);
         DLIB_TEST(e2.error() == 2);
 
-        unexpected<int> e3 = e2;
+        dlib::unexpected<int> e3 = e2;
         DLIB_TEST(e3.error() == 2);
         DLIB_TEST(e3 == e2);
     }
@@ -55,16 +55,16 @@ namespace
     {
         using std::swap;
 
-        unexpected<unexpected_error_type1> e1{in_place, 1, 3.1415f, "hello there"};
+        dlib::unexpected<unexpected_error_type1> e1{in_place, 1, 3.1415f, "hello there"};
         DLIB_TEST(e1.error() == unexpected_error_type1(1, 3.1415f, "hello there"));
 
-        unexpected<unexpected_error_type1> e2{e1};
+        dlib::unexpected<unexpected_error_type1> e2{e1};
         DLIB_TEST(e1 == e2);
 
-        unexpected<unexpected_error_type1> e3 = e2;
+        dlib::unexpected<unexpected_error_type1> e3 = e2;
         DLIB_TEST(e1 == e3);
 
-        unexpected<unexpected_error_type1> e4{in_place, 0, 0.0f, ""};
+        dlib::unexpected<unexpected_error_type1> e4{in_place, 0, 0.0f, ""};
         swap(e1, e4);
         DLIB_TEST(e1.error() == unexpected_error_type1(0, 0.0f, ""));
         DLIB_TEST(e4.error() == unexpected_error_type1(1, 3.1415f, "hello there"));
@@ -89,16 +89,16 @@ namespace
     {
         using std::swap;
 
-        unexpected<unexpected_error_type2> e1{in_place, {0, 1, 2, 3}, 42};
+        dlib::unexpected<unexpected_error_type2> e1{in_place, {0, 1, 2, 3}, 42};
         DLIB_TEST(e1.error() == unexpected_error_type2({0, 1, 2, 3}, 42));
 
-        unexpected<unexpected_error_type2> e2{e1};
+        dlib::unexpected<unexpected_error_type2> e2{e1};
         DLIB_TEST(e1 == e2);
 
-        unexpected<unexpected_error_type2> e3 = e2;
+        dlib::unexpected<unexpected_error_type2> e3 = e2;
         DLIB_TEST(e1 == e3);
 
-        unexpected<unexpected_error_type2> e4{in_place, {0}, 0};
+        dlib::unexpected<unexpected_error_type2> e4{in_place, {0}, 0};
         swap(e1, e4);
         DLIB_TEST(e1.error() == unexpected_error_type2({0}, 0));
         DLIB_TEST(e4.error() == unexpected_error_type2({0, 1, 2, 3}, 42));
@@ -108,7 +108,7 @@ namespace
 
     void test_expected_int_int()
     {
-        expected<int, int> e1;
+        dlib::expected<int, int> e1;
         DLIB_TEST(e1);
         DLIB_TEST(e1.has_value());
     }
