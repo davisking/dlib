@@ -530,8 +530,10 @@ namespace dlib
             constexpr expected_copy_assign& operator=(const expected_copy_assign &rhs) 
             noexcept(std::is_nothrow_copy_constructible<T>::value   && 
                      std::is_nothrow_copy_assignable<T>::value      &&
+                     std::is_nothrow_destructible<T>::value         &&
                      std::is_nothrow_copy_constructible<E>::value   && 
-                     std::is_nothrow_copy_assignable<E>::value)
+                     std::is_nothrow_copy_assignable<E>::value      && 
+                     std::is_nothrow_destructible<E>::value)
             {
                 this->assign(rhs);
                 return *this;
@@ -568,8 +570,10 @@ namespace dlib
             constexpr expected_move_assign& operator=(expected_move_assign &&rhs) 
             noexcept(std::is_nothrow_move_constructible<T>::value   && 
                      std::is_nothrow_move_assignable<T>::value      &&
+                     std::is_nothrow_destructible<T>::value         &&
                      std::is_nothrow_move_constructible<E>::value   && 
-                     std::is_nothrow_move_assignable<E>::value)
+                     std::is_nothrow_move_assignable<E>::value      && 
+                     std::is_nothrow_destructible<E>::value)
             {
                 this->assign(std::move(rhs));
                 return *this;
@@ -666,11 +670,23 @@ namespace dlib
             constexpr expected_delete_default_constructor& operator=(expected_delete_default_constructor &&)        = default;
         };
 
+        template <class E>
+        struct expected_delete_default_constructor<void, E, false>
+        {
+            constexpr expected_delete_default_constructor()                                                         = default;
+            constexpr expected_delete_default_constructor(const expected_delete_default_constructor&)               = default;
+            constexpr expected_delete_default_constructor(expected_delete_default_constructor&&)                    = default;
+            constexpr expected_delete_default_constructor& operator=(const expected_delete_default_constructor &)   = default;
+            constexpr expected_delete_default_constructor& operator=(expected_delete_default_constructor &&)        = default;
+        };
+
+// ---------------------------------------------------------------------------------------------------
+
         template <
           class T, 
           class E,
-          bool copyable = (std::is_copy_constructible<T>::value && std::is_copy_constructible<E>::value),
-          bool moveable = (std::is_move_constructible<T>::value && std::is_move_constructible<E>::value)
+          bool copyable = ((std::is_void<T>::value || std::is_copy_constructible<T>::value) && std::is_copy_constructible<E>::value),
+          bool moveable = ((std::is_void<T>::value || std::is_move_constructible<T>::value) && std::is_move_constructible<E>::value)
         >
         struct expected_delete_constructors
         {
@@ -716,12 +732,10 @@ namespace dlib
         template <
           class T,
           class E,
-          bool copyable = (std::is_copy_constructible<T>::value && 
-                           std::is_copy_assignable<T>::value    &&
+          bool copyable = ((std::is_void<T>::value || (std::is_copy_constructible<T>::value && std::is_copy_assignable<T>::value)) &&
                            std::is_copy_constructible<E>::value && 
                            std::is_copy_assignable<E>::value),
-          bool moveable = (std::is_move_constructible<T>::value && 
-                           std::is_move_assignable<T>::value    &&
+          bool moveable = ((std::is_void<T>::value || (std::is_move_constructible<T>::value && std::is_move_assignable<T>::value)) &&
                            std::is_move_constructible<E>::value && 
                            std::is_move_assignable<E>::value)
         >
