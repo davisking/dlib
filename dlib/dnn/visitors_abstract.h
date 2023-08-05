@@ -30,6 +30,22 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename net_type>
+    void disable_duplicative_biases (
+        const net_type& net
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+        ensures
+            - Disables bias for all bn_ and layer_norm_ inputs.
+            - Sets the get_bias_learning_rate_multiplier() and get_bias_weight_decay_multiplier()
+              to zero of all bn_ and layer_norm_ inputs.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename net_type>
     void fuse_layers (
         net_type& net
     );
@@ -42,6 +58,11 @@ namespace dlib
             - Disables all the affine_ layers that have a convolution as an input.
             - Updates the convolution weights beneath the affine_ layers to produce the same
               output as with the affine_ layers enabled.
+            - Disables all the relu_ layers that have a convolution as input.
+            - Disables all the relu_ layers that have an affine_ layer as input, with a
+              convolution as input.
+            - Updates the convolution to apply a relu activation function, to produce the same
+              output as with the relu_ layer enabled.
     !*/
 
 // ----------------------------------------------------------------------------------------

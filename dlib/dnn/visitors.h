@@ -3,6 +3,7 @@
 #ifndef DLIB_DNn_VISITORS_H_
 #define DLIB_DNn_VISITORS_H_
 
+#include "visitors_abstract.h"
 #include "input.h"
 #include "layers.h"
 #include "loss.h"
@@ -401,7 +402,42 @@ namespace dlib
                 // disable other layer types
             }
 
-            // handle the standard case (convolutional layer followed by affine;
+            // handle the case of convolutional layer followed by relu
+            template <long nf, long nr, long nc, int sy, int sx, int py, int px, typename U, typename R>
+            void fuse_convolution(add_layer<relu_, add_layer<con_<nf, nr, nc, sy, sx, py, px>, U>, R>& l)
+            {
+                if (l.layer_details().is_disabled())
+                    return;
+
+                // get the convolution below the relu layer
+                auto& conv = l.subnet().layer_details();
+
+                conv.enable_relu();
+
+                // disable the relu layer
+                l.layer_details().disable();
+            }
+
+            // handle the case of convolutional layer followed by affine followed by relu
+            template <long nf, long nr, long nc, int sy, int sx, int py, int px, typename U, typename E, typename R>
+            void fuse_convolution(add_layer<relu_, add_layer<affine_, add_layer<con_<nf, nr, nc, sy, sx, py, px>, U>, E>, R>& l)
+            {
+                if (l.layer_details().is_disabled())
+                    return;
+
+                // fuse the convolutional layer followed by affine
+                fuse_convolution(l.subnet());
+
+                // get the convolution below the affine layer
+                auto& conv = l.subnet().subnet().layer_details();
+
+                conv.enable_relu();
+
+                // disable the relu layer
+                l.layer_details().disable();
+            }
+
+            // handle the case of convolutional layer followed by affine
             template <long nf, long nr, long nc, int sy, int sx, int py, int px, typename U, typename E>
             void fuse_convolution(add_layer<affine_, add_layer<con_<nf, nr, nc, sy, sx, py, px>, U>, E>& l)
             {

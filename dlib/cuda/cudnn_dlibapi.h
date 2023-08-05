@@ -190,7 +190,8 @@ namespace dlib
                 resizable_tensor& output,
                 const tensor& data,
                 const tensor& filters,
-                const tensor& biases
+                const tensor& biases,
+                bool use_relu
             );
 
             void operator() (
@@ -198,7 +199,8 @@ namespace dlib
                 tensor& output,
                 const tensor& data,
                 const tensor& filters,
-                const tensor& biases
+                const tensor& biases,
+                bool use_relu
             );
 
             void get_gradient_for_data (
