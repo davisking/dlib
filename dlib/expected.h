@@ -685,8 +685,8 @@ namespace dlib
         template <
           class T, 
           class E,
-          bool copyable = ((std::is_void<T>::value || std::is_copy_constructible<T>::value) && std::is_copy_constructible<E>::value),
-          bool moveable = ((std::is_void<T>::value || std::is_move_constructible<T>::value) && std::is_move_constructible<E>::value)
+          bool copyable = (disjunction<std::is_void<T>, std::is_copy_constructible<T>>::value && std::is_copy_constructible<E>::value),
+          bool moveable = (disjunction<std::is_void<T>, std::is_move_constructible<T>>::value && std::is_move_constructible<E>::value)
         >
         struct expected_delete_constructors
         {
@@ -732,11 +732,13 @@ namespace dlib
         template <
           class T,
           class E,
-          bool copyable = ((std::is_void<T>::value || (std::is_copy_constructible<T>::value && std::is_copy_assignable<T>::value)) &&
-                           std::is_copy_constructible<E>::value && 
+          bool copyable = (disjunction<std::is_void<T>, std::is_copy_constructible<T>>::value   &&
+                           disjunction<std::is_void<T>, std::is_copy_assignable<T>>::value      &&
+                           std::is_copy_constructible<E>::value                                 && 
                            std::is_copy_assignable<E>::value),
-          bool moveable = ((std::is_void<T>::value || (std::is_move_constructible<T>::value && std::is_move_assignable<T>::value)) &&
-                           std::is_move_constructible<E>::value && 
+          bool moveable = (disjunction<std::is_void<T>, std::is_move_constructible<T>>::value   && 
+                           disjunction<std::is_void<T>, std::is_move_assignable<T>>::value      &&
+                           std::is_move_constructible<E>::value                                 && 
                            std::is_move_assignable<E>::value)
         >
         struct expected_delete_assign

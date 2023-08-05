@@ -128,6 +128,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template<class...>
+    struct disjunction : std::false_type {};
+
+    template<class B1> 
+    struct disjunction<B1> : B1 {};
+
+    template<class B1, class... Bn>
+    struct disjunction<B1, Bn...> : std::conditional_t<bool(B1::value), B1, disjunction<Bn...>>  {};
+
+// ----------------------------------------------------------------------------------------
+
     template <typename ...Types>
     struct are_nothrow_move_constructible : And<std::is_nothrow_move_constructible<Types>::value...> {};
 
