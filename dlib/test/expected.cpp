@@ -111,6 +111,12 @@ namespace
         dlib::expected<int, int> e1;
         DLIB_TEST(e1);
         DLIB_TEST(e1.has_value());
+
+        dlib::expected<int, int> e2(1);
+        DLIB_TEST(e2);
+        DLIB_TEST(e2.has_value());
+        DLIB_TEST(e2.value() == 1);
+        DLIB_TEST(*e2 == 1);
     }
 
 // ---------------------------------------------------------------------------------------------------

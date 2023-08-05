@@ -597,31 +597,31 @@ namespace dlib
 
             constexpr T& value() & 
             {
-                if (this->state == IS_VAL)
-                    return **this;
-                throw bad_expected_access<std::decay_t<E>>(std::as_const(this->error));
+                if (this->state != IS_VAL)
+                    throw bad_expected_access<std::decay_t<E>>(std::as_const(this->error.error()));
+                return **this;
             }
 
             constexpr const T& value() const & 
             {
-                if (this->state == IS_VAL)
-                    return **this;
-                throw bad_expected_access<std::decay_t<E>>(std::as_const(this->error));
+                if (this->state != IS_VAL)
+                    throw bad_expected_access<std::decay_t<E>>(std::as_const(this->error.error()));
+                return **this;
             }
 
             constexpr T&& value() && 
             {
-                if (this->state == IS_VAL)
-                    return std::move(**this);
-                throw bad_expected_access<std::decay_t<E>>(std::move(this->error));
+                if (this->state != IS_VAL)
+                    throw bad_expected_access<std::decay_t<E>>(std::move(this->error.error()));
+                return std::move(**this);
             }
 
             constexpr const T&& value() const && 
             {
-                if (this->state == IS_VAL)
-                    return std::move(**this);
-                throw bad_expected_access<std::decay_t<E>>(std::move(this->error));
-        }
+                if (this->state != IS_VAL)
+                    throw bad_expected_access<std::decay_t<E>>(std::move(this->error.error()));
+                return std::move(**this);
+            }
         };
 
         template <class T, class E>
@@ -989,12 +989,12 @@ namespace dlib
         {
         }
         
-        constexpr explicit  operator bool() const noexcept { return this->state == expected_details::IS_VAL; }
-        constexpr bool      has_value()     const noexcept { return this->state == expected_details::IS_VAL; }
-        constexpr E&        error() &       noexcept { return this->error; }
-        constexpr const E&  error() const&  noexcept { return this->error; }
-        constexpr E&&       error() &&      noexcept { return std::move(this->error); }
-        constexpr const E&& error() const&& noexcept { return std::move(this->error); }
+        constexpr explicit  operator bool() const noexcept { return base::state == expected_details::IS_VAL; }
+        constexpr bool      has_value()     const noexcept { return base::state == expected_details::IS_VAL; }
+        constexpr E&        error() &       noexcept { return base::error.error(); }
+        constexpr const E&  error() const&  noexcept { return base::error.error(); }
+        constexpr E&&       error() &&      noexcept { return std::move(base::error.error()); }
+        constexpr const E&& error() const&& noexcept { return std::move(base::error.error()); }
 
         template <class U> 
         constexpr T value_or(U &&u) const & 
