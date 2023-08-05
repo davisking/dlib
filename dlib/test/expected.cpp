@@ -106,6 +106,15 @@ namespace
     
 // ---------------------------------------------------------------------------------------------------
 
+    void test_expected_int_int()
+    {
+        expected<int, int> e1;
+        DLIB_TEST(e1);
+        DLIB_TEST(e1.has_value());
+    }
+
+// ---------------------------------------------------------------------------------------------------
+
     class expected_tester : public tester
     {
     public:
@@ -121,6 +130,7 @@ namespace
             test_unexpected_trivial();
             test_unexpected_nontrival1();
             test_unexpected_nontrival2();
+            test_expected_int_int();
         }
     } a;
 }
