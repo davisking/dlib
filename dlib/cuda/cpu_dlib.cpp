@@ -2647,12 +2647,14 @@ namespace dlib
             resizable_tensor& output,
             const tensor& data,
             const tensor& filters,
-            const tensor& biases
+            const tensor& biases,
+            bool use_relu
         )
         {
             DLIB_CASSERT(filters.num_samples() == biases.k());
             (*this)(add_to_output, output,data,filters);
             tt::add(1, output, 1, biases);
+            if (use_relu) tt::relu(output, output);
         }
 
         void tensor_conv::operator() (
@@ -2660,12 +2662,14 @@ namespace dlib
             tensor& output,
             const tensor& data,
             const tensor& filters,
-            const tensor& biases
+            const tensor& biases,
+            bool use_relu
         )
         {
             DLIB_CASSERT(filters.num_samples() == biases.k());
             (*this)(add_to_output, output, data, filters);
             tt::add(1, output, 1, biases);
+            if (use_relu) tt::relu(output, output);
         }
 
 

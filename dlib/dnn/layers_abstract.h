@@ -939,6 +939,28 @@ namespace dlib
                 - #get_bias_weight_decay_multiplier() == val
         !*/
 
+        void disable_relu(
+        );
+        /*!
+            ensures
+                - relu_is_disabled() returns true
+        !*/
+
+        void enable_relu(
+        );
+        /*!
+            ensures
+                - relu_is_disabled() returns false
+        !*/
+
+        bool relu_is_disabled(
+        ) const;
+        /*!
+            ensures
+                - returns true if relu is disabled for this layer. This means no activation function
+                  will be applied after the convolution when calling forward.
+        !*/
+
         void disable_bias(
         );
         /*!
@@ -1823,22 +1845,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename net_type>
-    void disable_duplicative_biases (
-        const net_type& net
-    );
-    /*!
-        requires
-            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
-              add_tag_layer.
-        ensures
-            - Disables bias for all bn_ and layer_norm_ inputs.
-            - Sets the get_bias_learning_rate_multiplier() and get_bias_weight_decay_multiplier()
-              to zero of all bn_ and layer_norm_ inputs.
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
     class affine_
     {
         /*!
@@ -2273,6 +2279,15 @@ namespace dlib
 
         relu_(
         );
+
+        void disable(
+        );
+        /*!
+            ensures
+                - #get_layer_params().size() == 0.
+                - when forward_inplace and backward_inplace are called, they return immediately doing nothing.
+                  Causing this layer to trivially perform the an identity transform.
+        !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);

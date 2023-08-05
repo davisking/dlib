@@ -1,0 +1,52 @@
+name: Matlab
+
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - ".github/workflows/build_matlab.yml"
+    - "**.cpp"
+    - "**.h"
+    - "**.c"
+    - "**.cu"
+    - "**.cmake"
+    - "**CMakeLists.txt"
+  pull_request:
+    branches:
+    - master
+    paths:
+    - ".github/workflows/build_matlab.yml"
+    - "**.cpp"
+    - "**.h"
+    - "**.c"
+    - "**.cu"
+    - "**.cmake"
+    - "**CMakeLists.txt"
+
+defaults:
+  run:
+    shell: bash
+    working-directory: dlib/matlab
+
+
+jobs:
+  mex-wrapper:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup MATLAB
+      uses: matlab-actions/setup-matlab@v1
+    - name: Compile mex wrappers 
+      run: |
+        pwd
+        mkdir build
+        cd build
+        cmake ..
+        cmake --build . --config Release --target install --parallel 4
+    - name: Run example script
+      uses: matlab-actions/run-command@v1
+      with:
+        command: cd dlib/matlab; example
+
+
