@@ -76,6 +76,14 @@ namespace dlib
     static constexpr in_place_t in_place{};
 
     // ---------------------------------------------------------------------
+
+    template<class T>
+    constexpr std::add_const_t<T>& as_const(T& t) noexcept
+    {
+        return t;
+    }
+
+    // ---------------------------------------------------------------------
 }
 
 #endif //DLIB_UTILITY_Hh_

@@ -578,11 +578,7 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-        template <
-          class T,
-          class E,
-          bool = std::is_void<T>::value
-        >
+        template <class T, class E>
         struct expected_ops : protected expected_move_assign<T,E>
         {   
             using expected_move_assign<T,E>::expected_move_assign;
@@ -598,14 +594,14 @@ namespace dlib
             constexpr T& value() & 
             {
                 if (this->state != IS_VAL)
-                    throw bad_expected_access<std::decay_t<E>>(std::as_const(this->error.error()));
+                    throw bad_expected_access<std::decay_t<E>>(dlib::as_const(this->error.error()));
                 return **this;
             }
 
             constexpr const T& value() const & 
             {
                 if (this->state != IS_VAL)
-                    throw bad_expected_access<std::decay_t<E>>(std::as_const(this->error.error()));
+                    throw bad_expected_access<std::decay_t<E>>(dlib::as_const(this->error.error()));
                 return **this;
             }
 
@@ -624,17 +620,17 @@ namespace dlib
             }
         };
 
-        template <class T, class E>
-        struct expected_ops<T, E, true> : expected_move_assign<T,E>
+        template <class E>
+        struct expected_ops<void, E> : expected_move_assign<void,E>
         {
-            using expected_move_assign<T,E>::expected_move_assign;
+            using expected_move_assign<void,E>::expected_move_assign;
 
             constexpr void operator*() const noexcept {}
 
-            constexpr void value() const&
+            constexpr void value() const &
             {
                 if (this->state != IS_VAL)
-                    throw bad_expected_access<std::decay_t<E>>(std::as_const(this->error));
+                    throw bad_expected_access<std::decay_t<E>>(dlib::as_const(this->error));
             }
 
             constexpr void value() &&
