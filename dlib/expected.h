@@ -937,7 +937,7 @@ namespace dlib
         constexpr explicit expected(const expected<U,G> &rhs)
         {
             if (rhs)
-                this->contruct(std::forward<UF>(*rhs));
+                this->contruct_value(std::forward<UF>(*rhs));
             else
                 this->construct_error(std::forward<GF>(rhs.error()));
         }

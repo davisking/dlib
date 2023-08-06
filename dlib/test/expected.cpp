@@ -136,6 +136,20 @@ namespace
         DLIB_TEST(e4.value() == 1);
         DLIB_TEST(*e4 == 1);
         DLIB_TEST(e4.value_or(2) == 1);
+
+        // Construct from error
+        dlib::expected<int, int> e5{dlib::unexpected<int>(1)};
+        DLIB_TEST(!e5);
+        DLIB_TEST(!e5.has_value());
+        DLIB_TEST(e5.error() == 1);
+        int thrown{0};
+        try {
+            e5.value() = 0;
+        } catch(const std::exception&) {
+            thrown = 1;
+        }
+        DLIB_TEST(thrown == 1);
+        DLIB_TEST(e5.value_or(2) == 2);
     }
 
 // ---------------------------------------------------------------------------------------------------
