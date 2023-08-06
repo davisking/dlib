@@ -470,7 +470,7 @@ namespace dlib
         template <
           class T,
           class E,
-          bool = (std::is_trivially_move_constructible<T>::value && std::is_trivially_move_constructible<E>::value)
+          bool = (disjunction<std::is_void<T>, std::is_trivially_move_constructible<T>>::value && std::is_trivially_move_constructible<E>::value)
         >
         struct expected_move : expected_copy<T, E> 
         {
@@ -505,11 +505,12 @@ namespace dlib
         template <
           class T, 
           class E,
-          bool = std::is_trivially_copy_assignable<T>::value    &&
-                 std::is_trivially_copy_constructible<T>::value &&
-                 std::is_trivially_destructible<T>::value       &&
-                 std::is_trivially_copy_assignable<E>::value    &&
-                 std::is_trivially_copy_constructible<E>::value &&
+          bool = disjunction<std::is_void<T>,
+                    conjunction<std::is_trivially_copy_assignable<T>,
+                                std::is_trivially_copy_constructible<T>,
+                                std::is_trivially_destructible<T>>>::value  && 
+                 std::is_trivially_copy_assignable<E>::value                &&
+                 std::is_trivially_copy_constructible<E>::value             &&
                  std::is_trivially_destructible<E>::value
         >
         struct expected_copy_assign : expected_move<T, E> 
@@ -545,11 +546,12 @@ namespace dlib
         template <
           class T, 
           class E,
-          bool = std::is_trivially_move_assignable<T>::value    &&
-                 std::is_trivially_move_constructible<T>::value &&
-                 std::is_trivially_destructible<T>::value       &&
-                 std::is_trivially_move_assignable<E>::value    &&
-                 std::is_trivially_move_constructible<E>::value &&
+          bool = disjunction<std::is_void<T>,
+                    conjunction<std::is_trivially_move_assignable<T>,
+                                std::is_trivially_move_constructible<T>,
+                                std::is_trivially_destructible<T>>>::value  && 
+                 std::is_trivially_move_assignable<E>::value                &&
+                 std::is_trivially_move_constructible<E>::value             &&
                  std::is_trivially_destructible<E>::value
         >
         struct expected_move_assign : expected_copy_assign<T,E> 
