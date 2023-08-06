@@ -158,20 +158,43 @@ namespace
         DLIB_TEST(*e5 == 1);
         DLIB_TEST(e5.value_or(2) == 1);
 
+        // Move assign
+        Expected e6;
+        e6 = std::move(e5);
+        DLIB_TEST(e6);
+        DLIB_TEST(e6.has_value());
+        DLIB_TEST(e6.value() == 1);
+        DLIB_TEST(*e6 == 1);
+        DLIB_TEST(e6.value_or(2) == 1);
 
         // Construct from error
-        Expected e6{dlib::unexpected<int>(1)};
-        DLIB_TEST(!e6);
-        DLIB_TEST(!e6.has_value());
-        DLIB_TEST(e6.error() == 1);
+        Expected e7{dlib::unexpected<int>(1)};
+        DLIB_TEST(!e7);
+        DLIB_TEST(!e7.has_value());
+        DLIB_TEST(e7.error() == 1);
         int thrown{0};
         try {
-            e6.value() = 0;
-        } catch(const std::exception&) {
+            e7.value() = 0;
+        } catch(const bad_expected_access<int>& e) {
             thrown = 1;
+            DLIB_TEST(e.error() == 1);
         }
         DLIB_TEST(thrown == 1);
-        DLIB_TEST(e6.value_or(2) == 2);
+        DLIB_TEST(e7.value_or(2) == 2);
+
+        // Assign from error
+        Expected e8;
+        e8 = dlib::unexpected<int>(1);
+        DLIB_TEST(!e8);
+        DLIB_TEST(e8.error() == 1);
+        try {
+            e8.value() = 42;
+        } catch(const bad_expected_access<int>& e) {
+            thrown++;
+            DLIB_TEST(e.error() == 1);
+        }
+        DLIB_TEST(thrown == 2);
+        DLIB_TEST(e8.value_or(3) == 3);
     }
 
 // ---------------------------------------------------------------------------------------------------

@@ -205,8 +205,7 @@ namespace dlib
         bool>;
 
         template <
-          class T, class E,
-          class U
+          class T, class E, class U
         >
         using is_convert_constructible = std::enable_if_t<And<
             !std::is_void<T>::value,
@@ -215,6 +214,21 @@ namespace dlib
             !is_unexpected_type<dlib::remove_cvref_t<U>>::value,
             std::is_same<bool, dlib::remove_cvref_t<T>>::value || !is_expected_type<dlib::remove_cvref_t<U>>::value,
             std::is_constructible<T, U>::value
+        >::value,
+        bool>;
+
+        template <
+          class T, class E, class U
+        >
+        using is_convert_assignable = std::enable_if_t<And<
+            !std::is_void<T>::value,
+            !std::is_same<expected<T,E>, dlib::remove_cvref_t<U>>::value,
+            !is_unexpected_type<dlib::remove_cvref_t<U>>::value,
+            std::is_constructible<T, U>::value,
+            std::is_assignable<std::add_lvalue_reference<T>, U>::value,
+            Or<std::is_nothrow_constructible<T, U>::value,
+               std::is_nothrow_move_constructible<T>::value,
+               std::is_nothrow_move_constructible<E>::value>::value
         >::value,
         bool>;
 
@@ -1111,6 +1125,39 @@ namespace dlib
         : base(unexpect, il, std::forward<Args>(args)...)
         {
         }
+
+        template <
+          class U = T,
+          expected_details::is_convert_assignable<T,E,U> = true
+        >
+        constexpr expected& operator=( U&& v )
+        {
+            using namespace expected_details;
+
+            if (*this)
+            {
+                **this = std::forward<U>(v); 
+            }
+            else
+            {
+                this->destruct();
+                this->construct_value(std::forward<U>(v));
+            }
+            
+            return *this;
+        }
+
+        // template< class G >
+        // constexpr expected& operator=( const unexpected<G>& other )
+        // {
+
+        // }
+
+        // template< class G >
+        // constexpr expected& operator=( unexpected<G>&& other )
+        // {
+
+        // }
         
         constexpr bool      has_value()     const noexcept { return base::state == expected_details::IS_VAL; }
         constexpr E&        error() &       noexcept { return base::error.error(); }

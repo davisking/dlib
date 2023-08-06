@@ -139,6 +139,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template<class B>
+    struct negation : std::integral_constant<bool, !bool(B::value)> {};
+
+// ----------------------------------------------------------------------------------------
+
     template <typename ...Types>
     struct are_nothrow_move_constructible : And<std::is_nothrow_move_constructible<Types>::value...> {};
 
