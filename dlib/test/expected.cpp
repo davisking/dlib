@@ -108,15 +108,49 @@ namespace
 
     void test_expected_int_int()
     {
+        // Default construction
         dlib::expected<int, int> e1;
         DLIB_TEST(e1);
         DLIB_TEST(e1.has_value());
 
+        // Construct from T
         dlib::expected<int, int> e2(1);
         DLIB_TEST(e2);
         DLIB_TEST(e2.has_value());
         DLIB_TEST(e2.value() == 1);
         DLIB_TEST(*e2 == 1);
+        DLIB_TEST(e2.value_or(2) == 1);
+
+        // Copy construction
+        dlib::expected<int, int> e3{e2};
+        DLIB_TEST(e3);
+        DLIB_TEST(e3.has_value());
+        DLIB_TEST(e3.value() == 1);
+        DLIB_TEST(*e3 == 1);
+        DLIB_TEST(e3.value_or(2) == 1);
+
+        // Move construction
+        dlib::expected<int, int> e4{std::move(e3)};
+        DLIB_TEST(e4);
+        DLIB_TEST(e4.has_value());
+        DLIB_TEST(e4.value() == 1);
+        DLIB_TEST(*e4 == 1);
+        DLIB_TEST(e4.value_or(2) == 1);
+    }
+
+// ---------------------------------------------------------------------------------------------------
+
+    void test_expected_void_int()
+    {
+        // Default construction
+        dlib::expected<void, int> e1;
+        DLIB_TEST(e1);
+        DLIB_TEST(e1.has_value());
+
+        // Copy construction
+        dlib::expected<void, int> e2{e1};
+        DLIB_TEST(e2);
+        DLIB_TEST(e2.has_value());
     }
 
 // ---------------------------------------------------------------------------------------------------
@@ -137,6 +171,7 @@ namespace
             test_unexpected_nontrival1();
             test_unexpected_nontrival2();
             test_expected_int_int();
+            test_expected_void_int();
         }
     } a;
 }

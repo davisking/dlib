@@ -356,6 +356,17 @@ namespace dlib
         {
             using expected_base<T,E>::expected_base;
 
+            constexpr void destruct() noexcept(std::is_nothrow_destructible<T>::value &&
+                                               std::is_nothrow_destructible<E>::value)
+            {
+                switch(this->state)
+                {
+                    case IS_VAL:    this->val.~T();               break;
+                    case IS_ERROR:  this->error.~unexpected<E>(); break;
+                    default:                                      break;
+                }
+            }  
+
             template <class... U> 
             constexpr void construct(U&&... u) noexcept(std::is_nothrow_constructible<T,U...>::value)
             {
@@ -368,18 +379,7 @@ namespace dlib
             {
                 new (std::addressof(this->error)) T(std::forward<U>(u)...);
                 this->state = IS_ERROR;
-            }
-
-            constexpr void destruct() noexcept(std::is_nothrow_destructible<T>::value &&
-                                               std::is_nothrow_destructible<E>::value)
-            {
-                switch(this->state)
-                {
-                    case IS_VAL:    this->val.~T();               break;
-                    case IS_ERROR:  this->error.~unexpected<E>(); break;
-                    default:                                      break;
-                }
-            }    
+            }              
 
             template<class Expected>
             constexpr void assign(Expected&& rhs)
@@ -435,7 +435,7 @@ namespace dlib
         template <
           class T,
           class E,
-          bool = (std::is_trivially_copy_constructible<T>::value && std::is_trivially_copy_constructible<E>::value)
+          bool = (disjunction<std::is_void<T>, std::is_trivially_copy_constructible<T>>::value && std::is_trivially_copy_constructible<E>::value)
         >
         struct expected_copy : expected_operations<T,E> 
         {
@@ -587,6 +587,7 @@ namespace dlib
         {   
             using expected_move_assign<T,E>::expected_move_assign;
 
+            constexpr explicit  operator bool() const noexcept { return this->state == expected_details::IS_VAL; }
             constexpr T&        operator*() &       noexcept { return this->val; }
             constexpr const T&  operator*() const&  noexcept { return this->val; }
             constexpr T&&       operator*() &&      noexcept { return std::move(this->val); }
@@ -622,6 +623,18 @@ namespace dlib
                     throw bad_expected_access<std::decay_t<E>>(std::move(this->error.error()));
                 return std::move(**this);
             }
+
+            template <class U> 
+            constexpr T value_or(U &&u) const & 
+            {
+                return *this ? **this : static_cast<T>(std::forward<U>(u));
+            }
+
+            template <class U> 
+            constexpr T value_or(U &&u) && 
+            {
+                return *this ? std::move(**this) : static_cast<T>(std::forward<U>(u));
+            }
         };
 
         template <class E>
@@ -629,6 +642,7 @@ namespace dlib
         {
             using expected_move_assign<void,E>::expected_move_assign;
 
+            constexpr explicit operator bool() const noexcept { return this->state == expected_details::IS_VAL; }
             constexpr void operator*() const noexcept {}
 
             constexpr void value() const &
@@ -1001,24 +1015,11 @@ namespace dlib
         {
         }
         
-        constexpr explicit  operator bool() const noexcept { return base::state == expected_details::IS_VAL; }
         constexpr bool      has_value()     const noexcept { return base::state == expected_details::IS_VAL; }
         constexpr E&        error() &       noexcept { return base::error.error(); }
         constexpr const E&  error() const&  noexcept { return base::error.error(); }
         constexpr E&&       error() &&      noexcept { return std::move(base::error.error()); }
         constexpr const E&& error() const&& noexcept { return std::move(base::error.error()); }
-
-        template <class U> 
-        constexpr T value_or(U &&u) const & 
-        {
-            return *this ? **this : static_cast<T>(std::forward<U>(u));
-        }
-
-        template <class U> 
-        constexpr T value_or(U &&u) && 
-        {
-            return *this ? std::move(**this) : static_cast<T>(std::forward<U>(u));
-        }
 
         void reset() noexcept(std::is_nothrow_destructible<T>::value)
         {
