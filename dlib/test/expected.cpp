@@ -37,16 +37,16 @@ namespace
     
 // ---------------------------------------------------------------------------------------------------
 
-    struct unexpected_error_type1
+    struct nontrivial1
     {
-        unexpected_error_type1(int i_, float f_, std::string str_) : i{i_}, f{f_}, str{str_} {};
+        nontrivial1(int i_, float f_, std::string str_) : i{i_}, f{f_}, str{str_} {};
 
         int         i{0};
         float       f{0.0f};
         std::string str;
     };
 
-    bool operator==(const unexpected_error_type1& a, const unexpected_error_type1& b)
+    bool operator==(const nontrivial1& a, const nontrivial1& b)
     {
         return std::tie(a.i, a.f, a.str) == std::tie(b.i, b.f, b.str);
     }
@@ -55,32 +55,32 @@ namespace
     {
         using std::swap;
 
-        dlib::unexpected<unexpected_error_type1> e1{in_place, 1, 3.1415f, "hello there"};
-        DLIB_TEST(e1.error() == unexpected_error_type1(1, 3.1415f, "hello there"));
+        dlib::unexpected<nontrivial1> e1{in_place, 1, 3.1415f, "hello there"};
+        DLIB_TEST(e1.error() == nontrivial1(1, 3.1415f, "hello there"));
 
-        dlib::unexpected<unexpected_error_type1> e2{e1};
+        dlib::unexpected<nontrivial1> e2{e1};
         DLIB_TEST(e1 == e2);
 
-        dlib::unexpected<unexpected_error_type1> e3 = e2;
+        dlib::unexpected<nontrivial1> e3 = e2;
         DLIB_TEST(e1 == e3);
 
-        dlib::unexpected<unexpected_error_type1> e4{in_place, 0, 0.0f, ""};
+        dlib::unexpected<nontrivial1> e4{in_place, 0, 0.0f, ""};
         swap(e1, e4);
-        DLIB_TEST(e1.error() == unexpected_error_type1(0, 0.0f, ""));
-        DLIB_TEST(e4.error() == unexpected_error_type1(1, 3.1415f, "hello there"));
+        DLIB_TEST(e1.error() == nontrivial1(0, 0.0f, ""));
+        DLIB_TEST(e4.error() == nontrivial1(1, 3.1415f, "hello there"));
     }
 
 // ---------------------------------------------------------------------------------------------------
 
-    struct unexpected_error_type2
+    struct nontrivial2
     {
-        unexpected_error_type2(std::initializer_list<int> l, int i_) : v{l}, i{i_} {}
+        nontrivial2(std::initializer_list<int> l, int i_) : v{l}, i{i_} {}
 
         std::vector<int> v;
         int i{0};
     };
 
-    bool operator==(const unexpected_error_type2& a, const unexpected_error_type2& b)
+    bool operator==(const nontrivial2& a, const nontrivial2& b)
     {
         return std::tie(a.v, a.i) == std::tie(b.v, b.i);
     }
@@ -89,19 +89,19 @@ namespace
     {
         using std::swap;
 
-        dlib::unexpected<unexpected_error_type2> e1{in_place, {0, 1, 2, 3}, 42};
-        DLIB_TEST(e1.error() == unexpected_error_type2({0, 1, 2, 3}, 42));
+        dlib::unexpected<nontrivial2> e1{in_place, {0, 1, 2, 3}, 42};
+        DLIB_TEST(e1.error() == nontrivial2({0, 1, 2, 3}, 42));
 
-        dlib::unexpected<unexpected_error_type2> e2{e1};
+        dlib::unexpected<nontrivial2> e2{e1};
         DLIB_TEST(e1 == e2);
 
-        dlib::unexpected<unexpected_error_type2> e3 = e2;
+        dlib::unexpected<nontrivial2> e3 = e2;
         DLIB_TEST(e1 == e3);
 
-        dlib::unexpected<unexpected_error_type2> e4{in_place, {0}, 0};
+        dlib::unexpected<nontrivial2> e4{in_place, {0}, 0};
         swap(e1, e4);
-        DLIB_TEST(e1.error() == unexpected_error_type2({0}, 0));
-        DLIB_TEST(e4.error() == unexpected_error_type2({0, 1, 2, 3}, 42));
+        DLIB_TEST(e1.error() == nontrivial2({0}, 0));
+        DLIB_TEST(e4.error() == nontrivial2({0, 1, 2, 3}, 42));
     }
     
 // ---------------------------------------------------------------------------------------------------
@@ -155,6 +155,53 @@ namespace
 
 // ---------------------------------------------------------------------------------------------------
 
+    void test_expected_int_nontrivial1()
+    {
+        // Default construction
+        dlib::expected<int, nontrivial1> e1;
+        DLIB_TEST(e1);
+        DLIB_TEST(e1.has_value());
+
+        // Construct from T
+        dlib::expected<int, nontrivial1> e2(1);
+        DLIB_TEST(e2);
+        DLIB_TEST(e2.has_value());
+        DLIB_TEST(e2.value() == 1);
+        DLIB_TEST(*e2 == 1);
+        DLIB_TEST(e2.value_or(2) == 1);
+
+        // Copy construction
+        dlib::expected<int, nontrivial1> e3{e2};
+        DLIB_TEST(e3);
+        DLIB_TEST(e3.has_value());
+        DLIB_TEST(e3.value() == 1);
+        DLIB_TEST(*e3 == 1);
+        DLIB_TEST(e3.value_or(2) == 1);
+
+        // Move construction
+        dlib::expected<int, nontrivial1> e4{std::move(e3)};
+        DLIB_TEST(e4);
+        DLIB_TEST(e4.has_value());
+        DLIB_TEST(e4.value() == 1);
+        DLIB_TEST(*e4 == 1);
+        DLIB_TEST(e4.value_or(2) == 1);
+    }
+
+    void test_expected_void_nontrivial1()
+    {
+        // Default construction
+        dlib::expected<void, nontrivial1> e1;
+        DLIB_TEST(e1);
+        DLIB_TEST(e1.has_value());
+
+        // Copy construction
+        dlib::expected<void, nontrivial1> e2{e1};
+        DLIB_TEST(e2);
+        DLIB_TEST(e2.has_value());
+    }
+
+// ---------------------------------------------------------------------------------------------------
+
     class expected_tester : public tester
     {
     public:
@@ -172,6 +219,8 @@ namespace
             test_unexpected_nontrival2();
             test_expected_int_int();
             test_expected_void_int();
+            test_expected_int_nontrivial1();
+            test_expected_void_nontrivial1();
         }
     } a;
 }

@@ -365,10 +365,11 @@ namespace dlib
                     case IS_ERROR:  this->error.~unexpected<E>(); break;
                     default:                                      break;
                 }
+                this->state = IS_EMPTY;
             }  
 
             template <class... U> 
-            constexpr void construct(U&&... u) noexcept(std::is_nothrow_constructible<T,U...>::value)
+            constexpr void construct_value(U&&... u) noexcept(std::is_nothrow_constructible<T,U...>::value)
             {
                 new (std::addressof(this->val)) T(std::forward<U>(u)...);
                 this->state = IS_VAL;
@@ -377,9 +378,20 @@ namespace dlib
             template <class... U> 
             constexpr void construct_error(U&&... u) noexcept(std::is_nothrow_constructible<E,U...>::value)
             {
-                new (std::addressof(this->error)) T(std::forward<U>(u)...);
+                new (std::addressof(this->error)) unexpected<E>(std::forward<U>(u)...);
                 this->state = IS_ERROR;
-            }              
+            }    
+
+            template <class Expected>
+            constexpr void construct(Expected&& rhs)
+            {
+                switch(rhs.state)
+                {
+                    case IS_VAL:    construct_value(std::forward<Expected>(rhs).val);           break;
+                    case IS_ERROR:  construct_error(std::forward<Expected>(rhs).error.error()); break;
+                    default:        this->state = IS_ERROR;                                     break;
+                }
+            }          
 
             template<class Expected>
             constexpr void assign(Expected&& rhs)
@@ -392,6 +404,93 @@ namespace dlib
                 {
                     case IS_VAL | (IS_VAL << 4): 
                         this->val = std::forward<Expected>(rhs).val; 
+                        break;
+                    
+                    case IS_VAL | (IS_EMPTY << 4):
+                        destruct();
+                        break;
+                    
+                    case IS_VAL | (IS_ERROR << 4):
+                        destruct();
+                        construct_error(std::forward<Expected>(rhs).error);
+                        break;
+                    
+                    case IS_EMPTY | (IS_VAL << 4): 
+                        construct(std::forward<Expected>(rhs).val);
+                        break;
+                    
+                    case IS_EMPTY | (IS_ERROR << 4): 
+                        construct_error(std::forward<Expected>(rhs).error);
+                        break;
+
+                    case IS_ERROR | (IS_VAL << 4): 
+                        destruct();
+                        construct(std::forward<Expected>(rhs).val);
+                        break;
+
+                    case IS_ERROR | (IS_ERROR << 4): 
+                        this->error = std::forward<Expected>(rhs).error; 
+                        break;
+
+                    case IS_ERROR | (IS_EMPTY << 4): 
+                        destruct();
+                        break;
+
+                    default:
+                        break;
+                }
+            }  
+        };
+
+        template <class E>
+        struct expected_operations<void,E> : expected_base<void,E>
+        {
+            using expected_base<void,E>::expected_base;
+
+            constexpr void destruct() noexcept(std::is_nothrow_destructible<E>::value)
+            {
+                switch(this->state)
+                {
+                    case IS_ERROR: this->error.~unexpected<E>(); break;
+                    default:                                     break;
+                }
+                this->state = IS_EMPTY;
+            }  
+
+            template <class... U> 
+            constexpr void construct_value(U&&... u) noexcept
+            {
+                this->state = IS_VAL;
+            }
+
+            template <class... U> 
+            constexpr void construct_error(U&&... u) noexcept(std::is_nothrow_constructible<E,U...>::value)
+            {
+                new (std::addressof(this->error)) unexpected<E>(std::forward<U>(u)...);
+                this->state = IS_ERROR;
+            }    
+
+            template <class Expected>
+            constexpr void construct(Expected&& rhs)
+            {
+                switch(rhs.state)
+                {
+                    case IS_VAL:    this->state = IS_VAL;                                       break;
+                    case IS_ERROR:  construct_error(std::forward<Expected>(rhs).error.error()); break;
+                    default:        this->state = IS_ERROR;                                     break;
+                }
+            }          
+
+            template<class Expected>
+            constexpr void assign(Expected&& rhs)
+            {                    
+                /* This is screaming for pattern matching. */
+
+                const uint8_t combined = this->state | (rhs.state << 4);
+                
+                switch(combined)
+                {
+                    case IS_VAL | (IS_VAL << 4): 
                         break;
                     
                     case IS_VAL | (IS_EMPTY << 4):
@@ -456,12 +555,7 @@ namespace dlib
                                                                        std::is_nothrow_copy_constructible<E>::value)
             : expected_operations<T, E>(empty_initialization_tag{})
             {
-                switch(rhs.state)
-                {
-                    case IS_VAL:    this->construct(rhs.val);           break;
-                    case IS_ERROR:  this->construct_error(rhs.error);   break;
-                    default:                                            break;
-                }
+                this->construct(rhs);
             }
         };
 
@@ -491,12 +585,7 @@ namespace dlib
                                                                   std::is_nothrow_move_constructible<E>::value)
             : expected_copy<T, E>(empty_initialization_tag{})
             {
-                switch(rhs.state)
-                {
-                    case IS_VAL:    this->construct(std::move(rhs.val));            break;
-                    case IS_ERROR:  this->construct_error(std::move(rhs.error));    break;
-                    default:                                                        break;
-                }
+                this->construct(std::move(rhs));
             }
         };
 
