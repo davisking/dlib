@@ -38,10 +38,12 @@ namespace dlib
         !*/
 
     public:
-        constexpr unexpected()                      = delete;
-        constexpr unexpected( const unexpected& )   = default;
-        constexpr unexpected( unexpected&& )        = default;
-        ~unexpected()                               = default;
+        constexpr unexpected()                                  = delete;
+        constexpr unexpected( const unexpected& )               = default;
+        constexpr unexpected( unexpected&& )                    = default;
+        constexpr unexpected& operator=( const unexpected& )    = default;
+        constexpr unexpected& operator=( unexpected&& )         = default;
+        ~unexpected()                                           = default;
 
         template < 
           class Err = E,
@@ -207,10 +209,12 @@ namespace dlib
           class U
         >
         using is_convert_constructible = std::enable_if_t<And<
-            std::is_constructible<T, U>::value,
+            !std::is_void<T>::value,
             !std::is_same<dlib::remove_cvref_t<U>, in_place_t>::value,
             !std::is_same<expected<T, E>, dlib::remove_cvref_t<U>>::value,
-            !std::is_same<unexpected<E>, dlib::remove_cvref_t<U>>::value
+            !is_unexpected_type<dlib::remove_cvref_t<U>>::value,
+            std::is_same<bool, dlib::remove_cvref_t<T>>::value || !is_expected_type<dlib::remove_cvref_t<U>>::value,
+            std::is_constructible<T, U>::value
         >::value,
         bool>;
 
@@ -900,7 +904,9 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS 
                 This is a standard's compliant backport of std::expected that works with C++14.
-                It includes C++23 monadic interfaces
+                It includes C++23 monadic interfaces.
+                This is an optimized vocabulary type, designed for error handling and value semantics.
+                It correctly propagates constexpr, noexcept-ness and triviality.
         !*/
 
         using base = expected_details::expected_ops<T,E>;
@@ -953,7 +959,7 @@ namespace dlib
         constexpr expected(const expected<U,G> &rhs)
         {
             if (rhs)
-                this->contruct(std::forward<UF>(*rhs));
+                this->contruct_value(std::forward<UF>(*rhs));
             else
                 this->construct_error(std::forward<GF>(rhs.error()));
         }
@@ -969,7 +975,7 @@ namespace dlib
         constexpr explicit expected(expected<U,G>&& rhs)
         {
             if (rhs)
-                this->contruct(std::forward<UF>(*rhs));
+                this->contruct_value(std::forward<UF>(*rhs));
             else
                 this->construct_error(std::forward<GF>(rhs.error()));
         }
@@ -985,7 +991,7 @@ namespace dlib
         constexpr expected(expected<U,G>&& rhs)
         {
             if (rhs)
-                this->contruct(std::forward<UF>(*rhs));
+                this->contruct_value(std::forward<UF>(*rhs));
             else
                 this->construct_error(std::forward<GF>(rhs.error()));
         }

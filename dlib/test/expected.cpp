@@ -14,7 +14,7 @@ namespace
     logger dlog("test.optional");
 
 // ---------------------------------------------------------------------------------------------------
-    
+
     void test_unexpected_trivial()
     {
         using std::swap;
@@ -33,6 +33,9 @@ namespace
         dlib::unexpected<int> e3 = e2;
         DLIB_TEST(e3.error() == 2);
         DLIB_TEST(e3 == e2);
+
+        constexpr dlib::unexpected<int> e4{1};
+        static_assert(e4.error() == 1, "bad");
     }
     
 // ---------------------------------------------------------------------------------------------------
@@ -146,32 +149,51 @@ namespace
         DLIB_TEST(*e4 == 1);
         DLIB_TEST(e4.value_or(2) == 1);
 
+        // Copy assign
+        Expected e5;
+        e5 = e4;
+        DLIB_TEST(e5);
+        DLIB_TEST(e5.has_value());
+        DLIB_TEST(e4.value() == 1);
+        DLIB_TEST(*e5 == 1);
+        DLIB_TEST(e5.value_or(2) == 1);
+
+
         // Construct from error
-        Expected e5{dlib::unexpected<int>(1)};
-        DLIB_TEST(!e5);
-        DLIB_TEST(!e5.has_value());
-        DLIB_TEST(e5.error() == 1);
+        Expected e6{dlib::unexpected<int>(1)};
+        DLIB_TEST(!e6);
+        DLIB_TEST(!e6.has_value());
+        DLIB_TEST(e6.error() == 1);
         int thrown{0};
         try {
-            e5.value() = 0;
+            e6.value() = 0;
         } catch(const std::exception&) {
             thrown = 1;
         }
         DLIB_TEST(thrown == 1);
-        DLIB_TEST(e5.value_or(2) == 2);
+        DLIB_TEST(e6.value_or(2) == 2);
     }
 
 // ---------------------------------------------------------------------------------------------------
 
     void test_expected_void_int()
     {
+        using Expected = dlib::expected<void, int>;
+        static_assert(std::is_trivially_copy_constructible<Expected>::value,    "bad");
+        static_assert(std::is_trivially_move_constructible<Expected>::value,    "bad");
+        static_assert(std::is_trivially_destructible<Expected>::value,          "bad");
+        static_assert(std::is_nothrow_default_constructible<Expected>::value,   "bad");
+        static_assert(std::is_nothrow_copy_constructible<Expected>::value,      "bad");
+        static_assert(std::is_nothrow_move_constructible<Expected>::value,      "bad");
+        static_assert(std::is_nothrow_destructible<Expected>::value,            "bad");
+
         // Default construction
-        dlib::expected<void, int> e1;
+        Expected e1;
         DLIB_TEST(e1);
         DLIB_TEST(e1.has_value());
 
         // Copy construction
-        dlib::expected<void, int> e2{e1};
+        Expected e2{e1};
         DLIB_TEST(e2);
         DLIB_TEST(e2.has_value());
     }
@@ -180,13 +202,23 @@ namespace
 
     void test_expected_int_nontrivial1()
     {
+        using Expected = dlib::expected<int, nontrivial1>;
+        // All verified on compiler explorer using std::expected https://godbolt.org/z/4GsM6h7Y5
+        static_assert(!std::is_trivially_copy_constructible<Expected>::value,    "bad");
+        static_assert(!std::is_trivially_move_constructible<Expected>::value,    "bad");
+        static_assert(!std::is_trivially_destructible<Expected>::value,          "bad");
+        static_assert(std::is_nothrow_default_constructible<Expected>::value,   "bad");
+        static_assert(!std::is_nothrow_copy_constructible<Expected>::value,      "bad");
+        static_assert(std::is_nothrow_move_constructible<Expected>::value,      "bad");
+        static_assert(std::is_nothrow_destructible<Expected>::value,            "bad");
+
         // Default construction
-        dlib::expected<int, nontrivial1> e1;
+        Expected e1;
         DLIB_TEST(e1);
         DLIB_TEST(e1.has_value());
 
         // Construct from T
-        dlib::expected<int, nontrivial1> e2(1);
+        Expected e2(1);
         DLIB_TEST(e2);
         DLIB_TEST(e2.has_value());
         DLIB_TEST(e2.value() == 1);
@@ -194,7 +226,7 @@ namespace
         DLIB_TEST(e2.value_or(2) == 1);
 
         // Copy construction
-        dlib::expected<int, nontrivial1> e3{e2};
+        Expected e3{e2};
         DLIB_TEST(e3);
         DLIB_TEST(e3.has_value());
         DLIB_TEST(e3.value() == 1);
@@ -202,7 +234,7 @@ namespace
         DLIB_TEST(e3.value_or(2) == 1);
 
         // Move construction
-        dlib::expected<int, nontrivial1> e4{std::move(e3)};
+        Expected e4{std::move(e3)};
         DLIB_TEST(e4);
         DLIB_TEST(e4.has_value());
         DLIB_TEST(e4.value() == 1);
@@ -212,13 +244,20 @@ namespace
 
     void test_expected_void_nontrivial1()
     {
+        using Expected = dlib::expected<void, nontrivial1>;
+        static_assert(!std::is_trivially_copy_constructible<Expected>::value,    "bad");
+        static_assert(!std::is_trivially_move_constructible<Expected>::value,    "bad");
+        static_assert(!std::is_trivially_destructible<Expected>::value,          "bad");
+        static_assert(std::is_nothrow_default_constructible<Expected>::value,   "bad");
+        static_assert(std::is_nothrow_destructible<Expected>::value,            "bad");
+
         // Default construction
-        dlib::expected<void, nontrivial1> e1;
+        Expected e1;
         DLIB_TEST(e1);
         DLIB_TEST(e1.has_value());
 
         // Copy construction
-        dlib::expected<void, nontrivial1> e2{e1};
+        Expected e2{e1};
         DLIB_TEST(e2);
         DLIB_TEST(e2.has_value());
     }
