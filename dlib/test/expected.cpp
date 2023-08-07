@@ -135,6 +135,7 @@ namespace
         Expected e1;
         DLIB_TEST(e1);
         DLIB_TEST(e1.has_value());
+        DLIB_TEST(noexcept(e1.has_value()));
 
         // Construct from T
         Expected e2(1);

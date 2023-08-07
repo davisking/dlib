@@ -218,18 +218,18 @@ namespace dlib
         bool>;
 
         template <
-          class T, class E, class U
+          class T, class E, class GF
         >
-        using is_convert_assignable = std::enable_if_t<And<
-            !std::is_void<T>::value,
-            !std::is_same<expected<T,E>, dlib::remove_cvref_t<U>>::value,
-            !is_unexpected_type<dlib::remove_cvref_t<U>>::value,
-            std::is_constructible<T, U>::value,
-            std::is_assignable<std::add_lvalue_reference<T>, U>::value,
-            Or<std::is_nothrow_constructible<T, U>::value,
-               std::is_nothrow_move_constructible<T>::value,
-               std::is_nothrow_move_constructible<E>::value>::value
-        >::value,
+        using is_constructible_from_error = std::enable_if_t<And<
+            std::is_constructible<E, GF>::value,
+            std::is_assignable<E&, GF>::value,
+            Or<
+              std::is_void<T>::value,
+              std::is_nothrow_constructible<E, GF>::value,
+              std::is_nothrow_move_constructible<T>::value,
+              std::is_nothrow_move_constructible<E>::value
+            >::value
+          >::value,
         bool>;
 
 // ---------------------------------------------------------------------------------------------------
@@ -467,11 +467,8 @@ namespace dlib
 
             constexpr void destruct() noexcept(std::is_nothrow_destructible<E>::value)
             {
-                switch(this->state)
-                {
-                    case IS_ERROR: this->error.~unexpected<E>(); break;
-                    default:                                     break;
-                }
+                if (this->state == IS_ERROR)
+                    this->error.~unexpected<E>();
                 this->state = IS_EMPTY;
             }  
 
@@ -744,6 +741,27 @@ namespace dlib
             {
                 return *this ? std::move(**this) : static_cast<T>(std::forward<U>(u));
             }
+
+            template< 
+              class... Args,
+              std::enable_if_t<std::is_nothrow_constructible<T, Args...>::value, bool> = true
+            >
+            constexpr T& emplace( Args&&... args ) noexcept
+            {
+                this->destruct();
+                this->construct_value(std::forward<Args>(args)...);
+            }
+
+            template < 
+              class U, 
+              class... Args,
+              std::enable_if_t<std::is_nothrow_constructible<T, std::initializer_list<U>&, Args...>::value, bool> = true
+            >
+            constexpr T& emplace( std::initializer_list<U>& il, Args&&... args ) noexcept
+            {
+                this->destruct();
+                this->construct_value(il, std::forward<Args>(args)...);
+            }
         };
 
         template <class E>
@@ -764,6 +782,11 @@ namespace dlib
             {
                 if (this->state != IS_VAL)
                     throw bad_expected_access<std::decay_t<E>>(std::move(this->error));
+            }
+
+            constexpr void emplace() noexcept
+            {
+                this->destruct();
             }
         };
 
@@ -1127,8 +1150,19 @@ namespace dlib
         }
 
         template <
-          class U = T,
-          expected_details::is_convert_assignable<T,E,U> = true
+          class U  = T,
+          class G  = T,
+          class U_ = dlib::remove_cvref_t<U>,
+          std::enable_if_t<And<
+            !std::is_void<G>::value,
+            !std::is_same<expected<G,E>, U_>::value,
+            !expected_details::is_unexpected_type<U_>::value,
+            std::is_constructible<G,U>::value,
+            std::is_assignable<G&,U>::value,
+            Or<std::is_nothrow_constructible<G, U>::value,
+               std::is_nothrow_move_constructible<G>::value,
+               std::is_nothrow_move_constructible<E>::value>::value
+          >::value, bool> = true
         >
         constexpr expected& operator=( U&& v )
         {
@@ -1147,17 +1181,43 @@ namespace dlib
             return *this;
         }
 
-        // template< class G >
-        // constexpr expected& operator=( const unexpected<G>& other )
-        // {
+        template< 
+          class G,
+          class GF = const G&,
+          expected_details::is_constructible_from_error<T,E,GF> = true
+        >
+        constexpr expected& operator=( const unexpected<G>& e )
+        {
+            if (!*this)
+            {
+                error() = std::forward<GF>(e.error());
+            }
+            else
+            {
+                this->destruct();
+                this->construct_error(std::forward<GF>(e.error()));
+            }
+            return *this;
+        }
 
-        // }
-
-        // template< class G >
-        // constexpr expected& operator=( unexpected<G>&& other )
-        // {
-
-        // }
+        template< 
+          class G,
+          class GF = G,
+          expected_details::is_constructible_from_error<T,E,GF> = true
+        >
+        constexpr expected& operator=( unexpected<G>&& e )
+        {
+            if (!*this)
+            {
+                error() = std::forward<GF>(e.error());
+            }
+            else
+            {
+                this->destruct();
+                this->construct_error(std::forward<GF>(e.error()));
+            }
+            return *this;
+        }
         
         constexpr bool      has_value()     const noexcept { return base::state == expected_details::IS_VAL; }
         constexpr E&        error() &       noexcept { return base::error.error(); }
