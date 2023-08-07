@@ -111,7 +111,7 @@ namespace dlib
     };
 
     template< class E1, class E2 >
-    constexpr bool operator==(unexpected<E1>& x, unexpected<E2>& y)
+    constexpr bool operator==(unexpected<E1>& x, unexpected<E2>& y) noexcept(noexcept(x.error() == y.error()))
     {
         return x.error() == y.error();
     }

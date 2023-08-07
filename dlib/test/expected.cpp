@@ -21,6 +21,8 @@ namespace
 
         dlib::unexpected<int> e1{1};
         DLIB_TEST(e1.error() == 1);
+        DLIB_TEST(noexcept(e1.error()));
+        DLIB_TEST(noexcept(as_const(e1).error()));
 
         dlib::unexpected<int> e2{2};
         e1.swap(e2);
@@ -29,13 +31,22 @@ namespace
         swap(e1, e2);
         DLIB_TEST(e1.error() == 1);
         DLIB_TEST(e2.error() == 2);
+        DLIB_TEST(noexcept(swap(e1,e2)));
+        DLIB_TEST(noexcept(e1.swap(e2)));
 
         dlib::unexpected<int> e3 = e2;
         DLIB_TEST(e3.error() == 2);
         DLIB_TEST(e3 == e2);
+        DLIB_TEST(noexcept(e3 == e2));
 
         constexpr dlib::unexpected<int> e4{1};
         static_assert(e4.error() == 1, "bad");
+
+        constexpr dlib::unexpected<int> e5{e4};
+        static_assert(e5.error() == 1, "bad");
+
+        constexpr dlib::unexpected<int> e6{std::move(e5)};
+        static_assert(e6.error() == 1, "bad");
     }
     
 // ---------------------------------------------------------------------------------------------------
