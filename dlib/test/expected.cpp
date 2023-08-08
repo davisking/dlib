@@ -59,7 +59,7 @@ namespace
 #endif
 
         constexpr dlib::unexpected<int> e9 = make_unexpected(3);
-        static_assert(e9.error() == 3);
+        static_assert(e9.error() == 3, "bad");
     }
     
 // ---------------------------------------------------------------------------------------------------
