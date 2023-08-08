@@ -7,6 +7,7 @@
 #include <exception>
 #include <initializer_list>
 #include "functional.h"
+#include "constexpr_if.h"
 
 namespace dlib
 {
@@ -247,6 +248,22 @@ namespace dlib
             >::value
           >::value,
         bool>;
+
+        template <
+          class T, class E, class TF, class EF, class F
+        >
+        struct and_then_traits
+        {
+            using U = std::conditional_t<std::is_void<T>::value, dlib::remove_cvref_t<dlib::invoke_result_t<F>>,
+                                                                 dlib::remove_cvref_t<dlib::invoke_result_t<F,TF>>>;
+
+            using check = std::enable_if_t<
+                std::is_same<typename U::error_type, E>::value  &&
+                is_expected_type<U>::value                      &&
+                std::is_constructible<E, EF>::value,
+                bool
+            >;
+        };
 
 // ---------------------------------------------------------------------------------------------------
 
@@ -1206,6 +1223,118 @@ namespace dlib
         void reset() noexcept(std::is_nothrow_destructible<T>::value)
         {
             this->destruct();
+        }
+
+        template< 
+          class F,
+          class G = T,
+          class GF = G&,
+          class EF = E&,
+          typename expected_details::and_then_traits<G, E, GF, EF, F>::check = true
+        >
+        constexpr auto and_then( F&& f ) &
+        {
+            using U = typename expected_details::and_then_traits<G, E, GF, EF, F>::U;
+            
+            if (*this)
+            {
+                return switch_(bools(std::is_void<T>{}),
+                    [&](true_t, auto _) {
+                        return dlib::invoke(std::forward<F>(_(f)));
+                    },
+                    [&](false_t, auto _) {
+                        return dlib::invoke(std::forward<F>(_(f)), base::value());
+                    }
+                );
+            }
+            else
+            {
+                return U{dlib::unexpect, error()};
+            }
+        }
+
+        template< 
+          class F,
+          class G = T,
+          class GF = const G&,
+          class EF = const E&,
+          typename expected_details::and_then_traits<G, E, GF, EF, F>::check = true
+        >
+        constexpr auto and_then( F&& f ) const&
+        {
+            using U = typename expected_details::and_then_traits<G, E, GF, EF, F>::U;
+
+            if (*this)
+            {
+                return switch_(bools(std::is_void<T>{}),
+                    [&](true_t, auto _) {
+                        return dlib::invoke(std::forward<F>(_(f)));
+                    },
+                    [&](false_t, auto _) {
+                        return dlib::invoke(std::forward<F>(_(f)), base::value());
+                    }
+                );
+            }
+            else
+            {
+                return U{dlib::unexpect, error()};
+            }
+        }
+
+        template< 
+          class F,
+          class G = T,
+          class GF = G&&,
+          class EF = E&&,
+          typename expected_details::and_then_traits<G, E, GF, EF, F>::check = true
+        >
+        constexpr auto and_then( F&& f ) &&
+        {
+            using U = typename expected_details::and_then_traits<G, E, GF, EF, F>::U;
+
+            if (*this)
+            {
+                return switch_(bools(std::is_void<T>{}),
+                    [&](true_t, auto _) {
+                        return dlib::invoke(std::forward<F>(_(f)));
+                    },
+                    [&](false_t, auto _) {
+                        return dlib::invoke(std::forward<F>(_(f)), std::move(base::value()));
+                    }
+                );
+            }
+            else
+            {
+                return U{dlib::unexpect, std::move(error())};
+            }
+        }
+
+        template< 
+          class F,
+          class G = T,
+          class GF = const G&&,
+          class EF = const E&&,
+          typename expected_details::and_then_traits<G, E, GF, EF, F>::check = true
+        >
+        constexpr auto and_then( F&& f ) const&&
+        {
+            using U = typename expected_details::and_then_traits<G, E, GF, EF, F>::U;
+
+            if (*this)
+            {
+                return switch_(bools(std::is_void<T>{}),
+                    [&](true_t, auto _) {
+                        return dlib::invoke(std::forward<F>(_(f)));
+                    },
+                    [&](false_t, auto _) {
+                        return dlib::invoke(std::forward<F>(_(f)), std::move(base::value()));
+                    }
+                );
+            }
+            else
+            {
+                return U{dlib::unexpect, std::move(error())};
+            }
         }
     };
 
