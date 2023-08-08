@@ -339,7 +339,7 @@ namespace
 
     void test_expected_void_nontrivial1()
     {
-        using Expected = dlib::expected<void, nontrivial1>;
+        using Expected = dlib::expected<void, nontrivial2>;
         static_assert(!std::is_trivially_copy_constructible<Expected>::value,    "bad");
         static_assert(!std::is_trivially_move_constructible<Expected>::value,    "bad");
         static_assert(!std::is_trivially_destructible<Expected>::value,          "bad");
@@ -355,6 +355,50 @@ namespace
         Expected e2{e1};
         DLIB_TEST(e2);
         DLIB_TEST(e2.has_value());
+
+        // Move construction
+        Expected e3{std::move(e2)};
+        DLIB_TEST(e3);
+        DLIB_TEST(e3.has_value());
+
+        // Copy assign
+        Expected e4;
+        e4 = e3;
+        DLIB_TEST(e4);
+        DLIB_TEST(e4.has_value());
+
+        // Move assign
+        Expected e5;
+        e5 = std::move(e4);
+        DLIB_TEST(e5);
+        DLIB_TEST(e5.has_value());
+
+        // Construct from error
+        Expected e6{dlib::unexpected<nontrivial2>{in_place, {0, 1, 2, 3}, 42}};
+        DLIB_TEST(!e6);
+        DLIB_TEST(!e6.has_value());
+        DLIB_TEST(e6.error() == nontrivial2({0, 1, 2, 3}, 42));
+        int thrown{0};
+        try {
+            e6.value();
+        } catch(const bad_expected_access<nontrivial2>& e) {
+            thrown = 1;
+            DLIB_TEST(e.error() == nontrivial2({0, 1, 2, 3}, 42));
+        }
+        DLIB_TEST(thrown == 1);
+
+        // Assign from error
+        Expected e7;
+        e7 = dlib::unexpected<nontrivial2>{in_place, {0, 1, 2, 3}, 42};
+        DLIB_TEST(!e7);
+        DLIB_TEST(e7.error() == nontrivial2({0, 1, 2, 3}, 42));
+        try {
+            e7.value();
+        } catch(const bad_expected_access<nontrivial2>& e) {
+            thrown++;
+            DLIB_TEST(e.error() == nontrivial2({0, 1, 2, 3}, 42));
+        }
+        DLIB_TEST(thrown == 2);
     }
 
 // ---------------------------------------------------------------------------------------------------

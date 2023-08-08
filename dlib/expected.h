@@ -589,13 +589,13 @@ namespace dlib
             constexpr void value() const &
             {
                 if (!has_value())
-                    throw bad_expected_access<std::decay_t<E>>(dlib::as_const(this->error));
+                    throw bad_expected_access<std::decay_t<E>>(dlib::as_const(this->error.error()));
             }
 
             constexpr void value() &&
             {
                 if (!has_value())
-                    throw bad_expected_access<std::decay_t<E>>(std::move(this->error));
+                    throw bad_expected_access<std::decay_t<E>>(std::move(this->error.error()));
             }
 
             constexpr void emplace() noexcept
