@@ -1235,7 +1235,7 @@ namespace dlib
         constexpr auto and_then( F&& f ) &
         {
             using U = typename expected_details::and_then_traits<G, E, GF, EF, F>::U;
-            
+
             if (*this)
             {
                 return switch_(bools(std::is_void<T>{}),
@@ -1243,7 +1243,7 @@ namespace dlib
                         return dlib::invoke(std::forward<F>(_(f)));
                     },
                     [&](false_t, auto _) {
-                        return dlib::invoke(std::forward<F>(_(f)), base::value());
+                        return dlib::invoke(std::forward<F>(_(f)), **this);
                     }
                 );
             }
@@ -1271,7 +1271,7 @@ namespace dlib
                         return dlib::invoke(std::forward<F>(_(f)));
                     },
                     [&](false_t, auto _) {
-                        return dlib::invoke(std::forward<F>(_(f)), base::value());
+                        return dlib::invoke(std::forward<F>(_(f)), **this);
                     }
                 );
             }
@@ -1299,7 +1299,7 @@ namespace dlib
                         return dlib::invoke(std::forward<F>(_(f)));
                     },
                     [&](false_t, auto _) {
-                        return dlib::invoke(std::forward<F>(_(f)), std::move(base::value()));
+                        return dlib::invoke(std::forward<F>(_(f)), std::move(**this));
                     }
                 );
             }
@@ -1327,7 +1327,7 @@ namespace dlib
                         return dlib::invoke(std::forward<F>(_(f)));
                     },
                     [&](false_t, auto _) {
-                        return dlib::invoke(std::forward<F>(_(f)), std::move(base::value()));
+                        return dlib::invoke(std::forward<F>(_(f)), std::move(**this));
                     }
                 );
             }

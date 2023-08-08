@@ -288,6 +288,53 @@ namespace
         DLIB_TEST(e4.value() == 1);
         DLIB_TEST(*e4 == 1);
         DLIB_TEST(e4.value_or(2) == 1);
+
+        // Copy assign
+        Expected e5;
+        e5 = e4;
+        DLIB_TEST(e5);
+        DLIB_TEST(e5.has_value());
+        DLIB_TEST(e5.value() == 1);
+        DLIB_TEST(*e5 == 1);
+        DLIB_TEST(e5.value_or(2) == 1);
+
+        // Move assign
+        Expected e6;
+        e6 = std::move(e5);
+        DLIB_TEST(e6);
+        DLIB_TEST(e6.has_value());
+        DLIB_TEST(e6.value() == 1);
+        DLIB_TEST(*e6 == 1);
+        DLIB_TEST(e6.value_or(2) == 1);
+
+        // Construct from error
+        Expected e7{dlib::unexpected<nontrivial1>{in_place, 1, 3.1415f, "hello there"}};
+        DLIB_TEST(!e7);
+        DLIB_TEST(!e7.has_value());
+        DLIB_TEST(e7.error() == nontrivial1(1, 3.1415f, "hello there"));
+        int thrown{0};
+        try {
+            e7.value() = 0;
+        } catch(const bad_expected_access<nontrivial1>& e) {
+            thrown = 1;
+            DLIB_TEST(e.error() == nontrivial1(1, 3.1415f, "hello there"));
+        }
+        DLIB_TEST(thrown == 1);
+        DLIB_TEST(e7.value_or(2) == 2);
+
+        // Assign from error
+        Expected e8;
+        e8 = dlib::unexpected<nontrivial1>{in_place, 1, 3.1415f, "hello there"};
+        DLIB_TEST(!e8);
+        DLIB_TEST(e8.error() == nontrivial1(1, 3.1415f, "hello there"));
+        try {
+            e8.value() = 42;
+        } catch(const bad_expected_access<nontrivial1>& e) {
+            thrown++;
+            DLIB_TEST(e.error() == nontrivial1(1, 3.1415f, "hello there"));
+        }
+        DLIB_TEST(thrown == 2);
+        DLIB_TEST(e8.value_or(3) == 3);
     }
 
     void test_expected_void_nontrivial1()
