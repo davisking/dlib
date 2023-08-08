@@ -47,6 +47,19 @@ namespace
 
         constexpr dlib::unexpected<int> e6{std::move(e5)};
         static_assert(e6.error() == 1, "bad");
+
+        auto e7 = make_unexpected(1);
+        static_assert(std::is_same<decltype(e7), dlib::unexpected<int>>::value, "bad");
+        DLIB_TEST(e7.error() == 1);
+
+#ifdef __cpp_deduction_guides
+        dlib::unexpected e8{2};
+        static_assert(std::is_same<decltype(e8), dlib::unexpected<int>>::value, "bad");
+        DLIB_TEST(e8.error() == 2);
+#endif
+
+        constexpr dlib::unexpected<int> e9 = make_unexpected(3);
+        static_assert(e9.error() == 3);
     }
     
 // ---------------------------------------------------------------------------------------------------
