@@ -313,7 +313,7 @@ namespace dlib
 
             template<class ...U>
             constexpr expected_base(unexpect_t, U&& ...u) noexcept(std::is_nothrow_constructible<E,U...>::value)
-            : error{std::forward<U>(u)...}, state{IS_ERROR} 
+            : error{in_place, std::forward<U>(u)...}, state{IS_ERROR} 
             {}    
 
             struct empty{};
@@ -341,7 +341,7 @@ namespace dlib
 
             template<class ...U>
             constexpr expected_base(unexpect_t, U&& ...u) noexcept(std::is_nothrow_constructible<E,U...>::value)
-            : error{std::forward<U>(u)...}, state{IS_ERROR} 
+            : error{in_place, std::forward<U>(u)...}, state{IS_ERROR} 
             {}  
 
             struct empty{};
@@ -374,7 +374,7 @@ namespace dlib
 
             template<class ...U>
             constexpr expected_base(unexpect_t, U&& ...u) noexcept(std::is_nothrow_constructible<E,U...>::value)
-            : error{std::forward<U>(u)...}, state{IS_ERROR} 
+            : error{in_place, std::forward<U>(u)...}, state{IS_ERROR} 
             {}  
 
             struct empty{};
@@ -401,7 +401,7 @@ namespace dlib
 
             template<class ...U>
             constexpr expected_base(unexpect_t, U&& ...u) noexcept(std::is_nothrow_constructible<E,U...>::value)
-            : error{std::forward<U>(u)...}, state{IS_ERROR} 
+            : error{in_place, std::forward<U>(u)...}, state{IS_ERROR} 
             {}  
 
             struct empty{};
@@ -601,6 +601,7 @@ namespace dlib
             constexpr void emplace() noexcept
             {
                 this->destruct();
+                this->state = IS_VAL;
             }
 
         protected:

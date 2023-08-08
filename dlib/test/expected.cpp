@@ -322,9 +322,8 @@ namespace
         DLIB_TEST(thrown == 1);
         DLIB_TEST(e7.value_or(2) == 2);
 
-        // Assign from error
-        Expected e8;
-        e8 = dlib::unexpected<nontrivial1>{in_place, 1, 3.1415f, "hello there"};
+        // Construct from error
+        Expected e8{unexpect, 1, 3.1415f, "hello there"};
         DLIB_TEST(!e8);
         DLIB_TEST(e8.error() == nontrivial1(1, 3.1415f, "hello there"));
         try {
@@ -335,9 +334,24 @@ namespace
         }
         DLIB_TEST(thrown == 2);
         DLIB_TEST(e8.value_or(3) == 3);
+
+        // Assign from error
+        Expected e9;
+        e9 = dlib::unexpected<nontrivial1>{in_place, 1, 3.1415f, "hello there"};
+        DLIB_TEST(!e9);
+        DLIB_TEST(!e9.has_value());
+        DLIB_TEST(e9.error() == nontrivial1(1, 3.1415f, "hello there"));
+        try {
+            e9.value() = 0;
+        } catch(const bad_expected_access<nontrivial1>& e) {
+            thrown++;
+            DLIB_TEST(e.error() == nontrivial1(1, 3.1415f, "hello there"));
+        }
+        DLIB_TEST(thrown == 3);
+        DLIB_TEST(e9.value_or(2) == 2);
     }
 
-    void test_expected_void_nontrivial1()
+    void test_expected_void_nontrivial2()
     {
         using Expected = dlib::expected<void, nontrivial2>;
         static_assert(!std::is_trivially_copy_constructible<Expected>::value,    "bad");
@@ -403,6 +417,20 @@ namespace
 
 // ---------------------------------------------------------------------------------------------------
 
+    void test_expected_nontrivial1_int()
+    {
+        using Expected = dlib::expected<nontrivial1, int>;
+        static_assert(!std::is_default_constructible<Expected>::value, "bad");
+
+        // // Default construction
+        // Expected e1{in_place, 1, 3.1415f, "hello there"};
+        // DLIB_TEST(e1.has_value());
+
+        // // TODO more stuff here
+    }
+
+// ---------------------------------------------------------------------------------------------------
+
     class expected_tester : public tester
     {
     public:
@@ -421,7 +449,8 @@ namespace
             test_expected_int_int();
             test_expected_void_int();
             test_expected_int_nontrivial1();
-            test_expected_void_nontrivial1();
+            test_expected_void_nontrivial2();
+            test_expected_nontrivial1_int();
         }
     } a;
 }
