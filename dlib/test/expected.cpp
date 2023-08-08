@@ -401,9 +401,8 @@ namespace
         }
         DLIB_TEST(thrown == 1);
 
-        // Assign from error
-        Expected e7;
-        e7 = dlib::unexpected<nontrivial2>{in_place, {0, 1, 2, 3}, 42};
+        // Construct from error
+        Expected e7{unexpect, {0, 1, 2, 3}, 42};
         DLIB_TEST(!e7);
         DLIB_TEST(e7.error() == nontrivial2({0, 1, 2, 3}, 42));
         try {
@@ -413,6 +412,19 @@ namespace
             DLIB_TEST(e.error() == nontrivial2({0, 1, 2, 3}, 42));
         }
         DLIB_TEST(thrown == 2);
+
+        // Assign from error
+        Expected e8;
+        e8 = dlib::unexpected<nontrivial2>{in_place, {0, 1, 2, 3}, 42};
+        DLIB_TEST(!e8);
+        DLIB_TEST(e8.error() == nontrivial2({0, 1, 2, 3}, 42));
+        try {
+            e8.value();
+        } catch(const bad_expected_access<nontrivial2>& e) {
+            thrown++;
+            DLIB_TEST(e.error() == nontrivial2({0, 1, 2, 3}, 42));
+        }
+        DLIB_TEST(thrown == 3);
     }
 
 // ---------------------------------------------------------------------------------------------------
