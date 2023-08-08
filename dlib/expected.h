@@ -213,14 +213,30 @@ namespace dlib
             !std::is_same<expected<T, E>, U_>::value,
             std::is_constructible<T, U>::value,
             !is_unexpected_type<U_>::value,
-            std::is_same<bool, dlib::remove_cvref_t<T>>::value || !is_expected_type<U_>::value
+            Or<std::is_same<bool, dlib::remove_cvref_t<T>>::value,
+               !is_expected_type<U_>::value>::value
         >::value,
+        bool>;
+
+        template <
+          class T, class E, class U, class U_ = dlib::remove_cvref_t<U>
+        >
+        using is_assignable_from_value = std::enable_if_t<And<
+            !std::is_void<T>::value,
+            !std::is_same<expected<T,E>, U_>::value,
+            !is_unexpected_type<U_>::value,
+            std::is_constructible<T,U>::value,
+            std::is_assignable<T&,U>::value,
+            Or<std::is_nothrow_constructible<T, U>::value,
+               std::is_nothrow_move_constructible<T>::value,
+               std::is_nothrow_move_constructible<E>::value>::value
+          >::value,
         bool>;
 
         template <
           class T, class E, class GF
         >
-        using is_constructible_from_error = std::enable_if_t<And<
+        using is_assignable_from_error = std::enable_if_t<And<
             std::is_constructible<E, GF>::value,
             std::is_assignable<E&, GF>::value,
             Or<
@@ -510,7 +526,7 @@ namespace dlib
                         construct_value(std::forward<Expected>(rhs).val);
                         break;
 
-                    case IS_VAL | (IS_VAL << 4): 
+                    case IS_VAL   | (IS_VAL << 4): 
                         this->val = std::forward<Expected>(rhs).val; 
                         break;
                     
@@ -521,7 +537,7 @@ namespace dlib
                         destruct();
                         break;
 
-                    case IS_VAL | (IS_EMPTY << 4):
+                    case IS_VAL   | (IS_EMPTY << 4):
                         destruct();
                         break;
                     
@@ -533,7 +549,7 @@ namespace dlib
                         this->error = std::forward<Expected>(rhs).error; 
                         break;
 
-                    case IS_VAL | (IS_ERROR << 4):
+                    case IS_VAL   | (IS_ERROR << 4):
                         destruct();
                         construct_error(std::forward<Expected>(rhs).error);
                         break;
@@ -787,7 +803,7 @@ namespace dlib
         template <
           class T, 
           class E,
-          bool = std::is_default_constructible<T>::value
+          bool = disjunction<std::is_void<T>, std::is_default_constructible<T>>::value
         >
         struct expected_delete_default_constructor
         {
@@ -802,16 +818,6 @@ namespace dlib
         struct expected_delete_default_constructor<T, E, false>
         {
             constexpr expected_delete_default_constructor()                                                         = delete;
-            constexpr expected_delete_default_constructor(const expected_delete_default_constructor&)               = default;
-            constexpr expected_delete_default_constructor(expected_delete_default_constructor&&)                    = default;
-            constexpr expected_delete_default_constructor& operator=(const expected_delete_default_constructor &)   = default;
-            constexpr expected_delete_default_constructor& operator=(expected_delete_default_constructor &&)        = default;
-        };
-
-        template <class E>
-        struct expected_delete_default_constructor<void, E, false>
-        {
-            constexpr expected_delete_default_constructor()                                                         = default;
             constexpr expected_delete_default_constructor(const expected_delete_default_constructor&)               = default;
             constexpr expected_delete_default_constructor(expected_delete_default_constructor&&)                    = default;
             constexpr expected_delete_default_constructor& operator=(const expected_delete_default_constructor &)   = default;
@@ -1132,17 +1138,7 @@ namespace dlib
         template <
           class U  = T,
           class G  = T,
-          class U_ = dlib::remove_cvref_t<U>,
-          std::enable_if_t<And<
-            !std::is_void<G>::value,
-            !std::is_same<expected<G,E>, U_>::value,
-            !expected_details::is_unexpected_type<U_>::value,
-            std::is_constructible<G,U>::value,
-            std::is_assignable<G&,U>::value,
-            Or<std::is_nothrow_constructible<G, U>::value,
-               std::is_nothrow_move_constructible<G>::value,
-               std::is_nothrow_move_constructible<E>::value>::value
-          >::value, bool> = true
+          expected_details::is_assignable_from_value<G,E,U> = true
         >
         constexpr expected& operator=( U&& v )
         {
@@ -1164,38 +1160,40 @@ namespace dlib
         template< 
           class G,
           class GF = const G&,
-          expected_details::is_constructible_from_error<T,E,GF> = true
+          expected_details::is_assignable_from_error<T,E,GF> = true
         >
         constexpr expected& operator=( const unexpected<G>& e )
         {
-            if (!*this)
+            if (*this)
             {
-                error() = std::forward<GF>(e.error());
+                this->destruct();
+                this->construct_error(e.error());
             }
             else
             {
-                this->destruct();
-                this->construct_error(std::forward<GF>(e.error()));
+                error() = e.error();
             }
+
             return *this;
         }
 
         template< 
           class G,
           class GF = G,
-          expected_details::is_constructible_from_error<T,E,GF> = true
+          expected_details::is_assignable_from_error<T,E,GF> = true
         >
         constexpr expected& operator=( unexpected<G>&& e )
         {
-            if (!*this)
+            if (*this)
             {
-                error() = std::forward<GF>(e.error());
+                this->destruct();
+                this->construct_error(std::move(e).error());
             }
             else
             {
-                this->destruct();
-                this->construct_error(std::forward<GF>(e.error()));
+                error() = std::move(e).error();
             }
+
             return *this;
         }
         
