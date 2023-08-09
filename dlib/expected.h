@@ -819,8 +819,7 @@ namespace dlib
 // ---------------------------------------------------------------------------------------------------
 
         template <
-          class T, 
-          class E,
+          class T,
           bool = disjunction<std::is_void<T>, std::is_default_constructible<T>>::value
         >
         struct expected_delete_default_constructor
@@ -830,16 +829,18 @@ namespace dlib
             constexpr expected_delete_default_constructor(expected_delete_default_constructor&&)                    = default;
             constexpr expected_delete_default_constructor& operator=(const expected_delete_default_constructor &)   = default;
             constexpr expected_delete_default_constructor& operator=(expected_delete_default_constructor &&)        = default;
+            constexpr explicit expected_delete_default_constructor(empty_initialization_tag) {}
         };
 
-        template <class T, class E>
-        struct expected_delete_default_constructor<T, E, false>
+        template <class T>
+        struct expected_delete_default_constructor<T, false>
         {
             constexpr expected_delete_default_constructor()                                                         = delete;
             constexpr expected_delete_default_constructor(const expected_delete_default_constructor&)               = default;
             constexpr expected_delete_default_constructor(expected_delete_default_constructor&&)                    = default;
             constexpr expected_delete_default_constructor& operator=(const expected_delete_default_constructor &)   = default;
             constexpr expected_delete_default_constructor& operator=(expected_delete_default_constructor &&)        = default;
+            constexpr explicit expected_delete_default_constructor(empty_initialization_tag) {}
         };
 
 // ---------------------------------------------------------------------------------------------------
@@ -950,7 +951,7 @@ namespace dlib
 
     template <class T, class E>
     class expected : public expected_details::expected_move_assign<T,E>,
-                     private expected_details::expected_delete_default_constructor<T,E>,
+                     private expected_details::expected_delete_default_constructor<T>,
                      private expected_details::expected_delete_constructors<T,E>,
                      private expected_details::expected_delete_assign<T,E>
     {
@@ -963,6 +964,7 @@ namespace dlib
         !*/
 
         using base = expected_details::expected_move_assign<T,E>;
+        using ctor = expected_details::expected_delete_default_constructor<T>;
 
         static_assert(!std::is_reference<T>::value,             "expected<T&,E&> not allowed");
         static_assert(!std::is_reference<E>::value,             "expected<T&,E&> not allowed");
@@ -994,6 +996,7 @@ namespace dlib
           std::enable_if_t<!std::is_convertible<UF, T>::value || !std::is_convertible<GF, E>::value, bool> = true
         >
         constexpr explicit expected(const expected<U,G> &rhs)
+        : ctor(expected_details::empty_initialization_tag{})
         {
             this->construct(rhs);
         }
@@ -1007,6 +1010,7 @@ namespace dlib
           std::enable_if_t<std::is_convertible<UF, T>::value && std::is_convertible<GF, E>::value, bool> = true
         >
         constexpr expected(const expected<U,G> &rhs)
+        : ctor(expected_details::empty_initialization_tag{})
         {
             this->construct(rhs);
         }
@@ -1020,6 +1024,7 @@ namespace dlib
           std::enable_if_t<!std::is_convertible<UF, T>::value || !std::is_convertible<GF, E>::value, bool> = true
         >
         constexpr explicit expected(expected<U,G>&& rhs)
+        : ctor(expected_details::empty_initialization_tag{})
         {
             this->construct(std::move(rhs));
         }
@@ -1033,6 +1038,7 @@ namespace dlib
           std::enable_if_t<std::is_convertible<UF, T>::value && std::is_convertible<GF, E>::value, bool> = true
         >
         constexpr expected(expected<U,G>&& rhs)
+        : ctor(expected_details::empty_initialization_tag{})
         {
             this->construct(std::move(rhs));
         }
@@ -1043,7 +1049,7 @@ namespace dlib
           std::enable_if_t<!std::is_convertible<U, T>::value, bool> = true
         >
         constexpr explicit expected( U&& v )
-        : base(dlib::in_place, std::forward<U>(v))
+        : expected(dlib::in_place, std::forward<U>(v))
         {
         }
 
@@ -1053,7 +1059,7 @@ namespace dlib
           std::enable_if_t<std::is_convertible<U, T>::value, bool> = true
         >
         constexpr expected( U&& v )
-        : base(dlib::in_place, std::forward<U>(v))
+        : expected(dlib::in_place, std::forward<U>(v))
         {
         }
 
@@ -1064,7 +1070,8 @@ namespace dlib
           std::enable_if_t<!std::is_convertible<GF, E>::value, bool> = true
         >
         constexpr explicit expected( const unexpected<G>& e )
-        : base(unexpect, std::forward<GF>(e.error()))
+        : base(unexpect, std::forward<GF>(e.error())),
+          ctor(expected_details::empty_initialization_tag{})
         {
         }
 
@@ -1075,7 +1082,8 @@ namespace dlib
           std::enable_if_t<std::is_convertible<GF, E>::value, bool> = true
         >
         constexpr expected( const unexpected<G>& e )
-        : base(unexpect, std::forward<GF>(e.error()))
+        : base(unexpect, std::forward<GF>(e.error())),
+          ctor(expected_details::empty_initialization_tag{})
         {
         }
 
@@ -1086,7 +1094,8 @@ namespace dlib
           std::enable_if_t<!std::is_convertible<GF, E>::value, bool> = true
         >
         constexpr explicit expected( unexpected<G>&& e )
-        : base(unexpect, std::forward<GF>(e.error()))
+        : base(unexpect, std::forward<GF>(e.error())),
+          ctor(expected_details::empty_initialization_tag{})
         {
         }
 
@@ -1097,7 +1106,8 @@ namespace dlib
           std::enable_if_t<std::is_convertible<GF, E>::value, bool> = true
         >
         constexpr expected( unexpected<G>&& e )
-        : base(unexpect, std::forward<GF>(e.error()))
+        : base(unexpect, std::forward<GF>(e.error())),
+          ctor(expected_details::empty_initialization_tag{})
         {
         }
 
@@ -1109,7 +1119,8 @@ namespace dlib
             dlib::in_place_t, 
             Args&&... args 
         ) noexcept(std::is_nothrow_constructible<T, Args...>::value)
-        : base(dlib::in_place, std::forward<Args>(args)...)
+        : base(dlib::in_place, std::forward<Args>(args)...),
+          ctor(expected_details::empty_initialization_tag{})
         {
         }
 
@@ -1123,7 +1134,8 @@ namespace dlib
             std::initializer_list<U> il,
             Args&&... args 
         ) noexcept(std::is_nothrow_constructible<T, std::initializer_list<U>&, Args...>::value)
-        : base(dlib::in_place, il, std::forward<Args>(args)...)
+        : base(dlib::in_place, il, std::forward<Args>(args)...),
+          ctor(expected_details::empty_initialization_tag{})
         {
         }
 

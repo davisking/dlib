@@ -434,11 +434,11 @@ namespace
         using Expected = dlib::expected<nontrivial1, int>;
         static_assert(!std::is_default_constructible<Expected>::value, "bad");
 
-        // // Default construction
-        // Expected e1{in_place, 1, 3.1415f, "hello there"};
-        // DLIB_TEST(e1.has_value());
+        // Default construction
+        Expected e1{in_place, 1, 3.1415f, "hello there"};
+        DLIB_TEST(e1.has_value());
 
-        // // TODO more stuff here
+        // TODO more stuff here
     }
 
 // ---------------------------------------------------------------------------------------------------
