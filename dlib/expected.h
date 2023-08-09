@@ -276,7 +276,7 @@ namespace dlib
             using check = std::enable_if_t<
                 !is_expected_type<U>::value     &&
                 !is_unexpected_type<U>::value   &&
-                std::is_constructible<E, EF>::value
+                std::is_constructible<E, EF>::value,
                 bool
             >;
         };
