@@ -265,6 +265,37 @@ namespace dlib
             >;
         };
 
+        template <
+          class T, class E
+        >
+        using is_swappable = std::enable_if_t<And<
+            disjunction<std::is_void<T>, dlib::is_swappable<T>>::value,
+            disjunction<std::is_void<T>, std::is_move_constructible<T>>::value,
+            dlib::is_swappable<E>::value,
+            std::is_move_constructible<E>::value,
+            Or<std::is_void<T>::value,
+               std::is_nothrow_move_constructible<T>::value,
+               std::is_nothrow_move_constructible<E>::value>::value
+          >::value,
+        bool>;
+
+        template <
+          class T, class E
+        >
+        using is_nothrow_swappable = std::integral_constant<bool, 
+          And<
+            std::is_nothrow_move_constructible<E>::value,
+            dlib::is_nothrow_swappable<E>::value,
+            Or<
+              std::is_void<T>::value,
+              And<
+                std::is_nothrow_move_constructible<T>::value,
+                dlib::is_nothrow_swappable<T>::value
+              >::value
+            >::value
+          >::value
+        >;
+
 // ---------------------------------------------------------------------------------------------------
 
         struct empty_initialization_tag{};
@@ -1354,8 +1385,11 @@ namespace dlib
             }
         }
 
-        // TODO: some SFINAE
-        constexpr void swap(expected& other) // TODO: noexcept(...)
+        template <
+          class G = T,
+          expected_details::is_swappable<G,E> = true
+        >
+        constexpr void swap(expected& other) noexcept(expected_details::is_nothrow_swappable<G,E>::value)
         {
             using std::swap;
 
