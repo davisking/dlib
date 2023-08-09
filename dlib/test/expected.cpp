@@ -501,7 +501,7 @@ namespace
         // Assign from error
         Expected e8{val1};
         e8 = dlib::unexpected<int>{42};
-        check_is_error(e7, val1, 42);
+        check_is_error(e8, val1, 42);
 
         // Swap
         Expected e9{val1};
@@ -527,9 +527,88 @@ namespace
         using std::swap;
         using Expected = dlib::expected<nontrivial1, nontrivial2>;
 
+        const nontrivial1 val1(1, 3.1415f, "hello there");
+        const nontrivial1 val2(2, 2.72f, "general kenobi");
+        const nontrivial2 err1({0,1}, 1);
+
+        const auto check_is_val = [](const Expected& e, const nontrivial1& val1, const nontrivial1& val2)
+        {
+            DLIB_TEST(e);
+            DLIB_TEST(e.has_value());
+            DLIB_TEST(*e == val1);
+            DLIB_TEST(e.value() == val1);
+            DLIB_TEST(e.value_or(val2) == val1);
+        };
+
+        const auto check_is_error = [](const Expected& e, const nontrivial1& val, const nontrivial2& err)
+        {
+            DLIB_TEST(!e);
+            DLIB_TEST(!e.has_value());
+            DLIB_TEST(e.error() == err);
+            int thrown{0};
+            try {
+                e.value() == val;
+            } catch(const bad_expected_access<nontrivial2>& e) {
+                ++thrown;
+                DLIB_TEST(e.error() == err);
+            }
+            DLIB_TEST(thrown == 1);
+        };
+
         // Default construction
         static_assert(!std::is_default_constructible<Expected>::value, "bad");
 
+        // In-place construction
+        Expected e1{in_place, 1, 3.1415f, "hello there"};
+        check_is_val(e1, val1, val2);
+
+        // Copy constructor
+        Expected e2{e1};
+        check_is_val(e1, val1, val2);
+        check_is_val(e2, val1, val2);
+
+        // Move constructor
+        Expected e3{std::move(e2)};
+        check_is_val(e3, val1, val2);
+        DLIB_TEST(e2->str.empty());
+
+        // Copy assign
+        Expected e4{val2};
+        e4 = e3;
+        check_is_val(e3, val1, val2);
+        check_is_val(e4, val1, val2);
+
+        // Move assign
+        Expected e5{val2};
+        e5 = std::move(e4);
+        check_is_val(e5, val1, val2);
+        DLIB_TEST(e4->str == "");
+
+        // Construct from error
+        Expected e6{unexpect, {0,1}, 1};
+        check_is_error(e6, val1, err1);
+
+        // Construct from unexpected
+        Expected e7{dlib::unexpected<nontrivial2>{in_place, {0,1}, 1}};
+        check_is_error(e7, val1, err1);
+        
+        // Assign from error
+        Expected e8{val1};
+        e8 = dlib::unexpected<nontrivial2>{in_place, {0,1}, 1};
+        check_is_error(e8, val1, err1);
+
+        // Swap
+        Expected e9{val1};
+        Expected e10{val2};
+        swap(e9, e10);
+        check_is_val(e9, val2, val1);
+        check_is_val(e10, val1, val2);
+        e9.swap(e10);
+        check_is_val(e9, val1, val2);
+        check_is_val(e10, val2, val1);
+        e10.swap(e8);
+        check_is_val(e8, val2, val1);
+        check_is_error(e10, val1, err1);
     }
 
 // ---------------------------------------------------------------------------------------------------
