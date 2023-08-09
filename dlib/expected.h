@@ -266,6 +266,22 @@ namespace dlib
         };
 
         template <
+          class T, class E, class TF, class EF, class F
+        >
+        struct transform_traits
+        {
+            using U = std::conditional_t<std::is_void<T>::value, dlib::remove_cvref_t<dlib::invoke_result_t<F>>,
+                                                                 dlib::remove_cvref_t<dlib::invoke_result_t<F,TF>>>;
+
+            using check = std::enable_if_t<
+                !is_expected_type<U>::value     &&
+                !is_unexpected_type<U>::value   &&
+                std::is_constructible<E, EF>::value
+                bool
+            >;
+        };
+
+        template <
           class T, class E
         >
         using is_swappable = std::enable_if_t<And<
@@ -1382,6 +1398,118 @@ namespace dlib
             else
             {
                 return U{dlib::unexpect, std::move(error())};
+            }
+        }
+
+        template< 
+          class F,
+          class G = T,
+          class GF = G&,
+          class EF = E&,
+          typename expected_details::transform_traits<G, E, GF, EF, F>::check = true
+        >
+        constexpr auto transform( F&& f ) &
+        {
+            using U = typename expected_details::transform_traits<G, E, GF, EF, F>::U;
+
+            if (*this)
+            {
+                return switch_(bools(std::is_void<T>{}),
+                    [&](true_t, auto _) {
+                        return dlib::invoke(std::forward<F>(_(f)));
+                    },
+                    [&](false_t, auto _) {
+                        return dlib::invoke(std::forward<F>(_(f)), **this);
+                    }
+                );
+            }
+            else
+            {
+                return dlib::expected<U,E>{dlib::unexpect, error()};
+            }
+        }
+
+        template< 
+          class F,
+          class G = T,
+          class GF = const G&,
+          class EF = const E&,
+          typename expected_details::transform_traits<G, E, GF, EF, F>::check = true
+        >
+        constexpr auto transform( F&& f ) const&
+        {
+            using U = typename expected_details::transform_traits<G, E, GF, EF, F>::U;
+
+            if (*this)
+            {
+                return switch_(bools(std::is_void<T>{}),
+                    [&](true_t, auto _) {
+                        return dlib::invoke(std::forward<F>(_(f)));
+                    },
+                    [&](false_t, auto _) {
+                        return dlib::invoke(std::forward<F>(_(f)), **this);
+                    }
+                );
+            }
+            else
+            {
+                return dlib::expected<U,E>{dlib::unexpect, error()};
+            }
+        }
+
+        template< 
+          class F,
+          class G = T,
+          class GF = G&&,
+          class EF = E&&,
+          typename expected_details::transform_traits<G, E, GF, EF, F>::check = true
+        >
+        constexpr auto transform( F&& f ) &&
+        {
+            using U = typename expected_details::transform_traits<G, E, GF, EF, F>::U;
+
+            if (*this)
+            {
+                return switch_(bools(std::is_void<T>{}),
+                    [&](true_t, auto _) {
+                        return dlib::invoke(std::forward<F>(_(f)));
+                    },
+                    [&](false_t, auto _) {
+                        return dlib::invoke(std::forward<F>(_(f)), std::move(**this));
+                    }
+                );
+            }
+            else
+            {
+                return dlib::expected<U,E>{dlib::unexpect, std::move(error())};
+            }
+        }
+
+        template< 
+          class F,
+          class G = T,
+          class GF = const G&&,
+          class EF = const E&&,
+          typename expected_details::transform_traits<G, E, GF, EF, F>::check = true
+        >
+        constexpr auto transform( F&& f ) const&&
+        {
+            using U = typename expected_details::transform_traits<G, E, GF, EF, F>::U;
+
+            if (*this)
+            {
+                return switch_(bools(std::is_void<T>{}),
+                    [&](true_t, auto _) {
+                        return dlib::invoke(std::forward<F>(_(f)));
+                    },
+                    [&](false_t, auto _) {
+                        return dlib::invoke(std::forward<F>(_(f)), std::move(**this));
+                    }
+                );
+            }
+            else
+            {
+                return dlib::expected<U,E>{dlib::unexpect, std::move(error())};
             }
         }
 

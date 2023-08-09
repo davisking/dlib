@@ -509,12 +509,27 @@ namespace
         swap(e9, e10);
         check_is_val(e9, val2, val1);
         check_is_val(e10, val1, val2);
+        e9.swap(e10);
+        check_is_val(e9, val1, val2);
+        check_is_val(e10, val2, val1);
 
         // Emplace - not defined because according to the standard, it is only available when the in-place construction is noexcept. 
         // Don't understand why. Maybe there are some incredibly subtle bugs relating to strong exception guarantees which are hard to handle...
         // I'm falling out of love with exceptions. They add way too many complexities when designing vocabulary types and libraries in general.
 
         // TODO more stuff here
+    }
+
+// ---------------------------------------------------------------------------------------------------
+
+    void test_expected_nontrivial1_nontrivial2()
+    {
+        using std::swap;
+        using Expected = dlib::expected<nontrivial1, nontrivial2>;
+
+        // Default construction
+        static_assert(!std::is_default_constructible<Expected>::value, "bad");
+
     }
 
 // ---------------------------------------------------------------------------------------------------
@@ -539,6 +554,7 @@ namespace
             test_expected_int_nontrivial1();
             test_expected_void_nontrivial2();
             test_expected_nontrivial1_int();
+            test_expected_nontrivial1_nontrivial2();
         }
     } a;
 }
