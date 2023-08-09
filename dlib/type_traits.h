@@ -186,6 +186,20 @@ namespace dlib
             constexpr static bool is_swappable{true};
             constexpr static bool is_nothrow{noexcept(swap(std::declval<T&>(), std::declval<T&>()))};
         };
+
+        template<class T, class = void>
+        struct swap_member_traits
+        {
+            constexpr static bool is_swappable{false};
+            constexpr static bool is_nothrow{false};
+        };
+
+        template<class T>
+        struct swap_member_traits<T, void_t<decltype(std::declval<T&>().swap(std::declval<T&>()))>>
+        {
+            constexpr static bool is_swappable{true};
+            constexpr static bool is_nothrow{noexcept(std::declval<T&>().swap(std::declval<T&>()))};
+        };
     }
 
 // ----------------------------------------------------------------------------------------
@@ -197,6 +211,16 @@ namespace dlib
 
     template<class T>
     using is_nothrow_swappable = std::integral_constant<bool, swappable_details::swap_traits<T>::is_nothrow>;
+
+// ----------------------------------------------------------------------------------------
+
+    template<class T>
+    using is_swappable_via_member = std::integral_constant<bool, swappable_details::swap_member_traits<T>::is_swappable>;
+
+// ----------------------------------------------------------------------------------------
+
+    template<class T>
+    using is_nothrow_swappable_via_member = std::integral_constant<bool, swappable_details::swap_member_traits<T>::is_nothrow>;
 
 // ----------------------------------------------------------------------------------------
 

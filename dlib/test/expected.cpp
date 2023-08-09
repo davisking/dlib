@@ -431,6 +431,7 @@ namespace
 
     void test_expected_nontrivial1_int()
     {
+        using std::swap;
         using Expected = dlib::expected<nontrivial1, int>;
 
         const nontrivial1 val1(1, 3.1415f, "hello there");
@@ -443,6 +444,21 @@ namespace
             DLIB_TEST(*e == val1);
             DLIB_TEST(e.value() == val1);
             DLIB_TEST(e.value_or(val2) == val1);
+        };
+
+        const auto check_is_error = [](const Expected& e, const nontrivial1& val, int error)
+        {
+            DLIB_TEST(!e);
+            DLIB_TEST(!e.has_value());
+            DLIB_TEST(e.error() == error);
+            int thrown{0};
+            try {
+                e.value() == val;
+            } catch(const bad_expected_access<int>& err) {
+                ++thrown;
+                DLIB_TEST(err.error() == error);
+            }
+            DLIB_TEST(thrown == 1);
         };
 
         // Default construction
@@ -473,6 +489,30 @@ namespace
         e5 = std::move(e4);
         check_is_val(e5, val1, val2);
         DLIB_TEST(e4->str == "");
+
+        // Construct from error
+        Expected e6{unexpect, 42};
+        check_is_error(e6, val1, 42);
+
+        // Construct from unexpected
+        Expected e7{dlib::unexpected<int>{42}};
+        check_is_error(e7, val1, 42);
+        
+        // Assign from error
+        Expected e8{val1};
+        e8 = dlib::unexpected<int>{42};
+        check_is_error(e7, val1, 42);
+
+        // Swap
+        Expected e9{val1};
+        Expected e10{val2};
+        swap(e9, e10);
+        check_is_val(e9, val2, val1);
+        check_is_val(e10, val1, val2);
+
+        // Emplace - not defined because according to the standard, it is only available when the in-place construction is noexcept. 
+        // Don't understand why. Maybe there are some incredibly subtle bugs relating to strong exception guarantees which are hard to handle...
+        // I'm falling out of love with exceptions. They add way too many complexities when designing vocabulary types and libraries in general.
 
         // TODO more stuff here
     }

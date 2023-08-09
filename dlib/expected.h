@@ -474,6 +474,7 @@ namespace dlib
             {
                 this->destruct();
                 this->construct_value(std::forward<Args>(args)...);
+                return **this;
             }
 
             template < 
@@ -485,6 +486,7 @@ namespace dlib
             {
                 this->destruct();
                 this->construct_value(il, std::forward<Args>(args)...);
+                return **this;
             }
 
         protected:
@@ -1147,7 +1149,8 @@ namespace dlib
             unexpect_t, 
             Args&&... args 
         ) noexcept(std::is_nothrow_constructible<E, Args...>::value)
-        : base(unexpect, std::forward<Args>(args)...)
+        : base(unexpect, std::forward<Args>(args)...),
+          ctor(expected_details::empty_initialization_tag{})
         {
         }
 
@@ -1161,7 +1164,8 @@ namespace dlib
             std::initializer_list<U> il,
             Args&&... args 
         ) noexcept(std::is_nothrow_constructible<E, std::initializer_list<U>&, Args...>::value)
-        : base(unexpect, il, std::forward<Args>(args)...)
+        : base(unexpect, il, std::forward<Args>(args)...),
+          ctor(expected_details::empty_initialization_tag{})
         {
         }
 
@@ -1349,7 +1353,78 @@ namespace dlib
                 return U{dlib::unexpect, std::move(error())};
             }
         }
+
+        // TODO: some SFINAE
+        constexpr void swap(expected& other) // TODO: noexcept(...)
+        {
+            using std::swap;
+
+            if (this->has_value() && other.has_value())
+            {
+                switch_(bools(std::is_void<T>{}),
+                    [&](true_t, auto _) {
+                        // no-op
+                    },
+                    [&](false_t, auto _) {
+                        swap(**this, *_(other));
+                    }
+                );
+            }
+            else if (!this->has_value() && !other.has_value())
+            {
+                swap(error(), other.error());
+            }
+            else if (!this->has_value() && other.has_value())
+            {
+                other.swap(*this); // go to next statement
+            }
+            else if (this->has_value() && !other.has_value())
+            {
+                switch_(bools(std::is_void<T>{}, std::is_nothrow_move_constructible<E>{}),
+                    [&](true_t, auto, auto _) {
+                        this->construct_error(std::move(_(other)).error());
+                        other.destruct();
+                    },
+                    [&](false_t, true_t, auto _) {
+                        E temp{std::move(_(other)).error()};
+                        other.destruct();
+                        try {
+                            other.construct_value(std::move(**this));
+                            this->destruct();
+                            this->construct_error(std::move(temp));
+                        } catch(...) {
+                            other.construct_error(std::move(temp));
+                            throw;
+                        }
+                    },
+                    [&](false_t, false_t, auto _) {
+                        T temp{std::move(**this)};
+                        this->destruct();
+                        try {
+                            this->construct_error(std::move(_(other)).error());
+                            other.destruct();
+                            other.construct_value(std::move(temp));
+                        } catch(...) {
+                            this->construct_value(std::move(temp));
+                            throw;
+                        }
+                    }
+                );
+            }
+        }
     };
+
+// ---------------------------------------------------------------------------------------------------
+
+    template < 
+      class T,
+      class E,
+      std::enable_if_t<dlib::is_swappable_via_member<expected<T,E>>::value, bool> = true
+    >
+    constexpr void swap(expected<T,E>& x, expected<T,E>& y ) noexcept(noexcept(x.swap(y)))
+    {
+        x.swap(y);
+    }
 
 // ---------------------------------------------------------------------------------------------------
 
