@@ -220,6 +220,23 @@ namespace
         }
         DLIB_TEST(thrown == 2);
         DLIB_TEST(e8.value_or(3) == 3);
+
+        // Converting copy constructor (don't know what the technical term for this constructor is)
+        const dlib::expected<long, int> tmp{2};
+        Expected e9{tmp};
+        DLIB_TEST(e9);
+        DLIB_TEST(e9.has_value());
+        DLIB_TEST(*e9 == 2);
+        DLIB_TEST(e9.value() == 2);
+        DLIB_TEST(e9.value_or(3) == 2);
+
+        // Converting move constructor
+        Expected e10{std::move(tmp)};
+        DLIB_TEST(e10);
+        DLIB_TEST(e10.has_value());
+        DLIB_TEST(*e10 == 2);
+        DLIB_TEST(e10.value() == 2);
+        DLIB_TEST(e10.value_or(3) == 2);
     }
 
 // ---------------------------------------------------------------------------------------------------
@@ -609,6 +626,13 @@ namespace
         e10.swap(e8);
         check_is_val(e8, val2, val1);
         check_is_error(e10, val1, err1);
+    }
+
+// ---------------------------------------------------------------------------------------------------
+
+    void test_monads()
+    {
+        // TODO
     }
 
 // ---------------------------------------------------------------------------------------------------

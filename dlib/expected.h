@@ -469,7 +469,6 @@ namespace dlib
             constexpr const T&  operator*() const&  noexcept { return this->val; }
             constexpr T&&       operator*() &&      noexcept { return std::move(this->val); }
             constexpr const T&& operator*() const&& noexcept { return std::move(this->val); }
-
             constexpr const T*  operator->() const  noexcept { return &this->val; }
             constexpr T*        operator->()        noexcept { return &this->val; }
 
@@ -1047,7 +1046,10 @@ namespace dlib
         constexpr explicit expected(const expected<U,G> &rhs)
         : ctor(expected_details::empty_initialization_tag{})
         {
-            this->construct(rhs);
+            if (rhs)
+                this->construct_value(*rhs);
+            else
+                this->construct_error(rhs.error());
         }
 
         template <
@@ -1061,7 +1063,10 @@ namespace dlib
         constexpr expected(const expected<U,G> &rhs)
         : ctor(expected_details::empty_initialization_tag{})
         {
-            this->construct(rhs);
+            if (rhs)
+                this->construct_value(*rhs);
+            else
+                this->construct_error(rhs.error());
         }
 
         template <
@@ -1075,7 +1080,10 @@ namespace dlib
         constexpr explicit expected(expected<U,G>&& rhs)
         : ctor(expected_details::empty_initialization_tag{})
         {
-            this->construct(std::move(rhs));
+            if (rhs)
+                this->construct_value(std::move(*rhs));
+            else
+                this->construct_error(std::move(rhs).error());
         }
 
         template <
@@ -1089,7 +1097,10 @@ namespace dlib
         constexpr expected(expected<U,G>&& rhs)
         : ctor(expected_details::empty_initialization_tag{})
         {
-            this->construct(std::move(rhs));
+            if (rhs)
+                this->construct_value(std::move(*rhs));
+            else
+                this->construct_error(std::move(rhs).error());
         }
 
         template< 
