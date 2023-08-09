@@ -432,11 +432,47 @@ namespace
     void test_expected_nontrivial1_int()
     {
         using Expected = dlib::expected<nontrivial1, int>;
-        static_assert(!std::is_default_constructible<Expected>::value, "bad");
+
+        const nontrivial1 val1(1, 3.1415f, "hello there");
+        const nontrivial1 val2(2, 2.72f, "general kenobi");
+
+        const auto check_is_val = [](const Expected& e, const nontrivial1& val1, const nontrivial1& val2)
+        {
+            DLIB_TEST(e);
+            DLIB_TEST(e.has_value());
+            DLIB_TEST(*e == val1);
+            DLIB_TEST(e.value() == val1);
+            DLIB_TEST(e.value_or(val2) == val1);
+        };
 
         // Default construction
+        static_assert(!std::is_default_constructible<Expected>::value, "bad");
+
+        // In-place construction
         Expected e1{in_place, 1, 3.1415f, "hello there"};
-        DLIB_TEST(e1.has_value());
+        check_is_val(e1, val1, val2);
+
+        // Copy constructor
+        Expected e2{e1};
+        check_is_val(e1, val1, val2);
+        check_is_val(e2, val1, val2);
+
+        // Move constructor
+        Expected e3{std::move(e2)};
+        check_is_val(e3, val1, val2);
+        DLIB_TEST(e2->str == "");
+
+        // Copy assign
+        Expected e4{val2};
+        e4 = e3;
+        check_is_val(e3, val1, val2);
+        check_is_val(e4, val1, val2);
+
+        // Move assign
+        Expected e5{val2};
+        e5 = std::move(e4);
+        check_is_val(e5, val1, val2);
+        DLIB_TEST(e4->str == "");
 
         // TODO more stuff here
     }
