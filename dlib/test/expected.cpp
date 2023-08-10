@@ -470,7 +470,8 @@ namespace
             DLIB_TEST(e.error() == error);
             int thrown{0};
             try {
-                e.value() == val;
+                bool dummy = e.value() == val;
+                (void)dummy;
             } catch(const bad_expected_access<int>& err) {
                 ++thrown;
                 DLIB_TEST(err.error() == error);
@@ -564,7 +565,8 @@ namespace
             DLIB_TEST(e.error() == err);
             int thrown{0};
             try {
-                e.value() == val;
+                bool dummy = e.value() == val;
+                (void)dummy;
             } catch(const bad_expected_access<nontrivial2>& e) {
                 ++thrown;
                 DLIB_TEST(e.error() == err);
