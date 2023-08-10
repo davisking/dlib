@@ -659,7 +659,20 @@ namespace
         static_assert(std::is_same<decltype(ret2), dlib::expected<double,int>>::value, "bad");
         DLIB_TEST(ret2);
         DLIB_TEST(ret2.has_value());
-        DLIB_TEST(*ret2 == 42);
+        DLIB_TEST(*ret2 == 2.0);
+
+        auto ret3 = dlib::expected<int, int>{1}
+            .transform([](int i) -> long {
+                return i + 1;
+            })
+            .transform([](long j) -> float {
+                return j * 2;
+            });
+
+        static_assert(std::is_same<decltype(ret3), dlib::expected<float,int>>::value, "bad");
+        DLIB_TEST(ret3);
+        DLIB_TEST(ret3.has_value());
+        DLIB_TEST(*ret3 == 4);
     }
 
 // ---------------------------------------------------------------------------------------------------
@@ -685,6 +698,7 @@ namespace
             test_expected_void_nontrivial2();
             test_expected_nontrivial1_int();
             test_expected_nontrivial1_nontrivial2();
+            test_monads();
         }
     } a;
 }

@@ -342,7 +342,7 @@ namespace dlib
             bool
           > = true
         >
-        constexpr auto transform(Exp&& e, F&& f)
+        constexpr auto transform(Exp&& e, F&& f) -> dlib::expected<U, E>
         {
             if (e)
                 return dlib::invoke(std::forward<F>(f));
@@ -356,14 +356,14 @@ namespace dlib
           class T = typename std::decay_t<Exp>::value_type,
           class E = typename std::decay_t<Exp>::error_type,
           std::enable_if_t<!std::is_void<T>::value, bool> = true,
-          class U = dlib::remove_cvref_t<dlib::invoke_result_t<F>>,
+          class U = dlib::remove_cvref_t<dlib::invoke_result_t<F, decltype(*std::declval<Exp>())>>,
           std::enable_if_t<
             !is_expected_type<U>::value &&
             !is_unexpected_type<U>::value, 
             bool
           > = true
         >
-        constexpr auto transform(Exp&& e, F&& f)
+        constexpr auto transform(Exp&& e, F&& f) -> dlib::expected<U, E>
         {
             if (e)
                 return dlib::invoke(std::forward<F>(f), *std::forward<Exp>(e));
