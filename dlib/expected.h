@@ -297,32 +297,24 @@ namespace dlib
 
         template <
           class Exp,
-          class F,
-          class T = typename std::decay_t<Exp>::value_type,
-          std::enable_if_t<std::is_void<T>::value, bool> = true,
-          class U = dlib::remove_cvref_t<dlib::invoke_result_t<F>>,
-          std::enable_if_t<is_expected_type<U>::value, bool> = true
+          class F
         >
         constexpr auto and_then(Exp&& e, F&& f)
         {
-            if (e)
-                return dlib::invoke(std::forward<F>(f));
-            else
-                return U{unexpect, std::forward<Exp>(e).error()};
-        }
+            using TF = decltype(std::forward<Exp>(e).value());
+            using T  = typename std::decay_t<Exp>::value_type;
+            using U  = dlib::remove_cvref_t<typename std::conditional_t<std::is_void<T>::value,
+                                                                        dlib::invoke_result<F>,
+                                                                        dlib::invoke_result<F,TF>>::type>;
+            static_assert(is_expected_type<U>::value, "Return type must be dlib::expected");
 
-        template <
-          class Exp,
-          class F,
-          class T = typename std::decay_t<Exp>::value_type,
-          std::enable_if_t<!std::is_void<T>::value, bool> = true,
-          class U = dlib::remove_cvref_t<dlib::invoke_result_t<F, decltype(*std::declval<Exp>())>>,
-          std::enable_if_t<is_expected_type<U>::value, bool> = true
-        >
-        constexpr auto and_then(Exp&& e, F&& f)
-        {
             if (e)
-                return dlib::invoke(std::forward<F>(f), *std::forward<Exp>(e));
+            {
+                return switch_(bools(std::is_void<T>{})
+                    ,[&](true_t,  auto _) { return dlib::invoke(std::forward<F>(_(f))); }
+                    ,[&](false_t, auto _) { return dlib::invoke(std::forward<F>(_(f)), *std::forward<Exp>(e)); }
+                );
+            }
             else
                 return U{unexpect, std::forward<Exp>(e).error()};
         }
@@ -330,47 +322,69 @@ namespace dlib
 // ---------------------------------------------------------------------------------------------------
 
         template <
-          class Exp,
-          class F,
-          class T = typename std::decay_t<Exp>::value_type,
-          class E = typename std::decay_t<Exp>::error_type,
-          std::enable_if_t<std::is_void<T>::value, bool> = true,
-          class U = dlib::remove_cvref_t<dlib::invoke_result_t<F>>,
-          std::enable_if_t<
-            !is_expected_type<U>::value &&
-            !is_unexpected_type<U>::value, 
-            bool
-          > = true
+          class Exp, 
+          class F
         >
-        constexpr auto transform(Exp&& e, F&& f) -> dlib::expected<U, E>
+        constexpr auto transform(Exp&& e, F&& f)
         {
+            using TF = decltype(std::forward<Exp>(e).value());
+            using T  = typename std::decay_t<Exp>::value_type;
+            using E  = typename std::decay_t<Exp>::error_type;
+            using U  = dlib::remove_cvref_t<typename std::conditional_t<std::is_void<T>::value,
+                                                                        dlib::invoke_result<F>,
+                                                                        dlib::invoke_result<F,TF>>::type>;
+            static_assert(!is_expected_type<U>::value,   "Return type of function passed to transform() cannot be dlib::expected, must be a value type");
+            static_assert(!is_unexpected_type<U>::value, "Return type of function passed to transform() cannot be dlib::unexpected, must be a value type");
+
             if (e)
-                return dlib::invoke(std::forward<F>(f));
+            {
+                return switch_(bools(std::is_void<T>{}, std::is_void<U>{})
+                    ,[&](true_t, true_t, auto _) {
+                        dlib::invoke(std::forward<F>(_(f)));
+                        return dlib::expected<U,E>{};
+                    }
+                    ,[&](true_t, false_t, auto _) {
+                        return dlib::expected<U,E>{dlib::invoke(std::forward<F>(_(f)))};
+                    }
+                    ,[&](false_t, true_t, auto _) {
+                        dlib::invoke(std::forward<F>(f), *std::forward<Exp>(_(e)));
+                        return dlib::expected<U,E>{};
+                    }
+                    ,[&](false_t, false_t, auto _) {
+                        return dlib::expected<U,E>{dlib::invoke(std::forward<F>(f), *std::forward<Exp>(_(e)))};
+                    }
+                );
+            }
             else
-                return dlib::expected<U, E>{unexpect, std::forward<Exp>(e).error()};
+                return dlib::expected<U,E>{unexpect, std::forward<Exp>(e).error()};
         }
+
+// ---------------------------------------------------------------------------------------------------
 
         template <
           class Exp,
-          class F,
-          class T = typename std::decay_t<Exp>::value_type,
-          class E = typename std::decay_t<Exp>::error_type,
-          std::enable_if_t<!std::is_void<T>::value, bool> = true,
-          class U = dlib::remove_cvref_t<dlib::invoke_result_t<F, decltype(*std::declval<Exp>())>>,
-          std::enable_if_t<
-            !is_expected_type<U>::value &&
-            !is_unexpected_type<U>::value, 
-            bool
-          > = true
+          class F
         >
-        constexpr auto transform(Exp&& e, F&& f) -> dlib::expected<U, E>
-        {
-            if (e)
-                return dlib::invoke(std::forward<F>(f), *std::forward<Exp>(e));
-            else
-                return dlib::expected<U, E>{unexpect, std::forward<Exp>(e).error()};
-        }
+        const auto or_else(Exp&& e, F&& f)
+        {h
+            using EF = decltype(std::forward<Exp>(e).error());
+            using T  = typename std::decay_t<Exp>::value_type;
+            using R  = dlib::remove_cvref_t<dlib::invoke_result_t<F, EF>>;
 
+            static_assert(is_expected_type<R>::value, "Function passed to or_else() should return a dlib::expected type");
+
+            if (e)
+            {
+                return switch_(bools(std::is_void<T>{}),
+                    [&](true_t,  auto _) -> R { return R{}; },
+                    [&](false_t, auto _) -> R { return R{dlib::in_place, *std::forward<Exp>(_(e))}; }
+                );
+            }
+            else
+            {
+                return dlib::invoke_r<R>(std::forward<F>(f), std::forward<Exp>(e).error());
+            }
+        }
 
 // ---------------------------------------------------------------------------------------------------
 
@@ -1360,53 +1374,18 @@ namespace dlib
             this->destruct();
         }
 
-        template<class F>
-        constexpr auto and_then( F&& f ) &
-        {
-            return expected_details::and_then(*this, std::forward<F>(f));
-        }
-
-        template<class F>
-        constexpr auto and_then( F&& f ) const&
-        {
-            return expected_details::and_then(*this, std::forward<F>(f));
-        }
-
-        template<class F>
-        constexpr auto and_then( F&& f ) &&
-        {
-            return expected_details::and_then(std::move(*this), std::forward<F>(f));
-        }
-
-        template<class F>
-        constexpr auto and_then( F&& f ) const &&
-        {
-            return expected_details::and_then(std::move(*this), std::forward<F>(f));
-        }
-
-        template<class F>
-        constexpr auto transform( F&& f ) &
-        {
-            return expected_details::transform(*this, std::forward<F>(f));
-        }
-
-        template<class F>
-        constexpr auto transform( F&& f ) const&
-        {
-            return expected_details::transform(*this, std::forward<F>(f));
-        }
-
-        template<class F>
-        constexpr auto transform( F&& f ) &&
-        {
-            return expected_details::transform(std::move(*this), std::forward<F>(f));
-        }
-
-        template<class F>
-        constexpr auto transform( F&& f ) const &&
-        {
-            return expected_details::transform(std::move(*this), std::forward<F>(f));
-        }
+        template<class F> constexpr auto and_then( F&& f ) &         { return expected_details::and_then(*this, std::forward<F>(f)); }
+        template<class F> constexpr auto and_then( F&& f ) const&    { return expected_details::and_then(*this, std::forward<F>(f)); }
+        template<class F> constexpr auto and_then( F&& f ) &&        { return expected_details::and_then(std::move(*this), std::forward<F>(f)); }
+        template<class F> constexpr auto and_then( F&& f ) const &&  { return expected_details::and_then(std::move(*this), std::forward<F>(f)); }
+        template<class F> constexpr auto transform( F&& f ) &        { return expected_details::transform(*this, std::forward<F>(f)); }
+        template<class F> constexpr auto transform( F&& f ) const &  { return expected_details::transform(*this, std::forward<F>(f)); }
+        template<class F> constexpr auto transform( F&& f ) &&       { return expected_details::transform(std::move(*this), std::forward<F>(f)); }
+        template<class F> constexpr auto transform( F&& f ) const && { return expected_details::transform(std::move(*this), std::forward<F>(f)); }
+        template<class F> constexpr auto or_else( F&& f ) &          { return expected_details::or_else(*this, std::forward<F>(f)); }
+        template<class F> constexpr auto or_else( F&& f ) const &    { return expected_details::or_else(*this, std::forward<F>(f)); }
+        template<class F> constexpr auto or_else( F&& f ) &&         { return expected_details::or_else(std::move(*this), std::forward<F>(f)); }
+        template<class F> constexpr auto or_else( F&& f ) const &&   { return expected_details::or_else(std::move(*this), std::forward<F>(f)); }
 
         template <
           class G = T,

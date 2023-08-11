@@ -635,15 +635,9 @@ namespace
     void test_monads()
     {
         auto ret = dlib::expected<int,int>{1}
-            .and_then([](int i) {
-                return dlib::expected<long,int>(i+1);
-            })
-            .and_then([](long l) {
-                return dlib::expected<std::string,int>(std::to_string(l));
-            })
-            .and_then([](const std::string& str) {
-                return dlib::expected<float,int>(std::stof(str));
-            });
+            .and_then([](int i)  { return dlib::expected<long,int>(i+1); })
+            .and_then([](long l) { return dlib::expected<std::string,int>(std::to_string(l)); })
+            .and_then([](const std::string& str) { return dlib::expected<float,int>(std::stof(str)); });
         
         static_assert(std::is_same<decltype(ret), dlib::expected<float,int>>::value, "bad");
         DLIB_TEST(ret);
@@ -651,12 +645,8 @@ namespace
         DLIB_TEST(*ret == 2.0f);
 
         auto ret2 = ret
-            .and_then([](float) -> dlib::expected<void,int> {
-                return {};
-            })
-            .and_then([] {
-                return dlib::expected<double,int>(2.0);
-            });
+            .and_then([](float) -> dlib::expected<void,int> { return {}; })
+            .and_then([] { return dlib::expected<double,int>(2.0); });
 
         static_assert(std::is_same<decltype(ret2), dlib::expected<double,int>>::value, "bad");
         DLIB_TEST(ret2);
@@ -664,17 +654,31 @@ namespace
         DLIB_TEST(*ret2 == 2.0);
 
         auto ret3 = dlib::expected<int, int>{1}
-            .transform([](int i) -> long {
-                return i + 1;
-            })
-            .transform([](long j) -> float {
-                return j * 2;
-            });
+            .transform([](int i)  -> long  { return i + 1; })
+            .transform([](long j) -> float { return j * 2;  });
 
         static_assert(std::is_same<decltype(ret3), dlib::expected<float,int>>::value, "bad");
         DLIB_TEST(ret3);
         DLIB_TEST(ret3.has_value());
         DLIB_TEST(*ret3 == 4);
+
+        auto ret5 = dlib::expected<int, int>{1}
+            .and_then([](int i)     { return dlib::expected<int,int>{unexpect, 2}; })
+            .transform([](int i)    { DLIB_TEST_MSG(false, "This shouldn't get called"); return i; })
+            .or_else([](int e)      { DLIB_TEST(e == 2); return dlib::expected<int,int>(unexpect, e); } );
+        
+        static_assert(std::is_same<decltype(ret5), dlib::expected<int,int>>::value, "bad");
+        DLIB_TEST(!ret5);
+        DLIB_TEST(ret5.error() == 2);
+
+        auto ret6 = dlib::expected<int, int>{1}
+            .and_then([](int i)     { return expected<int,int>{unexpect, 2}; })
+            .transform([](int i)    { DLIB_TEST_MSG(false, "This shouldn't get called"); })
+            .or_else([](int e)      { DLIB_TEST(e == 2); return expected<void,int>(unexpect, e); } );
+        
+        static_assert(std::is_same<decltype(ret6), dlib::expected<void,int>>::value, "bad");
+        assert(!ret6);
+        assert(ret6.error() == 2);
     }
 
 // ---------------------------------------------------------------------------------------------------
