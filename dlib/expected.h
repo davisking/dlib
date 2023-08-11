@@ -1496,6 +1496,50 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
+    template <class T, class E, class U, class F>
+    constexpr bool operator==(const dlib::expected<T, E> &lhs, const dlib::expected<U, F> &rhs)
+    {
+        if (lhs.has_value() != rhs.has_value())
+            return false;
+        
+        return lhs.has_value() ? *lhs == *rhs : lhs.error() == rhs.error();
+    }
+
+    template <class E, class F>
+    constexpr bool operator==(const dlib::expected<void, E> &lhs, const dlib::expected<void, F> &rhs) 
+    {
+        if (lhs.has_value() != rhs.has_value())
+            return false;
+        
+        return lhs.has_value() || lhs.error() == rhs.error();
+    }
+
+    template <class T, class E, class U>
+    constexpr bool operator==(const dlib::expected<T, E> &x, const U &val)
+    {
+        return x.has_value() && static_cast<bool>(*x == val);
+    }
+
+    template <class T, class E, class U>
+    constexpr bool operator==(const U &val, const dlib::expected<T, E> &x)
+    {
+        return x.has_value() && static_cast<bool>(*x == val);
+    }
+
+    template <class T, class E>
+    constexpr bool operator==(const dlib::expected<T, E> &x, const dlib::unexpected<E> &e)
+    {
+        return !x.has_value() && static_cast<bool>(x.error() == e.error());
+    }
+
+    template <class T, class E>
+    constexpr bool operator==(const dlib::unexpected<E> &e, const dlib::expected<T, E> &x) 
+    {
+        return !x.has_value() && static_cast<bool>(x.error() == e.error());
+    }
+
+// ---------------------------------------------------------------------------------------------------
+
 }
 
 #endif

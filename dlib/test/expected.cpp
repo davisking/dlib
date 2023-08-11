@@ -156,6 +156,8 @@ namespace
         DLIB_TEST(e2.has_value());
         DLIB_TEST(e2.value() == 1);
         DLIB_TEST(*e2 == 1);
+        DLIB_TEST(e2 == 1);
+        DLIB_TEST(1 == e2);
         DLIB_TEST(e2.value_or(2) == 1);
 
         // Copy construction
@@ -197,6 +199,8 @@ namespace
         DLIB_TEST(!e7);
         DLIB_TEST(!e7.has_value());
         DLIB_TEST(e7.error() == 1);
+        DLIB_TEST(e7 == dlib::unexpected<int>(1));
+        DLIB_TEST(dlib::unexpected<int>(1) == e7);
         int thrown{0};
         try {
             e7.value() = 0;
