@@ -366,7 +366,7 @@ namespace dlib
           class F
         >
         const auto or_else(Exp&& e, F&& f)
-        {h
+        {
             using EF = decltype(std::forward<Exp>(e).error());
             using T  = typename std::decay_t<Exp>::value_type;
             using R  = dlib::remove_cvref_t<dlib::invoke_result_t<F, EF>>;
