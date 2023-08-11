@@ -388,6 +388,34 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
+        template <
+          class Exp, 
+          class F
+        >
+        constexpr auto transform_error(Exp&& e, F&& f)
+        {
+            using EF = decltype(std::forward<Exp>(e).error());
+            using T  = typename std::decay_t<Exp>::value_type;
+            using G  = dlib::remove_cvref_t<dlib::invoke_result_t<F, EF>>;
+            static_assert(!is_expected_type<G>::value,   "Return type of function passed to transform() cannot be dlib::expected, must be a value type");
+            static_assert(!is_unexpected_type<G>::value, "Return type of function passed to transform() cannot be dlib::unexpected, must be a value type");
+            using R = dlib::expected<T,G>;
+
+            if (e)
+            {
+                return switch_(bools(std::is_void<T>{}),
+                    [&](true_t,  auto _) -> R { return R{}; },
+                    [&](false_t, auto _) -> R { return R{dlib::in_place, *std::forward<Exp>(_(e))}; }
+                );
+            }
+            else
+            {
+                return R{unexpect, dlib::invoke(std::forward<F>(f), std::forward<Exp>(e).error())};
+            }
+        }
+
+// ---------------------------------------------------------------------------------------------------
+
         struct empty_initialization_tag{};
 
 // ---------------------------------------------------------------------------------------------------
@@ -1386,6 +1414,10 @@ namespace dlib
         template<class F> constexpr auto or_else( F&& f ) const &    { return expected_details::or_else(*this, std::forward<F>(f)); }
         template<class F> constexpr auto or_else( F&& f ) &&         { return expected_details::or_else(std::move(*this), std::forward<F>(f)); }
         template<class F> constexpr auto or_else( F&& f ) const &&   { return expected_details::or_else(std::move(*this), std::forward<F>(f)); }
+        template<class F> constexpr auto transform_error( F&& f ) &         { return expected_details::transform_error(*this, std::forward<F>(f)); }
+        template<class F> constexpr auto transform_error( F&& f ) const &   { return expected_details::transform_error(*this, std::forward<F>(f)); }
+        template<class F> constexpr auto transform_error( F&& f ) &&        { return expected_details::transform_error(std::move(*this), std::forward<F>(f)); }
+        template<class F> constexpr auto transform_error( F&& f ) const &&  { return expected_details::transform_error(std::move(*this), std::forward<F>(f)); }
 
         template <
           class G = T,

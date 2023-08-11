@@ -679,6 +679,15 @@ namespace
         static_assert(std::is_same<decltype(ret6), dlib::expected<void,int>>::value, "bad");
         assert(!ret6);
         assert(ret6.error() == 2);
+
+        auto ret7 = dlib::expected<int, int>{1}
+            .and_then([](int i)         { return expected<int,int>{unexpect, 2}; })
+            .transform([](int i)        { DLIB_TEST_MSG(false, "This shouldn't get called"); })
+            .transform_error([](int e)  { DLIB_TEST(e == 2); return e;} );
+        
+        static_assert(std::is_same<decltype(ret7), dlib::expected<void,int>>::value, "bad");
+        assert(!ret7);
+        assert(ret7.error() == 2);
     }
 
 // ---------------------------------------------------------------------------------------------------
