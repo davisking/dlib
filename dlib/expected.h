@@ -638,16 +638,27 @@ namespace dlib
             }
 
         protected:
+            constexpr void destruct_value() noexcept(std::is_nothrow_destructible<T>::value)
+            {
+                this->val.~T();
+                this->state = IS_EMPTY;
+            }
+
+            constexpr void destruct_error() noexcept(std::is_nothrow_destructible<E>::value)
+            {
+                this->error.~unexpected<E>();
+                this->state = IS_EMPTY;
+            }
+
             constexpr void destruct() noexcept(std::is_nothrow_destructible<T>::value &&
                                                std::is_nothrow_destructible<E>::value)
             {
                 switch(this->state)
                 {
-                    case IS_VAL:    this->val.~T();               break;
-                    case IS_ERROR:  this->error.~unexpected<E>(); break;
-                    default:                                      break;
+                    case IS_VAL:    destruct_value(); break;
+                    case IS_ERROR:  destruct_error(); break;
+                    default:                          break;
                 }
-                this->state = IS_EMPTY;
             }  
 
             template <class... U> 
@@ -689,7 +700,7 @@ namespace dlib
                         break;
 
                     case IS_ERROR | (IS_VAL << 4): 
-                        destruct();
+                        destruct_error();
                         construct_value(std::forward<Expected>(rhs).val);
                         break;
 
@@ -701,11 +712,11 @@ namespace dlib
                         break;
 
                     case IS_ERROR | (IS_EMPTY << 4): 
-                        destruct();
+                        destruct_error();
                         break;
 
                     case IS_VAL   | (IS_EMPTY << 4):
-                        destruct();
+                        destruct_value();
                         break;
                     
                     case IS_EMPTY | (IS_ERROR << 4): 
@@ -717,7 +728,7 @@ namespace dlib
                         break;
 
                     case IS_VAL   | (IS_ERROR << 4):
-                        destruct();
+                        destruct_value();
                         construct_error(std::forward<Expected>(rhs).error);
                         break;
 
@@ -755,10 +766,19 @@ namespace dlib
             }
 
         protected:
+
+            constexpr void destruct_value() noexcept {}
+
+            constexpr void destruct_error() noexcept(std::is_nothrow_destructible<E>::value)
+            {
+                this->error.~unexpected<E>();
+                this->state = IS_EMPTY;
+            }
+
             constexpr void destruct() noexcept(std::is_nothrow_destructible<E>::value)
             {
-                if (std::exchange(this->state, IS_EMPTY) == IS_ERROR)
-                    this->error.~unexpected<E>();
+                if (this->state == IS_ERROR)
+                    destruct_error();
             }  
 
             template <class... U> 
@@ -1336,15 +1356,13 @@ namespace dlib
         >
         constexpr expected& operator=( U&& v )
         {
-            using namespace expected_details;
-
             if (*this)
             {
                 **this = std::forward<U>(v); 
             }
             else
             {
-                this->destruct();
+                this->destruct_error();
                 this->construct_value(std::forward<U>(v));
             }
             
@@ -1360,7 +1378,7 @@ namespace dlib
         {
             if (*this)
             {
-                this->destruct();
+                this->destruct_value();
                 this->construct_error(e.error());
             }
             else
@@ -1380,7 +1398,7 @@ namespace dlib
         {
             if (*this)
             {
-                this->destruct();
+                this->destruct_value();
                 this->construct_error(std::move(e).error());
             }
             else
@@ -1396,11 +1414,6 @@ namespace dlib
         constexpr const E&  error() const&  noexcept { return base::error.error(); }
         constexpr E&&       error() &&      noexcept { return std::move(base::error.error()); }
         constexpr const E&& error() const&& noexcept { return std::move(base::error.error()); }
-
-        void reset() noexcept(std::is_nothrow_destructible<T>::value)
-        {
-            this->destruct();
-        }
 
         template<class F> constexpr auto and_then( F&& f ) &         { return expected_details::and_then(*this, std::forward<F>(f)); }
         template<class F> constexpr auto and_then( F&& f ) const&    { return expected_details::and_then(*this, std::forward<F>(f)); }
@@ -1451,14 +1464,14 @@ namespace dlib
                 switch_(bools(std::is_void<T>{}, std::is_nothrow_move_constructible<E>{}),
                     [&](true_t, auto, auto _) {
                         this->construct_error(std::move(_(other)).error());
-                        other.destruct();
+                        other.destruct_error();
                     },
                     [&](false_t, true_t, auto _) {
                         E temp{std::move(_(other)).error()};
-                        other.destruct();
+                        other.destruct_error();
                         try {
                             other.construct_value(std::move(**this));
-                            this->destruct();
+                            this->destruct_value();
                             this->construct_error(std::move(temp));
                         } catch(...) {
                             other.construct_error(std::move(temp));
@@ -1467,10 +1480,10 @@ namespace dlib
                     },
                     [&](false_t, false_t, auto _) {
                         T temp{std::move(**this)};
-                        this->destruct();
+                        this->destruct_value();
                         try {
                             this->construct_error(std::move(_(other)).error());
-                            other.destruct();
+                            other.destruct_error();
                             other.construct_value(std::move(temp));
                         } catch(...) {
                             this->construct_value(std::move(temp));
