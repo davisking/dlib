@@ -1123,7 +1123,8 @@ namespace dlib
           std::enable_if_t<std::is_convertible<UF, T>::value && std::is_convertible<GF, E>::value, bool> = true
         >
         constexpr expected(const expected<U,G> &rhs)
-        : ctor(expected_details::empty_initialization_tag{})
+        : base(expected_details::empty_initialization_tag{}),
+          ctor(expected_details::empty_initialization_tag{})
         {
             if (rhs)
                 this->construct_value(*rhs);
@@ -1140,7 +1141,8 @@ namespace dlib
           std::enable_if_t<!std::is_convertible<UF, T>::value || !std::is_convertible<GF, E>::value, bool> = true
         >
         constexpr explicit expected(expected<U,G>&& rhs)
-        : ctor(expected_details::empty_initialization_tag{})
+        : base(expected_details::empty_initialization_tag{}),
+          ctor(expected_details::empty_initialization_tag{})
         {
             if (rhs)
                 this->construct_value(std::move(*rhs));
@@ -1157,7 +1159,8 @@ namespace dlib
           std::enable_if_t<std::is_convertible<UF, T>::value && std::is_convertible<GF, E>::value, bool> = true
         >
         constexpr expected(expected<U,G>&& rhs)
-        : ctor(expected_details::empty_initialization_tag{})
+        : base(expected_details::empty_initialization_tag{}),
+          ctor(expected_details::empty_initialization_tag{})
         {
             if (rhs)
                 this->construct_value(std::move(*rhs));

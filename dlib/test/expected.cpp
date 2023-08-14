@@ -696,6 +696,82 @@ namespace
 
 // ---------------------------------------------------------------------------------------------------
 
+    void test_semantics()
+    {
+        static int i{0};
+        static int j{0};
+        static int k{0};
+        static int l{0};
+        static int m{0};
+        static int n{0};
+
+        const auto reset = [&] {
+            i = j = k = l = m = n = 0;
+        };
+
+        const auto check = [&](int i_, int j_, int k_, int l_, int m_, int n_) {
+            DLIB_TEST(i == i_);
+            DLIB_TEST(j == j_);
+            DLIB_TEST(k == k_);
+            DLIB_TEST(l == l_);
+            DLIB_TEST(m == m_);
+            DLIB_TEST(n == n_);
+        };
+
+        struct dummy
+        {
+            dummy()                         {i++;}
+            dummy(const dummy&)             {j++;}
+            dummy(dummy&&)                  {k++;}
+            dummy& operator=(const dummy&)  {l++; return *this;}
+            dummy& operator=(dummy&&)       {m++; return *this;}
+            ~dummy()                        {n++;}
+        };
+
+        using Expected1 = dlib::expected<dummy, int>;
+
+        Expected1 a{};
+        check(1,0,0,0,0,0); reset();
+
+        Expected1 b{dlib::in_place};
+        check(1,0,0,0,0,0); reset();
+
+        Expected1 c{b};
+        check(0,1,0,0,0,0); reset();
+
+        Expected1 d{std::move(c)};
+        check(0,0,1,0,0,0); reset();
+
+        Expected1 e;
+        dummy tmp;
+        reset();
+        e = tmp;
+        check(0,0,0,1,0,0); reset();
+
+        Expected1 f;
+        reset();
+        e = dummy{};
+        check(1,0,0,0,1,1); reset();
+
+        Expected1 g;
+        reset();
+        g = f;
+        check(0,0,0,1,0,0); reset();
+
+        Expected1 h;
+        reset();
+        h = std::move(g);
+        check(0,0,0,0,1,0); reset();
+
+        Expected1 o{dlib::unexpect, 0};
+        check(0,0,0,0,0,0); reset();
+
+        Expected1 p{dlib::unexpected<int>(1)};
+        check(0,0,0,0,0,0); reset();
+    }
+
+// ---------------------------------------------------------------------------------------------------
+
     class expected_tester : public tester
     {
     public:
@@ -718,6 +794,7 @@ namespace
             test_expected_nontrivial1_int();
             test_expected_nontrivial1_nontrivial2();
             test_monads();
+            test_semantics();
         }
     } a;
 }
