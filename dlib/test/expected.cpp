@@ -768,6 +768,13 @@ namespace
 
         Expected1 p{dlib::unexpected<int>(1)};
         check(0,0,0,0,0,0); reset();
+
+        Expected1 q{dlib::unexpected<long>(2)};
+        check(0,0,0,0,0,0); reset();
+
+        dlib::unexpected<long> tmp2{2};
+        Expected1 r{tmp2};
+        check(0,0,0,0,0,0); reset();
     }
 
 // ---------------------------------------------------------------------------------------------------

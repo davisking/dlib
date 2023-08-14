@@ -71,7 +71,7 @@ namespace dlib
             Args&&... args 
         ) 
         noexcept(std::is_nothrow_constructible<E, Args...>::value)
-        : v{std::forward<Args>(args)...}
+        : v(std::forward<Args>(args)...)
         {
         }
 
@@ -461,7 +461,7 @@ namespace dlib
 
             template<class ...U>
             constexpr expected_base(unexpect_t, U&& ...u) noexcept(std::is_nothrow_constructible<E,U...>::value)
-            : error{in_place, std::forward<U>(u)...}, is_val{false} 
+            : error(in_place, std::forward<U>(u)...), is_val{false} 
             {}    
 
             struct empty{};
@@ -1189,49 +1189,45 @@ namespace dlib
         }
 
         template< 
-          class G,
-          class GF = const G&,
-          std::enable_if_t<std::is_constructible<E, GF>::value, bool> = true,
-          std::enable_if_t<!std::is_convertible<GF, E>::value, bool> = true
+          class G = E,
+          std::enable_if_t<std::is_constructible<E, const G&>::value, bool> = true,
+          std::enable_if_t<!std::is_convertible<const G&, E>::value, bool> = true
         >
         constexpr explicit expected( const unexpected<G>& e )
-        : base(unexpect, std::forward<GF>(e.error())),
+        : base(unexpect, e.error()),
           ctor(expected_details::empty_initialization_tag{})
         {
         }
 
         template< 
-          class G,
-          class GF = const G&,
-          std::enable_if_t<std::is_constructible<E, GF>::value, bool> = true,
-          std::enable_if_t<std::is_convertible<GF, E>::value, bool> = true
+          class G = E,
+          std::enable_if_t<std::is_constructible<E, const G&>::value, bool> = true,
+          std::enable_if_t<std::is_convertible<const G&, E>::value, bool> = true
         >
         constexpr expected( const unexpected<G>& e )
-        : base(unexpect, std::forward<GF>(e.error())),
+        : base(unexpect, e.error()),
           ctor(expected_details::empty_initialization_tag{})
         {
         }
 
         template< 
-          class G,
-          class GF = G,
-          std::enable_if_t<std::is_constructible<E, GF>::value, bool> = true,
-          std::enable_if_t<!std::is_convertible<GF, E>::value, bool> = true
+          class G = E,
+          std::enable_if_t<std::is_constructible<E, G&&>::value, bool> = true,
+          std::enable_if_t<!std::is_convertible<G&&, E>::value, bool> = true
         >
-        constexpr explicit expected( unexpected<G>&& e )
-        : base(unexpect, std::forward<GF>(e.error())),
+        constexpr explicit expected( unexpected<G>&& e ) noexcept(std::is_nothrow_constructible<E, G &&>::value)
+        : base(unexpect, std::move(e).error()),
           ctor(expected_details::empty_initialization_tag{})
         {
         }
 
         template< 
-          class G,
-          class GF = G,
-          std::enable_if_t<std::is_constructible<E, GF>::value, bool> = true,
-          std::enable_if_t<std::is_convertible<GF, E>::value, bool> = true
+          class G = E,
+          std::enable_if_t<std::is_constructible<E, G&&>::value, bool> = true,
+          std::enable_if_t<std::is_convertible<G&&, E>::value, bool> = true
         >
-        constexpr expected( unexpected<G>&& e )
-        : base(unexpect, std::forward<GF>(e.error())),
+        constexpr expected( unexpected<G>&& e ) noexcept(std::is_nothrow_constructible<E, G &&>::value)
+        : base(unexpect, std::move(e).error()),
           ctor(expected_details::empty_initialization_tag{})
         {
         }
