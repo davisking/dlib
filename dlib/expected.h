@@ -58,7 +58,7 @@ namespace dlib
             Err&& e 
         ) 
         noexcept(std::is_nothrow_constructible<E, Err>::value)
-        : v{std::forward<Err>(e)}
+        : v(std::forward<Err>(e))
         {
         }
 

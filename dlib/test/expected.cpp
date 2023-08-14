@@ -775,6 +775,11 @@ namespace
         dlib::unexpected<long> tmp2{2};
         Expected1 r{tmp2};
         check(0,0,0,0,0,0); reset();
+
+        dlib::expected<dummy, long> tmp3;
+        reset();
+        Expected1 s{tmp3};
+        check(0,1,0,0,0,0); reset();
     }
 
 // ---------------------------------------------------------------------------------------------------
