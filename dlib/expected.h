@@ -451,7 +451,7 @@ namespace dlib
         protected:
 
             constexpr expected_base(empty_initialization_tag) noexcept
-            : e{}, is_val{false}
+            : is_val{false}
             {}
 
             template<class ...U>
@@ -464,8 +464,7 @@ namespace dlib
             : error(in_place, std::forward<U>(u)...), is_val{false} 
             {}    
 
-            struct empty{};
-            union {T val; unexpected<E> error; empty e;};
+            union {T val; unexpected<E> error;};
             bool is_val{true};
         };
 
@@ -479,7 +478,7 @@ namespace dlib
 
         protected:
             constexpr expected_base(empty_initialization_tag) noexcept
-            : e{}, is_val{false}
+            : is_val{false}
             {}
 
             template<class ...U>
@@ -492,8 +491,7 @@ namespace dlib
             : error{in_place, std::forward<U>(u)...}, is_val{false} 
             {}  
 
-            struct empty{};
-            union {T val; unexpected<E> error; empty e;};
+            union {T val; unexpected<E> error;};
             bool is_val{true};
         };
 
@@ -513,11 +511,7 @@ namespace dlib
 
         protected:
             constexpr expected_base(empty_initialization_tag) noexcept
-            : e{}, is_val{false}
-            {}
-
-            constexpr expected_base(in_place_t) noexcept
-            : is_val{true}
+            : is_val{false}
             {}
 
             template<class ...U>
@@ -525,8 +519,7 @@ namespace dlib
             : error{in_place, std::forward<U>(u)...}, is_val{false} 
             {}  
 
-            struct empty{};
-            union {unexpected<E> error; empty e;};
+            union {unexpected<E> error;};
             bool is_val{true};
         };
 
@@ -540,11 +533,7 @@ namespace dlib
         
         protected:
             constexpr expected_base(empty_initialization_tag) noexcept
-            : e{}, is_val{false}
-            {}
-
-            constexpr expected_base(in_place_t) noexcept
-            : is_val{true}
+            : is_val{false}
             {}
 
             template<class ...U>
@@ -552,8 +541,7 @@ namespace dlib
             : error{in_place, std::forward<U>(u)...}, is_val{false} 
             {}  
 
-            struct empty{};
-            union {unexpected<E> error; empty e;};
+            union {unexpected<E> error;};
             bool is_val{true};
         };
 
