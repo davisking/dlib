@@ -233,7 +233,7 @@ namespace dlib
         >
         using is_assignable_from_value = std::enable_if_t<And<
             !std::is_void<T>::value,
-            !std::is_same<expected<T,E>, U_>::value,
+            !is_expected_type<U_>::value,
             !is_unexpected_type<U_>::value,
             std::is_constructible<T,U>::value,
             std::is_assignable<T&,U>::value,
@@ -670,7 +670,7 @@ namespace dlib
             template<class Expected>
             constexpr void assign(Expected&& rhs)
             {
-                // double parentheses in decltype(()) so that we evaludate decltype of "expression", 
+                // double parentheses in decltype(()) so that we evaluate decltype of "expression", 
                 // not "member variable access". This is important, otherwise you don't get the exact CV-REf qualifiers.
                 using TF = decltype((std::forward<Expected>(rhs).val)); 
                 using EF = decltype((std::forward<Expected>(rhs).error.error()));
@@ -1300,8 +1300,8 @@ namespace dlib
         }
 
         template <
-          class U  = T,
-          class G  = T,
+          class U,
+          class G = T,
           expected_details::is_assignable_from_value<G,E,U> = true
         >
         constexpr expected& operator=( U&& v )
@@ -1312,8 +1312,23 @@ namespace dlib
             }
             else
             {
-                this->destruct_error();
-                this->construct_value(std::forward<U>(v));
+                switch_(bools(std::is_nothrow_constructible<T,U&&>{})
+                    ,[&](true_t, auto _) {
+                        this->destruct_error();
+                        this->construct_value(std::forward<U>(_(v)));
+                    }
+                    ,[&](false_t, auto _) {
+                        auto tmp = std::move(this->error());
+                        this->destruct_error();
+
+                        try {
+                            this->construct_value(std::forward<U>(_(v)));
+                        } catch (...) {
+                            this->construct_error(std::move(tmp));
+                            throw;
+                        }
+                    }
+                );
             }
             
             return *this;

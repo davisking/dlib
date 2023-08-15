@@ -844,6 +844,62 @@ namespace
 
 // ---------------------------------------------------------------------------------------------------
 
+    void test_strong_exception_guarantees()
+    {
+        struct can_throw
+        {
+            can_throw(int i_) : i{i_} {}
+            can_throw(const can_throw&) {throw std::runtime_error("");}
+            can_throw(can_throw&&) {throw std::runtime_error("");}
+            can_throw& operator=(const can_throw&)  = default;
+            can_throw& operator=(can_throw&&)       = default;
+            ~can_throw()                            = default;
+            int i{0};
+        };
+
+        using Expected = dlib::expected<can_throw, int>;
+
+        Expected a{dlib::unexpect, 1};
+        DLIB_TEST(!a);
+        DLIB_TEST(a.error() == 1);
+
+        int thrown{0};
+        try {
+            a = can_throw{2};
+        } catch(...) {
+            ++thrown;
+        }
+        DLIB_TEST(thrown==1);
+        DLIB_TEST(!a);
+        DLIB_TEST(a.error() == 1);
+
+        Expected b{2};
+        DLIB_TEST(b);
+        DLIB_TEST(b.value().i == 2);
+        try {
+            a = b;
+        } catch(...) {
+            ++thrown;
+        }
+        DLIB_TEST(thrown==2);
+        DLIB_TEST(!a);
+        DLIB_TEST(a.error() == 1);
+
+        Expected c{3};
+        DLIB_TEST(c);
+        DLIB_TEST(c.value().i == 3);
+        try {
+            a = std::move(c);
+        } catch(...) {
+            ++thrown;
+        }
+        DLIB_TEST(thrown==3);
+        DLIB_TEST(!a);
+        DLIB_TEST(a.error() == 1);
+    }
+
+// ---------------------------------------------------------------------------------------------------
+
     class expected_tester : public tester
     {
     public:
@@ -867,6 +923,7 @@ namespace
             test_expected_nontrivial1_nontrivial2();
             test_monads();
             test_semantics();
+            test_strong_exception_guarantees();
         }
     } a;
 }
