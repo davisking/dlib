@@ -698,6 +698,8 @@ namespace
 
     void test_semantics()
     {
+        // Checked against std::expected https://godbolt.org/z/61rTGbPrh
+
         static int i{0};
         static int j{0};
         static int k{0};
@@ -720,12 +722,12 @@ namespace
 
         struct dummy
         {
-            dummy()                         {i++;}
-            dummy(const dummy&)             {j++;}
-            dummy(dummy&&)                  {k++;}
-            dummy& operator=(const dummy&)  {l++; return *this;}
-            dummy& operator=(dummy&&)       {m++; return *this;}
-            ~dummy()                        {n++;}
+            dummy()                        noexcept {i++;}
+            dummy(const dummy&)            noexcept {j++;}
+            dummy(dummy&&)                 noexcept {k++;}
+            dummy& operator=(const dummy&) noexcept {l++; return *this;}
+            dummy& operator=(dummy&&)      noexcept {m++; return *this;}
+            ~dummy()                       noexcept {n++;}
         };
 
         using Expected1 = dlib::expected<dummy, int>;
@@ -793,6 +795,51 @@ namespace
         reset();
         u = std::move(tmp3);
         check(0,0,1,0,1,1); reset();
+
+        Expected1 w;
+        reset();
+        w.emplace();
+        check(1,0,0,0,0,1); reset();
+
+        using Expected2 = dlib::expected<int, dummy>;
+
+        Expected2 aa;
+        check(0,0,0,0,0,0); reset();
+
+        Expected2 ab{aa};
+        check(0,0,0,0,0,0); reset();
+
+        Expected2 ac{std::move(ab)};
+        check(0,0,0,0,0,0); reset();
+
+        Expected2 ad;
+        reset();
+        ad = ac;
+        check(0,0,0,0,0,0); reset();
+
+        Expected2 ae;
+        reset();
+        ae = std::move(ad);
+        check(0,0,0,0,0,0); reset();
+
+        Expected2 af{1};
+        check(0,0,0,0,0,0); reset();
+
+        Expected2 ag;
+        ag = 1;
+        check(0,0,0,0,0,0); reset();
+
+        Expected2 ah{dlib::expected<long, dummy>{2}};
+        check(0,0,0,0,0,0); reset();
+
+        Expected2 ai{dlib::unexpect};
+        check(1,0,0,0,0,0); reset();
+
+        Expected2 aj{dlib::unexpect, dummy{}};
+        check(1,0,1,0,0,1); reset();
+
+        Expected2 ak{dlib::unexpected<dummy>{dummy{}}};
+        check(1,0,2,0,0,2); reset();
     }
 
 // ---------------------------------------------------------------------------------------------------
