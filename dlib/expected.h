@@ -665,14 +665,17 @@ namespace dlib
                     construct_value(std::forward<Expected>(rhs).val);
                 else
                     construct_error(std::forward<Expected>(rhs).error.error());
-            }          
+            }        
 
             template<class Expected>
             constexpr void assign(Expected&& rhs)
-            {   
-                /* Good candidate for pattern matching */
+            {
+                // double parentheses in decltype(()) so that we evaludate decltype of "expression", 
+                // not "member variable access". This is important, otherwise you don't get the exact CV-REf qualifiers.
+                using TF = decltype((std::forward<Expected>(rhs).val)); 
+                using EF = decltype((std::forward<Expected>(rhs).error.error()));
 
-                if (this->is_val && rhs.is_val)
+                if (this->is_val && rhs.is_val) 
                 {
                     this->val = std::forward<Expected>(rhs).val; 
                 }
@@ -687,8 +690,28 @@ namespace dlib
                 }
                 else if (!this->is_val && rhs.is_val)
                 {
-                    destruct_error();
-                    construct_value(std::forward<Expected>(rhs).val);
+                    switch_(bools(std::is_nothrow_constructible<T,TF>{}, std::is_nothrow_move_constructible<T>{})
+                        ,[&](true_t, auto, auto _) {
+                            destruct_error();
+                            construct_value(std::forward<Expected>(_(rhs)).val);
+                        }
+                        ,[&](false_t, true_t, auto _) {
+                            T tmp = std::forward<Expected>(_(rhs)).val;
+                            destruct_error();
+                            construct_value(std::move(tmp));
+                        }
+                        ,[&](false_t, false_t, auto _) {
+                            auto tmp = std::move(this->error);
+                            destruct_error();
+
+                            try {
+                                construct_value(std::forward<Expected>(_(rhs)).val);
+                            } catch (...) {
+                                construct_error(std::move(tmp));
+                                throw;
+                            }
+                        }
+                    );
                 }
             }  
         };
