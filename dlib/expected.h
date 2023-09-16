@@ -1,5 +1,21 @@
 // Copyright (C) 2023  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
+
+/*!
+    This file contains standard's compliant backports of std::expected and related utilities.
+    Specifically, it implements:
+        - dlib::expected
+        - dlib::unexpected
+        - dlib::bad_expected_access
+        - dlib::unexpect
+
+    The documentation for these classes can be found on cppreference:
+        - https://en.cppreference.com/w/cpp/utility/expected
+
+    Anything found in the dlib::expected_details namespace is implementation details and should be ignored
+    by the user.
+!*/
+
 #ifndef DLIB_expected_H
 #define DLIB_expected_H
 
@@ -112,9 +128,15 @@ namespace dlib
     };
 
     template< class E1, class E2 >
-    constexpr bool operator==(unexpected<E1>& x, unexpected<E2>& y) noexcept(noexcept(x.error() == y.error()))
+    constexpr bool operator==(const unexpected<E1>& x, const unexpected<E2>& y) noexcept(noexcept(x.error() == y.error()))
     {
         return x.error() == y.error();
+    }
+
+    template< class E1, class E2 >
+    constexpr bool operator!=(const unexpected<E1>& x, const unexpected<E2>& y) noexcept(noexcept(x == y))
+    {
+        return !(x == y);
     }
 
     template < 

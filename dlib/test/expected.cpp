@@ -681,8 +681,8 @@ namespace
             .or_else([](int e)      { DLIB_TEST(e == 2); return expected<void,int>(unexpect, e); } );
         
         static_assert(std::is_same<decltype(ret6), dlib::expected<void,int>>::value, "bad");
-        assert(!ret6);
-        assert(ret6.error() == 2);
+        DLIB_TEST(!ret6);
+        DLIB_TEST(ret6.error() == 2);
 
         auto ret7 = dlib::expected<int, int>{1}
             .and_then([](int i)         { return expected<int,int>{unexpect, 2}; })
@@ -690,8 +690,8 @@ namespace
             .transform_error([](int e)  { DLIB_TEST(e == 2); return e;} );
         
         static_assert(std::is_same<decltype(ret7), dlib::expected<void,int>>::value, "bad");
-        assert(!ret7);
-        assert(ret7.error() == 2);
+        DLIB_TEST(!ret7);
+        DLIB_TEST(ret7.error() == 2);
     }
 
 // ---------------------------------------------------------------------------------------------------
@@ -899,6 +899,170 @@ namespace
     }
 
 // ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
+// MSVC tests taken from https://github.com/microsoft/STL/blob/main/tests/std/tests/P0323R12_expected/test.cpp
+// ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
+
+    enum class IsDefaultConstructible : bool { Not, Yes };
+    enum class IsTriviallyCopyConstructible : bool { Not, Yes };
+    enum class IsTriviallyMoveConstructible : bool { Not, Yes };
+    enum class IsTriviallyDestructible : bool { Not, Yes };
+
+    enum class IsNothrowConstructible : bool { Not, Yes };
+    enum class IsNothrowCopyConstructible : bool { Not, Yes };
+    enum class IsNothrowMoveConstructible : bool { Not, Yes };
+    enum class IsNothrowCopyAssignable : bool { Not, Yes };
+    enum class IsNothrowMoveAssignable : bool { Not, Yes };
+    enum class IsNothrowConvertible : bool { Not, Yes };
+    enum class IsNothrowComparable : bool { Not, Yes };
+    enum class IsNothrowSwappable : bool { Not, Yes };
+
+    enum class IsExplicitConstructible : bool { Not, Yes };
+
+    template <typename E>
+    constexpr bool IsYes(const E e) noexcept {
+        return e == E::Yes;
+    }
+
+    namespace test_unexpected 
+    {
+        struct convertible 
+        {
+            constexpr convertible() = default;
+            constexpr convertible(const int val) noexcept : _val(val) {}
+            constexpr bool operator==(const int other) const noexcept { return other == _val; }
+            int _val = 0;
+        };
+
+        template <
+          bool nothrowCopyConstructible, 
+          bool nothrowMoveConstructible,
+          bool nothrowComparable
+        >
+        struct test
+        {
+            static constexpr bool copy_construction_is_noexcept = nothrowCopyConstructible;
+            static constexpr bool move_construction_is_noexcept = nothrowMoveConstructible;
+            static constexpr bool compare_is_noexcept           = nothrowComparable;
+
+            struct test_error 
+            {
+                constexpr test_error(const int& val) noexcept(copy_construction_is_noexcept) : _val(val) {}
+                constexpr test_error(int&& val) noexcept(move_construction_is_noexcept) : _val(val) {}
+
+                constexpr test_error(std::initializer_list<int>, const int& val) noexcept(copy_construction_is_noexcept)
+                    : _val(val) {}
+                constexpr test_error(std::initializer_list<int>, int&& val) noexcept(move_construction_is_noexcept)
+                    : _val(val) {}
+
+                constexpr test_error(const convertible& other) noexcept(copy_construction_is_noexcept) : _val(other._val) {}
+                constexpr test_error(convertible&& other) noexcept(move_construction_is_noexcept) : _val(other._val) {}
+
+                [[nodiscard]] constexpr bool operator==(const test_error& right) const noexcept(compare_is_noexcept) {
+                    return _val == right._val;
+                }
+                [[nodiscard]] constexpr bool operator==(const convertible& right) const noexcept(compare_is_noexcept) {
+                    return _val == right._val;
+                }
+
+                int _val = 0;
+            };
+
+            using Unexpect = dlib::unexpected<test_error>;
+
+            static void run()
+            {
+                // [expected.un.ctor]
+                const int& input = 1;
+                Unexpect in_place_lvalue_constructed{in_place, input};
+                static_assert(noexcept(Unexpect{in_place, input}) == nothrowCopyConstructible, "bad");
+                DLIB_TEST(in_place_lvalue_constructed == Unexpect{test_error{1}});
+
+                Unexpect in_place_rvalue_constructed{in_place, 42};
+                static_assert(noexcept(Unexpect{in_place, 42}) == nothrowMoveConstructible, "bad");
+                DLIB_TEST(in_place_rvalue_constructed == Unexpect{test_error{42}});
+
+                Unexpect in_place_ilist_lvalue_constructed{in_place, {2}, input};
+                static_assert(noexcept(Unexpect{in_place, {2}, input}) == nothrowCopyConstructible, "bad");
+                DLIB_TEST(in_place_ilist_lvalue_constructed == Unexpect{test_error{1}});
+
+                Unexpect in_place_ilist_rvalue_constructed{in_place, {2}, 1337};
+                static_assert(noexcept(Unexpect{in_place, {2}, 1337}) == nothrowMoveConstructible, "bad");
+                DLIB_TEST(in_place_ilist_rvalue_constructed == Unexpect{test_error{1337}});
+
+                Unexpect base_error_constructed{test_error{3}};
+                static_assert(noexcept(Unexpect{test_error{3}}) == nothrowMoveConstructible, "bad");
+                DLIB_TEST(base_error_constructed.error()._val == 3);
+
+                Unexpect conversion_error_constructed{convertible{4}};
+                static_assert(noexcept(Unexpect{convertible{4}}) == nothrowMoveConstructible, "bad");
+                DLIB_TEST(conversion_error_constructed.error()._val == 4);
+
+                Unexpect brace_error_constructed{{5}};
+                static_assert(noexcept(Unexpect{{5}}) == nothrowMoveConstructible);
+                DLIB_TEST(brace_error_constructed.error()._val == 5);
+
+                // [expected.un.eq]
+                DLIB_TEST(in_place_lvalue_constructed == in_place_lvalue_constructed);
+                DLIB_TEST(in_place_lvalue_constructed != in_place_rvalue_constructed);
+                static_assert(noexcept(in_place_lvalue_constructed == in_place_lvalue_constructed) == nothrowComparable, "bad");
+                static_assert(noexcept(in_place_lvalue_constructed != in_place_lvalue_constructed) == nothrowComparable, "bad");
+
+                const auto converted = dlib::unexpected<convertible>{convertible{3}};
+                DLIB_TEST(base_error_constructed == converted);
+                DLIB_TEST(conversion_error_constructed != converted);
+                static_assert(noexcept(base_error_constructed == converted) == nothrowComparable, "bad");
+                static_assert(noexcept(conversion_error_constructed != converted) == nothrowComparable, "bad");
+
+                // [expected.un.swap]
+                in_place_lvalue_constructed.swap(in_place_rvalue_constructed);
+                DLIB_TEST(in_place_lvalue_constructed == Unexpect{test_error{42}});
+                DLIB_TEST(in_place_rvalue_constructed == Unexpect{test_error{1}});
+                static_assert(noexcept(in_place_lvalue_constructed.swap(in_place_rvalue_constructed)), "bad");
+
+                swap(base_error_constructed, conversion_error_constructed);
+                DLIB_TEST(base_error_constructed == Unexpect{test_error{4}});
+                DLIB_TEST(conversion_error_constructed == Unexpect{test_error{3}});
+                static_assert(noexcept(swap(base_error_constructed, conversion_error_constructed)), "bad");
+
+                // [expected.un.obs]
+                auto&& lvalue_error = base_error_constructed.error();
+                DLIB_TEST(lvalue_error == test_error{4});
+                static_assert(std::is_same<decltype(lvalue_error), test_error&>::value, "bad");
+
+                auto&& rvalue_error = std::move(conversion_error_constructed).error();
+                DLIB_TEST(rvalue_error == test_error{3});
+                static_assert(std::is_same<decltype(rvalue_error), test_error&&>::value, "bad");
+
+                auto&& const_lvalue_error = dlib::as_const(in_place_lvalue_constructed).error();
+                DLIB_TEST(const_lvalue_error == test_error{42});
+                static_assert(std::is_same<decltype(const_lvalue_error), const test_error&>::value, "bad");
+
+                auto&& const_rvalue_error = std::move(dlib::as_const(in_place_ilist_lvalue_constructed)).error();
+                DLIB_TEST(const_rvalue_error == test_error{1});
+                static_assert(std::is_same<decltype(const_rvalue_error), const test_error&&>::value, "bad");
+
+                // deduction guide
+    #ifdef __cpp_deduction_guides
+                dlib::unexpected deduced(test_error{42});
+                static_assert(std::is_same<decltype(deduced), Unexpect>::value, "bad");
+    #endif
+            }
+        };
+
+        void test_all()
+        {
+            test<false, false, false>::run();
+            test<false, false, true>::run();
+            test<false, true, false>::run();
+            test<false, true, true>::run();
+            test<true, false, false>::run();
+            test<true, false, true>::run();
+            test<true, true, false>::run();
+            test<true, true, true>::run();
+        }
+    } // namespace test_unexpected
 
     class expected_tester : public tester
     {
@@ -924,6 +1088,9 @@ namespace
             test_monads();
             test_semantics();
             test_strong_exception_guarantees();
+
+            //From MSVC's unit test https://github.com/microsoft/STL/blob/main/tests/std/tests/P0323R12_expected/test.cpp
+            test_unexpected::test_all();
         }
     } a;
 }
