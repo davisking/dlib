@@ -80,13 +80,13 @@ namespace dlib
 
         template < 
           class... Args,
-          std::enable_if_t<std::is_constructible<E, Args...>::value,bool> = true
+          std::enable_if_t<std::is_constructible<E, Args&&...>::value,bool> = true
         >
         constexpr explicit unexpected ( 
             dlib::in_place_t, 
             Args&&... args 
         ) 
-        noexcept(std::is_nothrow_constructible<E, Args...>::value)
+        noexcept(std::is_nothrow_constructible<E, Args&&...>::value)
         : v(std::forward<Args>(args)...)
         {
         }
