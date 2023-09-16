@@ -942,26 +942,19 @@ namespace
         >
         struct test
         {
-            static constexpr bool copy_construction_is_noexcept = nothrowCopyConstructible;
-            static constexpr bool move_construction_is_noexcept = nothrowMoveConstructible;
-            static constexpr bool compare_is_noexcept           = nothrowComparable;
-
             struct test_error 
-            {
-                constexpr test_error() = default;
-                ~test_error() = default;
-
-                constexpr test_error(int&& val)                                     noexcept(move_construction_is_noexcept) : _val(val) {}
-                constexpr test_error(const int& val)                                noexcept(copy_construction_is_noexcept) : _val(val) {}
-                constexpr test_error(std::initializer_list<int>, int&& val)         noexcept(move_construction_is_noexcept) : _val(val) {}
-                constexpr test_error(std::initializer_list<int>, const int& val)    noexcept(copy_construction_is_noexcept) : _val(val) {}
-                constexpr test_error(convertible&& other)                           noexcept(move_construction_is_noexcept) : _val(other._val) {}
-                constexpr test_error(const convertible& other)                      noexcept(copy_construction_is_noexcept) : _val(other._val) {}
+            {               
+                constexpr test_error(int&& val)                                     noexcept(nothrowMoveConstructible) : _val(val) {}
+                constexpr test_error(const int& val)                                noexcept(nothrowCopyConstructible) : _val(val) {}
+                constexpr test_error(std::initializer_list<int>, int&& val)         noexcept(nothrowMoveConstructible) : _val(val) {}
+                constexpr test_error(std::initializer_list<int>, const int& val)    noexcept(nothrowCopyConstructible) : _val(val) {}
+                constexpr test_error(convertible&& other)                           noexcept(nothrowMoveConstructible) : _val(other._val) {}
+                constexpr test_error(const convertible& other)                      noexcept(nothrowCopyConstructible) : _val(other._val) {}
                 
-                constexpr bool operator==(const test_error& right) const noexcept(compare_is_noexcept) {
+                constexpr bool operator==(const test_error& right) const noexcept(nothrowComparable) {
                     return _val == right._val;
                 }
-                constexpr bool operator==(const convertible& right) const noexcept(compare_is_noexcept) {
+                constexpr bool operator==(const convertible& right) const noexcept(nothrowComparable) {
                     return _val == right._val;
                 }
 
@@ -972,6 +965,8 @@ namespace
 
             static void run()
             {
+                using std::swap;
+
                 // [expected.un.ctor]
                 const int& input = 1;
                 Unexpect in_place_lvalue_constructed{in_place, input};
@@ -1063,6 +1058,338 @@ namespace
         }
     } // namespace test_unexpected
 
+    namespace test_unexpect 
+    {
+        auto copy = unexpect;
+        static_assert(std::is_same<decltype(copy), unexpect_t>::value, "bad");
+        static_assert(std::is_trivial<unexpect_t>::value, "bad");
+        static_assert(std::is_empty<unexpect_t>::value, "bad");
+    } // namespace test_unexpect
+
+    namespace test_expected 
+    {
+        constexpr void test_aliases()
+        {
+            struct value_tag {};
+            struct error_tag {};
+
+            {
+                using Expected = expected<value_tag, error_tag>;
+                static_assert(std::is_same<typename Expected::value_type, value_tag>::value, "bad");
+                static_assert(std::is_same<typename Expected::error_type, error_tag>::value, "bad");
+                static_assert(std::is_same<typename Expected::unexpected_type, dlib::unexpected<error_tag>>::value, "bad");
+                static_assert(std::is_same<typename Expected::rebind<int>, expected<int, error_tag>>::value, "bad");
+            }
+
+            {
+                using Expected = expected<void, error_tag>;
+                static_assert(std::is_same<typename Expected::value_type, void>::value, "bad");
+                static_assert(std::is_same<typename Expected::error_type, error_tag>::value, "bad");
+                static_assert(std::is_same<typename Expected::unexpected_type, dlib::unexpected<error_tag>>::value, "bad");
+                static_assert(std::is_same<typename Expected::rebind<int>, expected<int, error_tag>>::value, "bad");
+            }
+        }
+
+        struct payload_default_constructor 
+        {
+            constexpr payload_default_constructor() : _val(42) {}
+            constexpr bool operator==(const int val) const noexcept {return _val == val;}
+
+            int _val = 0;
+        };
+
+        struct payload_no_default_constructor
+        {
+            constexpr payload_no_default_constructor() = delete;
+            constexpr bool operator==(const int val) const noexcept {return _val == val;}
+            int _val = 0;
+        };
+
+        void test_default_constructors() 
+        {
+            static_assert(std::is_default_constructible<dlib::expected<payload_default_constructor, int>>::value, "bad");
+            static_assert(!std::is_default_constructible<dlib::expected<payload_no_default_constructor, int>>::value, "bad");
+            // we only care about payload type
+            static_assert(std::is_default_constructible<dlib::expected<int, payload_default_constructor>>::value, "bad");
+            static_assert(std::is_default_constructible<dlib::expected<void, payload_default_constructor>>::value, "bad");
+            static_assert(std::is_default_constructible<dlib::expected<int, payload_no_default_constructor>>::value, "bad");
+            static_assert(std::is_default_constructible<dlib::expected<void, payload_no_default_constructor>>::value, "bad");
+
+            const dlib::expected<payload_default_constructor, int> defaulted;
+            DLIB_TEST(defaulted);
+            DLIB_TEST(defaulted.value() == 42);
+        }
+
+        template <
+          bool triviallyCopyConstructible,
+          bool nothrowCopyConstructible,
+          bool copyConstructible = triviallyCopyConstructible || nothrowCopyConstructible
+        >
+        struct payload_copy_constructor 
+        {
+            constexpr payload_copy_constructor()                                           = default;
+            constexpr payload_copy_constructor& operator=(const payload_copy_constructor&) = delete;
+            constexpr payload_copy_constructor(const payload_copy_constructor&) noexcept(copyConstructible) : _val(42) {}
+            constexpr bool operator==(const int val) const noexcept { return _val == val; }
+            int _val = 0;
+        };
+
+        template <
+          bool nothrowCopyConstructible
+        >
+        struct payload_copy_constructor<true,nothrowCopyConstructible,true>
+        {
+            constexpr payload_copy_constructor()                                           = default;
+            constexpr payload_copy_constructor& operator=(const payload_copy_constructor&) = delete;
+            constexpr payload_copy_constructor(const payload_copy_constructor&)            = default;
+            constexpr bool operator==(const int val) const noexcept { return _val == val; }
+            int _val = 0;
+        };
+
+        template <
+          bool triviallyCopyConstructible,
+          bool nothrowCopyConstructible
+        >
+        void test_copy_constructors() 
+        {
+            constexpr bool should_be_noexcept = triviallyCopyConstructible || nothrowCopyConstructible;
+
+            using payload = payload_copy_constructor<triviallyCopyConstructible,nothrowCopyConstructible>;
+
+            { // Check payload type
+                using Expected = expected<payload, int>;
+                static_assert(std::is_trivially_copy_constructible<Expected>::value == triviallyCopyConstructible, "bad");
+                static_assert(std::is_copy_constructible<Expected>::value, "bad");
+
+                const Expected with_value{in_place};
+                const Expected from_value{with_value};
+                DLIB_TEST(from_value);
+                DLIB_TEST(from_value.value() == (triviallyCopyConstructible ? 0 : 42));
+                static_assert(noexcept(Expected{with_value}) == should_be_noexcept, "bad");
+
+                const Expected with_error{unexpect};
+                const Expected from_error{with_error};
+                DLIB_TEST(!from_error);
+                DLIB_TEST(from_error.error() == 0);
+                static_assert(noexcept(Expected{with_error}) == should_be_noexcept, "bad");
+            }
+
+            { // Check error type
+                using Expected = dlib::expected<int, payload>;
+                static_assert(std::is_trivially_copy_constructible<Expected>::value == triviallyCopyConstructible, "bad");
+                static_assert(std::is_copy_constructible<Expected>::value, "bad");
+
+                const Expected with_value{in_place};
+                const Expected from_value{with_value};
+                DLIB_TEST(from_value);
+                DLIB_TEST(from_value.value() == 0);
+                static_assert(noexcept(Expected{with_value}) == should_be_noexcept);
+
+                const Expected with_error{unexpect};
+                const Expected from_error{with_error};
+                DLIB_TEST(!from_error);
+                DLIB_TEST(from_error.error() == (triviallyCopyConstructible ? 0 : 42));
+                static_assert(noexcept(Expected{with_error}) == should_be_noexcept);
+            }
+
+            { // Check void payload
+                using Expected = expected<void, payload>;
+                static_assert(std::is_trivially_copy_constructible<Expected>::value == triviallyCopyConstructible, "bad");
+                static_assert(std::is_copy_constructible<Expected>::value, "bad");
+
+                const Expected with_value{in_place};
+                const Expected from_value{with_value};
+                DLIB_TEST(from_value);
+                // static_assert(noexcept(Expected{with_value}) == should_be_noexcept, "bad");
+
+                const Expected with_error{unexpect};
+                const Expected from_error{with_error};
+                DLIB_TEST(!from_error);
+                DLIB_TEST(from_error.error() == (triviallyCopyConstructible ? 0 : 42));
+                // static_assert(noexcept(Expected{with_error}) == should_be_noexcept, "bad");
+            }
+
+            { // ensure we are not copy constructible if either the payload or the error are not
+                struct not_copy_constructible {
+                    not_copy_constructible(const not_copy_constructible&) = delete;
+                };
+
+                static_assert(!std::is_copy_constructible<expected<not_copy_constructible, int>>::value, "bad");
+                static_assert(!std::is_copy_constructible<expected<int, not_copy_constructible>>::value, "bad");
+                static_assert(!std::is_copy_constructible<expected<void, not_copy_constructible>>::value, "bad");
+            }
+        }
+
+        template <
+          bool triviallyMoveConstructible,
+          bool nothrowMoveConstructible,
+          bool nothrow = triviallyMoveConstructible || nothrowMoveConstructible
+        >
+        struct payload_move_constructor
+        {
+            constexpr payload_move_constructor()                                      = default;
+            constexpr payload_move_constructor(const payload_move_constructor&)       = default;
+            constexpr payload_move_constructor& operator=(payload_move_constructor&&) = delete;
+            constexpr payload_move_constructor(payload_move_constructor&&) noexcept(nothrow) : _val(42) {}
+            constexpr bool operator==(const int val) const noexcept {return _val == val;}
+            int _val = 0;
+        };
+
+        template <
+          bool nothrowMoveConstructible
+        >
+        struct payload_move_constructor<true,nothrowMoveConstructible,true>
+        {
+            constexpr payload_move_constructor()                                      = default;
+            constexpr payload_move_constructor(const payload_move_constructor&)       = default;
+            constexpr payload_move_constructor& operator=(payload_move_constructor&&) = delete;
+            constexpr payload_move_constructor(payload_move_constructor&&)            = default;
+            constexpr bool operator==(const int val) const noexcept {return _val == val;}
+            int _val = 0;
+        };
+
+        template <
+          bool triviallyMoveConstructible,
+          bool nothrowMoveConstructible
+        >
+        constexpr void test_move_constructors() 
+        {
+            constexpr bool should_be_noexcept = triviallyMoveConstructible || nothrowMoveConstructible;
+
+            using payload = payload_move_constructor<triviallyMoveConstructible,nothrowMoveConstructible>;
+
+            { // Check payload type
+                using Expected = expected<payload, int>;
+                static_assert(std::is_trivially_move_constructible<Expected>::value == triviallyMoveConstructible, "bad");
+                static_assert(std::is_move_constructible<Expected>::value, "bad");
+
+                Expected value_input{in_place};
+                const Expected from_value{std::move(value_input)};
+                DLIB_TEST(from_value);
+                DLIB_TEST(from_value.value() == (triviallyMoveConstructible ? 0 : 42));
+                static_assert(noexcept(Expected{std::move(value_input)}) == should_be_noexcept, "bad");
+
+                Expected error_input{unexpect};
+                const Expected from_error{std::move(error_input)};
+                DLIB_TEST(!from_error);
+                DLIB_TEST(from_error.error() == 0);
+                static_assert(noexcept(Expected{std::move(error_input)}) == should_be_noexcept, "bad");
+            }
+
+            { // Check error type
+                using Expected = expected<int, payload>;
+                static_assert(std::is_trivially_move_constructible<Expected>::value == triviallyMoveConstructible, "bad");
+                static_assert(std::is_move_constructible<Expected>::value, "bad");
+
+                Expected value_input{in_place};
+                const Expected from_value{std::move(value_input)};
+                DLIB_TEST(from_value);
+                DLIB_TEST(from_value.value() == 0);
+                static_assert(noexcept(Expected{std::move(value_input)}) == should_be_noexcept, "bad");
+
+                Expected error_input{unexpect};
+                const Expected from_error{std::move(error_input)};
+                DLIB_TEST(!from_error);
+                DLIB_TEST(from_error.error() == (triviallyMoveConstructible ? 0 : 42));
+                static_assert(noexcept(Expected{std::move(error_input)}) == should_be_noexcept, "bad");
+            }
+
+            { // Check void payload
+                using Expected = expected<void, payload>;
+                static_assert(std::is_trivially_move_constructible<Expected>::value == triviallyMoveConstructible, "bad");
+                static_assert(std::is_move_constructible<Expected>::value, "bad");
+
+                Expected value_input{in_place};
+                const Expected from_value{std::move(value_input)};
+                DLIB_TEST(from_value);
+                // static_assert(noexcept(Expected{std::move(value_input)}) == should_be_noexcept, "bad");
+
+                Expected error_input{unexpect};
+                const Expected from_error{std::move(error_input)};
+                DLIB_TEST(!from_error);
+                DLIB_TEST(from_error.error() == (triviallyMoveConstructible ? 0 : 42));
+                // static_assert(noexcept(Expected{std::move(error_input)}) == should_be_noexcept, "bad");
+            }
+
+            { // ensure we are not move constructible if either the payload or the error are not
+                struct not_move_constructible {
+                    not_move_constructible(not_move_constructible&&) = delete;
+                };
+
+                static_assert(!std::is_move_constructible<expected<not_move_constructible, int>>::value, "bad");
+                static_assert(!std::is_move_constructible<expected<int, not_move_constructible>>::value, "bad");
+                static_assert(!std::is_move_constructible<expected<void, not_move_constructible>>::value, "bad");
+            }
+        }
+
+        template <bool triviallyDestructible>
+        struct payload_destructor 
+        {
+            constexpr payload_destructor(bool& destructor_called) : _destructor_called(destructor_called) {}
+            ~payload_destructor() = default;
+            bool& _destructor_called;
+        };
+
+        template <>
+        struct payload_destructor<false>
+        {
+            constexpr payload_destructor(bool& destructor_called) : _destructor_called(destructor_called) {}
+            ~payload_destructor() { _destructor_called = true; }
+            bool& _destructor_called;
+        };
+
+        template <bool triviallyDestructible>
+        constexpr void test_destructors()
+        {
+            constexpr bool is_trivial = triviallyDestructible;
+            bool destructor_called    = false;
+
+            { // Check payload
+                using Expected = expected<payload_destructor<triviallyDestructible>, int>;
+                static_assert(std::is_trivially_destructible<Expected>::value == is_trivial, "bad");
+                Expected val{in_place, destructor_called};
+            }
+
+            DLIB_TEST(destructor_called == !is_trivial);
+            destructor_called = false;
+
+            { // Check error
+                using Expected = expected<int, payload_destructor<triviallyDestructible>>;
+                static_assert(std::is_trivially_destructible<Expected>::value == is_trivial, "bad");
+                Expected err{unexpect, destructor_called};
+            }
+
+            DLIB_TEST(destructor_called == !is_trivial);
+            destructor_called = false;
+
+            { // Check void error
+                using Expected = expected<void, payload_destructor<triviallyDestructible>>;
+                static_assert(std::is_trivially_destructible<Expected>::value == is_trivial, "bad");
+                Expected err{unexpect, destructor_called};
+            }
+            DLIB_TEST(destructor_called == !is_trivial);
+        }
+
+        void test_special_members() 
+        {
+            test_default_constructors();
+
+            test_copy_constructors<false, false>();
+            test_copy_constructors<false, true>();
+            test_copy_constructors<true, false>();
+            test_copy_constructors<true, true>();
+
+            test_move_constructors<false, false>();
+            test_move_constructors<false, true>();
+            test_move_constructors<true, false>();
+            test_move_constructors<true, true>();
+
+            test_destructors<false>();
+            test_destructors<true>();
+        }
+    }
+
+
     class expected_tester : public tester
     {
     public:
@@ -1090,6 +1417,15 @@ namespace
 
             //From MSVC's unit test https://github.com/microsoft/STL/blob/main/tests/std/tests/P0323R12_expected/test.cpp
             test_unexpected::test_all();
+            test_expected::test_aliases();
+            test_expected::test_special_members();
+            // test_expected::test_constructors();
+            // test_expected::test_assignment();
+            // test_expected::test_emplace();
+            // test_expected::test_swap();
+            // test_expected::test_access();
+            // test_expected::test_monadic();
+            // test_expected::test_equality();
         }
     } a;
 }

@@ -94,14 +94,14 @@ namespace dlib
         template < 
           class U, 
           class... Args,
-          std::enable_if_t<std::is_constructible<E, std::initializer_list<U>&, Args...>::value, bool> = true
+          std::enable_if_t<std::is_constructible<E, std::initializer_list<U>&, Args&&...>::value, bool> = true
         >
         constexpr explicit unexpected (
             dlib::in_place_t,
             std::initializer_list<U> il, 
             Args&&... args 
         ) 
-        noexcept(std::is_nothrow_constructible<E, std::initializer_list<U>&, Args...>::value)
+        noexcept(std::is_nothrow_constructible<E, std::initializer_list<U>&, Args&&...>::value)
         : v{il, std::forward<Args>(args)...}
         {
         }
@@ -531,6 +531,10 @@ namespace dlib
             : is_val{true}
             {}
 
+            constexpr expected_base(in_place_t) noexcept
+            : is_val{true}
+            {}
+
         protected:
             constexpr expected_base(empty_initialization_tag) noexcept
             : is_val{false}
@@ -550,6 +554,10 @@ namespace dlib
         {
         public:
             constexpr expected_base() noexcept
+            : is_val{true}
+            {}
+
+            constexpr expected_base(in_place_t) noexcept
             : is_val{true}
             {}
         
@@ -1267,6 +1275,8 @@ namespace dlib
 
         template < 
           class... Args,
+          class U = T,
+          std::enable_if_t<!std::is_void<U>::value, bool> = true,
           std::enable_if_t<std::is_constructible<T, Args...>::value, bool> = true
         >
         constexpr explicit expected( 
@@ -1274,6 +1284,18 @@ namespace dlib
             Args&&... args 
         ) noexcept(std::is_nothrow_constructible<T, Args...>::value)
         : base(dlib::in_place, std::forward<Args>(args)...),
+          ctor(expected_details::empty_initialization_tag{})
+        {
+        }
+
+        template <
+          class U = T,
+          std::enable_if_t<std::is_void<U>::value, bool> = true
+        >
+        constexpr explicit expected( 
+            dlib::in_place_t
+        ) noexcept
+        : base(dlib::in_place),
           ctor(expected_details::empty_initialization_tag{})
         {
         }
