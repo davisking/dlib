@@ -239,6 +239,7 @@
          <item>upsample_image_dataset</item> 
          <item>flip_image_dataset_left_right</item> 
          <item>rotate_image_dataset</item> 
+         <item>insert_image_chip</item> 
          <item>extract_image_chips</item> 
          <item>extract_image_4points</item> 
          <item>random_cropper</item> 
@@ -253,6 +254,8 @@
          <item>jet</item>
          <item>render_face_detections</item> 
          <item>draw_line</item> 
+         <item>draw_solid_polygon</item> 
+         <item>draw_solid_convex_polygon</item> 
          <item>draw_solid_circle</item> 
          <item>draw_surf_points</item> 
          <item>draw_rectangle</item> 
@@ -1360,6 +1363,33 @@
    <!-- ************************************************************************* -->
       
       <component>
+         <name>draw_solid_polygon</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/draw_abstract.h</spec_file>
+         <description>        
+            Draws a filled in polygon onto an image.
+         </description>
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>draw_solid_convex_polygon</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/draw_abstract.h</spec_file>
+         <description>        
+            Draws a filled in polygon onto an image. Also filling in part
+            of the convex hull of the polygon as well. Specifically,
+            fills in any row of pixels falling horizontally between two parts of 
+            the polygon.
+
+            <p>Supports alpha blending</p>
+         </description>
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>render_face_detections</name>
          <file>dlib/image_processing/render_face_detections.h</file>
          <spec_file link="true">dlib/image_processing/render_face_detections_abstract.h</spec_file>
@@ -1984,6 +2014,18 @@
          <examples>
             <example>dnn_yolo_train_ex.cpp.html</example>
          </examples>
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>insert_image_chip</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/interpolation_abstract.h</spec_file>
+         <description>        
+            This function does the opposite of <a href="#extract_image_chips">extract_image_chips</a>.
+            That is, it takes a cropped image and draws it into a larger image in some user defined location.
          </description>
       </component>
 

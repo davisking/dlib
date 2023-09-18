@@ -51,10 +51,6 @@
       <section>
          <name>Objects</name>
          <item>static_set</item> 
-         <item>any</item> 
-         <item>any_trainer</item> 
-         <item>any_function</item> 
-         <item>any_decision_function</item> 
          <item>array</item> 
          <item>array2d</item> 
          <item>binary_search_tree</item> 
@@ -77,7 +73,20 @@
          <item>circular_buffer</item>
          <item>tuple</item>
          <item>reference_wrapper</item>
-         
+         <item>optional</item>
+      </section>
+
+      <section>
+         <name>Type Erasure</name>
+         <item>any</item> 
+         <item>any_trainer</item> 
+         <item>any_function</item> 
+         <item>any_decision_function</item> 
+         <item>storage_heap</item> 
+         <item>storage_stack</item> 
+         <item>storage_sbo</item> 
+         <item>storage_shared</item> 
+         <item>storage_view</item> 
       </section>
 
       <section>
@@ -512,6 +521,102 @@
    <!-- ************************************************************************* -->
       
       <component>
+         <name>storage_heap</name>
+         <file>dlib/any.h</file>
+         <spec_file link="true">dlib/any/storage.h</spec_file>
+         <description>
+                This object is basically a type-safe version of a void*.  In particular,
+                it is a container which can contain only one object but the object may
+                be of any type.  Importantly, this container stores the object <b>on the 
+                heap</b>.
+
+               <p>
+                  This class is meant to be a lower level tool used to implement other 
+                  higher level containers or APIs that depend on type erasure.
+               </p>
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>storage_stack</name>
+         <file>dlib/any.h</file>
+         <spec_file link="true">dlib/any/storage.h</spec_file>
+         <description>
+                This object is basically a type-safe version of a void*.  In particular,
+                it is a container which can contain only one object but the object may
+                be of any type.  Importantly, this container stores the object <b>on the 
+                stack</b>.
+
+               <p>
+                  This class is meant to be a lower level tool used to implement other 
+                  higher level containers or APIs that depend on type erasure.
+               </p>
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>storage_sbo</name>
+         <file>dlib/any.h</file>
+         <spec_file link="true">dlib/any/storage.h</spec_file>
+         <description>
+                This object is basically a type-safe version of a void*.  In particular,
+                it is a container which can contain only one object but the object may
+                be of any type.  This container uses the <b>small buffer optimization</b>
+                to store small objects on the stack, but larger objects on the heap.
+
+               <p>
+                  This class is meant to be a lower level tool used to implement other 
+                  higher level containers or APIs that depend on type erasure.
+               </p>
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>storage_shared</name>
+         <file>dlib/any.h</file>
+         <spec_file link="true">dlib/any/storage.h</spec_file>
+         <description>
+                This object is basically a type-safe version of a void*.  In particular,
+                it is a container which can contain only one object but the object may
+                be of any type.  This container stores the object it contains in a <tt>std::shared_ptr</tt>,
+                and therefore has reference rather than value semantics, as well as storage on the heap.
+
+               <p>
+                  This class is meant to be a lower level tool used to implement other 
+                  higher level containers or APIs that depend on type erasure.
+               </p>
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>storage_view</name>
+         <file>dlib/any.h</file>
+         <spec_file link="true">dlib/any/storage.h</spec_file>
+         <description>
+                This object is basically a type-safe version of a void*.  In particular,
+                it is a container which can contain only one object but the object may
+                be of any type.  This container doesn't actually store the object it contains,
+                rather, it is a non-owning view of that object.  It therefore has reference
+                semantics just as a void* would.
+
+               <p>
+                  This class is meant to be a lower level tool used to implement other 
+                  higher level containers or APIs that depend on type erasure.
+               </p>
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>any</name>
          <file>dlib/any.h</file>
          <spec_file link="true">dlib/any/any_abstract.h</spec_file>
@@ -624,6 +729,18 @@
             <example>thread_function_ex.cpp.html</example>
          </examples>
                
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>optional</name>
+         <file>dlib/optional.h</file>
+         <spec_file>dlib/optional.h</spec_file>
+         <description>
+            This is a standard's compliant backport of <a href="https://en.cppreference.com/w/cpp/utility/optional">std::optional</a> 
+            that works with C++14.  It includes C++23 monadic interfaces
+         </description>
       </component>
       
    <!-- ************************************************************************* -->

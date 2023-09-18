@@ -18,7 +18,7 @@
             make sure that T is either a char or wchar_t type.  You could place the following into your code
             and it would cause the compile to error out when T was set to something other than char or wchar_t.
             <br/>
-            <tt>COMPILE_TIME_ASSERT((is_same_type&lt;T,char&gt;::value || is_same_type&lt;T,wchar_t&gt;::value));</tt>
+            <tt>static_assert(is_same_type&lt;T,char&gt;::value || is_same_type&lt;T,wchar_t&gt;::value, "Should be a char type");</tt>
          </p>
 
    </body>
@@ -29,6 +29,25 @@
     <top>
       <section>
          <name>Objects</name>
+         <item>And</item>
+         <item>are_nothrow_copy_assignable</item>
+         <item>are_nothrow_copy_constructible</item>
+         <item>are_nothrow_move_assignable</item>
+         <item>are_nothrow_move_constructible</item>
+         <item>are_nothrow_swappable</item>
+         <item>callable_traits</item>
+         <item>conjunction</item>
+         <item>is_any_type</item>
+         <item>is_byte</item>
+         <item>is_complete_type</item>
+         <item>is_detected</item>
+         <item>is_nothrow_swappable</item>
+         <item>is_swappable</item>
+         <item>nth_type</item>
+         <item>Or</item>
+         <item>size_</item>
+         <item>types_</item>
+         <item>void_t</item>
          <item>is_pointer_type</item>
          <item>is_const_type</item>
          <item>is_reference_type</item>
@@ -53,7 +72,7 @@
          <item>is_directed_graph</item>
          <item>is_built_in_scalar_type</item>
          <item>promote</item>
-         <item>basic_type</item>
+         <item>remove_cvref_t</item>
          <item>unsigned_type</item> 
          <item>tabs</item> 
          <item>tmin</item> 
@@ -69,14 +88,12 @@
          <item>DLIB_STACK_TRACE_NAMED</item> 
          <item>get_stack_trace</item> 
          <item>DLIB_CASSERT</item> 
-         <item>COMPILE_TIME_ASSERT</item> 
          <item>ASSERT_ARE_SAME_TYPE</item> 
          <item>DLIB_ASSERT_HAS_STANDARD_LAYOUT</item> 
          <item>ASSERT_ARE_NOT_SAME_TYPE</item> 
          <item>_dT</item> 
          <item>is_same_object</item> 
          <item>assign_zero_if_built_in_scalar_type</item>
-         <item>wrap_function</item>
          <item>DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST</item>
       </section>
 
@@ -220,8 +237,8 @@
       
       <component>
          <name>is_convertible</name>
-         <file>dlib/algs.h</file>
-         <spec_file link="true">dlib/algs.h</spec_file>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
          <description>
             This is a template that can be used to determine if one type is convertible 
             into another type.
@@ -246,8 +263,8 @@
 
       <component>
          <name>is_same_type</name>
-         <file>dlib/algs.h</file>
-         <spec_file link="true">dlib/algs.h</spec_file>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
          <description>
             This is a template where is_same_type&lt;T,U&gt;::value == true when T and U are 
             the same type and false otherwise. 
@@ -259,8 +276,8 @@
 
       <component>
          <name>is_float_type</name>
-         <file>dlib/algs.h</file>
-         <spec_file link="true">dlib/algs.h</spec_file>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
          <description>
             This is a template where is_float_type&lt;T&gt;::value == true when T is
             a floating point type (i.e. float, double, or long double) and false otherwise.
@@ -285,8 +302,8 @@
 
       <component>
          <name>is_function</name>
-         <file>dlib/algs.h</file>
-         <spec_file link="true">dlib/algs.h</spec_file>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
          <description>
             This is a template where is_function&lt;T&gt;::value == true when T is 
             a function type.  
@@ -298,8 +315,8 @@
       
       <component>
          <name>is_signed_type</name>
-         <file>dlib/algs.h</file>
-         <spec_file link="true">dlib/algs.h</spec_file>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
          <description>
             This is a template where is_signed_type&lt;T&gt;::value == true when T is
             a signed scalar type and false when it is an unsigned scalar
@@ -312,8 +329,8 @@
       
       <component>
          <name>is_unsigned_type</name>
-         <file>dlib/algs.h</file>
-         <spec_file link="true">dlib/algs.h</spec_file>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
          <description>
             This is a template where is_unsigned_type&lt;T&gt;::value == true when T is
             an unsigned scalar type and false when it is a signed scalar
@@ -339,8 +356,8 @@
       
       <component>
          <name>is_built_in_scalar_type</name>
-         <file>dlib/algs.h</file>
-         <spec_file link="true">dlib/algs.h</spec_file>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
          <description>
             This is a template where is_built_in_scalar_type&lt;T&gt;::value == true when T
             is a built in scalar type such as int, char, float, etc.
@@ -369,15 +386,15 @@
    <!-- ************************************************************************* -->
       
       <component>
-         <name>basic_type</name>
-         <file>dlib/algs.h</file>
-         <spec_file link="true">dlib/algs.h</spec_file>
+         <name>remove_cvref_t</name>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
          <description>
         This is a template that takes a type and strips off any const, volatile, or reference
         qualifiers and gives you back the basic underlying type.  
 
          <p>
-        For example, promote&lt;const int&amp;&gt;::type == int 
+        For example, remove_cvref_t&lt;const int&amp;&gt;::type == int 
          </p>
          </description>
          
@@ -496,8 +513,8 @@
       
       <component>
          <name>is_reference_type</name>
-         <file>dlib/algs.h</file>
-         <spec_file link="true">dlib/algs.h</spec_file>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
          <description>
             This is a template where is_reference_type&lt;T&gt;::value == true when T is a reference 
             type and false otherwise.
@@ -509,8 +526,8 @@
 
       <component>
          <name>is_const_type</name>
-         <file>dlib/algs.h</file>
-         <spec_file link="true">dlib/algs.h</spec_file>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
          <description>
             This is a template where is_const_type&lt;T&gt;::value == true when T is a const 
             type and false otherwise.
@@ -523,15 +540,234 @@
       
       <component>
          <name>is_pointer_type</name>
-         <file>dlib/algs.h</file>
-         <spec_file link="true">dlib/algs.h</spec_file>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
          <description>
             This is a template where is_pointer_type&lt;T&gt;::value == true when T is a pointer 
             type and false otherwise.
          </description>
-         
       </component>
-      
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>And</name>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
+         <description>
+            This template takes a list of bool values and yields their logical and.  E.g.
+            And&lt;true,true,true&gt;::value == true
+            And&lt;true,false,true&gt;::value == false 
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>Or</name>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
+         <description>
+            This template takes a list of bool values and yields their logical or.  E.g.
+            Or&lt;true,true,true&gt;::value == true
+            Or&lt;true,false,true&gt;::value == true 
+            Or&lt;false,false,false&gt;::value == false 
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>are_nothrow_copy_assignable</name>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
+         <description>
+            A type trait class telling you if all the types given to it are no-throw copy assignable.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>are_nothrow_copy_constructible</name>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
+         <description>
+            A type trait class telling you if all the types given to it are no-throw copy constructable.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>are_nothrow_move_assignable</name>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
+         <description>
+            A type trait class telling you if all the types given to it are no-throw move assignable.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>are_nothrow_move_constructible</name>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
+         <description>
+            A type trait class telling you if all the types given to it are no-throw move constructable.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>are_nothrow_swappable</name>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
+         <description>
+            A type trait telling you if a list of types are all no-throw swappable.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>callable_traits</name>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
+         <description>
+            This traits class gives will tell you about the various properties of a 
+            function or otherwise callable type.  Like what it returns, how many
+            arguments it has, and so forth.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>conjunction</name>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
+         <description>
+            Takes a list of type traits and gives you the logical AND of them. 
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>is_any_type</name>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
+         <description>
+            This is a template that tells you if a type appears in a list of other types.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>is_byte</name>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
+         <description>
+            Tells you if a type is one of the C++ byte types (e.g. is is T a char?).
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>is_complete_type</name>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
+         <description>
+            Tells you if a type is a complete type.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>is_detected</name>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
+         <description>
+            This is a convenient tool for testing if a type has some arbitrary property.
+            E.g. you could check if a class type has some particular member function or not.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>is_nothrow_swappable</name>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
+         <description>
+            A type trait telling you if a type can be swapped by a global swap() function.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>is_swappable</name>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
+         <description>
+            A type trait telling you if a type can be swapped by a global swap() function
+            that is declared noexcept.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>nth_type</name>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
+         <description>
+            This is a type trait for getting the n'th argument of a parameter pack.
+            In particular, nth_type&lt;n, some_types...&gt;::type is the nth type in some_types.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>size_</name>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
+         <description>
+            This is a shorthand for making std::integral_constant of type size_t.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>types_</name>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
+         <description>
+            Just a list of types.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>void_t</name>
+         <file>dlib/type_traits.h</file>
+         <spec_file link="true">dlib/type_traits.h</spec_file>
+         <description>
+            Just always the void type.  Is useful in SFINAE expressions when the resulting type doesn't
+            matter and you just need a place to put an expression where SFINAE can take effect.
+         </description>
+      </component>
+
    <!-- ************************************************************************* -->
 
       <component>
@@ -581,22 +817,6 @@
         it is a "standard layout type".  Once we can use C++0x we can change this macro 
         to something that uses the std::is_standard_layout type_traits class.  
         See: http://www2.research.att.com/~bs/C++0xFAQ.html#PODs
-         </description>
-                                 
-      </component>
-            
-   <!-- ************************************************************************* -->
-      
-      <component>
-         <name>COMPILE_TIME_ASSERT</name>
-         <file>dlib/assert.h</file>
-         <spec_file>dlib/assert.h</spec_file>
-         <description>
-      <p>
-            This is a macro function for debugging.  Its form is <tt>COMPILE_TIME_ASSERT(condition that should 
-            be true)</tt>.  The condition must be a compile time constant and if it is false then the compile
-            will fail.
-      </p>
          </description>
                                  
       </component>
@@ -776,20 +996,6 @@ or you can omit the error message and call it like:
             
    <!-- ************************************************************************* -->
       
-      <component>
-         <name>wrap_function</name>
-         <file>dlib/algs.h</file>
-         <spec_file link="true">dlib/algs.h</spec_file>
-         <description>        
-            This is a template that allows you to turn a global function into a 
-            function object.  See the specs for more details. 
-         </description>
-                                 
-      </component>
-            
-
-   <!-- ************************************************************************* -->
-
       <component>
          <name>portability_macros</name>
          <file>dlib/platform.h</file>

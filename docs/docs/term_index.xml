@@ -695,6 +695,7 @@
          <term file="ml.html" name="sigmoid_kernel"                  include="dlib/svm.h"/>
          <term file="ml.html" name="radial_basis_kernel"             include="dlib/svm.h"/>
          <term file="ml.html" name="auto_train_rbf_classifier"       include="dlib/svm.h"/>
+         <term file="ml.html" name="auto_train_multiclass_svm_linear_classifier"       include="dlib/svm.h"/>
 
 
          <term link="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors" name="unsorted sparse vectors"/>
@@ -923,6 +924,7 @@
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="distance"           include="dlib/sparse_vector.h"/>
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="has_unsigned_keys"  include="dlib/sparse_vector.h"/>
 
+         <term file="containers.html" name="optional"                     include="dlib/optional.h"/>
          <term file="containers.html" name="remover"                 include="dlib/interfaces/remover.h"/>
          <term file="containers.html" name="set"                     include="dlib/set.h"/>
          <term file="containers.html" name="stack"                   include="dlib/stack.h"/>
@@ -930,6 +932,12 @@
          <term file="containers.html" name="any_function"            include="dlib/any.h"/>
          <term file="containers.html" name="any_trainer"             include="dlib/any.h"/>
          <term file="containers.html" name="any_decision_function"   include="dlib/any.h"/>
+
+         <term file="containers.html" name="storage_heap"                     include="dlib/any.h"/>
+         <term file="containers.html" name="storage_stack"                     include="dlib/any.h"/>
+         <term file="containers.html" name="storage_sbo"                     include="dlib/any.h"/>
+         <term file="containers.html" name="storage_shared"                     include="dlib/any.h"/>
+         <term file="containers.html" name="storage_view"                     include="dlib/any.h"/>
 
          <term file="metaprogramming.html" name="compile_time_integer_list"          include="dlib/metaprogramming.h"/>
          <term file="metaprogramming.html" name="make_compile_time_integer_range"    include="dlib/metaprogramming.h"/>
@@ -958,19 +966,18 @@
          <term link="other.html#timing code blocks" name="stop"         include="dlib/timing.h"/>
          <term link="other.html#TIME_THIS" name="TIME_THIS_TO"          include="dlib/time_this.h"/>
          <term file="metaprogramming.html" name="_dT"                   include="dlib/algs.h"/>
-         <term file="metaprogramming.html" name="is_pointer_type"       include="dlib/algs.h"/>
-         <term file="metaprogramming.html" name="is_const_type"         include="dlib/algs.h"/>
-         <term file="metaprogramming.html" name="is_reference_type"     include="dlib/algs.h"/>
-         <term file="metaprogramming.html" name="is_same_type"          include="dlib/algs.h"/>
+         <term file="metaprogramming.html" name="is_pointer_type"       include="dlib/type_traits.h"/>
+         <term file="metaprogramming.html" name="is_const_type"         include="dlib/type_traits.h"/>
+         <term file="metaprogramming.html" name="is_reference_type"     include="dlib/type_traits.h"/>
+         <term file="metaprogramming.html" name="is_same_type"          include="dlib/type_traits.h"/>
          <term file="metaprogramming.html" name="DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST"          include="dlib/algs.h"/>
-         <term file="metaprogramming.html" name="is_float_type"         include="dlib/algs.h"/>
+         <term file="metaprogramming.html" name="is_float_type"         include="dlib/type_traits.h"/>
          <term file="metaprogramming.html" name="is_same_object"        include="dlib/algs.h"/>
-         <term file="metaprogramming.html" name="is_convertible"        include="dlib/algs.h"/>
+         <term file="metaprogramming.html" name="is_convertible"        include="dlib/type_traits.h"/>
          <term file="metaprogramming.html" name="is_complex"            include="dlib/matrix.h"/>
-         <term file="metaprogramming.html" name="is_function"           include="dlib/algs.h"/>
-         <term file="metaprogramming.html" name="wrap_function"         include="dlib/algs.h"/>
-         <term file="metaprogramming.html" name="is_signed_type"        include="dlib/algs.h"/>
-         <term file="metaprogramming.html" name="is_unsigned_type"      include="dlib/algs.h"/>
+         <term file="metaprogramming.html" name="is_function"           include="dlib/type_traits.h"/>
+         <term file="metaprogramming.html" name="is_signed_type"        include="dlib/type_traits.h"/>
+         <term file="metaprogramming.html" name="is_unsigned_type"      include="dlib/type_traits.h"/>
          <term file="metaprogramming.html" name="noncopyable"           include="dlib/noncopyable.h"/>
          <term link="metaprogramming.html#portability_macros" name="portability macros"/>
          <term file="metaprogramming.html" name="static_switch"         include="dlib/algs.h"/>
@@ -983,10 +990,32 @@
          <term file="metaprogramming.html" name="is_std_vector"         include="dlib/is_kind.h"/>
          <term file="metaprogramming.html" name="is_pair"               include="dlib/is_kind.h"/>
          <term file="metaprogramming.html" name="is_directed_graph"     include="dlib/is_kind.h"/>
-         <term file="metaprogramming.html" name="is_built_in_scalar_type" include="dlib/algs.h"/>
+         <term file="metaprogramming.html" name="is_built_in_scalar_type" include="dlib/type_traits.h"/>
          <term file="metaprogramming.html" name="promote"               include="dlib/algs.h"/>
-         <term file="metaprogramming.html" name="basic_type"            include="dlib/algs.h"/>
+         <term file="metaprogramming.html" name="basic_type"            include="dlib/type_traits.h"/>
+         <term file="metaprogramming.html" name="remove_cvref_t"            include="dlib/type_traits.h"/>
          <term file="metaprogramming.html" name="assign_zero_if_built_in_scalar_type" include="dlib/algs.h"/>
+
+         <term file="metaprogramming.html" name="And" include="dlib/type_traits.h"/>
+         <term file="metaprogramming.html" name="are_nothrow_copy_assignable" include="dlib/type_traits.h"/>
+         <term file="metaprogramming.html" name="are_nothrow_copy_constructible" include="dlib/type_traits.h"/>
+         <term file="metaprogramming.html" name="are_nothrow_move_assignable" include="dlib/type_traits.h"/>
+         <term file="metaprogramming.html" name="are_nothrow_move_constructible" include="dlib/type_traits.h"/>
+         <term file="metaprogramming.html" name="are_nothrow_swappable" include="dlib/type_traits.h"/>
+         <term file="metaprogramming.html" name="callable_traits" include="dlib/type_traits.h"/>
+         <term file="metaprogramming.html" name="conjunction" include="dlib/type_traits.h"/>
+         <term file="metaprogramming.html" name="is_any_type" include="dlib/type_traits.h"/>
+         <term file="metaprogramming.html" name="is_byte" include="dlib/type_traits.h"/>
+         <term file="metaprogramming.html" name="is_complete_type" include="dlib/type_traits.h"/>
+         <term file="metaprogramming.html" name="is_detected" include="dlib/type_traits.h"/>
+         <term file="metaprogramming.html" name="is_nothrow_swappable" include="dlib/type_traits.h"/>
+         <term file="metaprogramming.html" name="is_swappable" include="dlib/type_traits.h"/>
+         <term file="metaprogramming.html" name="nth_type" include="dlib/type_traits.h"/>
+         <term file="metaprogramming.html" name="Or" include="dlib/type_traits.h"/>
+         <term file="metaprogramming.html" name="size_" include="dlib/type_traits.h"/>
+         <term file="metaprogramming.html" name="types_" include="dlib/type_traits.h"/>
+         <item file="metaprogramming.html" name="void_t" include="dlib/type_traits.h"/>
+
 
 
          <term link="dlib/platform.h.html" name="DLIB_POSIX"     include="dlib/platform.h"/>
@@ -1292,7 +1321,12 @@
             <term link="imaging.html#draw_solid_circle" name="for image/array2d objects"    include="dlib/image_transforms.h"/>
          </term>
 
-         <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_solid_convex_polygon" include="dlib/gui_widgets.h"/>
+         <term name="draw_solid_convex_polygon">
+            <term link="dlib/gui_widgets/canvas_drawing_abstract.h.html#draw_solid_convex_polygon" name="for the GUI canvas object" include="dlib/gui_widgets.h"/>
+            <term link="imaging.html#draw_solid_convex_polygon" name="for image/array2d objects"    include="dlib/image_transforms.h"/>
+         </term>
+         <term file="imaging.html" name="draw_solid_polygon"                    include="dlib/image_transforms.h"/>
+
          <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_button_down" include="dlib/gui_widgets.h"/>
          <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_sunken_rectangle" include="dlib/gui_widgets.h"/>
          <term file="dlib/gui_widgets/canvas_drawing_abstract.h.html" name="draw_button_up" include="dlib/gui_widgets.h"/>
@@ -1451,12 +1485,16 @@
 
          <term file="containers.html" name="array2d"                    include="dlib/array2d.h"/>
 
-         <term file="dlib/invoke.h.html" name="invoke"            include="dlib/invoke.h"/>
-         <term file="dlib/invoke.h.html" name="invoke_r"            include="dlib/invoke.h"/>
-         <term file="dlib/invoke.h.html" name="apply"            include="dlib/invoke.h"/>
-         <term file="dlib/invoke.h.html" name="invoke_result"            include="dlib/invoke.h"/>
-         <term file="dlib/invoke.h.html" name="is_invocable"            include="dlib/invoke.h"/>
-         <term file="dlib/invoke.h.html" name="make_from_tuple"            include="dlib/invoke.h"/>
+         <term file="dlib/functional.h.html" name="invoke"            include="dlib/functional.h"/>
+         <term file="dlib/functional.h.html" name="invoke_result"            include="dlib/functional.h"/>
+         <term file="dlib/functional.h.html" name="invoke_r"            include="dlib/functional.h"/>
+         <term file="dlib/functional.h.html" name="apply"            include="dlib/functional.h"/>
+         <term file="dlib/functional.h.html" name="invoke_result"            include="dlib/functional.h"/>
+         <term file="dlib/functional.h.html" name="is_invocable"            include="dlib/functional.h"/>
+         <term file="dlib/functional.h.html" name="is_invocable_r"            include="dlib/functional.h"/>
+         <term file="dlib/functional.h.html" name="make_from_tuple"            include="dlib/functional.h"/>
+         <term file="dlib/functional.h.html" name="bind_front"            include="dlib/functional.h"/>
+         <term file="dlib/functional.h.html" name="bind_back"            include="dlib/functional.h"/>
 
          <term file="containers.html" name="hash_map"                   include="dlib/hash_map.h"/>
          <term file="containers.html" name="hash_set"                   include="dlib/hash_set.h"/>
@@ -1582,6 +1620,7 @@
          <term file="imaging.html" name="rotate_image"            include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="resize_image"            include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="letterbox_image"         include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="insert_image_chip"       include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="extract_image_chips"     include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="extract_image_4points"   include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="random_cropper"          include="dlib/image_transforms.h"/>
@@ -1651,6 +1690,10 @@
          <term file="dlib/image_processing/generic_image.h.html" name="image_view"        include="dlib/image_processing.h"/>
          <term file="dlib/image_processing/generic_image.h.html" name="const_image_view"  include="dlib/image_processing.h"/>
          <term file="dlib/image_processing/generic_image.h.html" name="make_image_view"   include="dlib/image_processing.h"/>
+         <term file="dlib/image_processing/generic_image.h.html" name="is_rgb_image"      include="dlib/image_processing.h"/>
+         <term file="dlib/image_processing/generic_image.h.html" name="is_color_space_cartesian_image"      include="dlib/image_processing.h"/>
+         <term file="dlib/image_processing/generic_image.h.html" name="is_grayscale_image"      include="dlib/image_processing.h"/>
+         <term file="dlib/image_processing/generic_image.h.html" name="is_image_type"      include="dlib/image_processing.h"/>
 
          <term file="dlib/image_processing/box_overlap_testing_abstract.h.html" name="overlaps_any_box"        include="dlib/image_processing.h"/>
          <term file="dlib/image_processing/box_overlap_testing_abstract.h.html" name="box_intersection_over_union"        include="dlib/image_processing.h"/>
@@ -1738,6 +1781,7 @@
          <term file="other.html" name="unserialize"                  include="dlib/vectorstream.h"/>
          <term file="other.html" name="member_function_pointer"      include="dlib/member_function_pointer.h"/>
          <term file="other.html" name="make_mfp"                     include="dlib/member_function_pointer.h"/>
+         <term file="other.html" name="wrap_function"         include="dlib/algs.h"/>
          <term file="other.html" name="bound_function_pointer"       include="dlib/bound_function_pointer.h"/>
          <term file="other.html" name="memory_manager_stateless"     include="dlib/memory_manager_stateless.h"/>
          <term file="other.html" name="pipe"                         include="dlib/pipe.h"/>
@@ -1811,7 +1855,8 @@
          <term file="parsing.html" name="split_on_last"              include="dlib/string.h"/>
          <term file="parsing.html" name="unichar"                    include="dlib/unicode.h"/>
          <term file="parsing.html" name="ustring"                    include="dlib/unicode.h"/>
-         <term file="parsing.html" name="convert_utf8_to_utf32"      include="dlib/unicode.h"/>
+         <term file="parsing.html" name="convert_to_utf32"      include="dlib/unicode.h"/>
+         <term file="parsing.html" name="convert_mbstring_to_wstring"      include="dlib/unicode.h"/>
          <term file="parsing.html" name="is_combining_char"          include="dlib/unicode.h"/>
          <term file="parsing.html" name="strings_equal_ignore_case"  include="dlib/string.h"/>
          <term file="dlib/unicode/unicode_abstract.h.html" name="invalid_utf8_error" include="dlib/unicode.h"/>

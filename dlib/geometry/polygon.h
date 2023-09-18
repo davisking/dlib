@@ -38,7 +38,7 @@ namespace dlib
         double area() const { return polygon_area(points); }
 
         template <typename alloc>
-        void get_convex_shape (
+        void get_left_and_right_bounds (
             const long top,
             const long bottom,
             std::vector<double, alloc>& left_boundary,
