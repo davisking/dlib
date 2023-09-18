@@ -330,7 +330,7 @@ namespace dlib
                       I.e. if this object contains the type T then this returns std::type_index{typeid(T)}.
             !*/
             {
-                DLIB_ASSERT(!is_empty<T>());
+                DLIB_ASSERT(!this->is_empty());
                 return type_id_();
             }
 
@@ -520,7 +520,7 @@ namespace dlib
                       I.e. if this object contains the type T then this returns std::type_index{typeid(T)}.
             !*/
             {
-                DLIB_ASSERT(!is_empty<T>());
+                DLIB_ASSERT(!this->is_empty());
                 return type_id_();
             }
 
@@ -768,7 +768,7 @@ namespace dlib
                       I.e. if this object contains the type T then this returns std::type_index{typeid(T)}.
             !*/
             {
-                DLIB_ASSERT(!is_empty<T>());
+                DLIB_ASSERT(!this->is_empty());
                 return type_id_();
             }
 
@@ -866,7 +866,7 @@ namespace dlib
                       I.e. if this object contains the type T then this returns std::type_index{typeid(T)}.
             !*/
             {
-                DLIB_ASSERT(!is_empty<T>());
+                DLIB_ASSERT(!this->is_empty());
                 return type_id_();
             }
 
@@ -960,7 +960,7 @@ namespace dlib
                       I.e. if this object contains the type T then this returns std::type_index{typeid(T)}.
             !*/
             {
-                DLIB_ASSERT(!is_empty<T>());
+                DLIB_ASSERT(!this->is_empty());
                 return type_id_();
             }
 
