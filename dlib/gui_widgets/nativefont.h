@@ -345,14 +345,13 @@ namespace nativefont
 
                         cmap = DefaultColormap(d, DefaultScreen(d));
                     }
-                    char fontset[256];
+                    char fontset[256] = {0};
                     {
-                        char *p = fontset;
-                        p += sprintf(fontset, "-*-*-%s-%c-normal--%d-*-*-*-%c",
-                                     bold ? "bold" : "medium", italic ? 'i' : 'r', height_want, fixed ? 'c' : 'p');
+                        int offset = snprintf(fontset, sizeof(fontset), "-*-*-%s-%c-normal--%d-*-*-*-%c",
+                                              bold ? "bold" : "medium", italic ? 'i' : 'r', height_want, fixed ? 'c' : 'p');
                         if (fixed){
-                            sprintf(p, ",-*-*-%s-%c-normal--%d-*-*-*-m",
-                                    bold ? "bold" : "medium", italic ? 'i' : 'r', height_want);
+                            snprintf(&fontset[offset], sizeof(fontset) - offset, ",-*-*-%s-%c-normal--%d-*-*-*-m",
+                                     bold ? "bold" : "medium", italic ? 'i' : 'r', height_want);
                         }
                     }
                     bool equal_font;
