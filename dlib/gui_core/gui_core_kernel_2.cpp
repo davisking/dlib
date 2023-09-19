@@ -1614,9 +1614,9 @@ namespace dlib
             char **mlist;
             int mcount;
             char *def_str;
-            char fontset[256];
+            char fontset[256] = {0};
             const long native_font_height = 12;
-            sprintf(fontset, "-*-*-medium-r-normal--%lu-*-*-*-", native_font_height);
+            snprintf(fontset, sizeof(fontset), "-*-*-medium-r-normal--%lu-*-*-*-", native_font_height);
             x11_stuff.fs = XCreateFontSet(x11_stuff.globals->disp, fontset, &mlist, &mcount, &def_str);
             xpoint.x = 0;
             xpoint.y = 0;
