@@ -88,15 +88,11 @@ int main(int argc, const char** argv)
         shape_predictor pose_model;
         deserialize("shape_predictor_68_face_landmarks.dat") >> pose_model;
 
-        ffmpeg::frame frame;
         array2d<rgb_pixel> img;
 
         // Grab and process frames until the main window is closed by the user.
-        while(cap.read(frame) && !win.is_closed())
+        while(cap.read(img) && !win.is_closed())
         {
-            // Convert the frame object into a dlib image object
-            convert(frame, img);
-
             // Detect faces 
             std::vector<rectangle> faces = detector(img);
             // Find the pose of each face.
