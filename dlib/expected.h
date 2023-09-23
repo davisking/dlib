@@ -589,28 +589,28 @@ namespace dlib
             constexpr T& value() & 
             {
                 if (!has_value())
-                    throw bad_expected_access<std::decay_t<E>>(dlib::as_const(this->err.error()));
+                    throw bad_expected_access<std::decay_t<E>>(dlib::as_const(error()));
                 return **this;
             }
 
             constexpr const T& value() const & 
             {
                 if (!has_value())
-                    throw bad_expected_access<std::decay_t<E>>(dlib::as_const(this->err.error()));
+                    throw bad_expected_access<std::decay_t<E>>(dlib::as_const(error()));
                 return **this;
             }
 
             constexpr T&& value() && 
             {
                 if (!has_value())
-                    throw bad_expected_access<std::decay_t<E>>(std::move(this->err.error()));
+                    throw bad_expected_access<std::decay_t<E>>(std::move(error()));
                 return std::move(**this);
             }
 
             constexpr const T&& value() const && 
             {
                 if (!has_value())
-                    throw bad_expected_access<std::decay_t<E>>(std::move(this->err.error()));
+                    throw bad_expected_access<std::decay_t<E>>(std::move(error()));
                 return std::move(**this);
             }
 
@@ -771,13 +771,13 @@ namespace dlib
             constexpr void value() const &
             {
                 if (!has_value())
-                    throw bad_expected_access<std::decay_t<E>>(dlib::as_const(this->err.error()));
+                    throw bad_expected_access<std::decay_t<E>>(dlib::as_const(error()));
             }
 
             constexpr void value() &&
             {
                 if (!has_value())
-                    throw bad_expected_access<std::decay_t<E>>(std::move(this->err.error()));
+                    throw bad_expected_access<std::decay_t<E>>(std::move(error()));
             }
 
             constexpr void emplace() noexcept
