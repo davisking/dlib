@@ -740,7 +740,7 @@ namespace dlib
                 }
             }  
 
-            constexpr void swap_(expected_operations& other)
+            void swap_(expected_operations& other)
             {
                 T temp{std::move(**this)};
                 this->destruct_value();
@@ -1530,7 +1530,11 @@ namespace dlib
         if (lhs.has_value() != rhs.has_value())
             return false;
         
-        return lhs.has_value() ? *lhs == *rhs : lhs.error() == rhs.error();
+        else if (lhs.has_value())
+            return *lhs == *rhs;
+
+        else
+            return lhs.error() == rhs.error();
     }
 
     template <class E, class F>
@@ -1538,20 +1542,66 @@ namespace dlib
     {
         if (lhs.has_value() != rhs.has_value())
             return false;
-        
-        return lhs.has_value() || lhs.error() == rhs.error();
+
+        else if (lhs.has_value())
+            return true;
+
+        else
+            return lhs.error() == rhs.error();
     }
 
-    template <class T, class E, class U, std::enable_if_t<!is_specialization_of<U, dlib::unexpected>::value, bool> = true>
+    template <class T, class E, class U, class F>
+    constexpr bool operator!=(const dlib::expected<T, E> &lhs, const dlib::expected<U, F> &rhs)
+    {
+        return !(lhs == rhs);
+    }
+
+    template <
+      class T, 
+      class E, 
+      class U, 
+      std::enable_if_t<!is_specialization_of<U, dlib::unexpected>::value, bool> = true,
+      std::enable_if_t<!is_specialization_of<U, dlib::expected>::value, bool> = true
+    >
     constexpr bool operator==(const dlib::expected<T, E> &x, const U &val)
     {
         return x.has_value() && static_cast<bool>(*x == val);
     }
 
-    template <class T, class E, class U, std::enable_if_t<!is_specialization_of<U, dlib::unexpected>::value, bool> = true>
+    template <
+      class T, 
+      class E, 
+      class U, 
+      std::enable_if_t<!is_specialization_of<U, dlib::unexpected>::value, bool> = true,
+      std::enable_if_t<!is_specialization_of<U, dlib::expected>::value, bool> = true
+    >
     constexpr bool operator==(const U &val, const dlib::expected<T, E> &x)
     {
-        return x.has_value() && static_cast<bool>(*x == val);
+        return (x == val);
+    }
+
+    template <
+      class T, 
+      class E, 
+      class U, 
+      std::enable_if_t<!is_specialization_of<U, dlib::unexpected>::value, bool> = true,
+      std::enable_if_t<!is_specialization_of<U, dlib::expected>::value, bool> = true
+    >
+    constexpr bool operator!=(const dlib::expected<T, E> &x, const U &val)
+    {
+        return !(x == val);
+    }
+
+    template <
+      class T, 
+      class E, 
+      class U, 
+      std::enable_if_t<!is_specialization_of<U, dlib::unexpected>::value, bool> = true,
+      std::enable_if_t<!is_specialization_of<U, dlib::expected>::value, bool> = true
+    >
+    constexpr bool operator!=(const U &val, const dlib::expected<T, E> &x)
+    {
+        return !(x == val);
     }
 
     template <class T, class E, class E2>
@@ -1561,9 +1611,21 @@ namespace dlib
     }
 
     template <class T, class E, class E2>
+    constexpr bool operator!=(const dlib::expected<T, E> &x, const dlib::unexpected<E2> &e)
+    {
+        return !(x == e);
+    }
+
+    template <class T, class E, class E2>
     constexpr bool operator==(const dlib::unexpected<E2> &e, const dlib::expected<T, E> &x) 
     {
-        return !x.has_value() && static_cast<bool>(x.error() == e.error());
+        return x == e;
+    }
+
+    template <class T, class E, class E2>
+    constexpr bool operator!=(const dlib::unexpected<E2> &e, const dlib::expected<T, E> &x) 
+    {
+        return !(e == x);
     }
 
 // ---------------------------------------------------------------------------------------------------

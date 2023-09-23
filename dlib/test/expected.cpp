@@ -2184,7 +2184,7 @@ namespace
                     : _destructor_called(destructor_called), _val(42) {}
                 constexpr payload_emplace(std::initializer_list<int>&, bool& destructor_called, convertible) noexcept
                     : _destructor_called(destructor_called), _val(1337) {}
-                constexpr ~payload_emplace() {
+                ~payload_emplace() {
                     _destructor_called = true;
                 }
 
@@ -2885,6 +2885,14 @@ namespace
 
             int _val = 0;
         };
+
+        template <
+          bool nothrowComparable
+        >
+        constexpr bool operator==(int val, const payload_equality<nothrowComparable>& rhs)
+        {
+            return val == rhs._val;
+        }
 
         template <
           bool nothrowComparable
