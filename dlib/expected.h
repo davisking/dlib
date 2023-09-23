@@ -38,10 +38,7 @@ namespace dlib
     namespace expected_details
     {
         template<class E>
-        struct is_unexpected_type : std::false_type{};
-
-        template<class E>
-        struct is_unexpected_type<unexpected<E>> : std::true_type{};
+        using is_unexpected_type = is_specialization_of<E,unexpected>; 
     }
 
 // ---------------------------------------------------------------------------------------------------
@@ -443,12 +440,6 @@ namespace dlib
 
 // ---------------------------------------------------------------------------------------------------
 
-        static constexpr uint8_t IS_EMPTY{0};   // Technically expected<T,E> can never be valueless, but one of the base classes can.
-        static constexpr uint8_t IS_VAL{1};
-        static constexpr uint8_t IS_ERROR{2};
-
-// ---------------------------------------------------------------------------------------------------
-
         template <
           class T, 
           class E,
@@ -463,7 +454,7 @@ namespace dlib
                 if (is_val)
                     val.~T();
                 else
-                    error.~unexpected<E>();
+                    err.~unexpected<E>();
             }
 
             constexpr expected_base() noexcept(std::is_nothrow_default_constructible<T>::value)
@@ -483,10 +474,10 @@ namespace dlib
 
             template<class ...U>
             constexpr expected_base(unexpect_t, U&& ...u) noexcept(std::is_nothrow_constructible<E,U...>::value)
-            : error(in_place, std::forward<U>(u)...), is_val{false} 
+            : err(in_place, std::forward<U>(u)...), is_val{false} 
             {}    
 
-            union {T val; unexpected<E> error;};
+            union {T val; unexpected<E> err;};
             bool is_val{true};
         };
 
@@ -510,10 +501,10 @@ namespace dlib
 
             template<class ...U>
             constexpr expected_base(unexpect_t, U&& ...u) noexcept(std::is_nothrow_constructible<E,U...>::value)
-            : error{in_place, std::forward<U>(u)...}, is_val{false} 
+            : err{in_place, std::forward<U>(u)...}, is_val{false} 
             {}  
 
-            union {T val; unexpected<E> error;};
+            union {T val; unexpected<E> err;};
             bool is_val{true};
         };
 
@@ -524,7 +515,7 @@ namespace dlib
             ~expected_base()
             {
                 if (!is_val)
-                    error.~unexpected<E>();
+                    err.~unexpected<E>();
             }
 
             constexpr expected_base() noexcept
@@ -542,10 +533,10 @@ namespace dlib
 
             template<class ...U>
             constexpr expected_base(unexpect_t, U&& ...u) noexcept(std::is_nothrow_constructible<E,U...>::value)
-            : error{in_place, std::forward<U>(u)...}, is_val{false} 
+            : err{in_place, std::forward<U>(u)...}, is_val{false} 
             {}  
 
-            union {unexpected<E> error;};
+            union {unexpected<E> err;};
             bool is_val{true};
         };
 
@@ -568,10 +559,10 @@ namespace dlib
 
             template<class ...U>
             constexpr expected_base(unexpect_t, U&& ...u) noexcept(std::is_nothrow_constructible<E,U...>::value)
-            : error{in_place, std::forward<U>(u)...}, is_val{false} 
+            : err{in_place, std::forward<U>(u)...}, is_val{false} 
             {}  
 
-            union {unexpected<E> error;};
+            union {unexpected<E> err;};
             bool is_val{true};
         };
 
@@ -588,34 +579,38 @@ namespace dlib
             constexpr const T&  operator*() const&  noexcept { return this->val; }
             constexpr T&&       operator*() &&      noexcept { return std::move(this->val); }
             constexpr const T&& operator*() const&& noexcept { return std::move(this->val); }
-            constexpr const T*  operator->() const  noexcept { return &this->val; }
-            constexpr T*        operator->()        noexcept { return &this->val; }
+            constexpr const T*  operator->() const  noexcept { return std::addressof(this->val); }
+            constexpr T*        operator->()        noexcept { return std::addressof(this->val); }
+            constexpr E&        error() &       noexcept { return this->err.error(); }
+            constexpr const E&  error() const&  noexcept { return this->err.error(); }
+            constexpr E&&       error() &&      noexcept { return std::move(this->err.error()); }
+            constexpr const E&& error() const&& noexcept { return std::move(this->err.error()); }
 
             constexpr T& value() & 
             {
                 if (!has_value())
-                    throw bad_expected_access<std::decay_t<E>>(dlib::as_const(this->error.error()));
+                    throw bad_expected_access<std::decay_t<E>>(dlib::as_const(this->err.error()));
                 return **this;
             }
 
             constexpr const T& value() const & 
             {
                 if (!has_value())
-                    throw bad_expected_access<std::decay_t<E>>(dlib::as_const(this->error.error()));
+                    throw bad_expected_access<std::decay_t<E>>(dlib::as_const(this->err.error()));
                 return **this;
             }
 
             constexpr T&& value() && 
             {
                 if (!has_value())
-                    throw bad_expected_access<std::decay_t<E>>(std::move(this->error.error()));
+                    throw bad_expected_access<std::decay_t<E>>(std::move(this->err.error()));
                 return std::move(**this);
             }
 
             constexpr const T&& value() const && 
             {
                 if (!has_value())
-                    throw bad_expected_access<std::decay_t<E>>(std::move(this->error.error()));
+                    throw bad_expected_access<std::decay_t<E>>(std::move(this->err.error()));
                 return std::move(**this);
             }
 
@@ -647,7 +642,7 @@ namespace dlib
               class... Args,
               std::enable_if_t<std::is_nothrow_constructible<T, std::initializer_list<U>&, Args...>::value, bool> = true
             >
-            constexpr T& emplace( std::initializer_list<U>& il, Args&&... args ) noexcept
+            constexpr T& emplace( std::initializer_list<U> il, Args&&... args ) noexcept
             {
                 this->destruct();
                 this->construct_value(il, std::forward<Args>(args)...);
@@ -662,7 +657,7 @@ namespace dlib
 
             constexpr void destruct_error() noexcept(std::is_nothrow_destructible<E>::value)
             {
-                this->error.~unexpected<E>();
+                this->err.~unexpected<E>();
             }
 
             constexpr void destruct() noexcept(std::is_nothrow_destructible<T>::value &&
@@ -684,17 +679,17 @@ namespace dlib
             template <class... U> 
             constexpr void construct_error(U&&... u) noexcept(std::is_nothrow_constructible<E,U...>::value)
             {
-                new (std::addressof(this->error)) unexpected<E>(std::forward<U>(u)...);
+                new (std::addressof(this->err)) unexpected<E>(std::forward<U>(u)...);
                 this->is_val = false;
             }    
 
             template <class Expected>
             constexpr void construct(Expected&& rhs)
             {
-                if (rhs.is_val)
-                    construct_value(std::forward<Expected>(rhs).val);
+                if (rhs.has_value())
+                    construct_value(*std::forward<Expected>(rhs));
                 else
-                    construct_error(std::forward<Expected>(rhs).error.error());
+                    construct_error(std::forward<Expected>(rhs).error());
             }        
 
             template<class Expected>
@@ -702,8 +697,8 @@ namespace dlib
             {
                 // double parentheses in decltype(()) so that we evaluate decltype of "expression", 
                 // not "member variable access". This is important, otherwise you don't get the exact CV-REf qualifiers.
-                using TF = decltype((std::forward<Expected>(rhs).val)); 
-                using EF = decltype((std::forward<Expected>(rhs).error.error()));
+                using TF = decltype((*std::forward<Expected>(rhs))); 
+                using EF = decltype((std::forward<Expected>(rhs).error()));
 
                 if (this->is_val && rhs.is_val) 
                 {
@@ -711,12 +706,12 @@ namespace dlib
                 }
                 else if (!this->is_val && !rhs.is_val)
                 {
-                    this->error = std::forward<Expected>(rhs).error; 
+                    this->error() = std::forward<Expected>(rhs).error(); 
                 }
                 else if (this->is_val && !rhs.is_val)
                 {
                     destruct_value();
-                    construct_error(std::forward<Expected>(rhs).error);
+                    construct_error(std::forward<Expected>(rhs).error());
                 }
                 else if (!this->is_val && rhs.is_val)
                 {
@@ -731,7 +726,7 @@ namespace dlib
                             construct_value(std::move(tmp));
                         }
                         ,[&](false_t, false_t, auto _) {
-                            auto tmp = std::move(this->error);
+                            auto tmp = std::move(this->err);
                             destruct_error();
 
                             try {
@@ -744,6 +739,20 @@ namespace dlib
                     );
                 }
             }  
+
+            constexpr void swap_(expected_operations& other)
+            {
+                T temp{std::move(**this)};
+                this->destruct_value();
+                try {
+                    this->construct_error(std::move(other).error());
+                    other.destruct_error();
+                    other.construct_value(std::move(temp));
+                } catch(...) {
+                    this->construct_value(std::move(temp));
+                    throw;
+                }
+            }
         };
 
         template <class E>
@@ -754,23 +763,27 @@ namespace dlib
 
             constexpr bool has_value() const noexcept { return this->is_val; }
             constexpr void operator*() const noexcept {}
+            constexpr E&        error() &       noexcept { return this->err.error(); }
+            constexpr const E&  error() const&  noexcept { return this->err.error(); }
+            constexpr E&&       error() &&      noexcept { return std::move(this->err.error()); }
+            constexpr const E&& error() const&& noexcept { return std::move(this->err.error()); }
 
             constexpr void value() const &
             {
                 if (!has_value())
-                    throw bad_expected_access<std::decay_t<E>>(dlib::as_const(this->error.error()));
+                    throw bad_expected_access<std::decay_t<E>>(dlib::as_const(this->err.error()));
             }
 
             constexpr void value() &&
             {
                 if (!has_value())
-                    throw bad_expected_access<std::decay_t<E>>(std::move(this->error.error()));
+                    throw bad_expected_access<std::decay_t<E>>(std::move(this->err.error()));
             }
 
             constexpr void emplace() noexcept
             {
                 this->destruct();
-                this->state = IS_VAL;
+                this->is_val = true;
             }
 
         protected:
@@ -779,7 +792,7 @@ namespace dlib
 
             constexpr void destruct_error() noexcept(std::is_nothrow_destructible<E>::value)
             {
-                this->error.~unexpected<E>();
+                this->err.~unexpected<E>();
             }
 
             constexpr void destruct() noexcept(std::is_nothrow_destructible<E>::value)
@@ -789,19 +802,25 @@ namespace dlib
             }  
 
             template <class... U> 
+            constexpr void construct_value(U&&...) noexcept 
+            {
+                this->is_val = true;
+            }
+
+            template <class... U> 
             constexpr void construct_error(U&&... u) noexcept(std::is_nothrow_constructible<E,U...>::value)
             {
-                new (std::addressof(this->error)) unexpected<E>(std::forward<U>(u)...);
+                new (std::addressof(this->err)) unexpected<E>(std::forward<U>(u)...);
                 this->is_val = false;
             }    
 
             template <class Expected>
             constexpr void construct(Expected&& rhs)
             {
-                if (rhs.is_val)
-                    this->is_val = true;
+                if (rhs.has_value())
+                    construct_value();
                 else
-                    construct_error(std::forward<Expected>(rhs).error.error());
+                    construct_error(std::forward<Expected>(rhs).error());
             }          
 
             template<class Expected>
@@ -810,18 +829,29 @@ namespace dlib
                 /* Good candidate for pattern matching */
                 if (!this->is_val && !rhs.is_val)
                 {
-                    this->error = std::forward<Expected>(rhs).error; 
+                    this->error() = std::forward<Expected>(rhs).error(); 
                 }
                 else if (this->is_val && !rhs.is_val)
                 {
-                    construct_error(std::forward<Expected>(rhs).error);
+                    construct_error(std::forward<Expected>(rhs).error());
                 }
                 else if (!this->is_val && rhs.is_val)
                 {
                     destruct_error();
-                    this->is_val = true;
+                    construct_value();
                 }
-            }  
+            } 
+
+            constexpr void swap_(expected_operations& other)
+            {
+                /* 
+                    switch_() isn't perfect and for some reason, 
+                    the block of code in the other swap_ function 
+                    can't be put in the switch_() function without error.
+                    Boost::hana has a good explanation as to when you have to 
+                    use _. And you can't put it around a type, only objects.
+                */
+            } 
         };
 
 // ---------------------------------------------------------------------------------------------------
@@ -1149,10 +1179,7 @@ namespace dlib
         : base(expected_details::empty_initialization_tag{}),
           ctor(expected_details::empty_initialization_tag{})
         {
-            if (rhs)
-                this->construct_value(*rhs);
-            else
-                this->construct_error(rhs.error());
+            this->construct(rhs);
         }
 
         template <
@@ -1167,10 +1194,7 @@ namespace dlib
         : base(expected_details::empty_initialization_tag{}),
           ctor(expected_details::empty_initialization_tag{})
         {
-            if (rhs)
-                this->construct_value(*rhs);
-            else
-                this->construct_error(rhs.error());
+            this->construct(rhs);
         }
 
         template <
@@ -1185,10 +1209,7 @@ namespace dlib
         : base(expected_details::empty_initialization_tag{}),
           ctor(expected_details::empty_initialization_tag{})
         {
-            if (rhs)
-                this->construct_value(std::move(*rhs));
-            else
-                this->construct_error(std::move(rhs).error());
+            this->construct(std::move(rhs));
         }
 
         template <
@@ -1203,10 +1224,7 @@ namespace dlib
         : base(expected_details::empty_initialization_tag{}),
           ctor(expected_details::empty_initialization_tag{})
         {
-            if (rhs)
-                this->construct_value(std::move(*rhs));
-            else
-                this->construct_error(std::move(rhs).error());
+            this->construct(std::move(rhs));
         }
 
         template< 
@@ -1392,7 +1410,7 @@ namespace dlib
             }
             else
             {
-                error() = e.error();
+                this->error() = e.error();
             }
 
             return *this;
@@ -1412,17 +1430,13 @@ namespace dlib
             }
             else
             {
-                error() = std::move(e).error();
+                this->error() = std::move(e).error();
             }
 
             return *this;
         }
         
         constexpr explicit  operator bool() const noexcept { return base::has_value(); }
-        constexpr E&        error() &       noexcept { return base::error.error(); }
-        constexpr const E&  error() const&  noexcept { return base::error.error(); }
-        constexpr E&&       error() &&      noexcept { return std::move(base::error.error()); }
-        constexpr const E&& error() const&& noexcept { return std::move(base::error.error()); }
 
         template<class F> constexpr auto and_then( F&& f ) &         { return expected_details::and_then(*this, std::forward<F>(f)); }
         template<class F> constexpr auto and_then( F&& f ) const&    { return expected_details::and_then(*this, std::forward<F>(f)); }
@@ -1462,7 +1476,7 @@ namespace dlib
             }
             else if (!this->has_value() && !other.has_value())
             {
-                swap(error(), other.error());
+                swap(this->error(), other.error());
             }
             else if (!this->has_value() && other.has_value())
             {
@@ -1474,12 +1488,13 @@ namespace dlib
                     [&](true_t, auto, auto _) {
                         this->construct_error(std::move(_(other)).error());
                         other.destruct_error();
+                        other.construct_value();
                     },
                     [&](false_t, true_t, auto _) {
                         E temp{std::move(_(other)).error()};
                         other.destruct_error();
                         try {
-                            other.construct_value(std::move(**this));
+                            other.construct_value(std::move(**_(this)));
                             this->destruct_value();
                             this->construct_error(std::move(temp));
                         } catch(...) {
@@ -1488,16 +1503,7 @@ namespace dlib
                         }
                     },
                     [&](false_t, false_t, auto _) {
-                        T temp{std::move(**this)};
-                        this->destruct_value();
-                        try {
-                            this->construct_error(std::move(_(other)).error());
-                            other.destruct_error();
-                            other.construct_value(std::move(temp));
-                        } catch(...) {
-                            this->construct_value(std::move(temp));
-                            throw;
-                        }
+                        this->swap_(_(other));
                     }
                 );
             }
@@ -1536,26 +1542,26 @@ namespace dlib
         return lhs.has_value() || lhs.error() == rhs.error();
     }
 
-    template <class T, class E, class U>
+    template <class T, class E, class U, std::enable_if_t<!is_specialization_of<U, dlib::unexpected>::value, bool> = true>
     constexpr bool operator==(const dlib::expected<T, E> &x, const U &val)
     {
         return x.has_value() && static_cast<bool>(*x == val);
     }
 
-    template <class T, class E, class U>
+    template <class T, class E, class U, std::enable_if_t<!is_specialization_of<U, dlib::unexpected>::value, bool> = true>
     constexpr bool operator==(const U &val, const dlib::expected<T, E> &x)
     {
         return x.has_value() && static_cast<bool>(*x == val);
     }
 
-    template <class T, class E>
-    constexpr bool operator==(const dlib::expected<T, E> &x, const dlib::unexpected<E> &e)
+    template <class T, class E, class E2>
+    constexpr bool operator==(const dlib::expected<T, E> &x, const dlib::unexpected<E2> &e)
     {
         return !x.has_value() && static_cast<bool>(x.error() == e.error());
     }
 
-    template <class T, class E>
-    constexpr bool operator==(const dlib::unexpected<E> &e, const dlib::expected<T, E> &x) 
+    template <class T, class E, class E2>
+    constexpr bool operator==(const dlib::unexpected<E2> &e, const dlib::expected<T, E> &x) 
     {
         return !x.has_value() && static_cast<bool>(x.error() == e.error());
     }
