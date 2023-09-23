@@ -59,7 +59,7 @@
          <item>split</item> 
          <item>tolower</item> 
          <item>toupper</item> 
-         <item>convert_utf8_to_utf32</item> 
+         <item>convert_to_utf32</item> 
          <item>is_combining_char</item> 
          <item>strings_equal_ignore_case</item> 
       </section>
@@ -406,12 +406,13 @@
    <!-- ************************************************************************* -->
 
       <component>
-         <name>convert_utf8_to_utf32</name>
+         <name>convert_to_utf32</name>
          <file>dlib/unicode.h</file>
          <spec_file link="true">dlib/unicode/unicode_abstract.h</spec_file>
          <description>        
-            This is a global function that can convert UTF-8 strings into strings
-            of 32bit unichar characters. 
+            This is a global function that can convert UTF-8, UTF-16, UTF-32, or ASCII strings into strings
+            of 32bit unichar characters.  That is, it takes any kind of UTF string and returns the 
+            UTF-32 representation of that string.
          </description>
                                  
       </component>

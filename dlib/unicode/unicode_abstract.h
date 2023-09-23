@@ -103,6 +103,15 @@ namespace dlib
     const ustring convert_to_utf32 (
         const std::basic_string<char_type, traits, alloc>& str
     );
+    /*!
+        requires
+            - char_type is char, wchar_t or unichar
+        ensures
+            - Converts any UTF character stream to UTF-32. E.g. inputs
+              can be UTF-8, UTF-16, or UTF-32 and the result is the UTF-32 equivalent.
+        throws
+            - invalid_utf8_error if we were unable to do the conversion.
+    !*/
 
     const ustring convert_utf8_to_utf32 (
         const std::string& str

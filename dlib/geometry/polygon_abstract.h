@@ -19,6 +19,12 @@ namespace dlib
                 Note that the origin of the coordinate system, i.e. (0,0), is located
                 at the upper left corner.  That is, points such as (1,1) or (3,5)
                 represent locations that are below and to the right of the origin.
+
+                Moreover, the polygon is the area enclosed by the lines defined by all
+                pairwise lines between adjacent points in this object.  That is, if
+                you drew lines between all pairs of points polygon[i] and polygon[(i+1)%polygon.size()]
+                for all valid i, then the area enclosed by those lines is the polygon in 
+                question.
         !*/
 
     public:
@@ -75,7 +81,7 @@ namespace dlib
         !*/
 
         template <typename alloc>
-        void get_convex_shape (
+        void get_left_and_right_bounds (
             const long top,
             const long bottom,
             std::vector<double, alloc>& left_boundary,
@@ -85,9 +91,8 @@ namespace dlib
             requires                                                                       
                 - 0 <= top <= bottom                                                       
             ensures                                                                        
-                - interprets points as the coordinates defining a convex polygon.  In      
-                  particular, we interpret points as a list of the vertices of the polygon 
-                  and assume they are ordered in clockwise order.                          
+                - Finds the left and right edges of the polygon for all y coordinate values in the
+                  range [top, bottom].
                 - #left_boundary.size() == bottom-top+1                                    
                 - #right_boundary.size() == bottom-top+1                                   
                 - for all top <= y <= bottom:                                              
@@ -95,9 +100,6 @@ namespace dlib
                       the polygon at coordinate y.                                         
                     - #right_boundary[y-top] == the x coordinate for the right most side of
                       the polygon at coordinate y.                                         
-
-              Note that it isn't illegal to call this method if the polygon defined by
-              points isn't convex.  In that case, we won't return a convex shape.
         !*/
 
     private:

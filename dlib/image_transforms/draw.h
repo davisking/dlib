@@ -463,7 +463,7 @@ namespace dlib
 
         std::vector<double> left_boundary;
         std::vector<double> right_boundary;
-        poly.get_convex_shape(valid_area.top(), valid_area.bottom(), left_boundary, right_boundary);
+        poly.get_left_and_right_bounds(valid_area.top(), valid_area.bottom(), left_boundary, right_boundary);
 
         // draw the polygon row by row
         for (unsigned long i = top_offset; i < left_boundary.size(); ++i)

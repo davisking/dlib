@@ -115,7 +115,7 @@ namespace dlib
     private:
 
         template<typename T>
-        using is_valid_check = std::enable_if_t<is_any<T,Types...>::value, bool>;
+        using is_valid_check = std::enable_if_t<is_any_type<T,Types...>::value, bool>;
 
         template <size_t I>
         using get_type_t = type_safe_union_alternative_t<I, type_safe_union>;

@@ -916,7 +916,7 @@ namespace
         const rectangle rect = triangle.get_rect();
         std::vector<double> left_boundary;
         std::vector<double> right_boundary;
-        triangle.get_convex_shape(rect.top(), rect.bottom(), left_boundary, right_boundary);
+        triangle.get_left_and_right_bounds(rect.top(), rect.bottom(), left_boundary, right_boundary);
 
         DLIB_TEST(left_boundary.size() == right_boundary.size());
 

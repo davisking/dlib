@@ -120,20 +120,21 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    /*!A is_pixel_type
+
+       This type traits template tells you if Pixel is a pixel type.  I.e. if it has a pixel_traits<> specialization.
+       E.g. is_pixel_type<std::string>::value == false
+            is_pixel_type<rgb_pixel>::value == true
+    !*/
     template <class Pixel>
     using is_pixel_type = is_complete_type<pixel_traits<Pixel>>;
-    /*!
-        ensures
-            - determines whether Pixel has a pixel_traits<> specialization
-    !*/
 
+    /*!A is_pixel_check
+
+        This is a SFINAE tool for restricting a template to only pixel types.
+    !*/
     template<class Pixel>
     using is_pixel_check = std::enable_if_t<is_pixel_type<Pixel>::value, bool>;
-    /*!
-        ensures
-            - SFINAE tool that prevents a function taking arbitrary types.
-              Instead, only pixel types with a pixel_traits<> specialisation are allowed.
-    !*/
 
 // ----------------------------------------------------------------------------------------
 

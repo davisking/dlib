@@ -119,7 +119,7 @@ namespace dlib
 #ifdef __WXMSW__
         ::ltoa(header_value, buf, 10);
 #else
-        sprintf(buf, "%ld", header_value);
+        snprintf(buf, sizeof(buf), "%ld", header_value);
 #endif
         set_header(header_name, buf);
     }
@@ -154,7 +154,7 @@ namespace dlib
 #ifdef __WXMSW__
         ::ltoa(cookie_value, buf, 10);
 #else
-        sprintf(buf, "%ld", cookie_value);
+        snprintf(buf, sizeof(buf), "%ld", cookie_value);
 #endif
         set_cookie(cookie_name, buf);
     }

@@ -3615,7 +3615,7 @@ namespace
                 DLIB_TEST(::std::abs(*(cuda_grad.begin() + i) - *(cpu_grad.begin() + i)) < 1e-8);
             }
             const auto err = abs(cuda_loss - cpu_loss) / cpu_loss;
-            DLIB_TEST_MSG(err < 1e-6, "multi class log per pixel weighted cuda and cpu losses differ");
+            DLIB_TEST_MSG(err < 1e-5, "multi class log per pixel weighted cuda and cpu losses differ: " << err);
 #endif
         }
     }

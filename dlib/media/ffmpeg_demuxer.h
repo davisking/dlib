@@ -1475,7 +1475,7 @@ namespace dlib
             {
                 ok = parse();
 
-                if (ok && st.packet->size > 0)
+                if (ok && channel && st.packet->size > 0)
                 {
                     // Decode
                     ok = channel->push(st.packet, wrap(st.frame_queue));

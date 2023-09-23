@@ -207,11 +207,10 @@ namespace dlib
               dlib/image_processing/generic_image.h
             - pixel_traits<pixel_type> is defined
         ensures
-            - Interprets the given polygon object as defining a convex polygon shape.
-              In particular, the polygon is given by taking the points and drawing
-              lines between them.  That is, imagine drawing a line connecting polygon[i]
-              and polygon[(i+1)%polygon.size()], for all valid i, and then filling in
-              the interior of the polygon.  That is what this function does.
+            - Assigns all pixels in the given polygon with the given color.  Moreover, some regions
+              that are also in the convex hull of the polygon will also be filled as well.  In
+              particular, any row of pixels falling horizontally between two parts of the polygon
+              will be filled as well.
             - When drawing the polygon, only the part of the polygon which overlaps both
               the given image and area rectangle is drawn.
             - Uses the given pixel color to draw the polygon.
@@ -235,11 +234,8 @@ namespace dlib
               dlib/image_processing/generic_image.h
             - pixel_traits<pixel_type> is defined
         ensures
-            - Interprets the given polygon object as defining a polygon shape.
-              In particular, the polygon is given by taking the points and drawing
-              lines between them.  That is, imagine drawing a line connecting polygon[i]
-              and polygon[(i+1)%polygon.size()], for all valid i, and then filling in
-              the interior of the polygon.  That is what this function does.
+            - Draws the given polygon onto the image, filling in the interior and edges of the
+              polygon.
             - When drawing the polygon, only the part of the polygon which overlaps both
               the given image and area rectangle is drawn.
             - Uses the given pixel color to draw the polygon.

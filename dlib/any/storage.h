@@ -8,6 +8,7 @@
 #include <typeindex>
 #include <new>
 #include <memory>
+#include "../assert.h"
 
 namespace dlib
 {
@@ -102,6 +103,7 @@ namespace dlib
                     - returns a reference to the object contained within *this.
             !*/
             {
+                DLIB_ASSERT(contains<T>());
                 Storage& me = *static_cast<Storage*>(this);
                 return *reinterpret_cast<T*>(me.get_ptr()); 
             }
@@ -115,6 +117,7 @@ namespace dlib
                     - returns a const reference to the object contained within *this.
             !*/
             {
+                DLIB_ASSERT(contains<T>());
                 const Storage& me = *static_cast<const Storage*>(this);
                 return *reinterpret_cast<const T*>(me.get_ptr()); 
             }
@@ -327,6 +330,7 @@ namespace dlib
                       I.e. if this object contains the type T then this returns std::type_index{typeid(T)}.
             !*/
             {
+                DLIB_ASSERT(!this->is_empty());
                 return type_id_();
             }
 
@@ -350,6 +354,9 @@ namespace dlib
                     Therefore, only objects whose size and alignment fits the template parameters can be
                     erased and absorbed into this object.  Attempting to store a type not
                     representable on the stack with those settings will result in a build error.
+
+                    This object will be capable of storing any type with an alignment requirement
+                    that is a divisor of Alignment.
             !*/
 
         public:
@@ -513,6 +520,7 @@ namespace dlib
                       I.e. if this object contains the type T then this returns std::type_index{typeid(T)}.
             !*/
             {
+                DLIB_ASSERT(!this->is_empty());
                 return type_id_();
             }
 
@@ -760,6 +768,7 @@ namespace dlib
                       I.e. if this object contains the type T then this returns std::type_index{typeid(T)}.
             !*/
             {
+                DLIB_ASSERT(!this->is_empty());
                 return type_id_();
             }
 
@@ -857,6 +866,7 @@ namespace dlib
                       I.e. if this object contains the type T then this returns std::type_index{typeid(T)}.
             !*/
             {
+                DLIB_ASSERT(!this->is_empty());
                 return type_id_();
             }
 
@@ -950,6 +960,7 @@ namespace dlib
                       I.e. if this object contains the type T then this returns std::type_index{typeid(T)}.
             !*/
             {
+                DLIB_ASSERT(!this->is_empty());
                 return type_id_();
             }
 

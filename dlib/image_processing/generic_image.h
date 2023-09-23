@@ -130,22 +130,33 @@ namespace dlib
                 image_traits<image_type>::pixel_type
     !*/
 
+    /*!A pixel_type_t 
+        An alias for the type of pixel in an image.
+    !*/
     template <typename image_type>
     using pixel_type_t = typename image_traits<image_type>::pixel_type;
 
+    /*!A is_rgb_image
+        A type traits class telling you if a type is an image holding RGB pixels.
+    !*/
     template <typename image_type>
     struct is_rgb_image { const static bool value = pixel_traits<pixel_type_t<image_type>>::rgb; };
 
+    /*!A is_color_space_cartesian_image
+        A type traits class telling you if a type is an image holding some type of cartesian pixel type.
+
+        E.g. as contrasted with polar coordinates pixel types.
+    !*/
     template <typename image_type>
     struct is_color_space_cartesian_image { const static bool value = 
         pixel_traits<pixel_type_t<image_type>>::rgb || 
         pixel_traits<pixel_type_t<image_type>>::lab || 
         pixel_traits<pixel_type_t<image_type>>::grayscale; };
-    /*
-        Tells if all color components of image pixels are in cartesian coordinates, compared to e.g. polar coordinates.
-        Polar coordinates that may require more complicated blending.
-    */
 
+    /*!A is_grayscale_image
+        A type traits class telling you if a type is an image holding a single channel (i.e.
+        grayscale) pixel type.
+    !*/
     template <typename image_type>
     struct is_grayscale_image { const static bool value = pixel_traits<pixel_type_t<image_type>>::grayscale; };
 
@@ -160,22 +171,22 @@ namespace dlib
         struct is_image_type<Container, dlib::void_t<is_pixel_check<pixel_type_t<Container>>>> : std::true_type{};
     }
 
+    /*!A is_image_type 
+
+        A type traits struct telling you if Container satisfies the generic image interface.
+
+        i.e. there exists an image_traits<> specialization and the underlying pixel type has a pixel_trait<> specialiation
+        e.g. array2d<rgb_pixel>, matrix<float>, etc...
+    !*/
     template<class Container>
     using is_image_type = details::is_image_type<Container>;
-    /*!
-        ensures
-            - determines whether Container satisfies the generic image interface
-              i.e. there exists an image_traits<> specialization and the underlying pixel type has a pixel_trait<> specialiation
-              e.g. array2d<rgb_pixel>, matrix<float>, etc...
-    !*/
 
+    /*!A is_image_check
+
+        This is a SFINAE tool for restricting a template to only image types.
+    !*/
     template<class Container>
     using is_image_check = std::enable_if_t<is_image_type<Container>::value, bool>;
-    /*!
-        ensures
-            - SFINAE tool that prevents a function taking arbitrary types.
-              Instead, only image types that satisfy the generic image interface are allowed.
-    !*/
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------

@@ -101,6 +101,10 @@ namespace dlib
                     };
 
                     type_safe_union<int,std::string> my_type_safe_union;  // No error
+
+                Finally, note that if the constructor of one of the Types throws when the type
+                safe union is constructing it then the type safe union will be left in an empty
+                state.  I.e. this->empty() == true.
         !*/
 
     public:

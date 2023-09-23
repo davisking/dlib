@@ -63,9 +63,27 @@
          <item>deserialize</item> 
          <item>serialize</item> 
          <item>zero_extend_cast</item> 
-         <item>make_mfp</item> 
          <item>TIME_THIS</item> 
          <item>timing code blocks</item> 
+         <item>
+            <name>make_from_tuple</name><link>dlib/functional.h.html#make_from_tuple</link>
+         </item>
+      </section>
+
+
+      <section>
+         <name>Functional</name>
+         <item>wrap_function</item>
+         <item>make_mfp</item> 
+         <item><name>invoke</name><link>dlib/functional.h.html#invoke</link></item>
+         <item><name>invoke_result</name><link>dlib/functional.h.html#invoke_result</link></item>
+         <item><name>invoke_r</name><link>dlib/functional.h.html#invoke_r</link></item>
+         <item><name>apply</name><link>dlib/functional.h.html#apply</link></item>
+         <item><name>invoke_result</name><link>dlib/functional.h.html#invoke_result</link></item>
+         <item><name>is_invocable</name><link>dlib/functional.h.html#is_invocable</link></item>
+         <item><name>is_invocable_r</name><link>dlib/functional.h.html#is_invocable_r</link></item>
+         <item><name>bind_front</name><link>dlib/functional.h.html#bind_front</link></item>
+         <item><name>bind_back</name><link>dlib/functional.h.html#bind_back</link></item>
       </section>
       
       <section>
@@ -460,6 +478,20 @@
             
    <!-- ************************************************************************* -->
       
+      <component>
+         <name>wrap_function</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>        
+            This is a template that allows you to turn a global function into a 
+            function object.  See the specs for more details. 
+         </description>
+                                 
+      </component>
+            
+
+   <!-- ************************************************************************* -->
+
       <component checked="true">
          <name>bit_stream</name>
          <file>dlib/bit_stream.h</file>

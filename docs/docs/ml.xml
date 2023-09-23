@@ -52,6 +52,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>svm_pegasos</item> 
          <item>train_probabilistic_decision_function</item> 
          <item>auto_train_rbf_classifier</item> 
+         <item>auto_train_multiclass_svm_linear_classifier</item> 
       </section>
       <section>
          <name>Multiclass Classification</name>
@@ -2150,6 +2151,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
       </component>
       
    <!-- ************************************************************************* -->
+
       <component>
          <name>auto_train_rbf_classifier</name>
          <file>dlib/svm.h</file>
@@ -2167,6 +2169,20 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
       
    <!-- ************************************************************************* -->
 
+      <component>
+         <name>auto_train_multiclass_svm_linear_classifier</name>
+         <file>dlib/svm.h</file>
+         <spec_file link="true">dlib/svm/auto_abstract.h</spec_file>
+         <description>
+            This routine trains a linear SVM.  It uses <a
+            href="optimization.html#find_max_global">find_max_global</a> and
+            3-fold cross-validation to automatically determine the best settings of the
+            SVM's hyper parameters.  Therefore, it takes no parameters. You just give it a dataset and it
+            returns a good classifier for that dataset.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
 
       <component>
          <name>svm_c_linear_trainer</name>

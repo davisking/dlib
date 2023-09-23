@@ -60,14 +60,13 @@
             </li>
             <li> <i>The C++ Standard Library: A Tutorial and Reference</i> by Nicolai M. Josuttis   
                <ul> If you are going to buy a reference book on the C++ standard library then this 
-                  is the one to get.  I think you
-                  will find it is better than any of the available online references.    So if you find 
-                  yourself frustrated with the online resources, then this is the book for you.
+                  is the one to get. That is, if you are looking for an in depth reference this is
+                  an excellent resource.
                </ul><br/>
             </li>
-            <li> <a href="http://www.cplusplus.com/reference/">Online C++ Standard Library Reference</a>
-               <ul> What I said aside, this is a good online reference.   I often find myself referring to it
-                  when I do not have the Josuttis book on hand.
+            <li> <a href="http://en.cppreference.com">Online C++ Standard Reference</a>
+               <ul> For a quick reference to just about any part of C++ or its standard library
+                  this is an excellent online resource.
                </ul><br/>
             </li>
          </ul>
