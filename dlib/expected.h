@@ -827,17 +827,6 @@ namespace dlib
                     construct_value();
                 }
             } 
-
-            constexpr void swap_(expected_operations& other)
-            {
-                /* 
-                    switch_() isn't perfect and for some reason, 
-                    the block of code in the other swap_ function 
-                    can't be put in the switch_() function without error.
-                    Boost::hana has a good explanation as to when you have to 
-                    use _. And you can't put it around a type, only objects.
-                */
-            } 
         };
 
 // ---------------------------------------------------------------------------------------------------
@@ -1473,12 +1462,12 @@ namespace dlib
                 switch_(bools(std::is_void<T>{}, std::is_nothrow_move_constructible<E>{}),
                     [&](true_t, auto, auto _) {
                         this->construct_error(std::move(_(other)).error());
-                        other.destruct_error();
-                        other.construct_value();
+                        _(other).destruct_error();
+                        _(other).construct_value();
                     },
                     [&](false_t, true_t, auto _) {
                         E temp{std::move(_(other)).error()};
-                        other.destruct_error();
+                        _(other).destruct_error();
                         try {
                             other.construct_value(std::move(**_(this)));
                             this->destruct_value();
@@ -1489,7 +1478,7 @@ namespace dlib
                         }
                     },
                     [&](false_t, false_t, auto _) {
-                        this->swap_(_(other));
+                        _(this)->swap_(_(other));
                     }
                 );
             }
