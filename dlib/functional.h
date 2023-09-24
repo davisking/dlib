@@ -357,7 +357,7 @@ namespace dlib
             Args&&... args
         )
         {
-            return binder_wrapper<Back, std::decay_t<F>, std::decay_t<Args>...>{std::forward<F>(func), std::forward<Args>(args)...};
+            return binder_wrapper<Back, std::decay_t<F>, std::decay_t<Args>...>{std::forward<F>(func), std::make_tuple(std::forward<Args>(args)...)};
         }
     }
     
