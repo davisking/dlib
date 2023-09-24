@@ -439,7 +439,7 @@ namespace dlib
                 if (is_val)
                     val.~T();
                 else
-                    err.~unexpected<E>();
+                    err.~E();
             }
 
             constexpr expected_base() noexcept(std::is_nothrow_default_constructible<T>::value)
@@ -459,10 +459,10 @@ namespace dlib
 
             template<class ...U>
             constexpr expected_base(unexpect_t, U&& ...u) noexcept(std::is_nothrow_constructible<E,U...>::value)
-            : err(in_place, std::forward<U>(u)...), is_val{false} 
+            : err(std::forward<U>(u)...), is_val{false} 
             {}    
 
-            union {T val; unexpected<E> err;};
+            union {T val; E err;};
             bool is_val{true};
         };
 
@@ -486,10 +486,10 @@ namespace dlib
 
             template<class ...U>
             constexpr expected_base(unexpect_t, U&& ...u) noexcept(std::is_nothrow_constructible<E,U...>::value)
-            : err{in_place, std::forward<U>(u)...}, is_val{false} 
+            : err(std::forward<U>(u)...), is_val{false} 
             {}  
 
-            union {T val; unexpected<E> err;};
+            union {T val; E err;};
             bool is_val{true};
         };
 
@@ -500,7 +500,7 @@ namespace dlib
             ~expected_base()
             {
                 if (!is_val)
-                    err.~unexpected<E>();
+                    err.~E();
             }
 
             constexpr expected_base() noexcept
@@ -518,10 +518,10 @@ namespace dlib
 
             template<class ...U>
             constexpr expected_base(unexpect_t, U&& ...u) noexcept(std::is_nothrow_constructible<E,U...>::value)
-            : err{in_place, std::forward<U>(u)...}, is_val{false} 
+            : err(std::forward<U>(u)...), is_val{false} 
             {}  
 
-            union {unexpected<E> err;};
+            union {E err;};
             bool is_val{true};
         };
 
@@ -544,10 +544,10 @@ namespace dlib
 
             template<class ...U>
             constexpr expected_base(unexpect_t, U&& ...u) noexcept(std::is_nothrow_constructible<E,U...>::value)
-            : err{in_place, std::forward<U>(u)...}, is_val{false} 
+            : err(std::forward<U>(u)...), is_val{false} 
             {}  
 
-            union {unexpected<E> err;};
+            union {E err;};
             bool is_val{true};
         };
 
@@ -566,36 +566,36 @@ namespace dlib
             constexpr const T&& operator*() const&& noexcept { return std::move(this->val); }
             constexpr const T*  operator->() const  noexcept { return std::addressof(this->val); }
             constexpr T*        operator->()        noexcept { return std::addressof(this->val); }
-            constexpr E&        error() &       noexcept { return this->err.error(); }
-            constexpr const E&  error() const&  noexcept { return this->err.error(); }
-            constexpr E&&       error() &&      noexcept { return std::move(this->err.error()); }
-            constexpr const E&& error() const&& noexcept { return std::move(this->err.error()); }
+            constexpr E&        error() &       noexcept { return this->err; }
+            constexpr const E&  error() const&  noexcept { return this->err; }
+            constexpr E&&       error() &&      noexcept { return std::move(this->err); }
+            constexpr const E&& error() const&& noexcept { return std::move(this->err); }
 
             constexpr T& value() & 
             {
                 if (!has_value())
-                    throw bad_expected_access<std::decay_t<E>>(dlib::as_const(error()));
+                    throw bad_expected_access<std::decay_t<E>>(dlib::as_const(this->err));
                 return **this;
             }
 
             constexpr const T& value() const & 
             {
                 if (!has_value())
-                    throw bad_expected_access<std::decay_t<E>>(dlib::as_const(error()));
+                    throw bad_expected_access<std::decay_t<E>>(dlib::as_const(this->err));
                 return **this;
             }
 
             constexpr T&& value() && 
             {
                 if (!has_value())
-                    throw bad_expected_access<std::decay_t<E>>(std::move(error()));
+                    throw bad_expected_access<std::decay_t<E>>(std::move(this->err));
                 return std::move(**this);
             }
 
             constexpr const T&& value() const && 
             {
                 if (!has_value())
-                    throw bad_expected_access<std::decay_t<E>>(std::move(error()));
+                    throw bad_expected_access<std::decay_t<E>>(std::move(this->err));
                 return std::move(**this);
             }
 
@@ -643,7 +643,7 @@ namespace dlib
 
             constexpr void destruct_error() noexcept(std::is_nothrow_destructible<E>::value)
             {
-                this->err.~unexpected<E>();
+                this->err.~E();
             }
             
             constexpr void destruct() noexcept(std::is_nothrow_destructible<T>::value &&
@@ -665,7 +665,7 @@ namespace dlib
             template <class... U> 
             constexpr void construct_error(U&&... u) noexcept(std::is_nothrow_constructible<E,U...>::value)
             {
-                new (std::addressof(this->err)) unexpected<E>(std::forward<U>(u)...);
+                new (std::addressof(this->err)) E(std::forward<U>(u)...);
                 this->is_val = false;
             } 
 
@@ -749,10 +749,10 @@ namespace dlib
 
             constexpr bool has_value() const noexcept { return this->is_val; }
             constexpr void operator*() const noexcept {}
-            constexpr E&        error() &       noexcept { return this->err.error(); }
-            constexpr const E&  error() const&  noexcept { return this->err.error(); }
-            constexpr E&&       error() &&      noexcept { return std::move(this->err.error()); }
-            constexpr const E&& error() const&& noexcept { return std::move(this->err.error()); }
+            constexpr E&        error() &       noexcept { return this->err; }
+            constexpr const E&  error() const&  noexcept { return this->err; }
+            constexpr E&&       error() &&      noexcept { return std::move(this->err); }
+            constexpr const E&& error() const&& noexcept { return std::move(this->err); }
 
             constexpr void value() const &
             {
@@ -778,7 +778,7 @@ namespace dlib
 
             constexpr void destruct_error() noexcept(std::is_nothrow_destructible<E>::value)
             {
-                this->err.~unexpected<E>();
+                this->err.~E();
             }
 
             constexpr void destruct() noexcept(std::is_nothrow_destructible<E>::value)
@@ -796,7 +796,7 @@ namespace dlib
             template <class... U> 
             constexpr void construct_error(U&&... u) noexcept(std::is_nothrow_constructible<E,U...>::value)
             {
-                new (std::addressof(this->err)) unexpected<E>(std::forward<U>(u)...);
+                new (std::addressof(this->err)) E(std::forward<U>(u)...);
                 this->is_val = false;
             }    
 
