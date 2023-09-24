@@ -2354,7 +2354,7 @@ namespace
                 first_value.swap(first_error);
                 DLIB_TEST(first_error && !first_value);
 
-                if constexpr (nothrow_move_constructible) {
+                if (nothrow_move_constructible) {
                     DLIB_TEST(first_value.error() == 5 + 42 + 42);
                 } else {
                     // Here we are storing _Ty as a temporary so we only move once
@@ -2365,7 +2365,7 @@ namespace
 
                 second_error.swap(second_value);
                 DLIB_TEST(second_error && !second_value);
-                if constexpr (nothrow_move_constructible) {
+                if (nothrow_move_constructible) {
                     DLIB_TEST(second_value.error() == 3 + 42 + 42);
                 } else {
                     // Here we are storing _Ty as a temporary so we only move once
@@ -2456,7 +2456,7 @@ namespace
 
                 swap(first_value, first_error);
                 DLIB_TEST(first_error && !first_value);
-                if constexpr (nothrow_move_constructible) {
+                if (nothrow_move_constructible) {
                     DLIB_TEST(first_value.error() == 5 + 42 + 42);
                 } else {
                     // Here we are storing _Ty as a temporary so we only move once
@@ -2467,7 +2467,7 @@ namespace
 
                 swap(second_error, second_value);
                 DLIB_TEST(second_error && !second_value);
-                if constexpr (nothrow_move_constructible) {
+                if (nothrow_move_constructible) {
                     DLIB_TEST(second_value.error() == 3 + 42 + 42);
                 } else {
                     // Here we are storing _Ty as a temporary so we only move once
