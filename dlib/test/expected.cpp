@@ -25,6 +25,7 @@ namespace
         DLIB_TEST(noexcept(as_const(e1).error()));
         static_assert(noexcept(e1.error()), "bad");
         static_assert(noexcept(as_const(e1).error()), "bad");
+        static_assert(noexcept(dlib::unexpected<int>{1}), "bad");
 
         dlib::unexpected<int> e2{2};
         e1.swap(e2);
@@ -2811,7 +2812,7 @@ namespace
 
                 Expected with_value{in_place, 42};
                 const Expected const_with_value{in_place, 1337};
-                DLIB_TEST(with_value.value_or(payload{1}) == 42 + 2);
+                DLIB_TEST_MSG(with_value.value_or(payload{1}) == 42 + 2, "actual " << with_value.value_or(payload{1})._val << " expected 42 + 2");
                 DLIB_TEST(const_with_value.value_or(payload{1}) == 1337 + 2);
                 // TODO: fix
                 // static_assert(noexcept(with_value.value_or(payload{1})) == construction_is_noexcept, "bad");
