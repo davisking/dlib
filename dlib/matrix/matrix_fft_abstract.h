@@ -325,9 +325,9 @@ namespace dlib
             - wlen >= hoplen
             - EXP::type is a complex floating point type (complex<float>, complex<double> or complex<long double>)
             - If you wish to satisfy istftr(stftr(x, ...), ...) == x then:
-                - w is the same as what was used with stft()
-                - wlen is the same as what was used with stft()
-                - hoplen is the same as what was used with stft()
+                - w is the same as what was used with stftr()
+                - wlen is the same as what was used with stftr()
+                - hoplen is the same as what was used with stftr()
         ensures
             - Performs an inverse Short-Time-Fourier-Transform (STFT)
             - istftr(stftr(x, w, wlen, wlen, hoplen), w, wlen, hoplen)) == x
