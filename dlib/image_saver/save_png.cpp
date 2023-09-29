@@ -42,8 +42,8 @@ namespace dlib
             std::vector<unsigned char*>& row_pointers,
             const long width,
             const png_type type,
-            const int bit_depth
-            
+            const int bit_depth,
+            const bool swap_rgb
         )
         {
             png_structp png_ptr;
@@ -101,7 +101,9 @@ namespace dlib
             byte_orderer bo;
             if (bo.host_is_little_endian())
                 png_transforms |= PNG_TRANSFORM_SWAP_ENDIAN;
-
+            if (swap_rgb)
+                png_transforms |= PNG_TRANSFORM_BGR;
+                
             const long height = row_pointers.size();
 
             png_set_IHDR(png_ptr, info_ptr, width, height, bit_depth, color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);

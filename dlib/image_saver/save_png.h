@@ -33,7 +33,8 @@ namespace dlib
             std::vector<unsigned char*>& row_pointers,
             const long width,
             const png_type type,
-            const int bit_depth
+            const int bit_depth,
+            const bool swap_rgb = false
         );
 
 // ----------------------------------------------------------------------------------------
@@ -73,6 +74,13 @@ namespace dlib
                     row_pointers[i] = (unsigned char*)(&img[i][0]);
 
                 impl::impl_save_png(std::move(clb), row_pointers, img.nc(), impl::png_type_rgb, 8);
+            }
+            else if (std::is_same<bgr_pixel,pixel_type>::value)
+            {
+                for (unsigned long i = 0; i < row_pointers.size(); ++i)
+                    row_pointers[i] = (unsigned char*)(&img[i][0]);
+
+                impl::impl_save_png(std::move(clb), row_pointers, img.nc(), impl::png_type_rgb, 8, true);
             }
             else if (std::is_same<rgb_alpha_pixel,pixel_type>::value)
             {
