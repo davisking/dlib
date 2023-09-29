@@ -243,7 +243,7 @@ namespace
                     img[r][c].alpha = static_cast<unsigned char>(r*14 + c + 4);
                 }
             }
-
+        
             save_png(img, "test.png");
 
             img.clear();
@@ -275,9 +275,123 @@ namespace
                 }
             }
         }
+        {
+            matrix<rgb_alpha_pixel> img;
+            matrix<rgb_pixel> img2, img3;
+            img.set_size(14,15);
+            img2.set_size(img.nr(),img.nc());
+            img3.set_size(img.nr(),img.nc());
+            for (long r = 0; r < 14; ++r)
+            {
+                for (long c = 0; c < 15; ++c)
+                {
+                    img(r,c).red = static_cast<unsigned char>(r*14 + c + 1);
+                    img(r,c).green = static_cast<unsigned char>(r*14 + c + 2);
+                    img(r,c).blue = static_cast<unsigned char>(r*14 + c + 3);
+                    img(r,c).alpha = static_cast<unsigned char>(r*14 + c + 4);
+                }
+            }
+
+            save_png(img, "test.png");
+
+            img.set_size(0,0);
+            DLIB_TEST(img.nr() == 0);
+            DLIB_TEST(img.nc() == 0);
+
+            load_png(img, "test.png");
+            
+            DLIB_TEST(img.nr() == 14);
+            DLIB_TEST(img.nc() == 15);
+
+            assign_all_pixels(img2, 255);
+            assign_all_pixels(img3, 0);
+            load_png(img2, "test.png");
+            assign_image(img3, img);
+
+            for (long r = 0; r < 14; ++r)
+            {
+                for (long c = 0; c < 15; ++c)
+                {
+                    DLIB_TEST(img(r,c).red == r*14 + c + 1);
+                    DLIB_TEST(img(r,c).green == r*14 + c + 2);
+                    DLIB_TEST(img(r,c).blue == r*14 + c + 3);
+                    DLIB_TEST(img(r,c).alpha == r*14 + c + 4);
+
+                    DLIB_TEST(img2(r,c).red == img3(r,c).red);
+                    DLIB_TEST(img2(r,c).green == img3(r,c).green);
+                    DLIB_TEST(img2(r,c).blue == img3(r,c).blue);
+                }
+            }
+        }
+        {
+            const auto test_savers = [](const auto& img1)
+            {
+                const auto test_pixels = [](const auto& img1, const auto& img2)
+                {
+                    DLIB_TEST(img1.nr() == img2.nr());
+                    DLIB_TEST(img1.nc() == img2.nc());
+
+                    for (long r = 0; r < img1.nr(); ++r)
+                    {
+                        for (long c = 0; c < img1.nc(); ++c)
+                        {
+                            DLIB_TEST(img1[r][c].red   == r*14 + c + 1);
+                            DLIB_TEST(img1[r][c].green == r*14 + c + 2);
+                            DLIB_TEST(img1[r][c].blue  == r*14 + c + 3);
+
+                            DLIB_TEST(img1[r][c].red   == img2[r][c].red);
+                            DLIB_TEST(img1[r][c].green == img2[r][c].green);
+                            DLIB_TEST(img1[r][c].blue  == img2[r][c].blue);
+                        }
+                    }
+                };
+
+                using image_type = std::decay_t<decltype(img1)>;
+
+                const std::string    file_name = "test.png";
+                std::ostringstream   out;
+                std::vector<char>    buf1;
+                std::vector<int8_t>  buf2;
+                std::vector<uint8_t> buf3;
+
+                save_png(img1, file_name);
+                save_png(img1, out); 
+                save_png(img1, buf1);
+                save_png(img1, buf2);
+                save_png(img1, buf3);
+                std::istringstream in(out.str());
+
+                image_type img2, img3, img4, img5, img6;
+                load_png(img2, file_name);
+                // load_png(img3, in);
+                load_png(img4, (const char*)buf1.data(), buf1.size());
+                load_png(img5, (const char*)buf1.data(), buf1.size());
+                load_png(img6, (const char*)buf1.data(), buf1.size());
+                test_pixels(img1, img2);
+                // test_pixels(img1, img3);
+                test_pixels(img1, img4);
+                test_pixels(img1, img5);
+                test_pixels(img1, img6);
+            };
+
+            array2d<rgb_pixel> img1(14,15);
+            array2d<bgr_pixel> img2(14,15);
+
+            for (long r = 0; r < 14; ++r)
+            {
+                for (long c = 0; c < 15; ++c)
+                {
+                    img1[r][c].red   = static_cast<unsigned char>(r*14 + c + 1);
+                    img1[r][c].green = static_cast<unsigned char>(r*14 + c + 2);
+                    img1[r][c].blue  = static_cast<unsigned char>(r*14 + c + 3);
+                }
+            }
+
+            assign_image(img2, img1);
+            test_savers(img1);
+            test_savers(img2);
+        }
 #endif // DLIB_PNG_SUPPORT
-
-
 
         {
             array2d<rgb_pixel> img;
