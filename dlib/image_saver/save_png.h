@@ -197,18 +197,33 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    // template <
-    //     typename EXP 
-    //     >
-    // void save_png(
-    //     const matrix_exp<EXP>& img,
-    //     const std::string& file_name
-    // )
-    // {
-    //     array2d<typename EXP::type> temp;
-    //     assign_image(temp, img);
-    //     save_png(temp, file_name);
-    // }
+    template <
+      class T, long NR, long NC, class MM, class L,
+      class Output
+    >
+    void save_png (
+        const matrix<T,NR,NC,MM,L>& img,
+        Output&& out
+    )
+    {
+        save_png(make_image_view(img), std::forward<Output>(out));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+      class EXP,
+      class Output
+    >
+    void save_png (
+        const matrix_exp<EXP>& img,
+        Output&& out
+    )
+    {
+        array2d<typename EXP::type> temp;
+        assign_image(temp, img);
+        save_png(temp, std::forward<Output>(out));
+    }
 
 // ----------------------------------------------------------------------------------------
 
