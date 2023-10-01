@@ -363,12 +363,12 @@ namespace
 
                 image_type img2, img3, img4, img5, img6;
                 load_png(img2, file_name);
-                // load_png(img3, in);
+                load_png(img3, in);
                 load_png(img4, (const char*)buf1.data(), buf1.size());
                 load_png(img5, (const char*)buf1.data(), buf1.size());
                 load_png(img6, (const char*)buf1.data(), buf1.size());
                 test_pixels(img1, img2);
-                // test_pixels(img1, img3);
+                test_pixels(img1, img3);
                 test_pixels(img1, img4);
                 test_pixels(img1, img5);
                 test_pixels(img1, img6);
