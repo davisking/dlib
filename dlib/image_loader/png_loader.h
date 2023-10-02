@@ -4,6 +4,7 @@
 #define DLIB_PNG_IMPORT
 
 #include <memory>
+#include <cstring>
 #include <functional>
 
 #include "png_loader_abstract.h"
@@ -59,16 +60,16 @@ namespace dlib
 
             const auto assign_gray = [&](const auto** lines) 
             {
-                for ( unsigned n = 0; n < data->height; ++n )
-                    for ( unsigned m = 0; m < data->width; ++m )
+                for ( int n = 0; n < data->height; ++n )
+                    for ( int m = 0; m < data->width; ++m )
                         assign_pixel( t[n][m], lines[n][m]);
             };
 
             const auto assign_gray_alpha = [&](const auto** lines) 
             {
-                for ( unsigned n = 0; n < data->height; ++n )
+                for ( int n = 0; n < data->height; ++n )
                 {
-                    for ( unsigned m = 0; m < data->width; ++m )
+                    for ( int m = 0; m < data->width; ++m )
                     {
                         if (!pixel_traits<pixel_type>::has_alpha)
                         {
@@ -87,9 +88,9 @@ namespace dlib
 
             const auto assign_rgb = [&](const auto** lines) 
             {
-                for ( unsigned n = 0; n < data->height;++n )
+                for ( int n = 0; n < data->height;++n )
                 {
-                    for ( unsigned m = 0; m < data->width;++m )
+                    for ( int m = 0; m < data->width;++m )
                     {
                         rgb_pixel p;
                         p.red   = static_cast<uint8>(lines[n][m*3]);
@@ -105,9 +106,9 @@ namespace dlib
                 if (!pixel_traits<pixel_type>::has_alpha)
                     assign_all_pixels(t,0);
 
-                for ( unsigned n = 0; n < data->height; ++n )
+                for ( int n = 0; n < data->height; ++n )
                 {
-                    for ( unsigned m = 0; m < data->width; ++m )
+                    for ( int m = 0; m < data->width; ++m )
                     {
                         rgb_alpha_pixel p;
                         p.red   = static_cast<uint8>(lines[n][m*4]);
@@ -186,7 +187,7 @@ namespace dlib
         png_impl::load_png(img,
             [&](char* data, std::size_t ndata) {
                 ndata = std::min(ndata, buffer_size - counter);
-                memcpy(data, image_buffer + counter, ndata);
+                std::memcpy(data, image_buffer + counter, ndata);
                 counter += ndata;
                 return ndata;
             }
