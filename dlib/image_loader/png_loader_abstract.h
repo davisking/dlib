@@ -26,12 +26,12 @@ namespace dlib
               dlib/image_processing/generic_image.h 
             - file_name points to a PNG file
         ensures
-            - Reads and decodes the PNG file located at file_name
+            - Reads and decodes the PNG file located at file_name into image
     !*/
 
     template <
         typename image_type,
-        typeame Byte
+        typename Byte
         >
     void load_png (
         image_type& image,
@@ -45,7 +45,7 @@ namespace dlib
             - Byte is either char, uint8_t, int8_t, std::byte
             - image_buffer is a memory buffer containing a complete PNG encoded image
         ensures
-            - Reads and ecodes the PNG file located in memory
+            - Reads and decodes the PNG file located in memory into image
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ namespace dlib
               dlib/image_processing/generic_image.h 
             - in is an input stream containing a complete PNG encoded image
         ensures
-            - Reads and ecodes the PNG file located in stream
+            - Reads and decodes the PNG file located in stream into img
     !*/
 
 // ----------------------------------------------------------------------------------------
