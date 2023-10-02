@@ -6,11 +6,13 @@
 #include <memory>
 #include <cstring>
 #include <functional>
+#include <istream>
+#include <fstream>
 
 #include "png_loader_abstract.h"
 #include "image_loader.h"
 #include "../pixel.h"
-#include "../dir_nav.h"
+#include "../type_traits.h"
 #include "../test_for_odr_violations.h"
 
 namespace dlib
@@ -175,11 +177,13 @@ namespace dlib
     }
 
     template <
-      class image_type
+      class image_type,
+      class Byte,
+      std::enable_if_t<is_byte<Byte>::value, bool> = true
     >
     void load_png (
         image_type& img,
-        const unsigned char* image_buffer,
+        const Byte* image_buffer,
         size_t buffer_size
     )
     {
@@ -192,18 +196,6 @@ namespace dlib
                 return ndata;
             }
         );
-    }
-
-    template <
-      class image_type
-    >
-    void load_png (
-        image_type& img,
-        const char* image_buffer,
-        size_t buffer_size
-    )
-    {
-        load_png(img, reinterpret_cast<const unsigned char*>(image_buffer), buffer_size);
     }
 
 // ----------------------------------------------------------------------------------------
