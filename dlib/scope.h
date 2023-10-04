@@ -15,6 +15,14 @@ namespace dlib
     template<class Fn>
     class scope_exit
     {
+    /*!
+        WHAT THIS OBJECT REPRESENTS 
+            This is a standard's compliant backport of std::experimental::scope_exit that works with C++14.
+
+            Therefore, refer to https://en.cppreference.com/w/cpp/experimental/scope_exit for docs on the
+            interface of scope_exit.
+    !*/
+
     private:
         Fn f_;
         bool active_{true};
@@ -48,6 +56,11 @@ namespace dlib
 
     template<class Fn>
     auto make_scope_exit(Fn&& f)
+    /*!
+        ensures:
+            - This is factory function that wraps the callback in a scope_exit object.
+    !*/
+
     {
         return scope_exit<std::decay_t<Fn>>(std::forward<Fn>(f));
     }
@@ -60,6 +73,14 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     using scope_exit_erased = scope_exit<std::function<void()>>;
+    /*!
+        WHAT THIS OBJECT REPRESENTS 
+            This is a type erased version of scope_exit. I.e. there is no template parameter.
+            Use this object if you wish to hide the exact function signature, for example
+            if splitting a declaration and definition across a header file and cpp file.
+            This does come at a slight performance penalty since it may incur a heap allocation
+            and due to a pointer indirection, the compiler may not inline your callback.
+    !*/
 
 // ----------------------------------------------------------------------------------------
 
