@@ -14,35 +14,31 @@
 #include "../pixel.h"
 #include "../type_traits.h"
 #include "../test_for_odr_violations.h"
+#include "../dir_nav.h"
 
 namespace dlib
 {
-    namespace png_impl
+
+// ----------------------------------------------------------------------------------------
+
+    class png_loader : noncopyable
     {
-        struct png_decoded
-        {
-            int height{0};
-            int width{0};
-            int bit_depth{0};
-            int color_type{0};
-            unsigned char** rows{nullptr};
-            bool is_gray()  const;
-            bool is_graya() const;
-            bool is_rgb()   const;
-            bool is_rgba()  const;
-        };
+    public:
 
-        using callback_t = std::function<std::size_t(char*, std::size_t)>;
+        png_loader( std::istream& in );
+        png_loader( const char* filename );
+        png_loader( const std::string& filename );
+        png_loader( const dlib::file& f );
+        png_loader( const unsigned char* image_buffer, std::size_t buffer_size );
 
-        std::shared_ptr<png_decoded> impl_load_png (
-            callback_t clb
-        );
+        bool is_gray()              const;
+        bool is_graya()             const;
+        bool is_rgb()               const;
+        bool is_rgba()              const;
+        unsigned int bit_depth ()   const;
 
         template<class image_type>
-        void load_png (
-            image_type& img,
-            callback_t clb
-        )
+        void get_image( image_type& img) const 
         {
 #ifndef DLIB_PNG_SUPPORT
             /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -54,24 +50,22 @@ namespace dlib
             COMPILE_TIME_ASSERT(sizeof(T) == 0);
 #else
             using pixel_type = pixel_type_t<image_type>;
+            auto t = make_image_view(img);
 
-            const auto data = impl_load_png(std::move(clb));
-            auto t          = make_image_view(img);
-
-            t.set_size( data->height, data->width );
+            t.set_size( height, width );
 
             const auto assign_gray = [&](const auto** lines) 
             {
-                for ( int n = 0; n < data->height; ++n )
-                    for ( int m = 0; m < data->width; ++m )
+                for ( int n = 0; n < height; ++n )
+                    for ( int m = 0; m < width; ++m )
                         assign_pixel( t[n][m], lines[n][m]);
             };
 
             const auto assign_gray_alpha = [&](const auto** lines) 
             {
-                for ( int n = 0; n < data->height; ++n )
+                for ( int n = 0; n < height; ++n )
                 {
-                    for ( int m = 0; m < data->width; ++m )
+                    for ( int m = 0; m < width; ++m )
                     {
                         if (!pixel_traits<pixel_type>::has_alpha)
                         {
@@ -90,9 +84,9 @@ namespace dlib
 
             const auto assign_rgb = [&](const auto** lines) 
             {
-                for ( int n = 0; n < data->height;++n )
+                for ( int n = 0; n < height;++n )
                 {
-                    for ( int m = 0; m < data->width;++m )
+                    for ( int m = 0; m < width;++m )
                     {
                         rgb_pixel p;
                         p.red   = static_cast<uint8>(lines[n][m*3]);
@@ -108,9 +102,9 @@ namespace dlib
                 if (!pixel_traits<pixel_type>::has_alpha)
                     assign_all_pixels(t,0);
 
-                for ( int n = 0; n < data->height; ++n )
+                for ( int n = 0; n < height; ++n )
                 {
-                    for ( int m = 0; m < data->width; ++m )
+                    for ( int m = 0; m < width; ++m )
                     {
                         rgb_alpha_pixel p;
                         p.red   = static_cast<uint8>(lines[n][m*4]);
@@ -124,56 +118,57 @@ namespace dlib
 
             const auto assign = [&](const auto** lines)
             {
-                if (data->is_gray())
+                if (is_gray())
                     assign_gray(lines);
 
-                else if (data->is_graya())
+                else if (is_graya())
                     assign_gray_alpha(lines);
                 
-                else if (data->is_rgb())
+                else if (is_rgb())
                     assign_rgb(lines);
 
-                else if (data->is_rgba())
+                else if (is_rgba())
                     assign_rgba(lines);
             };
 
-            if (data->bit_depth == 8)
-                assign((const uint8_t**)(data->rows));
+            if (bit_depth_ == 8)
+                assign((const uint8_t**)(rows));
             
-            else if (data->bit_depth == 16)
-                assign((const uint16_t**)(data->rows));
+            else if (bit_depth_ == 16)
+                assign((const uint16_t**)(rows));
 #endif
         }
-    }
+
+    private:
+        void load(std::function<std::size_t(char*,std::size_t)> clb);
+        void load(std::istream& in);
+
+        int             height{0};
+        int             width{0};
+        int             bit_depth_{0};
+        int             color_type{0};
+        unsigned char** rows{nullptr};
+        std::shared_ptr<void> finalizer;
+    };
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-      class image_type
-    >
+    template <class image_type>
     void load_png (
         image_type& img,
         std::istream& in
     )
     {
-        png_impl::load_png(img,
-            [&](char* data, std::size_t ndata) {
-                in.read(data, ndata);
-                return in.gcount();
-            }
-        );
+        png_loader(in).get_image(img);
     }
 
-    template <
-      class image_type
-    >
+    template <class image_type>
     void load_png (
         image_type& img,
         const std::string& file_name
     )
     {
-        std::ifstream in(file_name, std::ios::binary);
-        load_png(img, in);
+        png_loader(file_name).get_image(img);
     }
 
     template <
@@ -184,18 +179,10 @@ namespace dlib
     void load_png (
         image_type& img,
         const Byte* image_buffer,
-        size_t buffer_size
+        std::size_t buffer_size
     )
     {
-        size_t counter{0};
-        png_impl::load_png(img,
-            [&](char* data, std::size_t ndata) {
-                ndata = std::min(ndata, buffer_size - counter);
-                std::memcpy(data, image_buffer + counter, ndata);
-                counter += ndata;
-                return ndata;
-            }
-        );
+        png_loader((const unsigned char*)image_buffer, buffer_size).get_image(img);
     }
 
 // ----------------------------------------------------------------------------------------
