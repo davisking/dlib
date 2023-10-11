@@ -23,25 +23,31 @@ namespace dlib
     {
     }
 
+    void png_writer_data_callback(png_structp png, png_bytep data, png_size_t length)
+    {
+        using clb_t = std::function<void(const char*, std::size_t)>;
+        clb_t* clb = (clb_t*)png_get_io_ptr(png);
+        (*clb)((const char*)data, length);
+    }
+
+    void png_writer_flush_callback(png_structp png)
+    {
+        /*no-op*/
+    }
+
     namespace impl
     {
         void impl_save_png (
-            const std::string& file_name,
+            std::function<void(const char*, std::size_t)> clb,
             std::vector<unsigned char*>& row_pointers,
             const long width,
             const png_type type,
-            const int bit_depth
+            const int bit_depth,
+            const bool swap_rgb
         )
         {
-
-            FILE *fp;
             png_structp png_ptr;
             png_infop info_ptr;
-
-            /* Open the file */
-            fp = fopen(file_name.c_str(), "wb");
-            if (fp == NULL)
-                throw image_save_error("Unable to open " + file_name + " for writing.");
 
             /* Create and initialize the png_struct with the desired error handler
             * functions.  If you want to use the default stderr and longjump method,
@@ -52,18 +58,14 @@ namespace dlib
             png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, &png_reader_user_error_fn_silent, &png_reader_user_warning_fn_silent);
 
             if (png_ptr == NULL)
-            {
-                fclose(fp);
-                throw image_save_error("Error while writing PNG file " + file_name);
-            }
+                throw image_save_error("Error while writing PNG file : png_create_write_struct()");
 
             /* Allocate/initialize the image information data.  REQUIRED */
             info_ptr = png_create_info_struct(png_ptr);
             if (info_ptr == NULL)
             {
-                fclose(fp);
                 png_destroy_write_struct(&png_ptr,  NULL);
-                throw image_save_error("Error while writing PNG file " + file_name);
+                throw image_save_error("Error while writing PNG file : png_create_info_struct()");
             }
 
             /* Set error handling.  REQUIRED if you aren't supplying your own
@@ -72,9 +74,8 @@ namespace dlib
             if (setjmp(png_jmpbuf(png_ptr)))
             {
                 /* If we get here, we had a problem writing the file */
-                fclose(fp);
                 png_destroy_write_struct(&png_ptr, &info_ptr);
-                throw image_save_error("Error while writing PNG file " + file_name);
+                throw image_save_error("Error while writing PNG file");
             }
 
             int color_type = 0;
@@ -85,24 +86,25 @@ namespace dlib
                 case png_type_gray:      color_type = PNG_COLOR_TYPE_GRAY; break;
                 default:
                     {
-                        fclose(fp);
                         png_destroy_write_struct(&png_ptr, &info_ptr);
                         throw image_save_error("Invalid color type");
                     }
             }
 
-
-            /* Set up the output control if you are using standard C streams */
-            png_init_io(png_ptr, fp);
-
+            png_set_write_fn(
+                png_ptr, &clb, 
+                png_writer_data_callback,
+                png_writer_flush_callback
+            );
 
             int png_transforms = PNG_TRANSFORM_IDENTITY;
             byte_orderer bo;
             if (bo.host_is_little_endian())
                 png_transforms |= PNG_TRANSFORM_SWAP_ENDIAN;
-
+            if (swap_rgb)
+                png_transforms |= PNG_TRANSFORM_BGR;
+                
             const long height = row_pointers.size();
-
 
             png_set_IHDR(png_ptr, info_ptr, width, height, bit_depth, color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
             png_set_rows(png_ptr, info_ptr, &row_pointers[0]);
@@ -110,9 +112,6 @@ namespace dlib
 
             /* Clean up after the write, and free any memory allocated */
             png_destroy_write_struct(&png_ptr, &info_ptr);
-
-            /* Close the file */
-            fclose(fp);
         }
     }
 }

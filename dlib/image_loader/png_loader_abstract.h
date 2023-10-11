@@ -78,6 +78,18 @@ namespace dlib
                   us from loading the given PNG buffer.
         !*/
 
+        png_loader( 
+            std::istream& in
+        );
+        /*!
+            ensures
+                - loads the PNG file from the c++ IO stream into this object
+            throws
+                - image_load_error
+                  This exception is thrown if there is some error that prevents
+                  us from loading the given PNG buffer.
+        !*/
+
         ~png_loader(
         );
         /*!
@@ -166,36 +178,42 @@ namespace dlib
             - performs: png_loader(file_name).get_image(image);
     !*/
 
+// ----------------------------------------------------------------------------------------
+
     template <
-        typename image_type
+        typename image_type,
+        typename Byte
         >
     void load_png (
         image_type& image,
-        const unsigned char* image_buffer,
+        const Byte* image_buffer,
         size_t buffer_size
     );
     /*!
         requires
             - image_type == an image object that implements the interface defined in
               dlib/image_processing/generic_image.h 
+            - Byte is either char, int8_t, uint8_t or std::byte
         ensures
             - performs: png_loader(image_buffer, buffer_size).get_image(image);
     !*/
+    
+// ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type
-        >
+      class image_type
+    >
     void load_png (
-        image_type& image,
-        const char* image_buffer,
-        size_t buffer_size
+        image_type& img,
+        std::istream& in
     );
     /*!
         requires
             - image_type == an image object that implements the interface defined in
               dlib/image_processing/generic_image.h 
+            - in is an input stream containing a complete PNG encoded image
         ensures
-            - performs: png_loader((unsigned char*)image_buffer, buffer_size).get_image(image);
+            - Reads and ecodes the PNG file located in stream
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -203,5 +221,3 @@ namespace dlib
 }
 
 #endif // DLIB_PNG_IMPORT_ABSTRACT
-
-

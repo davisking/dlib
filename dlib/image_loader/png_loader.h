@@ -4,38 +4,41 @@
 #define DLIB_PNG_IMPORT
 
 #include <memory>
+#include <cstring>
+#include <functional>
+#include <istream>
+#include <fstream>
 
 #include "png_loader_abstract.h"
 #include "image_loader.h"
 #include "../pixel.h"
-#include "../dir_nav.h"
+#include "../type_traits.h"
 #include "../test_for_odr_violations.h"
+#include "../dir_nav.h"
 
 namespace dlib
 {
 
-    struct LibpngData;
-    struct PngBufferReaderState;
-    struct FileInfo;
+// ----------------------------------------------------------------------------------------
+
     class png_loader : noncopyable
     {
     public:
 
+        png_loader( std::istream& in );
         png_loader( const char* filename );
         png_loader( const std::string& filename );
         png_loader( const dlib::file& f );
-        png_loader( const unsigned char* image_buffer, size_t buffer_size );
-        ~png_loader();
+        png_loader( const unsigned char* image_buffer, std::size_t buffer_size );
 
-        bool is_gray() const;
-        bool is_graya() const;
-        bool is_rgb() const;
-        bool is_rgba() const;
+        bool is_gray()              const;
+        bool is_graya()             const;
+        bool is_rgb()               const;
+        bool is_rgba()              const;
+        unsigned int bit_depth ()   const;
 
-        unsigned int bit_depth () const { return bit_depth_; }
-
-        template<typename T>
-        void get_image( T& t_) const
+        template<class image_type>
+        void get_image( image_type& img) const 
         {
 #ifndef DLIB_PNG_SUPPORT
             /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -45,201 +48,142 @@ namespace dlib
                 to link against the libpng library.
             !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
             COMPILE_TIME_ASSERT(sizeof(T) == 0);
+#else
+            using pixel_type = pixel_type_t<image_type>;
+            auto t = make_image_view(img);
+
+            t.set_size( height, width );
+
+            const auto assign_gray = [&](const auto** lines) 
+            {
+                for ( int n = 0; n < height; ++n )
+                    for ( int m = 0; m < width; ++m )
+                        assign_pixel( t[n][m], lines[n][m]);
+            };
+
+            const auto assign_gray_alpha = [&](const auto** lines) 
+            {
+                for ( int n = 0; n < height; ++n )
+                {
+                    for ( int m = 0; m < width; ++m )
+                    {
+                        if (!pixel_traits<pixel_type>::has_alpha)
+                        {
+                            assign_pixel(t[n][m], lines[n][m*2]);
+                        }
+                        else
+                        {
+                            rgb_alpha_pixel pix;
+                            assign_pixel(pix,       lines[n][m*2]);
+                            assign_pixel(pix.alpha, lines[n][m*2+1]);
+                            assign_pixel(t[n][m], pix);
+                        }
+                    }
+                }
+            };
+
+            const auto assign_rgb = [&](const auto** lines) 
+            {
+                for ( int n = 0; n < height;++n )
+                {
+                    for ( int m = 0; m < width;++m )
+                    {
+                        rgb_pixel p;
+                        p.red   = static_cast<uint8>(lines[n][m*3]);
+                        p.green = static_cast<uint8>(lines[n][m*3+1]);
+                        p.blue  = static_cast<uint8>(lines[n][m*3+2]);
+                        assign_pixel( t[n][m], p );
+                    }
+                }
+            };
+
+            const auto assign_rgba = [&](const auto** lines) 
+            {
+                if (!pixel_traits<pixel_type>::has_alpha)
+                    assign_all_pixels(t,0);
+
+                for ( int n = 0; n < height; ++n )
+                {
+                    for ( int m = 0; m < width; ++m )
+                    {
+                        rgb_alpha_pixel p;
+                        p.red   = static_cast<uint8>(lines[n][m*4]);
+                        p.green = static_cast<uint8>(lines[n][m*4+1]);
+                        p.blue  = static_cast<uint8>(lines[n][m*4+2]);
+                        p.alpha = static_cast<uint8>(lines[n][m*4+3]);
+                        assign_pixel( t[n][m], p );
+                    }
+                }
+            };
+
+            const auto assign = [&](const auto** lines)
+            {
+                if (is_gray())
+                    assign_gray(lines);
+
+                else if (is_graya())
+                    assign_gray_alpha(lines);
+                
+                else if (is_rgb())
+                    assign_rgb(lines);
+
+                else if (is_rgba())
+                    assign_rgba(lines);
+            };
+
+            if (bit_depth_ == 8)
+                assign((const uint8_t**)(rows));
+            
+            else if (bit_depth_ == 16)
+                assign((const uint16_t**)(rows));
 #endif
-
-            typedef typename image_traits<T>::pixel_type pixel_type;
-            image_view<T> t(t_);
-            t.set_size( height_, width_ );
-
-
-            if (is_gray() && bit_depth_ == 8)
-            {
-                for ( unsigned n = 0; n < height_;n++ )
-                {
-                    const unsigned char* v = get_row( n );
-                    for ( unsigned m = 0; m < width_;m++ )
-                    {
-                        unsigned char p = v[m];
-                        assign_pixel( t[n][m], p );
-                    }
-                }
-            }
-            else if (is_gray() && bit_depth_ == 16)
-            {
-                for ( unsigned n = 0; n < height_;n++ )
-                {
-                    const uint16* v = (uint16*)get_row( n );
-                    for ( unsigned m = 0; m < width_;m++ )
-                    {
-                        dlib::uint16 p = v[m];
-                        assign_pixel( t[n][m], p );
-                    }
-                }
-            }
-            else if (is_graya() && bit_depth_ == 8)
-            {
-                for ( unsigned n = 0; n < height_;n++ )
-                {
-                    const unsigned char* v = get_row( n );
-                    for ( unsigned m = 0; m < width_; m++ )
-                    {
-                        unsigned char p = v[m*2];
-                        if (!pixel_traits<pixel_type>::has_alpha)
-                        {
-                            assign_pixel( t[n][m], p );
-                        }
-                        else
-                        {
-                            unsigned char pa = v[m*2+1];
-                            rgb_alpha_pixel pix;
-                            assign_pixel(pix, p);
-                            assign_pixel(pix.alpha, pa);
-                            assign_pixel(t[n][m], pix);
-                        }
-                    }
-                }
-            }
-            else if (is_graya() && bit_depth_ == 16)
-            {
-                for ( unsigned n = 0; n < height_;n++ )
-                {
-                    const uint16* v = (uint16*)get_row( n );
-                    for ( unsigned m = 0; m < width_; m++ )
-                    {
-                        dlib::uint16 p = v[m*2];
-                        if (!pixel_traits<pixel_type>::has_alpha)
-                        {
-                            assign_pixel( t[n][m], p );
-                        }
-                        else
-                        {
-                            dlib::uint16 pa = v[m*2+1];
-                            rgb_alpha_pixel pix;
-                            assign_pixel(pix, p);
-                            assign_pixel(pix.alpha, pa);
-                            assign_pixel(t[n][m], pix);
-                        }
-                    }
-                }
-            }
-            else if (is_rgb() && bit_depth_ == 8)
-            {
-                for ( unsigned n = 0; n < height_;n++ )
-                {
-                    const unsigned char* v = get_row( n );
-                    for ( unsigned m = 0; m < width_;m++ )
-                    {
-                        rgb_pixel p;
-                        p.red = v[m*3];
-                        p.green = v[m*3+1];
-                        p.blue = v[m*3+2];
-                        assign_pixel( t[n][m], p );
-                    }
-                }
-            }
-            else if (is_rgb() && bit_depth_ == 16)
-            {
-                for ( unsigned n = 0; n < height_;n++ )
-                {
-                    const uint16* v = (uint16*)get_row( n );
-                    for ( unsigned m = 0; m < width_;m++ )
-                    {
-                        rgb_pixel p;
-                        p.red   = static_cast<uint8>(v[m*3]);
-                        p.green = static_cast<uint8>(v[m*3+1]);
-                        p.blue  = static_cast<uint8>(v[m*3+2]);
-                        assign_pixel( t[n][m], p );
-                    }
-                }
-            }
-            else if (is_rgba() && bit_depth_ == 8)
-            {
-                if (!pixel_traits<pixel_type>::has_alpha)
-                    assign_all_pixels(t,0);
-
-                for ( unsigned n = 0; n < height_;n++ )
-                {
-                    const unsigned char* v = get_row( n );
-                    for ( unsigned m = 0; m < width_;m++ )
-                    {
-                        rgb_alpha_pixel p;
-                        p.red = v[m*4];
-                        p.green = v[m*4+1];
-                        p.blue = v[m*4+2];
-                        p.alpha = v[m*4+3];
-                        assign_pixel( t[n][m], p );
-                    }
-                }
-            }
-            else if (is_rgba() && bit_depth_ == 16)
-            {
-                if (!pixel_traits<pixel_type>::has_alpha)
-                    assign_all_pixels(t,0);
-
-                for ( unsigned n = 0; n < height_;n++ )
-                {
-                    const uint16* v = (uint16*)get_row( n );
-                    for ( unsigned m = 0; m < width_;m++ )
-                    {
-                        rgb_alpha_pixel p;
-                        p.red   = static_cast<uint8>(v[m*4]);
-                        p.green = static_cast<uint8>(v[m*4+1]);
-                        p.blue  = static_cast<uint8>(v[m*4+2]);
-                        p.alpha = static_cast<uint8>(v[m*4+3]);
-                        assign_pixel( t[n][m], p );
-                    }
-                }
-            }
         }
 
     private:
-        const unsigned char* get_row( unsigned i ) const;
-        std::unique_ptr<FileInfo> check_file( const char* filename );
-        void read_image( std::unique_ptr<FileInfo> file_info );
-        unsigned height_, width_;
-        unsigned bit_depth_;
-        int color_type_;
-        std::unique_ptr<LibpngData> ld_;
-        std::unique_ptr<PngBufferReaderState> buffer_reader_state_;
+        void load(std::function<std::size_t(char*,std::size_t)> clb);
+        void load(std::istream& in);
+
+        int             height{0};
+        int             width{0};
+        int             bit_depth_{0};
+        int             color_type{0};
+        unsigned char** rows{nullptr};
+        std::shared_ptr<void> finalizer;
     };
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename image_type
-        >
+    template <class image_type>
     void load_png (
-        image_type& image,
+        image_type& img,
+        std::istream& in
+    )
+    {
+        png_loader(in).get_image(img);
+    }
+
+    template <class image_type>
+    void load_png (
+        image_type& img,
         const std::string& file_name
     )
     {
-        png_loader(file_name).get_image(image);
+        png_loader(file_name).get_image(img);
     }
 
     template <
-        typename image_type
-        >
+      class image_type,
+      class Byte,
+      std::enable_if_t<is_byte<Byte>::value, bool> = true
+    >
     void load_png (
-        image_type& image,
-        const unsigned char* image_buffer,
-        size_t buffer_size
+        image_type& img,
+        const Byte* image_buffer,
+        std::size_t buffer_size
     )
     {
-        png_loader(image_buffer, buffer_size).get_image(image);
+        png_loader((const unsigned char*)image_buffer, buffer_size).get_image(img);
     }
-
-    template <
-        typename image_type
-        >
-    void load_png (
-        image_type& image,
-        const char* image_buffer,
-        size_t buffer_size
-    )
-    {
-        png_loader(reinterpret_cast<const unsigned char*>(image_buffer), buffer_size).get_image(image);
-    }
-
 
 // ----------------------------------------------------------------------------------------
 
@@ -250,4 +194,3 @@ namespace dlib
 #endif 
 
 #endif // DLIB_PNG_IMPORT 
-
