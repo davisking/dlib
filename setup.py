@@ -173,7 +173,9 @@ def num_available_cpu_cores(ram_per_build_process_in_gb):
     if 'TRAVIS' in os.environ and os.environ['TRAVIS']=='true':
         # When building on travis-ci, just use 2 cores since travis-ci limits
         # you to that regardless of what the hardware might suggest.
-        return 2 
+        return 2
+    elif 'CMAKE_BUILD_PARALLEL_LEVEL' in os.environ and os.environ['CMAKE_BUILD_PARALLEL_LEVEL'].isnumeric():
+        return int(os.environ['CMAKE_BUILD_PARALLEL_LEVEL'])
     try:
         mem_bytes = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')  
         mem_gib = mem_bytes/(1024.**3)
