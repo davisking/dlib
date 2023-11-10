@@ -1310,6 +1310,73 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace impl
+    {
+        enum class points_orientation
+        {
+            collinear,
+            clockwise,
+            couter_clockwise,
+        };
+
+        template <typename T>
+        std::enable_if_t<std::is_same<T, point>::value || std::is_same<T, dpoint>::value, points_orientation>
+        find_points_orientation(const T& a, const T& b, const T& c)
+        {
+            const auto v = a.x() * (b.y() - c.y()) + b.x() * (c.y() - a.y()) + c.x() * (a.y() - b.y());
+            if (v < 0) return points_orientation::clockwise;
+            if (v > 0) return points_orientation::couter_clockwise;
+            return points_orientation::collinear;
+        }
+    }
+
+    template <typename T>
+    std::enable_if_t<std::is_same<T, point>::value || std::is_same<T, dpoint>::value, std::vector<T>>
+    find_convex_hull(std::vector<T>& points)
+    {
+        if (points.size() < 3)
+            return {};
+
+        // find the point with the lowest y coordinate, and the left-most in case of ties.
+        const auto p0 = *std::min_element(points.begin(), points.end(), [](const auto& a, const auto& b){
+            return std::make_pair(a.y(), a.x()) < std::make_pair(b.y(), b.x());
+        });
+
+        // sort the points by polar angle in clockwise order
+        std::sort(points.begin(), points.end(), [&p0](const auto& a, const auto& b){
+            switch (impl::find_points_orientation(p0, a, b))
+            {
+                case impl::points_orientation::clockwise:
+                    return true;
+                case impl::points_orientation::couter_clockwise:
+                    return false;
+                case impl::points_orientation::collinear:
+                    return (p0.x() - a.x()) * (p0.x() - a.x()) + (p0.y() - a.y()) * (p0.y() - a.y()) <
+                           (p0.x() - b.x()) * (p0.x() - b.x()) + (p0.y() - b.y()) * (p0.y() - b.y());
+                default:
+                    throw std::logic_error("unreachable: invalid points_orientation");
+            }
+        });
+
+        std::vector<T> hull;
+        for (const auto& p : points)
+        {
+            while (hull.size() > 1 &&
+                impl::find_points_orientation(hull.at(hull.size() - 2), hull.back(), p) != impl::points_orientation::clockwise
+            )
+            {
+                hull.pop_back();
+            }
+            hull.push_back(p);
+        }
+        // If all the points were collinear, we'll have only two points in the hull, so we need to clear it.
+        if (hull.size() < 3)
+            hull.clear();
+        return hull;
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename array_of_dpoints
         >
