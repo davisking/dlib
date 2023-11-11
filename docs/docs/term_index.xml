@@ -465,6 +465,7 @@
          <term file="linear_algebra.html" name="angle_between_lines"             include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="is_convex_quadrilateral"         include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="polygon_area"                    include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="polygon"                         include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="find_convex_quadrilateral"       include="dlib/geometry.h"/>
          <term file="dlib/geometry/line_abstract.h.html" name="no_convex_quadrilateral"       include="dlib/geometry.h"/>
 
@@ -1571,6 +1572,7 @@
          <term file="imaging.html" name="load_webp"             include="dlib/image_io.h"/>
          <term file="imaging.html" name="pixel_traits"         include="dlib/pixel.h"/>
          <term file="imaging.html" name="rgb_pixel"            include="dlib/pixel.h"/>
+         <term file="imaging.html" name="hsv_pixel"            include="dlib/pixel.h"/>
          <term file="imaging.html" name="bgr_pixel"            include="dlib/pixel.h"/>
          <term file="imaging.html" name="cv_image"             include="dlib/opencv.h"/>
          <term file="imaging.html" name="toMat"                include="dlib/opencv.h"/>

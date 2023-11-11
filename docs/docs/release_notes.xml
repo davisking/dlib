@@ -18,7 +18,7 @@ New Features and Improvements:
    - Add insert_image_chip() (PR #2781)
 
    - Unify all conversions to UTF-32 #2737
-      - Adds convert_to_utf32
+      - Adds convert_to_utf32()
 
    - Backports of new C++ tooling not yet available in C++14:
       - Added bind_front() and bind_back() (PR #2705)
@@ -30,7 +30,7 @@ New Features and Improvements:
    - Container classes
       - Support noexcept dlib::type_safe_union::swap() (PR #2604)
       - dlib::optional (PR #2815)
-      - New type erasure tooling in dlib::te (PR #2666)
+      - New type erasure tooling in dlib/any/storage.h (PR #2666)
 
    - Update libraries in dlib/external
       - Update libjpeg to version 9e (PR #2619)
@@ -43,24 +43,22 @@ New Features and Improvements:
       - circular_buffer : 10X speedup (PR #2779)
       - type_safe_union : visit() and apply_to_contents() performance improvements (PR #2615)
       - Speed up DNN execution.  PRs: 2656, 2839, 2842
+   - Add support for loading custom label fonts in imglab via --font (PR #2733)
+   - Add HSV pixel support (PR #2758)
+   - Add simple polygon class (PR #2750)
      
 
+  # TODO: davis update web docs for this
    - FFT tooling
       - stft(), istft(), stftr() and istftr() (PR #2627)
       - [FFT] split FFT API into different layers #2793
          - Adds the dlib/fft folder and some more overloads of fft functions.  Update doc links for sure.
-
-
    - if constexpr() for C++14 (PR #2654)
       - Adds dlib/constexpr_if.h, update doc links with this
-
    - FFMPEG wrappers: dlib::ffmpeg::decoder and dlib::ffmpeg::demuxer (PR #2707)
-   - Add support for loading custom label fonts in imglab (PR #2733)
-   - Add simple polygon class (PR #2750)
-   - Add HSV pixel support (PR #2758)
 
 Non-Backwards Compatible Changes:
-   - Make C++14 and CMake 3.8.0 the new minimum required versions
+   - Dlib now requires C++14 and at least CMake version 3.8.0.
 
 Bug fixes:
    - Various adjustments to avoid errors on unusual platforms of system configurations.
