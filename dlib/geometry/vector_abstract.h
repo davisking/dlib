@@ -459,11 +459,12 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
-    std::enable_if_t<std::is_same<T, point>::value || std::is_same<T, dpoint>::value, std::vector<T>>
-    find_convex_hull(
+    std::vector<T> find_convex_hull(
         std::vector<T>& points
     );
     /*!
+        requires
+            - T == dlib::point or dlib::dpoint
         ensures
             - If points.size() < 3: it returns an empty vector.
             - Else: Finds the convex hull of points using the Graham scan algorithm.  That is,

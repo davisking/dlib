@@ -1331,9 +1331,9 @@ namespace dlib
     }
 
     template <typename T>
-    std::enable_if_t<std::is_same<T, point>::value || std::is_same<T, dpoint>::value, std::vector<T>>
-    find_convex_hull(std::vector<T>& points)
+    std::vector<T> find_convex_hull(std::vector<T>& points)
     {
+        static_assert(std::is_same<T, point>::value || std::is_same<T, dpoint>::value, "find_convex_hull() only works for 2D dlib::vector types.");
         if (points.size() < 3)
             return {};
 
@@ -1351,10 +1351,9 @@ namespace dlib
                 case impl::points_orientation::couter_clockwise:
                     return false;
                 case impl::points_orientation::collinear:
-                    return (p0.x() - a.x()) * (p0.x() - a.x()) + (p0.y() - a.y()) * (p0.y() - a.y()) <
-                           (p0.x() - b.x()) * (p0.x() - b.x()) + (p0.y() - b.y()) * (p0.y() - b.y());
+                    return length_squared(p0-a) < length_squared(p0-b);
                 default:
-                    throw std::logic_error("unreachable: invalid points_orientation");
+                    DLIB_CASSERT(false, "this should be impossible");
             }
         });
 
