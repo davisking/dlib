@@ -458,6 +458,22 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T>
+    std::vector<T> find_convex_hull(
+        std::vector<T>& points
+    );
+    /*!
+        requires
+            - T == dlib::point or dlib::dpoint
+        ensures
+            - If points.size() < 3: it returns an empty vector.
+            - Else: Finds the convex hull of points using the Graham scan algorithm.  That is,
+              the smallest convex shape that contains all points.  Moreover, in case all points
+              are collinear, that is, along the same line, it will also return an empty vector.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename array_of_dpoints
         >
