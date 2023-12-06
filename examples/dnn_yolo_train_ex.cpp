@@ -329,7 +329,7 @@ try
             cout << "Could not find file " << sync_file_name << endl;
             return EXIT_FAILURE;
         }
-        matrix<rgb_pixel> image, resized;
+        matrix<rgb_pixel> image, resized(image_size, image_size);
         std::map<std::string, std::vector<std::pair<double, bool>>> hits;
         std::map<std::string, unsigned long> missing;
         for (const auto& label : options.labels)
@@ -342,7 +342,7 @@ try
         {
             const auto& im = dataset.images[i];
             load_image(image, data_directory + "/" + im.filename);
-            const auto tform = preprocess_image(image, resized, image_size);
+            const auto tform = preprocess_image(image, resized);
             auto dets = net.process(resized, 0.005);
             postprocess_detections(tform, dets);
             std::vector<bool> used(dets.size(), false);
