@@ -131,9 +131,9 @@ namespace darknet
 }
 
 // In this example, YOLO expects square images, and we choose to transform them by letterboxing them.
-rectangle_transform preprocess_image(const matrix<rgb_pixel>& image, matrix<rgb_pixel>& output, const long image_size)
+rectangle_transform preprocess_image(const matrix<rgb_pixel>& image, matrix<rgb_pixel>& output)
 {
-    return rectangle_transform(inv(letterbox_image(image, output, image_size)));
+    return rectangle_transform(inv(letterbox_image(image, output)));
 }
 
 // YOLO outputs the bounding boxes in the coordinate system of the input (letterboxed) image, so we need to convert them
@@ -296,14 +296,14 @@ try
         }
         const double threshold = get_option(parser, "test", 0.01);
         image_window win;
-        matrix<rgb_pixel> image, resized;
+        matrix<rgb_pixel> image, resized(image_size, image_size);
         for (const auto& im : dataset.images)
         {
             win.clear_overlay();
             load_image(image, data_directory + "/" + im.filename);
             win.set_title(im.filename);
             win.set_image(image);
-            const auto tform = preprocess_image(image, resized, image_size);
+            const auto tform = preprocess_image(image, resized);
             auto detections = net.process(resized, threshold);
             postprocess_detections(tform, detections);
             cout << "# detections: " << detections.size() << endl;
@@ -395,6 +395,7 @@ try
         dlib::rand rnd(time(nullptr) + seed);
         matrix<rgb_pixel> image, rotated;
         std::pair<matrix<rgb_pixel>, std::vector<yolo_rect>> temp;
+        temp.first.set_size(image_size, image_size);
         random_cropper cropper;
         cropper.set_seed(time(nullptr) + seed);
         cropper.set_chip_dims(image_size, image_size);
@@ -423,7 +424,7 @@ try
                 for (auto& box : temp.second)
                     box.rect = tform(box.rect);
 
-                tform = letterbox_image(rotated, temp.first, image_size);
+                tform = letterbox_image(rotated, temp.first);
                 for (auto& box : temp.second)
                     box.rect = tform(box.rect);
 
