@@ -984,7 +984,7 @@ namespace dlib
         image_view<image_type2> vimg_out(img_out);
         const long rows = vimg_out.nr();
         const long cols = vimg_out.nc();
-        DLIB_CASSERT(vimg_out.size() > 0, "size must be bigger than zero, but was " << rows << "x" << cols);
+        DLIB_CASSERT(vimg_out.size() > 0, "img_out size must be bigger than zero, but was " << rows << "x" << cols);
 
         // early return if the image has already the requested size and no padding is needed
         if (have_same_dimensions(vimg_in, vimg_out))
@@ -993,22 +993,12 @@ namespace dlib
             return point_transform_affine();
         }
 
-        const auto scale = [&]
-        {
-            const double rows_scale = rows / static_cast<double>(vimg_in.nr());
-            const double cols_scale = cols / static_cast<double>(vimg_in.nc());
-            if (rows_scale * vimg_in.nc() > rows)
-            {
-                return cols_scale;
-            }
-            else
-            {
-                return rows_scale;
-            }
-        }();
+        const double rows_scale = rows / static_cast<double>(vimg_in.nr());
+        const double cols_scale = cols / static_cast<double>(vimg_in.nc());
+        const double scale = rows_scale * vimg_in.nc() > rows ? cols_scale : rows_scale;
 
-        const long nr = std::round(scale * vimg_in.nr());
-        const long nc = std::round(scale * vimg_in.nc());
+        const long nr = std::lround(scale * vimg_in.nr());
+        const long nc = std::lround(scale * vimg_in.nc());
         dpoint offset((cols - nc) / 2.0, (rows - nr) / 2.0);
         const auto r = rectangle(offset.x(), offset.y(), offset.x() + nc - 1, offset.y() + nr - 1);
         zero_border_pixels(vimg_out, r);
