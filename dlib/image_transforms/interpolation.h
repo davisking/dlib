@@ -999,7 +999,7 @@ namespace dlib
 
         const long nr = std::lround(scale * vimg_in.nr());
         const long nc = std::lround(scale * vimg_in.nc());
-        dpoint offset((cols - nc) / 2.0, (rows - nr) / 2.0);
+        const dpoint offset((cols - nc) / 2.0, (rows - nr) / 2.0);
         const auto r = rectangle(offset.x(), offset.y(), offset.x() + nc - 1, offset.y() + nr - 1);
         zero_border_pixels(vimg_out, r);
         auto si = sub_image(img_out, r);
