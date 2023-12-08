@@ -2438,9 +2438,9 @@ namespace
         rgb_pixel black(0, 0, 0);
         rgb_pixel white(255, 255, 255);
         matrix<rgb_pixel> img_s(40, 60);
-        matrix<rgb_pixel> img_d;
+        matrix<rgb_pixel> img_d(30, 30);
         assign_all_pixels(img_s, white);
-        const auto tform = letterbox_image(img_s, img_d, 30, interpolate_nearest_neighbor());
+        const auto tform = letterbox_image(img_s, img_d, interpolate_nearest_neighbor());
         DLIB_TEST(tform.get_m() == identity_matrix<double>(2) * 0.5);
         DLIB_TEST(tform.get_b() == dpoint(0, 5));
 

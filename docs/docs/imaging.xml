@@ -2008,7 +2008,7 @@
          <file>dlib/image_transforms.h</file>
          <spec_file link="true">dlib/image_transforms/interpolation_abstract.h</spec_file>
          <description>        
-            Scales an image so that it fits into a size * size square, while preserving the aspect
+            Scales an image so that it fits into another size, while preserving the aspect
             ratio of the actual contents by appropriate 0 padding.
 
          <examples>
