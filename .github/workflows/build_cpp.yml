@@ -224,17 +224,18 @@ jobs:
       run: cmake --build build --config Debug --target dtest --parallel 4
     - name: Build ancillary tools
       run: cmake --build build --config Release --target imglab htmlify dtoc --parallel 4
-
-  macos-latest:
-    runs-on: 'macos-latest'
-    steps:
-    - uses: actions/checkout@v2
-    - name: Configure
-      # MacOS machines often come with low quality BLAS libraries installed, so don't use those.
-      run: cmake ${{ github.workspace }}/dlib/test -B build -DDLIB_USE_BLAS=0 -DDLIB_USE_LAPACK=0
-    - name: Build just tests
-      run: cmake --build build --config Release --target dtest --parallel 4
-    - name: Test
-      run: build/dtest --runall --no_test_timer -q
-    - name: Build examples, etc
-      run: cmake --build build --config Release --parallel 2
+  
+  # Disable this because macos targets aren't working on github actions right now.
+  #macos-latest:
+  #  runs-on: 'macos-latest'
+  #  steps:
+  #  - uses: actions/checkout@v2
+  #  - name: Configure
+  #    # MacOS machines often come with low quality BLAS libraries installed, so don't use those.
+  #    run: cmake ${{ github.workspace }}/dlib/test -B build -DDLIB_USE_BLAS=0 -DDLIB_USE_LAPACK=0
+  #  - name: Build just tests
+  #    run: cmake --build build --config Release --target dtest --parallel 4
+  #  - name: Test
+  #    run: build/dtest --runall --no_test_timer -q
+  #  - name: Build examples, etc
+  #    run: cmake --build build --config Release --parallel 2
