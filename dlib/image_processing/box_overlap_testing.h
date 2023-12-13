@@ -93,9 +93,9 @@ namespace dlib
                 return false;
 
             const double outer = (a+b).area();
-            if (inner/outer > iou_thresh || 
-                inner/a.area() > percent_covered_thresh || 
-                inner/b.area() > percent_covered_thresh)
+            if (inner/outer >= iou_thresh || 
+                inner/a.area() >= percent_covered_thresh || 
+                inner/b.area() >= percent_covered_thresh)
                 return true;
             else
                 return false;
