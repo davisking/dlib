@@ -206,20 +206,10 @@ try
         trainer.be_verbose();
         cout << trainer << endl;
 
-        // During the training, we will compute the empirical cross-correlation
+        // During the training, we will visualize the empirical cross-correlation
         // matrix between the features of both versions of the augmented images.
         // This matrix should be getting close to the identity matrix as the training
-        // progresses.  Note that this step is already done in the loss layer, and it's
-        // not necessary to do it here for the example to work.  However, it provides
-        // a nice visualization of the training progress: the closer to the identity
-        // matrix, the better.
-        resizable_tensor eccm;
-        eccm.set_size(dims, dims);
-        // Some tensors needed to perform batch normalization
-        resizable_tensor za_norm, zb_norm, means, invstds, rms, rvs, gamma, beta;
-        const double eps = DEFAULT_BATCH_NORM_EPS;
-        gamma.set_size(1, dims);
-        beta.set_size(1, dims);
+        // progresses.  Note that this is done here for visualization purposes only.
         image_window win;
 
         std::vector<pair<matrix<rgb_pixel>, matrix<rgb_pixel>>> batch;
@@ -234,32 +224,13 @@ try
             }
             trainer.train_one_step(batch);
 
-            // Compute the empirical cross-correlation matrix every 100 steps. Again,
+            // Get the empirical cross-correlation matrix every 100 steps. Again,
             // this is not needed for the training to work, but it's nice to visualize.
             if (trainer.get_train_one_step_calls() % 100 == 0)
             {
                 // Wait for threaded processing to stop in the trainer.
                 trainer.get_net(force_flush_to_disk::no);
-                // Get the output from the last fc layer
-                const auto& out = net.subnet().get_output();
-                // The trainer might have synchronized its state to the disk and cleaned
-                // the network state. If that happens, the output will be empty, in which
-                // case, we just skip the empirical cross-correlation matrix computation.
-                if (out.size() == 0)
-                    continue;
-                // Separate both augmented versions of the images
-                alias_tensor split(out.num_samples() / 2, dims);
-                auto za = split(out);
-                auto zb = split(out, split.size());
-                gamma = 1;
-                beta = 0;
-                // Perform batch normalization on each feature representation, independently.
-                tt::batch_normalize(eps, za_norm, means, invstds, 1, rms, rvs, za, gamma, beta);
-                tt::batch_normalize(eps, zb_norm, means, invstds, 1, rms, rvs, zb, gamma, beta);
-                // Compute the empirical cross-correlation matrix between the features and
-                // visualize it.
-                tt::gemm(0, eccm, 1, za_norm, true, zb_norm, false);
-                eccm /= batch_size;
+                const matrix<float> eccm = mat(net.loss_details().get_eccm());
                 win.set_image(round(abs(mat(eccm)) * 255));
                 win.set_title("Barlow Twins step#: " + to_string(trainer.get_train_one_step_calls()));
             }

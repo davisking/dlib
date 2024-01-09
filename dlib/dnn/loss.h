@@ -4154,6 +4154,9 @@ namespace dlib
 
         float get_lambda() const  { return lambda; }
 
+        tensor& get_eccm() { return eccm; }
+        const tensor& get_eccm() const { return eccm; }
+
         friend void serialize(const loss_barlow_twins_& item, std::ostream& out)
         {
             serialize("loss_barlow_twins_", out);

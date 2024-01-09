@@ -2144,6 +2144,20 @@ namespace dlib
                   in WHAT THIS OBJECT REPRESENTS for details.
         !*/
 
+        tensor& get_eccm();
+        /*!
+            ensures
+                - returns the empirical cross-correlation matrix computed by the loss.
+                - this is only meant to be used for visualization/debugging purposes.
+        !*/
+
+        const tensor& get_eccm() const;
+        /*!
+            ensures
+                - returns the empirical cross-correlation matrix computed by the loss.
+                - this is only meant to be used for visualization/debugging purposes.
+        !*/
+
         template <
             typename SUBNET
         >
