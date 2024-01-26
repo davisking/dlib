@@ -3,6 +3,7 @@
 
 #include <type_traits>
 #include <mkl_dfti.h>
+#include <mkl_service.h>
 #include "fft_size.h"
 
 #define DLIB_DFTI_CHECK_STATUS(s) \
@@ -13,6 +14,12 @@
 
 namespace dlib
 {
+    inline bool init_mkl_threads()
+    {
+        static const bool done = [] {mkl_set_num_threads(1); return true;}();
+        return done;
+    }
+
     template<typename T>
     void mkl_fft(const fft_size& dims, const std::complex<T>* in, std::complex<T>* out, bool is_inverse)
     /*!
@@ -63,6 +70,7 @@ namespace dlib
         DLIB_DFTI_CHECK_STATUS(status);
 
         // Unless we use sequential mode, the fft results are not correct.
+        (void)init_mkl_threads();
         status = DftiSetValue(h, DFTI_THREAD_LIMIT, 1);
         DLIB_DFTI_CHECK_STATUS(status);
 
@@ -146,6 +154,7 @@ namespace dlib
         DLIB_DFTI_CHECK_STATUS(status);
 
         // Unless we use sequential mode, the fft results are not correct.
+        (void)init_mkl_threads();
         status = DftiSetValue(h, DFTI_THREAD_LIMIT, 1);
         DLIB_DFTI_CHECK_STATUS(status);
 
@@ -226,6 +235,7 @@ namespace dlib
         DLIB_DFTI_CHECK_STATUS(status);
         
         // Unless we use sequential mode, the fft results are not correct.
+        (void)init_mkl_threads();
         status = DftiSetValue(h, DFTI_THREAD_LIMIT, 1);
         DLIB_DFTI_CHECK_STATUS(status);
 
