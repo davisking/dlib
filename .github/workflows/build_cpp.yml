@@ -30,6 +30,34 @@ defaults:
     working-directory: dlib/test
 
 jobs:
+  ubuntu-latest-ffmpeg-default-mkl:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install libwebp-dev make yasm
+        sudo apt install libavformat-dev libavcodec-dev libavdevice-dev libavfilter-dev libavutil-dev libswresample-dev libswscale-dev 
+        sudo apt -y install libmkl-dev
+        sudo apt install ninja-build
+
+    - name: Configure tests
+      run: cmake ${{ github.workspace }}/dlib/test -B build -GNinja -DDLIB_USE_CUDA=OFF
+
+    - name: Build tests
+      run: cmake --build build --config Release --target dtest
+
+    - name: Test
+      run: build/dtest --runall -q
+
+    - name: Configure examples
+      run: cmake ${{ github.workspace }}/examples -B buildExamples -GNinja -DDLIB_USE_CUDA=OFF
+
+    - name: Build examples
+      run: cmake --build buildExamples --config Release
+
   ubuntu-latest-gcc-default-cmake-3-8-ffmpeg5:
     runs-on: 'ubuntu-latest'
     steps:
