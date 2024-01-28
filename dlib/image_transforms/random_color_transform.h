@@ -75,7 +75,7 @@ namespace dlib
         const double color_magnitude = 0.2
     )
     {
-        if (gamma_magnitude == 0 && color_magniture == 0)
+        if (gamma_magnitude == 0 && color_magnitude == 0)
             return;
 
         image_view<image_type> img(img_);
