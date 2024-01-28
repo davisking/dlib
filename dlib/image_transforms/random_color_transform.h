@@ -75,6 +75,9 @@ namespace dlib
         const double color_magnitude = 0.2
     )
     {
+        if (gamma_magnitude == 0 && color_magniture == 0)
+            return;
+
         image_view<image_type> img(img_);
         random_color_transform tform(rnd, gamma_magnitude, color_magnitude);
         for (long r = 0; r < img.nr(); ++r)
