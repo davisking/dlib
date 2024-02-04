@@ -47,7 +47,7 @@ namespace dlib
                 this object.   You must also make sure you set your build environment
                 to link against the libpng library.
             !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-            COMPILE_TIME_ASSERT(sizeof(T) == 0);
+            static_assert(sizeof(T) == 0, "DLIB_PNG_SUPPORT is not defined");
 #else
             using pixel_type = pixel_type_t<image_type>;
             auto t = make_image_view(img);
