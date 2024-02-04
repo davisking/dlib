@@ -1,8 +1,11 @@
 cmake_minimum_required(VERSION 3.17.0)
 
-project(dlib
-   VERSION 19.24.99
-   LANGUAGES C CXX)
+set(CPACK_PACKAGE_NAME "dlib")
+set(CPACK_PACKAGE_VERSION_MAJOR "19")
+set(CPACK_PACKAGE_VERSION_MINOR "24")
+set(CPACK_PACKAGE_VERSION_PATCH "99")
+set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
+project(dlib VERSION ${VERSION} LANGUAGES C CXX)
 
 # Dependencies
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -574,4 +577,62 @@ if (DLIB_BUILD_TESTS)
    target_link_libraries(dtest dlib::dlib)
    get_filename_component(DLIB_FFMPEG_DATA ${CMAKE_SOURCE_DIR}/test/ffmpeg_data/details.cfg REALPATH)
    target_compile_definitions(dtest PRIVATE DLIB_FFMPEG_DATA="${DLIB_FFMPEG_DATA}")
+   target_link_options(dtest PRIVATE $<$<CONFIG:RELEASE>:-s>)
 endif()
+
+# Install
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
+install(TARGETS dlib
+   EXPORT dlib 
+   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # Windows considers .dll to be runtime artifacts
+   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib
+   FILES_MATCHING 
+      PATTERN "*.h" 
+      PATTERN "*.cmake"
+      PATTERN "*_tutorial.txt"
+      PATTERN "cassert"
+      PATTERN "cstring"
+      PATTERN "fstream"
+      PATTERN "iomanip"
+      PATTERN "iosfwd"
+      PATTERN "iostream"
+      PATTERN "istream"
+      PATTERN "locale"
+      PATTERN "ostream"
+      PATTERN "sstream"
+      REGEX "${CMAKE_CURRENT_BINARY_DIR}" EXCLUDE)
+
+
+configure_file(${PROJECT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+configure_file(${PROJECT_SOURCE_DIR}/revision.h.in ${CMAKE_CURRENT_BINARY_DIR}/revision.h)
+configure_file(${PROJECT_SOURCE_DIR}/cmake_utils/dlibConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/revision.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib)
+
+## Config.cmake generation and installation
+set(ConfigPackageLocation "${CMAKE_INSTALL_LIBDIR}/cmake/dlib")
+install(EXPORT dlib
+   NAMESPACE dlib::
+   DESTINATION ${ConfigPackageLocation})
+
+write_basic_package_version_file(
+   "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake"
+   VERSION ${VERSION}
+   COMPATIBILITY AnyNewerVersion
+   )
+
+install(FILES 
+   "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" 
+   "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake" 
+   DESTINATION ${ConfigPackageLocation})
+
+## dlib-1.pc generation and installation
+
+configure_file("cmake_utils/dlib.pc.in" "dlib-1.pc" @ONLY)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/dlib-1.pc"
+   DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
