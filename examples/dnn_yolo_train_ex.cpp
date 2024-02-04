@@ -395,7 +395,6 @@ try
         dlib::rand rnd(time(nullptr) + seed);
         matrix<rgb_pixel> image, rotated;
         std::pair<matrix<rgb_pixel>, std::vector<yolo_rect>> temp;
-        temp.first.set_size(image_size, image_size);
         random_cropper cropper;
         cropper.set_seed(time(nullptr) + seed);
         cropper.set_chip_dims(image_size, image_size);
@@ -424,6 +423,7 @@ try
                 for (auto& box : temp.second)
                     box.rect = tform(box.rect);
 
+                temp.first.set_size(image_size, image_size);
                 tform = letterbox_image(rotated, temp.first);
                 for (auto& box : temp.second)
                     box.rect = tform(box.rect);
