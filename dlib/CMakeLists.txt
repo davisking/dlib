@@ -595,6 +595,10 @@ if (DLIB_BUILD_PYTHON)
       ../tools/python/src/numpy_returns.cpp
       ../tools/python/src/line.cpp)
    target_link_libraries(_dlib_pybind11 PRIVATE dlib::dlib)
+   set_target_properties(_dlib_pybind11 PROPERTIES
+      INTERPROCEDURAL_OPTIMIZATION ON
+      CXX_VISIBILITY_PRESET hidden
+      VISIBILITY_INLINES_HIDDEN ON)
 endif()
 
 # Install
