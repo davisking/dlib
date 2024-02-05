@@ -5,7 +5,7 @@
 # All rights reserved. Use of this source code is governed by a
 # BSD-style license that can be found in the LICENSE file.
 
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.17)
 
 # The `cmake_minimum_required(VERSION 3.4...3.22)` syntax does not work with
 # some versions of VS that have a patched CMake 3.11. This forces us to emulate
@@ -14,6 +14,10 @@ if(${CMAKE_VERSION} VERSION_LESS 3.22)
   cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 else()
   cmake_policy(VERSION 3.22)
+endif()
+
+if(POLICY CMP0148)
+  cmake_policy(SET CMP0148 OLD)
 endif()
 
 # Avoid infinite recursion if tests include this as a subdirectory

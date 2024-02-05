@@ -33,6 +33,7 @@ pkg_check_modules(FFMPEG IMPORTED_TARGET libavdevice libavfilter libavformat lib
 
 # Options
 option(DLIB_BUILD_TESTS          "Build tests"                    OFF)
+option(DLIB_BUILD_PYTHON         "Build python bindings"          OFF)
 option(DLIB_ISO_CPP_ONLY         "Build using standard c++ only"  OFF)
 option(DLIB_ENABLE_ASSERTS       "Enable Debug assert statements" OFF)
 option(DLIB_ENABLE_STACK_TRACE   "Enabled Debug stack trace"      OFF)
@@ -72,7 +73,7 @@ add_library(dlib
 target_include_directories(dlib
    INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
    INTERFACE $<INSTALL_INTERFACE:include>)
-
+set_target_properties(dlib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 add_library(dlib::dlib ALIAS dlib)
 
 if (NOT DLIB_ISO_CPP_ONLY)
@@ -272,21 +273,6 @@ if (NOT DLIB_ISO_CPP_ONLY)
             external/zlib/zutil.c)
          target_include_directories(dlib PRIVATE external/zlib external/libpng)
       endif()
-
-#             include(cmake_utils/check_if_neon_available.cmake)
-#             if (ARM_NEON_IS_AVAILABLE)
-#                message (STATUS "NEON instructions will be used for libpng.")
-#                enable_language(ASM)
-#                set(source_files ${source_files}
-#                   external/libpng/arm/arm_init.c
-#                   external/libpng/arm/filter_neon_intrinsics.c
-#                   external/libpng/arm/filter_neon.S
-#                   )
-#                set_source_files_properties(external/libpng/arm/filter_neon.S PROPERTIES COMPILE_FLAGS "${CMAKE_ASM_FLAGS} ${CMAKE_CXX_FLAGS} -x assembler-with-cpp")
-#             endif()
-#          endif()
-
-#       endif()
    endif()
 
    if (DLIB_GIF_SUPPORT)
@@ -580,6 +566,37 @@ if (DLIB_BUILD_TESTS)
    target_link_options(dtest PRIVATE $<$<CONFIG:RELEASE>:-s>)
 endif()
 
+if (DLIB_BUILD_PYTHON)
+   add_subdirectory(external/pybind11)
+   pybind11_add_module(_dlib_pybind11 
+      ../tools/python/src/dlib.cpp
+      ../tools/python/src/matrix.cpp
+      ../tools/python/src/vector.cpp
+      ../tools/python/src/svm_c_trainer.cpp
+      ../tools/python/src/svm_rank_trainer.cpp
+      ../tools/python/src/decision_functions.cpp
+      ../tools/python/src/other.cpp
+      ../tools/python/src/basic.cpp
+      ../tools/python/src/cca.cpp
+      ../tools/python/src/sequence_segmenter.cpp
+      ../tools/python/src/svm_struct.cpp
+      ../tools/python/src/image.cpp
+      ../tools/python/src/image2.cpp
+      ../tools/python/src/image3.cpp
+      ../tools/python/src/image4.cpp
+      ../tools/python/src/rectangles.cpp
+      ../tools/python/src/object_detection.cpp
+      ../tools/python/src/shape_predictor.cpp
+      ../tools/python/src/correlation_tracker.cpp
+      ../tools/python/src/face_recognition.cpp
+      ../tools/python/src/cnn_face_detector.cpp
+      ../tools/python/src/global_optimization.cpp
+      ../tools/python/src/image_dataset_metadata.cpp
+      ../tools/python/src/numpy_returns.cpp
+      ../tools/python/src/line.cpp)
+   target_link_libraries(_dlib_pybind11 PRIVATE dlib::dlib)
+endif()
+
 # Install
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
@@ -632,7 +649,12 @@ install(FILES
    DESTINATION ${ConfigPackageLocation})
 
 ## dlib-1.pc generation and installation
-
 configure_file("cmake_utils/dlib.pc.in" "dlib-1.pc" @ONLY)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/dlib-1.pc"
    DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+
+if (DLIB_BUILD_PYTHON)
+   if (CMAKE_LIBRARY_OUTPUT_DIRECTORY) 
+      configure_file(../tools/python/dlib/__init__.py.in ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/dlib/__init__.py)
+   endif()
+endif()
