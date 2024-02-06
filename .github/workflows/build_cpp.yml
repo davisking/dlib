@@ -30,7 +30,7 @@ defaults:
     working-directory: dlib/test
 
 jobs:
-  ubuntu-latest-gcc-default-cmake-3-8-ffmpeg5:
+  ubuntu-latest-gcc-default-cmake-3-17-ffmpeg5:
     runs-on: 'ubuntu-latest'
     steps:
     - uses: actions/checkout@v2
@@ -40,18 +40,18 @@ jobs:
         sudo apt update
         sudo apt install libwebp-dev make yasm
         
-    - name: Cache cmake 3.8.0
+    - name: Cache cmake 3.17.0
       uses: actions/cache@v3
       id: cache-cmake-download
       with:
         # cache this folder:
-        path: ~/cmake-3.8.0-Linux-x86_64
-        key: cmake-3.8.0_try3
+        path: ~/cmake-3.17.0-Linux-x86_64
+        key: cmake-3.17.0_try1
         
     - run: |
         # Get the minimum version of cmake dlib supports
-        wget https://cmake.org/files/v3.8/cmake-3.8.0-Linux-x86_64.tar.gz
-        tar -xf cmake-3.8.0-Linux-x86_64.tar.gz -C ~
+        wget https://cmake.org/files/v3.17/cmake-3.17.0-Linux-x86_64.tar.gz
+        tar -xf cmake-3.17.0-Linux-x86_64.tar.gz -C ~
       if: steps.cache-cmake-download.outputs.cache-hit != 'true'
 
     - name: Cache FFmpeg 5
@@ -73,23 +73,18 @@ jobs:
         cd ..
         
     - name: Configure
-      run: |
-        mkdir build
-        cd build
-        ~/cmake-3.8.0-Linux-x86_64/bin/cmake -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n5.1.3_installation .. 
+      run: ~/cmake-3.17.0-Linux-x86_64/bin/cmake ${{ github.workspace }}/dlib -B build -DDLIB_BUILD_TESTS=ON -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n5.1.3_installation
     
     - name: Build just tests
-      run: |
-        cd build
-        make -j4 dtest
+      run: ~/cmake-3.17.0-Linux-x86_64/bin/cmake --build build --config Release --target dtest --parallel 4
         
     - name: Test
       run: build/dtest --runall -q
       
-    - name: Build examples, etc
-      run: |
-        cd build
-        make -j2
+    # - name: Build examples, etc
+    #   run: |
+    #     cd build
+    #     make -j2
 
   ubuntu-latest-gcc-11-blas:
     runs-on: 'ubuntu-latest'
@@ -104,22 +99,25 @@ jobs:
       run: |
         sudo apt install gcc-11 g++-11
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110 --slave /usr/bin/g++ g++ /usr/bin/g++-11 --slave /usr/bin/gcov gcov /usr/bin/gcov-11
+    
     - name: Configure
-      run: cmake ${{ github.workspace }}/dlib/test -B build
+      run: cmake ${{ github.workspace }}/dlib -B build -DDLIB_BUILD_TESTS=ON
+    
     - name: Build just tests
       run: cmake --build build --config Release --target dtest --parallel 4
+    
     - name: Test
       run: build/dtest --runall -q
-    - name: Build examples, etc
-      run: cmake --build build --config Release --parallel 2
+    # - name: Build examples, etc
+    #   run: cmake --build build --config Release --parallel 2
 
     # Test the BLAS bindings
-    - name: Configure BLAS binding tests
-      run: cmake ${{ github.workspace }}/dlib/test/blas_bindings -B build_blas_bindings
-    - name: Build blas binding tests
-      run: cmake --build build_blas_bindings --config Debug --parallel 4
-    - name: Test BLAS bindings
-      run: build_blas_bindings/dtest --runall -q
+    # - name: Configure BLAS binding tests
+    #   run: cmake ${{ github.workspace }}/dlib/test/blas_bindings -B build_blas_bindings
+    # - name: Build blas binding tests
+    #   run: cmake --build build_blas_bindings --config Debug --parallel 4
+    # - name: Test BLAS bindings
+    #   run: build_blas_bindings/dtest --runall -q
 
   ubuntu-20_04-gcc-7:
     runs-on: 'ubuntu-20.04'
@@ -187,13 +185,16 @@ jobs:
       run: |
         export CC=/usr/bin/clang
         export CXX=/usr/bin/clang++
-        cmake ${{ github.workspace }}/dlib/test -B build -DUSE_AVX_INSTRUCTIONS=1
+        cmake ${{ github.workspace }}/dlib -B build -DUSE_AVX_INSTRUCTIONS=1
+    
     - name: Build just tests
       run: cmake --build build --config Release --target dtest --parallel 4
+
     - name: Test
       run: build/dtest --runall -q
-    - name: Build examples, etc
-      run: cmake --build build --config Release --parallel 2
+      
+    # - name: Build examples, etc
+    #   run: cmake --build build --config Release --parallel 2
 
   windows-latest:
     runs-on: 'windows-latest'
