@@ -38,7 +38,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt update
-        sudo apt install libwebp-dev make yasm
+        sudo apt install libwebp-dev make yasm libblas-dev liblapack-dev
         
     - name: Cache cmake 3.17.0
       uses: actions/cache@v3
@@ -94,7 +94,7 @@ jobs:
       run: |
         sudo apt update
         sudo apt install libwebp-dev libavformat-dev libavcodec-dev libavdevice-dev libavfilter-dev libswresample-dev libswscale-dev libavutil-dev 
-        sudo apt install libopenblas-dev liblapack-dev
+        sudo apt install libblas-dev liblapack-dev
     - name: Install gcc 11
       run: |
         sudo apt install gcc-11 g++-11
@@ -127,7 +127,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt update
-        sudo apt install libwebp-dev make yasm 
+        sudo apt install libwebp-dev make yasm libblas-dev liblapack-dev
 
     - name: Install gcc 7
       run: |
@@ -181,6 +181,7 @@ jobs:
       run: |
         sudo apt update
         sudo apt install libwebp-dev libavformat-dev libavcodec-dev libavdevice-dev libavfilter-dev libswresample-dev libswscale-dev libavutil-dev 
+        sudo apt install libblas-dev liblapack-dev
     - name: Configure
       run: |
         export CC=/usr/bin/clang
