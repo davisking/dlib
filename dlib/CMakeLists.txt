@@ -375,7 +375,6 @@ if (NOT DLIB_ISO_CPP_ONLY)
             external/cblas/zdotcsub.f
             external/cblas/zdotusub.f)
          target_compile_definitions(dlib PUBLIC ADD_)
-         # set_target_properties(dlib PROPERTIES POSITION_INDEPENDENT_CODE ON)
       endif()
    endif()
 
@@ -594,11 +593,13 @@ if (DLIB_BUILD_PYTHON)
       ../tools/python/src/image_dataset_metadata.cpp
       ../tools/python/src/numpy_returns.cpp
       ../tools/python/src/line.cpp)
+   
+   if(NOT DLIB_NO_GUI_SUPPORT)
+      target_sources(_dlib_pybind11 PRIVATE ../tools/python/src/gui.cpp)
+   endif()
    target_link_libraries(_dlib_pybind11 PRIVATE dlib::dlib)
    set_target_properties(_dlib_pybind11 PROPERTIES
-      INTERPROCEDURAL_OPTIMIZATION ON
-      CXX_VISIBILITY_PRESET hidden
-      VISIBILITY_INLINES_HIDDEN ON)
+      INTERPROCEDURAL_OPTIMIZATION ON)
 endif()
 
 # Install
