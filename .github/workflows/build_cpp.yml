@@ -155,7 +155,7 @@ jobs:
       run: |
         export CC=/usr/bin/gcc-7
         export CXX=/usr/bin/g++-7
-        cmake ${{ github.workspace }}/dlib/test -B build -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n3.2.18_installation
+        cmake ${{ github.workspace }}/dlib -B build -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n3.2.18_installation -DDLIB_BUILD_TESTS=ON 
 
     - name: Build just tests
       run: cmake --build build --config Release --target dtest --parallel 4
@@ -185,14 +185,14 @@ jobs:
       run: |
         export CC=/usr/bin/clang
         export CXX=/usr/bin/clang++
-        cmake ${{ github.workspace }}/dlib -B build -DUSE_AVX_INSTRUCTIONS=1
+        cmake ${{ github.workspace }}/dlib -B build -DDLIB_USE_AVX=on -DDLIB_BUILD_TESTS=ON 
     
     - name: Build just tests
       run: cmake --build build --config Release --target dtest --parallel 4
 
     - name: Test
       run: build/dtest --runall -q
-      
+
     # - name: Build examples, etc
     #   run: cmake --build build --config Release --parallel 2
 
@@ -204,7 +204,7 @@ jobs:
       run: |
         # don't use CMake 3.25.0 https://gitlab.kitware.com/cmake/cmake/-/issues/23975
         pip3 install cmake==3.24.0
-        cmake . -B build
+        cmake . -B build -DDLIB_BUILD_TESTS=ON 
     - name: Build just tests
       run: cmake --build build --config Release --target dtest --parallel 4
     - name: Test
