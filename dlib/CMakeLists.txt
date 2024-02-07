@@ -23,14 +23,15 @@ find_package(X11)
 find_package(SQLite3)
 find_package(MKL)
 if (NOT MKL_FOUND)
-   set(BLA_PREFER_PKGCONFIG true)
    find_package(BLAS)
    find_package(LAPACK)
 endif()
 find_package(CUDAToolkit)
 find_package(CUDNN)
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(FFMPEG IMPORTED_TARGET libavdevice libavfilter libavformat libavcodec libavutil libswresample libswscale)
+find_package(PkgConfig)
+if (PKG_CONFIG_FOUND)
+   pkg_check_modules(FFMPEG IMPORTED_TARGET libavdevice libavfilter libavformat libavcodec libavutil libswresample libswscale)
+endif()
 
 # Options
 option(DLIB_BUILD_TESTS          "Build tests"                    OFF)
@@ -41,7 +42,7 @@ option(DLIB_ENABLE_STACK_TRACE   "Enabled Debug stack trace"      OFF)
 option(DLIB_JPEG_SUPPORT         "Enable JPEG support"            ON)
 option(DLIB_PNG_SUPPORT          "Enable PNG support"             ON)
 option(DLIB_USE_BLAS             "Enable BLAS support"            ON)
-option(DLIB_USE_LAPACK           "Enable LAPACK support"          ON)
+cmake_dependent_option(DLIB_USE_LAPACK          "Enable LAPACK support"    ON  "MKL_FOUND OR LAPACK_FOUND" OFF)
 cmake_dependent_option(DLIB_USE_AVX             "Enable AVX SIMD"          ON  "AVX_FOUND"         OFF)
 cmake_dependent_option(DLIB_USE_SSE             "Enable SSE SIMD"          ON  "SSE_FOUND"         OFF)
 cmake_dependent_option(DLIB_USE_NEON            "Enable NEON SIMD"         ON  "NEON_FOUND"        OFF)
@@ -320,61 +321,35 @@ if (NOT DLIB_ISO_CPP_ONLY)
       elseif(NOT MKL_FOUND)
          enable_language (Fortran)
          target_sources(dlib PRIVATE
-            external/cblas/cblas.h
-            external/cblas/cblas_f77.h
-            external/cblas/cblas_caxpy.c
-            external/cblas/cblas_cdotc_sub.c
-            external/cblas/cblas_cdotu_sub.c
-            external/cblas/cblas_cgemm.c
-            external/cblas/cblas_cgemv.c
-            external/cblas/cblas_cgerc.c
-            external/cblas/cblas_cgeru.c
-            external/cblas/cblas_cscal.c
-            external/cblas/cblas_ctrsm.c
-            external/cblas/cblas_daxpy.c
-            external/cblas/cblas_ddot.c
-            external/cblas/cblas_dgemm.c
-            external/cblas/cblas_dgemv.c
-            external/cblas/cblas_dger.c
-            external/cblas/cblas_dscal.c
-            external/cblas/cblas_dtrsm.c
-            external/cblas/cblas_saxpy.c
-            external/cblas/cblas_sdot.c
-            external/cblas/cblas_sgemm.c
-            external/cblas/cblas_sgemv.c
-            external/cblas/cblas_sger.c
-            external/cblas/cblas_sscal.c
-            external/cblas/cblas_strsm.c
-            external/cblas/cblas_xerbla.c
-            external/cblas/cblas_zaxpy.c
-            external/cblas/cblas_zdotc_sub.c
-            external/cblas/cblas_zdotu_sub.c
-            external/cblas/cblas_zgemm.c
-            external/cblas/cblas_zgemv.c
-            external/cblas/cblas_zgerc.c
-            external/cblas/cblas_zgeru.c
-            external/cblas/cblas_zscal.c
-            external/cblas/cblas_ztrsm.c
-            external/cblas/cdotcsub.f
-            external/cblas/cdotusub.f
-            external/cblas/dasumsub.f
-            external/cblas/ddotsub.f
-            external/cblas/dnrm2sub.f
-            external/cblas/dsdotsub.f
-            external/cblas/dzasumsub.f
-            external/cblas/dznrm2sub.f
-            external/cblas/icamaxsub.f
-            external/cblas/idamaxsub.f
-            external/cblas/isamaxsub.f
-            external/cblas/izamaxsub.f
-            external/cblas/sasumsub.f
-            external/cblas/scasumsub.f
-            external/cblas/scnrm2sub.f
-            external/cblas/sdotsub.f
-            external/cblas/sdsdotsub.f
-            external/cblas/snrm2sub.f
-            external/cblas/zdotcsub.f
-            external/cblas/zdotusub.f)
+            external/cblas/cblas_caxpy.c     external/cblas/cblas_cdotc_sub.c    external/cblas/cblas_cdotu_sub.c
+            external/cblas/cblas_cgemm.c     external/cblas/cblas_cgemv.c        external/cblas/cblas_cgerc.c
+            external/cblas/cblas_cgeru.c     external/cblas/cblas_cscal.c        external/cblas/cblas_ctrsm.c
+            external/cblas/cblas_daxpy.c     external/cblas/cblas_ddot.c         external/cblas/cblas_dgemm.c
+            external/cblas/cblas_dgemv.c     external/cblas/cblas_dger.c         external/cblas/cblas_dscal.c
+            external/cblas/cblas_dtrsm.c     external/cblas/cblas_saxpy.c        external/cblas/cblas_sdot.c
+            external/cblas/cblas_sgemm.c     external/cblas/cblas_sgemv.c        external/cblas/cblas_sger.c
+            external/cblas/cblas_sscal.c     external/cblas/cblas_strsm.c        external/cblas/cblas_xerbla.c
+            external/cblas/cblas_zaxpy.c     external/cblas/cblas_zdotc_sub.c    external/cblas/cblas_zdotu_sub.c
+            external/cblas/cblas_zgemm.c     external/cblas/cblas_zgemv.c        external/cblas/cblas_zscal.c
+            external/cblas/cblas_zgerc.c     external/cblas/cblas_zgeru.c        external/cblas/cblas_ztrsm.c
+            external/cblas/cdotcsub.f        external/cblas/cdotusub.f           external/cblas/dasumsub.f
+            external/cblas/ddotsub.f         external/cblas/dnrm2sub.f           external/cblas/dsdotsub.f
+            external/cblas/dzasumsub.f       external/cblas/dznrm2sub.f          external/cblas/icamaxsub.f
+            external/cblas/idamaxsub.f       external/cblas/isamaxsub.f          external/cblas/izamaxsub.f 
+            external/cblas/sasumsub.f        external/cblas/scasumsub.f          external/cblas/scnrm2sub.f
+            external/cblas/sdotsub.f         external/cblas/sdsdotsub.f          external/cblas/snrm2sub.f
+            external/cblas/zdotcsub.f        external/cblas/zdotusub.f)
+         
+         target_sources(dlib PRIVATE
+            external/blas/caxpy.f      external/blas/cgemm.f      external/blas/cgemv.f      external/blas/cgeru.f
+            external/blas/cgerc.f      external/blas/cscal.f      external/blas/daxpy.f      external/blas/dgemm.f
+            external/blas/dgemv.f      external/blas/dger.f       external/blas/dscal.f      external/blas/dtrsm.f
+            external/blas/saxpy.f      external/blas/sgemm.f      external/blas/sgemv.f      external/blas/sger.f 
+            external/blas/sscal.f      external/blas/strsm.f      external/blas/zaxpy.f      external/blas/zgemm.f
+            external/blas/zgemv.f      external/blas/zscal.f      external/blas/zgeru.f      external/blas/zgerc.f
+            external/blas/cdotc.f      external/blas/cdotu.f      external/blas/ddot.f       external/blas/sdot.f
+            external/blas/zdotc.f      external/blas/zdotu.f      external/blas/scabs1.f     external/blas/lsame.f   
+            external/blas/xerbla.f     external/blas/dcabs1.f)
          target_compile_definitions(dlib PUBLIC ADD_)
       endif()
    endif()
