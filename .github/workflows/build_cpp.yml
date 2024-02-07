@@ -205,7 +205,7 @@ jobs:
       run: |
         # don't use CMake 3.25.0 https://gitlab.kitware.com/cmake/cmake/-/issues/23975
         pip3 install cmake==3.24.0
-        cmake ${{ github.workspace }}/dlib -B build -DDLIB_BUILD_TESTS=ON 
+        cmake . -B build -DDLIB_BUILD_TESTS=ON 
 
     - name: Build just tests
       run: cmake --build build --config Release --target dtest --parallel 4
@@ -224,7 +224,7 @@ jobs:
       run: |
         # don't use CMake 3.25.0 https://gitlab.kitware.com/cmake/cmake/-/issues/23975
         pip3 install cmake==3.24.0
-        cmake ${{ github.workspace }}/dlib -B build -DDLIB_BUILD_TESTS=ON
+        cmake . -B build -DDLIB_BUILD_TESTS=ON
         
     - name: Build just tests
       run: cmake --build build --config Debug --target dtest --parallel 4
