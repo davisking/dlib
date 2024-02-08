@@ -753,6 +753,10 @@ if (DLIB_BUILD_TOOLS)
       ../tools/imglab/src/flip_dataset.cpp)
    target_link_libraries(imglab PRIVATE dlib::dlib)
 
+   add_executable(htmlify 
+      htmlify.cpp
+      to_xml.cpp)
+   target_link_libraries(htmlify PRIVATE dlib::dlib)
 endif()
 
 # Install
@@ -818,10 +822,10 @@ if (DLIB_BUILD_PYTHON)
 endif()
 
 if (DLIB_BUILD_TOOLS)
-   install(TARGETS imglab
-      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+   install(TARGETS imglab RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+   install(TARGETS htmlify RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
    install(PROGRAMS 
       ../tools/imglab/convert_imglab_paths_to_relative 
       ../tools/imglab/copy_imglab_dataset 
-      DESTINATION ${CMAKE_INSTALL_BINDIR} )
+      DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
