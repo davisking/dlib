@@ -754,9 +754,13 @@ if (DLIB_BUILD_TOOLS)
    target_link_libraries(imglab PRIVATE dlib::dlib)
 
    add_executable(htmlify 
-      htmlify.cpp
-      to_xml.cpp)
+      ../tools/htmlify/htmlify.cpp
+      ../tools/htmlify/to_xml.cpp)
    target_link_libraries(htmlify PRIVATE dlib::dlib)
+
+   add_executable(dtoc
+      ../tools/convert_dlib_nets_to_caffe/main.cpp)
+   target_link_libraries(dtoc PRIVATE dlib::dlib)
 endif()
 
 # Install
@@ -824,6 +828,7 @@ endif()
 if (DLIB_BUILD_TOOLS)
    install(TARGETS imglab RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
    install(TARGETS htmlify RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+   INSTALL(TARGETS dtoc RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
    install(PROGRAMS 
       ../tools/imglab/convert_imglab_paths_to_relative 
       ../tools/imglab/copy_imglab_dataset 
