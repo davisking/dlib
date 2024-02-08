@@ -577,6 +577,7 @@ if (DLIB_BUILD_PYTHON)
       target_sources(_dlib_pybind11 PRIVATE ../tools/python/src/gui.cpp)
    endif()
    target_link_libraries(_dlib_pybind11 PRIVATE dlib::dlib)
+   target_compile_definitions(_dlib_pybind11 PRIVATE DLIB_NO_ABORT_ON_2ND_FATAL_ERROR)
    set_target_properties(_dlib_pybind11 PROPERTIES
       INTERPROCEDURAL_OPTIMIZATION ON)
 endif()
