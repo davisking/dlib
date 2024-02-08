@@ -58,9 +58,10 @@ size_t num_function_arguments(py::object f, size_t expected_num)
 double call_func(py::object f, const matrix<double,0,1>& args)
 {
     const auto num = num_function_arguments(f, args.size());
-    DLIB_CASSERT(num == args.size(), 
-        "The function being optimized takes a number of arguments that doesn't agree with the size of the bounds lists you provided to find_max_global()");
-    DLIB_CASSERT(0 < num && num <= 35, "Functions being optimized must take between 1 and 35 scalar arguments.");
+    if (num != args.size()) 
+        throw std::invalid_argument("The function being optimized takes a number of arguments that doesn't agree with the size of the bounds lists you provided to find_max_global()");
+    if(!(0 < num && num <= 35))
+        throw std::invalid_argument("Functions being optimized must take between 1 and 35 scalar arguments.");
 
 #define CALL_WITH_N_ARGS(N) case N: return dlib::gopt_impl::_cwv(f,args,std::make_index_sequence<N>{}).cast<double>(); 
     switch (num)
@@ -188,7 +189,7 @@ py::tuple py_find_min_global2 (
 )
 {
     DLIB_CASSERT(len(bound1) == len(bound2));
-
+    
     auto func = [&](const matrix<double,0,1>& x)
     {
         return call_func(f, x);
