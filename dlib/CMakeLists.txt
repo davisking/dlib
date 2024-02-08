@@ -87,6 +87,7 @@ if (NOT DLIB_ISO_CPP_ONLY)
       dir_nav/dir_nav_kernel_1.cpp
       dir_nav/dir_nav_kernel_2.cpp
       dir_nav/dir_nav_extensions.cpp
+      gui_widgets/fonts.cpp
       linker/linker_kernel_1.cpp
       logger/extra_logger_headers.cpp
       logger/logger_kernel_1.cpp
@@ -130,8 +131,7 @@ if (NOT DLIB_ISO_CPP_ONLY)
          gui_widgets/widgets.cpp
          gui_widgets/drawable.cpp
          gui_widgets/canvas_drawing.cpp
-         gui_widgets/style.cpp
-         gui_widgets/fonts.cpp)
+         gui_widgets/style.cpp)
       target_link_libraries(dlib PUBLIC X11::X11)
    endif()
 
