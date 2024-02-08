@@ -40,6 +40,7 @@ find_package(OpenCV QUIET)
 option(DLIB_BUILD_TESTS          "Build tests"                    OFF)
 option(DLIB_BUILD_PYTHON         "Build python bindings"          OFF)
 option(DLIB_BUILD_EXAMPLES       "Build examples"                 OFF)
+option(DLIB_BUILD_TOOLS          "Build tools"                    OFF)
 option(DLIB_ISO_CPP_ONLY         "Build using standard c++ only"  OFF)
 option(DLIB_ENABLE_ASSERTS       "Enable Debug assert statements" OFF)
 option(DLIB_ENABLE_STACK_TRACE   "Enabled Debug stack trace"      OFF)
@@ -734,6 +735,26 @@ if (DLIB_BUILD_EXAMPLES)
    endif()
 endif()
 
+# Tools
+if (DLIB_BUILD_TOOLS)
+   add_executable(imglab
+      ../tools/imglab/src/main.cpp
+      ../tools/imglab/src/metadata_editor.h
+      ../tools/imglab/src/metadata_editor.cpp
+      ../tools/imglab/src/convert_pascal_xml.h
+      ../tools/imglab/src/convert_pascal_xml.cpp
+      ../tools/imglab/src/convert_pascal_v1.h
+      ../tools/imglab/src/convert_pascal_v1.cpp
+      ../tools/imglab/src/convert_idl.h
+      ../tools/imglab/src/convert_idl.cpp
+      ../tools/imglab/src/common.h
+      ../tools/imglab/src/common.cpp
+      ../tools/imglab/src/cluster.cpp
+      ../tools/imglab/src/flip_dataset.cpp)
+   target_link_libraries(imglab PRIVATE dlib::dlib)
+
+endif()
+
 # Install
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
@@ -794,4 +815,13 @@ if (DLIB_BUILD_PYTHON)
    if (CMAKE_LIBRARY_OUTPUT_DIRECTORY) 
       configure_file(../tools/python/dlib/__init__.py.in ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/dlib/__init__.py)
    endif()
+endif()
+
+if (DLIB_BUILD_TOOLS)
+   install(TARGETS imglab
+      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+   install(PROGRAMS 
+      ../tools/imglab/convert_imglab_paths_to_relative 
+      ../tools/imglab/copy_imglab_dataset 
+      DESTINATION ${CMAKE_INSTALL_BINDIR} )
 endif()
