@@ -73,18 +73,13 @@ jobs:
         cd ..
         
     - name: Configure
-      run: ~/cmake-3.17.0-Linux-x86_64/bin/cmake ${{ github.workspace }}/dlib -B build -DDLIB_BUILD_TESTS=ON -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n5.1.3_installation
+      run: ~/cmake-3.17.0-Linux-x86_64/bin/cmake ${{ github.workspace }}/dlib -B build -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n5.1.3_installation -DDLIB_BUILD_TESTS=ON -DDLIB_BUILD_EXAMPLES=ON
     
-    - name: Build just tests
-      run: ~/cmake-3.17.0-Linux-x86_64/bin/cmake --build build --config Release --target dtest --parallel 4
+    - name: Build tests and examples
+      run: ~/cmake-3.17.0-Linux-x86_64/bin/cmake --build build --config Release --parallel 4
         
     - name: Test
       run: build/dtest --runall -q
-      
-    # - name: Build examples, etc
-    #   run: |
-    #     cd build
-    #     make -j2
 
   ubuntu-latest-gcc-11-blas:
     runs-on: 'ubuntu-latest'
@@ -101,23 +96,13 @@ jobs:
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110 --slave /usr/bin/g++ g++ /usr/bin/g++-11 --slave /usr/bin/gcov gcov /usr/bin/gcov-11
     
     - name: Configure
-      run: cmake ${{ github.workspace }}/dlib -B build -DDLIB_BUILD_TESTS=ON
+      run: cmake ${{ github.workspace }}/dlib -B build -DDLIB_BUILD_TESTS=ON -DDLIB_BUILD_EXAMPLES=ON
     
-    - name: Build just tests
-      run: cmake --build build --config Release --target dtest --parallel 4
+    - name: Build tests (including BLAS tests) and examples
+      run: cmake --build build --config Release --parallel 4
     
     - name: Test
       run: build/dtest --runall -q
-    # - name: Build examples, etc
-    #   run: cmake --build build --config Release --parallel 2
-
-    # Test the BLAS bindings
-    # - name: Configure BLAS binding tests
-    #   run: cmake ${{ github.workspace }}/dlib/test/blas_bindings -B build_blas_bindings
-    # - name: Build blas binding tests
-    #   run: cmake --build build_blas_bindings --config Debug --parallel 4
-    # - name: Test BLAS bindings
-    #   run: build_blas_bindings/dtest --runall -q
 
   ubuntu-20_04-gcc-7:
     runs-on: 'ubuntu-20.04'
@@ -155,16 +140,13 @@ jobs:
       run: |
         export CC=/usr/bin/gcc-7
         export CXX=/usr/bin/g++-7
-        cmake ${{ github.workspace }}/dlib -B build -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n3.2.18_installation -DDLIB_BUILD_TESTS=ON 
+        cmake ${{ github.workspace }}/dlib -B build -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n3.2.18_installation -DDLIB_BUILD_TESTS=ON -DDLIB_BUILD_EXAMPLES=ON
 
-    - name: Build just tests
-      run: cmake --build build --config Release --target dtest --parallel 4
+    - name: Build tests and examples
+      run: cmake --build build --config Release --parallel 4
 
     - name: Test
       run: build/dtest --runall -q
-
-    - name: Build examples, etc
-      run: cmake --build build --config Release --parallel 2
 
     # Test cmake scrips can build standalone dlib as a shared library
     - name: Configure dlib as shared library  
@@ -186,16 +168,13 @@ jobs:
       run: |
         export CC=/usr/bin/clang
         export CXX=/usr/bin/clang++
-        cmake ${{ github.workspace }}/dlib -B build -DDLIB_USE_AVX=on -DDLIB_BUILD_TESTS=ON 
+        cmake ${{ github.workspace }}/dlib -B build -DDLIB_USE_AVX=on -DDLIB_BUILD_TESTS=ON -DDLIB_BUILD_EXAMPLES=ON
     
-    - name: Build just tests
-      run: cmake --build build --config Release --target dtest --parallel 4
+    - name: Build tests and examples
+      run: cmake --build build --config Release --parallel 4
 
     - name: Test
       run: build/dtest --runall -q
-
-    # - name: Build examples, etc
-    #   run: cmake --build build --config Release --parallel 2
 
   windows-latest:
     runs-on: 'windows-latest'
