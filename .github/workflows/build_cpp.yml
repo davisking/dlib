@@ -184,7 +184,7 @@ jobs:
       run: |
         # don't use CMake 3.25.0 https://gitlab.kitware.com/cmake/cmake/-/issues/23975
         pip3 install cmake==3.24.0
-        cmake . -B build -DDLIB_BUILD_TESTS=ON 
+        cmake . -B build -DDLIB_BUILD_TESTS=ON -DDLIB_BUILD_TOOLS=ON
 
     - name: Build just tests
       run: cmake --build build --config Release --target dtest --parallel 4
@@ -192,8 +192,8 @@ jobs:
     - name: Test
       run: build/Release/dtest.exe --runall -q
 
-    # - name: Build ancillary tools
-    #   run: cmake --build build --config Release --target imglab htmlify dtoc --parallel 4
+    - name: Build ancillary tools
+      run: cmake --build build --config Release --target imglab htmlify dtoc --parallel 4
 
   windows-2019:
     runs-on: 'windows-2019'
@@ -203,13 +203,13 @@ jobs:
       run: |
         # don't use CMake 3.25.0 https://gitlab.kitware.com/cmake/cmake/-/issues/23975
         pip3 install cmake==3.24.0
-        cmake . -B build -DDLIB_BUILD_TESTS=ON
+        cmake . -B build -DDLIB_BUILD_TESTS=ON -DDLIB_BUILD_TOOLS=ON
         
     - name: Build just tests
       run: cmake --build build --config Debug --target dtest --parallel 4
 
-    # - name: Build ancillary tools
-    #   run: cmake --build build --config Release --target imglab htmlify dtoc --parallel 4
+    - name: Build ancillary tools
+      run: cmake --build build --config Release --target imglab htmlify dtoc --parallel 4
   
   # Disable this because macos targets aren't working on github actions right now.
   #macos-latest:
