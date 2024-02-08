@@ -541,7 +541,7 @@ if (DLIB_BUILD_TESTS)
    target_link_libraries(dtest dlib::dlib)
    get_filename_component(DLIB_FFMPEG_DATA ${CMAKE_SOURCE_DIR}/test/ffmpeg_data/details.cfg REALPATH)
    target_compile_definitions(dtest PRIVATE DLIB_FFMPEG_DATA="${DLIB_FFMPEG_DATA}")
-   target_link_options(dtest PRIVATE $<$<CONFIG:RELEASE>:-s>)
+   target_link_options(dtest PRIVATE $<$<AND:$<CONFIG:RELEASE>,$<NOT:$<BOOL:${WIN32}>>>:-s>)
 endif()
 
 if (DLIB_BUILD_PYTHON)
