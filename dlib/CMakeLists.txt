@@ -369,7 +369,6 @@ if (NOT DLIB_ISO_CPP_ONLY)
    endif()
 
    if (DLIB_USE_CUDA)
-      set(CMAKE_CUDA_ARCHITECTURES native)
       set(CMAKE_CUDA_COMPILER ${CUDAToolkit_NVCC_EXECUTABLE})
       enable_language(CUDA)
       target_sources(dlib PRIVATE
@@ -382,7 +381,7 @@ if (NOT DLIB_ISO_CPP_ONLY)
          cuda/gpu_data.cpp)
       target_link_libraries(dlib PUBLIC CUDA::cudart CUDA::cublas CUDA::curand CUDA::cusolver CUDNN::CUDNN)
       target_compile_definitions(dlib PUBLIC DLIB_USE_CUDA)
-      set_target_properties(dlib PROPERTIES CUDA_ARCHITECTURES native)
+      set_target_properties(dlib PROPERTIES CUDA_ARCHITECTURES "35;50;72")
    endif()
 endif()
 
@@ -531,7 +530,7 @@ if (DLIB_BUILD_TESTS)
       test/tuple.cpp
       test/type_safe_union.cpp
       test/vectorstream.cpp
-      # dnn.cpp
+      test/dnn.cpp
       test/cublas.cpp
       test/find_optimal_parameters.cpp
       test/elastic_net.cpp
@@ -737,21 +736,23 @@ endif()
 
 # Tools
 if (DLIB_BUILD_TOOLS)
-   add_executable(imglab
-      ../tools/imglab/src/main.cpp
-      ../tools/imglab/src/metadata_editor.h
-      ../tools/imglab/src/metadata_editor.cpp
-      ../tools/imglab/src/convert_pascal_xml.h
-      ../tools/imglab/src/convert_pascal_xml.cpp
-      ../tools/imglab/src/convert_pascal_v1.h
-      ../tools/imglab/src/convert_pascal_v1.cpp
-      ../tools/imglab/src/convert_idl.h
-      ../tools/imglab/src/convert_idl.cpp
-      ../tools/imglab/src/common.h
-      ../tools/imglab/src/common.cpp
-      ../tools/imglab/src/cluster.cpp
-      ../tools/imglab/src/flip_dataset.cpp)
-   target_link_libraries(imglab PRIVATE dlib::dlib)
+   if (NOT DLIB_NO_GUI_SUPPORT)
+      add_executable(imglab
+         ../tools/imglab/src/main.cpp
+         ../tools/imglab/src/metadata_editor.h
+         ../tools/imglab/src/metadata_editor.cpp
+         ../tools/imglab/src/convert_pascal_xml.h
+         ../tools/imglab/src/convert_pascal_xml.cpp
+         ../tools/imglab/src/convert_pascal_v1.h
+         ../tools/imglab/src/convert_pascal_v1.cpp
+         ../tools/imglab/src/convert_idl.h
+         ../tools/imglab/src/convert_idl.cpp
+         ../tools/imglab/src/common.h
+         ../tools/imglab/src/common.cpp
+         ../tools/imglab/src/cluster.cpp
+         ../tools/imglab/src/flip_dataset.cpp)
+      target_link_libraries(imglab PRIVATE dlib::dlib)
+   endif()
 
    add_executable(htmlify 
       ../tools/htmlify/htmlify.cpp
@@ -826,11 +827,13 @@ if (DLIB_BUILD_PYTHON)
 endif()
 
 if (DLIB_BUILD_TOOLS)
-   install(TARGETS imglab RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-   install(TARGETS htmlify RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-   INSTALL(TARGETS dtoc RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-   install(PROGRAMS 
+   if (NOT DLIB_NO_GUI_SUPPORT)
+      install(TARGETS imglab RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+      install(PROGRAMS 
       ../tools/imglab/convert_imglab_paths_to_relative 
       ../tools/imglab/copy_imglab_dataset 
       DESTINATION ${CMAKE_INSTALL_BINDIR})
+   endif()
+   install(TARGETS htmlify RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+   INSTALL(TARGETS dtoc RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
