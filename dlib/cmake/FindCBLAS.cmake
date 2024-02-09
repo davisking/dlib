@@ -14,8 +14,8 @@ find_package(PkgConfig)
 
 # pkg-config
 if (PKG_CONFIG_FOUND)
-    pkg_check_modules(BLAS IMPORTED_TARGET blas)
-    pkg_check_modules(LAPACK IMPORTED_TARGET lapack)
+    pkg_check_modules(BLAS IMPORTED_TARGET GLOBAL blas)
+    pkg_check_modules(LAPACK IMPORTED_TARGET GLOBAL lapack)
 
     if (BLAS_FOUND AND LAPACK_FOUND)
         message(STATUS "Found BLAS using pkg-config: ${BLAS_LINK_LIBRARIES}")
