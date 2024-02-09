@@ -7,6 +7,10 @@ set(CPACK_PACKAGE_VERSION_PATCH "99")
 set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 project(dlib VERSION ${VERSION} LANGUAGES C CXX)
 
+# Generator expression helpers
+set(IS_CLANG      "$<CXX_COMPILER_ID:Clang>")
+set(IS_CLANG_OLD  "$<AND:${IS_CLANG},$<VERSION_LESS:$<CXX_COMPILER_VERSION>,7.0.0>>")
+
 # Dependencies
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 list(APPEND CMAKE_PREFIX_PATH /opt/intel/oneapi/mkl/latest)
@@ -80,6 +84,8 @@ add_library(dlib
 target_include_directories(dlib
    INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
    INTERFACE $<INSTALL_INTERFACE:include>)
+target_compile_options(dlib PUBLIC $<${IS_CLANG_OLD}:-ftemplate-depth=500>)
+target_compile_options(dlib PUBLIC $<$<BOOL:${WIN32}>:/bigobj>)
 set_target_properties(dlib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 add_library(dlib::dlib ALIAS dlib)
 
