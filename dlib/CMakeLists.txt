@@ -10,6 +10,8 @@ project(dlib VERSION ${VERSION} LANGUAGES C CXX)
 # Generator expression helpers
 set(IS_CLANG      "$<CXX_COMPILER_ID:Clang>")
 set(IS_CLANG_OLD  "$<AND:${IS_CLANG},$<VERSION_LESS:$<CXX_COMPILER_VERSION>,7.0.0>>")
+set(IS_WIN32      "$<BOOL:${WIN32}>")
+set(IS_NOT_WIN32  "$<NOT:${IS_WIN32}>")
 
 # Dependencies
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -57,7 +59,7 @@ cmake_dependent_option(DLIB_USE_SSE             "Enable SSE SIMD"          ON  "
 cmake_dependent_option(DLIB_USE_NEON            "Enable NEON SIMD"         ON  "NEON_FOUND"        OFF)
 cmake_dependent_option(DLIB_GIF_SUPPORT         "Enable GIF support"       ON  "GIF_FOUND"         OFF)
 cmake_dependent_option(DLIB_WEBP_SUPPORT        "Enable WEBP support"      ON  "WEBP_FOUND"        OFF)
-cmake_dependent_option(DLIB_NO_GUI_SUPPORT      "Disable GUI support"      OFF "X11_FOUND"         ON)
+cmake_dependent_option(DLIB_NO_GUI_SUPPORT      "Disable GUI support"      OFF "X11_FOUND OR WIN32" ON)
 cmake_dependent_option(DLIB_LINK_WITH_SQLITE3   "Enable Sqlite3 support"   ON  "SQLite3_FOUND"     OFF)
 cmake_dependent_option(DLIB_USE_FFMPEG          "Enable FFMPEG support"    ON  "FFMPEG_FOUND"      OFF)
 cmake_dependent_option(DLIB_USE_CUDA            "Enable CUDA support"      ON  "CUDAToolkit_FOUND" OFF)
@@ -85,7 +87,7 @@ target_include_directories(dlib
    INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
    INTERFACE $<INSTALL_INTERFACE:include>)
 target_compile_options(dlib PUBLIC $<${IS_CLANG_OLD}:-ftemplate-depth=500>)
-target_compile_options(dlib PUBLIC $<$<BOOL:${WIN32}>:/bigobj>)
+target_compile_options(dlib PUBLIC $<${IS_WIN32}:/bigobj>)
 set_target_properties(dlib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 add_library(dlib::dlib ALIAS dlib)
 
@@ -141,7 +143,7 @@ if (NOT DLIB_ISO_CPP_ONLY)
          gui_widgets/drawable.cpp
          gui_widgets/canvas_drawing.cpp
          gui_widgets/style.cpp)
-      target_link_libraries(dlib PUBLIC X11::X11)
+      target_link_libraries(dlib PUBLIC $<${IS_NOT_WIN32}:X11::X11>)
    endif()
 
    if(DLIB_ENABLE_ASSERTS)
@@ -560,7 +562,7 @@ if (DLIB_BUILD_TESTS)
    target_link_libraries(dtest dlib::dlib)
    get_filename_component(DLIB_FFMPEG_DATA ${CMAKE_SOURCE_DIR}/test/ffmpeg_data/details.cfg REALPATH)
    target_compile_definitions(dtest PRIVATE DLIB_FFMPEG_DATA="${DLIB_FFMPEG_DATA}")
-   target_link_options(dtest PRIVATE $<$<AND:$<CONFIG:RELEASE>,$<NOT:$<BOOL:${WIN32}>>>:-s>)
+   target_link_options(dtest PRIVATE $<$<AND:$<CONFIG:RELEASE>,${IS_NOT_WIN32}>:-s>)
 endif()
 
 if (DLIB_BUILD_PYTHON)
@@ -606,7 +608,7 @@ if (DLIB_BUILD_EXAMPLES)
    macro(add_example name)
       add_executable(${name} ../examples/${name}.cpp)
       target_link_libraries(${name} dlib::dlib)
-      target_link_options(${name} PRIVATE $<$<AND:$<CONFIG:RELEASE>,$<NOT:$<BOOL:${WIN32}>>>:-s>)
+      target_link_options(${name}  PRIVATE $<$<AND:$<CONFIG:RELEASE>,${IS_NOT_WIN32}>:-s>)
    endmacro()
 
    add_example(dnn_metric_learning_ex)
