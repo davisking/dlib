@@ -27,7 +27,7 @@ on:
 defaults:
   run:
     shell: bash
-    working-directory: dlib/matlab
+    working-directory: dlib
 
 
 jobs:
@@ -39,11 +39,8 @@ jobs:
       uses: matlab-actions/setup-matlab@v1
     - name: Compile mex wrappers 
       run: |
-        pwd
-        mkdir build
-        cd build
-        cmake ..
-        cmake --build . --config Release --target install --parallel 4
+        cmake . -B build -DDLIB_BUILD_MATLAB=ON
+        cmake --build build --config Release --target install --parallel 4
     - name: Run example script
       uses: matlab-actions/run-command@v1
       with:

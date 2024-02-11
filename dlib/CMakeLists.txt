@@ -16,12 +16,12 @@ set(IS_NOT_WIN32  "$<NOT:${IS_WIN32}>")
 # Dependencies
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 list(APPEND CMAKE_PREFIX_PATH /opt/intel/oneapi/mkl/latest)
-# set(Matlab_ROOT_DIR /usr/local/MATLAB/MATLAB_Runtime/R2023b)
+set(Matlab_ROOT_DIR /usr/share/matlab)
 include(CMakeDependentOption)
 include(CheckLanguage)
 check_language(Fortran)
 find_package(PkgConfig)
-# find_package(Matlab COMPONENTS MAT_LIBRARY)
+find_package(Matlab)
 find_package(Threads)
 find_package(AVX)
 find_package(SSE)
@@ -51,7 +51,8 @@ option(DLIB_ENABLE_ASSERTS       "Enable Debug assert statements" OFF)
 option(DLIB_ENABLE_STACK_TRACE   "Enabled Debug stack trace"      OFF)
 option(DLIB_JPEG_SUPPORT         "Enable JPEG support"            ON)
 option(DLIB_PNG_SUPPORT          "Enable PNG support"             ON)
-cmake_dependent_option(DLIB_USE_BLAS            "Enable BLAS support"      ON  "MKL_FOUND OR BLAS_FOUND OR CMAKE_Fortran_COMPILER" OFF)
+cmake_dependent_option(DLIB_BUILD_MATLAB        "Build matlab bindings"    ON  "Matlab_FOUND" OFF)
+cmake_dependent_option(DLIB_USE_BLAS            "Enable BLAS support"      ON  "MKL_FOUND OR BLAS_FOUND" OFF)
 cmake_dependent_option(DLIB_USE_LAPACK          "Enable LAPACK support"    ON  "MKL_FOUND OR LAPACK_FOUND" OFF)
 cmake_dependent_option(DLIB_USE_AVX             "Enable AVX SIMD"          ON  "AVX_FOUND"         OFF)
 cmake_dependent_option(DLIB_USE_SSE             "Enable SSE SIMD"          ON  "SSE_FOUND"         OFF)
@@ -82,13 +83,13 @@ add_library(dlib
    test_for_odr_violations.cpp
    fft/fft.cpp)
 
+add_library(dlib::dlib ALIAS dlib)
 target_include_directories(dlib
    INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
    INTERFACE $<INSTALL_INTERFACE:include>)
 target_compile_options(dlib PUBLIC $<${IS_CLANG_OLD}:-ftemplate-depth=500>)
 target_compile_options(dlib PUBLIC $<${IS_WIN32}:/bigobj>)
 set_target_properties(dlib PROPERTIES POSITION_INDEPENDENT_CODE ON)
-add_library(dlib::dlib ALIAS dlib)
 
 if (NOT DLIB_ISO_CPP_ONLY)
    target_sources(dlib PRIVATE
@@ -158,25 +159,15 @@ if (NOT DLIB_ISO_CPP_ONLY)
 
    if (DLIB_USE_AVX)
       target_compile_options(dlib PUBLIC ${AVX_CFLAGS})
-      if (HAVE_AVX2)
-         target_compile_definitions(dlib PUBLIC DLIB_HAVE_AVX2)
-      endif()
-      if (HAVE_AVX)
-         target_compile_definitions(dlib PUBLIC DLIB_HAVE_AVX)
-      endif()
+      target_compile_definitions(dlib PUBLIC $<${HAVE_AVX2}:DLIB_HAVE_AVX2>)
+      target_compile_definitions(dlib PUBLIC $<${HAVE_AVX}:DLIB_HAVE_AVX>)
    endif()
 
    if (DLIB_USE_SSE)
       target_compile_options(dlib PUBLIC ${SSE_CFLAGS})
-      if (HAVE_SSE42)
-         target_compile_definitions(dlib PUBLIC DLIB_HAVE_SSE42)
-      endif()
-      if (HAVE_SSE41)
-         target_compile_definitions(dlib PUBLIC DLIB_HAVE_SSE41)
-      endif()
-      if (HAVE_SSE3)
-         target_compile_definitions(dlib PUBLIC DLIB_HAVE_SSE3)
-      endif()
+      target_compile_definitions(dlib PUBLIC $<${HAVE_SSE42}:DLIB_HAVE_SSE42>)
+      target_compile_definitions(dlib PUBLIC $<${HAVE_SSE41}:DLIB_HAVE_SSE41>)
+      target_compile_definitions(dlib PUBLIC $<${HAVE_SSE3}:DLIB_HAVE_SSE3>)
    endif()
 
    if (DLIB_USE_NEON)
@@ -328,48 +319,13 @@ if (NOT DLIB_ISO_CPP_ONLY)
 
    if (DLIB_USE_BLAS)
       target_compile_definitions(dlib PUBLIC DLIB_USE_BLAS)
-
       if(BLAS_FOUND)
          target_link_libraries(dlib PUBLIC BLAS::BLAS)
-      elseif(NOT MKL_FOUND)
-         enable_language (Fortran)
-         target_sources(dlib PRIVATE
-            external/cblas/cblas_caxpy.c     external/cblas/cblas_cdotc_sub.c    external/cblas/cblas_cdotu_sub.c
-            external/cblas/cblas_cgemm.c     external/cblas/cblas_cgemv.c        external/cblas/cblas_cgerc.c
-            external/cblas/cblas_cgeru.c     external/cblas/cblas_cscal.c        external/cblas/cblas_ctrsm.c
-            external/cblas/cblas_daxpy.c     external/cblas/cblas_ddot.c         external/cblas/cblas_dgemm.c
-            external/cblas/cblas_dgemv.c     external/cblas/cblas_dger.c         external/cblas/cblas_dscal.c
-            external/cblas/cblas_dtrsm.c     external/cblas/cblas_saxpy.c        external/cblas/cblas_sdot.c
-            external/cblas/cblas_sgemm.c     external/cblas/cblas_sgemv.c        external/cblas/cblas_sger.c
-            external/cblas/cblas_sscal.c     external/cblas/cblas_strsm.c        external/cblas/cblas_xerbla.c
-            external/cblas/cblas_zaxpy.c     external/cblas/cblas_zdotc_sub.c    external/cblas/cblas_zdotu_sub.c
-            external/cblas/cblas_zgemm.c     external/cblas/cblas_zgemv.c        external/cblas/cblas_zscal.c
-            external/cblas/cblas_zgerc.c     external/cblas/cblas_zgeru.c        external/cblas/cblas_ztrsm.c
-            external/cblas/cdotcsub.f        external/cblas/cdotusub.f           external/cblas/dasumsub.f
-            external/cblas/ddotsub.f         external/cblas/dnrm2sub.f           external/cblas/dsdotsub.f
-            external/cblas/dzasumsub.f       external/cblas/dznrm2sub.f          external/cblas/icamaxsub.f
-            external/cblas/idamaxsub.f       external/cblas/isamaxsub.f          external/cblas/izamaxsub.f 
-            external/cblas/sasumsub.f        external/cblas/scasumsub.f          external/cblas/scnrm2sub.f
-            external/cblas/sdotsub.f         external/cblas/sdsdotsub.f          external/cblas/snrm2sub.f
-            external/cblas/zdotcsub.f        external/cblas/zdotusub.f)
-         
-         target_sources(dlib PRIVATE
-            external/blas/caxpy.f      external/blas/cgemm.f      external/blas/cgemv.f      external/blas/cgeru.f
-            external/blas/cgerc.f      external/blas/cscal.f      external/blas/daxpy.f      external/blas/dgemm.f
-            external/blas/dgemv.f      external/blas/dger.f       external/blas/dscal.f      external/blas/dtrsm.f
-            external/blas/saxpy.f      external/blas/sgemm.f      external/blas/sgemv.f      external/blas/sger.f 
-            external/blas/sscal.f      external/blas/strsm.f      external/blas/zaxpy.f      external/blas/zgemm.f
-            external/blas/zgemv.f      external/blas/zscal.f      external/blas/zgeru.f      external/blas/zgerc.f
-            external/blas/cdotc.f      external/blas/cdotu.f      external/blas/ddot.f       external/blas/sdot.f
-            external/blas/zdotc.f      external/blas/zdotu.f      external/blas/scabs1.f     external/blas/lsame.f   
-            external/blas/xerbla.f     external/blas/dcabs1.f)
-         target_compile_definitions(dlib PUBLIC ADD_)
       endif()
    endif()
 
    if (DLIB_USE_LAPACK)
       target_compile_definitions(dlib PUBLIC DLIB_USE_LAPACK)
-
       if (LAPACK_FOUND)
          target_link_libraries(dlib PUBLIC LAPACK::LAPACK)
       endif()
@@ -388,7 +344,7 @@ if (NOT DLIB_ISO_CPP_ONLY)
          cuda/gpu_data.cpp)
       target_link_libraries(dlib PUBLIC CUDA::cudart CUDA::cublas CUDA::curand CUDA::cusolver CUDNN::CUDNN)
       target_compile_definitions(dlib PUBLIC DLIB_USE_CUDA)
-      set_target_properties(dlib PROPERTIES CUDA_ARCHITECTURES "35;50;72")
+      set_target_properties(dlib PROPERTIES CUDA_ARCHITECTURES "50;72")
    endif()
 endif()
 
@@ -564,6 +520,7 @@ if (DLIB_BUILD_TESTS)
    target_link_options(dtest PRIVATE $<$<AND:$<CONFIG:RELEASE>,${IS_NOT_WIN32}>:-s>)
 endif()
 
+# Python bindings
 if (DLIB_BUILD_PYTHON)
    add_subdirectory(external/pybind11)
    pybind11_add_module(_dlib_pybind11 
@@ -600,6 +557,54 @@ if (DLIB_BUILD_PYTHON)
    target_compile_definitions(_dlib_pybind11 PRIVATE DLIB_NO_ABORT_ON_2ND_FATAL_ERROR)
    set_target_properties(_dlib_pybind11 PROPERTIES
       INTERPROCEDURAL_OPTIMIZATION ON)
+endif()
+
+# Matlab bindings
+if (DLIB_BUILD_MATLAB)
+   macro(add_mex_function name)
+      matlab_add_mex(
+         NAME ${name} MODULE 
+         SRC matlab/${name}.cpp all/source.cpp
+         LINK_TO dlib_all_source)
+      target_compile_definitions(${name} PUBLIC MATLAB_MEX_FILE)
+   endmacro()
+   
+   # Don't link to dlib library as that may link to CUDA, MKL, X11, JPEG and other stuff. 
+   # We just want to use ISO dlib with cblas and lapack enabled. So basically start from scratch using all/source.cpp
+   add_library(dlib_all_source STATIC all/source.cpp)
+   target_compile_definitions(dlib_all_source PUBLIC DLIB_USE_BLAS)
+   target_compile_definitions(dlib_all_source PUBLIC DLIB_USE_LAPACK)
+   target_include_directories(dlib_all_source PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
+
+   # add_library(cblas STATIC
+   #    external/cblas/cblas_caxpy.c     external/cblas/cblas_cdotc_sub.c    external/cblas/cblas_cdotu_sub.c
+   #    external/cblas/cblas_cgemm.c     external/cblas/cblas_cgemv.c        external/cblas/cblas_cgerc.c
+   #    external/cblas/cblas_cgeru.c     external/cblas/cblas_cscal.c        external/cblas/cblas_ctrsm.c
+   #    external/cblas/cblas_daxpy.c     external/cblas/cblas_ddot.c         external/cblas/cblas_dgemm.c
+   #    external/cblas/cblas_dgemv.c     external/cblas/cblas_dger.c         external/cblas/cblas_dscal.c
+   #    external/cblas/cblas_dtrsm.c     external/cblas/cblas_saxpy.c        external/cblas/cblas_sdot.c
+   #    external/cblas/cblas_sgemm.c     external/cblas/cblas_sgemv.c        external/cblas/cblas_sger.c
+   #    external/cblas/cblas_sscal.c     external/cblas/cblas_strsm.c        external/cblas/cblas_xerbla.c
+   #    external/cblas/cblas_zaxpy.c     external/cblas/cblas_zdotc_sub.c    external/cblas/cblas_zdotu_sub.c
+   #    external/cblas/cblas_zgemm.c     external/cblas/cblas_zgemv.c        external/cblas/cblas_zscal.c
+   #    external/cblas/cblas_zgerc.c     external/cblas/cblas_zgeru.c        external/cblas/cblas_ztrsm.c
+   #    external/cblas/cdotcsub.f        external/cblas/cdotusub.f           external/cblas/dasumsub.f
+   #    external/cblas/ddotsub.f         external/cblas/dnrm2sub.f           external/cblas/dsdotsub.f
+   #    external/cblas/dzasumsub.f       external/cblas/dznrm2sub.f          external/cblas/icamaxsub.f
+   #    external/cblas/idamaxsub.f       external/cblas/isamaxsub.f          external/cblas/izamaxsub.f 
+   #    external/cblas/sasumsub.f        external/cblas/scasumsub.f          external/cblas/scnrm2sub.f
+   #    external/cblas/sdotsub.f         external/cblas/sdsdotsub.f          external/cblas/snrm2sub.f
+   #    external/cblas/zdotcsub.f        external/cblas/zdotusub.f)
+   # target_compile_definitions(cblas PUBLIC ADD_)
+
+   add_mex_function(example_mex_function)
+   add_mex_function(example_mex_callback)
+   add_mex_function(example_mex_struct)
+   add_mex_function(example_mex_class)
+   install(TARGETS example_mex_function LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+   install(TARGETS example_mex_callback LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+   install(TARGETS example_mex_struct LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+   install(TARGETS example_mex_class LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endif()
 
 # Examples
