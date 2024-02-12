@@ -40,7 +40,8 @@ jobs:
     - name: Compile mex wrappers 
       run: |
         cmake . -B build -DDLIB_BUILD_MATLAB=ON
-        cmake --build build --config Release --target install --parallel 4
+        cmake --build build --config Release --target example_mex_function example_mex_callback example_mex_struct example_mex_class --parallel 4
+        cmake --install build --component Matlab --prefix dlib/matlab
     - name: Run example script
       uses: matlab-actions/run-command@v1
       with:

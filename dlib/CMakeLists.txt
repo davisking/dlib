@@ -563,7 +563,7 @@ if (DLIB_BUILD_MATLAB)
       matlab_add_mex(
          NAME ${name} MODULE 
          SRC matlab/${name}.cpp all/source.cpp
-         LINK_TO dlib_all_source)
+         LINK_TO dlib_all_source cblas)
       target_compile_definitions(${name} PUBLIC MATLAB_MEX_FILE)
    endmacro()
    
@@ -574,26 +574,27 @@ if (DLIB_BUILD_MATLAB)
    target_compile_definitions(dlib_all_source PUBLIC DLIB_USE_LAPACK)
    target_include_directories(dlib_all_source PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
-   # add_library(cblas STATIC
-   #    external/cblas/cblas_caxpy.c     external/cblas/cblas_cdotc_sub.c    external/cblas/cblas_cdotu_sub.c
-   #    external/cblas/cblas_cgemm.c     external/cblas/cblas_cgemv.c        external/cblas/cblas_cgerc.c
-   #    external/cblas/cblas_cgeru.c     external/cblas/cblas_cscal.c        external/cblas/cblas_ctrsm.c
-   #    external/cblas/cblas_daxpy.c     external/cblas/cblas_ddot.c         external/cblas/cblas_dgemm.c
-   #    external/cblas/cblas_dgemv.c     external/cblas/cblas_dger.c         external/cblas/cblas_dscal.c
-   #    external/cblas/cblas_dtrsm.c     external/cblas/cblas_saxpy.c        external/cblas/cblas_sdot.c
-   #    external/cblas/cblas_sgemm.c     external/cblas/cblas_sgemv.c        external/cblas/cblas_sger.c
-   #    external/cblas/cblas_sscal.c     external/cblas/cblas_strsm.c        external/cblas/cblas_xerbla.c
-   #    external/cblas/cblas_zaxpy.c     external/cblas/cblas_zdotc_sub.c    external/cblas/cblas_zdotu_sub.c
-   #    external/cblas/cblas_zgemm.c     external/cblas/cblas_zgemv.c        external/cblas/cblas_zscal.c
-   #    external/cblas/cblas_zgerc.c     external/cblas/cblas_zgeru.c        external/cblas/cblas_ztrsm.c
-   #    external/cblas/cdotcsub.f        external/cblas/cdotusub.f           external/cblas/dasumsub.f
-   #    external/cblas/ddotsub.f         external/cblas/dnrm2sub.f           external/cblas/dsdotsub.f
-   #    external/cblas/dzasumsub.f       external/cblas/dznrm2sub.f          external/cblas/icamaxsub.f
-   #    external/cblas/idamaxsub.f       external/cblas/isamaxsub.f          external/cblas/izamaxsub.f 
-   #    external/cblas/sasumsub.f        external/cblas/scasumsub.f          external/cblas/scnrm2sub.f
-   #    external/cblas/sdotsub.f         external/cblas/sdsdotsub.f          external/cblas/snrm2sub.f
-   #    external/cblas/zdotcsub.f        external/cblas/zdotusub.f)
-   # target_compile_definitions(cblas PUBLIC ADD_)
+   add_library(cblas STATIC
+      external/cblas/cblas_caxpy.c     external/cblas/cblas_cdotc_sub.c    external/cblas/cblas_cdotu_sub.c
+      external/cblas/cblas_cgemm.c     external/cblas/cblas_cgemv.c        external/cblas/cblas_cgerc.c
+      external/cblas/cblas_cgeru.c     external/cblas/cblas_cscal.c        external/cblas/cblas_ctrsm.c
+      external/cblas/cblas_daxpy.c     external/cblas/cblas_ddot.c         external/cblas/cblas_dgemm.c
+      external/cblas/cblas_dgemv.c     external/cblas/cblas_dger.c         external/cblas/cblas_dscal.c
+      external/cblas/cblas_dtrsm.c     external/cblas/cblas_saxpy.c        external/cblas/cblas_sdot.c
+      external/cblas/cblas_sgemm.c     external/cblas/cblas_sgemv.c        external/cblas/cblas_sger.c
+      external/cblas/cblas_sscal.c     external/cblas/cblas_strsm.c        external/cblas/cblas_xerbla.c
+      external/cblas/cblas_zaxpy.c     external/cblas/cblas_zdotc_sub.c    external/cblas/cblas_zdotu_sub.c
+      external/cblas/cblas_zgemm.c     external/cblas/cblas_zgemv.c        external/cblas/cblas_zscal.c
+      external/cblas/cblas_zgerc.c     external/cblas/cblas_zgeru.c        external/cblas/cblas_ztrsm.c
+      external/cblas/cdotcsub.f        external/cblas/cdotusub.f           external/cblas/dasumsub.f
+      external/cblas/ddotsub.f         external/cblas/dnrm2sub.f           external/cblas/dsdotsub.f
+      external/cblas/dzasumsub.f       external/cblas/dznrm2sub.f          external/cblas/icamaxsub.f
+      external/cblas/idamaxsub.f       external/cblas/isamaxsub.f          external/cblas/izamaxsub.f 
+      external/cblas/sasumsub.f        external/cblas/scasumsub.f          external/cblas/scnrm2sub.f
+      external/cblas/sdotsub.f         external/cblas/sdsdotsub.f          external/cblas/snrm2sub.f
+      external/cblas/zdotcsub.f        external/cblas/zdotusub.f)
+   target_compile_definitions(cblas PUBLIC ADD_)
+   set_target_properties(cblas PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
    add_mex_function(example_mex_function)
    add_mex_function(example_mex_callback)
@@ -834,19 +835,20 @@ endif()
 
 if (DLIB_BUILD_TOOLS)
    if (NOT DLIB_NO_GUI_SUPPORT)
-      install(TARGETS imglab RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+      install(TARGETS imglab RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}  COMPONENT Tools)
       install(PROGRAMS 
-      ../tools/imglab/convert_imglab_paths_to_relative 
-      ../tools/imglab/copy_imglab_dataset 
-      DESTINATION ${CMAKE_INSTALL_BINDIR})
+         ../tools/imglab/convert_imglab_paths_to_relative 
+         ../tools/imglab/copy_imglab_dataset 
+         DESTINATION ${CMAKE_INSTALL_BINDIR}
+         COMPONENT Tools)
    endif()
-   install(TARGETS htmlify RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-   INSTALL(TARGETS dtoc RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+   install(TARGETS htmlify RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Tools)
+   INSTALL(TARGETS dtoc    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Tools)
 endif()
 
 if (DLIB_BUILD_MATLAB)
-   install(TARGETS example_mex_function LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-   install(TARGETS example_mex_callback LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-   install(TARGETS example_mex_struct   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-   install(TARGETS example_mex_class    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+   install(TARGETS example_mex_function LIBRARY DESTINATION . COMPONENT Matlab)
+   install(TARGETS example_mex_callback LIBRARY DESTINATION . COMPONENT Matlab)
+   install(TARGETS example_mex_struct   LIBRARY DESTINATION . COMPONENT Matlab)
+   install(TARGETS example_mex_class    LIBRARY DESTINATION . COMPONENT Matlab)
 endif()
