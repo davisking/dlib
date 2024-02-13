@@ -566,7 +566,6 @@ if (DLIB_BUILD_MATLAB)
          NAME ${name} MODULE 
          SRC matlab/${name}.cpp all/source.cpp
          LINK_TO dlib_all_source cblas)
-      target_compile_definitions(${name} PUBLIC MATLAB_MEX_FILE)
       target_compile_definitions(${name} PRIVATE MEX_FILENAME=${name})
    endmacro()
    
@@ -850,6 +849,8 @@ if (DLIB_BUILD_TOOLS)
 endif()
 
 if (DLIB_BUILD_MATLAB)
+   set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION ${CMAKE_INSTALL_PREFIX})
+   include(InstallRequiredSystemLibraries)
    install(TARGETS example_mex_function DESTINATION . COMPONENT Matlab)
    install(TARGETS example_mex_callback DESTINATION . COMPONENT Matlab)
    install(TARGETS example_mex_struct   DESTINATION . COMPONENT Matlab)
