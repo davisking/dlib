@@ -562,41 +562,9 @@ endif()
 # Matlab bindings
 if (DLIB_BUILD_MATLAB)
    macro(add_mex_function name)
-      matlab_add_mex(
-         NAME ${name} MODULE 
-         SRC matlab/${name}.cpp all/source.cpp
-         LINK_TO dlib_all_source cblas)
+      matlab_add_mex(NAME ${name} MODULE SRC matlab/${name}.cpp LINK_TO dlib)
       target_compile_definitions(${name} PRIVATE MEX_FILENAME=${name})
    endmacro()
-   
-   # Don't link to dlib library as that may link to CUDA, MKL, X11, JPEG and other stuff. 
-   # We just want to use ISO dlib with cblas and lapack enabled. So basically start from scratch using all/source.cpp
-   add_library(dlib_all_source STATIC all/source.cpp)
-   target_compile_definitions(dlib_all_source PUBLIC DLIB_USE_BLAS)
-   target_compile_definitions(dlib_all_source PUBLIC DLIB_USE_LAPACK)
-   target_include_directories(dlib_all_source PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
-
-   add_library(cblas STATIC
-      external/cblas/cblas_caxpy.c     external/cblas/cblas_cdotc_sub.c    external/cblas/cblas_cdotu_sub.c
-      external/cblas/cblas_cgemm.c     external/cblas/cblas_cgemv.c        external/cblas/cblas_cgerc.c
-      external/cblas/cblas_cgeru.c     external/cblas/cblas_cscal.c        external/cblas/cblas_ctrsm.c
-      external/cblas/cblas_daxpy.c     external/cblas/cblas_ddot.c         external/cblas/cblas_dgemm.c
-      external/cblas/cblas_dgemv.c     external/cblas/cblas_dger.c         external/cblas/cblas_dscal.c
-      external/cblas/cblas_dtrsm.c     external/cblas/cblas_saxpy.c        external/cblas/cblas_sdot.c
-      external/cblas/cblas_sgemm.c     external/cblas/cblas_sgemv.c        external/cblas/cblas_sger.c
-      external/cblas/cblas_sscal.c     external/cblas/cblas_strsm.c        external/cblas/cblas_xerbla.c
-      external/cblas/cblas_zaxpy.c     external/cblas/cblas_zdotc_sub.c    external/cblas/cblas_zdotu_sub.c
-      external/cblas/cblas_zgemm.c     external/cblas/cblas_zgemv.c        external/cblas/cblas_zscal.c
-      external/cblas/cblas_zgerc.c     external/cblas/cblas_zgeru.c        external/cblas/cblas_ztrsm.c
-      external/cblas/cdotcsub.f        external/cblas/cdotusub.f           external/cblas/dasumsub.f
-      external/cblas/ddotsub.f         external/cblas/dnrm2sub.f           external/cblas/dsdotsub.f
-      external/cblas/dzasumsub.f       external/cblas/dznrm2sub.f          external/cblas/icamaxsub.f
-      external/cblas/idamaxsub.f       external/cblas/isamaxsub.f          external/cblas/izamaxsub.f 
-      external/cblas/sasumsub.f        external/cblas/scasumsub.f          external/cblas/scnrm2sub.f
-      external/cblas/sdotsub.f         external/cblas/sdsdotsub.f          external/cblas/snrm2sub.f
-      external/cblas/zdotcsub.f        external/cblas/zdotusub.f)
-   target_compile_definitions(cblas PUBLIC ADD_)
-   set_target_properties(cblas PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
    add_mex_function(example_mex_function)
    add_mex_function(example_mex_callback)
