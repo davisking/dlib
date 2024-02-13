@@ -554,7 +554,9 @@ if (DLIB_BUILD_PYTHON)
    target_link_libraries(_dlib_pybind11 PRIVATE dlib::dlib)
    target_compile_definitions(_dlib_pybind11 PRIVATE DLIB_NO_ABORT_ON_2ND_FATAL_ERROR)
    set_target_properties(_dlib_pybind11 PROPERTIES
-      INTERPROCEDURAL_OPTIMIZATION ON)
+      INTERPROCEDURAL_OPTIMIZATION ON
+      CXX_VISIBILITY_PRESET "hidden"
+      CUDA_VISIBILITY_PRESET "hidden")
 endif()
 
 # Matlab bindings
@@ -565,6 +567,7 @@ if (DLIB_BUILD_MATLAB)
          SRC matlab/${name}.cpp all/source.cpp
          LINK_TO dlib_all_source cblas)
       target_compile_definitions(${name} PUBLIC MATLAB_MEX_FILE)
+      target_compile_definitions(${name} PRIVATE MEX_FILENAME=${name})
    endmacro()
    
    # Don't link to dlib library as that may link to CUDA, MKL, X11, JPEG and other stuff. 
@@ -847,8 +850,8 @@ if (DLIB_BUILD_TOOLS)
 endif()
 
 if (DLIB_BUILD_MATLAB)
-   install(TARGETS example_mex_function LIBRARY DESTINATION . COMPONENT Matlab)
-   install(TARGETS example_mex_callback LIBRARY DESTINATION . COMPONENT Matlab)
-   install(TARGETS example_mex_struct   LIBRARY DESTINATION . COMPONENT Matlab)
-   install(TARGETS example_mex_class    LIBRARY DESTINATION . COMPONENT Matlab)
+   install(TARGETS example_mex_function DESTINATION . COMPONENT Matlab)
+   install(TARGETS example_mex_callback DESTINATION . COMPONENT Matlab)
+   install(TARGETS example_mex_struct   DESTINATION . COMPONENT Matlab)
+   install(TARGETS example_mex_class    DESTINATION . COMPONENT Matlab)
 endif()
