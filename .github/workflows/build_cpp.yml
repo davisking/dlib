@@ -239,7 +239,7 @@ jobs:
 
     - name: Build ancillary tools
       run: |
-        ccmake ${{ github.workspace }}\tools\imglab -B build_imglab 
+        cmake ${{ github.workspace }}\tools\imglab -B build_imglab 
         cmake --build build_imglab --config Release --parallel 4
         cmake ${{ github.workspace }}\tools\htmlify -B build_htmlify
         cmake --build build_htmlify --config Release --parallel 4
