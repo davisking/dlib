@@ -27,7 +27,7 @@ on:
 defaults:
   run:
     shell: bash
-    working-directory: dlib
+    working-directory: dlib/test
 
 jobs:
   ubuntu-latest-gcc-default-cmake-3-17-ffmpeg5:
@@ -72,14 +72,20 @@ jobs:
         make install
         cd ..
         
-    - name: Configure
-      run: ~/cmake-3.17.0-Linux-x86_64/bin/cmake ${{ github.workspace }}/dlib -B build -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n5.1.3_installation -DDLIB_BUILD_TESTS=ON -DDLIB_BUILD_EXAMPLES=ON
+    - name: Configure tests
+      run: ~/cmake-3.17.0-Linux-x86_64/bin/cmake ${{ github.workspace }}/dlib/test -B build -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n5.1.3_installation
     
-    - name: Build tests and examples
+    - name: Build tests
       run: ~/cmake-3.17.0-Linux-x86_64/bin/cmake --build build --config Release --parallel 4
         
-    - name: Test
+    - name: Run tests
       run: build/dtest --runall -q
+
+    - name: Configure examples
+      run: ~/cmake-3.17.0-Linux-x86_64/bin/cmake ${{ github.workspace }}/examples -B build2 -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n5.1.3_installation
+
+    - name: Build examples
+      run: ~/cmake-3.17.0-Linux-x86_64/bin/cmake --build build2 --config Release --parallel 4
 
   ubuntu-latest-gcc-11-blas:
     runs-on: 'ubuntu-latest'
@@ -95,14 +101,20 @@ jobs:
         sudo apt install gcc-11 g++-11
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110 --slave /usr/bin/g++ g++ /usr/bin/g++-11 --slave /usr/bin/gcov gcov /usr/bin/gcov-11
     
-    - name: Configure
-      run: cmake ${{ github.workspace }}/dlib -B build -DDLIB_BUILD_TESTS=ON -DDLIB_BUILD_EXAMPLES=ON
+    - name: Configure tests
+      run: cmake ${{ github.workspace }}/dlib/test -B build
     
-    - name: Build tests (including BLAS tests) and examples
+    - name: Build tests (including BLAS tests)
       run: cmake --build build --config Release --parallel 4
     
     - name: Test
       run: build/dtest --runall -q
+
+    - name: Configure examples
+      run: cmake ${{ github.workspace }}/examples -B build2
+
+    - name: Build examples
+      run: cmake --build build2 --config Release --parallel 4
 
   ubuntu-20_04-gcc-7:
     runs-on: 'ubuntu-20.04'
@@ -136,17 +148,23 @@ jobs:
         make install
         cd ..
 
-    - name: Configure
+    - name: Configure tests
       run: |
         export CC=/usr/bin/gcc-7
         export CXX=/usr/bin/g++-7
-        cmake ${{ github.workspace }}/dlib -B build -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n3.2.18_installation -DDLIB_BUILD_TESTS=ON -DDLIB_BUILD_EXAMPLES=ON
+        cmake ${{ github.workspace }}/dlib/test -B build -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n3.2.18_installation
 
-    - name: Build tests and examples
+    - name: Build tests
       run: cmake --build build --config Release --parallel 4
 
     - name: Test
       run: build/dtest --runall -q
+    
+    - name: Configure examples
+      run: cmake ${{ github.workspace }}/examples -B build2 -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n3.2.18_installation
+
+    - name: Build examples
+      run: cmake --build build2 --config Release --parallel 4
 
     # Test cmake scrips can build standalone dlib as a shared library
     - name: Configure dlib as shared library  
@@ -163,15 +181,20 @@ jobs:
       run: |
         sudo apt update
         sudo apt install libwebp-dev libavformat-dev libavcodec-dev libavdevice-dev libavfilter-dev libswresample-dev libswscale-dev libavutil-dev 
-        sudo apt install libblas-dev liblapack-dev
-    - name: Configure
+    - name: Configure test
       run: |
         export CC=/usr/bin/clang
         export CXX=/usr/bin/clang++
-        cmake ${{ github.workspace }}/dlib -B build -DDLIB_USE_AVX=on -DDLIB_BUILD_TESTS=ON -DDLIB_BUILD_EXAMPLES=ON
+        cmake ${{ github.workspace }}/dlib/test -B build -DDLIB_USE_AVX=ON
     
-    - name: Build tests and examples
+    - name: Build tests
       run: cmake --build build --config Release --parallel 4
+
+    - name: Configure examples
+      run: cmake ${{ github.workspace }}/examples -B build2 -DDLIB_USE_AVX=ON
+
+    - name: Build examples
+      run: cmake --build build2 --config Release --parallel 4
 
     - name: Test
       run: build/dtest --runall -q
@@ -184,7 +207,7 @@ jobs:
       run: |
         # don't use CMake 3.25.0 https://gitlab.kitware.com/cmake/cmake/-/issues/23975
         pip3 install cmake==3.24.0
-        cmake . -B build -DDLIB_BUILD_TESTS=ON -DDLIB_BUILD_TOOLS=ON
+        cmake . -B build
 
     - name: Build just tests
       run: cmake --build build --config Release --target dtest --parallel 4
@@ -193,7 +216,13 @@ jobs:
       run: build/Release/dtest.exe --runall -q
 
     - name: Build ancillary tools
-      run: cmake --build build --config Release --target imglab htmlify dtoc --parallel 4
+      run: |
+        cmake tools/imglab -B build_imglab 
+        cmake --build build_imglab --config Release --parallel 4
+        cmake tools/htmlify -B build_htmlify
+        cmake --build build_htmlify --config Release --parallel 4
+        cmake tools/convert_dlib_nets_to_caffe -B build_dtoc
+        cmake --build build_dtoc --config Release --parallel 4
 
   windows-2019:
     runs-on: 'windows-2019'
@@ -203,13 +232,19 @@ jobs:
       run: |
         # don't use CMake 3.25.0 https://gitlab.kitware.com/cmake/cmake/-/issues/23975
         pip3 install cmake==3.24.0
-        cmake . -B build -DDLIB_BUILD_TESTS=ON -DDLIB_BUILD_TOOLS=ON
+        cmake . -B build
         
     - name: Build just tests
-      run: cmake --build build --config Debug --target dtest --parallel 4
+      run: cmake --build build --config Debug --parallel 4
 
     - name: Build ancillary tools
-      run: cmake --build build --config Release --target imglab htmlify dtoc --parallel 4
+      run: |
+        cmake tools/imglab -B build_imglab 
+        cmake --build build_imglab --config Release --parallel 4
+        cmake tools/htmlify -B build_htmlify
+        cmake --build build_htmlify --config Release --parallel 4
+        cmake tools/convert_dlib_nets_to_caffe -B build_dtoc
+        cmake --build build_dtoc --config Release --parallel 4
   
   # Disable this because macos targets aren't working on github actions right now.
   #macos-latest:

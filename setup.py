@@ -133,8 +133,7 @@ class CMakeBuild(build_ext):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
 
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
-                      '-DPYTHON_EXECUTABLE=' + sys.executable,
-                      '-DDLIB_BUILD_PYTHON=ON']
+                      '-DPYTHON_EXECUTABLE=' + sys.executable]
 
         cmake_args += cmake_extra_options 
 
@@ -227,14 +226,14 @@ setup(
     author_email='davis@dlib.net',
     url='https://github.com/davisking/dlib',
     license='Boost Software License',
-    ext_modules=[CMakeExtension('_dlib_pybind11','dlib')],
+    ext_modules=[CMakeExtension('_dlib_pybind11','tools/python')],
     cmdclass=dict(build_ext=CMakeBuild, test=PyTest),
     zip_safe=False,
     # We need an older more-itertools version because v6 broke pytest (for everyone, not just dlib)
     tests_require=['pytest==3.8', 'more-itertools<6.0.0'],
     #install_requires=['cmake'], # removed because the pip cmake package is busted, maybe someday it will be usable.
     packages=find_packages(exclude=['python_examples']),
-    package_dir={'': 'dlib'},
+    package_dir={'': 'tools/python'},
     keywords=['dlib', 'Computer Vision', 'Machine Learning'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
