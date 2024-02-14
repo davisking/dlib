@@ -217,11 +217,11 @@ jobs:
 
     - name: Build ancillary tools
       run: |
-        cmake tools/imglab -B build_imglab 
+        cmake ${{ github.workspace }}/tools/imglab -B build_imglab 
         cmake --build build_imglab --config Release --parallel 4
-        cmake tools/htmlify -B build_htmlify
+        cmake ${{ github.workspace }}/tools/htmlify -B build_htmlify
         cmake --build build_htmlify --config Release --parallel 4
-        cmake tools/convert_dlib_nets_to_caffe -B build_dtoc
+        cmake ${{ github.workspace }}/tools/convert_dlib_nets_to_caffe -B build_dtoc
         cmake --build build_dtoc --config Release --parallel 4
 
   windows-2019:
@@ -239,11 +239,11 @@ jobs:
 
     - name: Build ancillary tools
       run: |
-        cmake tools/imglab -B build_imglab 
+        cmake ${{ github.workspace }}/tools/imglab -B build_imglab 
         cmake --build build_imglab --config Release --parallel 4
-        cmake tools/htmlify -B build_htmlify
+        cmake ${{ github.workspace }}/tools/htmlify -B build_htmlify
         cmake --build build_htmlify --config Release --parallel 4
-        cmake tools/convert_dlib_nets_to_caffe -B build_dtoc
+        cmake ${{ github.workspace }}/tools/convert_dlib_nets_to_caffe -B build_dtoc
         cmake --build build_dtoc --config Release --parallel 4
   
   # Disable this because macos targets aren't working on github actions right now.
