@@ -42,14 +42,86 @@ project(examples)
 # cmake needs is the dlib source code folder and it will take care of everything.
 add_subdirectory(../dlib dlib_build)
 
-# Generator expression helpers
-set(IS_WIN32      "$<BOOL:${WIN32}>")
-set(IS_NOT_WIN32  "$<NOT:${IS_WIN32}>")
+# If you have cmake 3.14 or newer you can even use FetchContent instead of
+# add_subdirectory() to pull in dlib as a dependency.  So instead of using the
+# above add_subdirectory() command, you could use the following three commands
+# to make dlib available:
+#  include(FetchContent)
+#  FetchContent_Declare(dlib
+#      GIT_REPOSITORY https://github.com/davisking/dlib.git
+#      GIT_TAG        v19.24
+#  )
+#  FetchContent_MakeAvailable(dlib)
+
+
+# The next thing we need to do is tell CMake about the code you want to
+# compile.  We do this with the add_executable() statement which takes the name
+# of the output executable and then a list of .cpp files to compile.  Here we
+# are going to compile one of the dlib example programs which has only one .cpp
+# file, assignment_learning_ex.cpp.  If your program consisted of multiple .cpp
+# files you would simply list them here in the add_executable() statement.  
+add_executable(assignment_learning_ex assignment_learning_ex.cpp)
+# Finally, you need to tell CMake that this program, assignment_learning_ex,
+# depends on dlib.  You do that with this statement: 
+target_link_libraries(assignment_learning_ex dlib::dlib)
+
+
+
+# To compile this program all you need to do is ask cmake.  You would type
+# these commands from within the directory containing this CMakeLists.txt
+# file:
+#   mkdir build
+#   cd build
+#   cmake ..
+#   cmake --build . --config Release
+#
+# The cmake .. command looks in the parent folder for a file named
+# CMakeLists.txt, reads it, and sets up everything needed to build program.
+# Also, note that CMake can generate Visual Studio or XCode project files.  So
+# if instead you had written:
+#   cd build
+#   cmake .. -G Xcode
+#
+# You would be able to open the resulting Xcode project and compile and edit
+# the example programs within the Xcode IDE.  CMake can generate a lot of
+# different types of IDE projects.  Run the cmake -h command to see a list of
+# arguments to -G to see what kinds of projects cmake can generate for you.  It
+# probably includes your favorite IDE in the list.
+
+
+
+
+#################################################################################
+#################################################################################
+#  A CMakeLists.txt file can compile more than just one program.  So below we
+#  tell it to compile the other dlib example programs using pretty much the
+#  same CMake commands we used above.
+#################################################################################
+#################################################################################
+
+
+# Since there are a lot of examples I'm going to use a macro to simplify this
+# CMakeLists.txt file.  However, usually you will create only one executable in
+# your cmake projects and use the syntax shown above.
+
+# These are generator expression helpers. They are useful for gating various cmake options.
+# Please read https://cmake.org/cmake/help/latest/manual/cmake-generator-expressions.7.html
+
+# This is a generator expression that returns 1 if you're using MSVC, otherwise returns 0
+set(IS_MSVC     "$<CXX_COMPILER_ID:MSVC>") 
+# This generator expressions does the opposite. It returns 0 if you're using MSVC, otherwise returns 1
+set(IS_NOT_MSVC "$<NOT:${IS_MSVC}>")
 
 macro(add_example name)
    add_executable(${name} ${name}.cpp)
    target_link_libraries(${name} dlib::dlib)
-   target_link_options(${name} PRIVATE $<$<AND:$<CONFIG:RELEASE>,${IS_NOT_WIN32}>:-s>)
+   # The following strips symbols to make your binary smaller if you like. Certainly not
+   # required though. It uses a generator expression to only enable this if you're
+   # in Release mode and if you're compiling with a linux compiler like GCC or Clang.
+   # It's typically a good idea to keep all symbols in debug mode. This could make
+   # you're debugging experience more useful.
+   # "-s" is not a valid option with MSVC. Hence why we gate it on the compiler.
+   target_link_options(${name} PRIVATE $<$<AND:$<CONFIG:RELEASE>,${IS_NOT_MSVC}>:-s>)
 endmacro()
 
 add_example(dnn_metric_learning_ex)
