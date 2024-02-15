@@ -116,6 +116,34 @@ jobs:
     - name: Build examples
       run: cmake --build build2 --config Release --parallel 4
 
+  ubuntu-latest-ffmpeg-mkl:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install libwebp-dev libavformat-dev libavcodec-dev libavdevice-dev libavfilter-dev libswresample-dev libswscale-dev libavutil-dev 
+        sudo apt install libmkl-dev
+
+    - name: Configure tests with MKL sequential
+      run: cmake . -B build -DDLIB_USE_MKL_SEQUENTIAL=ON -DDLIB_USE_MKL_WITH_TBB=OFF
+    
+    - name: Build tests with MKL sequential
+      run: cmake --build build --config Release --target dtest --parallel 4
+    
+    - name: Test with MKL sequential
+      run: build/dtest --runall -q
+
+    - name: Configure tests with MKL tbb
+      run: cmake . -B build2 -DDLIB_USE_MKL_SEQUENTIAL=OFF -DDLIB_USE_MKL_WITH_TBB=ON
+    
+    - name: Build tests with MKL tbb
+      run: cmake --build2 build --config Release --target dtest --parallel 4
+    
+    - name: Test with MKL tbb
+      run: build2/dtest --runall -q
+
   ubuntu-20_04-gcc-7:
     runs-on: 'ubuntu-20.04'
     steps:
