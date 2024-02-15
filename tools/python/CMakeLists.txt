@@ -1,6 +1,16 @@
 
 cmake_minimum_required(VERSION 3.17.0)
 
+if (WIN32 AND NOT "${CMAKE_GENERATOR}" MATCHES "Visual Studio") 
+   message(FATAL_ERROR "\n"
+      "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"
+      "You must use Visual Studio to build a python extension on windows. If you "
+      "are getting this error it means you have not installed Visual C++.  Note that "
+      "there are many flavors of Visual Studio, like Visual Studio for C\# development. " 
+      "You need to install Visual Studio for C++. \n"
+      "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+endif()
+
 project(dlib_python_bindings)
 
 add_subdirectory(../../dlib dlib_build)
