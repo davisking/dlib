@@ -11,8 +11,9 @@ message(STATUS "Compiling dlib version:   ${VERSION}")
 
 # Generator expression helpers
 set(IS_CLANG      "$<CXX_COMPILER_ID:Clang>")
-set(IS_CLANG_OLD  "$<AND:${IS_CLANG},$<VERSION_LESS:$<CXX_COMPILER_VERSION>,7.0.0>>")
+set(IS_GCC        "$<CXX_COMPILER_ID:GNU>")
 set(IS_MSVC       "$<CXX_COMPILER_ID:MSVC>")
+set(IS_CLANG_OLD  "$<AND:${IS_CLANG},$<VERSION_LESS:$<CXX_COMPILER_VERSION>,7.0.0>>")
 set(IS_WIN32      "$<BOOL:${WIN32}>")
 set(IS_NOT_WIN32  "$<NOT:${IS_WIN32}>")
 
@@ -81,6 +82,7 @@ target_include_directories(dlib
    INTERFACE $<INSTALL_INTERFACE:include>)
 target_compile_options(dlib PUBLIC $<${IS_CLANG_OLD}:-ftemplate-depth=500>)
 target_compile_options(dlib PUBLIC $<${IS_MSVC}:/bigobj>)
+target_compile_options(dlib PUBLIC $<${IS_GCC}:-Wreturn-type>)
 set_target_properties(dlib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 if (NOT DLIB_ISO_CPP_ONLY)
@@ -165,6 +167,7 @@ if (NOT DLIB_ISO_CPP_ONLY)
       target_compile_definitions(dlib PUBLIC $<${HAVE_SSE42}:DLIB_HAVE_SSE42>)
       target_compile_definitions(dlib PUBLIC $<${HAVE_SSE41}:DLIB_HAVE_SSE41>)
       target_compile_definitions(dlib PUBLIC $<${HAVE_SSE3}:DLIB_HAVE_SSE3>)
+      target_compile_definitions(dlib PUBLIC $<${HAVE_SSE2}:DLIB_HAVE_SSE2>)
    endif()
 
    if (DLIB_USE_NEON)
