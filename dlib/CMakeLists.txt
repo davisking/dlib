@@ -6,10 +6,13 @@ set(CPACK_PACKAGE_VERSION_MINOR "24")
 set(CPACK_PACKAGE_VERSION_PATCH "99")
 set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 project(dlib VERSION ${VERSION} LANGUAGES C CXX)
+message(STATUS "Using CMake version:      ${CMAKE_VERSION}")
+message(STATUS "Compiling dlib version:   ${VERSION}")
 
 # Generator expression helpers
 set(IS_CLANG      "$<CXX_COMPILER_ID:Clang>")
 set(IS_CLANG_OLD  "$<AND:${IS_CLANG},$<VERSION_LESS:$<CXX_COMPILER_VERSION>,7.0.0>>")
+set(IS_MSVC       "$<CXX_COMPILER_ID:MSVC>")
 set(IS_WIN32      "$<BOOL:${WIN32}>")
 set(IS_NOT_WIN32  "$<NOT:${IS_WIN32}>")
 
@@ -42,20 +45,19 @@ option(DLIB_ENABLE_ASSERTS       "Enable Debug assert statements" OFF)
 option(DLIB_ENABLE_STACK_TRACE   "Enabled Debug stack trace"      OFF)
 option(DLIB_JPEG_SUPPORT         "Enable JPEG support"            ON)
 option(DLIB_PNG_SUPPORT          "Enable PNG support"             ON)
-cmake_dependent_option(DLIB_USE_BLAS            "Enable BLAS support"      ON  "MKL_FOUND OR BLAS_FOUND" OFF)
-cmake_dependent_option(DLIB_USE_LAPACK          "Enable LAPACK support"    ON  "MKL_FOUND OR LAPACK_FOUND" OFF)
-cmake_dependent_option(DLIB_USE_AVX             "Enable AVX SIMD"          ON  "AVX_FOUND"         OFF)
-cmake_dependent_option(DLIB_USE_SSE             "Enable SSE SIMD"          ON  "SSE_FOUND"         OFF)
-cmake_dependent_option(DLIB_USE_NEON            "Enable NEON SIMD"         ON  "NEON_FOUND"        OFF)
-cmake_dependent_option(DLIB_GIF_SUPPORT         "Enable GIF support"       ON  "GIF_FOUND"         OFF)
-cmake_dependent_option(DLIB_WEBP_SUPPORT        "Enable WEBP support"      ON  "WEBP_FOUND"        OFF)
-cmake_dependent_option(DLIB_NO_GUI_SUPPORT      "Disable GUI support"      OFF "X11_FOUND OR WIN32" ON)
-cmake_dependent_option(DLIB_LINK_WITH_SQLITE3   "Enable Sqlite3 support"   ON  "SQLite3_FOUND"     OFF)
-cmake_dependent_option(DLIB_USE_FFMPEG          "Enable FFMPEG support"    ON  "FFMPEG_FOUND"      OFF)
-cmake_dependent_option(DLIB_USE_CUDA            "Enable CUDA support"      ON  "CUDAToolkit_FOUND" OFF)
-cmake_dependent_option(DLIB_USE_MKL_SEQUENTIAL  "Enable MKL sequential"    ON  "MKL_FOUND"         OFF)
-cmake_dependent_option(DLIB_USE_MKL_WITH_TBB    "Enable MKL tbb"           ON  "MKL_FOUND"         OFF)
-cmake_dependent_option(DLIB_USE_MKL_FFT         "Enable MKL FFT"           ON  "MKL_FOUND"         OFF)
+cmake_dependent_option(DLIB_USE_BLAS            "Enable BLAS support"      ON  "MKL_FOUND OR BLAS_FOUND"       OFF)
+cmake_dependent_option(DLIB_USE_LAPACK          "Enable LAPACK support"    ON  "MKL_FOUND OR LAPACK_FOUND"     OFF)
+cmake_dependent_option(DLIB_USE_AVX             "Enable AVX SIMD"          ON  "AVX_FOUND"                     OFF)
+cmake_dependent_option(DLIB_USE_SSE             "Enable SSE SIMD"          ON  "SSE_FOUND"                     OFF)
+cmake_dependent_option(DLIB_USE_NEON            "Enable NEON SIMD"         ON  "NEON_FOUND"                    OFF)
+cmake_dependent_option(DLIB_GIF_SUPPORT         "Enable GIF support"       ON  "GIF_FOUND"                     OFF)
+cmake_dependent_option(DLIB_WEBP_SUPPORT        "Enable WEBP support"      ON  "WEBP_FOUND"                    OFF)
+cmake_dependent_option(DLIB_NO_GUI_SUPPORT      "Disable GUI support"      OFF "X11_FOUND OR WIN32"            ON)
+cmake_dependent_option(DLIB_LINK_WITH_SQLITE3   "Enable Sqlite3 support"   ON  "SQLite3_FOUND"                 OFF)
+cmake_dependent_option(DLIB_USE_FFMPEG          "Enable FFMPEG support"    ON  "FFMPEG_FOUND"                  OFF)
+cmake_dependent_option(DLIB_USE_CUDA            "Enable CUDA support"      ON  "CUDAToolkit_FOUND;CUDNN_FOUND" OFF)
+cmake_dependent_option(DLIB_USE_MKL_SEQUENTIAL  "Enable MKL sequential"    ON  "MKL_FOUND"                     OFF)
+cmake_dependent_option(DLIB_USE_MKL_WITH_TBB    "Enable MKL tbb"           ON  "MKL_FOUND"                     OFF)
 
 # dlib
 add_library(dlib
@@ -78,7 +80,7 @@ target_include_directories(dlib
    INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
    INTERFACE $<INSTALL_INTERFACE:include>)
 target_compile_options(dlib PUBLIC $<${IS_CLANG_OLD}:-ftemplate-depth=500>)
-target_compile_options(dlib PUBLIC $<${IS_WIN32}:/bigobj>)
+target_compile_options(dlib PUBLIC $<${IS_MSVC}:/bigobj>)
 set_target_properties(dlib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 if (NOT DLIB_ISO_CPP_ONLY)
@@ -125,6 +127,7 @@ if (NOT DLIB_ISO_CPP_ONLY)
    if (DLIB_NO_GUI_SUPPORT)
       target_compile_definitions(dlib PUBLIC DLIB_NO_GUI_SUPPORT)
    else()
+      message(STATUS "Enabled GUI support")
       target_sources(dlib PRIVATE
          gui_core/gui_core_kernel_1.cpp
          gui_core/gui_core_kernel_2.cpp
@@ -137,6 +140,7 @@ if (NOT DLIB_ISO_CPP_ONLY)
    endif()
 
    if(DLIB_ENABLE_ASSERTS)
+      message(STATUS "Enabled DLIB_ASSERT statements")
       target_compile_definitions(dlib PUBLIC DLIB_ENABLE_ASSERTS)
       target_compile_definitions(dlib PUBLIC ENABLE_ASSERTS)
    else()
@@ -144,16 +148,19 @@ if (NOT DLIB_ISO_CPP_ONLY)
    endif()
 
    if (DLIB_ENABLE_STACK_TRACE)
+      message(STATUS "Enabled stack trace support")
       target_compile_definitions(dlib PUBLIC DLIB_ENABLE_STACK_TRACE)
    endif()
 
    if (DLIB_USE_AVX)
+      message(STATUS "Enabled AVX intrinsics")
       target_compile_options(dlib PUBLIC ${AVX_CFLAGS})
       target_compile_definitions(dlib PUBLIC $<${HAVE_AVX2}:DLIB_HAVE_AVX2>)
       target_compile_definitions(dlib PUBLIC $<${HAVE_AVX}:DLIB_HAVE_AVX>)
    endif()
 
    if (DLIB_USE_SSE)
+      message(STATUS "Enabled SSE intrinsics")
       target_compile_options(dlib PUBLIC ${SSE_CFLAGS})
       target_compile_definitions(dlib PUBLIC $<${HAVE_SSE42}:DLIB_HAVE_SSE42>)
       target_compile_definitions(dlib PUBLIC $<${HAVE_SSE41}:DLIB_HAVE_SSE41>)
@@ -161,11 +168,13 @@ if (NOT DLIB_ISO_CPP_ONLY)
    endif()
 
    if (DLIB_USE_NEON)
+      message(STATUS "Enabled NEON intrinsics")
       target_compile_features(dlib PUBLIC ${NEON_CFLAGS})
       target_compile_definitions(dlib PUBLIC DLIB_HAVE_NEON)
    endif()
 
    if (DLIB_JPEG_SUPPORT)
+      message(STATUS "Enabled JPEG wrappers")
       target_sources(dlib PRIVATE
          image_loader/jpeg_loader.cpp
          image_saver/save_jpeg.cpp)
@@ -174,6 +183,7 @@ if (NOT DLIB_ISO_CPP_ONLY)
       if (JPEG_FOUND)
          target_link_libraries(dlib PUBLIC JPEG::JPEG)
       else()
+         message(STATUS "    Using internal copy of libjpeg. Consider installing libjpeg")
          target_sources(dlib PRIVATE
             external/libjpeg/jaricom.c
             external/libjpeg/jcapimin.c
@@ -224,6 +234,7 @@ if (NOT DLIB_ISO_CPP_ONLY)
    endif()
 
    if (DLIB_PNG_SUPPORT)
+      message(STATUS "Enabled PNG wrappers")
       target_sources(dlib PRIVATE
          image_loader/png_loader.cpp
          image_saver/save_png.cpp)
@@ -231,8 +242,8 @@ if (NOT DLIB_ISO_CPP_ONLY)
 
       if (PNG_FOUND)
          target_link_libraries(dlib PUBLIC PNG::PNG)
-
       else()
+         message(STATUS "    Using internal copy of libpng. Consider installing libpng")
          target_sources(dlib PRIVATE
             external/libpng/arm/arm_init.c
             external/libpng/arm/filter_neon_intrinsics.c
@@ -272,11 +283,13 @@ if (NOT DLIB_ISO_CPP_ONLY)
    endif()
 
    if (DLIB_GIF_SUPPORT)
+      message(STATUS "Enabled GIF wrappers")
       target_compile_definitions(dlib PUBLIC DLIB_GIF_SUPPORT)
       target_link_libraries(dlib PUBLIC GIF::GIF)
    endif()
 
    if (DLIB_WEBP_SUPPORT)
+      message(STATUS "Enabled WEBP wrappers")
       target_sources(dlib PRIVATE
          image_loader/webp_loader.cpp
          image_saver/save_webp.cpp)
@@ -285,39 +298,49 @@ if (NOT DLIB_ISO_CPP_ONLY)
    endif()
 
    if (DLIB_LINK_WITH_SQLITE3)
+      message(STATUS "Enabled SQLITE3 wrappers")
       target_link_libraries(dlib PUBLIC SQLite::SQLite3)
       target_compile_definitions(dlib PUBLIC DLIB_LINK_WITH_SQLITE3)
    endif()
 
    if (DLIB_USE_FFMPEG)
+      message(STATUS "Enabled FFMPEG (libavformat) wrappers")
       target_link_libraries(dlib PUBLIC PkgConfig::FFMPEG)
       target_compile_definitions(dlib PUBLIC DLIB_USE_FFMPEG)
    endif()
 
    if (DLIB_USE_MKL_SEQUENTIAL)
-      target_compile_definitions(dlib PUBLIC DLIB_USE_MKL_SEQUENTIAL)
+      message(STATUS "Enabled MKL sequential")
+      target_compile_definitions(dlib PUBLIC DLIB_USE_MKL_SEQUENTIAL DLIB_USE_MKL_FFT)
       target_link_libraries(dlib PUBLIC mkl::sequential)
    elseif(DLIB_USE_MKL_WITH_TBB)
-      target_compile_definitions(dlib PUBLIC DLIB_USE_MKL_WITH_TBB)
+      message(STATUS "Enabled MKL tbb")
+      target_compile_definitions(dlib PUBLIC DLIB_USE_MKL_WITH_TBB DLIB_USE_MKL_FFT)
       target_link_libraries(dlib PUBLIC mkl::tbb)
-   endif()
-
-   if (DLIB_USE_MKL_FFT)
-      # Libs are already set above
-      target_compile_definitions(dlib PUBLIC DLIB_USE_MKL_FFT)
    endif()
 
    if (DLIB_USE_BLAS)
       target_compile_definitions(dlib PUBLIC DLIB_USE_BLAS)
-      target_link_libraries(dlib PUBLIC $<${BLAS_FOUND}:BLAS::BLAS>) # You may have linked to MKL already
+      if (NOT DLIB_USE_MKL_SEQUENTIAL AND NOT DLIB_USE_MKL_WITH_TBB)
+         message(STATUS "Enabled BLAS support - using BLAS library")
+         target_link_libraries(dlib PUBLIC BLAS::BLAS)
+      else()
+         message(STATUS "Enabled BLAS support - Using MKL library")
+      endif()
    endif()
 
    if (DLIB_USE_LAPACK)
       target_compile_definitions(dlib PUBLIC DLIB_USE_LAPACK)
-      target_link_libraries(dlib PUBLIC $<${LAPACK_FOUND}:LAPACK::LAPACK>) # You may have linked to MKL already
+      if (NOT DLIB_USE_MKL_SEQUENTIAL AND NOT DLIB_USE_MKL_WITH_TBB)
+         message(STATUS "Enabled LAPACK support - using LAPACK library")
+         target_link_libraries(dlib PUBLIC LAPACK::LAPACK)
+      else()
+         message(STATUS "Enabled LAPACK support - using MKL library")
+      endif()
    endif()
 
    if (DLIB_USE_CUDA)
+      message(STATUS "Enabled CUDA support")
       set(CMAKE_CUDA_COMPILER ${CUDAToolkit_NVCC_EXECUTABLE})
       enable_language(CUDA)
       target_sources(dlib PRIVATE
