@@ -122,9 +122,11 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install dependencies
       run: |
+        wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+        echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
         sudo apt update
         sudo apt install libwebp-dev libavformat-dev libavcodec-dev libavdevice-dev libavfilter-dev libswresample-dev libswscale-dev libavutil-dev 
-        sudo apt install libmkl-dev
+        sudo apt install intel-oneapi-mkl-devel
 
     - name: Configure tests with MKL sequential
       run: cmake . -B build -DDLIB_USE_MKL_SEQUENTIAL=ON -DDLIB_USE_MKL_WITH_TBB=OFF

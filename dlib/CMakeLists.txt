@@ -19,7 +19,6 @@ set(IS_NOT_WIN32  "$<NOT:${IS_WIN32}>")
 
 # Dependencies
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-list(APPEND CMAKE_PREFIX_PATH /opt/intel/oneapi/mkl/latest)
 include(CMakeDependentOption)
 find_package(PkgConfig)
 find_package(Threads)
