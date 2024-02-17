@@ -11,6 +11,17 @@
         throw dlib::error(DftiErrorMessage((s))); \
     }
 
+#ifdef DLIB_USE_MKL_WITH_TBB
+// This is a workaround to make libdlib link to libtbb.so explicitly and adding its path to the build tree RPATH.
+// This is because libmkl_tbb_threads.so depends on libtbb.so but dlib doesn't normally have any explicit symbols to libtbb.
+// If you don't do this, the runtime path of libtbb.so is stripped after build time.
+// Without this, at runtime you would get an error like "can't find libtbb.so"
+// And you would have to manually set it via LD_LIBRARY_PATH or something.
+// The better way to get around this is force cmake to add libtbb.so to RPATH. 
+// But i can't find a way to do it cleanly. Hopefully there isn't much performance impact here.
+extern "C" const char* TBB_runtime_version();
+#endif
+
 namespace dlib
 {
     template<typename T>
@@ -27,6 +38,9 @@ namespace dlib
               otherwise a forward FFT is performed.
     !*/
     {
+        #ifdef DLIB_USE_MKL_WITH_TBB
+        (void)TBB_runtime_version();
+        #endif
         static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floatint point type");
         DLIB_ASSERT(dims.num_dims() > 0, "dims can't be empty");
         DLIB_ASSERT(dims.num_dims() < 3, "we currently only support up to 2D FFT. Please submit an issue on github if 3D or above is required.");
