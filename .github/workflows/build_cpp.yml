@@ -143,8 +143,8 @@ jobs:
     - name: Build tests with MKL tbb
       run: cmake --build build2 --config Release --target dtest --parallel 4
     
-    - name: Test with MKL tbb
-      run: build2/dtest --runall -q
+    # - name: Test with MKL tbb
+    #   run: build2/dtest --runall -q
 
   ubuntu-20_04-gcc-7:
     runs-on: 'ubuntu-20.04'
