@@ -13,6 +13,14 @@ endif()
 
 project(dlib_python_bindings)
 
+# To avoid dll hell, always link everything statically when compiling in
+# visual studio.  This way, the resulting library won't depend on a bunch
+# of other dll files and can be safely copied to someone else's computer
+# and expected to run.
+if (MSVC)
+   include(../../dlib/cmake_utils/tell_visual_studio_to_use_static_runtime.cmake)
+endif()
+
 add_subdirectory(../../dlib dlib_build)
 add_subdirectory(../../dlib/external/pybind11 pybind11_build)
 
@@ -50,10 +58,13 @@ endif()
 target_link_libraries(_dlib_pybind11 PRIVATE dlib::dlib)
 target_compile_definitions(_dlib_pybind11 PRIVATE DLIB_NO_ABORT_ON_2ND_FATAL_ERROR)
 set_target_properties(_dlib_pybind11 PROPERTIES
-   INTERPROCEDURAL_OPTIMIZATION ON
+   INTERPROCEDURAL_OPTIMIZATION OFF
    CXX_VISIBILITY_PRESET "hidden"
    CUDA_VISIBILITY_PRESET "hidden")
 
+# When invoked from setup.py CMAKE_LIBRARY_OUTPUT_DIRECTORY will be set.  But when you are just building via say
+# `cd dlib/tools/python; mkdir build; cd build; cmake ..` it won't be set.  It only matters for building the actual
+# distribution.  So skip this for people building directly with cmake (which they might do when testing stuff).
 if (CMAKE_LIBRARY_OUTPUT_DIRECTORY) 
    configure_file(dlib/__init__.py.in ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/dlib/__init__.py)
 endif()

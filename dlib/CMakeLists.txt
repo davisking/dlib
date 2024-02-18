@@ -5,6 +5,7 @@ set(CPACK_PACKAGE_VERSION_MAJOR "19")
 set(CPACK_PACKAGE_VERSION_MINOR "24")
 set(CPACK_PACKAGE_VERSION_PATCH "99")
 set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
+set(DLIB_VERSION ${VERSION})
 project(dlib VERSION ${VERSION} LANGUAGES C CXX)
 message(STATUS "Using CMake version:      ${CMAKE_VERSION}")
 message(STATUS "Compiling dlib version:   ${VERSION}")
@@ -59,6 +60,7 @@ cmake_dependent_option(DLIB_USE_CUDA            "Enable CUDA support"      ON  "
 cmake_dependent_option(DLIB_USE_MKL_SEQUENTIAL  "Enable MKL sequential"    ON  "MKL_FOUND"                     OFF)
 cmake_dependent_option(DLIB_USE_MKL_WITH_TBB    "Enable MKL tbb"           ON  "MKL_FOUND"                     OFF)
 cmake_dependent_option(DLIB_USE_MKL_WITH_GNU    "Enable MKL GNU OMP"       ON  "MKL_FOUND"                     OFF)
+include(cmake_utils/release_build_by_default)
 
 # dlib
 add_library(dlib
@@ -83,6 +85,7 @@ target_include_directories(dlib
 target_compile_options(dlib PUBLIC $<${IS_CLANG_OLD}:-ftemplate-depth=500>)
 target_compile_options(dlib PUBLIC $<${IS_MSVC}:/bigobj>)
 target_compile_options(dlib PUBLIC $<${IS_GCC}:-Wreturn-type>)
+target_compile_definitions(dlib PUBLIC DLIB_VERSION=${DLIB_VERSION})
 set_target_properties(dlib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 if (NOT DLIB_ISO_CPP_ONLY)
