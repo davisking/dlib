@@ -21,7 +21,6 @@ set(IS_NOT_WIN32  "$<NOT:${IS_WIN32}>")
 # Dependencies
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(CMakeDependentOption)
-find_package(PkgConfig)
 find_package(Threads)
 find_package(AVX)
 find_package(SSE)
@@ -30,16 +29,16 @@ find_package(GIF)
 find_package(JPEG)
 find_package(PNG)
 find_package(WEBP)
-find_package(GUI)
 find_package(SQLite3)
+find_package(FFMPEG)
 find_package(CUDAToolkit)
 find_package(CUDNN)
 find_package(MKL)
 if (NOT MKL_FOUND)
    find_package(CBLAS)
 endif()
-if (PKG_CONFIG_FOUND)
-   pkg_check_modules(FFMPEG IMPORTED_TARGET libavdevice libavfilter libavformat libavcodec libavutil libswresample libswscale)
+if (NOT WIN32)
+   find_package(GUI)
 endif()
 
 # Options
@@ -55,13 +54,14 @@ cmake_dependent_option(DLIB_USE_SSE             "Enable SSE SIMD"          ON  "
 cmake_dependent_option(DLIB_USE_NEON            "Enable NEON SIMD"         ON  "NEON_FOUND"                    OFF)
 cmake_dependent_option(DLIB_GIF_SUPPORT         "Enable GIF support"       ON  "GIF_FOUND"                     OFF)
 cmake_dependent_option(DLIB_WEBP_SUPPORT        "Enable WEBP support"      ON  "WEBP_FOUND"                    OFF)
-cmake_dependent_option(DLIB_NO_GUI_SUPPORT      "Disable GUI support"      OFF "GUI_FOUND"                     ON)
+cmake_dependent_option(DLIB_NO_GUI_SUPPORT      "Disable GUI support"      OFF "X11_FOUND OR WIN32"            ON)
 cmake_dependent_option(DLIB_LINK_WITH_SQLITE3   "Enable Sqlite3 support"   ON  "SQLite3_FOUND"                 OFF)
 cmake_dependent_option(DLIB_USE_FFMPEG          "Enable FFMPEG support"    ON  "FFMPEG_FOUND"                  OFF)
 cmake_dependent_option(DLIB_USE_CUDA            "Enable CUDA support"      ON  "CUDAToolkit_FOUND;CUDNN_FOUND" OFF)
 cmake_dependent_option(DLIB_USE_MKL_SEQUENTIAL  "Enable MKL sequential"    ON  "MKL_FOUND"                     OFF)
 cmake_dependent_option(DLIB_USE_MKL_WITH_TBB    "Enable MKL tbb"           ON  "MKL_FOUND"                     OFF)
 cmake_dependent_option(DLIB_USE_MKL_WITH_GNU    "Enable MKL GNU OMP"       ON  "MKL_FOUND"                     OFF)
+# include(cmake_utils/release_build_by_default)
 
 # dlib
 add_library(dlib
@@ -143,7 +143,7 @@ if (NOT DLIB_ISO_CPP_ONLY)
          gui_widgets/drawable.cpp
          gui_widgets/canvas_drawing.cpp
          gui_widgets/style.cpp)
-      target_link_libraries(dlib PUBLIC gui::gui)
+      target_link_libraries(dlib PUBLIC $<${IS_NOT_WIN32}:X11::X11>)
    endif()
 
    if(DLIB_ENABLE_ASSERTS)
