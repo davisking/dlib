@@ -35,7 +35,9 @@ find_package(SQLite3)
 find_package(CUDAToolkit)
 find_package(CUDNN)
 find_package(MKL)
-find_package(CBLAS)
+if (NOT MKL_FOUND)
+   find_package(CBLAS)
+endif()
 if (PKG_CONFIG_FOUND)
    pkg_check_modules(FFMPEG IMPORTED_TARGET libavdevice libavfilter libavformat libavcodec libavutil libswresample libswscale)
 endif()
@@ -60,7 +62,6 @@ cmake_dependent_option(DLIB_USE_CUDA            "Enable CUDA support"      ON  "
 cmake_dependent_option(DLIB_USE_MKL_SEQUENTIAL  "Enable MKL sequential"    ON  "MKL_FOUND"                     OFF)
 cmake_dependent_option(DLIB_USE_MKL_WITH_TBB    "Enable MKL tbb"           ON  "MKL_FOUND"                     OFF)
 cmake_dependent_option(DLIB_USE_MKL_WITH_GNU    "Enable MKL GNU OMP"       ON  "MKL_FOUND"                     OFF)
-include(cmake_utils/release_build_by_default)
 
 # dlib
 add_library(dlib
