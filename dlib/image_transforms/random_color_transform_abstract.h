@@ -17,7 +17,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object generates a color balancing and gamma correction transform.
-                It then allows you to apply that specific transform to asga many
+                It then allows you to apply that specific transform to as many
                 rgb_pixel objects as you like.
         !*/
 
@@ -85,7 +85,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object generates a color balancing and gamma correction transform.
-                It then allows you to apply that specific transform to asga many
+                It then allows you to apply that specific transform to as many
                 rgb_pixel objects as you like. In particular, it generates the inverse
                 transform of the one constructed by color_transform with the same
                 parameters.
