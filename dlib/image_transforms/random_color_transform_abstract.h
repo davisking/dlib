@@ -94,27 +94,14 @@ namespace dlib
     public:
 
         color_transform (
-            const double gamma = 1.0,
-            const double red_scale = 1.0,
-            const double green_scale = 1.0,
-            const double blue_scale = 1.0
+            const color_transform& tform
         );
         /*!
-            requires
-                - 0 <= gamma
-                - 0 <= red_scale <= 1
-                - 0 <= green_scale <= 1
-                - 0 <= blue_scale <= 1
             ensures
                 - This constructor generates a color transform which can be applied by
                   calling this object's operator() method.
-                - The color transform is a gamma correction and color rebalancing.  If
-                  gamma == 1, red_scale == 1, green_scale == 1 and blue_scale == 1 then
-                  the transform doesn't change any colors at all.  However, the farther
-                  away from 1 these parameters are, the more noticeable the resulting
-                  transform.
-                - The resulting transform is the inverse of the one returned by calling
-                  color_transform with the same parameters.
+                - The resulting transform is the inverse of tform, which can be used to
+                  undo the effect of tform.
         !*/
 
         rgb_pixel operator()(
@@ -123,30 +110,6 @@ namespace dlib
         /*!
             ensures
                 - returns the color transformed version of p.
-        !*/
-
-        double get_gamma() const;
-        /*!
-            ensures
-                - returns the gamma used in this color transform.
-        !*/
-
-        double get_red_scale() const;
-        /*!
-            ensures
-                - returns the red scale used in this color transform.
-        !*/
-
-        double get_green_scale() const;
-        /*!
-            ensures
-                - returns the green scale used in this color transform.
-        !*/
-
-        double get_blue_scale() const;
-        /*!
-            ensures
-                - returns the blue scale used in this color transform.
         !*/
     };
 

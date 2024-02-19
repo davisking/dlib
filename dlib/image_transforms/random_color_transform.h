@@ -73,20 +73,13 @@ namespace dlib
     {
     public:
         inv_color_transform(
-            const double gamma_ = 1,
-            const double red_scale_ = 1,
-            const double green_scale_ = 1,
-            const double blue_scale_ = 1
-        ) : gamma(gamma_), red_scale(red_scale_), green_scale(green_scale_), blue_scale(blue_scale_)
+            const color_transform& tform
+        )
         {
-            DLIB_CASSERT(gamma_ >= 0)
-            DLIB_CASSERT(0 <= red_scale_ && red_scale_ <= 1)
-            DLIB_CASSERT(0 <= green_scale_ && green_scale_ <= 1)
-            DLIB_CASSERT(0 <= blue_scale_ && blue_scale_ <= 1)
-            const double m = 255 * std::max({red_scale_, green_scale_, blue_scale_});
-            red_scale /= m;
-            green_scale /= m;
-            blue_scale /= m;
+            const auto gamma = tform.get_gamma();
+            const auto red_scale = tform.get_red_scale();
+            const auto green_scale = tform.get_green_scale();
+            const auto blue_scale = tform.get_blue_scale();
             table.resize(256 * 3);
             unsigned long i = 0;
             for (int k = 0; k < 256; ++k)
@@ -111,18 +104,11 @@ namespace dlib
             return p;
         }
 
-        double get_gamma() const { return gamma; }
-        double get_red_scale() const { return red_scale; }
-        double get_green_scale() const { return green_scale; }
-        double get_blue_scale() const { return blue_scale; }
-
     private:
         std::vector<unsigned char> table;
-        double gamma;
-        double red_scale;
-        double green_scale;
-        double blue_scale;
     };
+
+// ----------------------------------------------------------------------------------------
 
     inline color_transform random_color_transform (
             dlib::rand& rnd,
