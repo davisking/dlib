@@ -14,7 +14,7 @@
 include(FindPackageHandleStandardArgs)
 include(CheckTypeSize)
 check_type_size( "void*" SIZE_OF_VOID_PTR)
-find_package(OpenMP)
+find_package(OpenMP QUIET)
 
 set(mkl_search_path
     /opt/intel/oneapi/mkl/latest

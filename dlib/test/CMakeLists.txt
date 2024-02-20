@@ -3,9 +3,9 @@ cmake_minimum_required(VERSION 3.17.0)
 project(dtest)
 
 # Generator expression helpers
-set(IS_WIN32      "$<BOOL:${WIN32}>")
-set(IS_NOT_WIN32  "$<NOT:${IS_WIN32}>")
 set(IS_GCC        "$<CXX_COMPILER_ID:GNU>")
+set(IS_MSVC       "$<CXX_COMPILER_ID:MSVC>")
+set(IS_NOT_MSVC   "$<NOT:${IS_MSVC}>")
 
 # Build dlib
 add_subdirectory(.. dlib_build)
@@ -176,8 +176,8 @@ endif()
 get_filename_component(DLIB_FFMPEG_DATA ${CMAKE_CURRENT_SOURCE_DIR}/ffmpeg_data/details.cfg REALPATH)
 target_compile_definitions(dtest PRIVATE DLIB_FFMPEG_DATA="${DLIB_FFMPEG_DATA}")
 target_link_libraries(dtest dlib::dlib)
-target_link_options(dtest PRIVATE $<$<AND:$<CONFIG:RELEASE>,${IS_NOT_WIN32}>:-s>)            # Strip
-# target_compile_options(dtest PRIVATE $<${IS_NOT_WIN32}:-W -Werror>)                          # Enable all warnings
+target_link_options(dtest PRIVATE $<$<AND:$<CONFIG:RELEASE>,${IS_NOT_MSVC}>:-s>)            # Strip
+# target_compile_options(dtest PRIVATE $<${IS_NOT_MSVC}:-W -Werror>)                          # Enable all warnings
 # target_compile_options(dtest PRIVATE $<${IS_NOT_WIN32}:-fdiagnostics-color=always>)          # ?
 # target_compile_options(dtest PRIVATE $<${IS_NOT_WIN32}:-Wno-unused-function>)                # Don't care about unused functions
 # target_compile_options(dtest PRIVATE $<${IS_NOT_WIN32}:-Wno-strict-overflow>)                # TODO: remove

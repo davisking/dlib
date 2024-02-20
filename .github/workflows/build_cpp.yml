@@ -73,19 +73,19 @@ jobs:
         cd ..
         
     - name: Configure tests
-      run: ~/cmake-3.17.0-Linux-x86_64/bin/cmake ${{ github.workspace }}/dlib/test -B build -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n5.1.3_installation
+      run: ~/cmake-3.17.0-Linux-x86_64/bin/cmake ${{ github.workspace }}/dlib/test -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n5.1.3_installation
     
     - name: Build tests
-      run: ~/cmake-3.17.0-Linux-x86_64/bin/cmake --build build --config Release --parallel 4
+      run: ~/cmake-3.17.0-Linux-x86_64/bin/cmake --build build --parallel 4
         
     - name: Run tests
       run: build/dtest --runall -q
 
     - name: Configure examples
-      run: ~/cmake-3.17.0-Linux-x86_64/bin/cmake ${{ github.workspace }}/examples -B build2 -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n5.1.3_installation
+      run: ~/cmake-3.17.0-Linux-x86_64/bin/cmake ${{ github.workspace }}/examples -B build2 -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n5.1.3_installation
 
     - name: Build examples
-      run: ~/cmake-3.17.0-Linux-x86_64/bin/cmake --build build2 --config Release --parallel 4
+      run: ~/cmake-3.17.0-Linux-x86_64/bin/cmake --build build2 --parallel 4
 
   ubuntu-latest-gcc-11-blas:
     runs-on: 'ubuntu-latest'
@@ -102,19 +102,19 @@ jobs:
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110 --slave /usr/bin/g++ g++ /usr/bin/g++-11 --slave /usr/bin/gcov gcov /usr/bin/gcov-11
     
     - name: Configure tests
-      run: cmake ${{ github.workspace }}/dlib/test -B build
+      run: cmake ${{ github.workspace }}/dlib/test -B build -DCMAKE_BUILD_TYPE=Release
     
     - name: Build tests (including BLAS tests)
-      run: cmake --build build --config Release --parallel 4
+      run: cmake --build build --parallel 4
     
     - name: Test
       run: build/dtest --runall -q
 
     - name: Configure examples
-      run: cmake ${{ github.workspace }}/examples -B build2
+      run: cmake ${{ github.workspace }}/examples -B build2 -DCMAKE_BUILD_TYPE=Release
 
     - name: Build examples
-      run: cmake --build build2 --config Release --parallel 4
+      run: cmake --build build2 --parallel 4
 
   ubuntu-latest-ffmpeg-mkl:
     runs-on: 'ubuntu-latest'
@@ -129,19 +129,19 @@ jobs:
         sudo apt install intel-oneapi-mkl-devel
 
     - name: Configure tests with MKL sequential
-      run: cmake . -B build -DDLIB_USE_MKL_SEQUENTIAL=ON -DDLIB_USE_MKL_WITH_TBB=OFF
+      run: cmake . -B build -DCMAKE_BUILD_TYPE=Release -DDLIB_USE_MKL_SEQUENTIAL=ON -DDLIB_USE_MKL_WITH_TBB=OFF
     
     - name: Build tests with MKL sequential
-      run: cmake --build build --config Release --target dtest --parallel 4
+      run: cmake --build build --target dtest --parallel 4
     
     - name: Test with MKL sequential
       run: build/dtest --runall -q
 
     - name: Configure tests with MKL tbb
-      run: cmake . -B build2 -DDLIB_USE_MKL_SEQUENTIAL=OFF -DDLIB_USE_MKL_WITH_TBB=ON
+      run: cmake . -B build2 -DCMAKE_BUILD_TYPE=Release -DDLIB_USE_MKL_SEQUENTIAL=OFF -DDLIB_USE_MKL_WITH_TBB=ON
     
     - name: Build tests with MKL tbb
-      run: cmake --build build2 --config Release --target dtest --parallel 4
+      run: cmake --build build2 --target dtest --parallel 4
     
     - name: Test with MKL tbb
       run: build2/dtest --runall -q
@@ -182,23 +182,23 @@ jobs:
       run: |
         export CC=/usr/bin/gcc-7
         export CXX=/usr/bin/g++-7
-        cmake ${{ github.workspace }}/dlib/test -B build -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n3.2.18_installation
+        cmake ${{ github.workspace }}/dlib/test -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n3.2.18_installation
 
     - name: Build tests
-      run: cmake --build build --config Release --parallel 4
+      run: cmake --build build --parallel 4
 
     - name: Test
       run: build/dtest --runall -q
     
     - name: Configure examples
-      run: cmake ${{ github.workspace }}/examples -B build2 -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n3.2.18_installation
+      run: cmake ${{ github.workspace }}/examples -B build2 -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n3.2.18_installation
 
     - name: Build examples
-      run: cmake --build build2 --config Release --parallel 4
+      run: cmake --build build2 --parallel 4
 
     # Test cmake scrips can build standalone dlib as a shared library
     - name: Configure dlib as shared library  
-      run: cmake ${{ github.workspace }}/dlib -B build_dlib_shared -DBUILD_SHARED_LIBS=1 -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n3.2.18_installation
+      run: cmake ${{ github.workspace }}/dlib -B build_dlib_shared -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=1 -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n3.2.18_installation
 
     - name: Build dlib as shared library
       run: cmake --build build_dlib_shared --parallel 4
@@ -215,16 +215,16 @@ jobs:
       run: |
         export CC=/usr/bin/clang
         export CXX=/usr/bin/clang++
-        cmake ${{ github.workspace }}/dlib/test -B build -DDLIB_USE_AVX=ON
+        cmake ${{ github.workspace }}/dlib/test -B build -DCMAKE_BUILD_TYPE=Release -DDLIB_USE_AVX=ON
     
     - name: Build tests
-      run: cmake --build build --config Release --parallel 4
+      run: cmake --build build  --parallel 4
 
     - name: Configure examples
-      run: cmake ${{ github.workspace }}/examples -B build2 -DDLIB_USE_AVX=ON
+      run: cmake ${{ github.workspace }}/examples -B build2 -DCMAKE_BUILD_TYPE=Release -DDLIB_USE_AVX=ON
 
     - name: Build examples
-      run: cmake --build build2 --config Release --parallel 4
+      run: cmake --build build2 --parallel 4
 
     - name: Test
       run: build/dtest --runall -q
