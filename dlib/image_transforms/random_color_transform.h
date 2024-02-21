@@ -32,6 +32,8 @@ namespace dlib
             red_scale /= m;
             green_scale /= m;
             blue_scale /= m;
+            // Now compute a lookup table for all the color channels.  The table tells us
+            // what the transform does.
             table.resize(256 * 3);
             unsigned long i = 0;
             for (int k = 0; k < 256; ++k)
