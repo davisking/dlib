@@ -12,33 +12,37 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class random_color_transform
+    class color_transform
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object generates a random color balancing and gamma correction
-                transform.  It then allows you to apply that specific transform to as many
+                This object generates a color balancing and gamma correction transform.
+                It then allows you to apply that specific transform to as many
                 rgb_pixel objects as you like.
         !*/
 
     public:
 
-        random_color_transform (
-            dlib::rand& rnd,
-            const double gamma_magnitude = 0.5,
-            const double color_magnitude = 0.2
+        color_transform (
+            const double gamma = 1.0,
+            const double red_scale = 1.0,
+            const double green_scale = 1.0,
+            const double blue_scale = 1.0
         );
         /*!
             requires
-                - 0 <= gamma_magnitude 
-                - 0 <= color_magnitude <= 1
+                - 0 <= gamma
+                - 0 <= red_scale <= 1
+                - 0 <= green_scale <= 1
+                - 0 <= blue_scale <= 1
             ensures
-                - This constructor generates a random color transform which can be applied
-                  by calling this object's operator() method.
+                - This constructor generates a color transform which can be applied by
+                  calling this object's operator() method.
                 - The color transform is a gamma correction and color rebalancing.  If
-                  gamma_magnitude == 0 and color_magnitude == 0 then the transform doesn't
-                  change any colors at all.  However, the larger these parameters the more
-                  noticeable the resulting transform.
+                  gamma == 1, red_scale == 1, green_scale == 1 and blue_scale == 1 then
+                  the transform doesn't change any colors at all.  However, the farther
+                  away from 1 these parameters are, the more noticeable the resulting
+                  transform.
         !*/
 
         rgb_pixel operator()(
@@ -46,14 +50,87 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the color transformed version of p. 
+                - returns the color transformed version of p.
+        !*/
+
+        double get_gamma() const;
+        /*!
+            ensures
+                - returns the gamma used in this color transform.
+        !*/
+
+        double get_red_scale() const;
+        /*!
+            ensures
+                - returns the red scale used in this color transform.
+        !*/
+
+        double get_green_scale() const;
+        /*!
+            ensures
+                - returns the green scale used in this color transform.
+        !*/
+
+        double get_blue_scale() const;
+        /*!
+            ensures
+                - returns the blue scale used in this color transform.
         !*/
     };
 
 // ----------------------------------------------------------------------------------------
 
+    class inv_color_transform
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object generates a color balancing and gamma correction transform.
+                It then allows you to apply that specific transform to as many
+                rgb_pixel objects as you like. In particular, it generates the inverse
+                transform of the one constructed by color_transform with the same
+                parameters.
+        !*/
+
+    public:
+
+        color_transform (
+            const color_transform& tform
+        );
+        /*!
+            ensures
+                - This constructor generates a color transform which can be applied by
+                  calling this object's operator() method.
+                - The resulting transform is the inverse of tform, which can be used to
+                  undo the effect of tform.
+        !*/
+
+        rgb_pixel operator()(
+            rgb_pixel p
+        ) const;
+        /*!
+            ensures
+                - returns the color transformed version of p.
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    inline color_transform random_color_transform (
+            dlib::rand& rnd,
+            const double gamma_magnitude = 0.5,
+            const double color_magnitude = 0.2
+    );
+    /*!
+        ensures
+            - returns a random color balancing and gamma corection transform.  It then
+              allows you to apply that specific transform to as many rgb_pixel objects as
+              you like.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <typename image_type>
-    void disturb_colors (
+    color_transform disturb_colors (
         image_type& img,
         dlib::rand& rnd,
         const double gamma_magnitude = 0.5,
@@ -62,11 +139,12 @@ namespace dlib
     /*!
         requires
             - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
         ensures
             - Applies a random color transform to the given image.  This is done by
               creating a random_color_transform with the given parameters and then
               transforming each pixel in the image with the resulting transform.
+            - Returns the color transform used to transform the given image.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -91,4 +169,3 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
 #endif // DLIB_RANDOM_cOLOR_TRANSFORM_ABSTRACT_Hh_
-
