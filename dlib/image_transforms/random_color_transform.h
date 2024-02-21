@@ -82,6 +82,9 @@ namespace dlib
             const auto red_scale = tform.get_red_scale();
             const auto green_scale = tform.get_green_scale();
             const auto blue_scale = tform.get_blue_scale();
+
+            // Now compute a lookup table for all the color channels.  The table tells us
+            // what the transform does.
             table.resize(256 * 3);
             unsigned long i = 0;
             for (int k = 0; k < 256; ++k)
