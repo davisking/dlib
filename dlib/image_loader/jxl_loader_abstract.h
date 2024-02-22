@@ -1,7 +1,7 @@
 // Copyright (C) 2022  Davis E. King (davis@dlib.net), Martin Sandsmark, Adrià Arrufat
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_WEBP_IMPORT_ABSTRACT
-#ifdef DLIB_WEBP_IMPORT_ABSTRACT
+#undef DLIB_JPEGXL_IMPORT_ABSTRACT
+#ifdef DLIB_JPEGXL_IMPORT_ABSTRACT
 
 #include "image_loader_abstract.h"
 #include "../algs.h"
@@ -12,70 +12,70 @@
 namespace dlib
 {
 
-    class webp_loader : noncopyable
+    class jxl_loader : noncopyable
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object represents a class capable of loading WEBP image files.
-                Once an instance of it is created to contain a WEBP file from
+                This object represents a class capable of loading JPEG XL image files.
+                Once an instance of it is created to contain a JPEG XL file from
                 disk you can obtain the image stored in it via get_image().
         !*/
 
     public:
 
-        webp_loader( 
+        jxl_loader( 
             const char* filename 
         );
         /*!
             ensures
-                - loads the WEBP file with the given file name into this object
+                - loads the JPEG XL file with the given file name into this object
             throws
                 - std::bad_alloc
                 - image_load_error
                   This exception is thrown if there is some error that prevents
-                  us from loading the given WEBP file.
+                  us from loading the given JPEG XL file.
         !*/
 
-        webp_loader( 
+        jxl_loader( 
             const std::string& filename 
         );
         /*!
             ensures
-                - loads the WEBP file with the given file name into this object
+                - loads the JPEG XL file with the given file name into this object
             throws
                 - std::bad_alloc
                 - image_load_error
                   This exception is thrown if there is some error that prevents
-                  us from loading the given WEBP file.
+                  us from loading the given JPEG XL file.
         !*/
 
-        webp_loader( 
+        jxl_loader( 
             const dlib::file& f 
         );
         /*!
             ensures
-                - loads the WEBP file with the given file name into this object
+                - loads the JPEG XL file with the given file name into this object
             throws
                 - std::bad_alloc
                 - image_load_error
                   This exception is thrown if there is some error that prevents
-                  us from loading the given WEBP file.
+                  us from loading the given JPEG XL file.
         !*/
 
-        webp_loader( 
+        jxl_loader( 
             const unsigned char* imgbuffer,
             size_t buffersize
         );
         /*!
             ensures
-                - loads the WEBP from memory imgbuffer of size buffersize into this object
+                - loads the JPEG XL from memory imgbuffer of size buffersize into this object
             throws
                 - image_load_error
                   This exception is thrown if there is some error that prevents
-                  us from loading the given WEBP buffer.
+                  us from loading the given JPEG XL buffer.
         !*/
 
-        ~webp_loader(
+        ~jxl_loader(
         );
         /*!
             ensures
@@ -93,7 +93,7 @@ namespace dlib
                 - image_type == an image object that implements the interface defined in
                   dlib/image_processing/generic_image.h 
             ensures
-                - loads the WEBP image stored in this object into img
+                - loads the JPEG XL image stored in this object into img
         !*/
 
     };
@@ -103,7 +103,7 @@ namespace dlib
     template <
         typename image_type
         >
-    void load_webp (
+    void load_jxl (
         image_type& image,
         const std::string& file_name
     );
@@ -112,13 +112,13 @@ namespace dlib
             - image_type == an image object that implements the interface defined in
               dlib/image_processing/generic_image.h 
         ensures
-            - performs: webp_loader(file_name).get_image(image);
+            - performs: jxl_loader(file_name).get_image(image);
     !*/
 
     template <
         typename image_type
         >
-    void load_webp (
+    void load_jxl (
         image_type& image,
         const unsigned char* imgbuff,
         size_t imgbuffsize
@@ -128,13 +128,13 @@ namespace dlib
             - image_type == an image object that implements the interface defined in
               dlib/image_processing/generic_image.h 
         ensures
-            - performs: webp_loader(imgbuff, imgbuffsize).get_image(image);
+            - performs: jxl_loader(imgbuff, imgbuffsize).get_image(image);
     !*/
 
     template <
         typename image_type
         >
-    void load_webp (
+    void load_jxl (
         image_type& image,
         const char* imgbuff,
         size_t imgbuffsize
@@ -144,12 +144,12 @@ namespace dlib
             - image_type == an image object that implements the interface defined in
               dlib/image_processing/generic_image.h 
         ensures
-            - performs: webp_loader((unsigned char*)imgbuff, imgbuffsize).get_image(image);
+            - performs: jxl_loader((unsigned char*)imgbuff, imgbuffsize).get_image(image);
     !*/
 
 // ----------------------------------------------------------------------------------------
 
 }
 
-#endif // DLIB_WEBP_IMPORT_ABSTRACT
+#endif // DLIB_JPEGXL_IMPORT_ABSTRACT
 
