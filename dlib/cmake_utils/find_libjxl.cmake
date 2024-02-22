@@ -10,24 +10,22 @@
 
 # Look for the header file.
 
-unset(JXL_FOUND)
-
-find_path(JXL_INCLUDE_DIR NAMES jxl/decode_cxx.h jxl/encode_cxx.h)
-
-if(NOT JXL_INCLUDE_DIR)
-    unset(JXL_FOUND)
+message(STATUS "Searching for JPEG XL")
+find_package(PkgConfig)
+if (PkgConfig_FOUND)
+    pkg_check_modules(JXL IMPORTED_TARGET libjxl libjxl_threads)
+    if (JXL_FOUND)
+        message(STATUS "Found libjxl via pkg-config in `${JXL_LIBRARY_DIRS}`")
+    else()
+        message(" *****************************************************************************")
+        message(" *** No JPEG XL libraries found.                                           ***")
+        message(" *** On Ubuntu you can install them by executing                           ***")
+        message(" ***    sudo apt install libjxl-dev                                        ***")
+        message(" *****************************************************************************")
+    endif()
 else()
-    mark_as_advanced(JXL_INCLUDE_DIR)
-
-    # Look for the library
-    find_library(JXL_LIBRARY NAMES jxl)
-    # handle the QUIETLY and REQUIRED arguments and set JXL_FOUND to TRUE if
-    # all listed variables are TRUE
-    include(${CMAKE_ROOT}/Modules/FindPackageHandleStandardArgs.cmake)
-    find_package_handle_standard_args(JXL DEFAULT_MSG JXL_LIBRARY JXL_INCLUDE_DIR)
-
-    set(JXL_LIBRARIES ${JXL_LIBRARY})
-    set(JXL_INCLUDE_DIRS ${JXL_INCLUDE_DIR})
+    message(STATUS "PkgConfig could not be found, JPEG XL support won't be available")
+    set(JXL_FOUND 0)
 endif()
 
 if(JXL_FOUND)

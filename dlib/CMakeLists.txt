@@ -584,15 +584,18 @@ if (NOT TARGET dlib)
       if (DLIB_JPEGXL_SUPPORT)
          include(cmake_utils/find_libjxl.cmake)
          if (JXL_FOUND)
-            list (APPEND dlib_needed_private_includes ${JXL_INCLUDE_DIR})
-            list (APPEND dlib_needed_private_libraries ${JXL_LIBRARY})
+            list (APPEND dlib_needed_private_includes ${JXL_INCLUDE_DIRS})
+            list (APPEND dlib_needed_private_libraries ${JXL_LIBRARIES})
+            list (APPEND dlib_needed_public_cflags ${JXL_CFLAGS})
+            list (APPEND dlib_needed_public_ldflags ${JXL_LDFLAGS})
             set(source_files ${source_files}
                image_loader/jxl_loader.cpp
                # image_saver/save_jxl.cpp
                )
+            enable_preprocessor_switch(DLIB_JPEGXL_SUPPORT)
          else()
-             set(DLIB_JPEGXL_SUPPORT OFF CACHE BOOL ${DLIB_JPEGXL_SUPPORT_STR} FORCE )
-             toggle_preprocessor_switch(DLIB_JPEGXL_SUPPORT)
+            set(DLIB_JPEGXL_SUPPORT OFF CACHE BOOL ${DLIB_JPEGXL_SUPPORT_STR} FORCE)
+            disable_preprocessor_switch(DLIB_JPEGXL_SUPPORT)
          endif()
       endif()
 
