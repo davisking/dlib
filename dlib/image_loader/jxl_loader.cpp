@@ -70,17 +70,20 @@ namespace dlib
         {
             throw image_load_error("jxl_loader: JxlSignatureCheck failed");
         }
+
         auto dec = JxlDecoderMake(nullptr);
         if (JXL_DEC_SUCCESS != JxlDecoderSubscribeEvents(dec.get(), JXL_DEC_BASIC_INFO))
         {
             throw image_load_error("jxl_loader: JxlDecoderSubscribeEvents failed");
         }
-        JxlBasicInfo basic_info;
+
         JxlDecoderSetInput(dec.get(), data.data(), data.size());
         JxlDecoderCloseInput(dec.get());
         if (JXL_DEC_BASIC_INFO != JxlDecoderProcessInput(dec.get())) {
             throw image_load_error("jxl_loader: JxlDecoderProcessInput failed");
         }
+
+        JxlBasicInfo basic_info;
         if (JXL_DEC_SUCCESS != JxlDecoderGetBasicInfo(dec.get(), &basic_info))
         {
             throw image_load_error("jxl_loader: JxlDecoderGetBasicInfo failed");
@@ -92,7 +95,6 @@ namespace dlib
 
     void jxl_loader::decode(unsigned char* out, const size_t out_size, const long num_channels) const
     {
-        // Multi-threaded parallel runner.
         auto runner = JxlResizableParallelRunnerMake(nullptr);
         auto dec = JxlDecoderMake(nullptr);
         if (JXL_DEC_SUCCESS != JxlDecoderSubscribeEvents(dec.get(), JXL_DEC_FULL_IMAGE))
@@ -105,14 +107,18 @@ namespace dlib
             throw image_load_error("jxl_loader: JxlDecoderSetParallelRunner failed");
         }
 
+        if (JXL_DEC_SUCCESS != JxlDecoderSetInput(dec.get(), data.data(), data.size()))
+        {
+            throw image_load_error("jxl_loader: JxlDecoderSetInput failed");
+        }
+        JxlDecoderCloseInput(dec.get());
+
         JxlPixelFormat format = {
             .num_channels = static_cast<uint32_t>(num_channels),
             .data_type = JXL_TYPE_UINT8,
             .endianness = JXL_NATIVE_ENDIAN,
             .align=0
         };
-        JxlDecoderSetInput(dec.get(), data.data(), data.size());
-        JxlDecoderCloseInput(dec.get());
         for (;;)
         {
             JxlDecoderStatus status = JxlDecoderProcessInput(dec.get());
@@ -124,7 +130,8 @@ namespace dlib
             {
                 throw image_load_error("jxl_loader: Error, expected more input");
             }
-            else if (status == JXL_DEC_NEED_IMAGE_OUT_BUFFER) {
+            else if (status == JXL_DEC_NEED_IMAGE_OUT_BUFFER)
+            {
                 JxlResizableParallelRunnerSetThreads(runner.get(), JxlResizableParallelRunnerSuggestThreads(width, height));
                 size_t buffer_size;
                 if (JXL_DEC_SUCCESS != JxlDecoderImageOutBufferSize(dec.get(), &format, &buffer_size))
@@ -145,6 +152,9 @@ namespace dlib
             }
             else if (status == JXL_DEC_FULL_IMAGE)
             {
+                // If the image is an animation, more full frames may be decoded.
+                // This loader only decodes the first one.
+                return;
             }
             else if (status == JXL_DEC_SUCCESS)
             {

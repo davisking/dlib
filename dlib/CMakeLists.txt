@@ -590,7 +590,7 @@ if (NOT TARGET dlib)
             list (APPEND dlib_needed_public_ldflags ${JXL_LDFLAGS})
             set(source_files ${source_files}
                image_loader/jxl_loader.cpp
-               # image_saver/save_jxl.cpp
+               image_saver/save_jxl.cpp
                )
             enable_preprocessor_switch(DLIB_JPEGXL_SUPPORT)
          else()

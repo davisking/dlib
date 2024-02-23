@@ -123,7 +123,6 @@ macro(add_gui_example name)
    endif()
 endmacro()
 
-add_example(test_jxl_ex)
 add_example(dnn_metric_learning_ex)
 add_gui_example(dnn_face_recognition_ex)
 add_example(dnn_introduction_ex)

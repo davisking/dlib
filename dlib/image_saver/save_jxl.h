@@ -20,22 +20,13 @@ namespace dlib
 
     namespace impl
     {
-        enum class webp_type
-        {
-            rgb,
-            bgr,
-            rgba,
-            bgra
-        };
-
-        void impl_save_webp (
+        void impl_save_jxl (
             const std::string& filename,
             const uint8_t* data,
-            const int width,
-            const int height,
-            const int stride,
-            const float quality,
-            const webp_type type
+            const uint32_t width,
+            const uint32_t height,
+            const uint32_t num_channels,
+            const float quality
         );
     }
 
@@ -44,20 +35,20 @@ namespace dlib
     template <
         typename image_type
         >
-    typename disable_if<is_matrix<image_type>>::type save_webp (
+    typename disable_if<is_matrix<image_type>>::type save_jxl (
         const image_type& img_,
         const std::string& filename,
-        float quality = 75
+        const float quality = 75
     )
     {
 #ifndef DLIB_JPEGXL_SUPPORT
             /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                You are getting this error because you are trying to use the save_webp
+                You are getting this error because you are trying to use the save_jxl
                 function but you haven't defined DLIB_JPEGXL_SUPPORT.  You must do so to use
                 this object.   You must also make sure you set your build environment
-                to link against the libwebp library.
+                to link against the libjxl library.
             !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-            static_assert(sizeof(image_type) == 0, "webp support not enabled.");
+            static_assert(sizeof(image_type) == 0, "JPEG XL support not enabled.");
 #endif
         const_image_view<image_type> img(img_);
         using pixel_type = typename image_traits<image_type>::pixel_type;
@@ -67,8 +58,8 @@ namespace dlib
             "\t save_jxl()"
             << "\n\t You can't save an empty image as a JPEG XL."
             );
-        DLIB_CASSERT(0 <= quality,
-            "\t save_webp()"
+        DLIB_CASSERT(0 < quality || quality > 100,
+            "\t save_jxl()"
             << "\n\t Invalid quality value."
             << "\n\t quality: " << quality
             );
@@ -76,30 +67,21 @@ namespace dlib
         auto data = reinterpret_cast<const uint8_t*>(image_data(img));
         const int width = img.nc();
         const int height = img.nr();
-        int stride = width_step(img);
         if (pixel_traits<pixel_type>::rgb_alpha)
         {
-            if (pixel_traits<pixel_type>::bgr_layout)
-                impl::impl_save_webp(filename, data, width, height, stride, quality, impl::webp_type::bgra);
-            else
-                impl::impl_save_webp(filename, data, width, height, stride, quality, impl::webp_type::rgba);
+            impl::impl_save_jxl(filename, data, width, height, 4, quality); 
         }
         else if (pixel_traits<pixel_type>::rgb)
         {
-            if (pixel_traits<pixel_type>::bgr_layout)
-                impl::impl_save_webp(filename, data, width, height, stride, quality, impl::webp_type::bgr);
-            else
-                impl::impl_save_webp(filename, data, width, height, stride, quality, impl::webp_type::rgb);
+            impl::impl_save_jxl(filename, data, width, height, 3, quality); 
         }
         else
         {
             // This is some other kind of color image so just save it as an RGB image.
-            // We also need to recompute the stride in case we were given a grayscale image.
             array2d<rgb_pixel> temp;
             assign_image(temp, img);
-            stride = width_step(temp);
             auto data = reinterpret_cast<const uint8_t*>(image_data(temp));
-            impl::impl_save_webp(filename, data, width, height, stride, quality, impl::webp_type::rgb);
+            impl::impl_save_jxl(filename, data, width, height, 3, quality);
         }
     }
 
@@ -108,15 +90,15 @@ namespace dlib
     template <
         typename EXP
         >
-    void save_webp(
+    void save_jxl(
         const matrix_exp<EXP>& img,
         const std::string& filename,
-        float quality = 75
+        uint32_t quality = 75
     )
     {
         array2d<typename EXP::type> temp;
         assign_image(temp, img);
-        save_webp(temp, filename, quality);
+        save_jxl(temp, filename, quality);
     }
 
 // ----------------------------------------------------------------------------------------

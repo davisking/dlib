@@ -6,11 +6,11 @@
 // only do anything with this file if DLIB_JPEGXL_SUPPORT is defined
 #ifdef DLIB_JPEGXL_SUPPORT
 
-#include "save_webp.h"
+#include "save_jxl.h"
 #include "image_saver.h"
 #include <sstream>
-
-#include <webp/encode.h>
+#include <jxl/encode_cxx.h>
+#include <jxl/thread_parallel_runner_cxx.h>
 
 namespace dlib {
 
@@ -18,72 +18,114 @@ namespace dlib {
 
     namespace impl
     {
-        void impl_save_webp (
+        void impl_save_jxl (
             const std::string& filename,
-            const uint8_t* data,
-            const int width,
-            const int height,
-            const int stride,
-            const float quality,
-            const webp_type type
+            const uint8_t* pixels,
+            const uint32_t width,
+            const uint32_t height,
+            const uint32_t num_channels,
+            const float quality
         )
         {
-            if (width > JPEGXL_MAX_DIMENSION || height > JPEGXL_MAX_DIMENSION)
-                throw image_save_error("Error while encoding " + filename + ". Bad picture dimensions: "
-                + std::to_string(width) + "x" + std::to_string(height)
-                + ". Maximum WebP width and height allowed is "
-                + std::to_string(JPEGXL_MAX_DIMENSION) + " pixels");
-
             std::ofstream fout(filename, std::ios::binary);
             if (!fout.good())
-                throw image_save_error("Unable to open " + filename + " for writing.");
-
-            uint8_t* output;
-            size_t output_size = 0;
-            switch (type)
             {
-            case webp_type::rgb:
-                if (quality > 100)
-                    output_size = WebPEncodeLosslessRGB(data, width, height, stride, &output);
-                else
-                    output_size = WebPEncodeRGB(data, width, height, stride, quality, &output);
-                break;
-            case webp_type::rgba:
-                if (quality > 100)
-                    output_size = WebPEncodeLosslessRGBA(data, width, height, stride, &output);
-                else
-                    output_size = WebPEncodeRGBA(data, width, height, stride, quality, &output);
-                break;
-            case webp_type::bgr:
-                if (quality > 100)
-                    output_size = WebPEncodeLosslessBGR(data, width, height, stride, &output);
-                else
-                    output_size = WebPEncodeBGR(data, width, height, stride, quality, &output);
-                break;
-            case webp_type::bgra:
-                if (quality > 100)
-                    output_size = WebPEncodeLosslessBGRA(data, width, height, stride, &output);
-                else
-                    output_size = WebPEncodeBGRA(data, width, height, stride, quality, &output);
-                break;
-            default:
-                throw image_save_error("Invalid WebP color type");
+                throw image_save_error("Unable to open " + filename + " for writing.");
             }
 
-            if (output_size > 0)
+            auto enc = JxlEncoderMake(nullptr);
+            auto runner = JxlThreadParallelRunnerMake(nullptr, JxlThreadParallelRunnerDefaultNumWorkerThreads());
+
+            if (JXL_ENC_SUCCESS != JxlEncoderSetParallelRunner(enc.get(), JxlThreadParallelRunner, runner.get()))
             {
-                fout.write(reinterpret_cast<char*>(output), output_size);
-                if (!fout.good())
+                throw image_save_error("jxl_saver: JxlResizableParallelRunner failed");
+            }
+
+            JxlPixelFormat pixel_format{
+                .num_channels = num_channels,
+                .data_type = JXL_TYPE_UINT8,
+                .endianness = JXL_NATIVE_ENDIAN,
+                .align = 0
+            };
+            JxlBasicInfo basic_info;
+            JxlEncoderInitBasicInfo(&basic_info);
+            basic_info.xsize = width;
+            basic_info.ysize = height;
+            basic_info.bits_per_sample = 8;
+            basic_info.uses_original_profile = JXL_FALSE;
+            if (num_channels > 3)
+            {
+                basic_info.num_extra_channels = 1;
+                basic_info.alpha_bits = 8;
+            }
+
+            if (JXL_ENC_SUCCESS != JxlEncoderSetBasicInfo(enc.get(), &basic_info))
+            {
+                throw image_save_error("jxl_saver: JxlEncoderSetBasicInfo failed");
+            }
+
+            JxlColorEncoding color_encoding = {};
+            JxlColorEncodingSetToSRGB(&color_encoding, /* is_gray = */ num_channels < 3);
+            if (JXL_ENC_SUCCESS != JxlEncoderSetColorEncoding(enc.get(), &color_encoding))
+            {
+                throw image_save_error("jxl_saver: JxlEncoderSetColorEncoding failed");
+            }
+
+            JxlEncoderFrameSettings* frame_settings = JxlEncoderFrameSettingsCreate(enc.get(), nullptr);
+            const float distance = JxlEncoderDistanceFromQuality(quality);
+            if (JXL_ENC_SUCCESS != JxlEncoderSetFrameDistance(frame_settings, distance))
+            {
+                throw image_save_error("jxl_saver: JxlEncoderSetFrameDistance failed");
+            }
+            if (num_channels > 3)
+            {
+                if (JXL_ENC_SUCCESS != JxlEncoderSetExtraChannelDistance(frame_settings, 0, distance))
                 {
-                    WebPFree(output);
-                    throw image_save_error("Error while writing WebP image to " + filename + ".");
+                    throw image_save_error("jxl_saver: JxlEncoderSetExtraChannelDistance failed");
                 }
             }
-            else
+            // if (quality == 100 || distance < 0.01)
+            // {
+            //     if (JXL_ENC_SUCCESS != JxlEncoderSetFrameLossless(frame_settings, JXL_TRUE))
+            //     {
+            //         throw image_save_error("jxl_saver: JxlEncoderSetFrameLossless failed");
+            //     }
+            // }
+
+            void* pixels_data = reinterpret_cast<void*>(const_cast<uint8_t*>(pixels));
+            const size_t pixels_size = width * height * num_channels;
+            if (JXL_ENC_SUCCESS != JxlEncoderAddImageFrame(frame_settings, &pixel_format, pixels_data, pixels_size))
             {
-                throw image_save_error("Error while encoding WebP image to " + filename + ".");
+                throw image_save_error("jxl_saver: JxlEncoderAddImageFrame failed");
             }
-            WebPFree(output);
+            JxlEncoderCloseInput(enc.get());
+
+            std::vector<uint8_t> compressed;
+            compressed.resize(64);
+            uint8_t* next_out = compressed.data();
+            size_t avail_out = compressed.size() - (next_out - compressed.data());
+            JxlEncoderStatus process_result = JXL_ENC_NEED_MORE_OUTPUT;
+            while (process_result == JXL_ENC_NEED_MORE_OUTPUT)
+            {
+                process_result = JxlEncoderProcessOutput(enc.get(), &next_out, &avail_out);
+                if (process_result == JXL_ENC_NEED_MORE_OUTPUT)
+                {
+                    size_t offset = next_out - compressed.data();
+                    compressed.resize(compressed.size() * 2);
+                    next_out = compressed.data() + offset;
+                    avail_out = compressed.size() - offset;
+                }
+            }
+            compressed.resize(next_out - compressed.data());
+            if (JXL_ENC_SUCCESS != process_result)
+            {
+                throw image_save_error("jxl_saver: JxlEncoderProcessOutput failed");
+            }
+            fout.write(reinterpret_cast<char*>(compressed.data()), compressed.size());
+            if (!fout.good())
+            {
+                throw image_save_error("Error while writing JPEG XL image to " + filename + ".");
+            }
         }
     }
 
