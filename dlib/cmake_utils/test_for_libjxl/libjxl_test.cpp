@@ -4,7 +4,6 @@
 #include <jxl/encode_cxx.h>
 #include <jxl/decode_cxx.h>
 #include <jxl/resizable_parallel_runner_cxx.h>
-#include <jxl/thread_parallel_runner_cxx.h>
 #include <iostream>
 #include <memory>
 
