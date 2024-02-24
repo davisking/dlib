@@ -10,7 +10,7 @@
 #include "image_saver.h"
 #include <sstream>
 #include <jxl/encode_cxx.h>
-#include <jxl/thread_parallel_runner_cxx.h>
+#include <jxl/resizable_parallel_runner_cxx.h>
 
 namespace dlib {
 
@@ -34,9 +34,15 @@ namespace dlib {
             }
 
             auto enc = JxlEncoderMake(nullptr);
-            auto runner = JxlThreadParallelRunnerMake(nullptr, JxlThreadParallelRunnerDefaultNumWorkerThreads());
+            if (JXL_ENC_SUCCESS != JxlEncoderUseContainer(enc.get(), JXL_TRUE))
+            {
+                throw image_save_error("jxl_saver: JxlEncoderUseContainer failed");
+            }
 
-            if (JXL_ENC_SUCCESS != JxlEncoderSetParallelRunner(enc.get(), JxlThreadParallelRunner, runner.get()))
+            auto runner = JxlResizableParallelRunnerMake(nullptr);
+            JxlResizableParallelRunnerSetThreads(runner.get(), JxlResizableParallelRunnerSuggestThreads(width, height));
+
+            if (JXL_ENC_SUCCESS != JxlEncoderSetParallelRunner(enc.get(), JxlResizableParallelRunner, runner.get()))
             {
                 throw image_save_error("jxl_saver: JxlResizableParallelRunner failed");
             }
@@ -53,10 +59,22 @@ namespace dlib {
             basic_info.ysize = height;
             basic_info.bits_per_sample = 8;
             basic_info.uses_original_profile = JXL_FALSE;
-            if (num_channels > 3)
+            switch (num_channels)
             {
+            case 3:
+                basic_info.num_color_channels = 3;
+                basic_info.num_extra_channels = 0;
+                basic_info.alpha_bits = 0;
+                basic_info.alpha_exponent_bits = 0;
+                break;
+            case 4:
+                basic_info.num_color_channels = 3;
                 basic_info.num_extra_channels = 1;
-                basic_info.alpha_bits = 8;
+                basic_info.alpha_bits = basic_info.bits_per_sample;
+                basic_info.alpha_exponent_bits = 0;
+                break;
+            default:
+                throw ("jxl_saver: unsupported number of channels");
             }
 
             if (JXL_ENC_SUCCESS != JxlEncoderSetBasicInfo(enc.get(), &basic_info))
@@ -65,32 +83,53 @@ namespace dlib {
             }
 
             JxlColorEncoding color_encoding = {};
-            JxlColorEncodingSetToSRGB(&color_encoding, /* is_gray = */ num_channels < 3);
+            JxlColorEncodingSetToSRGB(&color_encoding, /* is_gray = */ JXL_FALSE);
             if (JXL_ENC_SUCCESS != JxlEncoderSetColorEncoding(enc.get(), &color_encoding))
             {
                 throw image_save_error("jxl_saver: JxlEncoderSetColorEncoding failed");
             }
 
             JxlEncoderFrameSettings* frame_settings = JxlEncoderFrameSettingsCreate(enc.get(), nullptr);
+            JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_DECODING_SPEED, 0);
+
             const float distance = JxlEncoderDistanceFromQuality(quality);
-            if (JXL_ENC_SUCCESS != JxlEncoderSetFrameDistance(frame_settings, distance))
-            {
-                throw image_save_error("jxl_saver: JxlEncoderSetFrameDistance failed");
-            }
-            if (num_channels > 3)
-            {
-                if (JXL_ENC_SUCCESS != JxlEncoderSetExtraChannelDistance(frame_settings, 0, distance))
-                {
-                    throw image_save_error("jxl_saver: JxlEncoderSetExtraChannelDistance failed");
-                }
-            }
             // if (quality == 100 || distance < 0.01)
             // {
+            //     if (JXL_ENC_SUCCESS != JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_EFFORT, 7))
+            //     {
+            //         throw image_save_error("jxl_saver: JxlEncoderFrameSettingsSetOption failed");
+            //     }
+            //     if (JXL_ENC_SUCCESS != JxlEncoderSetFrameDistance(frame_settings, 0))
+            //     {
+            //         throw image_save_error("jxl_saver: JxlEncoderSetFrameDistance failed");
+            //     }
             //     if (JXL_ENC_SUCCESS != JxlEncoderSetFrameLossless(frame_settings, JXL_TRUE))
             //     {
             //         throw image_save_error("jxl_saver: JxlEncoderSetFrameLossless failed");
             //     }
             // }
+            // else
+            {
+                if (JXL_ENC_SUCCESS != JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_EFFORT, 3))
+                {
+                    throw image_save_error("jxl_saver: JxlEncoderFrameSettingsSetOption failed");
+                }
+                // if (JXL_ENC_SUCCESS != JxlEncoderSetFrameLossless(frame_settings, JXL_FALSE))
+                // {
+                //     throw image_save_error("jxl_saver: JxlEncoderSetFrameLossless false failed");
+                // }
+                if (JXL_ENC_SUCCESS != JxlEncoderSetFrameDistance(frame_settings, distance))
+                {
+                    throw image_save_error("jxl_saver: JxlEncoderSetFrameDistance failed");
+                }
+                if (basic_info.alpha_bits > 0)
+                {
+                    if (JXL_ENC_SUCCESS != JxlEncoderSetExtraChannelDistance(frame_settings, 0, distance))
+                    {
+                        throw image_save_error("jxl_saver: JxlEncoderSetExtraChannelDistance failed");
+                    }
+                }
+            }
 
             void* pixels_data = reinterpret_cast<void*>(const_cast<uint8_t*>(pixels));
             const size_t pixels_size = width * height * num_channels;

@@ -1,7 +1,7 @@
-// Copyright (C) 2022  Davis E. King (davis@dlib.net), Martin Sandsmark, Adrià Arrufat
+// Copyright (C) 2024  Davis E. King (davis@dlib.net), Martin Sandsmark, Adrià Arrufat
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_JPEGXL_IMPORT_ABSTRACT
-#ifdef DLIB_JPEGXL_IMPORT_ABSTRACT
+#undef DLIB_JXL_IMPORT_ABSTRACT
+#ifdef DLIB_JXL_IMPORT_ABSTRACT
 
 #include "image_loader_abstract.h"
 #include "../algs.h"
@@ -151,5 +151,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_JPEGXL_IMPORT_ABSTRACT
+#endif // DLIB_JXL_IMPORT_ABSTRACT
 
