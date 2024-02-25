@@ -1,7 +1,7 @@
 // Copyright (C) 2022  Davis E. King (davis@dlib.net), Martin Sandsmark, Adrià Arrufat
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_JPEGXL_IMPORT
-#define DLIB_JPEGXL_IMPORT
+#ifndef DLIB_JXL_IMPORT
+#define DLIB_JXL_IMPORT
 
 #include <vector>
 
@@ -26,10 +26,10 @@ namespace dlib
         template<typename image_type>
         void get_image(image_type& image) const
         {
-#ifndef DLIB_JPEGXL_SUPPORT
+#ifndef DLIB_JXL_SUPPORT
             /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 You are getting this error because you are trying to use the jxl_loader
-                object but you haven't defined DLIB_JPEGXL_SUPPORT.  You must do so to use
+                object but you haven't defined DLIB_JXL_SUPPORT.  You must do so to use
                 this object.   You must also make sure you set your build environment
                 to link against the libjxl library.
             !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
@@ -123,6 +123,6 @@ namespace dlib
 #include "jxl_loader.cpp"
 #endif
 
-#endif // DLIB_JPEGXL_IMPORT
+#endif // DLIB_JXL_IMPORT
 
 

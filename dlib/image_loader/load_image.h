@@ -96,7 +96,7 @@ namespace dlib
 #ifdef DLIB_WEBP_SUPPORT
             case image_file_type::WEBP: load_webp(image, file_name); return;
 #endif
-#ifdef DLIB_JPEGXL_SUPPORT
+#ifdef DLIB_JXL_SUPPORT
             case image_file_type::JXL: load_jxl(image, file_name); return;
 #endif
 #ifdef DLIB_GIF_SUPPORT

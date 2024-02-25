@@ -3,8 +3,8 @@
 #ifndef DLIB_JXL_LOADER_CPp_
 #define DLIB_JXL_LOADER_CPp_
 
-// only do anything with this file if DLIB_JPEGXL_SUPPORT is defined
-#ifdef DLIB_JPEGXL_SUPPORT
+// only do anything with this file if DLIB_JXL_SUPPORT is defined
+#ifdef DLIB_JXL_SUPPORT
 #include "jxl_loader.h"
 #include <jxl/decode_cxx.h>
 #include <jxl/resizable_parallel_runner_cxx.h>
@@ -166,7 +166,5 @@ namespace dlib
     }
 }
 
-#endif // DLIB_JPEG_SUPPORT
-
+#endif // DLIB_JXL_SUPPORT
 #endif // DLIB_JXL_LOADER_CPp_
-

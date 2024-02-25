@@ -3,8 +3,8 @@
 #ifndef DLIB_JXL_SAVER_CPp_
 #define DLIB_JXL_SAVER_CPp_
 
-// only do anything with this file if DLIB_JPEGXL_SUPPORT is defined
-#ifdef DLIB_JPEGXL_SUPPORT
+// only do anything with this file if DLIB_JXL_SUPPORT is defined
+#ifdef DLIB_JXL_SUPPORT
 
 #include "save_jxl.h"
 #include "image_saver.h"
@@ -172,7 +172,7 @@ namespace dlib {
 
 }
 
-#endif // DLIB_JPEGXL_SUPPORT
+#endif // DLIB_JXL_SUPPORT
 
 #endif // DLIB_JXL_SAVER_CPp_
 

@@ -23,7 +23,7 @@
 #cmakedefine DLIB_PNG_SUPPORT
 #cmakedefine DLIB_GIF_SUPPORT
 #cmakedefine DLIB_WEBP_SUPPORT
-#cmakedefine DLIB_JPEGXL_SUPPORT
+#cmakedefine DLIB_JXL_SUPPORT
 #cmakedefine DLIB_USE_FFTW
 #cmakedefine DLIB_USE_BLAS
 #cmakedefine DLIB_USE_LAPACK

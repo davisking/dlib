@@ -41,10 +41,10 @@ namespace dlib
         const float quality = 90
     )
     {
-#ifndef DLIB_JPEGXL_SUPPORT
+#ifndef DLIB_JXL_SUPPORT
             /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 You are getting this error because you are trying to use the save_jxl
-                function but you haven't defined DLIB_JPEGXL_SUPPORT.  You must do so to use
+                function but you haven't defined DLIB_JXL_SUPPORT.  You must do so to use
                 this object.   You must also make sure you set your build environment
                 to link against the libjxl library.
             !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
