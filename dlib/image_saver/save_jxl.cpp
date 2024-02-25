@@ -58,7 +58,7 @@ namespace dlib {
             basic_info.xsize = width;
             basic_info.ysize = height;
             basic_info.bits_per_sample = 8;
-            basic_info.uses_original_profile = JXL_FALSE;
+            basic_info.uses_original_profile = quality == 100;
             switch (num_channels)
             {
             case 3:
@@ -93,42 +93,36 @@ namespace dlib {
             JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_DECODING_SPEED, 0);
 
             const float distance = JxlEncoderDistanceFromQuality(quality);
-            // if (quality == 100 || distance < 0.01)
-            // {
-            //     if (JXL_ENC_SUCCESS != JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_EFFORT, 7))
-            //     {
-            //         throw image_save_error("jxl_saver: JxlEncoderFrameSettingsSetOption failed");
-            //     }
-            //     if (JXL_ENC_SUCCESS != JxlEncoderSetFrameDistance(frame_settings, 0))
-            //     {
-            //         throw image_save_error("jxl_saver: JxlEncoderSetFrameDistance failed");
-            //     }
-            //     if (JXL_ENC_SUCCESS != JxlEncoderSetFrameLossless(frame_settings, JXL_TRUE))
-            //     {
-            //         throw image_save_error("jxl_saver: JxlEncoderSetFrameLossless failed");
-            //     }
-            // }
-            // else
+            if (JXL_ENC_SUCCESS != JxlEncoderSetFrameDistance(frame_settings, distance))
+            {
+                throw image_save_error("jxl_saver: JxlEncoderSetFrameDistance failed");
+            }
+            if (basic_info.alpha_bits > 0)
+            {
+                if (JXL_ENC_SUCCESS != JxlEncoderSetExtraChannelDistance(frame_settings, 0, distance))
+                {
+                    throw image_save_error("jxl_saver: JxlEncoderSetExtraChannelDistance failed");
+                }
+            }
+            // explictly enable lossless mode
+            if (distance == 0)
+            {
+                if (JXL_ENC_SUCCESS != JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_EFFORT, 7))
+                {
+                    throw image_save_error("jxl_saver: JxlEncoderFrameSettingsSetOption failed");
+                }
+                if (JXL_ENC_SUCCESS != JxlEncoderSetFrameLossless(frame_settings, JXL_TRUE))
+                {
+                    throw image_save_error("jxl_saver: JxlEncoderSetFrameLossless failed");
+                }
+            }
+            else
             {
                 if (JXL_ENC_SUCCESS != JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_EFFORT, 3))
                 {
                     throw image_save_error("jxl_saver: JxlEncoderFrameSettingsSetOption failed");
                 }
-                // if (JXL_ENC_SUCCESS != JxlEncoderSetFrameLossless(frame_settings, JXL_FALSE))
-                // {
-                //     throw image_save_error("jxl_saver: JxlEncoderSetFrameLossless false failed");
-                // }
-                if (JXL_ENC_SUCCESS != JxlEncoderSetFrameDistance(frame_settings, distance))
-                {
-                    throw image_save_error("jxl_saver: JxlEncoderSetFrameDistance failed");
-                }
-                if (basic_info.alpha_bits > 0)
-                {
-                    if (JXL_ENC_SUCCESS != JxlEncoderSetExtraChannelDistance(frame_settings, 0, distance))
-                    {
-                        throw image_save_error("jxl_saver: JxlEncoderSetExtraChannelDistance failed");
-                    }
-                }
+
             }
 
             void* pixels_data = reinterpret_cast<void*>(const_cast<uint8_t*>(pixels));
