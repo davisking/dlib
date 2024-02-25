@@ -136,15 +136,12 @@ namespace dlib
                 size_t buffer_size;
                 if (JXL_DEC_SUCCESS != JxlDecoderImageOutBufferSize(dec.get(), &format, &buffer_size))
                 {
-                    std::cout << "buffer_size = " << buffer_size << '\n';
-                    std::cout << "actual_size = " << width * height * num_channels << '\n';
                     throw image_load_error("jxl_loader: JxlDecoderImageOutBufferSize failed");
                 }
                 if (buffer_size != width * height * num_channels)
                 {
                     throw image_load_error("jxl_loader: invalid output buffer size");
                 }
-                std::cout << "buffer size: " << buffer_size << '\n';
                 if (JXL_DEC_SUCCESS != JxlDecoderSetImageOutBuffer(dec.get(), &format, out, out_size))
                 {
                     throw image_load_error("jxl_loader: JxlDecoderSetImageOutBuffer failed");
