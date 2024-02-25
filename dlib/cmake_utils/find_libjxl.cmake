@@ -13,7 +13,7 @@
 message(STATUS "Searching for JPEG XL")
 find_package(PkgConfig)
 if (PkgConfig_FOUND)
-    pkg_check_modules(JXL REQUIRED IMPORTED_TARGET libjxl libjxl_cms libjxl_threads)
+    pkg_check_modules(JXL IMPORTED_TARGET libjxl libjxl_cms libjxl_threads)
     if (JXL_FOUND)
         message(STATUS "Found libjxl via pkg-config in `${JXL_LIBRARY_DIRS}`")
     else()
