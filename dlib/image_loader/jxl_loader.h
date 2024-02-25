@@ -39,35 +39,42 @@ namespace dlib
             vimg.set_size(height, width);
             using pixel_type = typename image_traits<image_type>::pixel_type;
 
-            // Fast path: rgb, rgb_alpha.
-            if (pixel_traits<pixel_type>::rgb || pixel_traits<pixel_type>::rgb_alpha)
+            // Fast path: rgb, rgb_alpha, grayscale with matching input depth
+            if (pixel_traits<pixel_type>::grayscale && depth == 1 ||
+                pixel_traits<pixel_type>::rgb && depth == 3 ||
+                pixel_traits<pixel_type>::rgb_alpha && depth == 4)
             {
-                const long num_channels = pixel_traits<pixel_type>::rgb_alpha ? 4 : 3;
-                const size_t output_size = width * height * num_channels;
+                const size_t output_size = width * height * depth;
                 unsigned char* output = reinterpret_cast<unsigned char*>(image_data(vimg));
-                decode(output, output_size, num_channels);
+                decode(output, output_size);
                 return;
             }
 
-            // Manual decoding
-            array2d<rgb_alpha_pixel> decoded;
-            decoded.set_size(height, width);
-            unsigned char* output = reinterpret_cast<unsigned char*>(image_data(decoded));
-            decode(output, width * height * 4, 4);
-            for (int r = 0; r < height; ++r)
+            // Manual decoding: we still need to handle the case wether the input data has alpha.
+            if (depth == 4)
             {
-                for (int c = 0; c < width; ++c)
-                {
-                    assign_pixel(vimg[r][c], decoded[r][c]);
-                }
+                array2d<rgb_alpha_pixel> decoded;
+                decoded.set_size(height, width);
+                unsigned char* output = reinterpret_cast<unsigned char*>(image_data(decoded));
+                decode(output, width * height * depth);
+                assign_image(vimg, decoded);
+            }
+            else
+            {
+                array2d<rgb_pixel> decoded;
+                decoded.set_size(height, width);
+                unsigned char* output = reinterpret_cast<unsigned char*>(image_data(decoded));
+                decode(output, width * height * depth);
+                assign_image(vimg, decoded);
             }
         }
 
     private:
         void get_info();
-        void decode(unsigned char *out, const size_t out_size, const long num_channels) const;
-        long height;
-        long width;
+        void decode(unsigned char *out, const size_t out_size) const;
+        uint32_t height;
+        uint32_t width;
+        uint32_t depth;
         std::vector<unsigned char> data;
     };
 

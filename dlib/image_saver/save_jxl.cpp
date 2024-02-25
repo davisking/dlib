@@ -61,6 +61,12 @@ namespace dlib {
             basic_info.uses_original_profile = quality == 100;
             switch (num_channels)
             {
+            case 1:
+                basic_info.num_color_channels = 1;
+                basic_info.num_extra_channels = 0;
+                basic_info.alpha_bits = 0;
+                basic_info.alpha_exponent_bits = 0;
+                break;
             case 3:
                 basic_info.num_color_channels = 3;
                 basic_info.num_extra_channels = 0;
@@ -83,7 +89,7 @@ namespace dlib {
             }
 
             JxlColorEncoding color_encoding = {};
-            JxlColorEncodingSetToSRGB(&color_encoding, /* is_gray = */ JXL_FALSE);
+            JxlColorEncodingSetToSRGB(&color_encoding, /* is_gray = */ num_channels < 3);
             if (JXL_ENC_SUCCESS != JxlEncoderSetColorEncoding(enc.get(), &color_encoding))
             {
                 throw image_save_error("jxl_saver: JxlEncoderSetColorEncoding failed");

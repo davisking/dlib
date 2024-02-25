@@ -90,10 +90,11 @@ namespace dlib
         }
         width = basic_info.xsize;
         height = basic_info.ysize;
+        depth = basic_info.num_color_channels + basic_info.num_extra_channels;
     }
 // ----------------------------------------------------------------------------------------
 
-    void jxl_loader::decode(unsigned char* out, const size_t out_size, const long num_channels) const
+    void jxl_loader::decode(unsigned char* out, const size_t out_size) const
     {
         auto runner = JxlResizableParallelRunnerMake(nullptr);
         auto dec = JxlDecoderMake(nullptr);
@@ -114,7 +115,7 @@ namespace dlib
         JxlDecoderCloseInput(dec.get());
 
         JxlPixelFormat format = {
-            .num_channels = static_cast<uint32_t>(num_channels),
+            .num_channels = depth,
             .data_type = JXL_TYPE_UINT8,
             .endianness = JXL_NATIVE_ENDIAN,
             .align=0
@@ -138,7 +139,7 @@ namespace dlib
                 {
                     throw image_load_error("jxl_loader: JxlDecoderImageOutBufferSize failed");
                 }
-                if (buffer_size != width * height * num_channels)
+                if (buffer_size != width * height * depth)
                 {
                     throw image_load_error("jxl_loader: invalid output buffer size");
                 }

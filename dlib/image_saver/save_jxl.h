@@ -67,21 +67,31 @@ namespace dlib
         auto data = reinterpret_cast<const uint8_t*>(image_data(img));
         const int width = img.nc();
         const int height = img.nr();
-        if (pixel_traits<pixel_type>::rgb_alpha)
+        const int depth = pixel_traits<pixel_type>::num;
+        // Fast path: rgb, rgb_alpha, grayscale
+        if (pixel_traits<pixel_type>::rgb ||
+            pixel_traits<pixel_type>::rgb_alpha ||
+            pixel_traits<pixel_type>::grayscale)
         {
-            impl::impl_save_jxl(filename, data, width, height, 4, quality); 
-        }
-        else if (pixel_traits<pixel_type>::rgb)
-        {
-            impl::impl_save_jxl(filename, data, width, height, 3, quality); 
+            impl::impl_save_jxl(filename, data, width, height, depth, quality);
         }
         else
         {
             // This is some other kind of color image so just save it as an RGB image.
-            array2d<rgb_pixel> temp;
-            assign_image(temp, img);
-            auto data = reinterpret_cast<const uint8_t*>(image_data(temp));
-            impl::impl_save_jxl(filename, data, width, height, 3, quality);
+            if (pixel_traits<pixel_type>::has_alpha)
+            {
+                array2d<rgb_alpha_pixel> temp;
+                assign_image(temp, img);
+                auto data = reinterpret_cast<const uint8_t*>(image_data(temp));
+                impl::impl_save_jxl(filename, data, width, height, depth, quality);
+            }
+            else
+            {
+                array2d<rgb_pixel> temp;
+                assign_image(temp, img);
+                auto data = reinterpret_cast<const uint8_t*>(image_data(temp));
+                impl::impl_save_jxl(filename, data, width, height, depth, quality);
+            }
         }
     }
 
