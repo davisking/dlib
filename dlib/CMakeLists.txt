@@ -17,6 +17,7 @@ set(IS_MSVC       "$<CXX_COMPILER_ID:MSVC>")
 set(IS_CLANG_OLD  "$<AND:${IS_CLANG},$<VERSION_LESS:$<CXX_COMPILER_VERSION>,7.0.0>>")
 set(IS_WIN32      "$<BOOL:${WIN32}>")
 set(IS_NOT_WIN32  "$<NOT:${IS_WIN32}>")
+set(IS_GCC11      "$<AND:${IS_GCC},$<VERSION_GREATER_EQUAL:$<CXX_COMPILER_VERSION>,11.3.0>,$<VERSION_LESS_EQUAL:$<CXX_COMPILER_VERSION>,11.4.0>>")
 
 # Dependencies
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -86,6 +87,7 @@ target_include_directories(dlib
 target_compile_options(dlib PUBLIC $<${IS_CLANG_OLD}:-ftemplate-depth=500>)
 target_compile_options(dlib PUBLIC $<${IS_MSVC}:/bigobj>)
 target_compile_options(dlib PUBLIC $<${IS_GCC}:-Wreturn-type>)
+target_compile_options(dlib PUBLIC $<${IS_GCC11}:-Wno-free-nonheap-object>) # gcc 11 incorrectly yields warning in dlib::row_major_layout::layout with dlib::memory_manager_stateless_kernel_1
 target_compile_definitions(dlib PUBLIC DLIB_VERSION=${DLIB_VERSION})
 set_target_properties(dlib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
