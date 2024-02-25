@@ -38,7 +38,7 @@ namespace dlib
     typename disable_if<is_matrix<image_type>>::type save_jxl (
         const image_type& img_,
         const std::string& filename,
-        const float quality = 75
+        const float quality = 90
     )
     {
 #ifndef DLIB_JPEGXL_SUPPORT
@@ -58,7 +58,7 @@ namespace dlib
             "\t save_jxl()"
             << "\n\t You can't save an empty image as a JPEG XL."
             );
-        DLIB_CASSERT(0 < quality || quality > 100,
+        DLIB_CASSERT(0 <= quality && quality <= 100,
             "\t save_jxl()"
             << "\n\t Invalid quality value."
             << "\n\t quality: " << quality
