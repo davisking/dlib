@@ -26,8 +26,7 @@ namespace dlib
 
         void clear()
         {
-            running_stats empty{};
-            std::memcpy(this, &empty, sizeof(empty));
+            *this = running_stats{};
         }
 
         void add (
@@ -263,8 +262,7 @@ namespace dlib
 
         void clear()
         {
-            running_scalar_covariance empty{};
-            std::memcpy(this, &empty, sizeof(empty));
+            *this = running_scalar_covariance{};
         }
 
         void add (
