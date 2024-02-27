@@ -51,6 +51,14 @@ void save_image(numpy_image<T> img, const std::string &path)
         save_png(img, path);
     } else if(has_ending(lowered_path, ".jpg") || has_ending(lowered_path, ".jpeg")) {
         save_jpeg(img, path);
+#if DLIB_WEBP_SUPPORT
+    } else if(has_ending(lowered_path, ".webp")) {
+        save_webp(img, path);
+#endif
+#if DLIB_JXL_SUPPORT
+    } else if(has_ending(lowered_path, ".jxl")) {
+        save_jxl(img, path);
+#endif
     } else {
         throw dlib::error("Unsupported image type, image path must end with one of [.bmp, .png, .dng, .jpg, .jpeg]");
     }
