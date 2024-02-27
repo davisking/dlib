@@ -40,9 +40,9 @@ namespace dlib
             using pixel_type = typename image_traits<image_type>::pixel_type;
 
             // Fast path: rgb, rgb_alpha, grayscale with matching input depth
-            if (pixel_traits<pixel_type>::grayscale && depth == 1 ||
-                pixel_traits<pixel_type>::rgb && depth == 3 ||
-                pixel_traits<pixel_type>::rgb_alpha && depth == 4)
+            if ((pixel_traits<pixel_type>::grayscale && depth == 1) ||
+                (pixel_traits<pixel_type>::rgb && depth == 3) ||
+                (pixel_traits<pixel_type>::rgb_alpha && depth == 4))
             {
                 const size_t output_size = width * height * depth;
                 unsigned char* output = reinterpret_cast<unsigned char*>(image_data(vimg));
@@ -124,5 +124,3 @@ namespace dlib
 #endif
 
 #endif // DLIB_JXL_IMPORT
-
-
