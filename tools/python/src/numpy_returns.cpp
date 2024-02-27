@@ -42,15 +42,33 @@ void save_image(numpy_image<T> img, const std::string &path)
 {
     std::string lowered_path = path;
     std::transform(lowered_path.begin(), lowered_path.end(), lowered_path.begin(), ::tolower);
+    std::string error_message = "Unsupported image type, image path must end with one of [.bmp, .dng";
+#if DLIB_PNG_SUPPORT
+    error_message += ", .png";
+#endif
+#if DLIB_JPEG_SUPPORT
+    error_message += ", .jpg, jpeg";
+#endif
+#if DLIB_WEBP_SUPPORT
+    error_message += ", .webp";
+#endif
+#if DLIB_JXL_SUPPORT
+    error_message += ", .jxl";
+#endif
+    error_message += "]";
 
     if(has_ending(lowered_path, ".bmp")) {
         save_bmp(img, path);
     } else if(has_ending(lowered_path, ".dng")) {
         save_dng(img, path);
+#if DLIB_PNG_SUPPORT
     } else if(has_ending(lowered_path, ".png")) {
         save_png(img, path);
+#endif
+#if DLIB_JPEG_SUPPORT
     } else if(has_ending(lowered_path, ".jpg") || has_ending(lowered_path, ".jpeg")) {
         save_jpeg(img, path);
+#endif
 #if DLIB_WEBP_SUPPORT
     } else if(has_ending(lowered_path, ".webp")) {
         save_webp(img, path);
@@ -60,7 +78,7 @@ void save_image(numpy_image<T> img, const std::string &path)
         save_jxl(img, path);
 #endif
     } else {
-        throw dlib::error("Unsupported image type, image path must end with one of [.bmp, .png, .dng, .jpg, .jpeg]");
+        throw dlib::error(error_message);
     }
     return;
 }
