@@ -1,4 +1,4 @@
-// Copyright (C) 2022  Davis E. King (davis@dlib.net), Adrià Arrufat
+// Copyright (C) 2024  Davis E. King (davis@dlib.net), Adrià Arrufat
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_JXL_SAVER_CPp_
 #define DLIB_JXL_SAVER_CPp_
@@ -110,25 +110,14 @@ namespace dlib {
                     throw image_save_error("jxl_saver: JxlEncoderSetExtraChannelDistance failed");
                 }
             }
+
             // explictly enable lossless mode
             if (distance == 0)
             {
-                if (JXL_ENC_SUCCESS != JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_EFFORT, 7))
-                {
-                    throw image_save_error("jxl_saver: JxlEncoderFrameSettingsSetOption failed");
-                }
                 if (JXL_ENC_SUCCESS != JxlEncoderSetFrameLossless(frame_settings, JXL_TRUE))
                 {
                     throw image_save_error("jxl_saver: JxlEncoderSetFrameLossless failed");
                 }
-            }
-            else
-            {
-                if (JXL_ENC_SUCCESS != JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_EFFORT, 3))
-                {
-                    throw image_save_error("jxl_saver: JxlEncoderFrameSettingsSetOption failed");
-                }
-
             }
 
             void* pixels_data = reinterpret_cast<void*>(const_cast<uint8_t*>(pixels));

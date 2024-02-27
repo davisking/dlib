@@ -1,4 +1,4 @@
-// Copyright (C) 2022  Davis E. King (davis@dlib.net), Martin Sandsmark, Adrià Arrufat
+// Copyright (C) 2024  Davis E. King (davis@dlib.net), Adrià Arrufat
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_JXL_LOADER_CPp_
 #define DLIB_JXL_LOADER_CPp_

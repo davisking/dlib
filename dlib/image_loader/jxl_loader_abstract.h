@@ -1,4 +1,4 @@
-// Copyright (C) 2024  Davis E. King (davis@dlib.net), Martin Sandsmark, Adrià Arrufat
+// Copyright (C) 2024  Davis E. King (davis@dlib.net), Adrià Arrufat
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_JXL_IMPORT_ABSTRACT
 #ifdef DLIB_JXL_IMPORT_ABSTRACT

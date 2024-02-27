@@ -1,4 +1,4 @@
-// Copyright (C) 2022  Davis E. King (davis@dlib.net), Adrià Arrufat
+// Copyright (C) 2024  Davis E. King (davis@dlib.net), Adrià Arrufat
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_SAVE_JXL_Hh_
 #define DLIB_SAVE_JXL_Hh_
