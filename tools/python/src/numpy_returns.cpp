@@ -38,7 +38,7 @@ bool has_ending (std::string const full_string, std::string const &ending) {
 // ----------------------------------------------------------------------------------------
 
 template <typename T>
-void save_image(numpy_image<T> img, const std::string &path)
+void save_image(numpy_image<T> img, const std::string &path, const float quality)
 {
     std::string lowered_path = path;
     std::transform(lowered_path.begin(), lowered_path.end(), lowered_path.begin(), ::tolower);
@@ -67,15 +67,15 @@ void save_image(numpy_image<T> img, const std::string &path)
 #endif
 #if DLIB_JPEG_SUPPORT
     } else if(has_ending(lowered_path, ".jpg") || has_ending(lowered_path, ".jpeg")) {
-        save_jpeg(img, path);
+        save_jpeg(img, path, put_in_range(0, 100, quality));
 #endif
 #if DLIB_WEBP_SUPPORT
     } else if(has_ending(lowered_path, ".webp")) {
-        save_webp(img, path);
+        save_webp(img, path, std::max(0.f, quality));
 #endif
 #if DLIB_JXL_SUPPORT
     } else if(has_ending(lowered_path, ".jxl")) {
-        save_jxl(img, path);
+        save_jxl(img, path, put_in_range(0, 100, quality));
 #endif
     } else {
         throw dlib::error(error_message);
@@ -166,11 +166,11 @@ void bind_numpy_returns(py::module &m)
 
     m.def("save_image", &save_image<rgb_pixel>, 
 	"Saves the given image to the specified path. Determines the file type from the file extension specified in the path",
-	py::arg("img"), py::arg("filename")
+	py::arg("img"), py::arg("filename"), py::arg("quality") = 75
     );
     m.def("save_image", &save_image<unsigned char>, 
 	"Saves the given image to the specified path. Determines the file type from the file extension specified in the path",
-	py::arg("img"), py::arg("filename")
+	py::arg("img"), py::arg("filename"), py::arg("quality") = 75
     );
 
     m.def("jitter_image", &get_jitter_images, 
