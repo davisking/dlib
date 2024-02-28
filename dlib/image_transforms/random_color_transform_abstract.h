@@ -87,13 +87,12 @@ namespace dlib
                 This object generates a color balancing and gamma correction transform.
                 It then allows you to apply that specific transform to as many
                 rgb_pixel objects as you like. In particular, it generates the inverse
-                transform of the one constructed by color_transform with the same
-                parameters.
+                transform of the one passed as an argument to the constructor.
         !*/
 
     public:
 
-        color_transform (
+        inv_color_transform (
             const color_transform& tform
         );
         /*!
