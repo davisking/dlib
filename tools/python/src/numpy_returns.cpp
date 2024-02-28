@@ -67,7 +67,7 @@ void save_image(numpy_image<T> img, const std::string &path, const float quality
 #endif
 #if DLIB_JPEG_SUPPORT
     } else if(has_ending(lowered_path, ".jpg") || has_ending(lowered_path, ".jpeg")) {
-        save_jpeg(img, path, put_in_range(0, 100, quality));
+        save_jpeg(img, path, put_in_range(0, 100, std::lround(quality)));
 #endif
 #if DLIB_WEBP_SUPPORT
     } else if(has_ending(lowered_path, ".webp")) {
