@@ -28,8 +28,8 @@ namespace dlib
         bool is_rgb() const;
         bool is_rgba() const;
         unsigned int bit_depth() const;
-        unsigned int nr() const;
-        unsigned int nc() const;
+        long nr() const;
+        long nc() const;
 
         template<typename image_type>
         void get_image(image_type& image) const
@@ -51,7 +51,9 @@ namespace dlib
             if (pixel_traits<pixel_type>::num == depth && (
                 pixel_traits<pixel_type>::rgb ||
                 pixel_traits<pixel_type>::rgb_alpha ||
-                pixel_traits<pixel_type>::grayscale))
+                (pixel_traits<pixel_type>::grayscale &&
+                 std::is_same<typename pixel_traits<pixel_type>::basic_pixel_type, unsigned char>()))
+            )
             {
                 const size_t output_size = width * height * depth;
                 unsigned char* output = reinterpret_cast<unsigned char*>(image_data(vimg));

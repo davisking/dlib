@@ -67,8 +67,8 @@ namespace dlib
     bool jxl_loader::is_rgb() const { return depth == 3; }
     bool jxl_loader::is_rgba() const { return depth == 4; }
     unsigned int jxl_loader::bit_depth() const { return bits_per_sample; };
-    unsigned int jxl_loader::nr() const { return height; };
-    unsigned int jxl_loader::nc() const { return width; };
+    long jxl_loader::nr() const { return static_cast<long>(height); };
+    long jxl_loader::nc() const { return static_cast<long>(width); };
 
 // ----------------------------------------------------------------------------------------
 

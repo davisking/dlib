@@ -150,7 +150,7 @@ namespace dlib
                   object.
         !*/
 
-        unsigned int nr (
+        long nr (
         ) const;
         /*!
             ensures
@@ -158,7 +158,7 @@ namespace dlib
                   object.
         !*/
 
-        unsigned int nc (
+        long nc (
         ) const;
         /*!
             ensures
