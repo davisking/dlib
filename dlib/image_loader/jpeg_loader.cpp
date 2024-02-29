@@ -80,14 +80,14 @@ namespace dlib
 
     long jpeg_loader::nr() const
     {
-        return height_;
+        return static_cast<long>(height_);
     }
 
 // ----------------------------------------------------------------------------------------
 
     long jpeg_loader::nc() const
     {
-        return width_;
+        return static_cast<long>(width_);
     }
 
 // ----------------------------------------------------------------------------------------

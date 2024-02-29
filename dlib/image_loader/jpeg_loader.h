@@ -26,6 +26,8 @@ namespace dlib
         bool is_gray() const;
         bool is_rgb() const;
         bool is_rgba() const;
+        long nr() const;
+        long nc() const;
 
         template<typename T>
         void get_image( T& t_) const
