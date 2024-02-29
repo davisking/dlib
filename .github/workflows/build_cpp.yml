@@ -229,6 +229,29 @@ jobs:
     - name: Test
       run: build/dtest --runall -q
 
+  ubuntu-latest-intalled_dlib:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Configure library
+      run: cmake ${{ github.workspace }}/dlib -B build
+
+    - name: Build library
+      run: cmake --build build --parallel 4
+
+    - name: Install library
+      run: cmake --install build --prefix /home/runner/dlib_installation
+
+    - name: Configure example
+      run: cmake ${{ github.workspace }}/tools/test -B build2 -DCMAKE_PREFIX_PATH=/home/runner/dlib_installation
+
+    - name: Build example
+      run: cmake --build build2
+
+    - name: Run example
+      run: build2/assignment_learning_ex 
+
   windows-latest:
     runs-on: 'windows-latest'
     steps:
