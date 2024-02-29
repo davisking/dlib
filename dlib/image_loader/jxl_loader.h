@@ -87,7 +87,7 @@ namespace dlib
     void load_jxl (
         image_type& image,
         const std::string& file_name
-   )
+    )
     {
         jxl_loader(file_name).get_image(image);
     }
@@ -99,7 +99,7 @@ namespace dlib
         image_type& image,
         const unsigned char* imgbuff,
         size_t imgbuffsize
-   )
+    )
     {
         jxl_loader(imgbuff, imgbuffsize).get_image(image);
     }
@@ -111,7 +111,7 @@ namespace dlib
         image_type& image,
         const char* imgbuff,
         size_t imgbuffsize
-   )
+    )
     {
         jxl_loader(reinterpret_cast<const unsigned char*>(imgbuff), imgbuffsize).get_image(image);
     }
