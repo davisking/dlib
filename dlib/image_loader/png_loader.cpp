@@ -156,6 +156,8 @@ namespace dlib
     bool png_loader::is_rgb()   const { return color_type == PNG_COLOR_TYPE_RGB; }
     bool png_loader::is_rgba()  const { return color_type == PNG_COLOR_TYPE_RGB_ALPHA; }
     unsigned int png_loader::bit_depth () const {return bit_depth_;}  
+    long png_loader::nr() const { return height; }
+    long png_loader::nc() const { return width; }
 
 // ----------------------------------------------------------------------------------------
 

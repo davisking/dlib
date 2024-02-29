@@ -36,6 +36,8 @@ namespace dlib
         bool is_rgb()               const;
         bool is_rgba()              const;
         unsigned int bit_depth ()   const;
+        long nr()                   const;
+        long nc()                   const;
 
         template<class image_type>
         void get_image( image_type& img) const 
@@ -193,4 +195,4 @@ namespace dlib
 #include "png_loader.cpp"
 #endif 
 
-#endif // DLIB_PNG_IMPORT 
+#endif // DLIB_PNG_IMPORT

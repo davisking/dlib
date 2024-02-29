@@ -105,6 +105,22 @@ namespace dlib
                     - returns false
         !*/
 
+        long nr (
+        ) const;
+        /*!
+            ensures
+                - returns the number of rows (height) of the image contained by this
+                  object.
+        !*/
+
+        long nc (
+        ) const;
+        /*!
+            ensures
+                - returns the number of colums (width) of the image contained by this
+                  object.
+        !*/
+
         template<
             typename image_type 
             >
