@@ -23,6 +23,14 @@ namespace dlib
         jxl_loader(const dlib::file& f);
         jxl_loader(const unsigned char* imgbuffer, size_t buffersize);
 
+        bool is_gray() const;
+        bool is_graya() const;
+        bool is_rgb() const;
+        bool is_rgba() const;
+        unsigned int bit_depth() const;
+        unsigned int nr() const;
+        unsigned int nc() const;
+
         template<typename image_type>
         void get_image(image_type& image) const
         {
@@ -76,6 +84,7 @@ namespace dlib
         uint32_t height;
         uint32_t width;
         uint32_t depth;
+        uint32_t bits_per_sample;
         std::vector<unsigned char> data;
     };
 

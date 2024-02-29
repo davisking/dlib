@@ -62,6 +62,16 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    bool jxl_loader::is_gray() const { return depth == 1; }
+    bool jxl_loader::is_graya() const { return depth == 2; };
+    bool jxl_loader::is_rgb() const { return depth == 3; }
+    bool jxl_loader::is_rgba() const { return depth == 4; }
+    unsigned int jxl_loader::bit_depth() const { return bits_per_sample; };
+    unsigned int jxl_loader::nr() const { return height; };
+    unsigned int jxl_loader::nc() const { return width; };
+
+// ----------------------------------------------------------------------------------------
+
     void jxl_loader::get_info()
     {
         JxlSignature signature = JxlSignatureCheck(data.data(), data.size());
@@ -90,6 +100,7 @@ namespace dlib
         width = basic_info.xsize;
         height = basic_info.ysize;
         depth = basic_info.num_color_channels + basic_info.num_extra_channels;
+        bits_per_sample = basic_info.bits_per_sample;
     }
 // ----------------------------------------------------------------------------------------
 

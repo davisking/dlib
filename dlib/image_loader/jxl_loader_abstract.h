@@ -100,6 +100,72 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+        bool is_gray(
+        ) const;
+        /*!
+            ensures
+                - if (this object contains a grayscale image without an alpha channel) then
+                    - returns true
+                - else
+                    - returns false
+        !*/
+
+        bool is_graya(
+        ) const;
+        /*!
+            ensures
+                - if (this object contains a grayscale image with an alpha channel) then
+                    - returns true
+                - else
+                    - returns false
+        !*/
+
+        bool is_rgb(
+        ) const;
+        /*!
+            ensures
+                - if (this object contains a 3 channel RGB image) then
+                    - returns true
+                - else
+                    - returns false
+        !*/
+
+        bool is_rgba(
+        ) const;
+        /*!
+            ensures
+                - if (this object contains a 4 channel RGB alpha image) then
+                    - returns true
+                - else
+                    - returns false
+        !*/
+
+        unsigned int bit_depth (
+        ) const;
+        /*!
+            ensures
+                - returns the number of bits per channel in the image contained by this
+                  object.
+        !*/
+
+        unsigned int nr (
+        ) const;
+        /*!
+            ensures
+                - returns the number of rows (height) of the image contained by this
+                  object.
+        !*/
+
+        unsigned int nc (
+        ) const;
+        /*!
+            ensures
+                - returns the number of colums (width) of the image contained by this
+                  object.
+        !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename image_type
         >
