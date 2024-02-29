@@ -17,10 +17,9 @@ namespace dlib
     {
         std::ifstream stream(filename, std::ios::binary);
         stream.exceptions(std::ifstream::failbit | std::ifstream::badbit | std::ifstream::eofbit);
-        stream.seekg(0, std::ios_base::end);
-        std::vector<unsigned char> buffer(stream.tellg());
-        stream.seekg(0);
-        stream.read(reinterpret_cast<char*>(buffer.data()), buffer.size());
+        std::vector<unsigned char> buffer;
+        vectorstream temp(buffer);
+        temp << stream.rdbuf();
         return buffer;
     }
 
