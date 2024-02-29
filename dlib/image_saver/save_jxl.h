@@ -68,10 +68,11 @@ namespace dlib
         const int width = img.nc();
         const int height = img.nr();
         const int depth = pixel_traits<pixel_type>::num;
-        // Fast path: rgb, rgb_alpha, grayscale
+        // Fast path: rgb, rgb_alpha, 8-bit grayscale
         if (pixel_traits<pixel_type>::rgb ||
             pixel_traits<pixel_type>::rgb_alpha ||
-            pixel_traits<pixel_type>::grayscale)
+            (pixel_traits<pixel_type>::grayscale &&
+             std::is_same<typename pixel_traits<pixel_type>::basic_pixel_type, unsigned char>()))
         {
             impl::impl_save_jxl(filename, data, width, height, depth, quality);
         }
