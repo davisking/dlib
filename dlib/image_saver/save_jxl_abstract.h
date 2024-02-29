@@ -32,14 +32,14 @@ namespace dlib
             - image[image.nr()-1][image.nc()-1] will be in the lower right corner of the
               image.
             - This routine can save images containing any type of pixel.  However,
-              save_jxl() can only natively store rgb_pixel, rgb_alpha_pixel and unsigned char
-              pixel types.  All other pixel types will be converted into one of these types as
-              appropriate before being saved to disk.
+              save_jxl() can only natively store rgb_pixel, rgb_alpha_pixel and unsigned
+              char pixel types.  All other pixel types will be converted into one of
+              these types as appropriate before being saved to disk.
             - The quality value determines how lossy the compression is.  Larger quality
               values result in larger output images but the images will look better.
-              Although it can range from 0 to 100, the recommended range is between 68 and 96.
-              A value of 90 means visually lossless, while a value of 100 means mathematically
-              lossless.
+              Although it can range from 0 to 100, the recommended range is between
+              68 and 96.  A value of 90 means visually lossless, while a value of 100
+              means mathematically lossless.
         throws
             - image_save_error
                 This exception is thrown if there is an error that prevents us from saving

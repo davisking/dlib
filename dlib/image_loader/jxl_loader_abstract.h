@@ -68,7 +68,8 @@ namespace dlib
         );
         /*!
             ensures
-                - loads the JPEG XL from memory imgbuffer of size buffersize into this object
+                - loads the JPEG XL from memory imgbuffer of size buffersize into
+                  this object
             throws
                 - image_load_error
                   This exception is thrown if there is some error that prevents
@@ -104,7 +105,8 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - if (this object contains a grayscale image without an alpha channel) then
+                - if (this object contains a grayscale image without an alpha channel)
+                  then
                     - returns true
                 - else
                     - returns false
