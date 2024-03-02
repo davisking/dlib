@@ -5,7 +5,7 @@
 
 #include <iostream>
 #include <string>
-#include <dlib/map.h>
+#include <map>
 #include <dlib/logger.h>
 #include <dlib/assert.h>
 #include <dlib/algs.h>
@@ -33,7 +33,7 @@
 namespace test
 {
     class tester;
-    typedef dlib::map<std::string,tester*>::kernel_1a_c map_of_testers;
+    using map_of_testers = std::map<std::string,tester*>;
 
     map_of_testers& testers (
     );
@@ -55,7 +55,7 @@ namespace test
 
 // -----------------------------------------------------------------------------
 
-    dlib::uint64 number_of_testing_statements_executed (
+    std::uint64_t number_of_testing_statements_executed (
     );
     /*!
         ensures

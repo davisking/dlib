@@ -34,10 +34,9 @@ int main (int argc, char** argv)
         unsigned long num = 1;
 
         // add the options for all the different tests
-        testers().reset();
-        while (testers().move_next())
+        for (auto& kv : testers())
         {
-            tester& test = *testers().element().value();
+            tester& test = *kv.second;
             parser.add_option(test.cmd_line_switch(), test.description(), test.num_of_args());
             if (test.num_of_args()==0) 
                 parser.add_option("no_"+test.cmd_line_switch(), "Don't run this option when using --runall.");
@@ -111,10 +110,9 @@ int main (int argc, char** argv)
             dlog << LINFO << "************ Starting Test Run " << i+1 << " of " << num << ". ************";
 
             // loop over all the testers and see if they are supposed to run
-            testers().reset();
-            while (testers().move_next())
+            for(auto& kv : testers())
             {
-                tester& test= *testers().element().value();
+                tester& test= *kv.second;
                 const clp::option_type& opt = parser.option(test.cmd_line_switch());
                 // run the test for this option as many times as the user has requested.
                 for (unsigned long j = 0; j < parser.option("runall").count() + opt.count(); ++j)
