@@ -367,12 +367,14 @@ endif()
 # Install
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
+set(ConfigPackageLocation ${CMAKE_INSTALL_LIBDIR}/cmake/dlib)
 
 install(TARGETS dlib
    EXPORT dlib 
    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # Windows considers .dll to be runtime artifacts
    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+   INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib
    FILES_MATCHING 
@@ -391,29 +393,38 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${CMAKE_INSTALL_INCLU
       PATTERN "sstream"
       REGEX "${CMAKE_CURRENT_BINARY_DIR}" EXCLUDE)
 
-
 configure_file(${PROJECT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 configure_file(${PROJECT_SOURCE_DIR}/revision.h.in ${CMAKE_CURRENT_BINARY_DIR}/revision.h)
-configure_file(${PROJECT_SOURCE_DIR}/cmake_utils/dlibConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/revision.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib)
 
-## Config.cmake generation and installation
-set(ConfigPackageLocation "${CMAKE_INSTALL_LIBDIR}/cmake/dlib")
-install(EXPORT dlib
-   NAMESPACE dlib::
-   DESTINATION ${ConfigPackageLocation})
+configure_package_config_file(
+   ${CMAKE_CURRENT_SOURCE_DIR}/cmake_utils/dlibConfig.cmake.in
+   ${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake
+   INSTALL_DESTINATION ${ConfigPackageLocation}
+)
 
-write_basic_package_version_file(
-   "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake"
+write_basic_package_version_file (
+   ${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake
    VERSION ${VERSION}
    COMPATIBILITY AnyNewerVersion
-   )
+)
 
 install(FILES 
-   "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" 
-   "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake" 
-   DESTINATION ${ConfigPackageLocation})
+   ${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake
+   ${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake
+   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindFFMPEG.cmake
+   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindCUDNN.cmake
+   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindMKL.cmake
+   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindCBLAS.cmake
+   DESTINATION ${ConfigPackageLocation}
+)
+
+install(EXPORT dlib
+   FILE dlib.cmake
+   NAMESPACE dlib::
+   DESTINATION ${ConfigPackageLocation}
+)
 
 ## dlib-1.pc generation and installation
 configure_file("cmake_utils/dlib.pc.in" "dlib-1.pc" @ONLY)
