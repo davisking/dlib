@@ -16,7 +16,7 @@ namespace test
 // -----------------------------------------------------------------------------
 
     static std::mutex spinner_mutex;
-    static std::atomic<uint64_t> test_count = 0;
+    static std::atomic<uint64_t> test_count(0);
 
 // -----------------------------------------------------------------------------
 
