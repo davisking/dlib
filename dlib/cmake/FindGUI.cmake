@@ -1,0 +1,23 @@
+include(FindPackageHandleStandardArgs)
+
+find_package(X11)
+
+if (X11_FOUND)
+    set(GUI_LIBRARIES ${X11_LIBRARIES})
+    add_library(gui::gui INTERFACE IMPORTED)
+    target_link_libraries(gui::gui INTERFACE X11::X11)
+elseif(APPLE)
+    message(" *****************************************************************************")
+    message(" *** DLIB GUI SUPPORT DISABLED BECAUSE X11 DEVELOPMENT LIBRARIES NOT FOUND ***")
+    message(" *** Make sure XQuartz is installed if you want GUI support.               ***")
+    message(" *** You can download XQuartz from: https://www.xquartz.org/               ***")
+    message(" *****************************************************************************")
+else(NOT WIN32)
+    message(" *****************************************************************************")
+    message(" *** DLIB GUI SUPPORT DISABLED BECAUSE X11 DEVELOPMENT LIBRARIES NOT FOUND ***")
+    message(" *** Make sure libx11-dev is installed if you want GUI support.            ***")
+    message(" *** On Ubuntu run: sudo apt-get install libx11-dev                        ***")
+    message(" *****************************************************************************")
+endif()
+
+find_package_handle_standard_args(GUI DEFAULT_MSG GUI_LIBRARIES)

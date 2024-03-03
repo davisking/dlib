@@ -22,43 +22,23 @@ namespace dlib
     {
     public:
 
-        running_stats()
-        {
-            clear();
-
-            COMPILE_TIME_ASSERT ((
-                    is_same_type<float,T>::value ||
-                    is_same_type<double,T>::value ||
-                    is_same_type<long double,T>::value 
-            ));
-        }
+        static_assert(std::is_floating_point<T>::value, "T must be a floating point type");
 
         void clear()
         {
-            sum_     = 0;
-            sum_sqr  = 0;
-            sum_cub  = 0;
-            sum_four = 0;
-
-            n = 0;
-            min_value = std::numeric_limits<T>::infinity();
-            max_value = -std::numeric_limits<T>::infinity();
+            *this = running_stats{};
         }
 
         void add (
-            const T& val
+            T val
         )
         {
             sum_     += val;
             sum_sqr  += val*val;
             sum_cub  += cubed(val);
             sum_four += quaded(val);
-
-            if (val < min_value)
-                min_value = val;
-            if (val > max_value)
-                max_value = val;
-
+            min_value = std::min(min_value, val);
+            max_value = std::max(max_value, val);
             ++n;
         }
 
@@ -193,19 +173,17 @@ namespace dlib
         }
 
         running_stats operator+ (
-            const running_stats& rhs
+            running_stats rhs
         ) const
         {
-            running_stats temp(*this);
-
-            temp.sum_ += rhs.sum_;
-            temp.sum_sqr += rhs.sum_sqr;
-            temp.sum_cub += rhs.sum_cub;
-            temp.sum_four += rhs.sum_four;
-            temp.n += rhs.n;
-            temp.min_value = std::min(rhs.min_value, min_value);
-            temp.max_value = std::max(rhs.max_value, max_value);
-            return temp;
+            rhs.sum_        += sum_;
+            rhs.sum_sqr     += sum_sqr;
+            rhs.sum_cub     += sum_cub;
+            rhs.sum_four    += sum_four;
+            rhs.n           += n;
+            rhs.min_value   = std::min(rhs.min_value, min_value);
+            rhs.max_value   = std::max(rhs.max_value, max_value);
+            return rhs;
         }
 
         template <typename U>
@@ -221,16 +199,16 @@ namespace dlib
         ); 
 
     private:
-        T sum_;
-        T sum_sqr;
-        T sum_cub;
-        T sum_four;
-        T n;
-        T min_value;
-        T max_value;
+        T sum_{0};
+        T sum_sqr{0};
+        T sum_cub{0};
+        T sum_four{0};
+        T n{0};
+        T min_value{std::numeric_limits<T>::infinity()};
+        T max_value{-std::numeric_limits<T>::infinity()};
     
-        T cubed  (const T& val) const {return val*val*val; }
-        T quaded (const T& val) const {return val*val*val*val; }
+        static constexpr T cubed  (T val) {return val*val*val; }
+        static constexpr T quaded (T val) {return val*val*val*val; }
     };
 
     template <typename T>
@@ -280,30 +258,16 @@ namespace dlib
     {
     public:
 
-        running_scalar_covariance()
-        {
-            clear();
-
-            COMPILE_TIME_ASSERT ((
-                    is_same_type<float,T>::value ||
-                    is_same_type<double,T>::value ||
-                    is_same_type<long double,T>::value 
-            ));
-        }
+        static_assert(std::is_floating_point<T>::value, "T must be a floating point type");
 
         void clear()
         {
-            sum_xy = 0;
-            sum_x = 0;
-            sum_y = 0;
-            sum_xx = 0;
-            sum_yy = 0;
-            n = 0;
+            *this = running_scalar_covariance{};
         }
 
         void add (
-            const T& x,
-            const T& y
+            T x,
+            T y
         )
         {
             sum_xy += x*y;
@@ -432,28 +396,26 @@ namespace dlib
         }
 
         running_scalar_covariance operator+ (
-            const running_scalar_covariance& rhs
+            running_scalar_covariance rhs
         ) const
         {
-            running_scalar_covariance temp(rhs);
-
-            temp.sum_xy += sum_xy;
-            temp.sum_x  += sum_x;
-            temp.sum_y  += sum_y;
-            temp.sum_xx += sum_xx;
-            temp.sum_yy += sum_yy;
-            temp.n      += n;
-            return temp;
+            rhs.sum_xy += sum_xy;
+            rhs.sum_x  += sum_x;
+            rhs.sum_y  += sum_y;
+            rhs.sum_xx += sum_xx;
+            rhs.sum_yy += sum_yy;
+            rhs.n      += n;
+            return rhs;
         }
 
     private:
 
-        T sum_xy;
-        T sum_x;
-        T sum_y;
-        T sum_xx;
-        T sum_yy;
-        T n;
+        T sum_xy{0};
+        T sum_x{0};
+        T sum_y{0};
+        T sum_xx{0};
+        T sum_yy{0};
+        T n{0};
     };
 
 // ----------------------------------------------------------------------------------------
@@ -465,25 +427,13 @@ namespace dlib
     {
     public:
 
+        static_assert(std::is_floating_point<T>::value, "T must be a floating point type");
+
         explicit running_scalar_covariance_decayed(
             T decay_halflife = 1000 
-        )
+        ) : forget{std::pow(0.5, 1/decay_halflife)}
         {
             DLIB_ASSERT(decay_halflife > 0);
-
-            sum_xy = 0;
-            sum_x = 0;
-            sum_y = 0;
-            sum_xx = 0;
-            sum_yy = 0;
-            forget = std::pow(0.5, 1/decay_halflife);
-            n = 0;
-
-            COMPILE_TIME_ASSERT ((
-                    is_same_type<float,T>::value ||
-                    is_same_type<double,T>::value ||
-                    is_same_type<long double,T>::value 
-            ));
         }
 
         T forget_factor (
@@ -493,8 +443,8 @@ namespace dlib
         }
 
         void add (
-            const T& x,
-            const T& y
+            T x,
+            T y
         )
         {
             sum_xy = sum_xy*forget + x*y;
@@ -628,13 +578,13 @@ namespace dlib
 
     private:
 
-        T sum_xy;
-        T sum_x;
-        T sum_y;
-        T sum_xx;
-        T sum_yy;
-        T n;
-        T forget;
+        T sum_xy{0};
+        T sum_x{0};
+        T sum_y{0};
+        T sum_xx{0};
+        T sum_yy{0};
+        T n{0};
+        T forget{0};
     };
 
 // ----------------------------------------------------------------------------------------
@@ -646,22 +596,13 @@ namespace dlib
     {
     public:
 
+        static_assert(std::is_floating_point<T>::value, "T must be a floating point type");
+
         explicit running_stats_decayed(
             T decay_halflife = 1000 
-        )
+        ) : forget{std::pow(0.5, 1/decay_halflife)}
         {
             DLIB_ASSERT(decay_halflife > 0);
-
-            sum_x = 0;
-            sum_xx = 0;
-            forget = std::pow(0.5, 1/decay_halflife);
-            n = 0;
-
-            COMPILE_TIME_ASSERT ((
-                    is_same_type<float,T>::value ||
-                    is_same_type<double,T>::value ||
-                    is_same_type<long double,T>::value 
-            ));
         }
 
         T forget_factor (
@@ -671,7 +612,7 @@ namespace dlib
         }
 
         void add (
-            const T& x
+            T x
         )
         {
 
@@ -743,10 +684,10 @@ namespace dlib
 
     private:
 
-        T sum_x;
-        T sum_xx;
-        T n;
-        T forget;
+        T sum_x{0};
+        T sum_xx{0};
+        T n{0};
+        T forget{0};
     };
 
     template <typename T>
@@ -1893,4 +1834,3 @@ namespace dlib
 }
 
 #endif // DLIB_STATISTICs_
-

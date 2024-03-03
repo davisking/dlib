@@ -1,25 +1,8 @@
-#
-# This is a CMake makefile.  You can find the cmake utility and
-# information about it at http://www.cmake.org
-#
+cmake_minimum_required(VERSION 3.17.0)
 
-cmake_minimum_required(VERSION 3.8.0)
-
-set (target_name dtoc)
-
-PROJECT(${target_name})
-
+project(dtoc)
 add_subdirectory(../../dlib dlib_build)
-
-add_executable(${target_name} 
-   main.cpp
-   )
-
-target_link_libraries(${target_name} dlib::dlib )
-
-
-INSTALL(TARGETS ${target_name}
-	RUNTIME DESTINATION bin
-	)
-
-
+add_executable(dtoc main.cpp)
+target_link_libraries(dtoc dlib::dlib)
+include(GNUInstallDirs)
+install(TARGETS dtoc RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

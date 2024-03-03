@@ -1,22 +1,27 @@
+cmake_minimum_required(VERSION 3.17.0)
 
-cmake_minimum_required(VERSION 3.8.0)
+project(mex_functions)
 
-PROJECT(mex_functions)
-
-include(cmake_mex_wrapper)
-
+# Dependendices
+find_package(Matlab REQUIRED)
+set(DLIB_USE_CUDA OFF CACHE BOOL "" FORCE)      # Using CUDA in matlab is a bit flaky
+set(DLIB_NO_GUI_SUPPORT ON CACHE BOOL "" FORCE) # Don't build GUI stuff
 add_subdirectory(.. dlib_build)
 
+# Helper macro
+macro(add_mex_function name)
+    matlab_add_mex(NAME ${name} MODULE SRC ${name}.cpp LINK_TO dlib)
+    target_compile_definitions(${name} PRIVATE MEX_FILENAME=${name})
+endmacro()
 
-# You can tell cmake where to put the mex files when you run 'make install' by
-# setting this variable.  The path is relative to this CMakeLists.txt file.
-set(install_target_output_folder .)
+add_mex_function(example_mex_function)
+add_mex_function(example_mex_callback)
+add_mex_function(example_mex_struct)
+add_mex_function(example_mex_class)
 
-# Compile the example_mex_function.cpp file and link it to dlib.  Note
-# that you can give a list of things to link to here.  E.g. 
-#    add_mex_function(some_other_mex_function pthread dlib fftw) 
-add_mex_function(example_mex_function dlib::dlib)
-add_mex_function(example_mex_callback dlib::dlib)
-add_mex_function(example_mex_struct dlib::dlib)
-add_mex_function(example_mex_class dlib::dlib)
-
+set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION ${CMAKE_INSTALL_PREFIX})
+include(InstallRequiredSystemLibraries)
+install(TARGETS example_mex_function DESTINATION . COMPONENT Matlab)
+install(TARGETS example_mex_callback DESTINATION . COMPONENT Matlab)
+install(TARGETS example_mex_struct   DESTINATION . COMPONENT Matlab)
+install(TARGETS example_mex_class    DESTINATION . COMPONENT Matlab)

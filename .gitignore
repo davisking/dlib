@@ -18,3 +18,4 @@ docs/docs/python/functions.txt
 docs/docs/python/constants.txt
 **/.vscode
 **/venv
+**/.env

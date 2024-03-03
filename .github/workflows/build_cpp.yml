@@ -30,7 +30,7 @@ defaults:
     working-directory: dlib/test
 
 jobs:
-  ubuntu-latest-gcc-default-cmake-3-8-ffmpeg5:
+  ubuntu-latest-gcc-default-cmake-3-17-ffmpeg5:
     runs-on: 'ubuntu-latest'
     steps:
     - uses: actions/checkout@v2
@@ -40,18 +40,18 @@ jobs:
         sudo apt update
         sudo apt install libwebp-dev make yasm
         
-    - name: Cache cmake 3.8.0
+    - name: Cache cmake 3.17.0
       uses: actions/cache@v3
       id: cache-cmake-download
       with:
         # cache this folder:
-        path: ~/cmake-3.8.0-Linux-x86_64
-        key: cmake-3.8.0_try3
+        path: ~/cmake-3.17.0-Linux-x86_64
+        key: cmake-3.17.0_try1
         
     - run: |
         # Get the minimum version of cmake dlib supports
-        wget https://cmake.org/files/v3.8/cmake-3.8.0-Linux-x86_64.tar.gz
-        tar -xf cmake-3.8.0-Linux-x86_64.tar.gz -C ~
+        wget https://cmake.org/files/v3.17/cmake-3.17.0-Linux-x86_64.tar.gz
+        tar -xf cmake-3.17.0-Linux-x86_64.tar.gz -C ~
       if: steps.cache-cmake-download.outputs.cache-hit != 'true'
 
     - name: Cache FFmpeg 5
@@ -72,24 +72,20 @@ jobs:
         make install
         cd ..
         
-    - name: Configure
-      run: |
-        mkdir build
-        cd build
-        ~/cmake-3.8.0-Linux-x86_64/bin/cmake -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n5.1.3_installation .. 
+    - name: Configure tests
+      run: ~/cmake-3.17.0-Linux-x86_64/bin/cmake ${{ github.workspace }}/dlib/test -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n5.1.3_installation
     
-    - name: Build just tests
-      run: |
-        cd build
-        make -j4 dtest
+    - name: Build tests
+      run: ~/cmake-3.17.0-Linux-x86_64/bin/cmake --build build --parallel 4
         
-    - name: Test
+    - name: Run tests
       run: build/dtest --runall -q
-      
-    - name: Build examples, etc
-      run: |
-        cd build
-        make -j2
+
+    - name: Configure examples
+      run: ~/cmake-3.17.0-Linux-x86_64/bin/cmake ${{ github.workspace }}/examples -B build2 -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n5.1.3_installation
+
+    - name: Build examples
+      run: ~/cmake-3.17.0-Linux-x86_64/bin/cmake --build build2 --parallel 4
 
   ubuntu-latest-gcc-11-blas:
     runs-on: 'ubuntu-latest'
@@ -104,22 +100,51 @@ jobs:
       run: |
         sudo apt install gcc-11 g++-11
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110 --slave /usr/bin/g++ g++ /usr/bin/g++-11 --slave /usr/bin/gcov gcov /usr/bin/gcov-11
-    - name: Configure
-      run: cmake ${{ github.workspace }}/dlib/test -B build
-    - name: Build just tests
-      run: cmake --build build --config Release --target dtest --parallel 4
+    
+    - name: Configure tests
+      run: cmake ${{ github.workspace }}/dlib/test -B build -DCMAKE_BUILD_TYPE=Release
+    
+    - name: Build tests (including BLAS tests)
+      run: cmake --build build --parallel 4
+    
     - name: Test
       run: build/dtest --runall -q
-    - name: Build examples, etc
-      run: cmake --build build --config Release --parallel 2
 
-    # Test the BLAS bindings
-    - name: Configure BLAS binding tests
-      run: cmake ${{ github.workspace }}/dlib/test/blas_bindings -B build_blas_bindings
-    - name: Build blas binding tests
-      run: cmake --build build_blas_bindings --config Debug --parallel 4
-    - name: Test BLAS bindings
-      run: build_blas_bindings/dtest --runall -q
+    - name: Configure examples
+      run: cmake ${{ github.workspace }}/examples -B build2 -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build examples
+      run: cmake --build build2 --parallel 4
+
+  ubuntu-latest-ffmpeg-mkl:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+        echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+        sudo apt update
+        sudo apt install libwebp-dev libavformat-dev libavcodec-dev libavdevice-dev libavfilter-dev libswresample-dev libswscale-dev libavutil-dev 
+        sudo apt install intel-oneapi-mkl-devel
+
+    - name: Configure tests with MKL sequential
+      run: cmake . -B build -DCMAKE_BUILD_TYPE=Release -DDLIB_USE_MKL_SEQUENTIAL=ON -DDLIB_USE_MKL_WITH_TBB=OFF
+    
+    - name: Build tests with MKL sequential
+      run: cmake --build build --target dtest --parallel 4
+    
+    - name: Test with MKL sequential
+      run: build/dtest --runall -q
+
+    - name: Configure tests with MKL tbb
+      run: cmake . -B build2 -DCMAKE_BUILD_TYPE=Release -DDLIB_USE_MKL_SEQUENTIAL=OFF -DDLIB_USE_MKL_WITH_TBB=ON
+    
+    - name: Build tests with MKL tbb
+      run: cmake --build build2 --target dtest --parallel 4
+    
+    - name: Test with MKL tbb
+      run: build2/dtest --runall -q
 
   ubuntu-20_04-gcc-7:
     runs-on: 'ubuntu-20.04'
@@ -129,7 +154,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt update
-        sudo apt install libwebp-dev make yasm 
+        sudo apt install libwebp-dev make yasm
 
     - name: Install gcc 7
       run: |
@@ -153,24 +178,27 @@ jobs:
         make install
         cd ..
 
-    - name: Configure
+    - name: Configure tests
       run: |
         export CC=/usr/bin/gcc-7
         export CXX=/usr/bin/g++-7
-        cmake ${{ github.workspace }}/dlib/test -B build -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n3.2.18_installation
+        cmake ${{ github.workspace }}/dlib/test -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n3.2.18_installation
 
-    - name: Build just tests
-      run: cmake --build build --config Release --target dtest --parallel 4
+    - name: Build tests
+      run: cmake --build build --parallel 4
 
     - name: Test
       run: build/dtest --runall -q
+    
+    - name: Configure examples
+      run: cmake ${{ github.workspace }}/examples -B build2 -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n3.2.18_installation
 
-    - name: Build examples, etc
-      run: cmake --build build --config Release --parallel 2
+    - name: Build examples
+      run: cmake --build build2 --parallel 4
 
     # Test cmake scrips can build standalone dlib as a shared library
     - name: Configure dlib as shared library  
-      run: cmake ${{ github.workspace }}/dlib -B build_dlib_shared -DBUILD_SHARED_LIBS=1 -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n3.2.18_installation
+      run: cmake ${{ github.workspace }}/dlib -B build_dlib_shared -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=1 -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n3.2.18_installation
 
     - name: Build dlib as shared library
       run: cmake --build build_dlib_shared --parallel 4
@@ -183,17 +211,55 @@ jobs:
       run: |
         sudo apt update
         sudo apt install libwebp-dev libavformat-dev libavcodec-dev libavdevice-dev libavfilter-dev libswresample-dev libswscale-dev libavutil-dev 
-    - name: Configure
+    - name: Configure test
       run: |
         export CC=/usr/bin/clang
         export CXX=/usr/bin/clang++
-        cmake ${{ github.workspace }}/dlib/test -B build -DUSE_AVX_INSTRUCTIONS=1
-    - name: Build just tests
-      run: cmake --build build --config Release --target dtest --parallel 4
+        cmake ${{ github.workspace }}/dlib/test -B build -DCMAKE_BUILD_TYPE=Release -DDLIB_USE_AVX=ON
+    
+    - name: Build tests
+      run: cmake --build build  --parallel 4
+
+    - name: Configure examples
+      run: cmake ${{ github.workspace }}/examples -B build2 -DCMAKE_BUILD_TYPE=Release -DDLIB_USE_AVX=ON
+
+    - name: Build examples
+      run: cmake --build build2 --parallel 4
+
     - name: Test
       run: build/dtest --runall -q
-    - name: Build examples, etc
-      run: cmake --build build --config Release --parallel 2
+
+  ubuntu-latest-intalled_dlib:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Configure library
+      run: cmake ${{ github.workspace }}/dlib -B build
+
+    - name: Build library
+      run: cmake --build build --parallel 4
+
+    - name: Install library
+      run: cmake --install build --prefix /home/runner/dlib_installation
+
+    - name: Configure example using find_package
+      run: cmake ${{ github.workspace }}/tools/test -B build2 -DCMAKE_PREFIX_PATH=/home/runner/dlib_installation
+
+    - name: Build example
+      run: cmake --build build2
+
+    - name: Run example
+      run: build2/assignment_learning_ex 
+
+    - name: Configure example using pkg-config
+      run: cmake ${{ github.workspace }}/tools/test_pkgconfig -B build3 -DCMAKE_PREFIX_PATH=/home/runner/dlib_installation
+
+    - name: Build example
+      run: cmake --build build3
+
+    - name: Run example
+      run: build3/assignment_learning_ex 
 
   windows-latest:
     runs-on: 'windows-latest'
@@ -204,12 +270,21 @@ jobs:
         # don't use CMake 3.25.0 https://gitlab.kitware.com/cmake/cmake/-/issues/23975
         pip3 install cmake==3.24.0
         cmake . -B build
+
     - name: Build just tests
       run: cmake --build build --config Release --target dtest --parallel 4
+
     - name: Test
       run: build/Release/dtest.exe --runall -q
+
     - name: Build ancillary tools
-      run: cmake --build build --config Release --target imglab htmlify dtoc --parallel 4
+      run: |
+        cmake ../../tools/imglab -B build_imglab 
+        cmake --build build_imglab --config Release --parallel 4
+        cmake ../../tools/htmlify -B build_htmlify
+        cmake --build build_htmlify --config Release --parallel 4
+        cmake ../../tools/convert_dlib_nets_to_caffe -B build_dtoc
+        cmake --build build_dtoc --config Release --parallel 4
 
   windows-2019:
     runs-on: 'windows-2019'
@@ -220,10 +295,18 @@ jobs:
         # don't use CMake 3.25.0 https://gitlab.kitware.com/cmake/cmake/-/issues/23975
         pip3 install cmake==3.24.0
         cmake . -B build
+        
     - name: Build just tests
-      run: cmake --build build --config Debug --target dtest --parallel 4
+      run: cmake --build build --config Debug --parallel 4
+
     - name: Build ancillary tools
-      run: cmake --build build --config Release --target imglab htmlify dtoc --parallel 4
+      run: |
+        cmake ../../tools/imglab -B build_imglab 
+        cmake --build build_imglab --config Release --parallel 4
+        cmake ../../tools/htmlify -B build_htmlify
+        cmake --build build_htmlify --config Release --parallel 4
+        cmake ../../tools/convert_dlib_nets_to_caffe -B build_dtoc
+        cmake --build build_dtoc --config Release --parallel 4
   
   # Disable this because macos targets aren't working on github actions right now.
   #macos-latest:
