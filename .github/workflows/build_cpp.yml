@@ -243,7 +243,7 @@ jobs:
     - name: Install library
       run: cmake --install build --prefix /home/runner/dlib_installation
 
-    - name: Configure example
+    - name: Configure example using find_package
       run: cmake ${{ github.workspace }}/tools/test -B build2 -DCMAKE_PREFIX_PATH=/home/runner/dlib_installation
 
     - name: Build example
@@ -251,6 +251,15 @@ jobs:
 
     - name: Run example
       run: build2/assignment_learning_ex 
+
+    - name: Configure example using pkg-config
+      run: cmake ${{ github.workspace }}/tools/test_pkgconfig -B build3 -DCMAKE_PREFIX_PATH=/home/runner/dlib_installation
+
+    - name: Build example
+      run: cmake --build build3
+
+    - name: Run example
+      run: build3/assignment_learning_ex 
 
   windows-latest:
     runs-on: 'windows-latest'
