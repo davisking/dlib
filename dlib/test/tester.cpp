@@ -2,9 +2,10 @@
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 #include <string>
-#include "tester.h"
 #include <cstdlib>
-#include <dlib/threads.h>
+#include <atomic>
+#include <mutex>
+#include "tester.h"
 
 namespace test
 {
@@ -14,25 +15,21 @@ namespace test
 
 // -----------------------------------------------------------------------------
 
-    static dlib::mutex spinner_mutex;
-    static dlib::mutex test_count_mutex;
-    dlib::uint64 test_count = 0;
+    static std::mutex spinner_mutex;
+    static std::atomic<uint64_t> test_count(0);
 
 // -----------------------------------------------------------------------------
 
-    dlib::uint64 number_of_testing_statements_executed (
+    std::uint64_t number_of_testing_statements_executed (
     )
     {
-        dlib::auto_mutex lock(test_count_mutex);
         return test_count;
     }
 
     void increment_test_count (
     )
     {
-        test_count_mutex.lock();
         ++test_count;
-        test_count_mutex.unlock();
     }
 
 // -----------------------------------------------------------------------------
@@ -44,9 +41,7 @@ namespace test
         const char* _exp_str
     )
     {
-        test_count_mutex.lock();
         ++test_count;
-        test_count_mutex.unlock();
         if ( !(_exp) )                                                         
         {                                                                       
             std::ostringstream dlib_o_out;                                       
@@ -79,15 +74,13 @@ namespace test
         num_of_args_(num_of_args_x)
     {
         using namespace std;
-        if (testers().is_in_domain(switch_name))
+        if (testers().find(switch_name) != testers().end())
         {
             cerr << "ERROR: More than one tester has been defined with the switch '" << switch_name << "'." << endl;
             exit(1);
         }
 
-        string temp(switch_name);
-        tester* t = this;
-        testers().add(temp,t);
+        testers()[switch_name] = this;
     }
 
 // -----------------------------------------------------------------------------
@@ -152,7 +145,7 @@ namespace test
         if (be_verbose)
         {
             using namespace std;
-            dlib::auto_mutex M(spinner_mutex);
+            std::unique_lock<std::mutex> M(spinner_mutex);
             static int i = 0;
             cout << "\b\b";
             switch (i)
