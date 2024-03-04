@@ -123,4 +123,4 @@ namespace dlib
 
 }
 
-#endif // DLIB_WEBP_SUPPORT
+#endif // DLIB_SAVE_WEBP_Hh_

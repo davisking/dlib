@@ -17,6 +17,7 @@
 #include "image_saver/save_png.h"
 #include "image_saver/save_jpeg.h"
 #include "image_saver/save_webp.h"
+#include "image_saver/save_jxl.h"
 
 #endif // DLIB_IMAGe_IO_ 
 

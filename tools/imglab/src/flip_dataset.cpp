@@ -219,6 +219,14 @@ void flip_dataset(const command_line_parser& parser)
             filename = to_jpg_name(filename);
             save_jpeg(temp, filename,JPEG_QUALITY);
         }
+#ifdef DLIB_JXL_SUPPORT
+        else if (parser.option("jxl"))
+        {
+            filename = to_jxl_name(filename);
+            const float jxl_quality = std::stof(parser.option("jxl").argument());
+            save_webp(temp, filename, jxl_quality);
+        }
+#endif
 #ifdef DLIB_WEBP_SUPPORT
         else if (parser.option("webp"))
         {

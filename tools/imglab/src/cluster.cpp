@@ -301,7 +301,16 @@ int cluster_dataset(
             if (assignments[i].c == c)
                 temp.push_back(images[assignments[i].idx]);
         }
-
+#ifdef DLIB_JXL_SUPPORT
+        if (parser.option("jxl"))
+        {
+            string outfile = "cluster_"+pad_int_with_zeros(c+1, 3) + ".jxl";
+            cout << "Saving " << outfile << endl;
+            const float jxl_quality = std::stof(parser.option("jxl").argument());
+            save_jxl(tile_images(temp), outfile, jxl_quality);
+        }
+        else
+#endif
 #ifdef DLIB_WEBP_SUPPORT
         if (parser.option("webp"))
         {
