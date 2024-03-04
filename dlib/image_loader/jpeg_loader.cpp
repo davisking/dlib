@@ -75,6 +75,21 @@ namespace dlib
         return (output_components_ == 4);
     }
 
+
+// ----------------------------------------------------------------------------------------
+
+    long jpeg_loader::nr() const
+    {
+        return static_cast<long>(height_);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    long jpeg_loader::nc() const
+    {
+        return static_cast<long>(width_);
+    }
+
 // ----------------------------------------------------------------------------------------
 
     struct jpeg_loader_error_mgr 

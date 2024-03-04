@@ -23,6 +23,9 @@ namespace dlib
         webp_loader(const dlib::file& f);
         webp_loader(const unsigned char* imgbuffer, size_t buffersize);
 
+        long nr() const;
+        long nc() const;
+
         template<typename image_type>
         void get_image(image_type& image) const
         {

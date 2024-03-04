@@ -64,6 +64,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    long webp_loader::nr() const { return height_; }
+    long webp_loader::nc() const { return width_; }
+
+// ----------------------------------------------------------------------------------------
+
     void webp_loader::get_info()
     {
         if (!WebPGetInfo(data_.data(), data_.size(), &width_, &height_))
