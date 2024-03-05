@@ -57,11 +57,12 @@ namespace dlib
                 return DNG;
             else if (buffer[0]=='G' && buffer[1]=='I' && buffer[2] == 'F') 
                 return GIF;
+            else if ((buffer[0] == '\xff' && buffer[1] == '\x0a') ||
+                      memcmp(buffer, jxlHeader, 12) == 0)  // we can't use strlen because the header starts with \x00.
+                return JXL;
             else if (buffer[0]=='R' && buffer[1]=='I' && buffer[2] == 'F' && buffer[3] == 'F' &&
                     buffer[8]=='W' && buffer[9]=='E' && buffer[10] == 'B' && buffer[11] == 'P')
                 return WEBP;
-            else if (memcmp(buffer, jxlHeader, 12) == 0)  // we can't use strlen because the header starts with \x00.
-                return JXL;
 
             return UNKNOWN;
         }
