@@ -34,11 +34,6 @@ namespace dlib {
             }
 
             auto enc = JxlEncoderMake(nullptr);
-            if (JXL_ENC_SUCCESS != JxlEncoderUseContainer(enc.get(), JXL_TRUE))
-            {
-                throw image_save_error("jxl_saver: JxlEncoderUseContainer failed");
-            }
-
             auto runner = JxlResizableParallelRunnerMake(nullptr);
             JxlResizableParallelRunnerSetThreads(runner.get(), JxlResizableParallelRunnerSuggestThreads(width, height));
 
