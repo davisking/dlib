@@ -20,6 +20,13 @@ numpy_image<rgb_pixel> load_rgb_image (const std::string &path)
     return img; 
 }
 
+numpy_image<rgb_pixel> load_rgb_alpha_image (const std::string &path)
+{
+    numpy_image<rgb_alpha_pixel> img;
+    load_image(img, path);
+    return img;
+}
+
 numpy_image<unsigned char> load_grayscale_image (const std::string &path)
 {
     numpy_image<unsigned char> img;
@@ -165,6 +172,10 @@ void bind_numpy_returns(py::module &m)
     );
 
     m.def("save_image", &save_image<rgb_pixel>, 
+	"Saves the given image to the specified path. Determines the file type from the file extension specified in the path",
+	py::arg("img"), py::arg("filename"), py::arg("quality") = 75
+    );
+    m.def("save_image", &save_image<rgb_alpha_pixel>,
 	"Saves the given image to the specified path. Determines the file type from the file extension specified in the path",
 	py::arg("img"), py::arg("filename"), py::arg("quality") = 75
     );

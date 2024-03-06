@@ -262,6 +262,7 @@ namespace dlib
         else if (is_image<float>(src))     assign_image(dest, numpy_image<float>(src));
         else if (is_image<double>(src))    assign_image(dest, numpy_image<double>(src));
         else if (is_image<rgb_pixel>(src)) assign_image(dest, numpy_image<rgb_pixel>(src));
+        else if (is_image<rgb_alpha_pixel>(src)) assign_image(dest, numpy_image<rgb_alpha_pixel>(src));
         else DLIB_CASSERT(false, "Unsupported pixel type used in assign_image().");
     }
 
