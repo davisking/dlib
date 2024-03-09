@@ -92,16 +92,22 @@ namespace dlib
         void wait (
         ) const
         { 
-            std::unique_lock<std::mutex> cs(m.cs, std::defer_lock);
+            std::unique_lock<std::mutex> cs(m.cs, std::adopt_lock);
             cv.wait(cs);
+            // Make sure we don't actually modify the mutex. Since the calling code will have locked
+            // it and it should remain locked.
+            cs.release();			
         }
 
         bool wait_or_timeout (
             unsigned long milliseconds
         ) const
         { 
-            std::unique_lock<std::mutex> cs(m.cs, std::defer_lock);
+            std::unique_lock<std::mutex> cs(m.cs, std::adopt_lock);
             auto status = cv.wait_until(cs, std::chrono::system_clock::now() + std::chrono::milliseconds(milliseconds));
+            // Make sure we don't actually modify the mutex. Since the calling code will have locked
+            // it and it should remain locked.
+            cs.release();			
             return status == std::cv_status::no_timeout;
         }
 
