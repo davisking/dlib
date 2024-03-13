@@ -104,7 +104,7 @@ namespace dlib
     void save_jxl(
         const matrix_exp<EXP>& img,
         const std::string& filename,
-        uint32_t quality = 90
+        const float quality = 90
     )
     {
         array2d<typename EXP::type> temp;
