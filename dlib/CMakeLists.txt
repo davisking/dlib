@@ -622,7 +622,7 @@ if (NOT TARGET dlib)
 
          if (DLIB_USE_LAPACK)
             if (lapack_found)
-               list (APPEND dlib_needed_private_libraries ${lapack_libraries})
+               list (APPEND dlib_needed_public_libraries ${lapack_libraries})
                if (lapack_with_underscore)
                   set(LAPACK_FORCE_UNDERSCORE 1)
                   enable_preprocessor_switch(LAPACK_FORCE_UNDERSCORE)
