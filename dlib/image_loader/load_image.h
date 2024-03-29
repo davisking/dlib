@@ -71,7 +71,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
 // handle the differences in API between libgif v5 and older.
-#if defined(GIFLIB_MAJOR) && GIFLIB_MAJOR >= 5
+#if defined(GIFLIB_MAJOR) && (GIFLIB_MAJOR > 5 || (GIFLIB_MAJOR == 5 && defined(GIFLIB_MINOR) && GIFLIB_MINOR >= 1))
 #define DLIB_GIFLIB_HANDLE_DIFF_VERSIONS ,0
 #else
 #define DLIB_GIFLIB_HANDLE_DIFF_VERSIONS 
