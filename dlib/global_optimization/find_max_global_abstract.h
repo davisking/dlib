@@ -68,7 +68,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    const auto FOREVER = std::chrono::hours(24*356*290); // 290 years, basically forever
+    const auto FOREVER = std::chrono::hours(24*356*200); // 200 years, basically forever
 
     /*!
        WHAT THIS OBJECT REPRESENTS
