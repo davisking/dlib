@@ -91,7 +91,6 @@
 #ifdef DLIB_HAVE_SSE2
     #include <xmmintrin.h>
     #include <emmintrin.h>
-    #include <mmintrin.h>
 #endif
 #ifdef DLIB_HAVE_SSE3
     #include <pmmintrin.h> // SSE3
