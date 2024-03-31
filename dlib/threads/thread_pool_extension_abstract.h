@@ -276,6 +276,15 @@ namespace dlib
                   the maximum number of tasks that this object will process concurrently.
         !*/
 
+        unsigned long num_threads_started (
+        ) const;
+        /*!
+            ensures
+                - returns the number of threads that have actually been started.  This should
+                  ultimately equal num_threads_in_pool, but may less during pool startup.  This
+                  number does not decrease when shutting down the pool.
+        !*/
+
         template <typename F>
         uint64 add_task_by_value (
             const F& function_object

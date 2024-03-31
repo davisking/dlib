@@ -161,6 +161,9 @@ namespace dlib
         unsigned long num_threads_in_pool (
         ) const;
 
+        unsigned long num_threads_started (
+        ) const;
+
         void wait_for_all_tasks (
         ) const;
 
@@ -535,6 +538,9 @@ namespace dlib
 
         unsigned long num_threads_in_pool (
         ) const { return impl->num_threads_in_pool(); }
+
+        unsigned long num_threads_started (
+        ) const { return impl->num_threads_started(); }
 
         void wait_for_all_tasks (
         ) const { impl->wait_for_all_tasks(); }

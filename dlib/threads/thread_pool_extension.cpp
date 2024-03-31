@@ -91,6 +91,16 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    unsigned long thread_pool_implementation::
+    num_threads_started (
+    ) const
+    {
+        auto_mutex M(m);
+        return worker_thread_ids.size();
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void thread_pool_implementation::
     wait_for_task (
         uint64 task_id
