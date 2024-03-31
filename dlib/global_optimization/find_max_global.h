@@ -114,7 +114,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
 
 // ----------------------------------------------------------------------------------------
 
-    const auto FOREVER = std::chrono::hours(24*365*290); // 290 years
+    const auto FOREVER = std::chrono::hours(24*365*200); // 200 years
     using stop_condition = std::function<bool(double)>;
     const stop_condition never_stop_early = [](double) { return false; };
 
