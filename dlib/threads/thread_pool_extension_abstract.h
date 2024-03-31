@@ -204,6 +204,70 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class thread_pool_thread_manager
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents the methods used to create (acquire) and join (release)
+                threads for a thread_pool. The default implementation uses std::thread() to
+                acquire and std::thread::join() to release threads.
+
+                This class can be subclassed so threads from an external thread pool can be
+                reused rather than managing our own. This can be useful in situations where
+                threads are a scarce resource or their creation is slow or otherwise limited.
+
+                When using a subclass, thread_pools should never be created with a higher
+                num_threads than are available to be returned from create_thread() immediately.
+
+                The user of the subclass is responsible for ensuring its lifecycle extends
+                at least to that of the thread_pools it is passed to.
+
+                The default implementation is meant to be used with a single thread_pool, and
+                thread_pool will create and manage an instance internally if the manager
+                parameter is omitted or nullptr.
+        !*/
+    public:
+        using thread_id = std::vector<std::thread>::size_type;
+
+        thread_pool_thread_manager(
+        );
+
+        virtual ~thread_pool_thread_manager(
+        );
+
+        virtual thread_id create_thread(
+            std::function<void()> f
+        );
+        /*!
+            ensures
+                - returns a thread_id which
+                    - is unique to this instance, but not globally unique
+                    - can be used with join_thread() to release this particular thread
+                    - has not been returned by this function before at all, or has not
+                      been returned by this function since join_thread() was last called
+                      with this thread_id
+                - f() will be executed on the represented thread immediately
+        !*/
+
+        virtual void join_thread(
+            thread_id thread_id
+        );
+        /*!
+            ensures
+                - the thread represented by thread_id will (eventually) be joined
+        !*/
+
+    private:
+
+        std::vector<std::thread> threads;
+
+        // restricted functions
+        thread_pool_thread_manager(thread_pool_thread_manager&);        // copy constructor
+        thread_pool_thread_manager& operator=(thread_pool_thread_manager&);    // assignment operator
+    };
+
+// ----------------------------------------------------------------------------------------
+
     class thread_pool 
     {
         /*!
@@ -234,11 +298,17 @@ namespace dlib
 
     public:
         explicit thread_pool (
-            unsigned long num_threads
+            unsigned long num_threads,
+            thread_pool_thread_manager* manager = nullptr
         );
         /*!
             ensures
                 - #num_threads_in_pool() == num_threads
+                - manager is used to create (acquire) and join (release) threads if passed,
+                  otherwise it uses the default implementation which uses std::thread() to
+                  acquire and std::thread::join() to release threads.
+            requires
+                - manager (if passed) must have num_threads available threads.
             throws
                 - std::bad_alloc
                 - dlib::thread_error

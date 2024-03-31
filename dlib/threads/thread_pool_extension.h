@@ -127,6 +127,35 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class thread_pool_thread_manager
+    {
+
+    public:
+        using thread_id = std::vector<std::thread>::size_type;
+
+        thread_pool_thread_manager(
+        );
+
+        virtual ~thread_pool_thread_manager(
+        );
+
+        virtual thread_id create_thread(
+            std::function<void()> f
+        );
+
+        virtual void join_thread(
+            thread_id thread_id
+        );
+    private:
+        std::vector<std::thread> threads;
+
+        // restricted functions
+        thread_pool_thread_manager(thread_pool_thread_manager&);        // copy constructor
+        thread_pool_thread_manager& operator=(thread_pool_thread_manager&);    // assignment operator
+    };
+
+// ----------------------------------------------------------------------------------------
+
     class thread_pool_implementation 
     {
         /*!
@@ -147,7 +176,8 @@ namespace dlib
 
         friend class thread_pool;
         explicit thread_pool_implementation (
-            unsigned long num_threads
+            unsigned long num_threads,
+            thread_pool_thread_manager* manager
         );
 
     public:
@@ -478,14 +508,15 @@ namespace dlib
         signaler task_ready_signaler;
         bool we_are_destructing;
 
-        std::vector<std::thread> threads;
+        bool owns_manager;
+        thread_pool_thread_manager* manager;
+        std::vector<thread_pool_thread_manager::thread_id> threads;
 
         // restricted functions
         thread_pool_implementation(thread_pool_implementation&);        // copy constructor
         thread_pool_implementation& operator=(thread_pool_implementation&);    // assignment operator
 
     };
-
 
 // ----------------------------------------------------------------------------------------
 
@@ -502,10 +533,11 @@ namespace dlib
 
     public:
         explicit thread_pool (
-            unsigned long num_threads
-        ) 
+            unsigned long num_threads,
+            thread_pool_thread_manager* manager = nullptr
+        )
         {
-            impl.reset(new thread_pool_implementation(num_threads));
+            impl.reset(new thread_pool_implementation(num_threads, manager));
         }
 
         ~thread_pool (

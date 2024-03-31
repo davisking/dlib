@@ -11,19 +11,66 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    thread_pool_thread_manager::
+    thread_pool_thread_manager(
+    ) { }
+
+// ----------------------------------------------------------------------------------------
+
+    thread_pool_thread_manager::
+    ~thread_pool_thread_manager(
+    ) {
+        for (auto& thread : threads) {
+            if (thread.joinable()) {
+                thread.join();
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    thread_pool_thread_manager::thread_id thread_pool_thread_manager::
+    create_thread(
+        std::function<void()> f
+    ) {
+        threads.emplace_back(f);
+        return threads.size() - 1;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void thread_pool_thread_manager::
+    join_thread(
+        thread_pool_thread_manager::thread_id thread_id
+    ) {
+        if (threads[thread_id].joinable()) {
+            threads[thread_id].join();
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     thread_pool_implementation::
     thread_pool_implementation (
-        unsigned long num_threads
-    ) : 
+        unsigned long num_threads,
+        thread_pool_thread_manager* manager_
+    ) :
         task_done_signaler(m),
         task_ready_signaler(m),
         we_are_destructing(false)
     {
+        if (manager_ == nullptr) {
+            this->owns_manager = true;
+            this->manager = new thread_pool_thread_manager();
+        } else {
+            this->owns_manager = false;
+            this->manager = manager_;
+        }
         tasks.resize(num_threads);
         threads.resize(num_threads);
         for (unsigned long i = 0; i < num_threads; ++i)
         {
-            threads[i] = std::thread([&](){this->thread();});
+            threads[i] = this->manager->create_thread([&](){this->thread();});
         }
     }
 
@@ -62,7 +109,7 @@ namespace dlib
 
         // wait for all threads to terminate
         for (auto& t : threads)
-            t.join();
+            this->manager->join_thread(t);
         threads.clear();
 
         // Throw any unhandled exceptions.  Since shutdown_pool() is only called in the
@@ -77,6 +124,9 @@ namespace dlib
     ~thread_pool_implementation()
     {
         shutdown_pool();
+        if (this->owns_manager) {
+            delete this->manager;
+        }
     }
 
 // ----------------------------------------------------------------------------------------
