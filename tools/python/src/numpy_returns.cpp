@@ -20,7 +20,7 @@ numpy_image<rgb_pixel> load_rgb_image (const std::string &path)
     return img; 
 }
 
-numpy_image<rgb_pixel> load_rgb_alpha_image (const std::string &path)
+numpy_image<rgb_alpha_pixel> load_rgb_alpha_image (const std::string &path)
 {
     numpy_image<rgb_alpha_pixel> img;
     load_image(img, path);
@@ -163,6 +163,11 @@ void bind_numpy_returns(py::module &m)
 {
     m.def("load_rgb_image", &load_rgb_image, 
 	"Takes a path and returns a numpy array (RGB) containing the image",
+	py::arg("filename")
+    );
+
+    m.def("load_rgb_alpha_image", &load_rgb_alpha_image,
+	"Takes a path and returns a numpy array (RGBA) containing the image",
 	py::arg("filename")
     );
 
