@@ -81,9 +81,9 @@ namespace dlib
         
         FILE * check_file(const char* filename );
         void read_image( FILE *file, const unsigned char* imgbuffer, size_t imgbuffersize );
-        size_t long height_; 
-        size_t long width_;
-        size_t long output_components_;
+        size_t height_; 
+        size_t width_;
+        size_t output_components_;
         std::vector<unsigned char> data;
     };
 
