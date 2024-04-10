@@ -182,7 +182,7 @@ namespace dlib
         data.resize(height_*width_*output_components_);
 
         // setup pointers to each row
-        for (unsigned long i = 0; i < rows.size(); ++i)
+        for (size_t i = 0; i < rows.size(); ++i)
             rows[i] = &data[i*width_*output_components_];
 
         // read the data into the buffer

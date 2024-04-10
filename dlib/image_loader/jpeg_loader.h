@@ -43,10 +43,10 @@ namespace dlib
 #endif
             image_view<T> t(t_);
             t.set_size( height_, width_ );
-            for ( unsigned n = 0; n < height_;n++ )
+            for (size_t n = 0; n < height_;n++ )
             {
                 const unsigned char* v = get_row( n );
-                for ( unsigned m = 0; m < width_;m++ )
+                for (size_t m = 0; m < width_;m++ )
                 {
                     if ( is_gray() )
                     {
@@ -74,16 +74,16 @@ namespace dlib
         }
 
     private:
-        const unsigned char* get_row( unsigned long i ) const
+        const unsigned char* get_row(size_t i) const
         {
             return &data[i*width_*output_components_];
         }
         
         FILE * check_file(const char* filename );
         void read_image( FILE *file, const unsigned char* imgbuffer, size_t imgbuffersize );
-        unsigned long height_; 
-        unsigned long width_;
-        unsigned long output_components_;
+        size_t long height_; 
+        size_t long width_;
+        size_t long output_components_;
         std::vector<unsigned char> data;
     };
 
