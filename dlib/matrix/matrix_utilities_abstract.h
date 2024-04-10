@@ -1597,7 +1597,7 @@ namespace dlib
         requires
             - m.size() > 0
         ensures
-            - returns a row matrix that contains the sum of all the rows in m. 
+            - returns a row matrix that contains the sum of all the rows vectors in m. 
             - returns a matrix M such that
                 - M::type == the same type that was in m
                 - M.nr() == 1
@@ -1615,7 +1615,7 @@ namespace dlib
         requires
             - m.size() > 0
         ensures
-            - returns a column matrix that contains the sum of all the columns in m. 
+            - returns a column matrix that contains the sum of all the columns vectors in m. 
             - returns a matrix M such that
                 - M::type == the same type that was in m
                 - M.nr() == m.nr() 
