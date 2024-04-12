@@ -1120,8 +1120,8 @@ namespace dlib
                 if (ok && packet->size > 0)
                     ok = push(packet, std::forward<Callback>(clb));
                 
-                // If flushing, only flush parser once, so break
-                if (flushing)
+                // If flushing, you keep parsing until you get an empty packet
+                if (packet->size == 0 && flushing)
                     break;
             }
 
