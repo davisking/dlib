@@ -719,6 +719,57 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class input_tensor
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This input layer works with dlib::tensor objects. It is very similar to
+                the dlib::input layer except that it allows for concatenating data that
+                already resides in GPU memory.
+        !*/
+
+    public:
+        typedef tensor input_type;
+
+        input_tensor(
+        );
+        /*!
+            ensures
+                - input_tensor objects are default constructable
+        !*/
+
+        input_tensor(
+            const input_tensor& item
+        );
+        /*!
+            ensures
+                - input_tensor objects are copy constructable
+        !*/
+
+        template <typename forward_iterator>
+        void to_tensor(
+            forward_iterator ibegin,
+            forward_iterator iend,
+            resizable_tensor& data
+        ) const;
+        /*!
+            requires
+                - [ibegin, iend) is an iterator range over input_type objects.
+                - std::distance(ibegin,iend) > 0
+                - The input range should contain tensor objects that all have the same
+                  dimensions.
+            ensures
+                - Copies the iterator range into #data.  In particular, if the input tensors
+                  have R rows, C columns, and K channels then we will have:
+                    - #data.num_samples() == count_samples(ibegin,iend)
+                    - #data.nr() == R
+                    - #data.nc() == C
+                    - #data.k() == K
+                  This results in a tensor concatenation along the sample dimension.
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
 }
 
 #endif // DLIB_DNn_INPUT_ABSTRACT_H_
