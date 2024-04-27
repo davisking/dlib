@@ -178,7 +178,8 @@ if (CMAKE_COMPILER_IS_GNUCXX)
    add_compile_options(-Wno-strict-overflow)
    add_compile_options(-Wno-maybe-uninitialized)
 
-   if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 11.3.0 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS_EQUAL 11.4.0)
+   if ((CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 11.3.0 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS_EQUAL 11.4.0) OR
+      (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 14.0.0 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS_EQUAL 14.0.1))
       # These versions of gcc wrongly yield this warning:
       #  dlib::row_major_layout::layout<double, 0, 2, dlib::memory_manager_stateless_kernel_1<char> >::data’ with nonzero offset 8 [-Werror=free-nonheap-object]
       #   61 |                 delete [] item;
