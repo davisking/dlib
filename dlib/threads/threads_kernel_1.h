@@ -9,8 +9,6 @@
 
 #include "threads_kernel_abstract.h"
 
-#include "../windows_magic.h"
-#include <windows.h>
 #include "../algs.h"
 #include <condition_variable>
 #include <mutex>
@@ -22,13 +20,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
     
-    typedef DWORD thread_id_type;
+    typedef unsigned long thread_id_type;
 
-    inline thread_id_type get_thread_id (
-    )
-    {
-        return GetCurrentThreadId();
-    }
+    thread_id_type get_thread_id();
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
