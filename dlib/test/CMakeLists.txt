@@ -187,6 +187,17 @@ if (CMAKE_COMPILER_IS_GNUCXX)
       add_compile_options(-Wno-free-nonheap-object)
    endif()
 
+   if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 14.0.0 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS_EQUAL 14.0.1)
+      # These versions of gcc wrongly yield this warning:
+      # In member function ‘allocate_array’,
+      #     inlined from ‘set_max_size’ at /builddir/build/BUILD/dlib-19.24.4/dlib/../dlib/svm/../matrix/../array/array_kernel.h:438:59,
+      #     inlined from ‘push_back.constprop’ at /builddir/build/BUILD/dlib-19.24.4/dlib/../dlib/svm/../matrix/../array/array_kernel.h:769:30:
+      # /builddir/build/BUILD/dlib-19.24.4/dlib/../dlib/svm/../memory_manager_stateless/memory_manager_stateless_kernel_1.h:54:24: warning: argument 1 value ‘18446744073709551615’ exceeds maximum object size 9223372036854775807 [-Walloc-size-larger-than=]
+      #    54 |                 return new T[size];
+      # when compiling dlib example programs that most definitely do not ask for such allocations. 
+      add_compile_options(-Wno-alloc-size-larger-than)
+   endif()
+
    if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.13.0") 
       # strip debug symbols to make the binary smaller
       target_link_options(${target_name} PRIVATE $<$<CONFIG:RELEASE>:-s>)
