@@ -9,11 +9,20 @@
 
 #include "threads_kernel_1.h"
 
+#include "../windows_magic.h"
+#include <windows.h>
+
 #include <process.h>
 
 
 namespace dlib
 {
+    thread_id_type get_thread_id(
+    )
+    {
+        return GetCurrentThreadId();
+    }
+
     namespace threads_kernel_shared_helpers
     {
 
