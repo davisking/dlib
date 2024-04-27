@@ -11,8 +11,8 @@
 #include "misc_api_kernel_1.h"
 
 #include "../windows_magic.h"
-#include <mmsystem.h>
 #include <windows.h>
+#include <mmsystem.h>
 
 // tell visual studio to link to the library needed to call timeGetTime() 
 #ifdef _MSC_VER
