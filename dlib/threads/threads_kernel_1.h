@@ -9,6 +9,7 @@
 
 #include "threads_kernel_abstract.h"
 
+#include "../windows_magic.h"
 #include "../algs.h"
 #include <condition_variable>
 #include <mutex>
