@@ -4276,6 +4276,38 @@ namespace
 #endif
     }
 
+    void test_input_tensor()
+    {
+        using namespace dlib::tt;
+        print_spinner();
+        tt::tensor_rand rnd;
+        std::vector<resizable_tensor> tensors(3);
+
+        for (auto& t : tensors) {
+            t.set_size(1, 3, 224, 224);
+            rnd.fill_gaussian(t);
+        }
+
+        resizable_tensor out;
+        input_tensor input_layer;
+
+        input_layer.to_tensor(tensors.begin(), tensors.end(), out);
+
+        DLIB_TEST(out.num_samples() == 3);
+        DLIB_TEST(out.k() == 3);
+        DLIB_TEST(out.nr() == 224);
+        DLIB_TEST(out.nc() == 224);
+        size_t stride = out.k() * out.nr() * out.nc();
+        size_t offset = 0;
+        int error = 0;
+
+        for (auto& t : tensors) {
+            error = memcmp(out.host() + offset, t.host(), sizeof(float) * t.size());
+            DLIB_TEST(error == 0);
+            offset += stride;
+        }
+    }
+
 // ----------------------------------------------------------------------------------------
 
     class dnn_tester : public tester
@@ -4386,6 +4418,7 @@ namespace
             test_input_ouput_mappers();
             test_fuse_layers();
             test_reorg();
+            test_input_tensor();
         }
 
         void perform_test()
