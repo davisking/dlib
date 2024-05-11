@@ -607,6 +607,14 @@ namespace dlib
         ); 
     };
 
+    inline void memcpy (
+        alias_tensor_instance&& dest, 
+        const tensor& src
+    ) { memcpy(static_cast<tensor&>(dest), src); }
+    /*!
+        A convenient overload for copying from src to dest when you have a temporary alias tensor.
+    !*/
+
     class alias_tensor_const_instance 
     {
         /*!

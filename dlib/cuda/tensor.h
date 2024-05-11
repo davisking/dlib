@@ -680,6 +680,14 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline void memcpy (
+        alias_tensor_instance&& dest, 
+        const tensor& src
+    ) 
+    {
+        memcpy(static_cast<tensor&>(dest), src);
+    }
+
 }
 
 #endif // DLIB_DNn_TENSOR_H_
