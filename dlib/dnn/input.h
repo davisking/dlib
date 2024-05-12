@@ -1084,6 +1084,93 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class input_tensor
+    {
+    public:
+        typedef tensor input_type;
+
+        input_tensor() {}
+        input_tensor(const input_tensor&) {}
+
+        template<typename forward_iterator>
+        void to_tensor(
+            forward_iterator ibegin,
+            forward_iterator iend,
+            resizable_tensor& data
+        ) const
+        {
+            DLIB_CASSERT(std::distance(ibegin, iend) > 0);
+            const auto k = ibegin->k();
+            const auto nr = ibegin->nr();
+            const auto nc = ibegin->nc();
+            // make sure all the input tensors have the same dimensions
+            for (auto i = ibegin; i != iend; ++i)
+            {
+                DLIB_CASSERT(i->k() == k && i->nr() == nr && i->nc() == nc,
+                    "\t input_tensor::to_tensor()"
+                    << "\n\t All tensor objects given to to_tensor() must have the same dimensions."
+                    << "\n\t k: " << k
+                    << "\n\t nr: " << nr
+                    << "\n\t nc: " << nc
+                    << "\n\t i->k(): " << i->k()
+                    << "\n\t i->nr(): " << i->nr()
+                    << "\n\t i->nc(): " << i->nc()
+                );
+            }
+
+            const auto num_samples = count_samples(ibegin, iend);
+            // initialize data to the right size to contain the stuff in the iterator range.
+            data.set_size(num_samples, k, nr, nc);
+
+            const size_t stride = k * nr * nc;
+            size_t offset = 0;
+            for (auto i = ibegin; i != iend; ++i)
+            {
+                alias_tensor slice(i->num_samples(), k, nr, nc);
+                memcpy(slice(data, offset), *i);
+                offset += slice.num_samples() * stride;
+            }
+        }
+
+        friend void serialize(const input_tensor&, std::ostream& out)
+        {
+            serialize("input_tensor", out);
+        }
+
+        friend void deserialize(input_tensor&, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "input_tensor")
+                throw serialization_error("Unexpected version found while deserializing dlib::input_tensor.");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const input_tensor&)
+        {
+            out << "input_tensor";
+            return out;
+        }
+
+        friend void to_xml(const input_tensor&, std::ostream& out)
+        {
+            out << "<input_tensor/>\n";
+        }
+
+    private:
+
+        template<typename forward_iterator>
+        long long count_samples(
+            forward_iterator ibegin,
+            forward_iterator iend
+        ) const
+        {
+            return std::accumulate(ibegin, iend, 0,
+                [](long long a, const auto& b) { return a + b.num_samples(); });
+        }
+    };
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_INPUT_H_
