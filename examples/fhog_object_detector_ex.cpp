@@ -91,8 +91,7 @@ int main(int argc, char** argv)
         load_image_dataset(images_train, face_boxes_train, faces_directory+"/training.xml");
         load_image_dataset(images_test, face_boxes_test, faces_directory+"/testing.xml");
 
-        // Now we do a little bit of pre-processing.  This is optional but for
-        // this training data it improves the results.  The first thing we do is
+        // Now we do a little bit of pre-processing.  The first thing we do is
         // increase the size of the images by a factor of two.  We do this
         // because it will allow us to detect smaller faces than otherwise would
         // be practical (since the faces are all now twice as big).  Note that,
@@ -104,7 +103,7 @@ int main(int argc, char** argv)
         // Since human faces are generally left-right symmetric we can increase
         // our training dataset by adding mirrored versions of each image back
         // into images_train.  So this next step doubles the size of our
-        // training dataset.  Again, this is obviously optional but is useful in
+        // training dataset.  This is obviously optional but is useful in
         // many object detection tasks.
         add_image_left_right_flips(images_train, face_boxes_train);
         cout << "num training images: " << images_train.size() << endl;
