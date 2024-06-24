@@ -58,7 +58,7 @@ namespace dlib
             }
 
             template <typename T>
-            static auto go(T&& f, const matrix<double,0,1>& a) -> decltype(call_function_and_expand_args<max_unpack-1>::template go(std::forward<T>(f),a))
+            static auto go(T&& f, const matrix<double,0,1>& a) -> decltype(call_function_and_expand_args<max_unpack-1>::template go<T>(std::forward<T>(f),a))
             {
                 return call_function_and_expand_args<max_unpack-1>::go(std::forward<T>(f),a);
             }
