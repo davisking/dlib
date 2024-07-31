@@ -200,12 +200,17 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install make yasm 
+
     - name: Cache FFmpeg 7
       uses: actions/cache@v3
       id: cache-ffmpeg7
       with:
         path: /home/runner/ffmpeg-n7.0.1_installation
-        key: ffmpeg-n7.0.1_try1
+        key: ffmpeg-n7.0.1_try2
         
     - name: Build FFmpeg 7
       if: steps.cache-ffmpeg7.outputs.cache-hit != 'true'
