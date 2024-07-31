@@ -64,6 +64,10 @@ extern "C" {
 #include <memory>
 #include "../logger.h"
 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(59, 24, 100)
+#define FFMPEG_HAS_CH_LAYOUT 1
+#endif
+
 namespace dlib { namespace ffmpeg { namespace details
 {
 
@@ -156,7 +160,7 @@ namespace dlib { namespace ffmpeg { namespace details
         }
     }
 
-#if FF_API_OLD_CHANNEL_LAYOUT
+#if FFMPEG_HAS_CH_LAYOUT
 
     inline AVChannelLayout convert_layout(const uint64_t channel_layout)
     {

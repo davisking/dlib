@@ -788,7 +788,7 @@ namespace dlib
                     }
                 }
 
-#if FF_API_OLD_CHANNEL_LAYOUT
+#if FFMPEG_HAS_CH_LAYOUT
                 if (pCodec->ch_layouts)
                 {
                     bool channel_layout_supported = false;
