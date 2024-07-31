@@ -190,21 +190,6 @@ def num_available_cpu_cores(ram_per_build_process_in_gb):
         return 2 # just assume 2 if we can't get the os to tell us the right answer.
 
 
-from setuptools.command.test import test as TestCommand
-class PyTest(TestCommand):
-    user_options = [('pytest-args=', 'a', "Arguments to pass to pytest")]
-
-    def initialize_options(self):
-        TestCommand.initialize_options(self)
-        self.pytest_args = '--ignore docs --ignore dlib'
-
-    def run_tests(self):
-        import shlex
-        #import here, cause outside the eggs aren't loaded
-        import pytest
-        errno = pytest.main(shlex.split(self.pytest_args))
-        sys.exit(errno)
-
 def read_version_from_cmakelists(cmake_file):
     """Read version information
     """
@@ -228,10 +213,8 @@ setup(
     url='https://github.com/davisking/dlib',
     license='Boost Software License',
     ext_modules=[CMakeExtension('_dlib_pybind11','tools/python')],
-    cmdclass=dict(build_ext=CMakeBuild, test=PyTest),
+    cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
-    # We need an older more-itertools version because v6 broke pytest (for everyone, not just dlib)
-    tests_require=['pytest==3.8', 'more-itertools<6.0.0'],
     #install_requires=['cmake'], # removed because the pip cmake package is busted, maybe someday it will be usable.
     packages=find_packages(exclude=['python_examples']),
     package_dir={'': 'tools/python'},
