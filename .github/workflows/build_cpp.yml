@@ -195,6 +195,39 @@ jobs:
     - name: Build examples, etc
       run: cmake --build build --config Release --parallel 2
 
+  ubuntu-latest-ffmpeg7:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install make yasm 
+
+    - name: Cache FFmpeg 7
+      uses: actions/cache@v3
+      id: cache-ffmpeg7
+      with:
+        path: /home/runner/ffmpeg-n7.0.1_installation
+        key: ffmpeg-n7.0.1_try2
+        
+    - name: Build FFmpeg 7
+      if: steps.cache-ffmpeg7.outputs.cache-hit != 'true'
+      run: |
+        wget https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n7.0.1.tar.gz
+        tar -xf n7.0.1.tar.gz
+        cd FFmpeg-n7.0.1
+        ./configure --prefix=/home/runner/ffmpeg-n7.0.1_installation --disable-doc --disable-programs
+        make -j4
+        make install
+        cd ..
+        
+    - name: Configure
+      run: cmake . -B build -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n7.0.1_installation
+    - name: Build ffmpeg example
+      run: cmake --build build --config Release --target ffmpeg_video_muxing_ex --parallel 4
+
   windows-latest:
     runs-on: 'windows-latest'
     steps:

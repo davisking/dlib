@@ -775,7 +775,7 @@ namespace dlib
                     if (std::tie(src_sample_rate, src_channel_layout, src_fmt) !=
                         std::tie(dst_sample_rate, dst_channel_layout, dst_fmt))
                     {
-#if FF_API_OLD_CHANNEL_LAYOUT
+#if LIBSWRESAMPLE_VERSION_INT >= AV_VERSION_INT(4, 5, 100) 
                         AVChannelLayout layout_src = convert_layout(src_channel_layout);
                         AVChannelLayout layout_dst = convert_layout(dst_channel_layout);
                         
