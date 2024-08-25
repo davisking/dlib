@@ -857,6 +857,53 @@ namespace dlib { namespace tt
             - Assigns the gradient of f() with respect to beta to #beta_grad.
     !*/
 
+        // -----------------------------------------------------------------------------------
+
+        void rms_normalize(
+            const double eps,
+            resizable_tensor& dest,
+            resizable_tensor& scale,
+            const tensor& src,
+            const tensor& gamma
+        );
+        /*!
+            requires
+                - eps > 0
+                - src.num_samples() == gamma.size()
+                - gamma.num_samples() == gamma.nr() == gamma.nc() == 1
+            ensures
+                - have_same_dimensions(#dest, src) == true
+                - #scale.size() == src.num_samples()
+                - #dest == the RMS normalized version of src.
+                - #scale == the scaling factors used to normalize src.
+        !*/
+
+        void rms_normalize_gradient(
+            const double eps,
+            const tensor& gradient_input,
+            const tensor& scale,
+            const tensor& src,
+            const tensor& gamma,
+            tensor& src_grad,
+            tensor& gamma_grad
+        );
+        /*!
+            requires
+                - eps > 0
+                - scale should be the output of a call to
+                  rms_normalize(eps,dest,scale,src,gamma)
+                - have_same_dimensions(gradient_input, src) == true
+                - have_same_dimensions(src, src_grad) == true
+                - have_same_dimensions(gamma, gamma_grad) == true
+                - scale.size() == src.num_samples()
+                - have_same_dimensions(scale, gamma) == true
+            ensures
+                - Let f(src,gamma) == dot(gradient_input, dest output of
+                  rms_normalize(eps,dest,scale,src,gamma))
+                - Adds the gradient of f() with respect to src to #src_grad.
+                - Assigns the gradient of f() with respect to gamma to #gamma_grad.
+        !*/
+
     // -----------------------------------------------------------------------------------
 
     void threshold (

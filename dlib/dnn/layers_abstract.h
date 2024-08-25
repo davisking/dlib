@@ -1632,6 +1632,110 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+const double DEFAULT_RMS_NORM_EPS = 1e-5;
+
+class rms_norm_
+{
+    /*!
+        WHAT THIS OBJECT REPRESENTS
+            This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+            defined above. In particular, it defines a root mean square (RMS) normalization layer
+            that implements a method similar to that described in the paper:
+                Root Mean Square Layer Normalization by Biao Zhang and Rico Sennrich
+
+            This layer produces output tensors with the same dimensionality as the input tensors,
+            except that the root mean square of the elements in each sample has been standardized
+            to 1. This is different from layer normalization, as it does not center the data and
+            only scales by the RMS value. As a result, this layer is computationally more
+            efficient and has been shown to be effective in various natural language processing tasks.
+    !*/
+
+public:
+    rms_norm_(
+    );
+    /*!
+        ensures
+            - #get_learning_rate_multiplier() == 1
+            - #get_weight_decay_multiplier()  == 0
+            - #get_eps() == DEFAULT_RMS_NORM_EPS
+    !*/
+
+    explicit rms_norm_(
+        double eps_ = DEFAULT_RMS_NORM_EPS
+    );
+    /*!
+        requires
+            - eps > 0
+        ensures
+            - #get_learning_rate_multiplier() == 1
+            - #get_weight_decay_multiplier()  == 0
+            - #get_eps() == eps_
+    !*/
+
+    double get_eps(
+    ) const;
+    /*!
+        ensures
+            - When doing RMS normalization, we are dividing by the root mean square.
+              This epsilon value returned by this function is added to the
+              mean square to prevent division by zero.
+    !*/
+
+    double get_learning_rate_multiplier(
+    ) const;
+    /*!
+        ensures
+            - returns a multiplier number. The interpretation is that this object is
+              requesting that the learning rate used to optimize its parameters be
+              multiplied by get_learning_rate_multiplier().
+    !*/
+
+    double get_weight_decay_multiplier(
+    ) const;
+    /*!
+        ensures
+            - returns a multiplier number. The interpretation is that this object is
+              requesting that the weight decay used to optimize its parameters be
+              multiplied by get_weight_decay_multiplier().
+    !*/
+
+    void set_learning_rate_multiplier(
+        double val
+    );
+    /*!
+        requires
+            - val >= 0
+        ensures
+            - #get_learning_rate_multiplier() == val
+    !*/
+
+    void set_weight_decay_multiplier(
+        double val
+    );
+    /*!
+        requires
+            - val >= 0
+        ensures
+            - #get_weight_decay_multiplier() == val
+    !*/
+
+    template <typename SUBNET> void setup (const SUBNET& sub);
+    template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+    template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+    dpoint map_input_to_output(dpoint p) const;
+    dpoint map_output_to_input(dpoint p) const;
+    const tensor& get_layer_params() const;
+    tensor& get_layer_params();
+    /*!
+        These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+    !*/
+};
+
+template <typename SUBNET>
+using rms_norm = add_layer<rms_norm_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     enum layer_mode
     {
         CONV_MODE = 0, // convolutional mode

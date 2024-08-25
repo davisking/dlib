@@ -654,6 +654,76 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void rms_normalize()
+    {
+        resizable_tensor x(2, 3, 4, 5);
+        resizable_tensor y_cpu(x);
+        tt::tensor_rand rnd(0);
+        rnd.fill_uniform(x);
+        resizable_tensor scale_cpu(x.num_samples());
+        resizable_tensor gamma(1, x.k(), x.nr(), x.nc());
+        gamma = 1;
+        const float eps = 1e-5;
+        cpu::rms_normalize(eps, y_cpu, scale_cpu, x, gamma);
+
+        // check that the RMS per sample is close to 1 and that the scale is correctly applied
+        const float* p_x = x.host();
+        const float* p_y = y_cpu.host();
+        const float* p_scale = scale_cpu.host();
+        for (long n = 0; n < y_cpu.num_samples(); ++n) {
+            double sum_squared_x = 0;
+            double sum_squared_y = 0;
+            long count = 0;
+            for (long k = 0; k < y_cpu.k(); ++k) {
+                for (long r = 0; r < y_cpu.nr(); ++r) {
+                    for (long c = 0; c < y_cpu.nc(); ++c) {
+                        float val_x = p_x[tensor_index(x, n, k, r, c)];
+                        float val_y = p_y[tensor_index(y_cpu, n, k, r, c)];
+                        sum_squared_x += val_x * val_x;
+                        sum_squared_y += val_y * val_y;
+                        count++;
+                    }
+                }
+            }
+
+            // calculate RMS of input and output
+            float rms_x = std::sqrt(sum_squared_x / count);
+            float rms_y = std::sqrt(sum_squared_y / count);
+
+            // check that output RMS is close to 1
+            DLIB_TEST_MSG(std::abs(rms_y - 1.0f) < 1e-4,
+                "rms_norm layer, abs(rms_y - 1.0f) < 1e-4, got " << rms_y);
+
+            // check that the computed scale correctly transforms input RMS to output RMS
+            float computed_scale = p_scale[n];
+            float expected_scale = 1.0f / std::sqrt(sum_squared_x / count + eps);
+            DLIB_TEST_MSG(std::abs(computed_scale - expected_scale) < 1e-5,
+                "rms_norm layer, abs(computed_scale - expected_scale) < 1e-5, got "
+                << computed_scale << " vs expected " << expected_scale);
+        }
+
+        // check that the CPU and the CUDA implementation are equivalent 
+#ifdef DLIB_USE_CUDA 
+        resizable_tensor y_cuda(x);
+        resizable_tensor scale_cuda(x.num_samples());
+        cuda::rms_normalize(eps, y_cuda, scale_cuda, x, gamma);
+        DLIB_TEST_MSG(max(abs(mat(y_cpu) - mat(y_cuda))) < 1e-5, "rms_norm layer, max(abs(mat(y_cpu) - mat(y_cuda))) < 1e-5");
+        DLIB_TEST_MSG(max(abs(mat(scale_cpu) - mat(scale_cuda))) < 1e-5, "rms_norm layer, max(abs(mat(scale_cpu) - mat(scale_cuda))) < 1e-5");
+        resizable_tensor gradient_input(x);
+        resizable_tensor src_grad_cpu(x), gamma_grad_cpu(1, x.k(), x.nr(), x.nc());
+        resizable_tensor src_grad_cuda(x), gamma_grad_cuda(1, x.k(), x.nr(), x.nc());
+        rnd.fill_gaussian(gradient_input);
+        src_grad_cpu = 0;
+        src_grad_cuda = 0;
+        cpu::rms_normalize_gradient(eps, gradient_input, scale_cpu, x, gamma, src_grad_cpu, gamma_grad_cpu);
+        cuda::rms_normalize_gradient(eps, gradient_input, scale_cuda, x, gamma, src_grad_cuda, gamma_grad_cuda);
+        DLIB_TEST_MSG(max(abs(mat(src_grad_cpu) - mat(src_grad_cuda))) < 1e-5, "rms_norm layer, max(abs(mat(src_grad_cpu) - mat(src_grad_cuda))) < 1e-5");
+        DLIB_TEST_MSG(max(abs(mat(gamma_grad_cpu) - mat(gamma_grad_cuda))) < 1e-5, "rms_norm layer, max(abs(mat(gamma_grad_cpu) - mat(gamma_grad_cuda))) < 1e-5");
+#endif        
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void test_basic_tensor_ops()
     {
         using namespace dlib::tt;
@@ -4386,6 +4456,7 @@ namespace
             test_batch_normalize();
             test_batch_normalize_conv();
             test_layer_normalize();
+            test_rms_normalize();
             test_basic_tensor_ops();
             test_layers();
             test_visit_functions();
