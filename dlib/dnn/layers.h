@@ -2136,6 +2136,25 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <float DROP_RATE>
+    class dropout_custom_ : public dropout_
+    {
+    public:
+        explicit dropout_custom_() : dropout_(DROP_RATE)
+        {
+            DLIB_CASSERT(0 <= DROP_RATE && DROP_RATE <= 1, 
+                "DROP_RATE must be between 0 and 1, inclusive.");
+        }
+    };
+
+    template <float DROP_RATE, typename SUBNET>
+    using dropout_custom = add_layer<dropout_custom_<DROP_RATE>, SUBNET>;
+
+    template <typename SUBNET>
+    using dropout_10 = add_layer<dropout_custom_<0.10f>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     class multiply_
     {
     public:
