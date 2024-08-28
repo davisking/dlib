@@ -1386,7 +1386,7 @@ namespace dlib
                     p_beta_grad[i] += *p_grad;
                     p_gamma_grad[i] += (*p_grad)*x_hat;
 
-                    const float dx = *p_grad * p_gamma[n];
+                    const float dx = *p_grad * p_gamma[i];
 
                     p_dvars[n] += dx*(*p_src - p_means[n])*-0.5*p_invstds[n]*p_invstds[n]*p_invstds[n];
 

@@ -2136,7 +2136,7 @@ namespace dlib
                     bg[i] += gi[idx];
                     gg[i] += gi[idx]*x_hat;
 
-                    const float dx = gi[idx] * g[n];
+                    const float dx = gi[idx] * g[i];
                     temp_dv += dx*(s[idx] - m[n])*-0.5*v[n]*v[n]*v[n];
                 }
                 warp_reduce_atomic_add(dv[n], temp_dv);
