@@ -1435,7 +1435,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <float DROP_RATE>
+    template <int DROP_RATE_PERCENT>
     class dropout_rate_ : public dropout_
     {
         /*!
@@ -1451,7 +1451,7 @@ namespace dlib
                 flexibility and clarity in the network architecture definition.
 
             TEMPLATE PARAMETERS
-                - DROP_RATE: A float value between 0 and 1 that specifies the dropout rate.
+                - DROP_RATE_PERCENT: A int value between 0 and 100 that specifies the dropout rate.
                   This value is set at compile-time and cannot be changed during runtime.
         !*/
 
@@ -1464,7 +1464,7 @@ namespace dlib
         !*/
     };
 
-    template <float DROP_RATE, typename SUBNET>
+    template <int DROP_RATE, typename SUBNET>
     using dropout_rate = add_layer<dropout_rate_<DROP_RATE>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
