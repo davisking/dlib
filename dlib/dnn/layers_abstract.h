@@ -1436,7 +1436,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <float DROP_RATE>
-    class dropout_custom_ : public dropout_
+    class dropout_rate_ : public dropout_
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -1456,7 +1456,7 @@ namespace dlib
         !*/
 
     public:
-        explicit dropout_custom_();
+        explicit dropout_rate_();
         /*!
             ensures
                 - Constructs a dropout layer with a dropout rate of DROP_RATE.
@@ -1465,7 +1465,7 @@ namespace dlib
     };
 
     template <float DROP_RATE, typename SUBNET>
-    using dropout_custom = add_layer<dropout_custom_<DROP_RATE>, SUBNET>;
+    using dropout_rate = add_layer<dropout_rate_<DROP_RATE>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

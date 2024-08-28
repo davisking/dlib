@@ -2137,10 +2137,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <float DROP_RATE>
-    class dropout_custom_ : public dropout_
+    class dropout_rate_ : public dropout_
     {
     public:
-        explicit dropout_custom_() : dropout_(DROP_RATE)
+        explicit dropout_rate_() : dropout_(DROP_RATE)
         {
             DLIB_CASSERT(0 <= DROP_RATE && DROP_RATE <= 1, 
                 "DROP_RATE must be between 0 and 1, inclusive.");
@@ -2148,10 +2148,18 @@ namespace dlib
     };
 
     template <float DROP_RATE, typename SUBNET>
-    using dropout_custom = add_layer<dropout_custom_<DROP_RATE>, SUBNET>;
+    using dropout_rate = add_layer<dropout_rate_<DROP_RATE>, SUBNET>;
 
     template <typename SUBNET>
-    using dropout_10 = add_layer<dropout_custom_<0.10f>, SUBNET>;
+    using dropout_rate_5 = add_layer<dropout_rate_<0.05f>, SUBNET>;    
+    template <typename SUBNET>
+    using dropout_rate_10 = add_layer<dropout_rate_<0.10f>, SUBNET>;
+    template <typename SUBNET>
+    using dropout_rate_15 = add_layer<dropout_rate_<0.15f>, SUBNET>;
+    template <typename SUBNET>
+    using dropout_rate_20 = add_layer<dropout_rate_<0.20f>, SUBNET>;
+    template <typename SUBNET>
+    using dropout_rate_25 = add_layer<dropout_rate_<0.25f>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
