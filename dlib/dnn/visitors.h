@@ -741,6 +741,14 @@ namespace dlib
                 update(i);
             }
 
+            template <typename U, typename E>
+            void operator()(size_t i, const add_layer<rms_norm_, U, E>&)
+            {
+                start_node(i, "rms_norm");
+                end_node();
+                update(i);
+            }            
+
             template <layer_mode MODE, typename U, typename E>
             void operator()(size_t i, const add_layer<bn_<MODE>, U, E>&)
             {
