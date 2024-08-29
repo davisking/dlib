@@ -1435,6 +1435,41 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <int DROP_RATE_PERCENT>
+    class dropout_rate_ : public dropout_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents a customizable dropout layer that inherits from
+                the dropout_ class. It allows specifying the dropout rate at compile-time,
+                which is particularly useful for deep networks with many layers where it
+                might be cumbersome to explicitly modify the dropout rate for each layer
+                individually.
+
+                The main advantage of this layer is that it offers the possibility to specify
+                the dropout rate at the moment of network construction, providing more
+                flexibility and clarity in the network architecture definition.
+
+            TEMPLATE PARAMETERS
+                - DROP_RATE_PERCENT: A int value between 0 and 100 that specifies the dropout rate.
+                  This value is set at compile-time and cannot be changed during runtime.
+        !*/
+
+    public:
+        explicit dropout_rate_();
+        /*!
+            ensures
+                - Constructs a dropout layer with a dropout rate of DROP_RATE.
+                - Calls the base class constructor dropout_(DROP_RATE).
+        !*/
+    };
+
+    template <int DROP_RATE, typename SUBNET>
+    using dropout_rate = add_layer<dropout_rate_<DROP_RATE>, SUBNET>;
+    template <typename SUBNET>
+    using dropout_10 = add_layer<dropout_rate_<10>, SUBNET>;
+// ----------------------------------------------------------------------------------------
+
     class multiply_
     {
         /*!
