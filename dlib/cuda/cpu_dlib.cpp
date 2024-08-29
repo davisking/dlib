@@ -1499,7 +1499,8 @@ namespace dlib
             const tensor& src,
             const tensor& gamma,
             tensor& src_grad,
-            tensor& gamma_grad
+            tensor& gamma_grad,
+            tensor& dscale
         )
         {
             const long num = src.k() * src.nr() * src.nc();
@@ -1519,8 +1520,6 @@ namespace dlib
             const auto p_gamma_grad = gamma_grad.host();
             const auto p_scale = scale.host();
 
-            resizable_tensor dscale;
-            dscale.copy_size(scale);
             dscale = 0;
             const auto p_dscale = dscale.host();
 

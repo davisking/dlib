@@ -270,7 +270,8 @@ namespace dlib
             const tensor& src,
             const tensor& gamma,
             tensor& src_grad,
-            tensor& gamma_grad
+            tensor& gamma_grad,
+            tensor& dscale
         );
 
     // -----------------------------------------------------------------------------------

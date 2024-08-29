@@ -2345,7 +2345,8 @@ namespace dlib
             const tensor& src,
             const tensor& gamma,
             tensor& src_grad,
-            tensor& gamma_grad
+            tensor& gamma_grad,
+            tensor& dscale
         )
         {
             const long num = src.k() * src.nr() * src.nc();
@@ -2359,8 +2360,6 @@ namespace dlib
             DLIB_CASSERT(eps > 0);
 
             gamma_grad = 0;
-            resizable_tensor dscale;
-            dscale.copy_size(scale);
             dscale = 0;
             launch_kernel(_cuda_rms_normalize_gradient, max_jobs(num, src.num_samples()),
                 src_grad.device(), gamma_grad.device(), src.device(),

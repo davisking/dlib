@@ -718,13 +718,14 @@ namespace dlib { namespace tt
         const tensor& src,
         const tensor& gamma,
         tensor& src_grad,
-        tensor& gamma_grad
+        tensor& gamma_grad,
+        tensor& dscale
     )
     {            
 #ifdef DLIB_USE_CUDA
-        cuda::rms_normalize_gradient(eps, gradient_input, scale, src, gamma, src_grad, gamma_grad);
+        cuda::rms_normalize_gradient(eps, gradient_input, scale, src, gamma, src_grad, gamma_grad, dscale);
 #else
-        cpu::rms_normalize_gradient(eps, gradient_input, scale, src, gamma, src_grad, gamma_grad);
+        cpu::rms_normalize_gradient(eps, gradient_input, scale, src, gamma, src_grad, gamma_grad, dscale);
 #endif
     }
 

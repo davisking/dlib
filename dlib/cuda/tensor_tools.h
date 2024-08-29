@@ -885,7 +885,8 @@ namespace dlib { namespace tt
             const tensor& src,
             const tensor& gamma,
             tensor& src_grad,
-            tensor& gamma_grad
+            tensor& gamma_grad,
+            tensor& dscale
         );
         /*!
             requires
