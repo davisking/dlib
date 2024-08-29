@@ -670,13 +670,17 @@ namespace
         const float* p_x = x.host();
         const float* p_y = y_cpu.host();
         const float* p_scale = scale_cpu.host();
-        for (long n = 0; n < y_cpu.num_samples(); ++n) {
+        for (long n = 0; n < y_cpu.num_samples(); ++n)
+        {
             double sum_squared_x = 0;
             double sum_squared_y = 0;
             long count = 0;
-            for (long k = 0; k < y_cpu.k(); ++k) {
-                for (long r = 0; r < y_cpu.nr(); ++r) {
-                    for (long c = 0; c < y_cpu.nc(); ++c) {
+            for (long k = 0; k < y_cpu.k(); ++k)
+            {
+                for (long r = 0; r < y_cpu.nr(); ++r)
+                {
+                    for (long c = 0; c < y_cpu.nc(); ++c)
+                    {
                         float val_x = p_x[tensor_index(x, n, k, r, c)];
                         float val_y = p_y[tensor_index(y_cpu, n, k, r, c)];
                         sum_squared_x += val_x * val_x;
@@ -712,11 +716,12 @@ namespace
         resizable_tensor gradient_input(x);
         resizable_tensor src_grad_cpu(x), gamma_grad_cpu(1, x.k(), x.nr(), x.nc());
         resizable_tensor src_grad_cuda(x), gamma_grad_cuda(1, x.k(), x.nr(), x.nc());
+        resizable_tensor dscale_cpu(x.num_samples()), dscale_cuda(x.num_samples());
         rnd.fill_gaussian(gradient_input);
         src_grad_cpu = 0;
         src_grad_cuda = 0;
-        cpu::rms_normalize_gradient(eps, gradient_input, scale_cpu, x, gamma, src_grad_cpu, gamma_grad_cpu);
-        cuda::rms_normalize_gradient(eps, gradient_input, scale_cuda, x, gamma, src_grad_cuda, gamma_grad_cuda);
+        cpu::rms_normalize_gradient(eps, gradient_input, scale_cpu, x, gamma, src_grad_cpu, gamma_grad_cpu, dscale_cpu);
+        cuda::rms_normalize_gradient(eps, gradient_input, scale_cuda, x, gamma, src_grad_cuda, gamma_grad_cuda, dscale_cuda);
         DLIB_TEST_MSG(max(abs(mat(src_grad_cpu) - mat(src_grad_cuda))) < 1e-5, "rms_norm layer, max(abs(mat(src_grad_cpu) - mat(src_grad_cuda))) < 1e-5");
         DLIB_TEST_MSG(max(abs(mat(gamma_grad_cpu) - mat(gamma_grad_cuda))) < 1e-5, "rms_norm layer, max(abs(mat(gamma_grad_cpu) - mat(gamma_grad_cuda))) < 1e-5");
 #endif        
