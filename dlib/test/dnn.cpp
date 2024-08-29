@@ -654,7 +654,7 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    void rms_normalize()
+    void test_rms_normalize()
     {
         resizable_tensor x(2, 3, 4, 5);
         resizable_tensor y_cpu(x);
