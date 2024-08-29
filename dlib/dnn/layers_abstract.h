@@ -1466,7 +1466,8 @@ namespace dlib
 
     template <int DROP_RATE, typename SUBNET>
     using dropout_rate = add_layer<dropout_rate_<DROP_RATE>, SUBNET>;
-
+    template <typename SUBNET>
+    using dropout_10 = add_layer<dropout_rate_<10>, SUBNET>;
 // ----------------------------------------------------------------------------------------
 
     class multiply_
