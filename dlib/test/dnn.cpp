@@ -607,7 +607,7 @@ namespace
         tt::tensor_rand rnd(0);
         rnd.fill_uniform(x);
         resizable_tensor means_cpu(x.num_samples()), invstds_cpu(x.num_samples());
-        resizable_tensor gamma(1, x.k(), x.nr(), x.nc()), beta(1, x.k(), x.nr(), x.nc());
+        resizable_tensor gamma(1, x.k(), 1, 1), beta(1, x.k(), 1, 1);
         gamma = 1;
         beta = 0;
         const float eps = 1e-5;

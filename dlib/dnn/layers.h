@@ -1403,7 +1403,7 @@ namespace dlib
         template <typename SUBNET>
         void setup (const SUBNET& sub)
         {
-            gamma = alias_tensor(1, sub.get_output().k(), sub.get_output().nr(), sub.get_output().nc());
+            gamma = alias_tensor(1, sub.get_output().k());
             beta = gamma;
 
             params.set_size(gamma.size()+beta.size());
