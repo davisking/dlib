@@ -1426,7 +1426,7 @@ namespace dlib
             auto g = gamma(params, 0);
             auto g_grad = gamma(params_grad, 0);
             auto b_grad = beta(params_grad, gamma.size());
-            tt::layer_normalize_gradient(eps, gradient_input, means, invstds, sub.get_output(), g, sub.get_gradient_input(), g_grad, b_grad);
+            tt::layer_normalize_gradient(eps, gradient_input, means, invstds, sub.get_output(), g, sub.get_gradient_input(), g_grad, b_grad, dmeans, dvars);
         }
 
         const tensor& get_layer_params() const { return params; };
@@ -1493,6 +1493,7 @@ namespace dlib
         resizable_tensor params;
         alias_tensor gamma, beta;
         resizable_tensor means, invstds;
+        resizable_tensor dmeans, dvars;
         double learning_rate_multiplier;
         double weight_decay_multiplier;
         double bias_learning_rate_multiplier;

@@ -814,13 +814,13 @@ namespace dlib { namespace tt
     /*!
         requires
             - eps > 0
-            - src.num_samples() == gamma.size() == beta.size()
+            - src.k() == gamma.size() == beta.size()
+            - gamma.num_samples() == gamma.nr() == gamma.nc() == 1
             - have_same_dimensions(gamma, beta) == true
-            - beta.num_samples() ==beta.nr() ==gamma.nc() == 1
         ensures
             - have_same_dimensions(#dest, src) == true
             - #means.size() == invstds.size() == src.num_samples()
-            - #dest == the normalized version of src.
+            - #dest == the normalized version of src, sample-wise.
             - #means == the mean values of the contents of src.
             - #invstds == 1/(the standard deviation values of the contents of src).
     !*/
@@ -834,7 +834,9 @@ namespace dlib { namespace tt
             const tensor& gamma,
             tensor& src_grad,
             tensor& gamma_grad,
-            tensor& beta_grad
+            tensor& beta_grad,
+            resizable_tensor& dmeans,
+            resizable_tensor& dvars
     );
     /*!
         requires
@@ -847,8 +849,6 @@ namespace dlib { namespace tt
             - have_same_dimensions(gamma, beta_grad) == true
             - means.size() == src.num_samples()
             - invstds.size() == src.num_samples()
-            - have_same_dimensions(means, gamma) == true
-            - have_same_dimensions(invstds, gamma) == true
         ensures
             - Let f(src,gamma,beta) == dot(gradient_input, dest output of
               layer_normalize(eps,dest,means,invstds,src,gamma,beta))

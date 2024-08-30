@@ -1350,7 +1350,9 @@ namespace dlib
             const tensor& gamma,
             tensor& src_grad,
             tensor& gamma_grad,
-            tensor& beta_grad
+            tensor& beta_grad,
+            resizable_tensor& dmeans,
+            resizable_tensor& dvars
         )
         {
             const long num = src.nr() * src.nc();
@@ -1376,7 +1378,6 @@ namespace dlib
             const auto p_invstds = invstds.host();
             const auto p_means = means.host();
 
-            resizable_tensor dvars, dmeans;
             dvars.copy_size(invstds);
             dmeans.copy_size(means);
             dvars = 0;
@@ -1386,9 +1387,9 @@ namespace dlib
 
             for (long n = 0; n < src.num_samples(); ++n)
             {
+                const float invstd_pow = -0.5 * std::pow(p_invstds[n], 3.0f);
                 for (long k = 0; k < src.k(); ++k)
                 {
-                    const float invstd_pow = -0.5 * std::pow(p_invstds[n], 3.0f);
                     for (long i = 0; i < num; ++i)
                     {
                         const float x_hat = (*p_src - p_means[n]) * p_invstds[n];
