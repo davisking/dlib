@@ -2117,7 +2117,10 @@ namespace dlib
             // compute variances
             for (auto n : grid_stride_range_y(0, ns))
             {
-                v[n] = 1.0f / std::sqrt(v[n] - m[n] * m[n] + eps);
+                for (auto i : grid_stride_range(0, 1))
+                {
+                    v[n] = 1.0f / std::sqrt(v[n] - m[n] * m[n] + eps);
+                }
             }
             __syncthreads();
 
