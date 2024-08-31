@@ -1417,7 +1417,7 @@ namespace dlib
                     {
                         const float dx = *p_grad * p_gamma[k];
 
-                        p_dmeans[n] += -dx * p_invstds[n] + p_dvars[n] * -2 * (*p_src - p_means[n]) * invnum ;
+                        p_dmeans[n] += -dx * p_invstds[n] + p_dvars[n] * -2 * (*p_src - p_means[n]) * invnum;
 
                         ++p_grad;
                         ++p_src;

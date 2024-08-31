@@ -2184,20 +2184,20 @@ namespace dlib
             float* dv,
             float eps,
             size_t ns,
-            size_t k,
+            size_t ks,
             size_t num)
         {
             for (auto n : grid_stride_range_y(0, ns))
             {
-                const auto ps = s + n * k * num;
-                const auto pgi = gi + n * k * num;
+                const auto ps = s + n * ks * num;
+                const auto pgi = gi + n * ks * num;
                 const float invstd_pow = -0.5 * std::pow(v[n], 3.0f);
                 float temp_dv = 0;
-                for (auto i : grid_stride_range(0, k * num))
+                for (auto i : grid_stride_range(0, ks * num))
                 {
                     const float x_hat = (ps[i] - m[n]) * v[n];
-                    bg[i / num] += pgi[i];
-                    gg[i / num] += pgi[i] * x_hat;
+                    atomicAdd(&bg[i / num], pgi[i]);
+                    atomicAdd(&gg[i / num], pgi[i] * x_hat);
 
                     const float dx = pgi[i] * g[i / num];
                     temp_dv += dx * (ps[i] - m[n]) * invstd_pow;
@@ -2206,13 +2206,13 @@ namespace dlib
             }
             __syncthreads();
 
-            const float invnum = 1.0f / (k * num);
+            const float invnum = 1.0f / (ks * num);
             for (auto n : grid_stride_range_y(0, ns))
             {
-                const auto ps = s + n * k * num;
-                const auto pgi = gi + n * k * num;
+                const auto ps = s + n * ks * num;
+                const auto pgi = gi + n * ks * num;
                 float temp_dm = 0;
-                for (auto i : grid_stride_range(0, k * num))
+                for (auto i : grid_stride_range(0, ks * num))
                 {
                     const float dx = pgi[i] * g[i / num];
                     temp_dm += -dx * v[n] + dv[n] * -2 * (ps[i] - m[n]) * invnum;
@@ -2223,10 +2223,10 @@ namespace dlib
 
             for (auto n : grid_stride_range_y(0, ns))
             {
-                const auto ps = s + n * k * num;
-                const auto pgi = gi + n * k * num;
-                const auto pout = out + n * k * num;
-                for (auto i : grid_stride_range(0, k * num))
+                const auto ps = s + n * ks * num;
+                const auto pgi = gi + n * ks * num;
+                const auto pout = out + n * ks * num;
+                for (auto i : grid_stride_range(0, ks * num))
                 {
                     const float dx = pgi[i] * g[i / num];
                     pout[i] += dx * v[n] + dv[n] * 2 * (ps[i] - m[n]) * invnum + dm[n] * invnum;
