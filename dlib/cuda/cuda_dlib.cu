@@ -2190,37 +2190,27 @@ namespace dlib
             size_t ks,
             size_t num)
         {
-            for (auto n : grid_stride_range_y(0, ns))
-            {
-                const auto ps = s + n * ks * num;
-                const auto pgi = gi + n * ks * num;
-                const float invstd_pow = -0.5 * std::pow(v[n], 3.0f);
-                float temp_dv = 0;
-                for (auto i : grid_stride_range(0, ks * num))
-                {
-                    const float dx = pgi[i] * g[i / num];
-                    temp_dv += dx * (ps[i] - m[n]) * invstd_pow;
-                }
-                warp_reduce_atomic_add(dv[n], temp_dv);
-            }
-            __syncthreads();
-
             for (auto nk : grid_stride_range_y(0, ns * ks))
             {
                 const auto n = nk / ks;
                 const auto k = nk % ks;
                 const auto ps = s + (n * ks + k) * num;
                 const auto pgi = gi + (n * ks + k) * num;
+                const float invstd_pow = -0.5 * std::pow(v[n], 3.0f);
                 float temp_bg = 0;
                 float temp_gg = 0;
+                float temp_dv = 0;
                 for (auto i : grid_stride_range(0, num))
                 {
                     const float x_hat = (ps[i] - m[n]) * v[n];
+                    const float dx = pgi[i] * g[i / num];
                     temp_bg += pgi[i];
                     temp_gg += pgi[i] * x_hat;
+                    temp_dv += dx * (ps[i] - m[n]) * invstd_pow;
                 }
                 warp_reduce_atomic_add(bg[k], temp_bg);
                 warp_reduce_atomic_add(gg[k], temp_gg);
+                warp_reduce_atomic_add(dv[n], temp_dv);
             }
             __syncthreads();
 
