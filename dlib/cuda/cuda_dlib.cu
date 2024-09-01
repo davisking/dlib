@@ -2198,14 +2198,29 @@ namespace dlib
                 float temp_dv = 0;
                 for (auto i : grid_stride_range(0, ks * num))
                 {
-                    const float x_hat = (ps[i] - m[n]) * v[n];
-                    atomicAdd(&bg[i / num], pgi[i]);
-                    atomicAdd(&gg[i / num], pgi[i] * x_hat);
-
                     const float dx = pgi[i] * g[i / num];
                     temp_dv += dx * (ps[i] - m[n]) * invstd_pow;
                 }
                 warp_reduce_atomic_add(dv[n], temp_dv);
+            }
+            __syncthreads();
+
+            for (auto nk : grid_stride_range_y(0, ns * ks))
+            {
+                const auto n = nk / ks;
+                const auto k = nk % ks;
+                const auto ps = s + (n * ks + k) * num;
+                const auto pgi = gi + (n * ks + k) * num;
+                float temp_bg = 0;
+                float temp_gg = 0;
+                for (auto i : grid_stride_range(0, num))
+                {
+                    const float x_hat = (ps[i] - m[n]) * v[n];
+                    temp_bg += pgi[i];
+                    temp_gg += pgi[i] * x_hat;
+                }
+                warp_reduce_atomic_add(bg[k], temp_bg);
+                warp_reduce_atomic_add(gg[k], temp_gg);
             }
             __syncthreads();
 
