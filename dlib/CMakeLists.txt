@@ -647,16 +647,15 @@ if (NOT TARGET dlib)
          endif()
       endif()
 
-      find_package(OpenMP)
-      set(openmp_libraries ${OpenMP_CXX_FLAGS}) 
-
 
       if (DLIB_USE_CUDA)
          find_package(CUDAToolkit 9.1)
          set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake_utils)
          find_package(CUDNN)
+         find_package(OpenMP)
+         set(openmp_libraries ${OpenMP_CXX_FLAGS}) 
 
-         if (CUDAToolkit_FOUND AND CUDNN_FOUND)
+         if (CUDAToolkit_FOUND AND CUDNN_FOUND AND OPENMP_FOUND)
             set(source_files ${source_files} 
                cuda/cuda_dlib.cu 
                cuda/cudnn_dlibapi.cpp

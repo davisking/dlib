@@ -3,7 +3,7 @@
 # that additional library dependencies can be added like this: add_mex_function(name lib1 dlib libetc).
 # That is, just add more libraries after the name and they will be build into the mex file.
 
-cmake_minimum_required(VERSION 3.8.0)
+cmake_minimum_required(VERSION 3.17.0)
 
 set(BUILDING_MATLAB_MEX_FILE true)
 set(CMAKE_POSITION_INDEPENDENT_CODE True)

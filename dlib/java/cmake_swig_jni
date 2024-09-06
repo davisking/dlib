@@ -2,7 +2,7 @@
 # it by defining some CMake variables and then include(cmake_swig_jni).  You
 # would make a CMakeLists.txt file that looks like the following:
 #
-#   cmake_minimum_required (VERSION 3.8.0)
+#   cmake_minimum_required (VERSION 3.17.0)
 #   project (example)
 #   set(java_package_name "org.mycompany")
 #   set(source_files
@@ -40,7 +40,7 @@
 ################################################################################
 ################################################################################
 
-cmake_minimum_required (VERSION 3.8.0)
+cmake_minimum_required (VERSION 3.17.0)
 
 # This block of code tries to figure out what the JAVA_HOME environment
 # variable should be by looking at the folder that contains the java

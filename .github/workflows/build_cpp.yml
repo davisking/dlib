@@ -4,7 +4,6 @@ on:
   push:
     branches:
     - master
-    - cuda-cmake
     paths:
     - ".github/workflows/build_cpp.yml"
     - "**.cpp"
@@ -31,7 +30,7 @@ defaults:
     working-directory: dlib/test
 
 jobs:
-  ubuntu-latest-gcc-default-cmake-3-8-ffmpeg5:
+  ubuntu-latest-gcc-default-cmake-3-17-ffmpeg5:
     runs-on: 'ubuntu-latest'
     steps:
     - uses: actions/checkout@v2
@@ -41,18 +40,18 @@ jobs:
         sudo apt update
         sudo apt install libwebp-dev make yasm
         
-    - name: Cache cmake 3.8.0
+    - name: Cache cmake 3.17.0
       uses: actions/cache@v3
       id: cache-cmake-download
       with:
         # cache this folder:
-        path: ~/cmake-3.8.0-Linux-x86_64
-        key: cmake-3.8.0_try3
+        path: ~/cmake-3.17.0-Linux-x86_64
+        key: cmake-3.17.0_try3
         
     - run: |
         # Get the minimum version of cmake dlib supports
-        wget https://cmake.org/files/v3.8/cmake-3.8.0-Linux-x86_64.tar.gz
-        tar -xf cmake-3.8.0-Linux-x86_64.tar.gz -C ~
+        wget https://cmake.org/files/v3.17/cmake-3.17.0-Linux-x86_64.tar.gz
+        tar -xf cmake-3.17.0-Linux-x86_64.tar.gz -C ~
       if: steps.cache-cmake-download.outputs.cache-hit != 'true'
 
     - name: Cache FFmpeg 5
@@ -77,7 +76,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        ~/cmake-3.8.0-Linux-x86_64/bin/cmake -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n5.1.3_installation .. 
+        ~/cmake-3.17.0-Linux-x86_64/bin/cmake -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n5.1.3_installation .. 
     
     - name: Build just tests
       run: |

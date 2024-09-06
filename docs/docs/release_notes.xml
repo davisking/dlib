@@ -58,7 +58,7 @@ New Features and Improvements:
    - FFMPEG wrappers: dlib::ffmpeg::decoder and dlib::ffmpeg::demuxer (PR #2707)
 
 Non-Backwards Compatible Changes:
-   - Dlib now requires C++14 and at least CMake version 3.8.0.
+   - Dlib now requires C++14 and at least CMake version 3.17.0.
 
 Bug fixes:
    - Various adjustments to avoid errors on unusual platforms of system configurations.
