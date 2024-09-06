@@ -4,6 +4,7 @@ on:
   push:
     branches:
     - master
+    - cuda-cmake
     paths:
     - ".github/workflows/build_cpp.yml"
     - "**.cpp"

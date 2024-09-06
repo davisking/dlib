@@ -4,7 +4,7 @@
 #
 
 
-cmake_minimum_required(VERSION 3.8.0)
+cmake_minimum_required(VERSION 3.17.0)
 
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
@@ -647,160 +647,16 @@ if (NOT TARGET dlib)
          endif()
       endif()
 
+      find_package(OpenMP)
+      set(openmp_libraries ${OpenMP_CXX_FLAGS}) 
+
 
       if (DLIB_USE_CUDA)
-         find_package(CUDA 7.5)
+         find_package(CUDAToolkit 9.1)
+         set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake_utils)
+         find_package(CUDNN)
 
-         if (CUDA_VERSION VERSION_GREATER 9.1 AND CMAKE_VERSION VERSION_LESS 3.12.2)
-            # This bit of weirdness is to work around a bug in cmake 
-            list(REMOVE_ITEM CUDA_CUBLAS_LIBRARIES "CUDA_cublas_device_LIBRARY-NOTFOUND")
-         endif()
-
-
-         if (CUDA_FOUND AND MSVC AND NOT CUDA_CUBLAS_LIBRARIES AND "${CMAKE_SIZEOF_VOID_P}" EQUAL "4")
-            message(WARNING "You have CUDA installed, but we can't use it unless you put visual studio in 64bit mode.")
-            set(CUDA_FOUND 0)
-         endif()
-
-         if (NOT CUDA_CUBLAS_LIBRARIES)
-            message(STATUS "Found CUDA, but CMake was unable to find the cuBLAS libraries that should be part of every basic CUDA "
-               "install. Your CUDA install is somehow broken or incomplete. Since cuBLAS is required for dlib to use CUDA we won't use CUDA.")
-            set(CUDA_FOUND 0)
-         endif()
-
-         if (CUDA_FOUND)
-
-            # There is some bug in cmake that causes it to mess up the
-            # -std=c++11 option if you let it propagate it to nvcc in some
-            # cases.  So instead we disable this and manually include
-            # things from CMAKE_CXX_FLAGS in the CUDA_NVCC_FLAGS list below.
-            if (APPLE)
-               set(CUDA_PROPAGATE_HOST_FLAGS OFF)
-               # Grab all the -D flags from CMAKE_CXX_FLAGS so we can pass them
-               # to nvcc.
-               string(REGEX MATCHALL "-D[^ ]*" FLAGS_FOR_NVCC "${CMAKE_CXX_FLAGS}")
-
-               # Check if we are being built as part of a pybind11 module. 
-               if (COMMAND pybind11_add_module)
-                  # Don't export unnecessary symbols.
-                  list(APPEND FLAGS_FOR_NVCC "-Xcompiler=-fvisibility=hidden")
-               endif()
-            endif()
-
-            set(CUDA_HOST_COMPILATION_CPP ON)
-            string(REPLACE "," ";" DLIB_CUDA_COMPUTE_CAPABILITIES ${DLIB_USE_CUDA_COMPUTE_CAPABILITIES})
-            foreach(CAP ${DLIB_CUDA_COMPUTE_CAPABILITIES})
-                list(APPEND CUDA_NVCC_FLAGS "-gencode arch=compute_${CAP},code=[sm_${CAP},compute_${CAP}]")
-            endforeach()
-            # Note that we add __STRICT_ANSI__ to avoid freaking out nvcc with gcc specific
-            # magic in the standard C++ header files (since nvcc uses gcc headers on linux).
-            list(APPEND CUDA_NVCC_FLAGS "-D__STRICT_ANSI__;-D_MWAITXINTRIN_H_INCLUDED;-D_FORCE_INLINES;${FLAGS_FOR_NVCC}")
-            list(APPEND CUDA_NVCC_FLAGS ${active_preprocessor_switches})
-            if (NOT DLIB_IN_PROJECT_BUILD)
-               LIST(APPEND CUDA_NVCC_FLAGS -DDLIB__CMAKE_GENERATED_A_CONFIG_H_FILE)
-            endif()
-            if (NOT MSVC)
-               list(APPEND CUDA_NVCC_FLAGS "-std=c++14")
-            endif()
-            if (CMAKE_POSITION_INDEPENDENT_CODE)
-               # sometimes this setting isn't propagated to NVCC, which then causes the
-               # compile to fail.  So make sure it's propagated.
-               if (NOT MSVC) # Visual studio doesn't have -fPIC so don't do it in that case.
-                  list(APPEND CUDA_NVCC_FLAGS "-Xcompiler -fPIC")
-               endif()
-            endif()
-
-            include(cmake_utils/test_for_cudnn/find_cudnn.txt)
-
-            if (cudnn AND cudnn_include AND NOT DEFINED cuda_test_compile_worked AND NOT DEFINED cudnn_test_compile_worked)
-               # make sure cuda is really working by doing a test compile
-               message(STATUS "Building a CUDA test project to see if your compiler is compatible with CUDA...")
-
-               set(CUDA_TEST_CMAKE_FLAGS 
-                  "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
-                  "-DCMAKE_INCLUDE_PATH=${CMAKE_INCLUDE_PATH}"
-                  "-DCMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH}")
-
-               if (NOT MSVC) # see https://github.com/davisking/dlib/issues/363
-                  list(APPEND CUDA_TEST_CMAKE_FLAGS "-DCUDA_HOST_COMPILER=${CUDA_HOST_COMPILER}")
-               endif()
-
-               try_compile(cuda_test_compile_worked 
-                  ${PROJECT_BINARY_DIR}/cuda_test_build 
-                  ${PROJECT_SOURCE_DIR}/cmake_utils/test_for_cuda cuda_test
-                  CMAKE_FLAGS ${CUDA_TEST_CMAKE_FLAGS}
-                  OUTPUT_VARIABLE try_compile_output_message
-                  )
-               if (NOT cuda_test_compile_worked)
-                  string(REPLACE "\n" "\n   ***   " try_compile_output_message "${try_compile_output_message}")
-                  message(STATUS "*****************************************************************************************************************")
-                  message(STATUS "*** CUDA was found but your compiler failed to compile a simple CUDA program so dlib isn't going to use CUDA. ")
-                  message(STATUS "*** The output of the failed CUDA test compile is shown below: ")
-                  message(STATUS "*** ")
-                  message(STATUS "***   ${try_compile_output_message}")
-                  message(STATUS "*****************************************************************************************************************")
-               else()
-                  message(STATUS "Building a cuDNN test project to check if you have the right version of cuDNN installed...")
-                  try_compile(cudnn_test_compile_worked 
-                     ${PROJECT_BINARY_DIR}/cudnn_test_build 
-                     ${PROJECT_SOURCE_DIR}/cmake_utils/test_for_cudnn cudnn_test
-                     CMAKE_FLAGS ${CUDA_TEST_CMAKE_FLAGS}
-                     OUTPUT_VARIABLE try_compile_output_message
-                     )
-                  if (NOT cudnn_test_compile_worked)
-                     string(REPLACE "\n" "\n   ***   " try_compile_output_message "${try_compile_output_message}")
-                     message(STATUS "*****************************************************************************************************")
-                     message(STATUS "*** Found cuDNN, but we failed to compile the dlib/cmake_utils/test_for_cudnn project. ")
-                     message(STATUS "*** You either have an unsupported version of cuDNN or something is wrong with your cudDNN install.")
-                     message(STATUS "*** Since a functional cuDNN is not found DLIB WILL NOT USE CUDA. ")
-                     message(STATUS "*** The output of the failed test_for_cudnn build is: ")
-                     message(STATUS "*** ")
-                     message(STATUS "***   ${try_compile_output_message}")
-                     message(STATUS "*****************************************************************************************************")
-                  endif()
-               endif()
-            endif()
-
-            # Find where cuSOLVER is since the FindCUDA cmake package doesn't
-            # bother to look for it in older versions of cmake.
-            if (NOT CUDA_cusolver_LIBRARY)
-               get_filename_component(cuda_blas_path "${CUDA_CUBLAS_LIBRARIES}" DIRECTORY)
-               find_library(CUDA_cusolver_LIBRARY cusolver HINTS ${cuda_blas_path})
-               # CUDA 10.1 doesn't install symbolic links to libcusolver.so in
-               # the usual place.  This is probably a bug in the cuda
-               # installer.  In any case, If we haven't found cusolver yet go
-               # look in the cuda install folder for it.  New versions of cmake
-               # do this correctly, but older versions need help.
-               if (NOT CUDA_cusolver_LIBRARY)
-                  find_library(CUDA_cusolver_LIBRARY cusolver HINTS 
-                     /usr/local/cuda/lib64/
-                     )
-               endif()
-               mark_as_advanced(CUDA_cusolver_LIBRARY)
-            endif()
-            # Also find OpenMP since cuSOLVER needs it.  Importantly, we only
-            # look for one to link to if our use of BLAS, specifically the
-            # Intel MKL, hasn't already decided what to use.  This is because
-            # it makes the MKL bug out if you link to another openmp lib other
-            # than Intel's when you use the MKL. I'm also not really sure when
-            # explicit linking to openmp became unnecessary, but for
-            # sufficiently older versions of cuda it was needed.  Then in
-            # versions of cmake newer than 3.11 linking to openmp started to
-            # mess up the switches passed to nvcc, so you can't just leave
-            # these "try to link to openmp" statements here going forward.  Fun
-            # times.
-            if (CUDA_VERSION VERSION_LESS "9.1" AND NOT openmp_libraries AND NOT MSVC AND NOT XCODE AND NOT APPLE)
-               find_package(OpenMP)
-               if (OPENMP_FOUND)
-                  set(openmp_libraries ${OpenMP_CXX_FLAGS}) 
-               else()
-                  message(STATUS "*** Didn't find OpenMP, which is required to use CUDA. ***")
-                  set(CUDA_FOUND 0)
-               endif()
-            endif()
-         endif()
-
-         if (CUDA_FOUND AND cudnn AND cuda_test_compile_worked AND cudnn_test_compile_worked AND cudnn_include)
+         if (CUDAToolkit_FOUND AND CUDNN_FOUND)
             set(source_files ${source_files} 
                cuda/cuda_dlib.cu 
                cuda/cudnn_dlibapi.cpp
@@ -810,19 +666,17 @@ if (NOT TARGET dlib)
                cuda/cuda_data_ptr.cpp
                cuda/gpu_data.cpp
                )
-            list (APPEND dlib_needed_private_libraries ${CUDA_CUBLAS_LIBRARIES})
-            list (APPEND dlib_needed_private_libraries ${cudnn})
-            list (APPEND dlib_needed_private_libraries ${CUDA_curand_LIBRARY})
-            list (APPEND dlib_needed_private_libraries ${CUDA_cusolver_LIBRARY})
-            list (APPEND dlib_needed_private_libraries ${CUDA_CUDART_LIBRARY})
-            if(openmp_libraries)
-               list (APPEND dlib_needed_private_libraries ${openmp_libraries})
-            endif()
+            list (APPEND dlib_needed_private_libraries CUDA::cublas)
+            list (APPEND dlib_needed_private_libraries ${CUDNN_LIBRARY_PATH})
+            list (APPEND dlib_needed_private_libraries CUDA::curand)
+            list (APPEND dlib_needed_private_libraries CUDA::cusolver)
+            list (APPEND dlib_needed_private_libraries CUDA::cudart)
+            list (APPEND dlib_needed_private_libraries ${openmp_libraries})
 
-            include_directories(${cudnn_include})
+            include_directories(${CUDAToolkit_INCLUDE_DIRS} ${CUDNN_INCLUDE_PATH})
             message(STATUS "Enabling CUDA support for dlib.  DLIB WILL USE CUDA, compute capabilities: ${DLIB_CUDA_COMPUTE_CAPABILITIES}")
          else()
-            set(DLIB_USE_CUDA OFF CACHE STRING ${DLIB_USE_BLAS_STR} FORCE )
+            set(DLIB_USE_CUDA OFF CACHE BOOL ${DLIB_USE_BLAS_STR} FORCE )
             toggle_preprocessor_switch(DLIB_USE_CUDA)
             if (NOT CUDA_FOUND)
                message(STATUS "DID NOT FIND CUDA")
@@ -875,15 +729,7 @@ if (NOT TARGET dlib)
          endif()
       endif()
 
-      # Tell CMake to build dlib via add_library()/cuda_add_library()
-      if (DLIB_USE_CUDA)
-         # The old cuda_add_library() command doesn't support CMake's newer dependency
-         # stuff, so we have to set the include path manually still, which we do here.
-         include_directories(${dlib_needed_public_includes})
-         cuda_add_library(dlib ${source_files} )
-      else()
-         add_library(dlib ${source_files} )
-      endif()
+      add_library(dlib ${source_files} )
 
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
 
