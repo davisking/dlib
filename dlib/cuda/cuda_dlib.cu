@@ -2280,6 +2280,166 @@ namespace dlib
                           dmeans.device(), dvars.device(), eps, src.num_samples(), src.k(), num);
         }
 
+   // ----------------------------------------------------------------------------------------
+
+        __global__ void _cuda_rms_normalize(
+            float* dest,
+            float* scale,
+            const float* src,
+            const float* gamma,
+            float eps,
+            size_t ns,
+            size_t ks,
+            size_t num
+        )
+        {
+            for (auto n : grid_stride_range_y(0, ns))
+            {
+                const auto ps = src + n * ks * num;
+                float sum_squares = 0.0f;
+                for (auto i : grid_stride_range(0, ks * num))
+                {
+                    sum_squares += ps[i] * ps[i];
+                }
+                warp_reduce_atomic_add(scale[n], sum_squares / (ks * num));
+            }
+            __syncthreads();
+
+            for (auto n : grid_stride_range_y(0, ns))
+            {
+                for (auto i : grid_stride_range(0, 1))
+                {
+                    scale[n] = 1.0f / std::sqrt(scale[n] + eps);
+                }
+            }
+            __syncthreads();
+
+            for (auto n : grid_stride_range_y(0, ns))
+            {
+                const auto ps = src + n * ks * num;
+                const auto pd = dest + n * ks * num;
+                for (auto i : grid_stride_range(0, ks * num))
+                {
+                    pd[i] = ps[i] * scale[n] * gamma[i / num];
+                }
+            }
+        }
+
+        void rms_normalize(
+            const double eps,
+            resizable_tensor& dest,
+            resizable_tensor& scale,
+            const tensor& src,
+            const tensor& gamma
+        )
+        {            
+            DLIB_CASSERT(
+                gamma.k() == src.k() &&
+                gamma.nr() == 1 &&
+                gamma.nc() == 1 &&
+                eps > 0,
+                "\nsrc.k():    " << src.k() <<
+                "\ngamma.k():  " << gamma.k() <<
+                "\ngamma.nr(): " << gamma.nr() <<
+                "\ngamma.nc(): " << gamma.nc() <<
+                "\neps:  " << eps
+            );
+
+            const long ns = src.num_samples();
+            const long ks = src.k();
+            const long num = src.nr() * src.nc();
+
+            dest.copy_size(src);
+            scale.set_size(ns);
+            scale = 0;
+
+            launch_kernel(_cuda_rms_normalize, max_jobs(ks * num, ns),
+                dest.device(), scale.device(), src.device(), gamma.device(), eps, ns, ks, num);
+        }
+
+   // ----------------------------------------------------------------------------------------
+
+        __global__ void _cuda_rms_normalize_gradient(
+            float* src_grad,
+            float* gamma_grad,
+            float* dscale,
+            const float* src,
+            const float* gradient_input,
+            const float* scale,
+            const float* gamma,
+            size_t ns, 
+            size_t ks,  
+            size_t num 
+        )
+        {
+            for (auto nk : grid_stride_range_y(0, ns * ks))
+            {
+                const auto n = nk / ks;
+                const auto k = nk % ks;
+                const auto ps = src + (n * ks + k) * num;
+                const auto pgi = gradient_input + (n * ks + k) * num;
+                const float scale_pow = -0.5f * std::pow(scale[n], 3.0f);
+                float temp_gg = 0.0f;
+                float temp_ds = 0.0f;
+                for (auto i : grid_stride_range(0, num))
+                {
+                    const float x_hat = ps[i] * scale[n];
+                    const float dx = pgi[i] * gamma[i / num];
+                    temp_gg += pgi[i] * x_hat;
+                    temp_ds += dx * ps[i] * scale_pow;
+                }
+                warp_reduce_atomic_add(gamma_grad[k], temp_gg);
+                warp_reduce_atomic_add(dscale[n], temp_ds);
+            }
+            __syncthreads();
+
+            const float invnum = 1.0f / (ks * num);
+            for (auto n : grid_stride_range_y(0, ns))
+            {
+                const auto ps = src + n * ks * num;
+                const auto pgi = gradient_input + n * ks * num;
+                const auto psg = src_grad + n * ks * num;
+                for (auto i : grid_stride_range(0, ks * num))
+                {
+                    const float dx = pgi[i] * gamma[i / num];
+                    psg[i] += dx * scale[n] + dscale[n] * 2 * ps[i] * invnum;
+                }
+            }
+        }
+
+        void rms_normalize_gradient(
+            const tensor& gradient_input,
+            const tensor& scale,
+            const tensor& src,
+            const tensor& gamma,
+            tensor& src_grad,
+            tensor& gamma_grad,
+            resizable_tensor& dscale
+        )
+        {            
+            DLIB_CASSERT(src.num_samples() == scale.size());
+            DLIB_CASSERT(have_same_dimensions(gamma, gamma_grad));
+            DLIB_CASSERT(gamma.k() == src.k());
+            DLIB_CASSERT(gamma.nr() == 1);
+            DLIB_CASSERT(gamma.nc() == 1);
+            DLIB_CASSERT(have_same_dimensions(gradient_input, src));
+            DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad));
+
+            const long ns = src.num_samples();
+            const long ks = src.k();
+            const long num = src.nr() * src.nc();
+
+            gamma_grad = 0;
+            dscale.copy_size(scale);
+            dscale = 0;
+
+            // Lancement du kernel CUDA
+            launch_kernel(_cuda_rms_normalize_gradient, max_jobs(ks * num, ns),
+                src_grad.device(), gamma_grad.device(), dscale.device(),
+                src.device(), gradient_input.device(), scale.device(), gamma.device(),
+                ns, ks, num);
+        }
+
     // ----------------------------------------------------------------------------------------
 
         __global__ void _cuda_copy_tensor_add_to (float* dest, size_t size,  const float* src,  size_t dest_stride, size_t src_stride, size_t block_size)

@@ -308,6 +308,14 @@ namespace dlib
                 set_bias_weight_decay_multiplier(l.subnet().layer_details(), 0);
             }
 
+            template <typename U, typename E>
+            void disable_input_bias(add_layer<rms_norm_, U, E>& l)
+            {
+                disable_bias(l.subnet().layer_details());
+                set_bias_learning_rate_multiplier(l.subnet().layer_details(), 0);
+                set_bias_weight_decay_multiplier(l.subnet().layer_details(), 0);
+            }            
+
             template <layer_mode mode, typename U, typename E>
             void disable_input_bias(add_layer<bn_<mode>, U, E>& l)
             {
@@ -333,6 +341,14 @@ namespace dlib
                 set_bias_weight_decay_multiplier(l.subnet().get_repeated_layer(0).layer_details(), 0);
             }
 
+            template <size_t N, template <typename> class R, typename U, typename E>
+            void disable_input_bias(add_layer<rms_norm_, repeat<N, R, U>, E>& l)
+            {
+                disable_bias(l.subnet().get_repeated_layer(0).layer_details());
+                set_bias_learning_rate_multiplier(l.subnet().get_repeated_layer(0).layer_details(), 0);
+                set_bias_weight_decay_multiplier(l.subnet().get_repeated_layer(0).layer_details(), 0);
+            }            
+
             // handle input repeat layer with tag case
             template <layer_mode mode, unsigned long ID, typename E>
             void disable_input_bias(add_layer<bn_<mode>, add_tag_layer<ID, impl::repeat_input_layer>, E>& )
@@ -343,6 +359,11 @@ namespace dlib
             void disable_input_bias(add_layer<layer_norm_, add_tag_layer<ID, impl::repeat_input_layer>, E>& )
             {
             }
+
+            template <unsigned long ID, typename E>
+            void disable_input_bias(add_layer<rms_norm_, add_tag_layer<ID, impl::repeat_input_layer>, E>& )
+            {
+            }            
 
             // handle tag layer case
             template <layer_mode mode, unsigned long ID, typename U, typename E>
@@ -355,6 +376,11 @@ namespace dlib
             {
             }
 
+            template <unsigned long ID, typename U, typename E>
+            void disable_input_bias(add_layer<rms_norm_, add_tag_layer<ID, U>, E>& )
+            {
+            }            
+
             // handle skip layer case
             template <layer_mode mode, template <typename> class TAG, typename U, typename E>
             void disable_input_bias(add_layer<bn_<mode>, add_skip_layer<TAG, U>, E>& )
@@ -365,6 +391,11 @@ namespace dlib
             void disable_input_bias(add_layer<layer_norm_, add_skip_layer<TAG, U>, E>& )
             {
             }
+
+            template <template <typename> class TAG, typename U, typename E>
+            void disable_input_bias(add_layer<rms_norm_, add_skip_layer<TAG, U>, E>& )
+            {
+            }            
 
             template<typename input_layer_type>
             void operator()(size_t , input_layer_type& ) const
@@ -740,6 +771,14 @@ namespace dlib
                 end_node();
                 update(i);
             }
+
+            template <typename U, typename E>
+            void operator()(size_t i, const add_layer<rms_norm_, U, E>&)
+            {
+                start_node(i, "rms_norm");
+                end_node();
+                update(i);
+            }            
 
             template <layer_mode MODE, typename U, typename E>
             void operator()(size_t i, const add_layer<bn_<MODE>, U, E>&)

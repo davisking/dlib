@@ -698,6 +698,40 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void rms_normalize(
+        const double eps,
+        resizable_tensor& dest,
+        resizable_tensor& scale,
+        const tensor& src,
+        const tensor& gamma
+    )
+    {            
+#ifdef DLIB_USE_CUDA
+        cuda::rms_normalize(eps, dest, scale, src, gamma);
+#else
+        cpu::rms_normalize(eps, dest, scale, src, gamma);
+#endif
+    }
+
+    void rms_normalize_gradient(
+        const tensor& gradient_input,
+        const tensor& scale,
+        const tensor& src,
+        const tensor& gamma,
+        tensor& src_grad,
+        tensor& gamma_grad,
+        resizable_tensor& dscale
+    )
+    {            
+#ifdef DLIB_USE_CUDA
+        cuda::rms_normalize_gradient(gradient_input, scale, src, gamma, src_grad, gamma_grad, dscale);
+#else
+        cpu::rms_normalize_gradient(gradient_input, scale, src, gamma, src_grad, gamma_grad, dscale);
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void threshold (
         tensor& data,
         float thresh

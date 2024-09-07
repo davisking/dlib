@@ -1447,6 +1447,144 @@ namespace dlib
             }
         }
 
+// -----------------------------------------------------------------------------------
+
+        void rms_normalize(
+            const double eps,
+            resizable_tensor& dest,
+            resizable_tensor& scale,
+            const tensor& src,
+            const tensor& gamma
+        )
+        {
+            DLIB_CASSERT(
+                gamma.k() == src.k() &&
+                gamma.nr() == 1 &&
+                gamma.nc() == 1 &&
+                eps > 0,
+                "\nsrc.k():    " << src.k() <<
+                "\ngamma.k():  " << gamma.k() <<
+                "\ngamma.nr(): " << gamma.nr() <<
+                "\ngamma.nc(): " << gamma.nc() <<
+                "\neps:  " << eps
+            );
+
+            const long ns = src.num_samples();
+            const long ks = src.k();
+            const long num = src.nr() * src.nc();
+
+            dest.copy_size(src);
+            scale.set_size(ns);
+
+            // Compute RMS values
+            scale = 0;
+            const float* p_src = src.host();
+            float* p_scale = scale.host();
+            for (long n = 0; n < ns; ++n)
+            {
+                for (long k = 0; k < ks; ++k)
+                {
+                    for (long i = 0; i < num; ++i)
+                    {
+                        p_scale[n] += (*p_src) * (*p_src);
+                        ++p_src;
+                    }
+                }
+                p_scale[n] = 1.0f / std::sqrt(p_scale[n] / (ks * num) + static_cast<float>(eps));
+            }
+            scale.host();
+
+            // Apply RMS normalization
+            p_src = src.host();
+            float* p_dest = dest.host();
+            const float* p_gamma = gamma.host();
+            for (long n = 0; n < ns; ++n)
+            {
+                for (long k = 0; k < ks; ++k)
+                {
+                    for (long i = 0; i < num; ++i)
+                    {
+                        *p_dest = (*p_src) * p_scale[n] * p_gamma[k];
+                        ++p_src;
+                        ++p_dest;
+                    }
+                }
+            }
+        }
+
+        void rms_normalize_gradient(
+            const tensor& gradient_input,
+            const tensor& scale,
+            const tensor& src,
+            const tensor& gamma,
+            tensor& src_grad,
+            tensor& gamma_grad,
+            resizable_tensor& dscale
+        )
+        {
+            DLIB_CASSERT(src.num_samples() == scale.size());
+            DLIB_CASSERT(have_same_dimensions(gamma, gamma_grad));
+            DLIB_CASSERT(gamma.k() == src.k());
+            DLIB_CASSERT(gamma.nr() == 1);
+            DLIB_CASSERT(gamma.nc() == 1);
+            DLIB_CASSERT(have_same_dimensions(gradient_input, src));
+            DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad));
+
+            const long ns = src.num_samples();
+            const long ks = src.k();
+            const long num = src.nr() * src.nc();
+
+            gamma_grad = 0;
+            dscale.copy_size(scale);
+            dscale = 0;
+
+            auto p_grad = gradient_input.host();
+            auto p_src = src.host();
+            const auto p_gamma = gamma.host();
+            const auto p_gamma_grad = gamma_grad.host();
+            const auto p_scale = scale.host();
+            auto p_dscale = dscale.host();
+
+            for (long n = 0; n < ns; ++n)
+            {
+                const float scale_pow = -0.5f * std::pow(p_scale[n], 3.0f);
+                for (long k = 0; k < ks; ++k)
+                {
+                    for (long i = 0; i < num; ++i)
+                    {
+                        const float x_hat = *p_src * p_scale[n];
+                        p_gamma_grad[k] += (*p_grad) * x_hat;
+
+                        const float dx = *p_grad * p_gamma[k];
+                        p_dscale[n] += dx * *p_src * scale_pow;
+
+                        ++p_grad;
+                        ++p_src;
+                    }
+                }
+            }
+
+            p_grad = gradient_input.host();
+            p_src = src.host();
+            auto p_src_grad = src_grad.host();
+            const float invnum = 1.0f / (ks * num);
+            for (long n = 0; n < ns; ++n)
+            {
+                for (long k = 0; k < ks; ++k)
+                {
+                    for (long i = 0; i < num; ++i)
+                    {
+                        const float dx = *p_grad * p_gamma[k];
+                        *p_src_grad += dx * p_scale[n] + p_dscale[n] * 2 * *p_src * invnum;
+
+                        ++p_grad;
+                        ++p_src;
+                        ++p_src_grad;
+                    }
+                }
+            }
+        }
+
     // -----------------------------------------------------------------------------------
 
         void threshold (
