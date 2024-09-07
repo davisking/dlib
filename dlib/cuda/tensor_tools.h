@@ -857,55 +857,58 @@ namespace dlib { namespace tt
             - Assigns the gradient of f() with respect to beta to #beta_grad.
     !*/
 
-        // -----------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------
 
-        void rms_normalize(
-            const double eps,
-            resizable_tensor& dest,
-            resizable_tensor& scale,
-            const tensor& src,
-            const tensor& gamma
-        );
-        /*!
-            requires
-                - eps > 0
-                - src.num_samples() == gamma.size()
-                - gamma.num_samples() == gamma.nr() == gamma.nc() == 1
-            ensures
-                - have_same_dimensions(#dest, src) == true
-                - #scale.size() == src.num_samples()
-                - #dest == the RMS normalized version of src.
-                - #scale == the scaling factors used to normalize src.
-        !*/
+    void rms_normalize(
+        const double eps,
+        resizable_tensor& dest,
+        resizable_tensor& scale,
+        const tensor& src,
+        const tensor& gamma
+    );
+    /*!
+        requires
+            - eps > 0
+            - gamma.k() == src.k()
+            - gamma.nr() == 1
+            - gamma.nc() == 1
+        ensures
+            - have_same_dimensions(#dest, src) == true
+            - #scale.size() == src.num_samples()
+            - #dest == the RMS normalized version of src
+            - #scale contains the RMS (Root Mean Square) values used to normalize each sample of src.
+            - Each element of #dest is computed as:
+                - #dest[n, k, i, j] == src[n, k, i, j] * gamma[k] / scale[n]
+            where n is the sample index, k is the channel index, and i, j are the spatial indices.
+    !*/
 
-        void rms_normalize_gradient(
-            const double eps,
-            const tensor& gradient_input,
-            const tensor& scale,
-            const tensor& src,
-            const tensor& gamma,
-            tensor& src_grad,
-            tensor& gamma_grad,
-            tensor& dscale
-        );
-        /*!
-            requires
-                - eps > 0
-                - scale should be the output of a call to
-                  rms_normalize(eps,dest,scale,src,gamma)
-                - have_same_dimensions(gradient_input, src) == true
-                - have_same_dimensions(src, src_grad) == true
-                - have_same_dimensions(gamma, gamma_grad) == true
-                - scale.size() == src.num_samples()
-                - have_same_dimensions(scale, gamma) == true
-            ensures
-                - Let f(src,gamma) == dot(gradient_input, dest output of
-                  rms_normalize(eps,dest,scale,src,gamma))
-                - Adds the gradient of f() with respect to src to #src_grad.
-                - Assigns the gradient of f() with respect to gamma to #gamma_grad.
-        !*/
+    void rms_normalize_gradient(
+        const tensor& gradient_input,
+        const tensor& scale,
+        const tensor& src,
+        const tensor& gamma,
+        tensor& src_grad,
+        tensor& gamma_grad,
+        resizable_tensor& dscale
+    );
+    /*!
+        requires
+            - scale.size() == src.num_samples()
+            - have_same_dimensions(gamma, gamma_grad)
+            - gamma.k() == src.k()
+            - gamma.nr() == 1
+            - gamma.nc() == 1
+            - have_same_dimensions(gradient_input, src)
+            - have_same_dimensions(gradient_input, src_grad)
+        ensures
+            - Let f(src, gamma) == dot(gradient_input, dest output of
+                rms_normalize(eps, dest, scale, src, gamma))
+            - Adds the gradient of f() with respect to src to #src_grad
+            - Assigns the gradient of f() with respect to gamma to #gamma_grad
+            - #dscale contains the gradients of f() with respect to the RMS values.
+    !*/
 
-    // -----------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------
 
     void threshold (
         tensor& data,

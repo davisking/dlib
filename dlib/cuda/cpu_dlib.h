@@ -266,14 +266,13 @@ namespace dlib
         );
 
         void rms_normalize_gradient(
-            const double eps,
             const tensor& gradient_input,
             const tensor& scale,
             const tensor& src,
             const tensor& gamma,
             tensor& src_grad,
             tensor& gamma_grad,
-            tensor& dscale
+            resizable_tensor& dscale
         );
 
     // -----------------------------------------------------------------------------------

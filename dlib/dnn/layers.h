@@ -1516,9 +1516,10 @@ namespace dlib
         ) :
             learning_rate_multiplier(1),
             weight_decay_multiplier(0),
+            bias_learning_rate_multiplier(1),
+            bias_weight_decay_multiplier(1),
             eps(eps_)
         {
-
         }
 
         double get_eps() const { return eps; }
@@ -1528,16 +1529,20 @@ namespace dlib
         void set_learning_rate_multiplier(double val) { learning_rate_multiplier = val; }
         void set_weight_decay_multiplier(double val) { weight_decay_multiplier = val; }
 
+        double get_bias_learning_rate_multiplier() const { return bias_learning_rate_multiplier; }
+        double get_bias_weight_decay_multiplier() const { return bias_weight_decay_multiplier; }
+        void set_bias_learning_rate_multiplier(double val) { bias_learning_rate_multiplier = val; }
+        void set_bias_weight_decay_multiplier(double val) { bias_weight_decay_multiplier = val; }
+
         inline dpoint map_input_to_output(const dpoint& p) const { return p; }
         inline dpoint map_output_to_input(const dpoint& p) const { return p; }
 
         template <typename SUBNET>
         void setup(const SUBNET& sub)
         {
-            gamma = alias_tensor(1, sub.get_output().k(), sub.get_output().nr(), sub.get_output().nc());
+            gamma = alias_tensor(1, sub.get_output().k());
             params.set_size(gamma.size());
             gamma(params, 0) = 1;
-            dscale.copy_size(gamma(params, 0));
         }
 
         template <typename SUBNET>
@@ -1552,7 +1557,7 @@ namespace dlib
         {
             auto g = gamma(params, 0);
             auto g_grad = gamma(params_grad, 0);
-            tt::rms_normalize_gradient(eps, gradient_input, scale, sub.get_output(), g, sub.get_gradient_input(), g_grad, dscale);
+            tt::rms_normalize_gradient(gradient_input, scale, sub.get_output(), g, sub.get_gradient_input(), g_grad, dscale);
         }
 
         const tensor& get_layer_params() const { return params; };
@@ -1563,9 +1568,10 @@ namespace dlib
             serialize("rms_norm_", out);
             serialize(item.params, out);
             serialize(item.gamma, out);
-            serialize(item.scale, out);
             serialize(item.learning_rate_multiplier, out);
             serialize(item.weight_decay_multiplier, out);
+            serialize(item.bias_learning_rate_multiplier, out);
+            serialize(item.bias_weight_decay_multiplier, out);
             serialize(item.eps, out);
         }
 
@@ -1577,27 +1583,32 @@ namespace dlib
                 throw serialization_error("Unexpected version '" + version + "' found while deserializing dlib::rms_norm_.");
             deserialize(item.params, in);
             deserialize(item.gamma, in);
-            deserialize(item.scale, in);
             deserialize(item.learning_rate_multiplier, in);
             deserialize(item.weight_decay_multiplier, in);
+            deserialize(item.bias_learning_rate_multiplier, in);
+            deserialize(item.bias_weight_decay_multiplier, in);
             deserialize(item.eps, in);
         }
 
         friend std::ostream& operator<<(std::ostream& out, const rms_norm_& item)
         {
             out << "rms_norm";
-            out << " eps=" << item.eps;
+            out << " (eps=" << item.eps << ")";
             out << " learning_rate_mult=" << item.learning_rate_multiplier;
             out << " weight_decay_mult=" << item.weight_decay_multiplier;
+            out << " bias_learning_rate_mult=" << item.bias_learning_rate_multiplier;
+            out << " bias_weight_decay_mult=" << item.bias_weight_decay_multiplier;
             return out;
         }
 
         friend void to_xml(const rms_norm_& item, std::ostream& out)
         {
-            out << "rms_norm";
+            out << "<rms_norm";
             out << " eps='" << item.eps << "'";
             out << " learning_rate_mult='" << item.learning_rate_multiplier << "'";
             out << " weight_decay_mult='" << item.weight_decay_multiplier << "'";
+            out << " bias_learning_rate_mult='" << item.bias_learning_rate_multiplier << "'";
+            out << " bias_weight_decay_mult='" << item.bias_weight_decay_multiplier << "'";
             out << ">\n";
             out << mat(item.params);
             out << "</rms_norm>\n";
@@ -1610,6 +1621,8 @@ namespace dlib
         resizable_tensor dscale;
         double learning_rate_multiplier;
         double weight_decay_multiplier;
+        double bias_learning_rate_multiplier;
+        double bias_weight_decay_multiplier;
         double eps;
     };
 
