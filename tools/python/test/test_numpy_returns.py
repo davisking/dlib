@@ -1,14 +1,14 @@
 import sys
 import pickle
+import pathlib
 
 import dlib
 import pytest
 
 import utils
 
-# Paths are relative to dlib root
-image_path = "examples/faces/Tom_Cruise_avp_2014_4.jpg"
-shape_path = "tools/python/test/shape.pkl"
+image_path = (pathlib.Path(__file__).parents[3] / "examples" / "faces" / "Tom_Cruise_avp_2014_4.jpg").absolute().as_posix()
+shape_path = (pathlib.Path(__file__).parents[3] / "tools" / "python" / "test" / "shape.pkl").absolute().as_posix()
 
 
 def get_test_image_and_shape():

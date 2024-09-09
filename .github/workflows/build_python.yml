@@ -31,50 +31,58 @@ defaults:
     shell: bash
 
 jobs:
-  Windows:
-    runs-on: 'windows-latest'
+  build_wheels_matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      include: ${{ steps.set-matrix.outputs.include }}
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
-    - name: Install python deps
-      run: |
-        pip install pytest numpy
-        # don't use CMake 3.25.0 https://gitlab.kitware.com/cmake/cmake/-/issues/23975
-        pip3 install cmake==3.24.0
-    - name: Build
-      run: |
-        pip3 install cmake==3.24.0
-        python setup.py build
-        python setup.py install --user
-    - name: Test
-      run: python -m pytest --ignore docs --ignore dlib
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+      - run: pip install cibuildwheel==2.17.0  # sync version with pypa/cibuildwheel below
+      - id: set-matrix
+        env:
+          CIBW_PROJECT_REQUIRES_PYTHON: '>=3.7'  # it is missing in setup.py and needed to determine which wheels to build
+        run: |
+          MATRIX_INCLUDE=$(
+            {
+              cibuildwheel --print-build-identifiers --platform linux --arch x86_64 | grep cp |  jq -nRc '{"only": inputs, "os": "ubuntu-latest"}' \
+              && cibuildwheel --print-build-identifiers --platform macos --arch x86_64 | grep cp |  jq -nRc '{"only": inputs, "os": "macos-13"}' \
+              && cibuildwheel --print-build-identifiers --platform macos --arch arm64 | grep cp |  jq -nRc '{"only": inputs, "os": "macos-14"}' \
+              && cibuildwheel --print-build-identifiers --platform windows --arch AMD64 | grep cp |  jq -nRc '{"only": inputs, "os": "windows-latest"}'
+            } | jq -sc
+          )
+          echo "include=$MATRIX_INCLUDE" >> $GITHUB_OUTPUT
 
-  Ubuntu:
-    runs-on: 'ubuntu-latest'
+  build_wheels:
+    needs: build_wheels_matrix
+    runs-on: ${{ matrix.os }}
+    name: Build ${{ matrix.only }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.build_wheels_matrix.outputs.include) }}
+
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
-    - name: Install python deps
-      run: pip install pytest numpy
-    - name: Build
+    - uses: actions/checkout@v4
+    
+    - name: Disable gui support
       run: |
-        python setup.py build
-        python setup.py install --user
-    - name: Test
-      run: python -m pytest --ignore docs --ignore dlib
+        sed -i'' -e "s/_cmake_extra_options = \[\]/_cmake_extra_options = \['-DDLIB_NO_GUI_SUPPORT=ON'\]/" setup.py
 
-# Disabled for now since something is going sideways with python packages on github actions
-# MacOS:
-#   runs-on: 'macos-latest'
-#   steps:
-#   - uses: actions/checkout@v3
-#   - uses: actions/setup-python@v4
-#   - name: Install python deps
-#     run: pip3 install pytest numpy
-#   - name: Build
-#     run: |
-#       python3 setup.py build
-#       python3 setup.py install --user
-#   - name: Test
-#     run: python3 -m pytest --ignore docs --ignore dlib
+    - name: Build wheel
+      uses: pypa/cibuildwheel@v2.17.0  # sync version with pip install cibuildwheel above
+      with:
+        only: ${{ matrix.only }}
+      env:
+        CIBW_BUILD_VERBOSITY: 1
+        CIBW_TEST_REQUIRES: pytest numpy
+        CIBW_TEST_COMMAND: python -m pytest {project}/tools/python/test --ignore docs --ignore dlib
 
+    - name: Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist-${{ matrix.only }}
+        path: wheelhouse/*.whl
