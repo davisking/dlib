@@ -1219,6 +1219,7 @@ namespace dlib { namespace tt
 // ------------------------------------------------------------------------------------
 
     void reorg (
+        bool add_to,
         tensor& dest,
         const int row_stride,
         const int col_stride,
@@ -1226,13 +1227,14 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::reorg(dest, row_stride, col_stride, src);
+        cuda::reorg(add_to, dest, row_stride, col_stride, src);
 #else
-        cpu::reorg(dest, row_stride, col_stride, src);
+        cpu::reorg(add_to, dest, row_stride, col_stride, src);
 #endif
     }
 
     void reorg_gradient (
+        bool add_to,
         tensor& grad,
         const int row_stride,
         const int col_stride,
@@ -1240,9 +1242,9 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::reorg_gradient(grad, row_stride, col_stride, gradient_input);
+        cuda::reorg_gradient(add_to, grad, row_stride, col_stride, gradient_input);
 #else
-        cpu::reorg_gradient(grad, row_stride, col_stride, gradient_input);
+        cpu::reorg_gradient(add_to, grad, row_stride, col_stride, gradient_input);
 #endif
     }
 

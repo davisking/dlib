@@ -3607,29 +3607,37 @@ namespace dlib
                 - col_stride >= 1
 
             WHAT THIS OBJECT REPRESENTS
-                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
-                defined above.  In particular, the output of this layer is simply a copy of
-                the input tensor.  However, it rearranges spatial information along the
-                channel dimension.  The dimensions of the tensor output by this layer are as
-                follows (letting IN be the input tensor and OUT the output tensor):
+                This class implements the EXAMPLE_COMPUTATIONAL_LAYER_ interface, performing a 
+                reorganization of tensor data. It rearranges spatial information along the channel
+                dimension, effectively "folding" spatial dimensions into channels.
+                
+                The dimensions of the output tensor are as follows (letting IN be the input tensor
+                and OUT the output tensor):
                     - OUT.num_samples() == IN.num_samples()
                     - OUT.k()  == IN.k() * row_stride * col_stride
                     - OUT.nr() == IN.nr() / row_stride
                     - OUT.nc() == IN.nc() / col_stride
 
-                So the output will always have the same number of samples as the input, but
-                within each sample (the k,nr,nc part) we will reorganize the values.  To be
-                very precise, we will have, for all n, k, r, c in OUT:
-                OUT.host[tensor_index(OUT, n, k, r, c)] ==
-                IN.host[tensor_index(IN,
-                                      n,
-                                      k % IN.k(),
-                                      r * row_stride + (k / IN.k()) / row_stride,
-                                      c * col_stride + (k / IN.k()) % col_stride)]
+                Therefore, the output tensor maintains the same number of samples as the input but
+                alters the channel and spatial dimensions based on the specified strides.
+                
+                Specifically, for all n, k, r, c in OUT:
+                    OUT.host[tensor_index(OUT, n, k, r, c)] ==
+                    IN.host[tensor_index(IN,
+                                        n,
+                                        k % IN.k(),
+                                        r * row_stride + (k / IN.k()) / col_stride,
+                                        c * col_stride + (k / IN.k()) % col_stride)]
 
+                **Enhancement Note:**  
+                The underlying utility functions (`reorg` and `reorg_gradient`) now include an
+                optional `bool add_to` parameter. While the current implementation uses the default
+                value to maintain existing behavior, this parameter allows for future reversible
+                operations and gradient accumulation flexibility within neural network layers.
 
-                Finally, you can think of this layer as an alternative to a strided convolutonal
-                layer to downsample a tensor.
+                You can think of this layer as an alternative to a strided convolutional layer for
+                downsampling tensors, offering similar spatial reduction with different internal
+                gradient propagation mechanics.
         !*/
 
     public:

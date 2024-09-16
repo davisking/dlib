@@ -2333,58 +2333,67 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-        void reorg (
+        void reorg(
+            bool add_to,
             tensor& dest,
             const int row_stride,
             const int col_stride,
             const tensor& src
         )
         {
-            DLIB_CASSERT(is_same_object(dest, src)==false);
-            DLIB_CASSERT(src.nr() % row_stride == 0);
-            DLIB_CASSERT(src.nc() % col_stride == 0);
-            DLIB_CASSERT(dest.num_samples() == src.num_samples());
-            DLIB_CASSERT(dest.k() == src.k() * row_stride * col_stride);
-            DLIB_CASSERT(dest.nr() == src.nr() / row_stride);
-            DLIB_CASSERT(dest.nc() == src.nc() / col_stride);
+            DLIB_CASSERT(!is_same_object(dest, src), "Destination and source must be distinct objects.");
+            DLIB_CASSERT(src.nr() % row_stride == 0, "The number of rows in src must be divisible by row_stride.");
+            DLIB_CASSERT(src.nc() % col_stride == 0, "The number of columns in src must be divisible by col_stride.");
+            DLIB_CASSERT(dest.num_samples() == src.num_samples(), "The number of samples must match.");
+            DLIB_CASSERT(dest.k() == src.k() * row_stride * col_stride, "The number of channels must match.");
+            DLIB_CASSERT(dest.nr() == src.nr() / row_stride, "The number of rows must match.");
+            DLIB_CASSERT(dest.nc() == src.nc() / col_stride, "The number of columns must match.");
+
             const float* s = src.host();
             float* d = dest.host();
 
-            parallel_for(0, dest.num_samples(), [&](long n)
+            const size_t sk = src.k(), snr = src.nr(), snc = src.nc();
+            const size_t dk = dest.k(), dnr = dest.nr(), dnc = dest.nc(), dsize = dest.size();
+
+            dlib::parallel_for(0, dsize, [&](long i)
             {
-                for (long k = 0; k < dest.k(); ++k)
-                {
-                    for (long r = 0; r < dest.nr(); ++r)
-                    {
-                        for (long c = 0; c < dest.nc(); ++c)
-                        {
-                            const auto out_idx = tensor_index(dest, n, k, r, c);
-                            const auto in_idx = tensor_index(src,
-                                                             n,
-                                                             k % src.k(),
-                                                             r * row_stride + (k / src.k()) / row_stride,
-                                                             c * col_stride + (k / src.k()) % col_stride);
-                            d[out_idx] = s[in_idx];
-                        }
-                    }
-                }
+                const size_t out_plane_size = dnr * dnc;
+                const size_t out_sample_size = dk * out_plane_size;
+
+                const size_t n = i / out_sample_size;
+                const size_t out_idx = i % out_sample_size;
+                const size_t out_k = out_idx / out_plane_size;
+                const size_t out_rc = out_idx % out_plane_size;
+                const size_t out_r = out_rc / dnc;
+                const size_t out_c = out_rc % dnc;
+
+                const size_t in_k = out_k % sk;
+                const size_t in_r = out_r * row_stride + (out_k / sk) / col_stride;
+                const size_t in_c = out_c * col_stride + (out_k / sk) % col_stride;
+
+                const size_t in_idx = ((n * sk + in_k) * snr + in_r) * snc + in_c;
+
+                if (add_to) d[i] += s[in_idx];
+                else d[i] = s[in_idx];
             });
         }
 
-        void reorg_gradient (
+        void reorg_gradient(
+            bool add_to,
             tensor& grad,
             const int row_stride,
             const int col_stride,
             const tensor& gradient_input
         )
         {
-            DLIB_CASSERT(is_same_object(grad, gradient_input)==false);
-            DLIB_CASSERT(grad.nr() % row_stride == 0);
-            DLIB_CASSERT(grad.nc() % col_stride == 0);
-            DLIB_CASSERT(grad.num_samples() == gradient_input.num_samples());
-            DLIB_CASSERT(grad.k() == gradient_input.k() / row_stride / col_stride);
-            DLIB_CASSERT(grad.nr() == gradient_input.nr() * row_stride);
-            DLIB_CASSERT(grad.nc() == gradient_input.nc() * row_stride);
+            DLIB_CASSERT(!is_same_object(grad, gradient_input), "Grad and gradient_input must be distinct objects.");
+            DLIB_CASSERT(grad.nr() % row_stride == 0, "The number of rows in grad must be divisible by row_stride.");
+            DLIB_CASSERT(grad.nc() % col_stride == 0, "The number of columns in grad must be divisible by col_stride.");
+            DLIB_CASSERT(grad.num_samples() == gradient_input.num_samples(), "The number of samples in grad and gradient_input must match.");
+            DLIB_CASSERT(grad.k() == gradient_input.k() / row_stride / col_stride, "The number of channels in grad must be gradient_input.k() divided by row_stride and col_stride.");
+            DLIB_CASSERT(grad.nr() == gradient_input.nr() * row_stride, "The number of rows in grad must be gradient_input.nr() multiplied by row_stride.");
+            DLIB_CASSERT(grad.nc() == gradient_input.nc() * col_stride, "The number of columns in grad must be gradient_input.nc() multiplied by col_stride.");
+
             const float* gi = gradient_input.host();
             float* g = grad.host();
 
@@ -2396,13 +2405,15 @@ namespace dlib
                     {
                         for (long c = 0; c < gradient_input.nc(); ++c)
                         {
-                            const auto in_idx = tensor_index(gradient_input, n, k, r, c);
-                            const auto out_idx = tensor_index(grad,
-                                                              n,
-                                                              k % grad.k(),
-                                                              r * row_stride + (k / grad.k()) / row_stride,
-                                                              c * col_stride + (k / grad.k()) % col_stride);
-                            g[out_idx] += gi[in_idx];
+                                const auto in_idx = tensor_index(gradient_input, n, k, r, c);
+                                const auto out_idx = tensor_index(grad,
+                                    n,
+                                    k % grad.k(),
+                                    r * row_stride + (k / grad.k()) / col_stride,
+                                    c * col_stride + (k / grad.k()) % col_stride);
+                                
+                                if (add_to) g[out_idx] += gi[in_idx];
+                                else g[out_idx] = gi[in_idx];
                         }
                     }
                 }
