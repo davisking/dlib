@@ -673,6 +673,14 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
+        void transpose(
+            bool add_to,
+            tensor& dest,
+            const tensor& src
+        );
+
+    // -----------------------------------------------------------------------------------
+
     class compute_loss_binary_log_per_pixel
     {
 

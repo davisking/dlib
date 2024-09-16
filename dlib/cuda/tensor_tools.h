@@ -2188,6 +2188,32 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void transpose(
+        bool add_to,
+        tensor& dest,
+        const tensor& src
+    );
+    /*!
+        requires
+            - is_same_object(dest, src) == false
+            - dest.num_samples() == src.num_samples()
+            - dest.k() == src.k()
+            - dest.nr() == src.nc()
+            - dest.nc() == src.nr()            
+        ensures
+            - Performs a transpose operation on the nr() x nc() matrices within src.
+            - If (add_to) is false:
+                - The result is stored in dest, overwriting its previous contents.
+                - For all valid n, k, r, c:
+                    - #dest(n,k,c,r) == src(n,k,r,c)
+            - If (add_to) is true:
+                - The result is added to the existing contents of dest.
+                - For all valid n, k, r, c:
+                    - #dest(n,k,c,r) == dest(n,k,c,r) + src(n,k,r,c)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }}
 
 #ifdef NO_MAKEFILE

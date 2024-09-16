@@ -2500,6 +2500,46 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        __global__ void _cuda_transpose(size_t dsize, size_t dk, size_t dnr, size_t dnc, float* d,
+            size_t sk, size_t snr, int snc, const float* s, const bool add_to)
+        {
+            const auto plane_size = dnr * dnc;
+            const auto sample_size = dk * plane_size;
+            for (auto i : grid_stride_range(0, dsize))
+            {
+                const auto n = i / sample_size;
+                const auto idx = i % plane_size;
+                const auto in_k = (i / plane_size) % dk;
+                const auto in_r = idx % dnc;
+                const auto in_c = idx / dnc;
+
+                const auto in_idx = ((n * sk + in_k) * snr + in_r) * snc + in_c;
+                if (add_to) d[i] += s[in_idx];
+                else d[i] = s[in_idx];
+            }
+        }
+
+        void transpose(
+            bool add_to,
+            tensor& dest,
+            const tensor& src            
+        )
+        {
+            DLIB_CASSERT(is_same_object(dest, src) == false);
+            DLIB_CASSERT(dest.num_samples() == src.num_samples() &&
+                dest.k() == src.k() &&
+                dest.nr() == src.nc() &&
+                dest.nc() == src.nr(),
+                "Incompatible tensor dimensions.");
+
+            launch_kernel(_cuda_transpose, max_jobs(dest.size()), dest.size(),
+                dest.k(), dest.nr(), dest.nc(), dest.device(),
+                src.k(), src.nr(), src.nc(), src.device(), add_to);
+        }
+
+    // ----------------------------------------------------------------------------------------
+
+
         __device__ float cuda_log1pexp(float x)
         {
             if (x <= -18)
