@@ -98,7 +98,7 @@ namespace dlib
 
         inline uint64_t ts()
         {
-            using namespace std::chrono;
+            using std::chrono::duration_cast, std::chrono::duration, std::chrono::high_resolution_clock;
             return duration_cast<duration<double,std::nano>>(high_resolution_clock::now().time_since_epoch()).count();
         }
 

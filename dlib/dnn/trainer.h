@@ -310,15 +310,14 @@ namespace dlib
                 epoch_iteration < max_num_epochs && learning_rate >= min_learning_rate; 
                 ++epoch_iteration)
             {
-                using namespace std::chrono;
-                last_time = system_clock::now();
+                last_time = std::chrono::system_clock::now();
                 clear_average_loss();
                 for (; epoch_pos < data.size() && learning_rate >= min_learning_rate; epoch_pos += mini_batch_size)
                 {
                     if (verbose)
                     {
-                        auto now_time = system_clock::now();
-                        if (now_time-last_time > seconds(20))
+                        auto now_time = std::chrono::system_clock::now();
+                        if (now_time-last_time > std::chrono::seconds(20))
                         {
                             last_time = now_time;
                             auto iter = epoch_iteration + epoch_pos/(double)data.size();
@@ -368,15 +367,14 @@ namespace dlib
                 epoch_iteration < max_num_epochs && learning_rate >= min_learning_rate; 
                 ++epoch_iteration)
             {
-                using namespace std::chrono;
-                last_time = system_clock::now();
+                last_time = std::chrono::system_clock::now();
                 clear_average_loss();
                 for (; epoch_pos < data.size() && learning_rate >= min_learning_rate; epoch_pos += mini_batch_size)
                 {
                     if (verbose)
                     {
-                        auto now_time = system_clock::now();
-                        if (now_time-last_time > seconds(20))
+                        auto now_time = std::chrono::system_clock::now();
+                        if (now_time-last_time > std::chrono::seconds(20))
                         {
                             last_time = now_time;
                             auto iter = epoch_iteration + epoch_pos/(double)data.size();
@@ -1266,9 +1264,8 @@ namespace dlib
         {
             if (verbose)
             {
-                using namespace std::chrono;
-                auto now_time = system_clock::now();
-                if (now_time-last_time > seconds(40))
+                auto now_time = std::chrono::system_clock::now();
+                if (now_time-last_time > std::chrono::seconds(40))
                 {
                     last_time = now_time;
                     std::cout << "step#: " << rpad(cast_to_string(train_one_step_calls),epoch_string_pad) << "  " 

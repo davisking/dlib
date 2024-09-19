@@ -807,8 +807,8 @@ namespace dlib
                 frame&                  dst
             )
             {
-                using namespace std::chrono;
                 using namespace details;
+                using std::chrono::system_clock;
 
                 DLIB_CASSERT(src.is_audio(), "src.is_audio() == false");
 
@@ -896,7 +896,7 @@ namespace dlib
                 frame&& in
             )
             {
-                using namespace std::chrono;
+                using std::chrono::system_clock;
                 DLIB_ASSERT(in.is_audio(), "this isn't an audio frame");
 
                 std::vector<frame> outs;
