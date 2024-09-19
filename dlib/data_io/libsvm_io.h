@@ -88,7 +88,7 @@ namespace dlib
 
                 if (sin && value != 0)
                 {
-                    sample.insert(sample.end(), make_pair(key, value));
+                    sample.insert(sample.end(), std::make_pair(key, value));
                 }
 
                 sin >> std::ws;

@@ -297,10 +297,10 @@ namespace dlib
 
                 if (verbose)
                 {
-                    cout << "gap:         " << PG_max - PG_min << endl;
-                    cout << "active_size: " << active_size << endl;
-                    cout << "iter:        " << iter << endl;
-                    cout << endl;
+                    std::cout << "gap:         " << PG_max - PG_min << std::endl;
+                    std::cout << "active_size: " << active_size << std::endl;
+                    std::cout << "iter:        " << iter << std::endl;
+                    std::cout << std::endl;
                 }
 
                 if (PG_max - PG_min <= eps)

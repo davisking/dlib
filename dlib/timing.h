@@ -140,7 +140,7 @@ namespace dlib
                 if (time_buf()[i] != 0)
                 {
                     double time = time_buf()[i]/1000.0/1000.0;
-                    string name;
+                    std::string name;
                     // Check if the name buffer is empty.  Use the name it contains if it isn't.
                     if (name_buf(i,"")[0] != '\0')
                         name = cast_to_string(i) + ": " + name_buf(i,"");
@@ -149,16 +149,16 @@ namespace dlib
 
                     // make sure the name is always the same length.  Do so by padding with spaces
                     if (name.size() < max_name_length)
-                        name += string(max_name_length-name.size(),' ');
+                        name += std::string(max_name_length-name.size(),' ');
 
                     if (time < 1000)
-                        cout << "  " << name << ": " << time << " milliseconds" << endl;
+                        std::cout << "  " << name << ": " << time << " milliseconds" << std::endl;
                     else if (time < 1000*60)
-                        cout << "  " << name << ": " << time/1000.0 << " seconds" << endl;
+                        std::cout << "  " << name << ": " << time/1000.0 << " seconds" << std::endl;
                     else if (time < 1000*60*60)
-                        cout << "  " << name << ": " << time/1000.0/60.0 << " minutes" << endl;
+                        std::cout << "  " << name << ": " << time/1000.0/60.0 << " minutes" << std::endl;
                     else
-                        cout << "  " << name << ": " << time/1000.0/60.0/60.0 << " hours" << endl;
+                        std::cout << "  " << name << ": " << time/1000.0/60.0/60.0 << " hours" << std::endl;
                 }
             }
         }

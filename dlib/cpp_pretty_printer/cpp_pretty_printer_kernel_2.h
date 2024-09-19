@@ -175,7 +175,7 @@ namespace dlib
 
         int type;
         stack scopes; // a stack to hold old scopes
-        string token, temp;
+        std::string token, temp;
         t.get_token(type,token);
         while (type != tok::END_OF_FILE)
         {
@@ -191,7 +191,7 @@ namespace dlib
                     if (type == tok::WHITE_SPACE)
                     {
                         t.get_token(type,temp);
-                        if (temp.find_first_of("\n\r") != string::npos)
+                        if (temp.find_first_of("\n\r") != std::string::npos)
                             recently_seen_preprocessor = false;
                     }
                     if (t.peek_token() != ";" && t.peek_type() != tok::IDENTIFIER &&
@@ -304,7 +304,7 @@ namespace dlib
             case tok::WHITE_SPACE: // -----------------------------------------
                 {
                     out << token;
-                    if (token.find_first_of("\n\r") != string::npos)
+                    if (token.find_first_of("\n\r") != std::string::npos)
                         recently_seen_preprocessor = false;
                 }
                 break;
@@ -432,9 +432,9 @@ namespace dlib
         const std::string& title
     ) const
     {
-        ostringstream sout;
+        std::ostringstream sout;
         print(in,sout,title);
-        istringstream sin(sout.str());
+        std::istringstream sin(sout.str());
         number(sin,out);
     }
 

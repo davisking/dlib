@@ -211,13 +211,13 @@ namespace
                         temp_total += test.get_count(a);
                     }
                     DLIB_TEST_MSG(temp_total == test.get_total(),
-                                 "temp_total == " << temp_total << endl <<
+                                 "temp_total == " << temp_total << std::endl <<
                                  "test.get_total() == " << test.get_total()
                     );
 
                     DLIB_TEST(test.get_count(alphabet_size-1) == counts[alphabet_size-1]);
                     DLIB_TEST_MSG(test.get_total() == total,
-                                 "test.get_total() == " << test.get_total() << endl <<
+                                 "test.get_total() == " << test.get_total() << std::endl <<
                                  "total == " << total
                     );
 
@@ -309,15 +309,15 @@ namespace
                         test.get_symbol(k,symbol,low_count,high_count);
                         DLIB_TEST(high_count - low_count == test.get_count(symbol));
                         DLIB_TEST_MSG(j == symbol,
-                                     "j == " << j << endl <<
-                                     "k == " << k << endl <<
-                                     "symbol == " << symbol << endl <<
-                                     "low_counts[j] == " << low_counts[j] << endl <<
-                                     "high_counts[j] == " << high_counts[j] << endl <<
-                                     "low_counts[symbol] == " << low_counts[symbol] << endl <<
-                                     "high_counts[symbol] == " << high_counts[symbol] << endl << 
-                                     "low_count == " << low_count << endl << 
-                                     "high_count == " << high_count << endl << 
+                                     "j == " << j << std::endl <<
+                                     "k == " << k << std::endl <<
+                                     "symbol == " << symbol << std::endl <<
+                                     "low_counts[j] == " << low_counts[j] << std::endl <<
+                                     "high_counts[j] == " << high_counts[j] << std::endl <<
+                                     "low_counts[symbol] == " << low_counts[symbol] << std::endl <<
+                                     "high_counts[symbol] == " << high_counts[symbol] << std::endl << 
+                                     "low_count == " << low_count << std::endl << 
+                                     "high_count == " << high_count << std::endl << 
                                      "temp.count(j) == " << test.get_count(j)
                         );
                         DLIB_TEST_MSG(low_count == low_counts[j],
@@ -616,13 +616,13 @@ namespace
                     if (!oom)
                     {
                         DLIB_TEST_MSG(temp_total == test.get_total(),
-                                     "temp_total == " << temp_total << endl <<
+                                     "temp_total == " << temp_total << std::endl <<
                                      "test.get_total() == " << test.get_total()
                         );
 
                         DLIB_TEST(test.get_count(alphabet_size-1) == counts[alphabet_size-1]);
                         DLIB_TEST_MSG(test.get_total() == total,
-                                     "test.get_total() == " << test.get_total() << endl <<
+                                     "test.get_total() == " << test.get_total() << std::endl <<
                                      "total == " << total
                         );
                     }
@@ -724,15 +724,15 @@ namespace
                             test.get_symbol(k,symbol,low_count,high_count);
                             DLIB_TEST(high_count - low_count == test.get_count(symbol));
                             DLIB_TEST_MSG(j == symbol,
-                                         "j == " << j << endl <<
-                                         "k == " << k << endl <<
-                                         "symbol == " << symbol << endl <<
-                                         "low_counts[j] == " << low_counts[j] << endl <<
-                                         "high_counts[j] == " << high_counts[j] << endl <<
-                                         "low_counts[symbol] == " << low_counts[symbol] << endl <<
-                                         "high_counts[symbol] == " << high_counts[symbol] << endl << 
-                                         "low_count == " << low_count << endl << 
-                                         "high_count == " << high_count << endl << 
+                                         "j == " << j << std::endl <<
+                                         "k == " << k << std::endl <<
+                                         "symbol == " << symbol << std::endl <<
+                                         "low_counts[j] == " << low_counts[j] << std::endl <<
+                                         "high_counts[j] == " << high_counts[j] << std::endl <<
+                                         "low_counts[symbol] == " << low_counts[symbol] << std::endl <<
+                                         "high_counts[symbol] == " << high_counts[symbol] << std::endl << 
+                                         "low_count == " << low_count << std::endl << 
+                                         "high_count == " << high_count << std::endl << 
                                          "temp.count(j) == " << test.get_count(j)
                             );
                             DLIB_TEST_MSG(low_count == low_counts[j],
