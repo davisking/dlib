@@ -13,7 +13,7 @@
         auto _tt_start = std::chrono::high_resolution_clock::now();                                             \
         {_tt_op;}                                                                                               \
         auto _tt_stop = std::chrono::high_resolution_clock::now();                                              \
-        auto _tt_thetime = _tt_stop-_tt_start;                                                                          \
+        auto _tt_thetime = _tt_stop-_tt_start;                                                                  \
         using std::chrono::duration_cast;                                                                       \
         using std::chrono::duration;                                                                            \
         if (_tt_thetime >= std::chrono::minutes(1))                                                             \

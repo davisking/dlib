@@ -1213,7 +1213,6 @@ namespace dlib
         inline bool muxer::open(const args& a)
         {
             using namespace details;
-            using std::chrono::system_clock;
 
             st = {};
             st.args_ = a;
@@ -1222,8 +1221,8 @@ namespace dlib
                 return fail("You need to set at least one of `enable_audio` or `enable_image`");
 
             {
-                st.connecting_time = system_clock::now();
-                st.connected_time  = system_clock::time_point::max();
+                st.connecting_time = std::chrono::system_clock::now();
+                st.connected_time  = std::chrono::system_clock::time_point::max();
 
                 const char* const format_name   = st.args_.output_format.empty() ? nullptr : st.args_.output_format.c_str();
                 const char* const filename      = st.args_.filepath.empty()      ? nullptr : st.args_.filepath.c_str();
@@ -1321,7 +1320,7 @@ namespace dlib
             if (ret < 0)
                 return fail("avformat_write_header() failed : ", get_av_error(ret));
 
-            st.connected_time = system_clock::now();
+            st.connected_time = std::chrono::system_clock::now();
 
             return true;
         }

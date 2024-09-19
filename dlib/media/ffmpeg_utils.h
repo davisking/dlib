@@ -808,7 +808,6 @@ namespace dlib
             )
             {
                 using namespace details;
-                using std::chrono::system_clock;
 
                 DLIB_CASSERT(src.is_audio(), "src.is_audio() == false");
 
@@ -830,9 +829,9 @@ namespace dlib
 
                     dst.f           = std::move(tmp);
                     dst.f->pts      = tracked_samples;
-                    dst.timestamp   = system_clock::time_point{system_clock::duration{av_rescale_q(tracked_samples,
+                    dst.timestamp   = std::chrono::system_clock::time_point{std::chrono::system_clock::duration{av_rescale_q(tracked_samples,
                                                                                         {1, dst_sample_rate},
-                                                                                        {system_clock::duration::period::num, system_clock::duration::period::den})}};
+                                                                                        {std::chrono::system_clock::duration::period::num, std::chrono::system_clock::duration::period::den})}};
                     tracked_samples += dst.nsamples();
 
                 }
@@ -896,7 +895,6 @@ namespace dlib
                 frame&& in
             )
             {
-                using std::chrono::system_clock;
                 DLIB_ASSERT(in.is_audio(), "this isn't an audio frame");
 
                 std::vector<frame> outs;
@@ -919,10 +917,10 @@ namespace dlib
 
                     while (av_audio_fifo_size(fifo.get()) >= frame_size)
                     {
-                        const system_clock::time_point timestamp{system_clock::duration{av_rescale_q(
+                        const std::chrono::system_clock::time_point timestamp{std::chrono::system_clock::duration{av_rescale_q(
                                 sample_count,
                                 {1, in.sample_rate()},
-                                {system_clock::duration::period::num, system_clock::duration::period::den})}};
+                                {std::chrono::system_clock::duration::period::num, std::chrono::system_clock::duration::period::den})}};
 
                         frame out(in.sample_rate(), frame_size, in.layout(), in.samplefmt(), timestamp);
 
