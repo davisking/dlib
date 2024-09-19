@@ -401,7 +401,7 @@ namespace dlib
         try
         {
             WIN32_FIND_DATAA data;
-            string path = state.full_name;
+            std::string path = state.full_name;
             // ensure that the path ends with a separator
             if (path[path.size()-1] != directory::get_separator())
                 path += directory::get_separator();
@@ -524,7 +524,7 @@ namespace dlib
         try
         {
             WIN32_FIND_DATAA data;
-            string path = state.full_name;
+            std::string path = state.full_name;
             // ensure that the path ends with a separator
             if (path[path.size()-1] != directory::get_separator())
                 path += directory::get_separator();
@@ -539,7 +539,7 @@ namespace dlib
             bool no_more_files = false;
             do
             {
-                string tname(data.cFileName);
+                std::string tname(data.cFileName);
                 if ((data.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) != 0 &&
                     tname != "." &&
                     tname != "..")
