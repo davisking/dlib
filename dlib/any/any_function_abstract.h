@@ -46,7 +46,6 @@ namespace dlib
                     #include <iostream>
                     #include <string>
                     #include "dlib/any.h"
-                    using namespace std;
                     void print_message(string str) { cout << str << endl; }
 
                     int main()

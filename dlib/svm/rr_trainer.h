@@ -394,12 +394,11 @@ namespace dlib
 
             if (verbose && did_loov)
             {
-                using namespace std;
-                cout << "Using lambda:             " << the_lambda << endl;
+                std::cout << "Using lambda:             " << the_lambda << std::endl;
                 if (use_regression_loss)
-                    cout << "LOO Mean Squared Error:   " << best_looe << endl;
+                    std::cout << "LOO Mean Squared Error:   " << best_looe << std::endl;
                 else
-                    cout << "LOO Classification Error: " << best_looe << endl;
+                    std::cout << "LOO Classification Error: " << best_looe << std::endl;
             }
 
             // convert w into a proper decision function

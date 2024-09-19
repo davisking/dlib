@@ -426,7 +426,6 @@ namespace dlib
     fill_block_table (
     ) 
     {
-        using namespace std;
         // first empty out the block table
         block_table.reset();
         while (block_table.move_next())

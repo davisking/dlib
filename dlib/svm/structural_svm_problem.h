@@ -434,27 +434,26 @@ namespace dlib
         {
             if (verbose)
             {
-                using namespace std;
                 if (nuclear_norm_regularizers.size() != 0)
                 {
-                    cout << "objective:             " << current_objective_value << endl;
-                    cout << "objective gap:         " << current_error_gap << endl;
-                    cout << "risk:                  " << current_risk_value-nuclear_norm_part << endl;
-                    cout << "risk+nuclear norm:     " << current_risk_value << endl;
-                    cout << "risk+nuclear norm gap: " << current_risk_gap << endl;
-                    cout << "num planes:            " << num_cutting_planes << endl;
-                    cout << "iter:                  " << num_iterations << endl;
+                    std::cout << "objective:             " << current_objective_value << std::endl;
+                    std::cout << "objective gap:         " << current_error_gap << std::endl;
+                    std::cout << "risk:                  " << current_risk_value-nuclear_norm_part << std::endl;
+                    std::cout << "risk+nuclear norm:     " << current_risk_value << std::endl;
+                    std::cout << "risk+nuclear norm gap: " << current_risk_gap << std::endl;
+                    std::cout << "num planes:            " << num_cutting_planes << std::endl;
+                    std::cout << "iter:                  " << num_iterations << std::endl;
                 }
                 else
                 {
-                    cout << "objective:     " << current_objective_value << endl;
-                    cout << "objective gap: " << current_error_gap << endl;
-                    cout << "risk:          " << current_risk_value << endl;
-                    cout << "risk gap:      " << current_risk_gap << endl;
-                    cout << "num planes:    " << num_cutting_planes << endl;
-                    cout << "iter:          " << num_iterations << endl;
+                    std::cout << "objective:     " << current_objective_value << std::endl;
+                    std::cout << "objective gap: " << current_error_gap << std::endl;
+                    std::cout << "risk:          " << current_risk_value << std::endl;
+                    std::cout << "risk gap:      " << current_risk_gap << std::endl;
+                    std::cout << "num planes:    " << num_cutting_planes << std::endl;
+                    std::cout << "iter:          " << num_iterations << std::endl;
                 }
-                cout << endl;
+                std::cout << std::endl;
             }
 
             if (num_iterations >= max_iterations)

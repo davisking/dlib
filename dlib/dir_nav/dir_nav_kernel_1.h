@@ -390,7 +390,6 @@ namespace dlib
         queue_of_files& files
     ) 
     {
-        using namespace std;
         typedef directory::listing_error listing_error;
         typedef file::private_constructor private_constructor;
 
@@ -514,7 +513,6 @@ namespace dlib
         queue_of_dirs& dirs
     ) 
     {
-        using namespace std;
         typedef directory::listing_error listing_error;
         typedef directory::private_constructor private_constructor;
 

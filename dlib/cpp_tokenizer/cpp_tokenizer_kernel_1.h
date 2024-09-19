@@ -380,8 +380,6 @@ namespace dlib
         std::string& token
     )
     {
-        using namespace std;
-
         if (!have_peeked)
         {
 

@@ -297,7 +297,6 @@ namespace dlib
 
                 if (verbose)
                 {
-                    using namespace std;
                     cout << "gap:         " << PG_max - PG_min << endl;
                     cout << "active_size: " << active_size << endl;
                     cout << "iter:        " << iter << endl;

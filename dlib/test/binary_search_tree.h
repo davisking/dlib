@@ -18,7 +18,6 @@ namespace
 {
 
     using namespace test;
-    using namespace std;
     using namespace dlib;
 
     logger dlog("test.binary_search_tree");

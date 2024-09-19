@@ -15,7 +15,6 @@ namespace
 {
     using namespace test;
     using namespace dlib;
-    using namespace std;
 
     logger dlog("test.cmd_line_parser");
 

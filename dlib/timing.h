@@ -89,8 +89,7 @@ namespace dlib
             // if this name buffer is empty then copy name into it
             if (buf[i][0] == '\0')
             {
-                using namespace std;
-                strncpy(buf[i], name, NAME_LENGTH-1);
+                std::strncpy(buf[i], name, NAME_LENGTH-1);
                 buf[i][NAME_LENGTH-1] = '\0';
             }
             // return the name buffer
@@ -121,14 +120,13 @@ namespace dlib
 
         inline void print()
         {
-            using namespace std;
-            cout << "Timing report: " << endl;
+            std::cout << "Timing report: " << std::endl;
 
             // figure out how long the longest name is going to be.
             unsigned long max_name_length = 0;
             for (int i = 0; i < TIME_SLOTS; ++i)
             {
-                string name;
+                std::string name;
                 // Check if the name buffer is empty.  Use the name it contains if it isn't.
                 if (name_buf(i,"")[0] != '\0')
                     name = cast_to_string(i) + ": " + name_buf(i,"");

@@ -32,7 +32,6 @@ namespace dlib
             width*height == area
             width/height == width_to_height_ratio
         */
-        using namespace std;
 
         const int height = (int)std::floor(std::sqrt(area/width_to_height_ratio) + 0.5);
         const int width  = (int)std::floor(area/height + 0.5);

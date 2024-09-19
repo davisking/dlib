@@ -14,7 +14,6 @@
 #include "../uintn.h"
 #include "../image_transforms/assign_image.h"
 #include <algorithm>
-#include "../vectorstream.h"
 
 namespace dlib
 {
@@ -48,9 +47,7 @@ namespace dlib
             unsigned long biCompression;
             unsigned long a, b, c, d, i;
 
-            using namespace std;
-
-            streambuf& in = *in_.rdbuf();
+            std::streambuf& in = *in_.rdbuf();
             unsigned char buf[100];
 
 

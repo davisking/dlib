@@ -4,7 +4,6 @@
 #define DLIB_TEST_CONDITIONING_CLASs_H_
 
 
-#include <sstream>
 #include <string>
 #include <ctime>
 #include <cstdlib>
@@ -17,7 +16,6 @@ namespace
 {
 
     using namespace test;
-    using namespace std;
     using namespace dlib;
 
     logger dlog("test.conditioning_class");

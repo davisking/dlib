@@ -60,8 +60,7 @@ namespace dlib
         {
             if (_verbose)
             {
-                using namespace std;
-                cout << "iteration: " << _cur_iter << "   objective: " << funct_value << endl;
+                std::cout << "iteration: " << _cur_iter << "   objective: " << funct_value << std::endl;
             }
 
             ++_cur_iter;
@@ -139,8 +138,7 @@ namespace dlib
         {
             if (_verbose)
             {
-                using namespace std;
-                cout << "iteration: " << _cur_iter << "   objective: " << funct_value << "   gradient norm: " << length(funct_derivative) << endl;
+                std::cout << "iteration: " << _cur_iter << "   objective: " << funct_value << "   gradient norm: " << length(funct_derivative) << std::endl;
             }
 
             ++_cur_iter;

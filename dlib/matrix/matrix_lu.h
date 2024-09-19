@@ -101,7 +101,6 @@ namespace dlib
         m(A.nr()),
         n(A.nc())
     {
-        using namespace std;
         using std::abs;
 
         COMPILE_TIME_ASSERT((is_same_type<type, typename EXP::type>::value));

@@ -13,13 +13,8 @@
 #include "cblas_constants.h"
 #include <stdint.h>
 
-//#include <iostream>
-//using namespace std;
-
 namespace dlib
 {
-
-
     namespace blas_bindings 
     {
 

@@ -122,8 +122,6 @@ namespace dlib
         const std::string& title
     ) const
     {
-        using namespace std;
-
         if (!out)
             throw std::ios::failure("error occurred in cpp_pretty_printer_kernel_2::print");
 
@@ -434,7 +432,6 @@ namespace dlib
         const std::string& title
     ) const
     {
-        using namespace std;
         ostringstream sout;
         print(in,sout,title);
         istringstream sin(sout.str());

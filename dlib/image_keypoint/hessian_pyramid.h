@@ -461,7 +461,6 @@ namespace dlib
             << "\n\t Invalid arguments to this function"
             << "\n\t threshold: " << threshold 
         );
-        using namespace std;
         using namespace hessian_pyramid_helpers;
 
         result_points.clear();
