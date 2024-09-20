@@ -2085,7 +2085,7 @@ namespace dlib
 
             launch_kernel(_cuda_reorg_gradient, gradient_input.size(), grad.k(), grad.nr(), grad.nc(), grad.device(),
                 gradient_input.k(), gradient_input.nr(), gradient_input.nc(), gradient_input.device(),
-                row_stride, col_stride);
+                row_stride, col_stride, add_to);
         }
 
     // ----------------------------------------------------------------------------------------
