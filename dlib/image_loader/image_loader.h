@@ -14,6 +14,7 @@
 #include "../uintn.h"
 #include "../image_transforms/assign_image.h"
 #include <algorithm>
+#include "../vectorstream.h"
 
 namespace dlib
 {
