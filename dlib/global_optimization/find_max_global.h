@@ -178,18 +178,21 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
             running_stats_decayed<double> objective_funct_eval_time(functions.size()*5);
             std::mutex eval_time_mutex;
 
-            const auto time_to_stop = std::chrono::steady_clock::now() + max_runtime;
+            using std::chrono::steady_clock;
+            using std::chrono::duration_cast;
+            using std::chrono::nanoseconds;
+            const auto time_to_stop = steady_clock::now() + max_runtime;
             //atomic<bool> doesn't support .fetch_or, use std::atomic<int> instead
             std::atomic<int> this_should_stop{false};
 
             double max_solver_overhead_time = 0;
 
             // Now run the main solver loop.
-            for (size_t i = 0; i < num.max_calls && std::chrono::steady_clock::now() < time_to_stop && !this_should_stop.load(); ++i)
+            for (size_t i = 0; i < num.max_calls && steady_clock::now() < time_to_stop && !this_should_stop.load(); ++i)
             {
-                const auto get_next_x_start_time = std::chrono::steady_clock::now();
+                const auto get_next_x_start_time = steady_clock::now();
                 auto next = std::make_shared<function_evaluation_request>(opt.get_next_x());
-                const auto get_next_x_runtime = std::chrono::steady_clock::now() - get_next_x_start_time;
+                const auto get_next_x_runtime = steady_clock::now() - get_next_x_start_time;
 
                 auto execute_call = [&functions,&ymult,&log_scale,&eval_time_mutex,&objective_funct_eval_time,next,&should_stop,&this_should_stop]() {
                     matrix<double,0,1> x = next->x();
@@ -200,9 +203,9 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
                         if (log_scale[next->function_idx()][j])
                             x(j) = std::exp(x(j));
                     }
-                    const auto funct_eval_start = std::chrono::steady_clock::now();
+                    const auto funct_eval_start = steady_clock::now();
                     double y = ymult*call_function_and_expand_args(functions[next->function_idx()], x);
-                    const double funct_eval_runtime = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now() - funct_eval_start).count();
+                    const double funct_eval_runtime = duration_cast<nanoseconds>(steady_clock::now() - funct_eval_start).count();
                     this_should_stop.fetch_or(should_stop(y*ymult));
                     next->set(y);
                     
@@ -214,7 +217,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
 
                 std::lock_guard<std::mutex> lock(eval_time_mutex);
                 const double obj_funct_time = objective_funct_eval_time.mean()/std::max(1ul,tp.num_threads_in_pool());
-                const double solver_overhead_time = std::chrono::duration_cast<std::chrono::nanoseconds>(get_next_x_runtime).count();
+                const double solver_overhead_time = duration_cast<nanoseconds>(get_next_x_runtime).count();
                 max_solver_overhead_time = std::max(max_solver_overhead_time, solver_overhead_time);
                 // Don't start thinking about the logic below until we have at least 5 objective
                 // function samples for each objective function.  This way we have a decent idea how
