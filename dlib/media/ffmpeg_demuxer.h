@@ -1236,6 +1236,7 @@ namespace dlib
         inline bool demuxer::open(const args& a)
         {
             using namespace details;
+            using std::chrono::system_clock;
 
             details::register_ffmpeg();
 
@@ -1281,8 +1282,8 @@ namespace dlib
             av_dict opts = st.args_.format_options;
             AVInputputFormatPtr input_format = st.args_.input_format.empty() ? nullptr : av_find_input_format(st.args_.input_format.c_str());
 
-            st.connecting_time = std::chrono::system_clock::now();
-            st.connected_time  = std::chrono::system_clock::time_point::max();
+            st.connecting_time = system_clock::now();
+            st.connected_time  = system_clock::time_point::max();
 
             int ret = avformat_open_input(&pFormatCtx,
                                         st.args_.filepath.c_str(),
@@ -1298,7 +1299,7 @@ namespace dlib
                 opts.print();
             }
 
-            st.connected_time = std::chrono::system_clock::now();
+            st.connected_time = system_clock::now();
             st.pFormatCtx.reset(std::exchange(pFormatCtx, nullptr));
 
             ret = avformat_find_stream_info(st.pFormatCtx.get(), NULL);
