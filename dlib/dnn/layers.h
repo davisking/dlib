@@ -4710,15 +4710,15 @@ namespace dlib
         tril_(): diag(diag_), diag_value(diag_value_::value) {}
         
         template <typename SUBNET>
-        void setup(const SUBNET& sub) {
-            initialize_mask(sub.get_output());
-        }
+        void setup(const SUBNET& sub) {}
         
         template <typename SUBNET>
         void forward(const SUBNET& sub, resizable_tensor& output)
         {
             auto& prev = sub.get_output();
             output.set_size(prev.num_samples(), prev.k(), prev.nr(), prev.nc());
+
+            check_mask(prev);
             tt::multiply(false, output, prev, binary_mask);
             if (diag_value != 0.0f) tt::add(1, output, 1, output_mask);
         }
@@ -4762,13 +4762,15 @@ namespace dlib
         }
 
     private:
-        void initialize_mask(const tensor& t)
+        void check_mask(const tensor& t)
         {
-            if (!have_same_dimensions(output_mask, t)) {
-                output_mask.copy_size(t);
-                binary_mask.copy_size(output_mask);
-                output_mask = 0;
+            if (!have_same_dimensions(binary_mask, t)) {
+                binary_mask.copy_size(t);
                 binary_mask = 1;
+                if (diag_value != 0.0f) {
+                    output_mask.copy_size(t);
+                    output_mask = 0;
+                }                                
                 for (long s = 0; s < output_mask.num_samples(); ++s)
                 {
                     for (long k = 0; k < output_mask.k(); ++k)
@@ -4777,7 +4779,7 @@ namespace dlib
                         {
                             for (long c = std::max(r + diag + 1, 0L); c < output_mask.nc(); ++c)
                             {
-                                output_mask.host()[tensor_index(output_mask, s, k, r, c)] = diag_value;
+                                if (diag_value != 0.0f) output_mask.host()[tensor_index(output_mask, s, k, r, c)] = diag_value;
                                 binary_mask.host()[tensor_index(binary_mask, s, k, r, c)] = 0;
                             }
                         }
@@ -4787,8 +4789,7 @@ namespace dlib
         }
 
         resizable_tensor params; // unused
-        resizable_tensor output_mask;
-        resizable_tensor binary_mask;
+        resizable_tensor binary_mask, output_mask;
         long diag;
         float diag_value;
     };
