@@ -4406,11 +4406,11 @@ namespace
         resizable_tensor grad_cpu(x), grad_cuda(x);
         tt::tensor_rand rnd;
         rnd.fill_gaussian(x);
-        cpu::reorg(out_cpu, 2, 2, x);
-        cuda::reorg(out_cuda, 2, 2, x);
+        cpu::reorg(false, out_cpu, 2, 2, x);
+        cuda::reorg(false, out_cuda, 2, 2, x);
         DLIB_TEST(max(squared(mat(out_cuda) - mat(out_cpu))) == 0);
-        cpu::reorg_gradient(grad_cpu, 2, 2, out_cpu);
-        cuda::reorg_gradient(grad_cuda, 2, 2, out_cuda);
+        cpu::reorg_gradient(false, grad_cpu, 2, 2, out_cpu);
+        cuda::reorg_gradient(false, grad_cuda, 2, 2, out_cuda);
         DLIB_TEST(max(squared(mat(out_cuda) - mat(out_cpu))) == 0);
 #endif
     }

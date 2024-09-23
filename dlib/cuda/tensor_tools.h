@@ -1969,6 +1969,7 @@ namespace dlib { namespace tt
 // ----------------------------------------------------------------------------------------
 
     void reorg (
+        bool add_to,
         tensor& dest,
         const int row_stride,
         const int col_stride,
@@ -1976,7 +1977,7 @@ namespace dlib { namespace tt
     );
     /*!
         requires
-            - is_same_object(dest, src)==false
+            - !is_same_object(dest, src)
             - src.nr() % row_stride == 0
             - src.nc() % col_stride == 0
             - dest.num_samples() == src.num_samples()
@@ -1984,20 +1985,31 @@ namespace dlib { namespace tt
             - dest.nr() == src.nr() / row_stride
             - dest.nc() == src.nc() / col_stride
         ensures
-            - Converts the spatial resolution into channel information.  So all the values in the input tensor 
-              appear in the output tensor, just in different positions.  
-            - For all n, k, r, c in dest:
-                dest.host[tensor_index(dest, n, k, r, c)] ==
-                src.host[tensor_index(src,
-                                      n,
-                                      k % src.k(),
-                                      r * row_stride + (k / src.k()) / row_stride,
-                                      c * col_stride + (k / src.k()) % col_stride)]
-
-
+            - Reorganizes the spatial resolution of src into channel information in dest, effectively
+              shifting spatial data into the channel dimension based on the specified strides.
+            - If add_to is false:
+                - Each element in dest is set to the corresponding reorganized value from src.
+            - If add_to is true:
+                - Each element in dest is incremented by the corresponding reorganized value from src.
+            - Specifically, for all n, k, r, c in dest:
+                - If add_to is false:
+                    dest.host[tensor_index(dest, n, k, r, c)] =
+                        src.host[tensor_index(src,
+                                            n,
+                                            k % src.k(),
+                                            r * row_stride + (k / src.k()) / col_stride,
+                                            c * col_stride + (k / src.k()) % col_stride)];
+                - If add_to is true:
+                    dest.host[tensor_index(dest, n, k, r, c)] +=
+                        src.host[tensor_index(src,
+                                            n,
+                                            k % src.k(),
+                                            r * row_stride + (k / src.k()) / col_stride,
+                                            c * col_stride + (k / src.k()) % col_stride)];
     !*/
 
     void reorg_gradient (
+        bool add_to,
         tensor& grad,
         const int row_stride,
         const int col_stride,
@@ -2005,18 +2017,37 @@ namespace dlib { namespace tt
     );
     /*!
         requires
-            - is_same_object(dest, src)==false
-            - gradient_input.nr % row_stride == 0
-            - gradient_input.nc % col_stride == 0
-            - dest.num_samples() == src.num_samples()
+            - !is_same_object(grad, gradient_input)
+            - gradient_input.nr() % row_stride == 0
+            - gradient_input.nc() % col_stride == 0
+            - grad.num_samples() == gradient_input.num_samples()
             - grad.k() == gradient_input.k() / row_stride / col_stride
             - grad.nr() == gradient_input.nr() * row_stride
             - grad.nc() == gradient_input.nc() * col_stride
         ensures
-            - Suppose that DEST is the output of reog(DEST, row_stride, col_stride, SRC)
-              for some SRC tensor, let f(SRC) == dot(gradient_input,DEST).  Then this
-              function computes the gradient of f() with respect to SRC and adds it to grad.
-            - It effectively reverts the reorg operation
+            - Computes the gradient of the function f(SRC) = DEST, where DEST is the result of
+              reorg(DEST, row_stride, col_stride, SRC).
+            - If add_to is false:
+                - Each element in grad is set to the corresponding gradient value.
+            - If add_to is true:
+                - Each element in grad is incremented by the corresponding gradient value.
+            - Specifically, for all n, k, r, c in grad:
+                - If add_to is false:
+                    grad.host[tensor_index(grad, n, k, r, c)] =
+                        gradient_input.host[tensor_index(gradient_input,
+                                                        n,
+                                                        (k*row_stride*col_stride) + (r%row_stride)*col_stride + c%col_stride,
+                                                        r/row_stride,
+                                                        c/col_stride)];
+                - If add_to is true:
+                    grad.host[tensor_index(grad, n, k, r, c)] +=
+                        gradient_input.host[tensor_index(gradient_input,
+                                                        n,
+                                                        (k*row_stride*col_stride) + (r%row_stride)*col_stride + c%col_stride,
+                                                        r/row_stride,
+                                                        c/col_stride)];
+            - This function effectively reverses the reorg operation, distributing gradients
+              from the channel dimension of gradient_input to the spatial dimensions of grad.
     !*/
 
 // ----------------------------------------------------------------------------------------

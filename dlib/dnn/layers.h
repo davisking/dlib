@@ -4564,13 +4564,13 @@ namespace dlib
                 sub.get_output().nr() / row_stride,
                 sub.get_output().nc() / col_stride
             );
-            tt::reorg(output, row_stride, col_stride, sub.get_output());
+            tt::reorg(false, output, row_stride, col_stride, sub.get_output());
         }
 
         template <typename SUBNET>
         void backward(const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
         {
-            tt::reorg_gradient(sub.get_gradient_input(), row_stride, col_stride, gradient_input);
+            tt::reorg_gradient(true, sub.get_gradient_input(), row_stride, col_stride, gradient_input);
         }
 
         inline dpoint map_input_to_output (dpoint p) const
