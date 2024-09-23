@@ -1029,8 +1029,8 @@ namespace dlib
                 update(i);
             }
 
-            template <long diag, typename diag_value_type, typename U, typename E>
-            void operator()(size_t i, const add_layer<tril_<diag, diag_value_type>, U, E>&)
+            template <long diag, typename diag_value, typename U, typename E>
+            void operator()(size_t i, const add_layer<tril_<diag, diag_value>, U, E>&)
             {
                 start_node(i, "tril");
                 out << " | {diag|{" << diag << "}}";

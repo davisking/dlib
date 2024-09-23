@@ -4698,9 +4698,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename T, T val>
-    struct float_constant {
-        static constexpr T value = val;
+    template <auto v>
+    struct constant_wrapper {
+        static constexpr auto value = v;
     };
 
     template <long diag_, typename diag_value_>
@@ -4795,13 +4795,13 @@ namespace dlib
     };
 
     template <typename SUBNET>
-    using tril = add_layer<tril_<0, float_constant<float, 0.0f>>, SUBNET>;
+    using tril = add_layer<tril_<0, constant_wrapper<0.0f>>, SUBNET>;
 
     template <typename SUBNET>
-    using tril_mask = add_layer<tril_<0, float_constant<float, -std::numeric_limits<float>::infinity()>>, SUBNET>;
+    using tril_mask = add_layer<tril_<0, constant_wrapper<-std::numeric_limits<float>::infinity()>>, SUBNET>;
 
-    template <long diag, typename diag_value_type, typename SUBNET>
-    using tril_diag = add_layer<tril_<diag, diag_value_type>, SUBNET>;
+    template <long diag, typename diag_value, typename SUBNET>
+    using tril_diag = add_layer<tril_<diag, diag_value>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
