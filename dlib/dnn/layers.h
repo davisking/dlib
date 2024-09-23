@@ -4698,6 +4698,112 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T, T val>
+    struct float_constant {
+        static constexpr T value = val;
+    };
+
+    template <long diag_, typename diag_value_>
+    class tril_
+    {
+    public:
+        tril_(): diag(diag_), diag_value(diag_value_::value) {}
+        
+        template <typename SUBNET>
+        void setup(const SUBNET& sub) {
+            initialize_mask(sub.get_output());
+        }
+        
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            auto& prev = sub.get_output();
+            output.set_size(prev.num_samples(), prev.k(), prev.nr(), prev.nc());
+            tt::multiply(false, output, prev, binary_mask);
+            if (diag_value != 0.0f) tt::add(1, output, 1, output_mask);
+        }
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
+        {
+            auto& prev_grad = sub.get_gradient_input();
+            tt::multiply(true, prev_grad, gradient_input, binary_mask);
+        }
+
+        inline dpoint map_input_to_output(const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input(const dpoint& p) const { return p; }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+        
+        friend void serialize(const tril_& item, std::ostream& out)
+        {
+            serialize("tril_", out);
+            serialize(item.diag, out);
+            serialize(item.diag_value, out);
+        }
+        friend void deserialize(tril_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "tril_")
+                throw serialization_error("Unexpected version '" + version + "' found while deserializing dlib::tril_.");
+            deserialize(item.diag, in);
+            deserialize(item.diag_value, in);
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const tril_& item)
+        {
+            out << "tril (diag=" << item.diag << ", diag_value=" << item.diag_value << ")";
+            return out;
+        }
+        friend void to_xml(const tril_& item, std::ostream& out)
+        {
+            out << "<tril diag='" << item.diag << "' diag_value='" << item.diag_value << "'/>\n";
+        }
+
+    private:
+        void initialize_mask(const tensor& t)
+        {
+            if (!have_same_dimensions(output_mask, t)) {
+                output_mask.copy_size(t);
+                binary_mask.copy_size(output_mask);
+                output_mask = 0;
+                binary_mask = 1;
+                for (long s = 0; s < output_mask.num_samples(); ++s)
+                {
+                    for (long k = 0; k < output_mask.k(); ++k)
+                    {
+                        for (long r = 0; r < output_mask.nr(); ++r)
+                        {
+                            for (long c = std::max(r + diag + 1, 0L); c < output_mask.nc(); ++c)
+                            {
+                                output_mask.host()[tensor_index(output_mask, s, k, r, c)] = diag_value;
+                                binary_mask.host()[tensor_index(binary_mask, s, k, r, c)] = 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        resizable_tensor params; // unused
+        resizable_tensor output_mask;
+        resizable_tensor binary_mask;
+        long diag;
+        float diag_value;
+    };
+
+    template <typename SUBNET>
+    using tril = add_layer<tril_<0, float_constant<float, 0.0f>>, SUBNET>;
+
+    template <typename SUBNET>
+    using tril_mask = add_layer<tril_<0, float_constant<float, -std::numeric_limits<float>::infinity()>>, SUBNET>;
+
+    template <long diag, typename diag_value_type, typename SUBNET>
+    using tril_diag = add_layer<tril_<diag, diag_value_type>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_LAYERS_H_
