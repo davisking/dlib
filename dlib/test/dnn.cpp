@@ -2025,7 +2025,7 @@ namespace
         }
         {
             print_spinner();
-            using specific_float = constant_wrapper<-std::numeric_limits<float>::infinity()>;
+            using specific_float = constant_wrapper<float, -std::numeric_limits<float>::infinity()>;
             tril_<-5, specific_float> l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
@@ -4460,7 +4460,7 @@ namespace
     {
         print_spinner();
         
-        using NEG_INF = constant_wrapper<-std::numeric_limits<float>::infinity()>;
+        using NEG_INF = constant_wrapper<float, -std::numeric_limits<float>::infinity()>;
         using net_type = tag1<tril_diag<0, NEG_INF, tag2<input<matrix<float>>>>>;
         net_type net;
 

@@ -1034,7 +1034,7 @@ namespace dlib
             {
                 start_node(i, "tril");
                 out << " | {diag|{" << diag << "}}";
-                out << " | {diag_value|{" << diag_value_type::value << "}}";
+                out << " | {diag_value|{" << diag_value::value << "}}";
                 end_node();
                 update(i);
             }            
