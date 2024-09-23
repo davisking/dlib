@@ -2938,7 +2938,47 @@ namespace dlib
         }
 
     // ------------------------------------------------------------------------------------
-    // ------------------------------------------------------------------------------------
+
+        void transpose(
+            bool add,
+            tensor& dest,
+            const tensor& src            
+        )
+        {
+            DLIB_CASSERT(dest.num_samples() == src.num_samples() &&
+                dest.k() == src.k() &&
+                dest.nr() == src.nc() &&
+                dest.nc() == src.nr(),
+                "Incompatible tensor dimensions.");
+
+            const float* src_data = src.host();
+            float* dest_data = dest.host();
+
+            const long num_samples = src.num_samples();
+            const long k_dim = src.k();
+            const long src_nr = src.nr();
+            const long src_nc = src.nc();
+            const long dest_nr = dest.nr();
+            const long dest_nc = dest.nc();
+
+            parallel_for(0, num_samples * k_dim, [&](long i) {
+                const long n = i / k_dim;
+                const long k = i % k_dim;
+                const long src_nk_offset = (n * src.k() + k) * src_nr;
+                const long dest_nk_offset = (n * dest.k() + k) * dest_nr;
+
+                for (long r = 0; r < src_nr; ++r) {
+                    for (long c = 0; c < src_nc; ++c) {
+                        const long src_idx = (src_nk_offset + r) * src_nc + c;
+                        const long dest_idx = (dest_nk_offset + c) * dest_nc + r;
+
+                        if (add) dest_data[dest_idx] += src_data[src_idx];
+                        else dest_data[dest_idx] = src_data[src_idx];
+                    }
+                }
+            });
+        }
+
     // ------------------------------------------------------------------------------------
 
     } 
