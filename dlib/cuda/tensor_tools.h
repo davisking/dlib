@@ -1985,31 +1985,27 @@ namespace dlib { namespace tt
             - dest.nr() == src.nr() / row_stride
             - dest.nc() == src.nc() / col_stride
         ensures
-            - Reorganizes the spatial resolution of `src` into channel information in `dest`, effectively
-            shifting spatial data into the channel dimension based on the specified strides.
-            - If `add_to` is `false`:
-                - Each element in `dest` is set to the corresponding reorganized value from `src`.
-            - If `add_to` is `true`:
-                - Each element in `dest` is incremented by the corresponding reorganized value from `src`.
-            - Specifically, for all `n`, `k`, `r`, `c` in `dest`:
-                - If `add_to` is `false`:
-                    ```
+            - Reorganizes the spatial resolution of src into channel information in dest, effectively
+              shifting spatial data into the channel dimension based on the specified strides.
+            - If add_to is false:
+                - Each element in dest is set to the corresponding reorganized value from src.
+            - If add_to is true:
+                - Each element in dest is incremented by the corresponding reorganized value from src.
+            - Specifically, for all n, k, r, c in dest:
+                - If add_to is false:
                     dest.host[tensor_index(dest, n, k, r, c)] =
                         src.host[tensor_index(src,
                                             n,
                                             k % src.k(),
                                             r * row_stride + (k / src.k()) / col_stride,
                                             c * col_stride + (k / src.k()) % col_stride)];
-                    ```
-                - If `add_to` is `true`:
-                    ```
+                - If add_to is true:
                     dest.host[tensor_index(dest, n, k, r, c)] +=
                         src.host[tensor_index(src,
                                             n,
                                             k % src.k(),
                                             r * row_stride + (k / src.k()) / col_stride,
                                             c * col_stride + (k / src.k()) % col_stride)];
-                    ```
     !*/
 
     void reorg_gradient (
@@ -2030,32 +2026,28 @@ namespace dlib { namespace tt
             - grad.nc() == gradient_input.nc() * col_stride
         ensures
             - Computes the gradient of the function f(SRC) = DEST, where DEST is the result of
-            reorg(DEST, row_stride, col_stride, SRC).
+              reorg(DEST, row_stride, col_stride, SRC).
             - If add_to is false:
                 - Each element in grad is set to the corresponding gradient value.
             - If add_to is true:
                 - Each element in grad is incremented by the corresponding gradient value.
             - Specifically, for all n, k, r, c in grad:
                 - If add_to is false:
-                    ```
                     grad.host[tensor_index(grad, n, k, r, c)] =
                         gradient_input.host[tensor_index(gradient_input,
                                                         n,
                                                         (k*row_stride*col_stride) + (r%row_stride)*col_stride + c%col_stride,
                                                         r/row_stride,
                                                         c/col_stride)];
-                    ```
                 - If add_to is true:
-                    ```
                     grad.host[tensor_index(grad, n, k, r, c)] +=
                         gradient_input.host[tensor_index(gradient_input,
                                                         n,
                                                         (k*row_stride*col_stride) + (r%row_stride)*col_stride + c%col_stride,
                                                         r/row_stride,
                                                         c/col_stride)];
-                    ```
             - This function effectively reverses the reorg operation, distributing gradients
-            from the channel dimension of gradient_input to the spatial dimensions of grad.
+              from the channel dimension of gradient_input to the spatial dimensions of grad.
     !*/
 
 // ----------------------------------------------------------------------------------------
