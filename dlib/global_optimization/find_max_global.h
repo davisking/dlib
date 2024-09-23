@@ -177,8 +177,10 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
 
             running_stats_decayed<double> objective_funct_eval_time(functions.size()*5);
             std::mutex eval_time_mutex;
-            using namespace std::chrono;
 
+            using std::chrono::steady_clock;
+            using std::chrono::duration_cast;
+            using std::chrono::nanoseconds;
             const auto time_to_stop = steady_clock::now() + max_runtime;
             //atomic<bool> doesn't support .fetch_or, use std::atomic<int> instead
             std::atomic<int> this_should_stop{false};

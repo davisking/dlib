@@ -200,7 +200,6 @@ namespace dlib
         }
 
         /*
-        using namespace std;
         cout << "SMO: " << endl;
         cout << "   duality gap: "<< trans(alpha)*df - C*min(df) << endl;
         cout << "   KKT gap:     "<< big-little << endl;
@@ -394,7 +393,6 @@ namespace dlib
         }
 
         /*
-        using namespace std;
         cout << "SMO: " << endl;
         cout << "   duality gap: "<< trans(alpha)*df - C*min(df) << endl;
         cout << "   KKT gap:     "<< big-little << endl;

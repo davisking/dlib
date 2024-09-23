@@ -414,8 +414,6 @@ namespace dlib
         const charT** argv
     )
     {
-        using namespace std;
-
         // make sure there aren't any arguments hanging around from the last time
         // parse was called
         this->argv.clear();

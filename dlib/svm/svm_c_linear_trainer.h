@@ -87,14 +87,13 @@ namespace dlib
         {
             if (be_verbose)
             {
-                using namespace std;
-                cout << "objective:     " << current_objective_value << endl;
-                cout << "objective gap: " << current_error_gap << endl;
-                cout << "risk:          " << current_risk_value << endl;
-                cout << "risk gap:      " << current_risk_gap << endl;
-                cout << "num planes:    " << num_cutting_planes << endl;
-                cout << "iter:          " << num_iterations << endl;
-                cout << endl;
+                std::cout << "objective:     " << current_objective_value << std::endl;
+                std::cout << "objective gap: " << current_error_gap << std::endl;
+                std::cout << "risk:          " << current_risk_value << std::endl;
+                std::cout << "risk gap:      " << current_risk_gap << std::endl;
+                std::cout << "num planes:    " << num_cutting_planes << std::endl;
+                std::cout << "iter:          " << num_iterations << std::endl;
+                std::cout << std::endl;
             }
 
             if (num_iterations >= max_iterations)

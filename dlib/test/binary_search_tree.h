@@ -18,7 +18,6 @@ namespace
 {
 
     using namespace test;
-    using namespace std;
     using namespace dlib;
 
     logger dlog("test.binary_search_tree");
@@ -173,9 +172,9 @@ namespace
 
             // serialize the state of test, then clear test, then
             // load the state back into test.
-            ostringstream sout;
+            std::ostringstream sout;
             serialize(test,sout);
-            istringstream sin(sout.str());
+            std::istringstream sin(sout.str());
             test.clear();
             deserialize(test,sin);
 
@@ -399,7 +398,7 @@ namespace
             for (int i = 0; i < 10000; ++i)
             {
                 a = ::rand()&0x7FFF;
-                m = max(a,m);
+                m = std::max(a,m);
                 test2.add(a,b);
             }
 

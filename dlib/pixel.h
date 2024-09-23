@@ -1068,7 +1068,6 @@ namespace dlib
         {
             double themin,themax,delta;
             HSL c2;
-            using namespace std;
 
             themin = std::min(c1.r,std::min(c1.g,c1.b));
             themax = std::max(c1.r,std::max(c1.g,c1.b));
@@ -1099,7 +1098,6 @@ namespace dlib
         inline COLOUR HSL2RGB(HSL c1)
         {
             COLOUR c2,sat,ctmp;
-            using namespace std;
 
             if (c1.h < 120) {
                 sat.r = (120 - c1.h) / 60.0;
@@ -1267,26 +1265,25 @@ namespace dlib
         inline Lab RGB2Lab(COLOUR c1)
         {
             Lab c2;
-            using namespace std;
 
             double var_R = c1.r;
             double var_G = c1.g;
             double var_B = c1.b;
 
             if (var_R > 0.04045) {
-                var_R = pow(((var_R + 0.055) / 1.055), 2.4);
+                var_R = std::pow(((var_R + 0.055) / 1.055), 2.4);
             } else {
                 var_R = var_R / 12.92;
             }
 
             if (var_G > 0.04045) {
-                var_G = pow(((var_G + 0.055) / 1.055), 2.4);
+                var_G = std::pow(((var_G + 0.055) / 1.055), 2.4);
             } else {
                 var_G = var_G / 12.92;
             }
 
             if (var_B > 0.04045) {
-                var_B = pow(((var_B + 0.055) / 1.055), 2.4);
+                var_B = std::pow(((var_B + 0.055) / 1.055), 2.4);
             } else {
                 var_B = var_B / 12.92;
             }
@@ -1305,21 +1302,21 @@ namespace dlib
             double var_Z = Z / 108.883;
 
             if (var_X > 0.008856) {
-                var_X = pow(var_X, (1.0 / 3));
+                var_X = std::pow(var_X, (1.0 / 3));
             }
             else {
                 var_X = (7.787 * var_X) + (16.0 / 116);
             }
 
             if (var_Y > 0.008856) {
-                var_Y = pow(var_Y, (1.0 / 3));
+                var_Y = std::pow(var_Y, (1.0 / 3));
             }
             else {
                 var_Y = (7.787 * var_Y) + (16.0 / 116);
             }
 
             if (var_Z > 0.008856) {
-                var_Z = pow(var_Z, (1.0 / 3));
+                var_Z = std::pow(var_Z, (1.0 / 3));
             }
             else {
                 var_Z = (7.787 * var_Z) + (16.0 / 116);
@@ -1342,26 +1339,25 @@ namespace dlib
         */
         inline COLOUR Lab2RGB(Lab c1) {
             COLOUR c2;
-            using namespace std;
 
             double var_Y = (c1.l + 16) / 116.0;
             double var_X = (c1.a / 500.0) + var_Y;
             double var_Z = var_Y - (c1.b / 200);
 
-            if (pow(var_Y, 3) > 0.008856) {
-                var_Y = pow(var_Y, 3);
+            if (std::pow(var_Y, 3) > 0.008856) {
+                var_Y = std::pow(var_Y, 3);
             } else {
                 var_Y = (var_Y - 16.0 / 116) / 7.787;
             }
 
-            if (pow(var_X, 3) > 0.008856) {
-                var_X = pow(var_X, 3);
+            if (std::pow(var_X, 3) > 0.008856) {
+                var_X = std::pow(var_X, 3);
             } else {
                 var_X = (var_X - 16.0 / 116) / 7.787;
             }
 
-            if (pow(var_Z, 3) > 0.008856) {
-                var_Z = pow(var_Z, 3);
+            if (std::pow(var_Z, 3) > 0.008856) {
+                var_Z = std::pow(var_Z, 3);
             } else {
                 var_Z = (var_Z - 16.0 / 116) / 7.787;
             }
@@ -1379,19 +1375,19 @@ namespace dlib
             double var_B = var_X * 0.0557 + var_Y * -0.2040 + var_Z * 1.0570;
 
             if (var_R > 0.0031308) {
-                var_R = 1.055 * pow(var_R, (1 / 2.4)) - 0.055;
+                var_R = 1.055 * std::pow(var_R, (1 / 2.4)) - 0.055;
             } else {
                 var_R = 12.92 * var_R;
             }
 
             if (var_G > 0.0031308) {
-                var_G = 1.055 * pow(var_G, (1 / 2.4)) - 0.055;
+                var_G = 1.055 * std::pow(var_G, (1 / 2.4)) - 0.055;
             } else {
                 var_G = 12.92 * var_G;
             }
 
             if (var_B > 0.0031308) {
-                var_B = 1.055 * pow(var_B, (1 / 2.4)) - 0.055;
+                var_B = 1.055 * std::pow(var_B, (1 / 2.4)) - 0.055;
             } else {
                 var_B = 12.92 * var_B;
             }

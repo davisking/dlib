@@ -277,12 +277,11 @@ namespace dlib
             scalar_type& b
         ) const
         {
-            using namespace std;
             long num_free = 0;
             scalar_type sum_free = 0;
 
-            scalar_type upper_bound = -numeric_limits<scalar_type>::infinity();
-            scalar_type lower_bound = numeric_limits<scalar_type>::infinity();
+            scalar_type upper_bound = -std::numeric_limits<scalar_type>::infinity();
+            scalar_type lower_bound = std::numeric_limits<scalar_type>::infinity();
 
             for(long i = 0; i < alpha.nr(); ++i)
             {

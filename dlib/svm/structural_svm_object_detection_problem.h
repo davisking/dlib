@@ -230,8 +230,7 @@ namespace dlib
                         const double match_amount = area_overlap/(double)( mapped_rects[i]+mapped_rects[j]).area();
                         const double overlap_amount = area_overlap/std::min(mapped_rects[i].area(),mapped_rects[j].area());
 
-                        using namespace std;
-                        ostringstream sout;
+                        std::ostringstream sout;
                         sout << "An impossible set of object labels was detected. This is happening because ";
                         sout << "the truth labels for an image contain rectangles which overlap according to the ";
                         sout << "test_box_overlap object supplied for non-max suppression.  To resolve this, you ";
@@ -239,16 +238,16 @@ namespace dlib
                         sout << "overlapping or adjust the truth rectangles in your training dataset. ";
 
                         // make sure the above string fits nicely into a command prompt window.
-                        string temp = sout.str();
-                        sout.str(""); sout << wrap_string(temp,0,0) << endl << endl;
+                        std::string temp = sout.str();
+                        sout.str(""); sout << wrap_string(temp,0,0) << std::endl << std::endl;
 
 
-                        sout << "image index: "<< idx << endl;
+                        sout << "image index: "<< idx << std::endl;
                         sout << "The offending rectangles are:\n";
-                        sout << "rect1: "<< mapped_rects[i] << endl;
-                        sout << "rect2: "<< mapped_rects[j] << endl;
-                        sout << "match amount:   " << match_amount << endl;
-                        sout << "overlap amount: " << overlap_amount << endl;
+                        sout << "rect1: "<< mapped_rects[i] << std::endl;
+                        sout << "rect2: "<< mapped_rects[j] << std::endl;
+                        sout << "match amount:   " << match_amount << std::endl;
+                        sout << "overlap amount: " << overlap_amount << std::endl;
                         throw dlib::impossible_labeling_error(sout.str());
                     }
                 }
@@ -262,8 +261,7 @@ namespace dlib
                 const double total_area = (truth_object_detections[idx][i].get_rect() + mapped_rects[i]).area();
                 if (area/total_area <= match_eps)
                 {
-                    using namespace std;
-                    ostringstream sout;
+                    std::ostringstream sout;
                     sout << "An impossible set of object labels was detected.  This is happening because ";
                     sout << "none of the object locations checked by the supplied image scanner is a close ";
                     sout << "enough match to one of the truth boxes in your training dataset.  To resolve this ";
@@ -278,18 +276,18 @@ namespace dlib
 
 
                     // make sure the above string fits nicely into a command prompt window.
-                    string temp = sout.str();
-                    sout.str(""); sout << wrap_string(temp,0,0) << endl << endl;
+                    std::string temp = sout.str();
+                    sout.str(""); sout << wrap_string(temp,0,0) << std::endl << std::endl;
 
-                    sout << "image index              "<< idx << endl;
-                    sout << "match_eps:               "<< match_eps << endl;
-                    sout << "best possible match:     "<< area/total_area << endl;
-                    sout << "truth rect:              "<< truth_object_detections[idx][i].get_rect() << endl;
-                    sout << "truth rect width/height: "<< truth_object_detections[idx][i].get_rect().width()/(double)truth_object_detections[idx][i].get_rect().height() << endl;
-                    sout << "truth rect area:         "<< truth_object_detections[idx][i].get_rect().area() << endl;
-                    sout << "nearest detection template rect:              "<< mapped_rects[i] << endl;
-                    sout << "nearest detection template rect width/height: "<< mapped_rects[i].width()/(double)mapped_rects[i].height() << endl;
-                    sout << "nearest detection template rect area:         "<< mapped_rects[i].area() << endl;
+                    sout << "image index              "<< idx << std::endl;
+                    sout << "match_eps:               "<< match_eps << std::endl;
+                    sout << "best possible match:     "<< area/total_area << std::endl;
+                    sout << "truth rect:              "<< truth_object_detections[idx][i].get_rect() << std::endl;
+                    sout << "truth rect width/height: "<< truth_object_detections[idx][i].get_rect().width()/(double)truth_object_detections[idx][i].get_rect().height() << std::endl;
+                    sout << "truth rect area:         "<< truth_object_detections[idx][i].get_rect().area() << std::endl;
+                    sout << "nearest detection template rect:              "<< mapped_rects[i] << std::endl;
+                    sout << "nearest detection template rect width/height: "<< mapped_rects[i].width()/(double)mapped_rects[i].height() << std::endl;
+                    sout << "nearest detection template rect area:         "<< mapped_rects[i].area() << std::endl;
                     throw dlib::impossible_labeling_error(sout.str());
                 }
 

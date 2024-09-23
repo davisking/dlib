@@ -3390,9 +3390,8 @@ namespace dlib
                 const auto forward_error = max(abs(mat(ip_out) - mat(subnetwork2.get_output())));
                 if (forward_error > 0.00001)
                 {
-                    using namespace std;
                     sout << "This layer is supposed to support in-place computations but the output of forward_inplace()\n";
-                    sout << "changes when invoked in-place vs. out-of-place. The error was: " << forward_error << endl;
+                    sout << "changes when invoked in-place vs. out-of-place. The error was: " << forward_error << std::endl;
                     return layer_test_results(sout.str()); 
                 }
 
@@ -3422,18 +3421,16 @@ namespace dlib
                     const auto backward_param_error = max(abs(mat(params_grad1) - mat(params_grad2)));
                     if (backward_param_error > 0.00001)
                     {
-                        using namespace std;
                         sout << "This layer is supposed to support in-place computations but the output of backward_inplace()\n";
-                        sout << "changes when invoked in-place vs. out-of-place. The error was: " << backward_param_error << endl;
+                        sout << "changes when invoked in-place vs. out-of-place. The error was: " << backward_param_error << std::endl;
                         return layer_test_results(sout.str()); 
                     }
                 }
                 const auto backward_data_error = max(abs(mat(data_grad1)-9 - mat(data_grad2)));
                 if (backward_data_error > 0.00001)
                 {
-                    using namespace std;
                     sout << "This layer is supposed to support in-place computations but the output of backward_inplace()\n";
-                    sout << "changes when invoked in-place vs. out-of-place. The error was: " << backward_data_error << endl;
+                    sout << "changes when invoked in-place vs. out-of-place. The error was: " << backward_data_error << std::endl;
                     return layer_test_results(sout.str()); 
                 }
             }
@@ -3467,11 +3464,10 @@ namespace dlib
                 rs_params.add(std::abs(relative_error));
                 if (std::abs(relative_error) > 0.05 && std::abs(absolute_error) > 0.006)
                 {
-                    using namespace std;
-                    sout << "Gradient error in parameter #" << i <<".  Relative error: "<< relative_error << endl;
-                    sout << "expected derivative: " << reference_derivative << endl;
-                    sout << "output derivative:   " << output_derivative << endl;
-                    sout << "iteration:           " << iter << endl;
+                    sout << "Gradient error in parameter #" << i <<".  Relative error: "<< relative_error << std::endl;
+                    sout << "expected derivative: " << reference_derivative << std::endl;
+                    sout << "output derivative:   " << output_derivative << std::endl;
+                    sout << "iteration:           " << iter << std::endl;
                     return layer_test_results(sout.str()); 
                 }
             }
@@ -3504,11 +3500,10 @@ namespace dlib
                 rs_data.add(std::abs(relative_error));
                 if (std::abs(relative_error) > 0.05 && std::abs(absolute_error) > 0.006)
                 {
-                    using namespace std;
-                    sout << "Gradient error in data variable #" << i <<".  Relative error: "<< relative_error << endl;
-                    sout << "expected derivative: " << reference_derivative << endl;
-                    sout << "output derivative:   " << output_derivative << endl;
-                    sout << "iteration:           " << iter << endl;
+                    sout << "Gradient error in data variable #" << i <<".  Relative error: "<< relative_error << std::endl;
+                    sout << "expected derivative: " << reference_derivative << std::endl;
+                    sout << "output derivative:   " << output_derivative << std::endl;
+                    sout << "iteration:           " << iter << std::endl;
                     return layer_test_results(sout.str()); 
                 }
             }
@@ -3517,14 +3512,12 @@ namespace dlib
 
         if (rs_params.mean() > 0.003)
         {
-            using namespace std;
-            sout << "Average parameter gradient error is somewhat large at: "<< rs_params.mean() << endl;
+            sout << "Average parameter gradient error is somewhat large at: "<< rs_params.mean() << std::endl;
             return layer_test_results(sout.str()); 
         }
         if (rs_data.mean() > 0.003)
         {
-            using namespace std;
-            sout << "Average data gradient error is somewhat large at: "<< rs_data.mean() << endl;
+            sout << "Average data gradient error is somewhat large at: "<< rs_data.mean() << std::endl;
             return layer_test_results(sout.str()); 
         }
 

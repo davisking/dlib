@@ -61,16 +61,15 @@ namespace dlib
         const std::string& body
     ) 
     {
-        using namespace std;
         // make sure requires clause is not broken
-        DLIB_CASSERT( head.find_first_of(" \r\t\n0123456789") == string::npos &&
-                body.find_first_of(" \r\t\n") == string::npos ,
+        DLIB_CASSERT( head.find_first_of(" \r\t\n0123456789") == std::string::npos &&
+                body.find_first_of(" \r\t\n") == std::string::npos ,
             "\tvoid tokenizer::set_identifier_token()"
             << "\n\tyou can't define the IDENTIFIER token this way."
             << "\n\thead: " << head
             << "\n\tbody: " << body
             << "\n\tthis: " << this
-            );
+            )
 
         // call the real function
         tokenizer::set_identifier_token(head,body);

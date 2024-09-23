@@ -69,8 +69,6 @@ namespace dlib
         }
 
 
-        using namespace std;
-
         for (long i = results.nr()-1; i >= 0; --i)
         {
             long worst_feature_idx = 0;
@@ -188,8 +186,6 @@ namespace dlib
         matrix<scalar_type,0,2,mm> results(num_features, 2);
         matrix<scalar_type,sample_matrix_type::type::NR,1,mm> mask(samples(0).nr());
         set_all_elements(mask,0);
-
-        using namespace std;
 
         for (long i = 0; i < results.nr(); ++i)
         {
@@ -332,8 +328,6 @@ namespace dlib
                 double gamma
             ) const
             {
-                using namespace std;
-
                 // we are doing the optimization in log space so don't forget to convert back to normal space
                 gamma = std::exp(gamma);
 
@@ -347,8 +341,8 @@ namespace dlib
 
                 if (verbose)
                 {
-                    cout << "\rChecking goodness of gamma = " << gamma << ".  Goodness = " 
-                         << temp << "                    " << flush;
+                    std::cout << "\rChecking goodness of gamma = " << gamma << ".  Goodness = " 
+                         << temp << "                    " << std::flush;
                 }
                 return temp;
             }
@@ -372,11 +366,9 @@ namespace dlib
             bool verbose
         )
         {
-            using namespace std;
-
             if (verbose)
             {
-                cout << endl;
+                std::cout << std::endl;
             }
 
             test<sample_matrix_type, label_matrix_type> funct(samples, labels, num_sv, verbose);
@@ -385,8 +377,8 @@ namespace dlib
             
             if (verbose)
             {
-                cout << "\rBest gamma = " << std::exp(best_gamma) << ".  Goodness = " 
-                    << goodness << "                    " << endl;
+                std::cout << "\rBest gamma = " << std::exp(best_gamma) << ".  Goodness = " 
+                    << goodness << "                    " << std::endl;
             }
 
             return std::exp(best_gamma);

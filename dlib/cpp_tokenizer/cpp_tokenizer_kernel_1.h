@@ -380,8 +380,6 @@ namespace dlib
         std::string& token
     )
     {
-        using namespace std;
-
         if (!have_peeked)
         {
 
@@ -501,7 +499,7 @@ namespace dlib
 
                 case '"':
                     {
-                        string temp;                    
+                        std::string temp;                    
                         tokenizer.get_token(type,token);
                         while (type != tok::END_OF_FILE)
                         {
@@ -528,7 +526,7 @@ namespace dlib
 
                 case '\'':
                     {
-                        string temp;                    
+                        std::string temp;                    
                         tokenizer.get_token(type,token);
                         if (type == tok::CHAR && token[0] == '\\')
                         {
@@ -557,7 +555,7 @@ namespace dlib
                                 tokenizer.get_token(type,token);
                                 // this is the start of a line comment
                                 token = "//";
-                                string temp;                    
+                                std::string temp;                    
                                 tokenizer.get_token(type,temp);
                                 while (type != tok::END_OF_FILE)
                                 {
@@ -582,7 +580,7 @@ namespace dlib
                                 tokenizer.get_token(type,token);
                                 // this is the start of a block comment
                                 token = "/*";
-                                string temp;                    
+                                std::string temp;                    
                                 tokenizer.get_token(type,temp);
                                 while (type != tok::END_OF_FILE)
                                 {

@@ -1843,12 +1843,11 @@ namespace dlib
             use_image_pyramid assume_image_pyramid
         ) const 
         {
-            using namespace std;
             if (!input_layer(net).image_contained_point(input_tensor,center(rect)))
             {
                 std::ostringstream sout;
-                sout << "Encountered a truth rectangle located at " << rect << " that is outside the image." << endl;
-                sout << "The center of each truth rectangle must be within the image." << endl;
+                sout << "Encountered a truth rectangle located at " << rect << " that is outside the image." << std::endl;
+                sout << "The center of each truth rectangle must be within the image." << std::endl;
                 throw impossible_labeling_error(sout.str());
             }
 

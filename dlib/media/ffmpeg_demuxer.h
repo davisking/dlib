@@ -4,6 +4,7 @@
 #ifndef DLIB_FFMPEG_DEMUXER
 #define DLIB_FFMPEG_DEMUXER
 
+#include <chrono>
 #include <queue>
 #include <functional>
 #include <unordered_map>
@@ -995,8 +996,10 @@ namespace dlib
             Callback&& clb
         )
         {
-            using namespace std::chrono;
             using namespace details;
+            using std::chrono::duration_cast;
+            using std::chrono::system_clock;
+            using std::chrono::nanoseconds;
 
             const auto send_packet = [&](extract_state& state)
             {
@@ -1232,8 +1235,8 @@ namespace dlib
 
         inline bool demuxer::open(const args& a)
         {
-            using namespace std::chrono;
             using namespace details;
+            using std::chrono::system_clock;
 
             details::register_ffmpeg();
 

@@ -224,7 +224,6 @@ namespace dlib
                     - #visited[N.index()] == true
         !*/
         {
-            using namespace std;
             if (visited[node.index()] == true)
                 return true;
 
@@ -269,7 +268,6 @@ namespace dlib
                     - #visited[N.index()] == true
         !*/
         {
-            using namespace std;
             if (visited[node.index()] == true)
                 return true;
 
@@ -511,7 +509,6 @@ namespace dlib
         const T& graph
     )
     {
-        using namespace std;
         using namespace graph_helpers;
         std::vector<bool> visited(graph.number_of_nodes(), false);
         std::vector<bool> temp(graph.number_of_nodes(), false);
@@ -544,7 +541,6 @@ namespace dlib
         const T& graph
     )
     {
-        using namespace std;
         using namespace graph_helpers;
         std::vector<bool> visited(graph.number_of_nodes(), false);
 
@@ -860,7 +856,6 @@ namespace dlib
 
 
         using namespace graph_helpers;
-        using namespace std;
         typedef typename set_of_sets_of_int::type set_of_int;
 
         cliques.clear();

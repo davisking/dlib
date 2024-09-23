@@ -271,7 +271,6 @@ namespace dlib
                           << "To prevent further fatal errors from being ignored this application will be \n"
                           << "terminated immediately and you should go fix this buggy program.\n\n"
                           << "The error message from this fatal error was:\n" << this->what() << "\n\n" << std::endl;
-                using namespace std;
                 assert(false);
                 abort();
             }

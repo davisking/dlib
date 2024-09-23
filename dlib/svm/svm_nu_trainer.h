@@ -233,16 +233,15 @@ namespace dlib
             scalar_type& b
         ) const
         {
-            using namespace std;
             long num_p_free = 0;
             long num_n_free = 0;
             scalar_type sum_p_free = 0;
             scalar_type sum_n_free = 0;
 
-            scalar_type upper_bound_p = -numeric_limits<scalar_type>::infinity();
-            scalar_type upper_bound_n = -numeric_limits<scalar_type>::infinity();
-            scalar_type lower_bound_p = numeric_limits<scalar_type>::infinity();
-            scalar_type lower_bound_n = numeric_limits<scalar_type>::infinity();
+            scalar_type upper_bound_p = -std::numeric_limits<scalar_type>::infinity();
+            scalar_type upper_bound_n = -std::numeric_limits<scalar_type>::infinity();
+            scalar_type lower_bound_p = std::numeric_limits<scalar_type>::infinity();
+            scalar_type lower_bound_n = std::numeric_limits<scalar_type>::infinity();
 
             for(long i = 0; i < alpha.nr(); ++i)
             {

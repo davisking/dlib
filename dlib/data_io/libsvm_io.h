@@ -30,7 +30,6 @@ namespace dlib
         std::vector<label_type, alloc2>& labels
     )
     {
-        using namespace std;
         typedef typename sample_type::value_type pair_type;
         typedef typename basic_type<typename pair_type::first_type>::type key_type;
         typedef typename pair_type::second_type value_type;
@@ -41,13 +40,13 @@ namespace dlib
         samples.clear();
         labels.clear();
 
-        ifstream fin(file_name.c_str());
+        std::ifstream fin(file_name.c_str());
 
         if (!fin)
             throw sample_data_io_error("Unable to open file " + file_name);
 
-        string line;
-        istringstream sin;
+        std::string line;
+        std::istringstream sin;
         key_type key;
         value_type value;
         label_type label;
@@ -56,12 +55,12 @@ namespace dlib
         while (fin.peek() != EOF)
         {
             ++line_num;
-            getline(fin, line);
+            std::getline(fin, line);
 
-            string::size_type pos = line.find_first_not_of(" \t\r\n");
+            std::string::size_type pos = line.find_first_not_of(" \t\r\n");
 
             // ignore empty lines or comment lines
-            if (pos == string::npos || line[pos] == '#')
+            if (pos == std::string::npos || line[pos] == '#')
                 continue;
 
             sin.clear();
@@ -74,12 +73,12 @@ namespace dlib
                 throw sample_data_io_error("On line: " + cast_to_string(line_num) + ", error while reading file " + file_name );
 
             // eat whitespace
-            sin >> ws;
+            sin >> std::ws;
 
             while (sin.peek() != EOF && sin.peek() != '#')
             {
 
-                sin >> key >> ws;
+                sin >> key >> std::ws;
 
                 // ignore what should be a : character
                 if (sin.get() != ':')
@@ -89,10 +88,10 @@ namespace dlib
 
                 if (sin && value != 0)
                 {
-                    sample.insert(sample.end(), make_pair(key, value));
+                    sample.insert(sample.end(), std::make_pair(key, value));
                 }
 
-                sin >> ws;
+                sin >> std::ws;
             }
 
             samples.push_back(sample);
@@ -202,8 +201,7 @@ namespace dlib
             );
 
 
-        using namespace std;
-        ofstream fout(file_name.c_str());
+        std::ofstream fout(file_name.c_str());
         fout.precision(14);
 
         if (!fout)
@@ -244,8 +242,7 @@ namespace dlib
             << "\n\t labels.size():  " << labels.size()
             );
 
-        using namespace std;
-        ofstream fout(file_name.c_str());
+        std::ofstream fout(file_name.c_str());
         fout.precision(14);
 
         if (!fout)

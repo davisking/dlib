@@ -333,8 +333,6 @@ namespace dlib
         queue_of_files& files
     ) 
     {
-        using namespace std;
-
         files.clear();
         if (state.full_name.size() == 0)
             throw directory::listing_error("This directory object currently doesn't represent any directory.");
@@ -345,7 +343,7 @@ namespace dlib
 
         try
         {
-            string path = state.full_name;
+            std::string path = state.full_name;
             // ensure that the path ends with a separator
             if (path[path.size()-1] != directory::get_separator())
                 path += directory::get_separator();
@@ -490,8 +488,6 @@ namespace dlib
         queue_of_dirs& dirs
     ) 
     {
-        using namespace std;
-
         dirs.clear();
         if (state.full_name.size() == 0)
             throw directory::listing_error("This directory object currently doesn't represent any directory.");
@@ -502,7 +498,7 @@ namespace dlib
 
         try
         {
-            string path = state.full_name;
+            std::string path = state.full_name;
             // ensure that the path ends with a separator
             if (path[path.size()-1] != directory::get_separator())
                 path += directory::get_separator();
@@ -540,7 +536,7 @@ namespace dlib
                     continue;
                 }
 
-                string dtemp(data->d_name);
+                std::string dtemp(data->d_name);
                 if (S_ISDIR(buffer.st_mode) &&
                     dtemp != "." &&
                     dtemp != ".." )

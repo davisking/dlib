@@ -4,6 +4,7 @@
 #ifndef DLIB_VIDEO_MUXER
 #define DLIB_VIDEO_MUXER
 
+#include <chrono>
 #include <queue>
 #include <functional>
 #include <unordered_map>
@@ -1016,7 +1017,6 @@ namespace dlib
             Callback&& clb
         )
         {
-            using namespace std::chrono;
             using namespace details;
 
             if (!is_open())
@@ -1212,8 +1212,8 @@ namespace dlib
 
         inline bool muxer::open(const args& a)
         {
-            using namespace std::chrono;
             using namespace details;
+            using std::chrono::system_clock;
 
             st = {};
             st.args_ = a;
