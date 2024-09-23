@@ -218,17 +218,14 @@ namespace dlib
             long& j_out
         ) const
         {
-            using namespace std;
-
             long ip = 0;
             long jp = 0;
-
 
             typedef typename colm_exp<EXP>::type col_type;
             typedef typename diag_exp<EXP>::type diag_type;
 
-            scalar_type ip_val = -numeric_limits<scalar_type>::infinity();
-            scalar_type jp_val = numeric_limits<scalar_type>::infinity();
+            scalar_type ip_val = -std::numeric_limits<scalar_type>::infinity();
+            scalar_type jp_val = std::numeric_limits<scalar_type>::infinity();
 
             // loop over the alphas and find the maximum ip and in indices.
             for (long i = 0; i < alpha.nr(); ++i)
@@ -257,7 +254,7 @@ namespace dlib
                 }
             }
 
-            scalar_type Mp = -numeric_limits<scalar_type>::infinity();
+            scalar_type Mp = -std::numeric_limits<scalar_type>::infinity();
 
             // Pick out the column and diagonal of Q we need below.  Doing
             // it this way is faster if Q is actually a symmetric_matrix_cache

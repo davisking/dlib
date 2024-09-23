@@ -1995,12 +1995,11 @@ namespace dlib
         const matrix_exp<EXP>& m
     )
     {
-        using namespace std;
-        const streamsize old = out.width();
+        const std::streamsize old = out.width();
 
         // first figure out how wide we should make each field
-        string::size_type w = 0;
-        ostringstream sout;
+        std::string::size_type w = 0;
+        std::ostringstream sout;
         for (long r = 0; r < m.nr(); ++r)
         {
             for (long c = 0; c < m.nc(); ++c)
@@ -2016,7 +2015,7 @@ namespace dlib
         {
             for (long c = 0; c < m.nc(); ++c)
             {
-                out.width(static_cast<streamsize>(w));
+                out.width(static_cast<std::streamsize>(w));
                 out << m(r,c) << " ";
             }
             out << "\n";

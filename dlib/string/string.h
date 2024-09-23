@@ -290,8 +290,7 @@ namespace dlib
             const std::basic_string<charT,traits,alloc>& str
         )
         {
-            using namespace std;
-            basic_istringstream<charT,traits,alloc> sin(str);
+            std::basic_istringstream<charT,traits,alloc> sin(str);
             T temp;
             sin >> temp;
             if (!sin) throw string_cast_error(narrow(str));
@@ -324,7 +323,6 @@ namespace dlib
             const std::basic_string<charT,traits,alloc>& str
         )
         {
-            using namespace std;
             if (str.size() == 1 && str[0] == '1')
                 return true;
             if (str.size() == 1 && str[0] == '0')
@@ -347,14 +345,13 @@ namespace dlib
             const std::basic_string<charT,traits,alloc>& str        \
         )                                                           \
         {                                                           \
-            using namespace std;                                    \
-            basic_istringstream<charT,traits,alloc> sin(str);       \
+            std::basic_istringstream<charT,traits,alloc> sin(str);  \
             type temp;                                              \
             if (str.size() > 2 && str[0] == _dT(charT,'0') && str[1] == _dT(charT,'x'))   \
-                sin >> hex >> temp;                                 \
+                sin >> std::hex >> temp;                            \
             else                                                    \
                 sin >> temp;                                        \
-            if (!sin) throw string_cast_error(narrow(str));                 \
+            if (!sin) throw string_cast_error(narrow(str));         \
             if (sin.get() != std::char_traits<charT>::eof()) throw string_cast_error(narrow(str));     \
             return temp;                                            \
         }                                                           \
@@ -508,23 +505,21 @@ namespace dlib
                  << "\n\trest_pad:     " << rest_pad
                  << "\n\tmax_per_line: " << max_per_line  );
 
-        using namespace std;
-
-        basic_ostringstream<charT,traits,alloc> sout;
-        basic_istringstream<charT,traits,alloc> sin(str);
+        std::basic_ostringstream<charT,traits,alloc> sout;
+        std::basic_istringstream<charT,traits,alloc> sin(str);
 
         for (unsigned long i = 0; i < rest_pad; ++i)
             sout << _dT(charT," ");
-        const basic_string<charT,traits,alloc> pad(sout.str());
+        const std::basic_string<charT,traits,alloc> pad(sout.str());
         sout.str(_dT(charT,""));
 
         for (unsigned long i = 0; i < first_pad; ++i)
             sout << _dT(charT," ");
 
 
-        typename basic_string<charT,traits,alloc>::size_type remaining = max_per_line - rest_pad;
+        typename std::basic_string<charT,traits,alloc>::size_type remaining = max_per_line - rest_pad;
 
-        basic_string<charT,traits,alloc> temp;
+        std::basic_string<charT,traits,alloc> temp;
 
         sin >> temp;
         while (sin)
@@ -533,7 +528,7 @@ namespace dlib
             {
                 if (temp.size() + rest_pad >= max_per_line)
                 {
-                    string::size_type i = 0;
+                    std::string::size_type i = 0;
                     for (; i < temp.size(); ++i)
                     {
                         sout << temp[i];

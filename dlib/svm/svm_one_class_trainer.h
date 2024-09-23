@@ -224,7 +224,6 @@ namespace dlib
             scalar_type& rho
         ) const
         {
-            using namespace std;
             long num_p_free = 0;
             scalar_type sum_p_free = 0;
 

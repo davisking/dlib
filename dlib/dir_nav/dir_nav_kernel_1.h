@@ -390,7 +390,6 @@ namespace dlib
         queue_of_files& files
     ) 
     {
-        using namespace std;
         typedef directory::listing_error listing_error;
         typedef file::private_constructor private_constructor;
 
@@ -402,7 +401,7 @@ namespace dlib
         try
         {
             WIN32_FIND_DATAA data;
-            string path = state.full_name;
+            std::string path = state.full_name;
             // ensure that the path ends with a separator
             if (path[path.size()-1] != directory::get_separator())
                 path += directory::get_separator();
@@ -514,7 +513,6 @@ namespace dlib
         queue_of_dirs& dirs
     ) 
     {
-        using namespace std;
         typedef directory::listing_error listing_error;
         typedef directory::private_constructor private_constructor;
 
@@ -526,7 +524,7 @@ namespace dlib
         try
         {
             WIN32_FIND_DATAA data;
-            string path = state.full_name;
+            std::string path = state.full_name;
             // ensure that the path ends with a separator
             if (path[path.size()-1] != directory::get_separator())
                 path += directory::get_separator();
@@ -541,7 +539,7 @@ namespace dlib
             bool no_more_files = false;
             do
             {
-                string tname(data.cFileName);
+                std::string tname(data.cFileName);
                 if ((data.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) != 0 &&
                     tname != "." &&
                     tname != "..")

@@ -50,8 +50,6 @@ namespace dlib
     inline double log1pexp(double x)
     {
         using std::exp;
-        using namespace std; // Do this instead of using std::log1p because some compilers
-                             // error out otherwise (E.g. gcc 4.9 in cygwin)
         if (x <= -37)
             return exp(x);
         else if (-37 < x && x <= 18)
