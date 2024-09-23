@@ -750,6 +750,37 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_transpose()
+    {
+        const long num_samples = 2;
+        const long k = 3;
+        const long nr = 4;
+        const long nc = 5;
+
+        resizable_tensor input(num_samples, k, nr, nc);
+        resizable_tensor output_cpu_a(num_samples, k, nc, nr);    
+        tt::tensor_rand rnd(0);
+        rnd.fill_uniform(input);
+        resizable_tensor output_cpu_b(input);
+
+        cpu::transpose(false, output_cpu_a, input);
+        cpu::transpose(true, output_cpu_b, output_cpu_a);
+        input *= 2;
+        DLIB_TEST(max(abs(mat(output_cpu_b) - mat(input))) < 1e-5);
+
+#ifdef DLIB_USE_CUDA
+        input /= 2;
+        resizable_tensor output_cuda_a, output_cuda_b(input);    
+        output_cuda_a.copy_size(output_cpu_a);
+        cuda::transpose(false, output_cuda_a, input);
+        cuda::transpose(true, output_cuda_b, output_cuda_a);
+        DLIB_TEST(max(abs(mat(output_cpu_a) - mat(output_cuda_a))) < 1e-5);
+        DLIB_TEST(max(abs(mat(output_cpu_b) - mat(output_cuda_b))) < 1e-5);
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void test_basic_tensor_ops()
     {
         using namespace dlib::tt;
@@ -2280,6 +2311,12 @@ namespace
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
         }
+        {
+            print_spinner();
+            transpose_ l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }        
     }
 
 // ----------------------------------------------------------------------------------------
@@ -4489,6 +4526,7 @@ namespace
             test_batch_normalize_conv();
             test_layer_normalize();
             test_rms_normalize();
+            test_transpose();
             test_basic_tensor_ops();
             test_layers();
             test_visit_functions();

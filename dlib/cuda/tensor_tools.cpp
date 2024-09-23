@@ -1281,6 +1281,21 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void transpose(
+        bool add_to,
+        tensor& dest,
+        const tensor& src
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::transpose(add_to, dest, src);
+#else
+        cpu::transpose(add_to, dest, src);
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }}
 
 #endif // DLIB_TeNSOR_TOOLS_CPP_
