@@ -4574,6 +4574,7 @@ namespace
             test_layer_normalize();
             test_rms_normalize();
             test_transpose();
+            test_tril();
             test_basic_tensor_ops();
             test_layers();
             test_visit_functions();
