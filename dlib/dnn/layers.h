@@ -4698,16 +4698,21 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename T, T v>
-    struct constant_wrapper {
-        static constexpr T value = v;
-    };
+    struct neg_infinity_tag {};
+    struct zero_tag {};
 
-    template <long diag_, typename diag_value_>
+    template<typename T>
+    struct is_special_value : std::false_type {};
+    template<>
+    struct is_special_value<neg_infinity_tag> : std::true_type {};
+    template<>
+    struct is_special_value<zero_tag> : std::true_type {};
+
+    template<long diag_, typename tag_, long num_ = 0, long den_ = 1>
     class tril_
     {
     public:
-        tril_(): diag(diag_), diag_value(diag_value_::value) {}
+        tril_(): diag(diag_), diag_value(compute_diag_value()) {}
         
         template <typename SUBNET>
         void setup(const SUBNET& sub) {}
@@ -4762,6 +4767,17 @@ namespace dlib
         }
 
     private:
+        float compute_diag_value() const {
+            if constexpr (std::is_same<tag_, neg_infinity_tag>::value)
+                return -std::numeric_limits<float>::infinity();
+            else if constexpr (std::is_same<tag_, zero_tag>::value)
+                return 0.0f;
+            else if constexpr (is_special_value<tag_>::value)
+                static_assert(always_false<tag_>::value, "unsupported special value");
+            else
+                return static_cast<float>(num_) / static_cast<float>(den_);
+        }
+
         void check_mask(const tensor& t)
         {
             if (!have_same_dimensions(binary_mask, t)) {
@@ -4788,6 +4804,9 @@ namespace dlib
             }
         }
 
+        template <typename T>
+        struct always_false : std::false_type {};
+
         resizable_tensor params; // unused
         resizable_tensor binary_mask, output_mask;
         long diag;
@@ -4795,13 +4814,13 @@ namespace dlib
     };
 
     template <typename SUBNET>
-    using tril = add_layer<tril_<0, constant_wrapper<float, 0.0f>>, SUBNET>;
+    using tril = add_layer<tril_<0, zero_tag>, SUBNET>;
 
     template <typename SUBNET>
-    using tril_mask = add_layer<tril_<0, constant_wrapper<float, -std::numeric_limits<float>::infinity()>>, SUBNET>;
+    using tril_mask = add_layer<tril_<0, neg_infinity_tag>, SUBNET>;
 
-    template <long diag, typename diag_value, typename SUBNET>
-    using tril_diag = add_layer<tril_<diag, diag_value>, SUBNET>;
+    template <long diag, long num, long den, typename SUBNET>
+    using tril_diag = add_layer<tril_<diag, void, num, den>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

@@ -1029,15 +1029,25 @@ namespace dlib
                 update(i);
             }
 
-            template <long diag, typename diag_value, typename U, typename E>
-            void operator()(size_t i, const add_layer<tril_<diag, diag_value>, U, E>&)
+            template <long diag, typename tag, long num, long den, typename U, typename E>
+            void operator()(size_t i, const add_layer<tril_<diag, tag, num, den>, U, E>&)
             {
                 start_node(i, "tril");
                 out << " | {diag|{" << diag << "}}";
-                out << " | {diag_value|{" << diag_value::value << "}}";
+                out << " | {diag_value|{";
+                
+                if constexpr (std::is_same_v<tag, neg_infinity_tag>) {
+                    out << "-inf";
+                } else if constexpr (std::is_same_v<tag, zero_tag>) {
+                    out << "0";
+                } else {
+                    out << static_cast<float>(num) / static_cast<float>(den);
+                }
+                
+                out << "}}";
                 end_node();
                 update(i);
-            }            
+            }         
 
             template <typename T, typename U, typename E>
             void operator()(size_t i, const add_layer<T, U, E>&)

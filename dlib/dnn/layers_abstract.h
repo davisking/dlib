@@ -3713,27 +3713,63 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename T, T v>
-    struct constant_wrapper {
-        static constexpr T value = v;
-    };
+    struct neg_infinity_tag {};
+    struct zero_tag {};
 
-    template <long diag_, typename diag_value_>
+    template<typename T>
+    struct is_special_value : std::false_type {};
+    template<>
+    struct is_special_value<neg_infinity_tag> : std::true_type {};
+    template<>
+    struct is_special_value<zero_tag> : std::true_type {};
+
+    template<long diag_, typename tag_, long num_ = 0, long den_ = 1>
     class tril_
     {
         /*!
-            REQUIREMENTS ON diag_ and diag_value_
-                - diag_ must be a non-negative integer.
-                - diag_value_ must be a type that has a static constexpr member `value` of type float.
+            TEMPLATE PARAMETERS
+                - diag_: A long integer specifying the diagonal offset.
+                - tag_: A type tag specifying special values or void for numeric values.
+                - num_: Numerator for numeric diagonal value (default is 0, only used if tag_ is void).
+                - den_: Denominator for numeric diagonal value (default is 1, only used if tag_ is void).
+
+            REQUIREMENTS
+                - diag_ must be an integer.
+                - tag_ must be either neg_infinity_tag, zero_tag, or void.
+                - If tag_ is void, num_ and den_ are used to compute the diagonal value.
+                - If tag_ is neg_infinity_tag or zero_tag, num_ and den_ are ignored.
 
             WHAT THIS OBJECT REPRESENTS
                 This object implements a layer in a deep neural network that applies a lower triangular mask to
                 its input tensor. The mask is defined such that all elements above the specified diagonal are set
-                to a given value (diag_value_::value). The diagonal is specified by the diag_ parameter.
+                to a given value. The diagonal offset and the mask value are determined by the template parameters.
+
+            DIAGONAL VALUE DETERMINATION
+                - If tag_ is neg_infinity_tag: diagonal value is set to negative infinity.
+                - If tag_ is zero_tag: diagonal value is set to zero.
+                - If tag_ is void: diagonal value is set to num_ / den_ as a float.
+
+            DIAGONAL OFFSET
+                The diag_ parameter determines the diagonal above which elements are masked:
+                - diag_ = 0: main diagonal
+                - diag_ > 0: diag_ steps above the main diagonal
+                - diag_ < 0: |diag_| steps below the main diagonal
 
             EXAMPLE USAGE
-                tril_<0, float_constant<float, -std::numeric_limits<float>::infinity()>> layer;
-                // This creates a layer that masks all elements above the main diagonal with -inf.
+                // Create a layer that masks all elements above the main diagonal with -inf
+                tril_<0, neg_infinity_tag> layer1;
+
+                // Create a layer that masks all elements above the main diagonal with 0
+                tril_<0, zero_tag> layer2;
+
+                // Create a layer that masks all elements above the main diagonal with 0.5
+                tril_<0, void, 1, 2> layer3;
+
+                // Create a layer that masks all elements 5 positions above the main diagonal with -inf
+                tril_<5, neg_infinity_tag> layer4;
+
+                // Create a layer that masks all elements 3 positions below the main diagonal with 0.25
+                tril_<-3, void, 1, 4> layer5;
 
             SERIALIZATION SUPPORT
                 This object supports serialization and deserialization via the serialize() and deserialize() functions.
@@ -3823,13 +3859,13 @@ namespace dlib
     };
 
     template <typename SUBNET>
-    using tril = add_layer<tril_<0, constant_wrapper<float, 0.0f>>, SUBNET>;
+    using tril = add_layer<tril_<0, zero_tag>, SUBNET>;
 
     template <typename SUBNET>
-    using tril_mask = add_layer<tril_<0, constant_wrapper<float, -std::numeric_limits<float>::infinity()>>, SUBNET>;
+    using tril_mask = add_layer<tril_<0, neg_infinity_tag>, SUBNET>;
 
-    template <long diag, typename diag_value, typename SUBNET>
-    using tril_diag = add_layer<tril_<diag, diag_value>, SUBNET>;    
+    template <long diag, long num, long den, typename SUBNET>
+    using tril_diag = add_layer<tril_<diag, void, num, den>, SUBNET>;    
 
 // ----------------------------------------------------------------------------------------
 
