@@ -1036,9 +1036,9 @@ namespace dlib
                 out << " | {diag|{" << diag << "}}";
                 out << " | {diag_value|{";
                 
-                if constexpr (std::is_same_v<tag, neg_infinity_tag>) {
+                if (std::is_same_v<tag, neg_infinity_tag>) {
                     out << "-inf";
-                } else if constexpr (std::is_same_v<tag, zero_tag>) {
+                } else if (std::is_same_v<tag, zero_tag>) {
                     out << "0";
                 } else {
                     out << static_cast<float>(num) / static_cast<float>(den);
