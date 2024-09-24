@@ -4772,8 +4772,6 @@ namespace dlib
                 return -std::numeric_limits<float>::infinity();
             else if (std::is_same<tag_, zero_tag>::value)
                 return 0.0f;
-            else if (is_special_value<tag_>::value)
-                static_assert(always_false<tag_>::value, "unsupported special value");
             else
                 return static_cast<float>(num_) / static_cast<float>(den_);
         }
