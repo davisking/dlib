@@ -1036,13 +1036,9 @@ namespace dlib
                 out << " | {diag|{" << diag << "}}";
                 out << " | {diag_value|{";
                 
-                if (std::is_same_v<tag, neg_infinity_tag>) {
-                    out << "-inf";
-                } else if (std::is_same_v<tag, zero_tag>) {
-                    out << "0";
-                } else {
-                    out << static_cast<float>(num) / static_cast<float>(den);
-                }
+                if (std::is_same<tag, neg_infinity_tag>::value) out << "-inf";
+                else if (std::is_same<tag, zero_tag>::value) out << "0";
+                else out << static_cast<float>(num) / static_cast<float>(den);
                 
                 out << "}}";
                 end_node();
