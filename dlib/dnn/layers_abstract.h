@@ -3713,6 +3713,152 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class positional_encodings_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+                It defines a positional encoding layer that adds position information to
+                the input tensor. This is particularly useful in transformer architectures
+                where the order of the sequence matters.
+
+                The dimensions of the tensors output by this layer are the same as the input
+                tensor dimensions.
+
+                This implementation is based on the positional encoding described in:
+                Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., 
+                Kaiser, Ł., & Polosukhin, I. (2017). Attention is all you need. In Advances 
+                in neural information processing systems (pp. 5998-6008).
+
+                The encoding uses sine and cosine functions of different frequencies:
+                PE(pos, 2i)   = sin(pos / 10000^(2i/d_model))
+                PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))
+                where pos is the position and i is the dimension.
+        !*/
+
+    public:
+
+        positional_encodings_(
+            unsigned long sequence_dim_ = 1,
+            unsigned long embedding_dim_ = 1
+        );
+        /*!
+            ensures
+                - #sequence_dim == sequence_dim_
+                - #embedding_dim == embedding_dim_
+        !*/
+
+        positional_encodings_ (
+            const positional_encodings_& item
+        );
+        /*!
+            ensures
+                - EXAMPLE_COMPUTATIONAL_LAYER_ objects are copy constructable
+        !*/
+
+        positional_encodings_& operator=(
+            const positional_encodings_& item
+        );
+        /*!
+            ensures
+                - EXAMPLE_COMPUTATIONAL_LAYER_ objects are assignable
+        !*/
+
+        template <typename SUBNET>
+        void setup (
+            const SUBNET& sub
+        );
+        /*!
+            requires
+                - SUBNET implements the SUBNET interface defined at the top of this file.
+            ensures
+                - performs any necessary setup for the layer, including the calculation
+                of positional encodings based on the dimensions of the input.
+        !*/
+
+        template <typename SUBNET>
+        void forward(
+            const SUBNET& sub,
+            resizable_tensor& output
+        );
+        /*!
+            requires
+                - SUBNET implements the SUBNET interface defined at the top of this file.
+                - setup() has been called.
+            ensures
+                - Adds the positional encodings to the output of the subnetwork and 
+                stores the results into #output.
+        !*/
+
+        template <typename SUBNET>
+        void backward(
+            const tensor& gradient_input,
+            SUBNET& sub,
+            tensor& params_grad
+        );
+        /*!
+            requires
+                - SUBNET implements the SUBNET interface defined at the top of this file.
+                - setup() has been called.
+                - #params_grad is unused in this layer as there are no learnable parameters.
+            ensures
+                - Computes the gradient of the layer with respect to the input, which
+                is simply the input gradient itself as positional encodings are constant.
+        !*/
+
+        const tensor& get_layer_params(
+        ) const;
+        /*!
+            ensures
+                - returns the parameters that define the behavior of forward().
+                Note: This layer has no learnable parameters, so this returns an empty tensor.
+        !*/
+
+        tensor& get_layer_params(
+        );
+        /*!
+            ensures
+                - returns the parameters that define the behavior of forward().
+                Note: This layer has no learnable parameters, so this returns an empty tensor.
+        !*/
+
+        const tensor& get_positional_encodings(
+        ) const;
+        /*!
+            ensures
+                - returns the computed positional encodings.
+        !*/
+
+        tensor& get_positional_encodings(
+        );
+        /*!
+            ensures
+                - returns the computed positional encodings.
+        !*/
+
+        friend void serialize(const positional_encodings_& item, std::ostream& out);
+        friend void deserialize(positional_encodings_& item, std::istream& in);
+        /*!
+            provides serialization support
+        !*/
+
+        friend std::ostream& operator<<(std::ostream& out, const positional_encodings_& item);
+        /*!
+            print a string describing this layer.
+        !*/
+
+        friend void to_xml(const positional_encodings_& item, std::ostream& out);
+        /*!
+            This function is optional, but required if you want to print your networks with
+            net_to_xml(). It prints a layer as XML.
+        !*/
+    };
+
+    template <typename SUBNET>
+    using positional_encodings = add_layer<positional_encodings_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_LAYERS_ABSTRACT_H_

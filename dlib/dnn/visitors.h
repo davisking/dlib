@@ -1029,6 +1029,14 @@ namespace dlib
                 update(i);
             }
 
+            template <typename U, typename E>
+            void operator()(size_t i, const add_layer<positional_encodings_, U, E>&)
+            {
+                start_node(i, "positional_encodings");
+                end_node();
+                update(i);
+            }
+
             template <typename T, typename U, typename E>
             void operator()(size_t i, const add_layer<T, U, E>&)
             {
