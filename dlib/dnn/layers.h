@@ -4768,11 +4768,11 @@ namespace dlib
 
     private:
         float compute_diag_value() const {
-            if constexpr (std::is_same<tag_, neg_infinity_tag>::value)
+            if (std::is_same<tag_, neg_infinity_tag>::value)
                 return -std::numeric_limits<float>::infinity();
-            else if constexpr (std::is_same<tag_, zero_tag>::value)
+            else if (std::is_same<tag_, zero_tag>::value)
                 return 0.0f;
-            else if constexpr (is_special_value<tag_>::value)
+            else if (is_special_value<tag_>::value)
                 static_assert(always_false<tag_>::value, "unsupported special value");
             else
                 return static_cast<float>(num_) / static_cast<float>(den_);

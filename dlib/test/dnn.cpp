@@ -4491,7 +4491,7 @@ namespace
 
         // Compare output tensor with expected output
         auto& net_output = layer<tag1>(net).get_output();
-        DLIB_TEST_MSG(max(abs(mat(net_output) - mat(expected_output))) < 1e-5);
+        DLIB_TEST(max(abs(mat(net_output) - mat(expected_output))) < 1e-5);
     }
 
 // ----------------------------------------------------------------------------------------
