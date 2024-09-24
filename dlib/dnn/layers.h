@@ -4715,7 +4715,9 @@ namespace dlib
         tril_(): diag(diag_), diag_value(compute_diag_value()) {}
         
         template <typename SUBNET>
-        void setup(const SUBNET& sub) {}
+        void setup(const SUBNET& /*sub*/)
+        {
+        }
         
         template <typename SUBNET>
         void forward(const SUBNET& sub, resizable_tensor& output)
