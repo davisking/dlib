@@ -23,7 +23,7 @@ namespace dlib
             bool trans_lhs,
             const tensor& rhs,
             bool trans_rhs,
-            size_t g_mode
+            size_t g_mode = 0
         );
     /*!
         requires

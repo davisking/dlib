@@ -102,7 +102,7 @@ namespace dlib
             bool trans_lhs,
             const tensor& rhs,
             bool trans_rhs,
-            size_t g_mode = 0
+            size_t g_mode
         )
         {
             if (g_mode == 0) // gemm_mode::CHANNEL_WISE

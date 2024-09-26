@@ -209,7 +209,7 @@ namespace dlib { namespace tt
         bool trans_lhs,
         const tensor& rhs,
         bool trans_rhs,
-        gemm_mode g_mode = CHANNEL_WISE
+        gemm_mode g_mode
     )
     {
 #ifdef DLIB_USE_CUDA
