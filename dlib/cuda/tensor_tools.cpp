@@ -208,33 +208,111 @@ namespace dlib { namespace tt
         const tensor& lhs,
         bool trans_lhs,
         const tensor& rhs,
-        bool trans_rhs
+        bool trans_rhs,
+        gemm_mode g_mode = CHANNEL_WISE
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::gemm(beta, dest, alpha, lhs, trans_lhs, rhs, trans_rhs);
+        cuda::gemm(beta, dest, alpha, lhs, trans_lhs, rhs, trans_rhs, g_mode);
 #else
-        if (beta != 0)
+        if (g_mode == CHANNEL_WISE)
         {
-            if (trans_lhs && trans_rhs)
-                dest = alpha*trans(mat(lhs))*trans(mat(rhs)) + beta*mat(dest);
-            else if (!trans_lhs && trans_rhs)
-                dest = alpha*mat(lhs)*trans(mat(rhs)) + beta*mat(dest);
-            else if (trans_lhs && !trans_rhs)
-                dest = alpha*trans(mat(lhs))*mat(rhs) + beta*mat(dest);
+            if (beta != 0)
+            {
+                if (trans_lhs && trans_rhs)
+                    dest = alpha * trans(mat(lhs)) * trans(mat(rhs)) + beta * mat(dest);
+                else if (!trans_lhs && trans_rhs)
+                    dest = alpha * mat(lhs) * trans(mat(rhs)) + beta * mat(dest);
+                else if (trans_lhs && !trans_rhs)
+                    dest = alpha * trans(mat(lhs)) * mat(rhs) + beta * mat(dest);
+                else
+                    dest = alpha * mat(lhs) * mat(rhs) + beta * mat(dest);
+            }
             else
-                dest = alpha*mat(lhs)*mat(rhs) + beta*mat(dest);
+            {
+                if (trans_lhs && trans_rhs)
+                    dest = alpha * trans(mat(lhs)) * trans(mat(rhs));
+                else if (!trans_lhs && trans_rhs)
+                    dest = alpha * mat(lhs) * trans(mat(rhs));
+                else if (trans_lhs && !trans_rhs)
+                    dest = alpha * trans(mat(lhs)) * mat(rhs);
+                else
+                    dest = alpha * mat(lhs) * mat(rhs);
+            }
         }
-        else
+        else if (g_mode == PLANE_WISE)
         {
-            if (trans_lhs && trans_rhs)
-                dest = alpha*trans(mat(lhs))*trans(mat(rhs));
-            else if (!trans_lhs && trans_rhs)
-                dest = alpha*mat(lhs)*trans(mat(rhs));
-            else if (trans_lhs && !trans_rhs)
-                dest = alpha*trans(mat(lhs))*mat(rhs);
+            auto is_matrix = [](const auto& tensor) {
+                return (tensor.num_samples() == 1 && tensor.k() == 1) ||
+                    (tensor.nr() == 1 && tensor.nc() == 1);
+                };
+
+            long num_samples = std::max({ lhs.num_samples(), rhs.num_samples(), dest.num_samples() });
+            long num_channels = std::max({ lhs.k(), rhs.k(), dest.k() });
+            const bool lhs_is_matrix = is_matrix(lhs), rhs_is_matrix = is_matrix(rhs), dest_is_matrix = is_matrix(dest);
+
+            if (lhs_is_matrix && rhs_is_matrix && dest_is_matrix) {
+                num_samples = num_channels = 1;
+            }
             else
-                dest = alpha*mat(lhs)*mat(rhs);
+            {
+                auto adjust = [&](const auto& tensor) {
+                    if (!is_matrix(tensor)) {
+                        if (tensor.num_samples() < num_samples) num_samples = tensor.num_samples();
+                        if (tensor.k() < num_channels) num_channels = tensor.k();
+                    }
+                    };
+                adjust(lhs);
+                adjust(rhs);
+                adjust(dest);
+            }
+
+            long lhs_rows = (lhs_is_matrix && lhs.num_samples() > 1) ? lhs.num_samples() : lhs.nr();
+            long lhs_cols = (lhs_is_matrix && lhs.k() > 1) ? lhs.k() : lhs.nc();
+            long rhs_rows = (rhs_is_matrix && rhs.num_samples() > 1) ? rhs.num_samples() : rhs.nr();
+            long rhs_cols = (rhs_is_matrix && rhs.k() > 1) ? rhs.k() : rhs.nc();
+            long dest_rows = (dest_is_matrix && dest.num_samples() > 1) ? dest.num_samples() : dest.nr();
+            long dest_cols = (dest_is_matrix && dest.k() > 1) ? dest.k() : dest.nc();
+
+            const size_t lhs_plane_size = lhs_rows * lhs_cols;
+            const size_t rhs_plane_size = rhs_rows * rhs_cols;
+            const size_t dest_plane_size = dest_rows * dest_cols;
+
+            for (long b = 0; b < num_samples; ++b)
+            {
+                for (long c = 0; c < num_channels; ++c)
+                {
+                    auto lhs_slice = lhs_is_matrix ? alias_tensor(lhs_rows, lhs_cols)(lhs, 0) :
+                        alias_tensor(lhs_rows, lhs_cols)(lhs, (b * num_channels + c) * lhs_plane_size);
+                    auto rhs_slice = rhs_is_matrix ? alias_tensor(rhs_rows, rhs_cols)(rhs, 0) :
+                        alias_tensor(rhs_rows, rhs_cols)(rhs, (b * num_channels + c) * rhs_plane_size);
+                    auto dest_slice = dest_is_matrix ? alias_tensor(dest_rows, dest_cols)(dest, 0) :
+                        alias_tensor(dest_rows, dest_cols)(dest, (b * num_channels + c) * dest_plane_size);
+
+                    if (beta != 0)
+                    {
+                        if (trans_lhs && trans_rhs)
+                            dest_slice = alpha * trans(mat(lhs_slice)) * trans(mat(rhs_slice)) + beta * mat(dest_slice);
+                        else if (!trans_lhs && trans_rhs)
+                            dest_slice = alpha * mat(lhs_slice) * trans(mat(rhs_slice)) + beta * mat(dest_slice);
+                        else if (trans_lhs && !trans_rhs)
+                            dest_slice = alpha * trans(mat(lhs_slice)) * mat(rhs_slice) + beta * mat(dest_slice);
+                        else
+                            dest_slice = alpha * mat(lhs_slice) * mat(rhs_slice) + beta * mat(dest_slice);
+                    }
+                    else
+                    {
+                        if (trans_lhs && trans_rhs)
+                            dest_slice = alpha * trans(mat(lhs_slice)) * trans(mat(rhs_slice));
+                        else if (!trans_lhs && trans_rhs)
+                            dest_slice = alpha * mat(lhs_slice) * trans(mat(rhs_slice));
+                        else if (trans_lhs && !trans_rhs)
+                            dest_slice = alpha * trans(mat(lhs_slice)) * mat(rhs_slice);
+                        else
+                            dest_slice = alpha * mat(lhs_slice) * mat(rhs_slice);
+                    }
+                }
+            }
         }
 #endif
     }
