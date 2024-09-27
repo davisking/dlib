@@ -2954,7 +2954,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     enum softmax_mode { CHANNEL_WISE = 0, PLANE_WISE = 1 };
-
+    
     template <unsigned long s_mode_>
     class softmax_
     {
