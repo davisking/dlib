@@ -3985,66 +3985,66 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <unsigned long s_mode_>
     class softmax_
     {
     public:
-        softmax_() 
-        {
-        }
+        softmax_() {}
 
         template <typename SUBNET>
-        void setup (const SUBNET& /*sub*/)
-        {
-        }
+        void setup(const SUBNET& /*sub*/) {}
 
         void forward_inplace(const tensor& input, tensor& output)
         {
-            tt::softmax(output, input);
-        } 
+            tt::softmax(output, input, s_mode_);
+        }
 
         void backward_inplace(
             const tensor& computed_output,
-            const tensor& gradient_input, 
-            tensor& data_grad, 
-            tensor& 
+            const tensor& gradient_input,
+            tensor& data_grad,
+            tensor& /*params_grad*/
         )
         {
-            tt::softmax_gradient(data_grad, computed_output, gradient_input);
+            tt::softmax_gradient(data_grad, computed_output, gradient_input, s_mode_);
         }
 
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const softmax_& /*item*/, std::ostream& out)
+        friend void serialize(const softmax_& item, std::ostream& out)
         {
             serialize("softmax_", out);
         }
 
-        friend void deserialize(softmax_& /*item*/, std::istream& in)
+        friend void deserialize(softmax_& item, std::istream& in)
         {
             std::string version;
             deserialize(version, in);
             if (version != "softmax_")
-                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::softmax_.");
+                throw serialization_error("Unexpected version '" + version + "' found while deserializing dlib::softmax_.");
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const softmax_& /*item*/)
+        friend std::ostream& operator<<(std::ostream& out, const softmax_& item)
         {
-            out << "softmax";
+            out << "softmax (mode=" << (s_mode_ == CHANNEL_WISE ? "channel_wise" : "plane_wise") << ")";
             return out;
         }
 
-        friend void to_xml(const softmax_& /*item*/, std::ostream& out)
+        friend void to_xml(const softmax_& item, std::ostream& out)
         {
-            out << "<softmax/>\n";
+            out << "<softmax mode='" << (s_mode_ == CHANNEL_WISE ? "channel_wise" : "plane_wise") << "'/>\n";
         }
 
     private:
-        resizable_tensor params;
+        resizable_tensor params; // unused
     };
 
     template <typename SUBNET>
-    using softmax = add_layer<softmax_, SUBNET>;
+    using softmax = add_layer<softmax_<CHANNEL_WISE>, SUBNET>;
+
+    template <typename SUBNET>
+    using softmaxm = add_layer<softmax_<PLANE_WISE>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

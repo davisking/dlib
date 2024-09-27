@@ -293,13 +293,15 @@ namespace dlib
 
         void softmax (
             tensor& dest,
-            const tensor& src
+            const tensor& src,
+            size_t mode
         );
 
         void softmax_gradient (
             tensor& grad,
             const tensor& dest,
-            const tensor& gradient_input
+            const tensor& gradient_input,
+            size_t mode
         );
 
     // ------------------------------------------------------------------------------------

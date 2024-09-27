@@ -1388,42 +1388,52 @@ namespace dlib { namespace tt
 
     void softmax (
         tensor& dest,
-        const tensor& src
+        const tensor& src,
+        size_t mode = 0
     );
     /*!
         requires
             - have_same_dimensions(dest, src) == true
+            - mode == CHANNEL_WISE || mode == PLANE_WISE
         ensures
             - Note that the softmax function is a vector valued function: 
                 s(x) == exp(x)/sum(exp(x)) 
-            - Computes the softmax function on src and writes the results to dest.  The
-              softmax is computed per spatial location across the different channels at
-              each location.  That is, softmax() outputs a new tensor, #dest, where each of
-              the spatial locations in dest (i.e. image idx, row idx, and column idx)
-              contains the output of s() evaluated over the channel values at each
-              location.
+            - Computes the softmax function on src and writes the results to dest.
+            - If mode == CHANNEL_WISE:
+                The softmax is computed per spatial location across the different channels at
+                each location. That is, softmax() outputs a new tensor, #dest, where each of
+                the spatial locations in dest (i.e. image idx, row idx, and column idx)
+                contains the output of s() evaluated over the channel values at each location.
+            - If mode == PLANE_WISE:
+                The softmax is computed across entire planes (nr x nc) of the input tensor.
+                This is useful for operations in Large Language Models (LLMs) and other 
+                applications requiring 2D tensor processing.
             - This function supports in-place operation, i.e. having
-              is_same_object(dest, src)==true
+            is_same_object(dest, src)==true
     !*/
 
     void softmax_gradient (
         tensor& grad,
         const tensor& dest,
-        const tensor& gradient_input
+        const tensor& gradient_input,
+        size_t mode = 0
     );
     /*!
         requires
             - have_same_dimensions(dest,gradient_input) == true 
             - have_same_dimensions(dest,grad) == true 
+            - mode == CHANNEL_WISE || mode == PLANE_WISE
         ensures
-            - We interpret dest as the output of softmax(dest,SRC) for some SRC tensor.
-              Then let f(SRC) == dot(gradient_input,dest).  Then this function computes the
-              gradient of f() with respect to SRC and stores it to grad.  Moreover, if
-              is_same_object(grad,gradient_input)==true then the output is assigned to
-              grad, replacing its previous contents.  Otherwise the output is added to
-              grad.
+            - We interpret dest as the output of softmax(dest,SRC,mode) for some SRC tensor.
+            Then let f(SRC) == dot(gradient_input,dest).  Then this function computes the
+            gradient of f() with respect to SRC and stores it to grad.  Moreover, if
+            is_same_object(grad,gradient_input)==true then the output is assigned to
+            grad, replacing its previous contents.  Otherwise the output is added to grad.
+            - The gradient computation takes into account the specified mode:
+            - If mode == CHANNEL_WISE: The gradient is computed per spatial location across channels.
+            - If mode == PLANE_WISE: The gradient is computed across entire planes of the tensor.
             - This function supports in-place operation, i.e. having
-              is_same_object(grad, gradient_input)==true
+            is_same_object(grad, gradient_input)==true
     !*/
 
 // ----------------------------------------------------------------------------------------
