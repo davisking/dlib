@@ -4847,7 +4847,7 @@ namespace dlib
         }
 
         template <typename SUBNET>
-        void setup(const SUBNET& sub)
+        void setup(const SUBNET& /*sub*/)
         {
             embs.set_size(num_embeddings, embedding_dim);
             dlib::rand rnd(std::rand());
