@@ -3986,7 +3986,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     enum softmax_mode { CHANNEL_WISE = 0, PLANE_WISE = 1 };
-    
+
     template <unsigned long s_mode_>
     class softmax_
     {
@@ -4014,12 +4014,12 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const softmax_& item, std::ostream& out)
+        friend void serialize(const softmax_& /*item*/, std::ostream& out)
         {
             serialize("softmax_", out);
         }
 
-        friend void deserialize(softmax_& item, std::istream& in)
+        friend void deserialize(softmax_& /*item*/, std::istream& in)
         {
             std::string version;
             deserialize(version, in);
@@ -4027,13 +4027,13 @@ namespace dlib
                 throw serialization_error("Unexpected version '" + version + "' found while deserializing dlib::softmax_.");
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const softmax_& item)
+        friend std::ostream& operator<<(std::ostream& out, const softmax_& /*item*/)
         {
             out << "softmax (mode=" << (s_mode_ == CHANNEL_WISE ? "channel_wise" : "plane_wise") << ")";
             return out;
         }
 
-        friend void to_xml(const softmax_& item, std::ostream& out)
+        friend void to_xml(const softmax_& /*item*/, std::ostream& out)
         {
             out << "<softmax mode='" << (s_mode_ == CHANNEL_WISE ? "channel_wise" : "plane_wise") << "'/>\n";
         }
