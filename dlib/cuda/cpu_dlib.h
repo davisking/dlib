@@ -768,7 +768,7 @@ namespace dlib
             double& loss
         ) const
         {
-            softmax(grad, output_tensor);
+            softmax(grad, output_tensor, 0);
             // The loss we output is the average loss over the mini-batch, and also over each element of the matrix output.
             const double scale = 1.0 / (output_tensor.num_samples() * output_tensor.nr() * output_tensor.nc());
             loss = 0;
@@ -833,7 +833,7 @@ namespace dlib
             double& loss
         ) const
         {
-            softmax(grad, output_tensor);
+            softmax(grad, output_tensor, 0);
             // The loss we output is the weighted average loss over the mini-batch, and also over each element of the matrix output.
             const double scale = 1.0 / (output_tensor.num_samples() * output_tensor.nr() * output_tensor.nc());
             loss = 0;
