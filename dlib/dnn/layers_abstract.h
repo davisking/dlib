@@ -3859,6 +3859,80 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        unsigned long num_embeddings_,
+        unsigned long embedding_dim_
+        >
+    class embeddings_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents an embedding layer in a neural network. It maps discrete
+                tokens to continuous vector representations. This is a fundamental technique in
+                natural language processing and other domains dealing with categorical data.
+
+                The layer takes as input a tensor of integer indices and outputs a tensor of 
+                the same shape (except for the last dimension) where each index is replaced by 
+                its corresponding embedding vector.
+
+                For more information on embeddings, see:
+                Mikolov, T., Sutskever, I., Chen, K., Corrado, G. S., & Dean, J. (2013). 
+                Distributed representations of words and phrases and their compositionality. 
+                In Advances in neural information processing systems (pp. 3111-3119).
+
+            TEMPLATE PARAMETERS
+                - num_embeddings_: The size of the embedding dictionary, i.e., the number of 
+                                discrete tokens that can be embedded.
+                - embedding_dim_: The dimensionality of each embedding vector.
+
+            CONVENTION
+                - get_embeddings() returns the tensor of embedding vectors.
+                - get_num_embeddings() == num_embeddings_
+                - get_embedding_dim() == embedding_dim_
+                - get_learning_rate_multiplier() returns the learning rate multiplier for this layer.
+                - get_scale_by_freq() returns whether to scale gradients by token frequency.
+        */        
+    public:
+        embeddings_() = default;
+
+        unsigned long get_num_embeddings() const;
+        unsigned long get_embedding_dim() const;
+        double get_learning_rate_multiplier() const;
+        bool get_scale_by_freq() const;
+
+        void set_num_embeddings(unsigned long num);
+        void set_embedding_dim(unsigned long dim);
+        void set_learning_rate_multiplier(double val);
+        void set_scale_by_freq(bool val);
+
+        template <typename SUBNET> void setup(const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
+        const tensor& get_embeddings() const;
+        tensor& get_embeddings();
+
+        friend void serialize(const embeddings_& item, std::ostream& out);
+        friend void deserialize(embeddings_& item, std::istream& in);
+        friend std::ostream& operator<<(std::ostream& out, const embeddings_& item);
+        friend void to_xml(const embeddings_& item, std::ostream& out);
+
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+    };
+
+    template <
+        unsigned long num_embeddings,
+        unsigned long embedding_dim,
+        typename SUBNET
+        >
+    using embeddings = add_layer<embeddings_<num_embeddings, embedding_dim>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_LAYERS_ABSTRACT_H_

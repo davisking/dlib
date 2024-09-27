@@ -2090,6 +2090,126 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        __global__ void _cuda_embeddings(size_t dsize, size_t dk, size_t dr, size_t dc,
+            float* d, const float* s, const float* e, size_t es
+        )
+        {
+            for (auto i : grid_stride_range(0, dsize))
+            {
+                const auto n = i / (dk * dr * dc);
+                const auto s_idx = i % (dk * dr * dc);
+                const auto k = (s_idx / (dr * dc)) % dk;
+                const auto r = (s_idx / dc) % dr;
+                const auto c = s_idx % dc;
+
+                const unsigned long t_idx = static_cast<unsigned long>(s[(n * dk + k) * dr + r]);
+
+                if (t_idx < es)
+                    d[i] = e[t_idx * dc + c];
+                else
+                    d[i] = 0.0f;
+            }
+        }
+
+        void embeddings(
+            resizable_tensor& dest,
+            const tensor& src,
+            const tensor& embs
+        )
+        {
+            DLIB_CASSERT(
+                src.nr() > 0 &&
+                embs.num_samples() > 0 &&
+                embs.k() > 0 &&
+                embs.nr() == 1 &&
+                embs.nc() == 1,
+                "\nsrc.num_samples(): " << src.num_samples() <<
+                "\nsrc.k(): " << src.k() <<
+                "\nsrc.nr(): " << src.nr() <<
+                "\nsrc.nc(): " << src.nc() <<
+                "\nembs.num_samples(): " << embs.num_samples() <<
+                "\nembs.k(): " << embs.k() <<
+                "\nembs.nr(): " << embs.nr() <<
+                "\nembs.nc(): " << embs.nc()
+            );
+
+            const long dk = dest.k();
+            const long dr = dest.nr();
+            const long dc = dest.nc();
+
+            launch_kernel(_cuda_embeddings, dest.size(), dk, dr, dc,
+                dest.device(), src.device(), embs.device(), embs.num_samples());
+        }
+
+        __global__ void _cuda_embeddings_gradient(size_t ssize, size_t sk, size_t sr, size_t sc,
+            const float* o, const float* gi, float* g, const float* f, float lr, bool sl, size_t es
+        )
+        {
+            for (auto i : grid_stride_range(0, ssize))
+            {
+                const auto n = i / (sk * sr * sc);
+                const auto s_idx = i % (sk * sr * sc);
+                const auto k = (s_idx / (sr * sc)) % sk;
+                const auto r = (s_idx / sc) % sr;
+                const auto c = s_idx % sc;
+
+                const unsigned long t_idx = static_cast<unsigned long>(o[(n * sk + k) * sr + r]);
+                if (t_idx < es)
+                {
+                    const float f_t = f[t_idx];
+                    float f_s = 1.0f;                    
+
+                    if (sl && f_t != 0.0f) f_s = fminf(0.15f, fmaxf(1.0f / f_t, 1.0f));
+                    if (f_t > 1) atomicAdd(&g[t_idx * sc + c], -gi[i] * lr * f_s);
+                    else g[t_idx * sc + c] -= gi[i] * lr * f_s;
+                }
+            }
+        }
+
+        void embeddings_gradient(
+            const tensor& prev,
+            const tensor& gradient_input,
+            tensor& grads,
+            const tensor& freqs,
+            float learning_rate,
+            bool scale
+        )
+        {
+            DLIB_CASSERT(
+                prev.nr() > 0 &&
+                gradient_input.num_samples() == prev.num_samples() &&
+                gradient_input.k() == prev.k() &&
+                gradient_input.nr() == prev.nr() &&
+                gradient_input.nc() == grads.k() &&
+                grads.num_samples() > 0 &&
+                grads.k() > 0 &&
+                grads.nr() == 1 &&
+                grads.nc() == 1,
+                "\ngradient_input.num_samples(): " << gradient_input.num_samples() <<
+                "\ngradient_input.k(): " << gradient_input.k() <<
+                "\ngradient_input.nr(): " << gradient_input.nr() <<
+                "\ngradient_input.nc(): " << gradient_input.nc() <<
+                "\nprev.num_samples(): " << prev.num_samples() <<
+                "\nprev.k(): " << prev.k() <<
+                "\nprev.nr(): " << prev.nr() <<
+                "\nprev.nc(): " << prev.nc() <<
+                "\ngrads.num_samples(): " << grads.num_samples() <<
+                "\ngrads.k(): " << grads.k() <<
+                "\ngrads.nr(): " << grads.nr() <<
+                "\ngrads.nc(): " << grads.nc()
+            );
+            
+            const long sk = gradient_input.k();
+            const long sr = gradient_input.nr();
+            const long sc = gradient_input.nc();
+
+            launch_kernel(_cuda_embeddings_gradient, gradient_input.size(), sk, sr, sc,
+                prev.device(), gradient_input.device(), grads.device(), freqs.device(),
+                learning_rate, scale, grads.num_samples());
+        }
+
+    // ----------------------------------------------------------------------------------------
+
         __global__ void _cuda_layer_normalize(
             float* out,
             const float* s,

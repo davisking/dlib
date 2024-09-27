@@ -1029,6 +1029,16 @@ namespace dlib
                 update(i);
             }
 
+            template <unsigned long ne, unsigned long ed, typename U, typename E>
+            void operator()(size_t i, const add_layer<embeddings_<ne, ed>, U, E>& l)
+            {
+                start_node(i, "embeddings");
+                out << " | {num_embeddings|{" << l.layer_details().get_num_embeddings() << "}}";
+                out << " | {embedding_dim|{" << l.layer_details().get_embedding_dim() << "}}";
+                end_node();
+                update(i);
+            }            
+
             template <typename U, typename E>
             void operator()(size_t i, const add_layer<positional_encodings_, U, E>&)
             {

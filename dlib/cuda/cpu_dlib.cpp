@@ -2421,6 +2421,121 @@ namespace dlib
         }
 
     // ------------------------------------------------------------------------------------
+
+        void embeddings(
+            resizable_tensor& dest,
+            const tensor& src,
+            const tensor& embs
+        )
+        {
+            DLIB_CASSERT(
+                src.nr() > 0 &&
+                embs.num_samples() > 0 &&
+                embs.k() > 0 &&
+                embs.nr() == 1 &&
+                embs.nc() == 1,
+                "\nsrc.num_samples(): " << src.num_samples() <<
+                "\nsrc.k(): " << src.k() <<
+                "\nsrc.nr(): " << src.nr() <<
+                "\nsrc.nc(): " << src.nc() <<
+                "\nembs.num_samples(): " << embs.num_samples() <<
+                "\nembs.k(): " << embs.k() <<
+                "\nembs.nr(): " << embs.nr() <<
+                "\nembs.nc(): " << embs.nc()
+            );
+
+            long ns = dest.num_samples(), nk = dest.k(), nr = dest.nr(), nc = dest.nc();
+            const float* src_data = src.host();
+            float* dest_data = dest.host();
+            const float* embs_data = embs.host();
+            for (long s = 0; s < ns; ++s)
+            {
+                for (long k = 0; k < nk; ++k)
+                {
+                    for (long r = 0; r < nr; ++r)
+                    {
+                        const unsigned long token_idx = static_cast<unsigned long>(src_data[tensor_index(src, s, k, r, 0)]);
+                        if (token_idx < embs.num_samples())
+                        {
+                            for (long c = 0; c < nc; ++c)
+                                dest_data[tensor_index(dest, s, k, r, c)] = embs_data[tensor_index(embs, token_idx, c, 0, 0)];
+                        }
+                        else
+                        {
+                            for (long c = 0; c < nc; ++c)
+                                dest_data[tensor_index(dest, s, k, r, c)] = 0;
+                        }
+                    }
+                }
+            }
+        }
+
+        void embeddings_gradient(
+            const tensor& prev,
+            const tensor& gradient_input,
+            tensor& grads,
+            const tensor& freqs,
+            float learning_rate,
+            bool scale
+        )
+        {
+            DLIB_CASSERT(
+                prev.nr() > 0 &&
+                gradient_input.num_samples() == prev.num_samples() &&
+                gradient_input.k() == prev.k() &&
+                gradient_input.nr() == prev.nr() &&
+                gradient_input.nc() == grads.k() &&
+                grads.num_samples() > 0 &&
+                grads.k() > 0 &&
+                grads.nr() == 1 &&
+                grads.nc() == 1,
+                "\ngradient_input.num_samples(): " << gradient_input.num_samples() <<
+                "\ngradient_input.k(): " << gradient_input.k() <<
+                "\ngradient_input.nr(): " << gradient_input.nr() <<
+                "\ngradient_input.nc(): " << gradient_input.nc() <<
+                "\nprev.num_samples(): " << prev.num_samples() <<
+                "\nprev.k(): " << prev.k() <<
+                "\nprev.nr(): " << prev.nr() <<
+                "\nprev.nc(): " << prev.nc() <<
+                "\ngrads.num_samples(): " << grads.num_samples() <<
+                "\ngrads.k(): " << grads.k() <<
+                "\ngrads.nr(): " << grads.nr() <<
+                "\ngrads.nc(): " << grads.nc()
+            );
+
+            const float* prev_data = prev.host();
+            const float* gradient_input_data = gradient_input.host();
+            const float* freqs_data = freqs.host();
+            float* grads_data = grads.host();
+            long ns = gradient_input.num_samples(), nk = gradient_input.k();
+            long nr = gradient_input.nr(), nc = gradient_input.nc();
+
+            std::vector<dlib::mutex> embedding_mutexes(grads.num_samples());
+            parallel_for(0, ns * nk, [&](long i)
+                {
+                    long s = i / nk;
+                    long k = i % nk;
+
+                    for (long r = 0; r < nr; ++r)
+                    {
+                        const unsigned long token_idx = static_cast<unsigned long>(prev_data[tensor_index(prev, s, k, r, 0)]);
+                        if (token_idx < grads.num_samples())
+                        {
+                            const float freg_token = freqs_data[token_idx];
+                            float freq_scale = 1.0f;
+
+                            if (scale && freg_token != 0.0f) freq_scale = std::min(0.15f, std::max(1.0f / freg_token, 1.0f));
+                            auto_mutex locker(embedding_mutexes[token_idx]);
+                            for (long c = 0; c < nc; ++c)
+                            {
+                                const float gradient = gradient_input_data[tensor_index(gradient_input, s, k, r, c)];
+                                grads_data[tensor_index(grads, token_idx, c, 0, 0)] -= (gradient * learning_rate * freq_scale);
+                            }
+                        }
+                    }
+                });
+        }
+
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
 
