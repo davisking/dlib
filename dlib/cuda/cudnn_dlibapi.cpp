@@ -1544,7 +1544,7 @@ namespace dlib
             const float alpha = 1;
             const float beta = 0;
 
-            if (s_mode == 0)
+            if (mode == 0)
             {
                 CHECK_CUDNN(cudnnSoftmaxForward(ccontext(),
                     CUDNN_SOFTMAX_ACCURATE,
@@ -1556,7 +1556,7 @@ namespace dlib
                     descriptor(dest),
                     dest.device()));
             }
-            else if (s_mode == 1)
+            else if (mode == 1)
             {
                 const long num_samples = src.num_samples();
                 const long num_channels = src.k();
@@ -1601,7 +1601,7 @@ namespace dlib
             const float alpha = 1;
             const float beta = is_same_object(grad, gradient_input) ? 0 : 1;
 
-            if (s_mode == 0)
+            if (mode == 0)
             {
                 CHECK_CUDNN(cudnnSoftmaxBackward(ccontext(),
                     CUDNN_SOFTMAX_ACCURATE,
@@ -1615,7 +1615,7 @@ namespace dlib
                     descriptor(grad),
                     grad.device()));
             }
-            else if (s_mode == 1)
+            else if (mode == 1)
             {
                 const long num_samples = output.num_samples();
                 const long num_channels = output.k();
