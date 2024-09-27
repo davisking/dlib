@@ -294,14 +294,14 @@ namespace dlib
         void softmax (
             tensor& dest,
             const tensor& src,
-            size_t mode
+            size_t mode = 0
         );
 
         void softmax_gradient (
             tensor& grad,
             const tensor& dest,
             const tensor& gradient_input,
-            size_t mode
+            size_t mode = 0
         );
 
     // ------------------------------------------------------------------------------------
@@ -768,7 +768,7 @@ namespace dlib
             double& loss
         ) const
         {
-            softmax(grad, output_tensor, 0);
+            softmax(grad, output_tensor);
             // The loss we output is the average loss over the mini-batch, and also over each element of the matrix output.
             const double scale = 1.0 / (output_tensor.num_samples() * output_tensor.nr() * output_tensor.nc());
             loss = 0;
@@ -833,7 +833,7 @@ namespace dlib
             double& loss
         ) const
         {
-            softmax(grad, output_tensor, 0);
+            softmax(grad, output_tensor);
             // The loss we output is the weighted average loss over the mini-batch, and also over each element of the matrix output.
             const double scale = 1.0 / (output_tensor.num_samples() * output_tensor.nr() * output_tensor.nc());
             loss = 0;

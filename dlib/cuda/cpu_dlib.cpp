@@ -1625,7 +1625,7 @@ namespace dlib
                 const long num_channels,
                 tensor& dest,
                 const tensor& src,
-                size_t mode
+                size_t mode = 0
             )
             {
                 DLIB_ASSERT(num_channels * num_locations == src.nr() * src.nc() * src.k());
@@ -1701,7 +1701,7 @@ namespace dlib
                 tensor& grad,
                 const tensor& dest,
                 const tensor& gradient_input,
-                size_t mode
+                size_t mode = 0
             )
             {
                 DLIB_ASSERT(num_channels * num_locations == grad.nr() * grad.nc() * grad.k());
@@ -1802,7 +1802,7 @@ namespace dlib
         )
         {
             DLIB_CASSERT(have_same_dimensions(dest,src));
-            ttimpl::softmax(1, src.nr()*src.nc()*src.k(), dest, src, 0);
+            ttimpl::softmax(1, src.nr()*src.nc()*src.k(), dest, src);
         }
 
         void softmax_all_gradient (
@@ -1813,7 +1813,7 @@ namespace dlib
         {
             DLIB_CASSERT(have_same_dimensions(grad,dest));
             DLIB_CASSERT(have_same_dimensions(grad,gradient_input));
-            ttimpl::softmax_gradient(1, grad.nr()*grad.nc()*grad.k(), grad, dest, gradient_input, 0);
+            ttimpl::softmax_gradient(1, grad.nr()*grad.nc()*grad.k(), grad, dest, gradient_input);
         }
 
     // ------------------------------------------------------------------------------------
