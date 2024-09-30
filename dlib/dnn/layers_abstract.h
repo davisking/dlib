@@ -3713,6 +3713,162 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct neg_infinity_tag {};
+    struct zero_tag {};
+
+    template<typename T>
+    struct is_special_value : std::false_type {};
+    template<>
+    struct is_special_value<neg_infinity_tag> : std::true_type {};
+    template<>
+    struct is_special_value<zero_tag> : std::true_type {};
+
+    template<long diag_, typename tag_, long num_ = 0, long den_ = 1>
+    class tril_
+    {
+        /*!
+            TEMPLATE PARAMETERS
+                - diag_: A long integer specifying the diagonal offset.
+                - tag_: A type tag specifying special values or void for numeric values.
+                - num_: Numerator for numeric diagonal value (default is 0, only used if tag_ is void).
+                - den_: Denominator for numeric diagonal value (default is 1, only used if tag_ is void).
+
+            REQUIREMENTS
+                - diag_ must be an integer.
+                - tag_ must be either neg_infinity_tag, zero_tag, or void.
+                - If tag_ is void, num_ and den_ are used to compute the diagonal value.
+                - If tag_ is neg_infinity_tag or zero_tag, num_ and den_ are ignored.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object implements a layer in a deep neural network that applies a lower triangular mask to
+                its input tensor. The mask is defined such that all elements above the specified diagonal are set
+                to a given value. The diagonal offset and the mask value are determined by the template parameters.
+
+            DIAGONAL VALUE DETERMINATION
+                - If tag_ is neg_infinity_tag: diagonal value is set to negative infinity.
+                - If tag_ is zero_tag: diagonal value is set to zero.
+                - If tag_ is void: diagonal value is set to num_ / den_ as a float.
+
+            DIAGONAL OFFSET
+                The diag_ parameter determines the diagonal above which elements are masked:
+                - diag_ = 0: main diagonal
+                - diag_ > 0: diag_ steps above the main diagonal
+                - diag_ < 0: |diag_| steps below the main diagonal
+
+            EXAMPLE USAGE
+                // Create a layer that masks all elements above the main diagonal with -inf
+                tril_<0, neg_infinity_tag> layer1;
+
+                // Create a layer that masks all elements above the main diagonal with 0
+                tril_<0, zero_tag> layer2;
+
+                // Create a layer that masks all elements above the main diagonal with 0.5
+                tril_<0, void, 1, 2> layer3;
+
+                // Create a layer that masks all elements 5 positions above the main diagonal with -inf
+                tril_<5, neg_infinity_tag> layer4;
+
+                // Create a layer that masks all elements 3 positions below the main diagonal with 0.25
+                tril_<-3, void, 1, 4> layer5;
+
+            SERIALIZATION SUPPORT
+                This object supports serialization and deserialization via the serialize() and deserialize() functions.
+        !*/
+
+    public:
+        tril_() = default;
+        /*!
+            ensures
+                - This object is properly initialized.
+        !*/
+
+        template <typename SUBNET>
+        void setup(const SUBNET& sub);
+        /*!
+            requires
+                - SUBNET is a valid network layer type.
+            ensures
+                - Initializes the mask based on the dimensions of the input tensor from sub.
+        !*/
+
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output);
+        /*!
+            requires
+                - SUBNET is a valid network layer type.
+            ensures
+                - Applies the lower triangular mask to the input tensor from sub and stores the result in output.
+        !*/
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        /*!
+            requires
+                - SUBNET is a valid network layer type.
+            ensures
+                - Computes the gradient of the loss with respect to the input tensor and stores it in sub.
+        !*/
+
+        inline dpoint map_input_to_output(const dpoint& p) const;
+        /*!
+            ensures
+                - Maps a point from the input tensor to the corresponding point in the output tensor.
+        !*/
+
+        inline dpoint map_output_to_input(const dpoint& p) const;
+        /*!
+            ensures
+                - Maps a point from the output tensor to the corresponding point in the input tensor.
+        !*/
+
+        const tensor& get_layer_params() const;
+        /*!
+            ensures
+                - Returns the parameters of this layer.
+        !*/
+
+        tensor& get_layer_params();
+        /*!
+            ensures
+                - Returns the parameters of this layer.
+        !*/
+
+        friend void serialize(const tril_& item, std::ostream& out);
+        /*!
+            ensures
+                - Serializes the state of this object to the given output stream.
+        !*/
+
+        friend void deserialize(tril_& item, std::istream& in);
+        /*!
+            ensures
+                - Deserializes the state of this object from the given input stream.
+        !*/
+
+        friend std::ostream& operator<<(std::ostream& out, const tril_& item);
+        /*!
+            ensures
+                - Prints a human-readable representation of this object to the given output stream.
+        !*/
+
+        friend void to_xml(const tril_& item, std::ostream& out);
+        /*!
+            ensures
+                - Serializes the state of this object to XML format and writes it to the given output stream.
+        !*/
+    };
+
+    template <typename SUBNET>
+    using tril = add_layer<tril_<0, zero_tag>, SUBNET>;
+
+    template <typename SUBNET>
+    using tril_mask = add_layer<tril_<0, neg_infinity_tag>, SUBNET>;
+
+    template <long diag, long num, long den, typename SUBNET>
+    using tril_diag = add_layer<tril_<diag, void, num, den>, SUBNET>;    
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_LAYERS_ABSTRACT_H_
