@@ -3862,4 +3862,3 @@ namespace dlib
 }
 
 #endif // DLIB_DNn_LAYERS_ABSTRACT_H_
-
