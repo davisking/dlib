@@ -1039,6 +1039,22 @@ namespace dlib
                 update(i);
             }
 
+            template <long diag, typename tag, long num, long den, typename U, typename E>
+            void operator()(size_t i, const add_layer<tril_<diag, tag, num, den>, U, E>&)
+            {
+                start_node(i, "tril");
+                out << " | {diag|{" << diag << "}}";
+                out << " | {diag_value|{";
+                
+                if (std::is_same<tag, neg_infinity_tag>::value) out << "-inf";
+                else if (std::is_same<tag, zero_tag>::value) out << "0";
+                else out << static_cast<float>(num) / static_cast<float>(den);
+                
+                out << "}}";
+                end_node();
+                update(i);
+            }
+            
             template <typename U, typename E>
             void operator()(size_t i, const add_layer<positional_encodings_, U, E>&)
             {

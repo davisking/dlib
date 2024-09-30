@@ -4792,6 +4792,132 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct neg_infinity_tag {};
+    struct zero_tag {};
+
+    template<typename T>
+    struct is_special_value : std::false_type {};
+    template<>
+    struct is_special_value<neg_infinity_tag> : std::true_type {};
+    template<>
+    struct is_special_value<zero_tag> : std::true_type {};
+
+    template<long diag_, typename tag_, long num_ = 0, long den_ = 1>
+    class tril_
+    {
+    public:
+        tril_(): diag(diag_), diag_value(compute_diag_value()) {}
+        
+        template <typename SUBNET>
+        void setup(const SUBNET& /*sub*/)
+        {
+        }
+        
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            auto& prev = sub.get_output();
+            output.set_size(prev.num_samples(), prev.k(), prev.nr(), prev.nc());
+
+            check_mask(prev);
+            tt::multiply(false, output, prev, binary_mask);
+            if (diag_value != 0.0f) tt::add(1, output, 1, output_mask);
+        }
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
+        {
+            auto& prev_grad = sub.get_gradient_input();
+            tt::multiply(true, prev_grad, gradient_input, binary_mask);
+        }
+
+        inline dpoint map_input_to_output(const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input(const dpoint& p) const { return p; }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+        
+        friend void serialize(const tril_& item, std::ostream& out)
+        {
+            serialize("tril_", out);
+            serialize(item.diag, out);
+            serialize(item.diag_value, out);
+        }
+        friend void deserialize(tril_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "tril_")
+                throw serialization_error("Unexpected version '" + version + "' found while deserializing dlib::tril_.");
+            deserialize(item.diag, in);
+            deserialize(item.diag_value, in);
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const tril_& item)
+        {
+            out << "tril (diag=" << item.diag << ", diag_value=" << item.diag_value << ")";
+            return out;
+        }
+        friend void to_xml(const tril_& item, std::ostream& out)
+        {
+            out << "<tril diag='" << item.diag << "' diag_value='" << item.diag_value << "'/>\n";
+        }
+
+    private:
+        float compute_diag_value() const {
+            if (std::is_same<tag_, neg_infinity_tag>::value)
+                return -std::numeric_limits<float>::infinity();
+            else if (std::is_same<tag_, zero_tag>::value)
+                return 0.0f;
+            else
+                return static_cast<float>(num_) / static_cast<float>(den_);
+        }
+
+        void check_mask(const tensor& t)
+        {
+            if (!have_same_dimensions(binary_mask, t)) {
+                binary_mask.copy_size(t);
+                binary_mask = 1;
+                if (diag_value != 0.0f) {
+                    output_mask.copy_size(t);
+                    output_mask = 0;
+                }                                
+                for (long s = 0; s < output_mask.num_samples(); ++s)
+                {
+                    for (long k = 0; k < output_mask.k(); ++k)
+                    {
+                        for (long r = 0; r < output_mask.nr(); ++r)
+                        {
+                            for (long c = std::max(r + diag + 1, 0L); c < output_mask.nc(); ++c)
+                            {
+                                if (diag_value != 0.0f) output_mask.host()[tensor_index(output_mask, s, k, r, c)] = diag_value;
+                                binary_mask.host()[tensor_index(binary_mask, s, k, r, c)] = 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        template <typename T>
+        struct always_false : std::false_type {};
+
+        resizable_tensor params; // unused
+        resizable_tensor binary_mask, output_mask;
+        long diag;
+        float diag_value;
+    };
+
+    template <typename SUBNET>
+    using tril = add_layer<tril_<0, zero_tag>, SUBNET>;
+
+    template <typename SUBNET>
+    using tril_mask = add_layer<tril_<0, neg_infinity_tag>, SUBNET>;
+
+    template <long diag, long num, long den, typename SUBNET>
+    using tril_diag = add_layer<tril_<diag, void, num, den>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     class positional_encodings_ {
     public:
         positional_encodings_(unsigned long sequence_dim_ = 1, unsigned long embedding_dim_ = 1) :
