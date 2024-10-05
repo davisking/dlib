@@ -4850,8 +4850,8 @@ namespace dlib
         void setup(const SUBNET& /*sub*/)
         {
             embs.set_size(num_embeddings, embedding_dim);
-            dlib::rand rnd(std::rand());
-            randomize_parameters(embs, num_embeddings + embedding_dim, rnd);
+            tt::tensor_rand rnd(std::rand());
+            rnd.fill_gaussian(embs);
         }
 
         template <typename SUBNET>
