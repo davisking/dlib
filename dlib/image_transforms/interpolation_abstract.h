@@ -1184,6 +1184,12 @@ namespace dlib
         unsigned long cols;
     };
 
+    void serialize(const chip_details& item, std::ostream& out);
+    void deserialize(chip_details& item, std::istream& in);
+    /*!
+        provides serialization support.
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     point_transform_affine get_mapping_to_chip (
