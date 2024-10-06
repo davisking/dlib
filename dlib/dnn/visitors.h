@@ -842,6 +842,16 @@ namespace dlib
             }
 
             template <template <typename> class TAG, typename U, typename E>
+            void operator()(size_t i, const add_layer<multm_prev_<TAG>, U, E>&)
+            {
+                start_node(i, "multm");
+                end_node();
+                const auto t = tag_id<TAG>::id;
+                out << tag_to_layer.at(t) << " -> " << i << '\n';
+                update(i);
+            }            
+
+            template <template <typename> class TAG, typename U, typename E>
             void operator()(size_t i, const add_layer<resize_prev_to_tagged_<TAG>, U, E>&)
             {
                 start_node(i, "resize_as");
@@ -1043,7 +1053,15 @@ namespace dlib
                 out << "}}";
                 end_node();
                 update(i);
-            }         
+            }
+            
+            template <typename U, typename E>
+            void operator()(size_t i, const add_layer<positional_encodings_, U, E>&)
+            {
+                start_node(i, "positional_encodings");
+                end_node();
+                update(i);
+            }
 
             template <typename T, typename U, typename E>
             void operator()(size_t i, const add_layer<T, U, E>&)

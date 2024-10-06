@@ -781,6 +781,39 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+void test_positional_encodings()
+{
+    print_spinner();
+    using net_type = tag1<positional_encodings<input<matrix<float>>>>;
+    net_type net;
+
+    const unsigned long sequence_dim = 4;
+    const unsigned long embedding_dim = 6;
+    const unsigned long n_samples = 1, n_channels = 1;
+    matrix<float> input_data(sequence_dim, embedding_dim);
+    input_data = 0.0f;
+    
+    resizable_tensor input_tensor(n_samples, n_channels, sequence_dim, embedding_dim);
+    std::vector<matrix<float>> x(n_samples);
+    x[0] = input_data;
+    net.to_tensor(&x[0], &x[0] + n_samples, input_tensor);
+    net.forward(input_tensor);
+
+    matrix<float> expected_output(sequence_dim, embedding_dim);
+    const float n = 10000.0f;
+    for (long r = 0; r < sequence_dim; ++r) {
+        for (long c = 0; c < embedding_dim; ++c) {
+            float theta = static_cast<float>(r) / std::pow(n, static_cast<float>(c) / embedding_dim);
+            expected_output(r, c) = (c % 2 == 0) ? std::sin(theta) : std::cos(theta);
+        }
+    }    
+
+    auto& net_output = layer<tag1>(net).get_output();
+    DLIB_TEST(max(abs(mat(net_output) - expected_output)) < 1e-5);
+}
+
+// ----------------------------------------------------------------------------------------
+
     void test_basic_tensor_ops()
     {
         using namespace dlib::tt;
@@ -2322,7 +2355,13 @@ namespace
             transpose_ l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
-        }        
+        }
+        {
+            print_spinner();
+            positional_encodings_ l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }           
     }
 
 // ----------------------------------------------------------------------------------------
@@ -2874,6 +2913,53 @@ namespace
         dlog << LINFO << "rs.max(): " << rs.max();
         DLIB_TEST(rs.mean() < 0.1);
     }
+
+// ----------------------------------------------------------------------------------------
+
+void test_multm_prev()
+{
+    print_spinner();
+    using net_type = tag1<multm_prev6<skip5<tag6<transpose<tag5<input<matrix<float>>>>>>>>;
+    net_type net;
+
+    dlib::rand rnd;
+    const int nr = 3, nc = 4;
+    const int n_samples = 3, k = 1;
+    std::vector<matrix<float>> x(n_samples);
+    matrix<float> xtmp(nr, nc);
+    for (int ii = 0; ii < n_samples; ++ii) {
+        for (int jj = 0; jj < nr; ++jj)
+            for (int kk = 0; kk < nc; ++kk)
+                xtmp(jj, kk) = rnd.get_random_gaussian();
+        x[ii] = xtmp;
+    }
+
+    resizable_tensor input_tensor;
+    net.to_tensor(&x[0], &x[0] + n_samples, input_tensor);
+    net.forward(input_tensor);
+
+    resizable_tensor expected_output(n_samples, k, nr, nr);
+    matrix<float> input_mat(nr, nc);
+    matrix<float> output_mat(nr, nr);
+
+    for (long s = 0; s < n_samples; ++s) {
+        for (long r = 0; r < nr; ++r) {
+            for (long c = 0; c < nc; ++c) {
+                input_mat(r, c) = input_tensor.host()[tensor_index(input_tensor, s, 0, r, c)];
+            }
+        }
+        output_mat = input_mat * trans(input_mat);
+
+        for (long r = 0; r < nr; ++r) {
+            for (long c = 0; c < nr; ++c) {
+                expected_output.host()[tensor_index(expected_output, s, 0, r, c)] = output_mat(r, c);
+            }
+        }
+    }
+
+    auto& net_output = layer<tag1>(net).get_output();
+    DLIB_TEST(max(abs(mat(net_output) - mat(expected_output))) < 1e-5);
+}
 
 // ----------------------------------------------------------------------------------------
 
@@ -4575,12 +4661,14 @@ namespace
             test_rms_normalize();
             test_transpose();
             test_tril();
+            test_positional_encodings();
             test_basic_tensor_ops();
             test_layers();
             test_visit_functions();
             test_copy_tensor_cpu();
             test_copy_tensor_add_to_cpu();
             test_concat();
+            test_multm_prev();
             test_simple_linear_regression();
             test_simple_linear_regression_eil();
             test_simple_linear_regression_with_mult_prev();

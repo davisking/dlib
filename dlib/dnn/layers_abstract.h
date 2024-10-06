@@ -3180,6 +3180,85 @@ namespace dlib
     template <
         template<typename> class tag
         >
+    class multm_prev_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above. This layer performs matrix multiplication on the output
+                of two previous layers. It multiplies the tensor from its immediate
+                predecessor layer, sub.get_output(), with the tensor from a deeper layer,
+                layer<tag>(sub).get_output().
+
+                The tag template argument specifies which layer to multiply with the
+                output of the previous layer. The result of this multiplication is
+                output by multm_prev_. The multiplication is performed using a modified
+                version of gemm() to account for the 2D matrix dimension in the nr()xnc()
+                planes of Dlib's 4D tensors.
+
+                This layer is similar to mult_prev_, but it considers the full matrix
+                in the nr()xnc() planes of the tensor, rather than just the upper
+                num_samples()xk() plane. This makes it suitable for implementing
+                mechanisms like attention, especially when the k() channel plane is
+                used to model multiple heads for parallel matrix processing.
+
+                The output tensor dimensions are determined as follows:
+                    - output.num_samples() == t1.num_samples()
+                    - output.k() == t1.k()
+                    - output.nr() == t1.nr()
+                    - output.nc() == t2.nc()
+                where t1 is sub.get_output() and t2 is layer<tag>(sub).get_output().
+        !*/
+
+    public:
+        multm_prev_(
+        ); 
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;        
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+    };
+
+    template <
+        template<typename> class tag,
+        typename SUBNET
+        >
+    using multm_prev = add_layer<multm_prev_<tag>, SUBNET>;
+
+    // Here we add some convenient aliases for using multm_prev_ with the tag layers. 
+    template <typename SUBNET> using multm_prev1  = multm_prev<tag1, SUBNET>;
+    template <typename SUBNET> using multm_prev2  = multm_prev<tag2, SUBNET>;
+    template <typename SUBNET> using multm_prev3  = multm_prev<tag3, SUBNET>;
+    template <typename SUBNET> using multm_prev4  = multm_prev<tag4, SUBNET>;
+    template <typename SUBNET> using multm_prev5  = multm_prev<tag5, SUBNET>;
+    template <typename SUBNET> using multm_prev6  = multm_prev<tag6, SUBNET>;
+    template <typename SUBNET> using multm_prev7  = multm_prev<tag7, SUBNET>;
+    template <typename SUBNET> using multm_prev8  = multm_prev<tag8, SUBNET>;
+    template <typename SUBNET> using multm_prev9  = multm_prev<tag9, SUBNET>;
+    template <typename SUBNET> using multm_prev10 = multm_prev<tag10, SUBNET>;
+    using multm_prev1_  = multm_prev_<tag1>;
+    using multm_prev2_  = multm_prev_<tag2>;
+    using multm_prev3_  = multm_prev_<tag3>;
+    using multm_prev4_  = multm_prev_<tag4>;
+    using multm_prev5_  = multm_prev_<tag5>;
+    using multm_prev6_  = multm_prev_<tag6>;
+    using multm_prev7_  = multm_prev_<tag7>;
+    using multm_prev8_  = multm_prev_<tag8>;
+    using multm_prev9_  = multm_prev_<tag9>;
+    using multm_prev10_ = multm_prev_<tag10>;
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        template<typename> class tag
+        >
     class resize_prev_to_tagged_
     {
         /*!
@@ -3865,7 +3944,153 @@ namespace dlib
     using tril_mask = add_layer<tril_<0, neg_infinity_tag>, SUBNET>;
 
     template <long diag, long num, long den, typename SUBNET>
-    using tril_diag = add_layer<tril_<diag, void, num, den>, SUBNET>;    
+    using tril_diag = add_layer<tril_<diag, void, num, den>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class positional_encodings_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+                It defines a positional encoding layer that adds position information to
+                the input tensor. This is particularly useful in transformer architectures
+                where the order of the sequence matters.
+
+                The dimensions of the tensors output by this layer are the same as the input
+                tensor dimensions.
+
+                This implementation is based on the positional encoding described in:
+                Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., 
+                Kaiser, Ł., & Polosukhin, I. (2017). Attention is all you need. In Advances 
+                in neural information processing systems (pp. 5998-6008).
+
+                The encoding uses sine and cosine functions of different frequencies:
+                PE(pos, 2i)   = sin(pos / 10000^(2i/d_model))
+                PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))
+                where pos is the position and i is the dimension.
+        !*/
+
+    public:
+
+        positional_encodings_(
+            unsigned long sequence_dim_ = 1,
+            unsigned long embedding_dim_ = 1
+        );
+        /*!
+            ensures
+                - #sequence_dim == sequence_dim_
+                - #embedding_dim == embedding_dim_
+        !*/
+
+        positional_encodings_ (
+            const positional_encodings_& item
+        );
+        /*!
+            ensures
+                - EXAMPLE_COMPUTATIONAL_LAYER_ objects are copy constructable
+        !*/
+
+        positional_encodings_& operator=(
+            const positional_encodings_& item
+        );
+        /*!
+            ensures
+                - EXAMPLE_COMPUTATIONAL_LAYER_ objects are assignable
+        !*/
+
+        template <typename SUBNET>
+        void setup (
+            const SUBNET& sub
+        );
+        /*!
+            requires
+                - SUBNET implements the SUBNET interface defined at the top of this file.
+            ensures
+                - performs any necessary setup for the layer, including the calculation
+                of positional encodings based on the dimensions of the input.
+        !*/
+
+        template <typename SUBNET>
+        void forward(
+            const SUBNET& sub,
+            resizable_tensor& output
+        );
+        /*!
+            requires
+                - SUBNET implements the SUBNET interface defined at the top of this file.
+                - setup() has been called.
+            ensures
+                - Adds the positional encodings to the output of the subnetwork and 
+                stores the results into #output.
+        !*/
+
+        template <typename SUBNET>
+        void backward(
+            const tensor& gradient_input,
+            SUBNET& sub,
+            tensor& params_grad
+        );
+        /*!
+            requires
+                - SUBNET implements the SUBNET interface defined at the top of this file.
+                - setup() has been called.
+                - #params_grad is unused in this layer as there are no learnable parameters.
+            ensures
+                - Computes the gradient of the layer with respect to the input, which
+                is simply the input gradient itself as positional encodings are constant.
+        !*/
+
+        const tensor& get_layer_params(
+        ) const;
+        /*!
+            ensures
+                - returns the parameters that define the behavior of forward().
+                Note: This layer has no learnable parameters, so this returns an empty tensor.
+        !*/
+
+        tensor& get_layer_params(
+        );
+        /*!
+            ensures
+                - returns the parameters that define the behavior of forward().
+                Note: This layer has no learnable parameters, so this returns an empty tensor.
+        !*/
+
+        const tensor& get_positional_encodings(
+        ) const;
+        /*!
+            ensures
+                - returns the computed positional encodings.
+        !*/
+
+        tensor& get_positional_encodings(
+        );
+        /*!
+            ensures
+                - returns the computed positional encodings.
+        !*/
+
+        friend void serialize(const positional_encodings_& item, std::ostream& out);
+        friend void deserialize(positional_encodings_& item, std::istream& in);
+        /*!
+            provides serialization support
+        !*/
+
+        friend std::ostream& operator<<(std::ostream& out, const positional_encodings_& item);
+        /*!
+            print a string describing this layer.
+        !*/
+
+        friend void to_xml(const positional_encodings_& item, std::ostream& out);
+        /*!
+            This function is optional, but required if you want to print your networks with
+            net_to_xml(). It prints a layer as XML.
+        !*/
+    };
+
+    template <typename SUBNET>
+    using positional_encodings = add_layer<positional_encodings_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
