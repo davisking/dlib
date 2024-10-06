@@ -31,50 +31,44 @@ defaults:
     shell: bash
 
 jobs:
-  Windows:
-    runs-on: 'windows-latest'
+  build_wheels:
+    runs-on: ${{ matrix.platform_arch[1] }}
+    name: Build ${{matrix.cpython}}-${{ matrix.platform_arch[0] }}
+    env:
+      identifier: ${{matrix.cpython}}-${{ matrix.platform_arch[0] }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        cpython: [cp37, cp38, cp39, cp310, cp311, cp312]
+        platform_arch: 
+          - [manylinux_x86_64, ubuntu-latest]
+          - [musllinux_x86_64, ubuntu-latest]
+          - [macosx_x86_64, macos-13]
+          - [macosx_arm64, macos-14]
+          - [win_amd64, windows-latest]
+        exclude:
+          - cpython: cp37
+            platform_arch: [macosx_arm64, macos-14]
+
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
-    - name: Install python deps
+    - uses: actions/checkout@v4
+    
+    - name: Disable gui support
       run: |
-        pip install pytest numpy
-        # don't use CMake 3.25.0 https://gitlab.kitware.com/cmake/cmake/-/issues/23975
-        pip3 install cmake==3.24.0
-    - name: Build
-      run: |
-        pip3 install cmake==3.24.0
-        python setup.py build
-        python setup.py install --user
-    - name: Test
-      run: python -m pytest --ignore docs --ignore dlib
+        sed -i'' -e "s/_cmake_extra_options = \[\]/_cmake_extra_options = \['-DDLIB_NO_GUI_SUPPORT=ON'\]/" setup.py
 
-  Ubuntu:
-    runs-on: 'ubuntu-latest'
-    steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
-    - name: Install python deps
-      run: pip install pytest numpy
-    - name: Build
-      run: |
-        python setup.py build
-        python setup.py install --user
-    - name: Test
-      run: python -m pytest --ignore docs --ignore dlib
+    - name: Build wheel
+      uses: pypa/cibuildwheel@v2.17.0  # sync version with pip install cibuildwheel above
+      with:
+        only: ${{ env.identifier }}
+      env:
+        CIBW_BUILD_VERBOSITY: 1
+        CIBW_TEST_REQUIRES: pytest numpy
+        CIBW_TEST_COMMAND: python -m pytest {project}/tools/python/test --ignore docs --ignore dlib
 
-# Disabled for now since something is going sideways with python packages on github actions
-# MacOS:
-#   runs-on: 'macos-latest'
-#   steps:
-#   - uses: actions/checkout@v3
-#   - uses: actions/setup-python@v4
-#   - name: Install python deps
-#     run: pip3 install pytest numpy
-#   - name: Build
-#     run: |
-#       python3 setup.py build
-#       python3 setup.py install --user
-#   - name: Test
-#     run: python3 -m pytest --ignore docs --ignore dlib
-
+    - name: Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist-${{ env.identifier }}
+        path: wheelhouse/*.whl
