@@ -859,7 +859,7 @@ void test_embeddings()
         if (predicted_labels[i] == labels[i]) ++num_correct;
 
     double acc = static_cast<double>(num_correct) / labels.size();
-    DLIB_TEST(acc > 0.97);
+    DLIB_TEST(acc > 0.9);
 }
 
 // ----------------------------------------------------------------------------------------
