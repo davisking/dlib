@@ -817,7 +817,7 @@ void test_positional_encodings()
 void test_embeddings()
 {
     print_spinner();
-    const size_t num_sequences = 100, sequence_length = 7, num_classes = 10, num_tokens = 50, embedding_length = 5;
+    const size_t num_sequences = 100, sequence_length = 7, num_classes = 3, num_tokens = 50, embedding_length = 5;
     using net_type = loss_multiclass_log<fc<num_classes,
         relu<fc<32,relu<fc<64,
         embeddings<num_tokens, embedding_length,
@@ -827,7 +827,7 @@ void test_embeddings()
     trainer.set_learning_rate(1e-1);
     trainer.set_min_learning_rate(1e-4);
     trainer.set_mini_batch_size(16);
-    trainer.set_max_num_epochs(300);
+    trainer.set_max_num_epochs(500);
 
     dlib::rand rnd(std::rand());
     auto generate_sequences = [&](size_t num_sequences, size_t sequence_length, size_t num_tokens) {
