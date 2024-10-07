@@ -4,7 +4,7 @@
 #
 
 
-cmake_minimum_required(VERSION 3.8.0)
+cmake_minimum_required(VERSION 3.17.0)
 
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
@@ -649,7 +649,7 @@ if (NOT TARGET dlib)
 
 
       if (DLIB_USE_CUDA)
-         find_package(CUDA 7.5)
+         find_package(CUDAToolkit QUIET)
 
          if (CUDA_VERSION VERSION_GREATER 9.1 AND CMAKE_VERSION VERSION_LESS 3.12.2)
             # This bit of weirdness is to work around a bug in cmake 
@@ -657,18 +657,12 @@ if (NOT TARGET dlib)
          endif()
 
 
-         if (CUDA_FOUND AND MSVC AND NOT CUDA_CUBLAS_LIBRARIES AND "${CMAKE_SIZEOF_VOID_P}" EQUAL "4")
+         if (CUDAToolkit_FOUND AND MSVC AND NOT TARGET CUDA::cublas AND "${CMAKE_SIZEOF_VOID_P}" EQUAL "4")
             message(WARNING "You have CUDA installed, but we can't use it unless you put visual studio in 64bit mode.")
             set(CUDA_FOUND 0)
          endif()
 
-         if (NOT CUDA_CUBLAS_LIBRARIES)
-            message(STATUS "Found CUDA, but CMake was unable to find the cuBLAS libraries that should be part of every basic CUDA "
-               "install. Your CUDA install is somehow broken or incomplete. Since cuBLAS is required for dlib to use CUDA we won't use CUDA.")
-            set(CUDA_FOUND 0)
-         endif()
-
-         if (CUDA_FOUND)
+         if (CUDAToolkit_FOUND)
 
             # There is some bug in cmake that causes it to mess up the
             # -std=c++11 option if you let it propagate it to nvcc in some
@@ -712,14 +706,25 @@ if (NOT TARGET dlib)
 
             include(cmake_utils/test_for_cudnn/find_cudnn.txt)
 
-            if (cudnn AND cudnn_include AND NOT DEFINED cuda_test_compile_worked AND NOT DEFINED cudnn_test_compile_worked)
+            include(CheckLanguage)
+            check_language(CUDA)
+            set(cuda_compiler_found OFF)
+            if (CMAKE_CUDA_COMPILER)
+               set(cuda_compiler_found ON)
+            else()
+               message(STATUS " *** Cannot find CUDA compiler. If you are on windows using Visual Studio, make sure to install 'Visual Studio Integration' in the cuda installer.")
+            endif()
+
+            if (cudnn AND cudnn_include AND cuda_compiler_found AND NOT DEFINED cuda_test_compile_worked AND NOT DEFINED cudnn_test_compile_worked)
                # make sure cuda is really working by doing a test compile
+               enable_language(CUDA)
                message(STATUS "Building a CUDA test project to see if your compiler is compatible with CUDA...")
 
                set(CUDA_TEST_CMAKE_FLAGS 
                   "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
                   "-DCMAKE_INCLUDE_PATH=${CMAKE_INCLUDE_PATH}"
-                  "-DCMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH}")
+                  "-DCMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH}"
+                  "-DCUDAToolkit_ROOT=${CUDAToolkit_ROOT}")
 
                if (NOT MSVC) # see https://github.com/davisking/dlib/issues/363
                   list(APPEND CUDA_TEST_CMAKE_FLAGS "-DCUDA_HOST_COMPILER=${CUDA_HOST_COMPILER}")
@@ -760,24 +765,6 @@ if (NOT TARGET dlib)
                   endif()
                endif()
             endif()
-
-            # Find where cuSOLVER is since the FindCUDA cmake package doesn't
-            # bother to look for it in older versions of cmake.
-            if (NOT CUDA_cusolver_LIBRARY)
-               get_filename_component(cuda_blas_path "${CUDA_CUBLAS_LIBRARIES}" DIRECTORY)
-               find_library(CUDA_cusolver_LIBRARY cusolver HINTS ${cuda_blas_path})
-               # CUDA 10.1 doesn't install symbolic links to libcusolver.so in
-               # the usual place.  This is probably a bug in the cuda
-               # installer.  In any case, If we haven't found cusolver yet go
-               # look in the cuda install folder for it.  New versions of cmake
-               # do this correctly, but older versions need help.
-               if (NOT CUDA_cusolver_LIBRARY)
-                  find_library(CUDA_cusolver_LIBRARY cusolver HINTS 
-                     /usr/local/cuda/lib64/
-                     )
-               endif()
-               mark_as_advanced(CUDA_cusolver_LIBRARY)
-            endif()
             # Also find OpenMP since cuSOLVER needs it.  Importantly, we only
             # look for one to link to if our use of BLAS, specifically the
             # Intel MKL, hasn't already decided what to use.  This is because
@@ -800,7 +787,7 @@ if (NOT TARGET dlib)
             endif()
          endif()
 
-         if (CUDA_FOUND AND cudnn AND cuda_test_compile_worked AND cudnn_test_compile_worked AND cudnn_include)
+         if (CUDAToolkit_FOUND AND cudnn AND cuda_test_compile_worked AND cudnn_test_compile_worked AND cudnn_include)
             set(source_files ${source_files} 
                cuda/cuda_dlib.cu 
                cuda/cudnn_dlibapi.cpp
@@ -810,11 +797,12 @@ if (NOT TARGET dlib)
                cuda/cuda_data_ptr.cpp
                cuda/gpu_data.cpp
                )
-            list (APPEND dlib_needed_private_libraries ${CUDA_CUBLAS_LIBRARIES})
+            list (APPEND dlib_needed_private_libraries CUDA::toolkit)
+            list (APPEND dlib_needed_private_libraries CUDA::cublas)
             list (APPEND dlib_needed_private_libraries ${cudnn})
-            list (APPEND dlib_needed_private_libraries ${CUDA_curand_LIBRARY})
-            list (APPEND dlib_needed_private_libraries ${CUDA_cusolver_LIBRARY})
-            list (APPEND dlib_needed_private_libraries ${CUDA_CUDART_LIBRARY})
+            list (APPEND dlib_needed_private_libraries CUDA::curand)
+            list (APPEND dlib_needed_private_libraries CUDA::cusolver)
+            list (APPEND dlib_needed_private_libraries CUDA::cudart)
             if(openmp_libraries)
                list (APPEND dlib_needed_private_libraries ${openmp_libraries})
             endif()
@@ -822,9 +810,9 @@ if (NOT TARGET dlib)
             include_directories(${cudnn_include})
             message(STATUS "Enabling CUDA support for dlib.  DLIB WILL USE CUDA, compute capabilities: ${DLIB_CUDA_COMPUTE_CAPABILITIES}")
          else()
-            set(DLIB_USE_CUDA OFF CACHE STRING ${DLIB_USE_BLAS_STR} FORCE )
+            set(DLIB_USE_CUDA OFF CACHE BOOL ${DLIB_USE_BLAS_STR} FORCE )
             toggle_preprocessor_switch(DLIB_USE_CUDA)
-            if (NOT CUDA_FOUND)
+            if (NOT CUDAToolkit_FOUND)
                message(STATUS "DID NOT FIND CUDA")
             endif()
             message(STATUS "Disabling CUDA support for dlib.  DLIB WILL NOT USE CUDA")
@@ -875,15 +863,7 @@ if (NOT TARGET dlib)
          endif()
       endif()
 
-      # Tell CMake to build dlib via add_library()/cuda_add_library()
-      if (DLIB_USE_CUDA)
-         # The old cuda_add_library() command doesn't support CMake's newer dependency
-         # stuff, so we have to set the include path manually still, which we do here.
-         include_directories(${dlib_needed_public_includes})
-         cuda_add_library(dlib ${source_files} )
-      else()
-         add_library(dlib ${source_files} )
-      endif()
+      add_library(dlib ${source_files} )
 
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
 
@@ -917,6 +897,9 @@ if (NOT TARGET dlib)
       target_compile_options(dlib PRIVATE "-DDLIB_CHECK_FOR_VERSION_MISMATCH=${DLIB_CHECK_FOR_VERSION_MISMATCH}")
    endif()
 
+   if (DLIB_USE_CUDA)
+      set_target_properties(dlib PROPERTIES CUDA_ARCHITECTURES ${DLIB_CUDA_COMPUTE_CAPABILITIES})
+   endif()
 
    # Allow the unit tests to ask us to compile the all/source.cpp file just to make sure it compiles.
    if (DLIB_TEST_COMPILE_ALL_SOURCE_CPP)

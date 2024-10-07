@@ -3,7 +3,7 @@
 # information about it at http://www.cmake.org
 #
 
-cmake_minimum_required(VERSION 3.8.0)
+cmake_minimum_required(VERSION 3.17.0)
 
 # create a variable called target_name and set it to the string "dtest"
 set (target_name dtest)
@@ -213,10 +213,8 @@ else() # basically Clang
    # This is for the comment in face_detection_ex.cpp that says "faces/*.jpg"
    add_compile_options(-Wno-comment)
 
-   if(${CMAKE_VERSION} VERSION_GREATER "3.8.0") 
-      # strip debug symbols to make the binary smaller
-      target_link_options(${target_name} PRIVATE $<$<CONFIG:RELEASE>:-s>)
-   endif()
+   # strip debug symbols to make the binary smaller
+   target_link_options(${target_name} PRIVATE $<$<CONFIG:RELEASE>:-s>)
 endif()
 
 

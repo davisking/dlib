@@ -77,9 +77,9 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
   if(OSX AND CMAKE_VERSION VERSION_LESS 3.7)
     # Bug in macOS CMake < 3.7 is unable to download catch
     message(WARNING "CMAKE 3.7+ needed on macOS to download catch, and newer HIGHLY recommended")
-  elseif(WINDOWS AND CMAKE_VERSION VERSION_LESS 3.8)
-    # Only tested with 3.8+ in CI.
-    message(WARNING "CMAKE 3.8+ tested on Windows, previous versions untested")
+  elseif(WINDOWS AND CMAKE_VERSION VERSION_LESS 3.17)
+    # Only tested with 3.8´17+ in CI.
+    message(WARNING "CMAKE 3.17+ tested on Windows, previous versions untested")
   endif()
 
   message(STATUS "CMake ${CMAKE_VERSION}")
