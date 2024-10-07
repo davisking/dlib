@@ -3985,31 +3985,30 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    enum softmax_mode { CHANNEL_WISE = 0, PLANE_WISE = 1 };
+
+    template <unsigned long s_mode_>
     class softmax_
     {
     public:
-        softmax_() 
-        {
-        }
+        softmax_() {}
 
         template <typename SUBNET>
-        void setup (const SUBNET& /*sub*/)
-        {
-        }
+        void setup(const SUBNET& /*sub*/) {}
 
         void forward_inplace(const tensor& input, tensor& output)
         {
-            tt::softmax(output, input);
-        } 
+            tt::softmax(output, input, s_mode_);
+        }
 
         void backward_inplace(
             const tensor& computed_output,
-            const tensor& gradient_input, 
-            tensor& data_grad, 
-            tensor& 
+            const tensor& gradient_input,
+            tensor& data_grad,
+            tensor& /*params_grad*/
         )
         {
-            tt::softmax_gradient(data_grad, computed_output, gradient_input);
+            tt::softmax_gradient(data_grad, computed_output, gradient_input, s_mode_);
         }
 
         const tensor& get_layer_params() const { return params; }
@@ -4025,26 +4024,29 @@ namespace dlib
             std::string version;
             deserialize(version, in);
             if (version != "softmax_")
-                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::softmax_.");
+                throw serialization_error("Unexpected version '" + version + "' found while deserializing dlib::softmax_.");
         }
 
         friend std::ostream& operator<<(std::ostream& out, const softmax_& /*item*/)
         {
-            out << "softmax";
+            out << "softmax (mode=" << (s_mode_ == CHANNEL_WISE ? "channel_wise" : "plane_wise") << ")";
             return out;
         }
 
         friend void to_xml(const softmax_& /*item*/, std::ostream& out)
         {
-            out << "<softmax/>\n";
+            out << "<softmax mode='" << (s_mode_ == CHANNEL_WISE ? "channel_wise" : "plane_wise") << "'/>\n";
         }
 
     private:
-        resizable_tensor params;
+        resizable_tensor params; // unused
     };
 
     template <typename SUBNET>
-    using softmax = add_layer<softmax_, SUBNET>;
+    using softmax = add_layer<softmax_<CHANNEL_WISE>, SUBNET>;
+
+    template <typename SUBNET>
+    using softmaxm = add_layer<softmax_<PLANE_WISE>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -4640,7 +4642,7 @@ namespace dlib
     class transpose_ {
     public:
         transpose_() {}
-        template <typename SUBNET> void setup(const SUBNET& /* sub */) {}
+        template <typename SUBNET> void setup(const SUBNET& /*sub*/) {}
 
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output) {
             auto& prev = sub.get_output();
@@ -4672,21 +4674,21 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const transpose_& /* item */, std::ostream& out) {
+        friend void serialize(const transpose_& /*item*/, std::ostream& out) {
             serialize("transpose_", out);
         }
-        friend void deserialize(transpose_& /* item */, std::istream& in) {
+        friend void deserialize(transpose_& /*item*/, std::istream& in) {
             std::string version;
             deserialize(version, in);
             if (version != "transpose_")
                 throw serialization_error("Unexpected version '" + version + "' found while deserializing dlib::transpose_.");
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const transpose_& /* item */) {
+        friend std::ostream& operator<<(std::ostream& out, const transpose_& /*item*/) {
             out << "transpose";
             return out;
         }
-        friend void to_xml(const transpose_& /* item */, std::ostream& out) {
+        friend void to_xml(const transpose_& /*item*/, std::ostream& out) {
             out << "<transpose />\n";
         }
 
@@ -4695,6 +4697,109 @@ namespace dlib
     };
 
     template <typename SUBNET> using transpose = add_layer<transpose_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class positional_encodings_ {
+    public:
+        positional_encodings_(unsigned long sequence_dim_ = 1, unsigned long embedding_dim_ = 1) :
+            sequence_dim(sequence_dim_), embedding_dim(embedding_dim_)
+        {
+        }
+        positional_encodings_(const positional_encodings_& item) : 
+            pe(item.pe), sequence_dim(item.sequence_dim), embedding_dim(item.embedding_dim)
+        {
+        }
+        positional_encodings_& operator= (const positional_encodings_& item) {
+            if (this == &item) return *this;
+            pe = item.pe;
+            sequence_dim = item.sequence_dim;
+            embedding_dim = item.embedding_dim;
+            return *this;
+        }
+        
+        template <typename SUBNET>
+        void setup(const SUBNET& sub)
+        {
+            auto& prev = sub.get_output();
+
+            sequence_dim = prev.nr();
+            embedding_dim = prev.nc();
+            const unsigned long ns = prev.num_samples();
+            const unsigned long nk = prev.k();
+            const float n = 10000.0f;
+
+            pe.set_size(ns, nk, sequence_dim, embedding_dim);              
+            for (unsigned long s = 0; s < ns; ++s)
+            {
+                for (unsigned long k = 0; k < nk; ++k)
+                {
+                    for (unsigned long r = 0; r < sequence_dim; ++r)
+                    {
+                        for (unsigned long c = 0; c < embedding_dim; ++c)
+                        {
+                            float theta = static_cast<float>(r) / std::pow(n, static_cast<float>(c) / embedding_dim);
+                            if (c % 2 == 0) pe.host()[tensor_index(pe, s, k, r, c)] = std::sin(theta);
+                            else pe.host()[tensor_index(pe, s, k, r, c)] = std::cos(theta);
+                        }
+                    }
+                }
+            }
+        }
+        
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {            
+            const auto& prev_output = sub.get_output();            
+            if (!have_same_dimensions(pe, prev_output)) setup(sub);
+            
+            output.set_size(prev_output.num_samples(), prev_output.k(), sequence_dim, embedding_dim);
+            tt::add(output, prev_output, pe);
+        }
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
+        {
+            auto& prev_grad = sub.get_gradient_input();
+            tt::add(prev_grad, prev_grad, gradient_input);
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        const tensor& get_positional_encodings() const { return pe; }
+        tensor& get_positional_encodings() { return pe; }
+
+        friend void serialize(const positional_encodings_& /*item*/, std::ostream& out)
+        {
+            serialize("positional_encodings_", out);
+        }
+        friend void deserialize(positional_encodings_& /*item*/, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "positional_encodings_")
+                throw serialization_error("Unexpected version '" + version + "' found while deserializing dlib::positional_encodings_.");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const positional_encodings_& /*item*/)
+        {
+            out << "positional_encodings";
+            return out;
+        }
+        friend void to_xml(const positional_encodings_& /*item*/, std::ostream& out)
+        {
+            out << "<positional_encodings />\n";
+        }
+
+    private:
+        resizable_tensor params; // unused
+        resizable_tensor pe;
+        unsigned long sequence_dim, embedding_dim;
+    };
+
+    template <typename SUBNET>
+    using positional_encodings = add_layer<positional_encodings_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -4820,12 +4925,10 @@ namespace dlib
     using tril_mask = add_layer<tril_<0, neg_infinity_tag>, SUBNET>;
 
     template <long diag, long num, long den, typename SUBNET>
-    using tril_diag = add_layer<tril_<diag, void, num, den>, SUBNET>;
-
+    using tril_diag = add_layer<tril_<diag, void, num, den>, SUBNET>;  
+  
 // ----------------------------------------------------------------------------------------
-
+  
 }
 
 #endif // DLIB_DNn_LAYERS_H_
-
-

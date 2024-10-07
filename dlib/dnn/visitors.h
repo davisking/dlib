@@ -962,8 +962,8 @@ namespace dlib
                 update(i);
             }
 
-            template <typename U, typename E>
-            void operator()(size_t i, const add_layer<softmax_, U, E>&)
+            template <unsigned long sm, typename U, typename E>
+            void operator()(size_t i, const add_layer<softmax_<sm>, U, E>&)
             {
                 start_node(i, "softmax");
                 end_node();
@@ -1029,6 +1029,14 @@ namespace dlib
                 update(i);
             }
 
+            template <typename U, typename E>
+            void operator()(size_t i, const add_layer<positional_encodings_, U, E>&)
+            {
+                start_node(i, "positional_encodings");
+                end_node();
+                update(i);
+            }
+
             template <long diag, typename tag, long num, long den, typename U, typename E>
             void operator()(size_t i, const add_layer<tril_<diag, tag, num, den>, U, E>&)
             {
@@ -1043,7 +1051,7 @@ namespace dlib
                 out << "}}";
                 end_node();
                 update(i);
-            }         
+            }
 
             template <typename T, typename U, typename E>
             void operator()(size_t i, const add_layer<T, U, E>&)

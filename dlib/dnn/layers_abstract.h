@@ -2953,44 +2953,69 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    enum softmax_mode { CHANNEL_WISE = 0, PLANE_WISE = 1 };
+    
+    template <unsigned long s_mode_>
     class softmax_
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
-                defined above.  In particular, it defines a softmax layer.  To be precise,
-                we define the softmax function s(x) as:
-                    s(x) == exp(x)/sum(exp(x)) 
-                where x is a vector.  Then this layer treats its input tensor as a
-                collection of multi-channel images and applies s() to each spatial location
-                in each image.  In each application, the tensor::k() channel elements at
-                each position are input to s() and then replaced by the outputs of s().   
+                defined above. It defines a softmax layer with two modes of operation:
+                channel-wise and plane-wise.
 
-                This means that, for example, if you collapsed each output image to a 1
-                channel image by adding the channels then you would end up with images
-                where each pixel value was 1.  This is because the sum of the outputs of
-                s() will always be equal to 1.
+                The softmax function s(x) is defined as:
+                    s(x) == exp(x)/sum(exp(x)) 
+                where x is a vector.
+
+                1. Channel-wise mode (s_mode_ == CHANNEL_WISE):
+                This mode treats the input tensor as a collection of multi-channel images
+                and applies s() to each spatial location in each image. The tensor::k() 
+                channel elements at each position are input to s() and then replaced by 
+                the outputs of s().
+
+                2. Plane-wise mode (s_mode_ == PLANE_WISE):
+                This mode applies the softmax function across entire planes (nr x nc) of 
+                the input tensor, useful for operations in Large Language Models (LLMs) 
+                and other applications requiring 2D tensor processing.
+
+                In both modes, the sum of the outputs of s() will always be equal to 1 for 
+                each application of the function.
+
+            TEMPLATE PARAMETERS
+                - s_mode_: Determines the mode of operation (CHANNEL_WISE or PLANE_WISE)
         !*/
 
     public:
+        softmax_();
 
-        softmax_(
-        );
-
-        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void setup(const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
-        void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
-        const tensor& get_layer_params() const; 
-        tensor& get_layer_params(); 
+        void backward_inplace(
+            const tensor& computed_output, 
+            const tensor& gradient_input, 
+            tensor& data_grad, 
+            tensor& params_grad
+        );
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
         /*!
             These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ 
-            interface.  Note that this layer doesn't have any parameters, so the tensor
+            interface. Note that this layer doesn't have any parameters, so the tensor
             returned by get_layer_params() is always empty.
         !*/
+
+        friend void serialize(const softmax_& item, std::ostream& out);
+        friend void deserialize(softmax_& item, std::istream& in);
+        friend std::ostream& operator<<(std::ostream& out, const softmax_& item);
+        friend void to_xml(const softmax_& item, std::ostream& out);
     };
 
     template <typename SUBNET>
-    using softmax = add_layer<softmax_, SUBNET>;
+    using softmax = add_layer<softmax_<CHANNEL_WISE>, SUBNET>;
+
+    template <typename SUBNET>
+    using softmaxm = add_layer<softmax_<PLANE_WISE>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -3713,6 +3738,152 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class positional_encodings_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+                It defines a positional encoding layer that adds position information to
+                the input tensor. This is particularly useful in transformer architectures
+                where the order of the sequence matters.
+
+                The dimensions of the tensors output by this layer are the same as the input
+                tensor dimensions.
+
+                This implementation is based on the positional encoding described in:
+                Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., 
+                Kaiser, Ł., & Polosukhin, I. (2017). Attention is all you need. In Advances 
+                in neural information processing systems (pp. 5998-6008).
+
+                The encoding uses sine and cosine functions of different frequencies:
+                PE(pos, 2i)   = sin(pos / 10000^(2i/d_model))
+                PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))
+                where pos is the position and i is the dimension.
+        !*/
+
+    public:
+
+        positional_encodings_(
+            unsigned long sequence_dim_ = 1,
+            unsigned long embedding_dim_ = 1
+        );
+        /*!
+            ensures
+                - #sequence_dim == sequence_dim_
+                - #embedding_dim == embedding_dim_
+        !*/
+
+        positional_encodings_ (
+            const positional_encodings_& item
+        );
+        /*!
+            ensures
+                - EXAMPLE_COMPUTATIONAL_LAYER_ objects are copy constructable
+        !*/
+
+        positional_encodings_& operator=(
+            const positional_encodings_& item
+        );
+        /*!
+            ensures
+                - EXAMPLE_COMPUTATIONAL_LAYER_ objects are assignable
+        !*/
+
+        template <typename SUBNET>
+        void setup (
+            const SUBNET& sub
+        );
+        /*!
+            requires
+                - SUBNET implements the SUBNET interface defined at the top of this file.
+            ensures
+                - performs any necessary setup for the layer, including the calculation
+                of positional encodings based on the dimensions of the input.
+        !*/
+
+        template <typename SUBNET>
+        void forward(
+            const SUBNET& sub,
+            resizable_tensor& output
+        );
+        /*!
+            requires
+                - SUBNET implements the SUBNET interface defined at the top of this file.
+                - setup() has been called.
+            ensures
+                - Adds the positional encodings to the output of the subnetwork and 
+                stores the results into #output.
+        !*/
+
+        template <typename SUBNET>
+        void backward(
+            const tensor& gradient_input,
+            SUBNET& sub,
+            tensor& params_grad
+        );
+        /*!
+            requires
+                - SUBNET implements the SUBNET interface defined at the top of this file.
+                - setup() has been called.
+                - #params_grad is unused in this layer as there are no learnable parameters.
+            ensures
+                - Computes the gradient of the layer with respect to the input, which
+                is simply the input gradient itself as positional encodings are constant.
+        !*/
+
+        const tensor& get_layer_params(
+        ) const;
+        /*!
+            ensures
+                - returns the parameters that define the behavior of forward().
+                Note: This layer has no learnable parameters, so this returns an empty tensor.
+        !*/
+
+        tensor& get_layer_params(
+        );
+        /*!
+            ensures
+                - returns the parameters that define the behavior of forward().
+                Note: This layer has no learnable parameters, so this returns an empty tensor.
+        !*/
+
+        const tensor& get_positional_encodings(
+        ) const;
+        /*!
+            ensures
+                - returns the computed positional encodings.
+        !*/
+
+        tensor& get_positional_encodings(
+        );
+        /*!
+            ensures
+                - returns the computed positional encodings.
+        !*/
+
+        friend void serialize(const positional_encodings_& item, std::ostream& out);
+        friend void deserialize(positional_encodings_& item, std::istream& in);
+        /*!
+            provides serialization support
+        !*/
+
+        friend std::ostream& operator<<(std::ostream& out, const positional_encodings_& item);
+        /*!
+            print a string describing this layer.
+        !*/
+
+        friend void to_xml(const positional_encodings_& item, std::ostream& out);
+        /*!
+            This function is optional, but required if you want to print your networks with
+            net_to_xml(). It prints a layer as XML.
+        !*/
+    };
+
+    template <typename SUBNET>
+    using positional_encodings = add_layer<positional_encodings_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     struct neg_infinity_tag {};
     struct zero_tag {};
 
@@ -3865,11 +4036,10 @@ namespace dlib
     using tril_mask = add_layer<tril_<0, neg_infinity_tag>, SUBNET>;
 
     template <long diag, long num, long den, typename SUBNET>
-    using tril_diag = add_layer<tril_<diag, void, num, den>, SUBNET>;    
-
+    using tril_diag = add_layer<tril_<diag, void, num, den>, SUBNET>;  
+  
 // ----------------------------------------------------------------------------------------
-
+  
 }
 
 #endif // DLIB_DNn_LAYERS_ABSTRACT_H_
-
