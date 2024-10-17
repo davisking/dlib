@@ -2052,6 +2052,78 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void embeddings(
+        resizable_tensor& dest,
+        const tensor& src,
+        const tensor& embs
+    );
+    /*!
+        requires
+            - src.nr() > 0
+            - embs.num_samples() > 0
+            - embs.k() > 0
+            - embs.nr() == 1
+            - embs.nc() == 1
+            - dest.num_samples() == src.num_samples()
+            - dest.k() == src.k()
+            - dest.nr() == src.nr()
+            - dest.nc() == embs.k()
+        ensures
+            - Projects tokens from the input tensor `src` into embeddings stored in `embs`.
+            - The resulting embeddings are stored in the `dest` tensor.
+            - For all valid s (0 <= s < dest.num_samples()),
+                        k (0 <= k < dest.k()),
+                        r (0 <= r < dest.nr()),
+                        c (0 <= c < dest.nc()):
+                - Let token_idx = static_cast<unsigned long>(src(s,k,r,0))
+                - If token_idx < embs.num_samples():
+                    - #dest(s,k,r,c) = embs(token_idx, c, 0, 0)
+                - Else:
+                    - #dest(s,k,r,c) = 0
+            - The function iterates over all elements of src and populates dest accordingly.
+            - If a token index in src is out of range (>= embs.num_samples()),
+              the corresponding embedding in dest is filled with 0's.
+    */
+
+    void embeddings_gradient(
+        const tensor& prev,
+        const tensor& gradient_input,
+        tensor& grads,
+        const tensor& freqs,
+        float learning_rate,
+        bool scale
+    );
+    /*!
+        requires
+            - prev.nr() > 0
+            - gradient_input.num_samples() == prev.num_samples()
+            - gradient_input.k() == prev.k()
+            - gradient_input.nr() == prev.nr()
+            - gradient_input.nc() == grads.k()
+            - grads.num_samples() > 0
+            - grads.k() > 0
+            - grads.nr() == 1
+            - grads.nc() == 1
+            - freqs.num_samples() == grads.num_samples()
+            - freqs.k() == 1
+            - freqs.nr() == 1
+            - freqs.nc() == 1
+        ensures
+            - Updates the `grads` tensor based on the gradients in `gradient_input`.
+            - For each sample s, channel k, and row r in prev:
+                - Retrieves the token index from prev[s,k,r,0]
+                - If the token index is valid (< grads.num_samples()):
+                    - If scale is true:
+                        - Computes a frequency scale factor based on freqs[token_idx]
+                        - The scale factor is min(0.15, max(1.0 / freqs[token_idx], 1.0))
+                    - For each column c in gradient_input:
+                        - Updates grads[token_idx, c] -= gradient_input[s,k,r,c] * learning_rate * freq_scale
+            - The updates to grads are performed atomically to handle concurrent updates to the same embedding.
+            - The function is thread-safe and processes samples in parallel.
+    */
+
+// ----------------------------------------------------------------------------------------
+
     class multi_device_tensor_averager
     {
         /*!
