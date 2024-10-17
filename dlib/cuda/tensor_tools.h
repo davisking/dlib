@@ -2082,7 +2082,7 @@ namespace dlib { namespace tt
                     - #dest(s,k,r,c) = 0
             - The function iterates over all elements of src and populates dest accordingly.
             - If a token index in src is out of range (>= embs.num_samples()),
-            the corresponding embedding in dest is filled with 0's.
+              the corresponding embedding in dest is filled with 0's.
     */
 
     void embeddings_gradient(
