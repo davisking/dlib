@@ -2111,7 +2111,7 @@ void test_embeddings()
             tril_<-5, void, 1, 2> l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
-        }        
+        }          
         {
             print_spinner();
             extract_<0,2,2,2> l;
@@ -4672,6 +4672,7 @@ void test_embeddings()
             test_positional_encodings();
             test_embeddings();
             test_tril();
+            test_positional_encodings();
             test_basic_tensor_ops();
             test_layers();
             test_visit_functions();

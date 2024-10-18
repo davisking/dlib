@@ -1061,7 +1061,7 @@ namespace dlib
                 out << "}}";
                 end_node();
                 update(i);
-            }
+            }         
 
             template <typename T, typename U, typename E>
             void operator()(size_t i, const add_layer<T, U, E>&)
