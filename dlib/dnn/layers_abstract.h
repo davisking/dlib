@@ -3713,6 +3713,226 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class positional_encodings_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+                It defines a positional encoding layer that adds position information to
+                the input tensor. This is particularly useful in transformer architectures
+                where the order of the sequence matters.
+
+                The dimensions of the tensors output by this layer are the same as the input
+                tensor dimensions.
+
+                This implementation is based on the positional encoding described in:
+                Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., 
+                Kaiser, Ł., & Polosukhin, I. (2017). Attention is all you need. In Advances 
+                in neural information processing systems (pp. 5998-6008).
+
+                The encoding uses sine and cosine functions of different frequencies:
+                PE(pos, 2i)   = sin(pos / 10000^(2i/d_model))
+                PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))
+                where pos is the position and i is the dimension.
+        !*/
+
+    public:
+
+        positional_encodings_(
+            unsigned long sequence_dim_ = 1,
+            unsigned long embedding_dim_ = 1
+        );
+        /*!
+            ensures
+                - #sequence_dim == sequence_dim_
+                - #embedding_dim == embedding_dim_
+        !*/
+
+        positional_encodings_ (
+            const positional_encodings_& item
+        );
+        /*!
+            ensures
+                - EXAMPLE_COMPUTATIONAL_LAYER_ objects are copy constructable
+        !*/
+
+        positional_encodings_& operator=(
+            const positional_encodings_& item
+        );
+        /*!
+            ensures
+                - EXAMPLE_COMPUTATIONAL_LAYER_ objects are assignable
+        !*/
+
+        template <typename SUBNET>
+        void setup (
+            const SUBNET& sub
+        );
+        /*!
+            requires
+                - SUBNET implements the SUBNET interface defined at the top of this file.
+            ensures
+                - performs any necessary setup for the layer, including the calculation
+                of positional encodings based on the dimensions of the input.
+        !*/
+
+        template <typename SUBNET>
+        void forward(
+            const SUBNET& sub,
+            resizable_tensor& output
+        );
+        /*!
+            requires
+                - SUBNET implements the SUBNET interface defined at the top of this file.
+                - setup() has been called.
+            ensures
+                - Adds the positional encodings to the output of the subnetwork and 
+                stores the results into #output.
+        !*/
+
+        template <typename SUBNET>
+        void backward(
+            const tensor& gradient_input,
+            SUBNET& sub,
+            tensor& params_grad
+        );
+        /*!
+            requires
+                - SUBNET implements the SUBNET interface defined at the top of this file.
+                - setup() has been called.
+                - #params_grad is unused in this layer as there are no learnable parameters.
+            ensures
+                - Computes the gradient of the layer with respect to the input, which
+                is simply the input gradient itself as positional encodings are constant.
+        !*/
+
+        const tensor& get_layer_params(
+        ) const;
+        /*!
+            ensures
+                - returns the parameters that define the behavior of forward().
+                Note: This layer has no learnable parameters, so this returns an empty tensor.
+        !*/
+
+        tensor& get_layer_params(
+        );
+        /*!
+            ensures
+                - returns the parameters that define the behavior of forward().
+                Note: This layer has no learnable parameters, so this returns an empty tensor.
+        !*/
+
+        const tensor& get_positional_encodings(
+        ) const;
+        /*!
+            ensures
+                - returns the computed positional encodings.
+        !*/
+
+        tensor& get_positional_encodings(
+        );
+        /*!
+            ensures
+                - returns the computed positional encodings.
+        !*/
+
+        friend void serialize(const positional_encodings_& item, std::ostream& out);
+        friend void deserialize(positional_encodings_& item, std::istream& in);
+        /*!
+            provides serialization support
+        !*/
+
+        friend std::ostream& operator<<(std::ostream& out, const positional_encodings_& item);
+        /*!
+            print a string describing this layer.
+        !*/
+
+        friend void to_xml(const positional_encodings_& item, std::ostream& out);
+        /*!
+            This function is optional, but required if you want to print your networks with
+            net_to_xml(). It prints a layer as XML.
+        !*/
+    };
+
+    template <typename SUBNET>
+    using positional_encodings = add_layer<positional_encodings_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        unsigned long num_embeddings_,
+        unsigned long embedding_dim_
+        >
+    class embeddings_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents an embedding layer in a neural network. It maps discrete
+                tokens to continuous vector representations. This is a fundamental technique in
+                natural language processing and other domains dealing with categorical data.
+
+                The layer takes as input a tensor of integer indices and outputs a tensor of 
+                the same shape (except for the last dimension) where each index is replaced by 
+                its corresponding embedding vector.
+
+                For more information on embeddings, see:
+                Mikolov, T., Sutskever, I., Chen, K., Corrado, G. S., & Dean, J. (2013). 
+                Distributed representations of words and phrases and their compositionality. 
+                In Advances in neural information processing systems (pp. 3111-3119).
+
+            TEMPLATE PARAMETERS
+                - num_embeddings_: The size of the embedding dictionary, i.e., the number of 
+                                discrete tokens that can be embedded.
+                - embedding_dim_: The dimensionality of each embedding vector.
+
+            CONVENTION
+                - get_embeddings() returns the tensor of embedding vectors.
+                - get_num_embeddings() == num_embeddings_
+                - get_embedding_dim() == embedding_dim_
+                - get_learning_rate_multiplier() returns the learning rate multiplier for this layer.
+                - get_scale_by_freq() returns whether to scale gradients by token frequency.
+        */        
+    public:
+        embeddings_() = default;
+
+        unsigned long get_num_embeddings() const;
+        unsigned long get_embedding_dim() const;
+        double get_learning_rate_multiplier() const;
+        bool get_scale_by_freq() const;
+
+        void set_num_embeddings(unsigned long num);
+        void set_embedding_dim(unsigned long dim);
+        void set_learning_rate_multiplier(double val);
+        void set_scale_by_freq(bool val);
+
+        template <typename SUBNET> void setup(const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
+        const tensor& get_embeddings() const;
+        tensor& get_embeddings();
+
+        friend void serialize(const embeddings_& item, std::ostream& out);
+        friend void deserialize(embeddings_& item, std::istream& in);
+        friend std::ostream& operator<<(std::ostream& out, const embeddings_& item);
+        friend void to_xml(const embeddings_& item, std::ostream& out);
+
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+    };
+
+    template <
+        unsigned long num_embeddings,
+        unsigned long embedding_dim,
+        typename SUBNET
+        >
+    using embeddings = add_layer<embeddings_<num_embeddings, embedding_dim>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     struct neg_infinity_tag {};
     struct zero_tag {};
 

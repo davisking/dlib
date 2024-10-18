@@ -814,6 +814,56 @@ void test_positional_encodings()
 
 // ----------------------------------------------------------------------------------------
 
+void test_embeddings()
+{
+    print_spinner();
+    const size_t num_sequences = 100, sequence_length = 7, num_classes = 3, num_tokens = 50, embedding_length = 5;
+    using net_type = loss_multiclass_log<fc<num_classes,
+        relu<fc<32,relu<fc<64,
+        embeddings<num_tokens, embedding_length,
+        input<matrix<unsigned long, 0, 1>>>>>>>>>;
+    net_type net;
+    dnn_trainer<net_type> trainer(net, sgd(0, 0.9));
+    trainer.set_learning_rate(1e-1);
+    trainer.set_min_learning_rate(1e-4);
+    trainer.set_mini_batch_size(16);
+    trainer.set_max_num_epochs(500);
+
+    dlib::rand rnd(std::rand());
+    auto generate_sequences = [&](size_t num_sequences, size_t sequence_length, size_t num_tokens) {
+        std::vector<matrix<unsigned long, 0, 1>> sequences;
+        for (size_t i = 0; i < num_sequences; ++i)
+        {
+            matrix<unsigned long, 0, 1> seq(sequence_length, 1);
+            for (size_t j = 0; j < sequence_length; ++j)
+                seq(j, 0) = rnd.get_random_32bit_number() % num_tokens;
+            sequences.push_back(seq);
+        }
+        return sequences;
+    };
+
+    auto generate_labels = [&](size_t num_sequences, size_t num_classes) {
+        std::vector<unsigned long> labels;
+        for (size_t i = 0; i < num_sequences; ++i)
+            labels.push_back(rnd.get_random_32bit_number() % num_classes);
+        return labels;
+    };
+
+    auto sequences = generate_sequences(num_sequences, sequence_length, num_tokens);
+    auto labels = generate_labels(num_sequences, num_classes);
+
+    trainer.train(sequences, labels);
+    std::vector<unsigned long> predicted_labels = net(sequences);
+    size_t num_correct = 0;
+    for (size_t i = 0; i < labels.size(); ++i)
+        if (predicted_labels[i] == labels[i]) ++num_correct;
+
+    double acc = static_cast<double>(num_correct) / labels.size();
+    DLIB_TEST(acc > 0.9);
+}
+
+// ----------------------------------------------------------------------------------------
+
     void test_basic_tensor_ops()
     {
         using namespace dlib::tt;
@@ -2361,7 +2411,13 @@ void test_positional_encodings()
             positional_encodings_ l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
-        }           
+        }
+        {
+            print_spinner();
+            embeddings_<7, 12> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }        
     }
 
 // ----------------------------------------------------------------------------------------
@@ -4613,6 +4669,8 @@ void test_positional_encodings()
             test_layer_normalize();
             test_rms_normalize();
             test_transpose();
+            test_positional_encodings();
+            test_embeddings();
             test_tril();
             test_positional_encodings();
             test_basic_tensor_ops();
