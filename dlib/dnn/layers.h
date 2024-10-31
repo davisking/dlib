@@ -4704,18 +4704,19 @@ namespace dlib
             sequence_dim(sequence_dim_), embedding_dim(embedding_dim_)
         {
         }
-        positional_encodings_(const positional_encodings_& item) : 
+        positional_encodings_(const positional_encodings_& item) :
             pe(item.pe), sequence_dim(item.sequence_dim), embedding_dim(item.embedding_dim)
         {
         }
-        positional_encodings_& operator= (const positional_encodings_& item) {
+        positional_encodings_& operator= (const positional_encodings_& item)
+        {
             if (this == &item) return *this;
             pe = item.pe;
             sequence_dim = item.sequence_dim;
             embedding_dim = item.embedding_dim;
             return *this;
         }
-        
+
         template <typename SUBNET>
         void setup(const SUBNET& sub)
         {
@@ -4727,7 +4728,7 @@ namespace dlib
             const unsigned long nk = prev.k();
             const float n = 10000.0f;
 
-            pe.set_size(ns, nk, sequence_dim, embedding_dim);              
+            pe.set_size(ns, nk, sequence_dim, embedding_dim);
             for (unsigned long s = 0; s < ns; ++s)
             {
                 for (unsigned long k = 0; k < nk; ++k)
@@ -4744,13 +4745,11 @@ namespace dlib
                 }
             }
         }
-        
+
         template <typename SUBNET>
         void forward(const SUBNET& sub, resizable_tensor& output)
-        {            
-            const auto& prev_output = sub.get_output();            
-            if (!have_same_dimensions(pe, prev_output)) setup(sub);
-            
+        {
+            const auto& prev_output = sub.get_output();
             output.set_size(prev_output.num_samples(), prev_output.k(), sequence_dim, embedding_dim);
             tt::add(output, prev_output, pe);
         }
@@ -4768,16 +4767,22 @@ namespace dlib
         const tensor& get_positional_encodings() const { return pe; }
         tensor& get_positional_encodings() { return pe; }
 
-        friend void serialize(const positional_encodings_& /*item*/, std::ostream& out)
+        friend void serialize(const positional_encodings_& item, std::ostream& out)
         {
             serialize("positional_encodings_", out);
+            serialize(item.pe, out);
+            serialize(item.sequence_dim, out);
+            serialize(item.embedding_dim, out);
         }
-        friend void deserialize(positional_encodings_& /*item*/, std::istream& in)
+        friend void deserialize(positional_encodings_& item, std::istream& in)
         {
             std::string version;
             deserialize(version, in);
             if (version != "positional_encodings_")
                 throw serialization_error("Unexpected version '" + version + "' found while deserializing dlib::positional_encodings_.");
+            deserialize(item.pe, in);
+            deserialize(item.sequence_dim, in);
+            deserialize(item.embedding_dim, in);
         }
 
         friend std::ostream& operator<<(std::ostream& out, const positional_encodings_& /*item*/)
@@ -4785,8 +4790,7 @@ namespace dlib
             out << "positional_encodings";
             return out;
         }
-        friend void to_xml(const positional_encodings_& /*item*/, std::ostream& out)
-        {
+        friend void to_xml(const positional_encodings_& /*item*/, std::ostream& out) {
             out << "<positional_encodings />\n";
         }
 
