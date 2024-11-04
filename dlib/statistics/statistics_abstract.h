@@ -108,10 +108,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     double binomial_random_vars_are_different (
-        uint64_t k1,
-        uint64_t n1,
-        uint64_t k2,
-        uint64_t n2
+        double k1,
+        double n1,
+        double k2,
+        double n2
     );
     /*!
         requires
@@ -138,10 +138,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     double event_correlation (
-        uint64_t A_count,
-        uint64_t B_count,
-        uint64_t AB_count,
-        uint64_t total_num_observations
+        double A_count,
+        double B_count,
+        double AB_count,
+        double total_num_observations
     );
     /*!
         requires

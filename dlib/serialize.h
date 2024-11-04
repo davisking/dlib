@@ -2570,7 +2570,14 @@ namespace dlib
         // read the size
         in.read((char*)&size, sizeof(size));
         bo.little_to_host(size);
-        if (!in || size == 0)
+        // Empty protos will just be empty.
+        if (size == 0) 
+        {
+            item.Clear();
+            return;
+        }
+
+        if (!in)
             throw dlib::serialization_error("Error while deserializing a Google Protocol Buffer object.");
 
         // read the bytes into temp

@@ -1376,6 +1376,37 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void embeddings(
+        resizable_tensor& dest,
+        const tensor& src,
+        const tensor& embs
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::embeddings(dest, src, embs);
+#else
+        cpu::embeddings(dest, src, embs);
+#endif
+    }
+
+    void embeddings_gradient(
+        const tensor& prev,
+        const tensor& gradient_input,
+        tensor& grads,
+        const tensor& freqs,
+        float learning_rate,
+        bool scale
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::embeddings_gradient(prev, gradient_input, grads, freqs, learning_rate, scale);
+#else
+        cpu::embeddings_gradient(prev, gradient_input, grads, freqs, learning_rate, scale);
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }}
 
 #endif // DLIB_TeNSOR_TOOLS_CPP_
