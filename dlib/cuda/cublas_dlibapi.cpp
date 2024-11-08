@@ -159,36 +159,35 @@ namespace dlib
                 const auto transa = trans_lhs ? CUBLAS_OP_T : CUBLAS_OP_N;
                 const auto transb = trans_rhs ? CUBLAS_OP_T : CUBLAS_OP_N;
 
-                long num_samples = std::max({ lhs.num_samples(), rhs.num_samples(), dest.num_samples() });
-                long num_channels = std::max({ lhs.k(), rhs.k(), dest.k() });
+                long num_samples = std::min({ lhs.num_samples(), rhs.num_samples(), dest.num_samples() });
+                long num_channels = std::min({ lhs.k(), rhs.k(), dest.k() });
 
                 auto is_matrix = [](const auto& tensor) {
-                    return (tensor.num_samples() == 1 && tensor.k() == 1) ||
-                        (tensor.nr() == 1 && tensor.nc() == 1);
-                    };
+                    return ((tensor.num_samples() * tensor.k() == 1 && tensor.nr() * tensor.nc() > 1) ||
+                        (tensor.num_samples() * tensor.k() > 1 && tensor.nr() * tensor.nc() == 1));
+                };
                 const bool lhs_is_matrix = is_matrix(lhs), rhs_is_matrix = is_matrix(rhs), dest_is_matrix = is_matrix(dest);
 
-                if (lhs_is_matrix && rhs_is_matrix && dest_is_matrix) {
-                    num_samples = num_channels = 1;
-                }
-                else {
-                    auto adjust = [&](const auto& tensor) {
-                        if (!is_matrix(tensor)) {
-                            if (tensor.num_samples() < num_samples) num_samples = tensor.num_samples();
-                            if (tensor.k() < num_channels) num_channels = tensor.k();
-                        }
-                        };
-                    adjust(lhs);
-                    adjust(rhs);
-                    adjust(dest);
-                }
+                if (lhs_is_matrix && rhs_is_matrix && dest_is_matrix) num_samples = num_channels = 1;
 
-                long lhs_rows = (lhs_is_matrix && lhs.num_samples() > 1) ? lhs.num_samples() : lhs.nr();
-                long lhs_cols = (lhs_is_matrix && lhs.k() > 1) ? lhs.k() : lhs.nc();
-                long rhs_rows = (rhs_is_matrix && rhs.num_samples() > 1) ? rhs.num_samples() : rhs.nr();
-                long rhs_cols = (rhs_is_matrix && rhs.k() > 1) ? rhs.k() : rhs.nc();
-                long dest_rows = (dest_is_matrix && dest.num_samples() > 1) ? dest.num_samples() : dest.nr();
-                long dest_cols = (dest_is_matrix && dest.k() > 1) ? dest.k() : dest.nc();
+                size_t lhs_rows = lhs.nr();
+                size_t lhs_cols = lhs.nc();
+                if (lhs_is_matrix && (lhs.num_samples() > 1 || lhs.k() > 1)) {
+                    lhs_rows = lhs.num_samples();
+                    lhs_cols = lhs.k();
+                }
+                size_t rhs_rows = rhs.nr();
+                size_t rhs_cols = rhs.nc();
+                if (rhs_is_matrix && (rhs.num_samples() > 1 || rhs.k() > 1)) {
+                    rhs_rows = rhs.num_samples();
+                    rhs_cols = rhs.k();
+                }
+                size_t dest_rows = dest.nr();
+                size_t dest_cols = dest.nc();
+                if (dest_is_matrix && (dest.num_samples() > 1 || dest.k() > 1)) {
+                    dest_rows = dest.num_samples();
+                    dest_cols = dest.k();
+                }
 
                 const size_t lhs_plane_size = lhs_rows * lhs_cols;
                 const size_t rhs_plane_size = rhs_rows * rhs_cols;
