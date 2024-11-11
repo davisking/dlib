@@ -243,28 +243,16 @@ namespace dlib { namespace tt
         else if (g_mode == PLANE_WISE)
         {
             auto is_matrix = [](const auto& tensor) {
-                return (tensor.num_samples() == 1 && tensor.k() == 1) ||
-                    (tensor.nr() == 1 && tensor.nc() == 1);
+                return ((tensor.num_samples() * tensor.k() == 1 && tensor.nr() * tensor.nc() > 1) ||
+                    (tensor.num_samples() * tensor.k() > 1 && tensor.nr() * tensor.nc() == 1));
                 };
 
-            long num_samples = std::max({ lhs.num_samples(), rhs.num_samples(), dest.num_samples() });
-            long num_channels = std::max({ lhs.k(), rhs.k(), dest.k() });
+            long num_samples = std::min({ lhs.num_samples(), rhs.num_samples(), dest.num_samples() });
+            long num_channels = std::min({ lhs.k(), rhs.k(), dest.k() });
             const bool lhs_is_matrix = is_matrix(lhs), rhs_is_matrix = is_matrix(rhs), dest_is_matrix = is_matrix(dest);
 
             if (lhs_is_matrix && rhs_is_matrix && dest_is_matrix) {
                 num_samples = num_channels = 1;
-            }
-            else
-            {
-                auto adjust = [&](const auto& tensor) {
-                    if (!is_matrix(tensor)) {
-                        if (tensor.num_samples() < num_samples) num_samples = tensor.num_samples();
-                        if (tensor.k() < num_channels) num_channels = tensor.k();
-                    }
-                    };
-                adjust(lhs);
-                adjust(rhs);
-                adjust(dest);
             }
 
             long lhs_rows = (lhs_is_matrix && lhs.num_samples() > 1) ? lhs.num_samples() : lhs.nr();
