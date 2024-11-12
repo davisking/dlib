@@ -1721,6 +1721,28 @@ namespace dlib
         }
     };
 
+    inline void serialize(const chip_details& item, std::ostream& out)
+    {
+        int version = 1;
+        serialize(version, out);
+        serialize(item.rect, out);
+        serialize(item.angle, out);
+        serialize(item.rows, out);
+        serialize(item.cols, out);
+    }
+
+    inline void deserialize(chip_details& item, std::istream& in)
+    {
+        int version = 0;
+        deserialize(version, in);
+        if (version != 1)
+            throw serialization_error("Unexpected version found while deserializing dlib::chip_details");
+        deserialize(item.rect, in);
+        deserialize(item.angle, in);
+        deserialize(item.rows, in);
+        deserialize(item.cols, in);
+    }
+
 // ----------------------------------------------------------------------------------------
 
     inline point_transform_affine get_mapping_to_chip (
