@@ -222,9 +222,8 @@ namespace dlib { namespace tt
                 and channel:
                     dest[s][k] = alpha * (lhs[s][k] * rhs[s][k]) + beta * dest[s][k]
                 Where [s][k] represents the 2D plane for sample s and channel k.
-
-        note
-            - The PLANE_WISE mode is particularly useful for operations like attention
+            
+            Note that the PLANE_WISE mode is particularly useful for operations like attention
             mechanisms in neural networks, where you want to perform matrix multiplications
             on 2D planes of 4D tensors while preserving the sample and channel dimensions.
     !*/
