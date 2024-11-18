@@ -102,10 +102,10 @@ namespace dlib
             bool trans_lhs,
             const tensor& rhs,
             bool trans_rhs,
-            size_t g_mode
+            tt::operation_mode mode
         )
         {
-            if (g_mode == 0) // gemm_mode::CHANNEL_WISE
+            if (mode == tt::operation_mode::CHANNEL_WISE)
             {
                 // Recall that BLAS uses column major order so to deal with that we flip the
                 // order of the lhs and rhs arguments.
@@ -154,7 +154,7 @@ namespace dlib
                     &beta,
                     dest.device(), dest_nc));
             }
-            else if (g_mode == 1) // gemm_mode::PLANE_WISE
+            else if (mode == tt::operation_mode::PLANE_WISE)
             {
                 const auto transa = trans_lhs ? CUBLAS_OP_T : CUBLAS_OP_N;
                 const auto transb = trans_rhs ? CUBLAS_OP_T : CUBLAS_OP_N;

@@ -2809,7 +2809,7 @@ namespace dlib
             auto& t2 = layer<tag>(sub).get_output();
             output.set_size(t1.num_samples(), t1.k(), t1.nr(), t2.nc());
 
-            tt::gemm(0, output, 1, t1, false, t2, false, tt::gemm_mode::PLANE_WISE);
+            tt::gemm(0, output, 1, t1, false, t2, false, tt::operation_mode::PLANE_WISE);
         }
 
         template <typename SUBNET>
@@ -2820,8 +2820,8 @@ namespace dlib
             auto& prev = sub.get_gradient_input();
             auto& prev_tag = layer<tag>(sub).get_gradient_input();            
 
-            tt::gemm(1, prev, 1, gradient_input, false, t2, true, tt::gemm_mode::PLANE_WISE);
-            tt::gemm(1, prev_tag, 1, t1, true, gradient_input, false, tt::gemm_mode::PLANE_WISE);
+            tt::gemm(1, prev, 1, gradient_input, false, t2, true, tt::operation_mode::PLANE_WISE);
+            tt::gemm(1, prev_tag, 1, t1, true, gradient_input, false, tt::operation_mode::PLANE_WISE);
         }
 
         const tensor& get_layer_params() const { return params; }

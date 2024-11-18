@@ -209,13 +209,13 @@ namespace dlib { namespace tt
         bool trans_lhs,
         const tensor& rhs,
         bool trans_rhs,
-        gemm_mode g_mode
+        tt::operation_mode mode
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::gemm(beta, dest, alpha, lhs, trans_lhs, rhs, trans_rhs, g_mode);
+        cuda::gemm(beta, dest, alpha, lhs, trans_lhs, rhs, trans_rhs, mode);
 #else
-        if (g_mode == CHANNEL_WISE)
+        if (mode == tt::operation_mode::CHANNEL_WISE)
         {
             if (beta != 0)
             {
@@ -240,7 +240,7 @@ namespace dlib { namespace tt
                     dest = alpha * mat(lhs) * mat(rhs);
             }
         }
-        else if (g_mode == PLANE_WISE)
+        else if (mode == tt::operation_mode::PLANE_WISE)
         {
             auto is_matrix = [](const auto& tensor) {
                 return ((tensor.num_samples() * tensor.k() == 1 && tensor.nr() * tensor.nc() > 1) ||

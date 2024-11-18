@@ -23,14 +23,14 @@ namespace dlib
             bool trans_lhs,
             const tensor& rhs,
             bool trans_rhs,
-            size_t g_mode = 0
+            tt::operation_mode mode = tt::operation_mode::CHANNEL_WISE
         );
     /*!
         requires
             - The dimensions of lhs and rhs must be compatible for matrix multiplication.
-            The specific requirements depend on the g_mode:
+            The specific requirements depend on the mode:
 
-            For g_mode == 0 (CHANNEL_WISE, default):
+            For CHANNEL_WISE mode (default):
                 - Let L == trans_lhs ? trans(mat(lhs)) : mat(lhs)
                 - Let R == trans_rhs ? trans(mat(rhs)) : mat(rhs)
                 - Let D == mat(dest)
@@ -38,7 +38,7 @@ namespace dlib
                 (i.e. dest must be preallocated and have the correct output dimensions)
                 - L.nc() == R.nr()
 
-            For g_mode == 1 (PLANE_WISE):
+            For PLANE_WISE mode:
                 - lhs.num_samples() == rhs.num_samples() && lhs.k() == rhs.k()
                 - If !trans_lhs && !trans_rhs:
                     lhs.nc() == rhs.nr()
@@ -54,13 +54,13 @@ namespace dlib
                     dest.nr() == lhs.nc() && dest.nc() == rhs.nr()
 
         ensures
-            - Performs matrix multiplication based on the specified g_mode:
+            - Performs matrix multiplication based on the specified mode:
 
-            For g_mode == 0 (CHANNEL_WISE):
+            For CHANNEL_WISE mode:
                 - performs: dest = alpha*L*R + beta*mat(dest)
                 Where L, R, and D are as defined above.
 
-            For g_mode == 1 (PLANE_WISE):
+            For PLANE_WISE mode:
                 - Performs matrix multiplication for each corresponding 2D plane (nr x nc)
                 in lhs and rhs across all samples and channels.
                 - The operation is equivalent to performing the following for each sample
