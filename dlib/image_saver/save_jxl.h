@@ -78,20 +78,28 @@ namespace dlib
         }
         else
         {
+            // This is probably a single-channel float image resulting from some matrix operation.
+            if (depth == 1)
+            {
+                array2d<unsigned char> temp;
+                assign_image(temp, img);
+                auto data = reinterpret_cast<const uint8_t*>(image_data(temp));
+                impl::impl_save_jxl(filename, data, width, height, 1, quality);
+            }
             // This is some other kind of color image so just save it as an RGB image.
-            if (pixel_traits<pixel_type>::has_alpha)
+            else if (pixel_traits<pixel_type>::has_alpha)
             {
                 array2d<rgb_alpha_pixel> temp;
                 assign_image(temp, img);
                 auto data = reinterpret_cast<const uint8_t*>(image_data(temp));
-                impl::impl_save_jxl(filename, data, width, height, depth, quality);
+                impl::impl_save_jxl(filename, data, width, height, 4, quality);
             }
             else
             {
                 array2d<rgb_pixel> temp;
                 assign_image(temp, img);
                 auto data = reinterpret_cast<const uint8_t*>(image_data(temp));
-                impl::impl_save_jxl(filename, data, width, height, depth, quality);
+                impl::impl_save_jxl(filename, data, width, height, 3, quality);
             }
         }
     }
