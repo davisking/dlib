@@ -1652,7 +1652,6 @@ namespace dlib
                                 dd[k * num_locations] = std::exp(ss[k * num_locations] - max_val);
                                 sum += dd[k * num_locations];
                             }
-                            sum += std::numeric_limits<float>::epsilon();
                             for (long k = 0; k < num_channels; ++k)
                                 dd[k * num_locations] /= sum;
 
@@ -1685,7 +1684,6 @@ namespace dlib
                                         d_channel[idx] = std::exp(s_channel[idx] - max_val);
                                         sum += d_channel[idx];
                                     }
-                                    sum += std::numeric_limits<float>::epsilon();
                                     for (long c = 0, idx = r * src.nc(); c < src.nc(); ++c, ++idx)
                                         d_channel[idx] /= sum;
                                 }
