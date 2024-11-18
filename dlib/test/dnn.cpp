@@ -4719,7 +4719,6 @@ void test_multm_prev()
             test_positional_encodings();
             test_embeddings();
             test_tril();
-            test_positional_encodings();
             test_basic_tensor_ops();
             test_layers();
             test_visit_functions();
