@@ -9,9 +9,9 @@
 #include "cuda_errors.h"
 
 namespace dlib
-{
+{    
     namespace cuda 
-    {
+    {        
 
     // -----------------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ namespace dlib
             bool trans_lhs,
             const tensor& rhs,
             bool trans_rhs,
-            tt::operation_mode mode = tt::operation_mode::CHANNEL_WISE
+            operation_mode mode = operation_mode::CHANNEL_WISE
         );
     /*!
         requires

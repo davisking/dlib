@@ -26,17 +26,6 @@ namespace dlib { namespace tt
 {
 
 // ----------------------------------------------------------------------------------------
-    
-    /*!
-        This enum is used to determine the mode of operation for certain functions 
-        (such as gemm and softmax) in Dlib. It specifies whether the calculation 
-        should be performed based on the matrix field in nr()xnc() or if the matrix 
-        should be considered in num_samples()xk(). This helps in organizing tensor 
-        computations more efficiently according to the required dimensions.
-    !*/
-    enum class operation_mode { CHANNEL_WISE = 0, PLANE_WISE = 1 };
-
-// ----------------------------------------------------------------------------------------
 
     void inverse_norms (
         resizable_tensor& invnorms,
@@ -177,7 +166,7 @@ namespace dlib { namespace tt
         bool trans_lhs,
         const tensor& rhs,
         bool trans_rhs,
-        tt::operation_mode mode = tt::operation_mode::CHANNEL_WISE
+        operation_mode mode = operation_mode::CHANNEL_WISE
     );
     /*!
         requires
