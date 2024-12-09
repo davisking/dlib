@@ -884,30 +884,31 @@ namespace dlib { namespace tt
     }
 
 // ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
 
-    void softmax (
+    void softmax(
         tensor& dest,
-        const tensor& src
+        const tensor& src,
+        operation_mode mode
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::softmax(dest,src);
+        cuda::softmax(dest, src, mode);
 #else
-        cpu::softmax(dest,src);
+        cpu::softmax(dest, src, mode);
 #endif
     }
 
-    void softmax_gradient (
+    void softmax_gradient(
         tensor& grad,
         const tensor& dest,
-        const tensor& gradient_input
+        const tensor& gradient_input,
+        operation_mode mode
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::softmax_gradient(grad, dest, gradient_input);
+        cuda::softmax_gradient(grad, dest, gradient_input, mode);
 #else
-        cpu::softmax_gradient(grad, dest, gradient_input);
+        cpu::softmax_gradient(grad, dest, gradient_input, mode);
 #endif
     }
 

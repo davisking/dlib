@@ -14,6 +14,17 @@ namespace dlib
     class tensor;
     class resizable_tensor;
 
+    // ----------------------------------------------------------------------------------------
+
+    /*!
+        This enum is used to determine the mode of operation for certain functions
+        (such as gemm and softmax) in Dlib. It specifies whether the calculation
+        should be performed based on the matrix field in nr()xnc() or if the matrix
+        should be considered in num_samples()xk(). This helps in organizing tensor
+        computations more efficiently according to the required dimensions.
+    !*/
+    enum class operation_mode { CHANNEL_WISE = 0, PLANE_WISE = 1 };
+
     namespace cuda 
     {
 
@@ -352,13 +363,15 @@ namespace dlib
 
         void softmax (
             tensor& dest,
-            const tensor& src
+            const tensor& src,
+            operation_mode mode = operation_mode::CHANNEL_WISE
         );
 
         void softmax_gradient (
             tensor& grad,
             const tensor& dest,
-            const tensor& gradient_input
+            const tensor& gradient_input,
+            operation_mode mode = operation_mode::CHANNEL_WISE
         );
 
     // ------------------------------------------------------------------------------------

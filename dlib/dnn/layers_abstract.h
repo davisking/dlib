@@ -2953,44 +2953,67 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <unsigned long s_mode_>
     class softmax_
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
-                defined above.  In particular, it defines a softmax layer.  To be precise,
-                we define the softmax function s(x) as:
-                    s(x) == exp(x)/sum(exp(x)) 
-                where x is a vector.  Then this layer treats its input tensor as a
-                collection of multi-channel images and applies s() to each spatial location
-                in each image.  In each application, the tensor::k() channel elements at
-                each position are input to s() and then replaced by the outputs of s().   
+                defined above. It defines a softmax layer with two modes of operation:
+                channel-wise and plane-wise.
 
-                This means that, for example, if you collapsed each output image to a 1
-                channel image by adding the channels then you would end up with images
-                where each pixel value was 1.  This is because the sum of the outputs of
-                s() will always be equal to 1.
+                The softmax function s(x) is defined as:
+                    s(x) == exp(x)/sum(exp(x))
+                where x is a vector.
+
+                1. Channel-wise mode (s_mode_ == CHANNEL_WISE):
+                This mode treats the input tensor as a collection of multi-channel images
+                and applies s() to each spatial location in each image. The tensor::k()
+                channel elements at each position are input to s() and then replaced by
+                the outputs of s().
+
+                2. Plane-wise mode (s_mode_ == PLANE_WISE):
+                This mode applies the softmax function across entire planes (nr x nc) of
+                the input tensor, useful for operations in Large Language Models (LLMs)
+                and other applications requiring 2D tensor processing.
+
+                In both modes, the sum of the outputs of s() will always be equal to 1 for
+                each application of the function.
+
+            TEMPLATE PARAMETERS
+                - s_mode_: Determines the mode of operation (CHANNEL_WISE or PLANE_WISE)
         !*/
 
     public:
+        softmax_();
 
-        softmax_(
-        );
-
-        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void setup(const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
-        void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
-        const tensor& get_layer_params() const; 
-        tensor& get_layer_params(); 
+        void backward_inplace(
+            const tensor& computed_output,
+            const tensor& gradient_input,
+            tensor& data_grad,
+            tensor& params_grad
+        );
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
         /*!
-            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ 
-            interface.  Note that this layer doesn't have any parameters, so the tensor
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_
+            interface. Note that this layer doesn't have any parameters, so the tensor
             returned by get_layer_params() is always empty.
         !*/
+
+        friend void serialize(const softmax_& item, std::ostream& out);
+        friend void deserialize(softmax_& item, std::istream& in);
+        friend std::ostream& operator<<(std::ostream& out, const softmax_& item);
+        friend void to_xml(const softmax_& item, std::ostream& out);
     };
 
     template <typename SUBNET>
-    using softmax = add_layer<softmax_, SUBNET>;
+    using softmax = add_layer<softmax_<operation_mode::CHANNEL_WISE>, SUBNET>;
+
+    template <typename SUBNET>
+    using softmaxm = add_layer<softmax_<operation_mode::PLANE_WISE>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

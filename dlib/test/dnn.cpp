@@ -166,6 +166,85 @@ namespace
 #endif
     }
 
+    void test_softmaxm()
+    {
+        print_spinner();
+        using net_type = tag1<softmaxm<tag2<input<matrix<float>>>>>;
+        net_type net;
+
+        // Initialization
+        dlib::rand rnd(std::rand());
+        const long nr = 2, nc = 3;
+        const int n_samples = 3, k = 1;
+        std::vector<matrix<float>> x(n_samples);
+        matrix<float> xtmp(nr, nc);
+        for (int ii = 0; ii < n_samples; ++ii) {
+            for (int jj = 0; jj < nr; ++jj)
+                for (int kk = 0; kk < nc; ++kk) {
+                    float r = rnd.get_random_gaussian();
+                    if (r > 1 || r < -1) r = -std::numeric_limits<float>::infinity();
+                    xtmp(jj, kk) = r;
+                }
+            x[ii] = xtmp;
+        }
+
+        // Convert input matrix to tensor
+        resizable_tensor input_tensor;
+        net.to_tensor(&x[0], &x[0] + n_samples, input_tensor);
+        net.forward(input_tensor);
+
+        // Expected output tensor
+        resizable_tensor expected_output;
+        expected_output.copy_size(input_tensor);
+        for (int ii = 0; ii < n_samples; ++ii) {
+            for (int jj = 0; jj < nr; ++jj) {
+                matrix<float> m(1, nc);
+                bool all_neg_inf = true;
+                for (int kk = 0; kk < nc; ++kk) {
+                    m(0, kk) = input_tensor.host()[tensor_index(input_tensor, ii, 0, jj, kk)];
+                    if (m(0, kk) > -std::numeric_limits<float>::infinity()) all_neg_inf = false;
+                }
+
+                matrix<float> r(1, nc);
+                if (all_neg_inf)
+                    for (int kk = 0; kk < nc; ++kk) r(0, kk) = 0.0f;
+                else {
+                    // Stabilize the computation by subtracting the max value
+                    float max_val = max(m);
+                    matrix<float> exp_m = exp(m - max_val);
+                    float sum_exp = sum(exp_m) + std::numeric_limits<float>::epsilon();
+                    r = exp_m / sum_exp;
+                }
+                for (int kk = 0; kk < nc; ++kk)
+                    expected_output.host()[tensor_index(expected_output, ii, 0, jj, kk)] = r(0, kk);
+            }
+        }
+
+        // Compare output tensor with expected output
+        auto& net_output = layer<tag1>(net).get_output();
+        DLIB_TEST(max(abs(mat(net_output) - mat(expected_output))) < 1e-5);
+
+        // Compare CPU and CUDA utility functions
+        resizable_tensor output_tensor, cpu_grad, gradient_input;
+        output_tensor.copy_size(input_tensor);
+        cpu_grad.copy_size(input_tensor);
+        cpu_grad = 0;
+        gradient_input.copy_size(input_tensor);
+        randomize_parameters(gradient_input, nr + nc, rnd);
+        cpu::softmax(output_tensor, input_tensor, 1);
+        cpu::softmax_gradient(cpu_grad, output_tensor, gradient_input, 1);
+        DLIB_TEST(max(abs(mat(output_tensor) - mat(expected_output))) < 1e-5);
+#ifdef DLIB_USE_CUDA
+        resizable_tensor cuda_grad;
+        cuda_grad.copy_size(input_tensor);
+        cuda_grad = 0;
+        cuda::softmax(output_tensor, input_tensor, 1);
+        cpu::softmax_gradient(cuda_grad, output_tensor, gradient_input, 1);
+        DLIB_TEST(max(abs(mat(output_tensor) - mat(expected_output))) < 1e-5);
+        DLIB_TEST(max(abs(mat(cuda_grad) - mat(cpu_grad))) < 1e-5);
+#endif
+    }
+
     void test_softmax_all()
     {
         using namespace dlib::tt;
@@ -2390,7 +2469,13 @@ void test_embeddings()
         }
         {
             print_spinner();
-            softmax_ l;
+            softmax_<operation_mode::CHANNEL_WISE> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            softmax_<operation_mode::PLANE_WISE> l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
         }
@@ -4702,6 +4787,7 @@ void test_multm_prev()
             test_avg_pool(4,5,40,50,0,1);
             test_tanh();
             test_softmax();
+            test_softmaxm();
             test_softmax_all();
             test_sigmoid();
             test_mish();
