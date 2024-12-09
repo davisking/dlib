@@ -4,10 +4,10 @@
 #define DLIB_DNN_CuDNN_H_
 
 #ifdef DLIB_USE_CUDA
-
 #include "cuda_errors.h"
 #include <memory>
 #include "cuda_data_ptr.h"
+#endif // DLIB_USE_CUDA
 
 namespace dlib
 {
@@ -25,6 +25,7 @@ namespace dlib
     !*/
     enum class operation_mode { CHANNEL_WISE = 0, PLANE_WISE = 1 };
 
+#ifdef DLIB_USE_CUDA
     namespace cuda 
     {
 
@@ -429,9 +430,8 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
     }
-}
-
 #endif // DLIB_USE_CUDA
+}
 
 #endif // DLIB_DNN_CuDNN_H_
 
