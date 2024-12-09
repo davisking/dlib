@@ -4128,7 +4128,8 @@ namespace dlib
 
         friend void to_xml(const softmax_& /*item*/, std::ostream& out)
         {
-            out << "<softmax mode='" << (s_mode_ == operation_mode::CHANNEL_WISE ? "channel_wise" : "plane_wise") << "'/>\n";
+            out << "<softmax mode='" << (s_mode_ == static_cast<unsigned long>(operation_mode::CHANNEL_WISE)
+                ? "channel_wise" : "plane_wise") << "'/>\n";
         }
 
     private:
