@@ -231,15 +231,15 @@ namespace
         cpu_grad = 0;
         gradient_input.copy_size(input_tensor);
         randomize_parameters(gradient_input, nr + nc, rnd);
-        cpu::softmax(output_tensor, input_tensor, 1);
-        cpu::softmax_gradient(cpu_grad, output_tensor, gradient_input, 1);
+        cpu::softmax(output_tensor, input_tensor, operation_mode::PLANE_WISE);
+        cpu::softmax_gradient(cpu_grad, output_tensor, gradient_input, operation_mode::PLANE_WISE);
         DLIB_TEST(max(abs(mat(output_tensor) - mat(expected_output))) < 1e-5);
 #ifdef DLIB_USE_CUDA
         resizable_tensor cuda_grad;
         cuda_grad.copy_size(input_tensor);
         cuda_grad = 0;
-        cuda::softmax(output_tensor, input_tensor, 1);
-        cpu::softmax_gradient(cuda_grad, output_tensor, gradient_input, 1);
+        cuda::softmax(output_tensor, input_tensor, operation_mode::PLANE_WISE);
+        cpu::softmax_gradient(cuda_grad, output_tensor, gradient_input, operation_mode::PLANE_WISE);
         DLIB_TEST(max(abs(mat(output_tensor) - mat(expected_output))) < 1e-5);
         DLIB_TEST(max(abs(mat(cuda_grad) - mat(cpu_grad))) < 1e-5);
 #endif
