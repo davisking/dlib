@@ -1594,7 +1594,6 @@ namespace dlib
             DLIB_CASSERT(
                 have_same_dimensions(dest, gradient_input) == true &&
                 have_same_dimensions(dest, grad) == true);
-            DLIB_CASSERT(mode == operation_mode::CHANNEL_WISE || mode == operation_mode::PLANE_WISE, "Invalid softmax mode");
             if (dest.size() == 0) return;
 
             const float alpha = 1;
