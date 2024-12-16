@@ -1788,7 +1788,6 @@ namespace dlib
         {
             DLIB_CASSERT(have_same_dimensions(grad, dest));
             DLIB_CASSERT(have_same_dimensions(grad, gradient_input));
-            DLIB_CASSERT(mode == operation_mode::CHANNEL_WISE || mode == operation_mode::PLANE_WISE, "Invalid softmax mode");
             ttimpl::softmax_gradient(grad.nr() * grad.nc(), grad.k(), grad, dest, gradient_input, mode);
         }
 
