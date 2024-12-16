@@ -1537,7 +1537,6 @@ namespace dlib
         )
         {
             DLIB_CASSERT(have_same_dimensions(dest, src));
-            DLIB_CASSERT(mode == operation_mode::CHANNEL_WISE || mode == operation_mode::PLANE_WISE, "Invalid softmax mode");
             if (src.size() == 0) return;
 
             const float alpha = 1;
