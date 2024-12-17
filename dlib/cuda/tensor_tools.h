@@ -165,21 +165,56 @@ namespace dlib { namespace tt
         const tensor& lhs,
         bool trans_lhs,
         const tensor& rhs,
-        bool trans_rhs
+        bool trans_rhs,
+        operation_mode mode = operation_mode::CHANNEL_WISE
     );
     /*!
         requires
             - dest does not alias the memory of lhs or rhs
             - The dimensions of lhs and rhs must be compatible for matrix multiplication.
-              In particular:
-                - Let L == trans_lhs ? trans(mat(lhs)) : mat(lhs)
-                - Let R == trans_rhs ? trans(mat(rhs)) : mat(rhs)
-                - Let D == mat(dest)
-                - D.nr() == L.nr() && D.nc() == R.nc()
-                  (i.e. dest must be preallocated and have the correct output dimensions)
-                - L.nc() == R.nr()
+                The specific requirements depend on the mode:
+
+                For CHANNEL_WISE mode (default):
+                    - Let L == trans_lhs ? trans(mat(lhs)) : mat(lhs)
+                    - Let R == trans_rhs ? trans(mat(rhs)) : mat(rhs)
+                    - Let D == mat(dest)
+                    - D.nr() == L.nr() && D.nc() == R.nc()
+                        (i.e. dest must be preallocated and have the correct output dimensions)
+                    - L.nc() == R.nr()
+
+                For PLANE_WISE mode:
+                    - lhs.num_samples() == rhs.num_samples() && lhs.k() == rhs.k()
+                    - If !trans_lhs && !trans_rhs:
+                        lhs.nc() == rhs.nr()
+                        dest.nr() == lhs.nr() && dest.nc() == rhs.nc()
+                    - If trans_lhs && !trans_rhs:
+                        lhs.nr() == rhs.nr()
+                        dest.nr() == lhs.nc() && dest.nc() == rhs.nc()
+                    - If !trans_lhs && trans_rhs:
+                        lhs.nc() == rhs.nc()
+                        dest.nr() == lhs.nr() && dest.nc() == rhs.nr()
+                    - If trans_lhs && trans_rhs:
+                        lhs.nr() == rhs.nc()
+                        dest.nr() == lhs.nc() && dest.nc() == rhs.nr()
+
         ensures
-            - performs: dest = alpha*L*R + beta*mat(dest)
+            - Performs matrix multiplication based on the specified mode:
+
+                For CHANNEL_WISE mode:
+                    - performs: dest = alpha*L*R + beta*mat(dest)
+                        where L, R, and D are as defined above.
+
+                For PLANE_WISE mode:
+                    - Performs matrix multiplication for each corresponding 2D plane (nr x nc)
+                        in lhs and rhs across all samples and channels.
+                    - The operation is equivalent to performing the following for each sample
+                        and channel:
+                            dest[s][k] = alpha * (lhs[s][k] * rhs[s][k]) + beta * dest[s][k]
+                            where [s][k] represents the 2D plane for sample s and channel k.
+            
+                Note that the PLANE_WISE mode is particularly useful for operations like attention
+                mechanisms in neural networks, where you want to perform matrix multiplications
+                on 2D planes of 4D tensors while preserving the sample and channel dimensions.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -1386,44 +1421,54 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
-    void softmax (
+    void softmax(
         tensor& dest,
-        const tensor& src
+        const tensor& src,
+        operation_mode mode = operation_mode::CHANNEL_WISE
     );
     /*!
         requires
             - have_same_dimensions(dest, src) == true
+            - mode == CHANNEL_WISE || mode == PLANE_WISE
         ensures
-            - Note that the softmax function is a vector valued function: 
-                s(x) == exp(x)/sum(exp(x)) 
-            - Computes the softmax function on src and writes the results to dest.  The
-              softmax is computed per spatial location across the different channels at
-              each location.  That is, softmax() outputs a new tensor, #dest, where each of
+            - Note that the softmax function is a vector valued function:
+              s(x) == exp(x)/sum(exp(x))
+            - Computes the softmax function on src and writes the results to dest.
+            - If mode == CHANNEL_WISE:
+              The softmax is computed per spatial location across the different channels at
+              each location. That is, softmax() outputs a new tensor, #dest, where each of
               the spatial locations in dest (i.e. image idx, row idx, and column idx)
-              contains the output of s() evaluated over the channel values at each
-              location.
+              contains the output of s() evaluated over the channel values at each location.
+            - If mode == PLANE_WISE:
+              The softmax is computed across entire planes (nr x nc) of the input tensor.
+              This is useful for operations in Large Language Models (LLMs) and other
+              applications requiring 2D tensor processing.
             - This function supports in-place operation, i.e. having
               is_same_object(dest, src)==true
     !*/
 
-    void softmax_gradient (
+    void softmax_gradient(
         tensor& grad,
         const tensor& dest,
-        const tensor& gradient_input
+        const tensor& gradient_input,
+        operation_mode mode = operation_mode::CHANNEL_WISE
     );
     /*!
         requires
-            - have_same_dimensions(dest,gradient_input) == true 
-            - have_same_dimensions(dest,grad) == true 
+            - have_same_dimensions(dest,gradient_input) == true
+            - have_same_dimensions(dest,grad) == true
+            - mode == CHANNEL_WISE || mode == PLANE_WISE
         ensures
-            - We interpret dest as the output of softmax(dest,SRC) for some SRC tensor.
-              Then let f(SRC) == dot(gradient_input,dest).  Then this function computes the
-              gradient of f() with respect to SRC and stores it to grad.  Moreover, if
-              is_same_object(grad,gradient_input)==true then the output is assigned to
-              grad, replacing its previous contents.  Otherwise the output is added to
-              grad.
+            - We interpret dest as the output of softmax(dest,SRC,mode) for some SRC tensor.
+            Then let f(SRC) == dot(gradient_input,dest).  Then this function computes the
+            gradient of f() with respect to SRC and stores it to grad.  Moreover, if
+            is_same_object(grad,gradient_input)==true then the output is assigned to
+            grad, replacing its previous contents.  Otherwise the output is added to grad.
+            - The gradient computation takes into account the specified mode:
+            - If mode == CHANNEL_WISE: The gradient is computed per spatial location across channels.
+            - If mode == PLANE_WISE: The gradient is computed across entire planes of the tensor.
             - This function supports in-place operation, i.e. having
-              is_same_object(grad, gradient_input)==true
+            is_same_object(grad, gradient_input)==true
     !*/
 
 // ----------------------------------------------------------------------------------------
