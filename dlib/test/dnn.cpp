@@ -2469,13 +2469,13 @@ void test_embeddings()
         }
         {
             print_spinner();
-            softmax_<static_cast<unsigned long>(operation_mode::CHANNEL_WISE)> l;
+            softmax_<operation_mode::CHANNEL_WISE> l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
         }
         {
             print_spinner();
-            softmax_<static_cast<unsigned long>(operation_mode::PLANE_WISE)> l;
+            softmax_<operation_mode::PLANE_WISE> l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
         }

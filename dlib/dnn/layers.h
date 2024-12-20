@@ -13,6 +13,7 @@
 #include "../cuda/tensor_tools.h"
 #include "../vectorstream.h"
 #include "utilities.h"
+#include "../cuda/operation_mode.h"
 #include <sstream>
 
 
@@ -4079,7 +4080,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <unsigned long s_mode_>
+    template <operation_mode s_mode_>
     class softmax_
     {
     public:
@@ -4090,7 +4091,7 @@ namespace dlib
 
         void forward_inplace(const tensor& input, tensor& output)
         {
-            tt::softmax(output, input, static_cast<operation_mode>(s_mode_));
+            tt::softmax(output, input, s_mode_);
         }
 
         void backward_inplace(
@@ -4100,7 +4101,7 @@ namespace dlib
             tensor& /*params_grad*/
         )
         {
-            tt::softmax_gradient(data_grad, computed_output, gradient_input, static_cast<operation_mode>(s_mode_));
+            tt::softmax_gradient(data_grad, computed_output, gradient_input, s_mode_);
         }
 
         const tensor& get_layer_params() const { return params; }
@@ -4121,14 +4122,14 @@ namespace dlib
 
         friend std::ostream& operator<<(std::ostream& out, const softmax_& /*item*/)
         {
-            out << "softmax (mode=" << (s_mode_ == static_cast<unsigned long>(operation_mode::CHANNEL_WISE)
+            out << "softmax (mode=" << (s_mode_ == operation_mode::CHANNEL_WISE
                 ? "channel_wise" : "plane_wise") << ")";
             return out;
         }
 
         friend void to_xml(const softmax_& /*item*/, std::ostream& out)
         {
-            out << "<softmax mode='" << (s_mode_ == static_cast<unsigned long>(operation_mode::CHANNEL_WISE)
+            out << "<softmax mode='" << (s_mode_ == operation_mode::CHANNEL_WISE
                 ? "channel_wise" : "plane_wise") << "'/>\n";
         }
 
@@ -4137,10 +4138,10 @@ namespace dlib
     };
 
     template <typename SUBNET>
-    using softmax = add_layer<softmax_<static_cast<unsigned long>(operation_mode::CHANNEL_WISE)>, SUBNET>;
+    using softmax = add_layer<softmax_<operation_mode::CHANNEL_WISE>, SUBNET>;
 
     template <typename SUBNET>
-    using softmaxm = add_layer<softmax_< static_cast<unsigned long>(operation_mode::PLANE_WISE)>, SUBNET>;
+    using softmaxm = add_layer<softmax_<operation_mode::PLANE_WISE>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

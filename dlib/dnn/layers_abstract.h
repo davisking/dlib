@@ -5,6 +5,7 @@
 
 #include "../cuda/tensor_abstract.h"
 #include "core_abstract.h"
+#include "../cuda/operation_mode.h"
 
 
 namespace dlib
@@ -2953,7 +2954,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <unsigned long s_mode_>
+    template <operation_mode s_mode_>
     class softmax_
     {
         /*!

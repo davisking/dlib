@@ -972,7 +972,7 @@ namespace dlib
                 update(i);
             }
 
-            template <unsigned long sm, typename U, typename E>
+            template <operation_mode sm, typename U, typename E>
             void operator()(size_t i, const add_layer<softmax_<sm>, U, E>&)
             {
                 start_node(i, "softmax");
