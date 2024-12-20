@@ -291,15 +291,17 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
-        void softmax (
+        void softmax(
             tensor& dest,
-            const tensor& src
+            const tensor& src,
+            operation_mode mode = operation_mode::CHANNEL_WISE
         );
 
-        void softmax_gradient (
+        void softmax_gradient(
             tensor& grad,
             const tensor& dest,
-            const tensor& gradient_input
+            const tensor& gradient_input,
+            operation_mode mode = operation_mode::CHANNEL_WISE
         );
 
     // ------------------------------------------------------------------------------------

@@ -5,6 +5,7 @@
 
 #include "../cuda/tensor_abstract.h"
 #include "core_abstract.h"
+#include "../cuda/operation_mode.h"
 
 
 namespace dlib
@@ -2953,44 +2954,67 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <operation_mode s_mode_>
     class softmax_
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
-                defined above.  In particular, it defines a softmax layer.  To be precise,
-                we define the softmax function s(x) as:
-                    s(x) == exp(x)/sum(exp(x)) 
-                where x is a vector.  Then this layer treats its input tensor as a
-                collection of multi-channel images and applies s() to each spatial location
-                in each image.  In each application, the tensor::k() channel elements at
-                each position are input to s() and then replaced by the outputs of s().   
+                defined above. It defines a softmax layer with two modes of operation:
+                channel-wise and plane-wise.
 
-                This means that, for example, if you collapsed each output image to a 1
-                channel image by adding the channels then you would end up with images
-                where each pixel value was 1.  This is because the sum of the outputs of
-                s() will always be equal to 1.
+                The softmax function s(x) is defined as:
+                    s(x) == exp(x)/sum(exp(x))
+                where x is a vector.
+
+                1. Channel-wise mode (s_mode_ == CHANNEL_WISE):
+                This mode treats the input tensor as a collection of multi-channel images
+                and applies s() to each spatial location in each image. The tensor::k()
+                channel elements at each position are input to s() and then replaced by
+                the outputs of s().
+
+                2. Plane-wise mode (s_mode_ == PLANE_WISE):
+                This mode applies the softmax function across entire planes (nr x nc) of
+                the input tensor, useful for operations in Large Language Models (LLMs)
+                and other applications requiring 2D tensor processing.
+
+                In both modes, the sum of the outputs of s() will always be equal to 1 for
+                each application of the function.
+
+            TEMPLATE PARAMETERS
+                - s_mode_: Determines the mode of operation (CHANNEL_WISE or PLANE_WISE)
         !*/
 
     public:
+        softmax_();
 
-        softmax_(
-        );
-
-        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void setup(const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
-        void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
-        const tensor& get_layer_params() const; 
-        tensor& get_layer_params(); 
+        void backward_inplace(
+            const tensor& computed_output,
+            const tensor& gradient_input,
+            tensor& data_grad,
+            tensor& params_grad
+        );
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
         /*!
-            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ 
-            interface.  Note that this layer doesn't have any parameters, so the tensor
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_
+            interface. Note that this layer doesn't have any parameters, so the tensor
             returned by get_layer_params() is always empty.
         !*/
+
+        friend void serialize(const softmax_& item, std::ostream& out);
+        friend void deserialize(softmax_& item, std::istream& in);
+        friend std::ostream& operator<<(std::ostream& out, const softmax_& item);
+        friend void to_xml(const softmax_& item, std::ostream& out);
     };
 
     template <typename SUBNET>
-    using softmax = add_layer<softmax_, SUBNET>;
+    using softmax = add_layer<softmax_<operation_mode::CHANNEL_WISE>, SUBNET>;
+
+    template <typename SUBNET>
+    using softmaxm = add_layer<softmax_<operation_mode::PLANE_WISE>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -3174,6 +3198,85 @@ namespace dlib
     using mult_prev8_  = mult_prev_<tag8>;
     using mult_prev9_  = mult_prev_<tag9>;
     using mult_prev10_ = mult_prev_<tag10>;
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        template<typename> class tag
+        >
+    class multm_prev_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above. This layer performs matrix multiplication on the output
+                of two previous layers. It multiplies the tensor from its immediate
+                predecessor layer, sub.get_output(), with the tensor from a deeper layer,
+                layer<tag>(sub).get_output().
+
+                The tag template argument specifies which layer to multiply with the
+                output of the previous layer. The result of this multiplication is
+                output by multm_prev_. The multiplication is performed using a modified
+                version of gemm() to account for the 2D matrix dimension in the nr()xnc()
+                planes of Dlib's 4D tensors.
+
+                This layer is similar to mult_prev_, but it considers the full matrix
+                in the nr()xnc() planes of the tensor, rather than just the upper
+                num_samples()xk() plane. This makes it suitable for implementing
+                mechanisms like attention, especially when the k() channel plane is
+                used to model multiple heads for parallel matrix processing.
+
+                The output tensor dimensions are determined as follows:
+                    - output.num_samples() == t1.num_samples()
+                    - output.k() == t1.k()
+                    - output.nr() == t1.nr()
+                    - output.nc() == t2.nc()
+                where t1 is sub.get_output() and t2 is layer<tag>(sub).get_output().
+        !*/
+
+    public:
+        multm_prev_(
+        ); 
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;        
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+    };
+
+    template <
+        template<typename> class tag,
+        typename SUBNET
+        >
+    using multm_prev = add_layer<multm_prev_<tag>, SUBNET>;
+
+    // Here we add some convenient aliases for using multm_prev_ with the tag layers. 
+    template <typename SUBNET> using multm_prev1  = multm_prev<tag1, SUBNET>;
+    template <typename SUBNET> using multm_prev2  = multm_prev<tag2, SUBNET>;
+    template <typename SUBNET> using multm_prev3  = multm_prev<tag3, SUBNET>;
+    template <typename SUBNET> using multm_prev4  = multm_prev<tag4, SUBNET>;
+    template <typename SUBNET> using multm_prev5  = multm_prev<tag5, SUBNET>;
+    template <typename SUBNET> using multm_prev6  = multm_prev<tag6, SUBNET>;
+    template <typename SUBNET> using multm_prev7  = multm_prev<tag7, SUBNET>;
+    template <typename SUBNET> using multm_prev8  = multm_prev<tag8, SUBNET>;
+    template <typename SUBNET> using multm_prev9  = multm_prev<tag9, SUBNET>;
+    template <typename SUBNET> using multm_prev10 = multm_prev<tag10, SUBNET>;
+    using multm_prev1_  = multm_prev_<tag1>;
+    using multm_prev2_  = multm_prev_<tag2>;
+    using multm_prev3_  = multm_prev_<tag3>;
+    using multm_prev4_  = multm_prev_<tag4>;
+    using multm_prev5_  = multm_prev_<tag5>;
+    using multm_prev6_  = multm_prev_<tag6>;
+    using multm_prev7_  = multm_prev_<tag7>;
+    using multm_prev8_  = multm_prev_<tag8>;
+    using multm_prev9_  = multm_prev_<tag9>;
+    using multm_prev10_ = multm_prev_<tag10>;
 
 // ----------------------------------------------------------------------------------------
 

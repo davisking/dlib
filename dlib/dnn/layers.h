@@ -13,6 +13,7 @@
 #include "../cuda/tensor_tools.h"
 #include "../vectorstream.h"
 #include "utilities.h"
+#include "../cuda/operation_mode.h"
 #include <sstream>
 
 
@@ -2794,6 +2795,100 @@ namespace dlib
     template <
         template<typename> class tag
         >
+    class multm_prev_
+    {
+    public:
+        const static unsigned long id = tag_id<tag>::id;
+
+        multm_prev_() {}
+        template <typename SUBNET> void setup(const SUBNET& /*sub*/) {}
+
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            auto& t1 = sub.get_output();
+            auto& t2 = layer<tag>(sub).get_output();
+            output.set_size(t1.num_samples(), t1.k(), t1.nr(), t2.nc());
+
+            tt::gemm(0, output, 1, t1, false, t2, false, operation_mode::PLANE_WISE);
+        }
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
+        {
+            auto& t1 = sub.get_output();
+            auto& t2 = layer<tag>(sub).get_output();
+            auto& prev = sub.get_gradient_input();
+            auto& prev_tag = layer<tag>(sub).get_gradient_input();            
+
+            tt::gemm(1, prev, 1, gradient_input, false, t2, true, operation_mode::PLANE_WISE);
+            tt::gemm(1, prev_tag, 1, t1, true, gradient_input, false, operation_mode::PLANE_WISE);
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        inline dpoint map_input_to_output(const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input(const dpoint& p) const { return p; }
+
+        friend void serialize(const multm_prev_& /*item*/, std::ostream& out)
+        {
+            serialize("multm_prev_", out);
+        }
+        friend void deserialize(multm_prev_& /*item*/, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "multm_prev_")
+                throw serialization_error("Unexpected version '" + version + "' found while deserializing dlib::multm_prev_.");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const multm_prev_& /*item*/)
+        {
+            out << "multm_prev" << id;
+            return out;
+        }
+        friend void to_xml(const multm_prev_& /*item*/, std::ostream& out)
+        {
+            out << "<multm_prev tag='" << id << "'/>\n";
+        }
+
+    private:
+        resizable_tensor params; // unused
+    };
+
+    template <
+        template<typename> class tag,
+        typename SUBNET
+        >
+    using multm_prev = add_layer<multm_prev_<tag>, SUBNET>;
+
+    template <typename SUBNET> using multm_prev1 = multm_prev<tag1, SUBNET>;
+    template <typename SUBNET> using multm_prev2 = multm_prev<tag2, SUBNET>;
+    template <typename SUBNET> using multm_prev3 = multm_prev<tag3, SUBNET>;
+    template <typename SUBNET> using multm_prev4 = multm_prev<tag4, SUBNET>;
+    template <typename SUBNET> using multm_prev5 = multm_prev<tag5, SUBNET>;
+    template <typename SUBNET> using multm_prev6 = multm_prev<tag6, SUBNET>;
+    template <typename SUBNET> using multm_prev7 = multm_prev<tag7, SUBNET>;
+    template <typename SUBNET> using multm_prev8 = multm_prev<tag8, SUBNET>;
+    template <typename SUBNET> using multm_prev9 = multm_prev<tag9, SUBNET>;
+    template <typename SUBNET> using multm_prev10 = multm_prev<tag10, SUBNET>;
+    using multm_prev1_ = multm_prev_<tag1>;
+    using multm_prev2_ = multm_prev_<tag2>;
+    using multm_prev3_ = multm_prev_<tag3>;
+    using multm_prev4_ = multm_prev_<tag4>;
+    using multm_prev5_ = multm_prev_<tag5>;
+    using multm_prev6_ = multm_prev_<tag6>;
+    using multm_prev7_ = multm_prev_<tag7>;
+    using multm_prev8_ = multm_prev_<tag8>;
+    using multm_prev9_ = multm_prev_<tag9>;
+    using multm_prev10_ = multm_prev_<tag10>;
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        template<typename> class tag
+        >
     class resize_prev_to_tagged_
     {
     public:
@@ -3985,31 +4080,28 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <operation_mode s_mode_>
     class softmax_
     {
     public:
-        softmax_() 
-        {
-        }
+        softmax_() {}
 
         template <typename SUBNET>
-        void setup (const SUBNET& /*sub*/)
-        {
-        }
+        void setup(const SUBNET& /*sub*/) {}
 
         void forward_inplace(const tensor& input, tensor& output)
         {
-            tt::softmax(output, input);
-        } 
+            tt::softmax(output, input, s_mode_);
+        }
 
         void backward_inplace(
             const tensor& computed_output,
-            const tensor& gradient_input, 
-            tensor& data_grad, 
-            tensor& 
+            const tensor& gradient_input,
+            tensor& data_grad,
+            tensor& /*params_grad*/
         )
         {
-            tt::softmax_gradient(data_grad, computed_output, gradient_input);
+            tt::softmax_gradient(data_grad, computed_output, gradient_input, s_mode_);
         }
 
         const tensor& get_layer_params() const { return params; }
@@ -4025,26 +4117,31 @@ namespace dlib
             std::string version;
             deserialize(version, in);
             if (version != "softmax_")
-                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::softmax_.");
+                throw serialization_error("Unexpected version '" + version + "' found while deserializing dlib::softmax_.");
         }
 
         friend std::ostream& operator<<(std::ostream& out, const softmax_& /*item*/)
         {
-            out << "softmax";
+            out << "softmax (mode=" << (s_mode_ == operation_mode::CHANNEL_WISE
+                ? "channel_wise" : "plane_wise") << ")";
             return out;
         }
 
         friend void to_xml(const softmax_& /*item*/, std::ostream& out)
         {
-            out << "<softmax/>\n";
+            out << "<softmax mode='" << (s_mode_ == operation_mode::CHANNEL_WISE
+                ? "channel_wise" : "plane_wise") << "'/>\n";
         }
 
     private:
-        resizable_tensor params;
+        resizable_tensor params; // unused
     };
 
     template <typename SUBNET>
-    using softmax = add_layer<softmax_, SUBNET>;
+    using softmax = add_layer<softmax_<operation_mode::CHANNEL_WISE>, SUBNET>;
+
+    template <typename SUBNET>
+    using softmaxm = add_layer<softmax_<operation_mode::PLANE_WISE>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

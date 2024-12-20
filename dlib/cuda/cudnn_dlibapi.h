@@ -3,17 +3,19 @@
 #ifndef DLIB_DNN_CuDNN_H_
 #define DLIB_DNN_CuDNN_H_
 
-#ifdef DLIB_USE_CUDA
-
-#include "cuda_errors.h"
 #include <memory>
+#include "operation_mode.h"
+#ifdef DLIB_USE_CUDA
+#include "cuda_errors.h"
 #include "cuda_data_ptr.h"
+#endif // DLIB_USE_CUDA
 
 namespace dlib
 {
     class tensor;
     class resizable_tensor;
 
+#ifdef DLIB_USE_CUDA
     namespace cuda 
     {
 
@@ -352,13 +354,15 @@ namespace dlib
 
         void softmax (
             tensor& dest,
-            const tensor& src
+            const tensor& src,
+            operation_mode mode = operation_mode::CHANNEL_WISE
         );
 
         void softmax_gradient (
             tensor& grad,
             const tensor& dest,
-            const tensor& gradient_input
+            const tensor& gradient_input,
+            operation_mode mode = operation_mode::CHANNEL_WISE
         );
 
     // ------------------------------------------------------------------------------------
@@ -416,9 +420,8 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
     }
-}
-
 #endif // DLIB_USE_CUDA
+}
 
 #endif // DLIB_DNN_CuDNN_H_
 

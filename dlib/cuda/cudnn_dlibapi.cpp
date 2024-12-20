@@ -1529,60 +1529,122 @@ namespace dlib
         }
 
     // ------------------------------------------------------------------------------------
-    // ------------------------------------------------------------------------------------
 
-        void softmax (
+        void softmax(
             tensor& dest,
-            const tensor& src
+            const tensor& src,
+            operation_mode mode
         )
         {
-            DLIB_CASSERT(have_same_dimensions(dest,src));
-            if (src.size() == 0)
-                return;
+            DLIB_CASSERT(have_same_dimensions(dest, src));
+            if (src.size() == 0) return;
 
             const float alpha = 1;
             const float beta = 0;
 
-            CHECK_CUDNN(cudnnSoftmaxForward(context(),
-                                      CUDNN_SOFTMAX_ACCURATE,
-                                      CUDNN_SOFTMAX_MODE_CHANNEL,
-                                      &alpha,
-                                      descriptor(src),
-                                      src.device(),
-                                      &beta,
-                                      descriptor(dest),
-                                      dest.device()));
+            if (mode == operation_mode::CHANNEL_WISE)
+            {
+                CHECK_CUDNN(cudnnSoftmaxForward(context(),
+                    CUDNN_SOFTMAX_ACCURATE,
+                    CUDNN_SOFTMAX_MODE_CHANNEL,
+                    &alpha,
+                    descriptor(src),
+                    src.device(),
+                    &beta,
+                    descriptor(dest),
+                    dest.device()));
+            }
+            else if (mode == operation_mode::PLANE_WISE)
+            {
+                const long num_samples = src.num_samples();
+                const long num_channels = src.k();
+                const size_t plane_size = src.nr() * src.nc();
+
+                for (long s = 0; s < num_samples; ++s)
+                {
+                    for (long k = 0; k < num_channels; ++k)
+                    {
+                        auto src_slice = src.device() + (s * num_channels + k) * plane_size;
+                        auto dest_slice = dest.device() + (s * num_channels + k) * plane_size;
+                        auto a_src_slice = alias_tensor(src.nr(), src.nc())(src, (s * num_channels + k) * plane_size);
+                        auto a_dest_slice = alias_tensor(dest.nr(), dest.nc())(dest, (s * num_channels + k) * plane_size);
+
+                        CHECK_CUDNN(cudnnSoftmaxForward(context(),
+                            CUDNN_SOFTMAX_ACCURATE,
+                            CUDNN_SOFTMAX_MODE_CHANNEL,
+                            &alpha,
+                            descriptor(a_src_slice),
+                            src_slice,
+                            &beta,
+                            descriptor(a_dest_slice),
+                            dest_slice));
+                    }
+                }
+            }
         }
 
-
-        void softmax_gradient (
+        void softmax_gradient(
             tensor& grad,
             const tensor& dest,
-            const tensor& gradient_input
+            const tensor& gradient_input,
+            operation_mode mode
         )
         {
             DLIB_CASSERT(
-                  have_same_dimensions(dest,gradient_input) == true &&
-                  have_same_dimensions(dest,grad) == true );
-            if (dest.size() == 0)
-                return;
+                have_same_dimensions(dest, gradient_input) == true &&
+                have_same_dimensions(dest, grad) == true);
+            if (dest.size() == 0) return;
 
             const float alpha = 1;
-            const float beta = is_same_object(grad,gradient_input) ? 0 : 1;
-            CHECK_CUDNN(cudnnSoftmaxBackward(context(),
-                                      CUDNN_SOFTMAX_ACCURATE,
-                                      CUDNN_SOFTMAX_MODE_CHANNEL,
-                                      &alpha,
-                                      descriptor(dest),
-                                      dest.device(),
-                                      descriptor(gradient_input),
-                                      gradient_input.device(),
-                                      &beta,
-                                      descriptor(grad),
-                                      grad.device()));
+            const float beta = is_same_object(grad, gradient_input) ? 0 : 1;
+
+            if (mode == operation_mode::CHANNEL_WISE)
+            {
+                CHECK_CUDNN(cudnnSoftmaxBackward(context(),
+                    CUDNN_SOFTMAX_ACCURATE,
+                    CUDNN_SOFTMAX_MODE_CHANNEL,
+                    &alpha,
+                    descriptor(dest),
+                    dest.device(),
+                    descriptor(gradient_input),
+                    gradient_input.device(),
+                    &beta,
+                    descriptor(grad),
+                    grad.device()));
+            }
+            else if (mode == operation_mode::PLANE_WISE)
+            {
+                const long num_samples = dest.num_samples();
+                const long num_channels = dest.k();
+                const size_t plane_size = dest.nr() * dest.nc();
+
+                for (long s = 0; s < num_samples; ++s)
+                {
+                    for (long k = 0; k < num_channels; ++k)
+                    {
+                        auto dest_slice = dest.device() + (s * num_channels + k) * plane_size;
+                        auto gi_slice = gradient_input.device() + (s * num_channels + k) * plane_size;
+                        auto grad_slice = grad.device() + (s * num_channels + k) * plane_size;
+                        auto a_dest_slice = alias_tensor(dest.nr(), dest.nc())(dest, (s * num_channels + k) * plane_size);
+                        auto a_gi_slice = alias_tensor(gradient_input.nr(), gradient_input.nc())(gradient_input, (s * num_channels + k) * plane_size);
+                        auto a_grad_slice = alias_tensor(grad.nr(), grad.nc())(grad, (s * num_channels + k) * plane_size);
+
+                        CHECK_CUDNN(cudnnSoftmaxBackward(context(),
+                            CUDNN_SOFTMAX_ACCURATE,
+                            CUDNN_SOFTMAX_MODE_CHANNEL,
+                            &alpha,
+                            descriptor(a_dest_slice),
+                            dest_slice,
+                            descriptor(a_gi_slice),
+                            gi_slice,
+                            &beta,
+                            descriptor(a_grad_slice),
+                            grad_slice));
+                    }
+                }
+            }
         }
 
-    // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
 
         void softmax_all (
