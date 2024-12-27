@@ -106,8 +106,13 @@ namespace dlib
         inline operator simd8i::rawarray() const 
         { 
             simd8i::rawarray temp;
+#if defined(DLIB_HAVE_NEON)
+            temp.low = simd4i(vcvtq_s32_f32(_low));
+            temp.high = simd4i(vcvtq_s32_f32(_high));
+#else
             temp.low = simd4i(_low);
             temp.high = simd4i(_high);
+#endif
             return temp;
         }
 
