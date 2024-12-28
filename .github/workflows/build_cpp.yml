@@ -30,8 +30,8 @@ defaults:
     working-directory: dlib/test
 
 jobs:
-  ubuntu-latest-gcc-default-cmake-3-8-ffmpeg5:
-    runs-on: 'ubuntu-latest'
+  ubuntu-22.04-gcc-default-cmake-3-8-ffmpeg5:
+    runs-on: 'ubuntu-22.04'
     steps:
     - uses: actions/checkout@v2
 
@@ -195,8 +195,8 @@ jobs:
     - name: Build examples, etc
       run: cmake --build build --config Release --parallel 2
 
-  ubuntu-latest-ffmpeg7:
-    runs-on: 'ubuntu-latest'
+  ubuntu-22.04-ffmpeg7:
+    runs-on: 'ubuntu-22.04'
     steps:
     - uses: actions/checkout@v2
 
