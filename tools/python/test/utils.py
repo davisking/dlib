@@ -1,4 +1,4 @@
-import pkgutil
+import importlib
 import sys
 
 def save_pickled_compatible(obj_to_pickle, file_name):
@@ -36,7 +36,7 @@ def is_numpy_installed():
     '''
         Returns True if Numpy is installed otherwise False
     '''
-    if pkgutil.find_loader("numpy"):
+    if importlib.util.find_spec("numpy"):
         return True
     else:
         return False
