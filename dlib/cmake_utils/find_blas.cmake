@@ -316,10 +316,13 @@ elseif(WIN32 AND NOT MINGW)
          "C:/Program Files/Intel/Composer XE/mkl/lib/intel64"
          "C:/Program Files/Intel/Composer XE/tbb/lib/intel64/vc14"
          "C:/Program Files/Intel/Composer XE/compiler/lib/intel64"
+         "C:/Program Files (x86)/Intel/oneAPI/mkl/*/lib"
+         "C:/Program Files (x86)/Intel/oneAPI/compiler/*/lib"
          "C:/Program Files (x86)/Intel/oneAPI/mkl/*/lib/intel64"
          "C:/Program Files (x86)/Intel/oneAPI/compiler/*/windows/compiler/lib/intel64_win"
          )
       set (mkl_redist_path
+         "C:/Program Files (x86)/Intel/oneAPI/compiler/*/bin"
          "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/redist/intel64/compiler" 
          "C:/Program Files (x86)/Intel/oneAPI/compiler/*/windows/redist/intel64_win/compiler"
          )
