@@ -6,7 +6,7 @@
 #include <algorithm>
 
 // Utility function to concatenate text parts
-std::string concatenateTexts(const std::vector<std::string>& texts) {
+inline std::string concatenateTexts(const std::vector<std::string>& texts) {
     std::string result;
     for (const auto& text : texts) {
         result += text;
