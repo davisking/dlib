@@ -214,11 +214,11 @@ namespace transformer
         template<bool is_training>
         using network_type = std::conditional_t<is_training,
             classification_head<USE_SQUEEZING, activation_func, VOCAB_SIZE, EMBEDDING_DIM,
-            repeat<NUM_LAYERS, t_transformer_block,
-            positional_embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>,
+                repeat<NUM_LAYERS, t_transformer_block,
+                positional_embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>,
             classification_head<USE_SQUEEZING, activation_func, VOCAB_SIZE, EMBEDDING_DIM,
-            repeat<NUM_LAYERS, i_transformer_block,
-            positional_embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>
+                repeat<NUM_LAYERS, i_transformer_block,
+                positional_embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>
             >;
 
         /**
