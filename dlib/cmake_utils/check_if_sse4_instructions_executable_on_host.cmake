@@ -1,6 +1,6 @@
 # This script checks if your compiler and host processor can generate and then run programs with SSE4 instructions.
 
-cmake_minimum_required(VERSION 3.8.0)
+cmake_minimum_required(VERSION 3.10.0)
 
 # Don't rerun this script if its already been executed.
 if (DEFINED SSE4_IS_AVAILABLE_ON_HOST)

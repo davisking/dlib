@@ -1,5 +1,5 @@
 
-cmake_minimum_required(VERSION 3.8.0)
+cmake_minimum_required(VERSION 3.10.0)
 project(test_if_libwebp_is_broken)
 
 include_directories(${WEBP_INCLUDE_DIR})

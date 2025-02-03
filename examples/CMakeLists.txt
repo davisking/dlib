@@ -32,7 +32,7 @@
 #
 
 
-cmake_minimum_required(VERSION 3.8.0)
+cmake_minimum_required(VERSION 3.10.0)
 # Every project needs a name.  We call this the "examples" project.
 project(examples)
 
