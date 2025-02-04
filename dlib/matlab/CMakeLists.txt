@@ -1,5 +1,5 @@
 
-cmake_minimum_required(VERSION 3.8.0)
+cmake_minimum_required(VERSION 3.10.0)
 
 PROJECT(mex_functions)
 

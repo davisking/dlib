@@ -1,5 +1,5 @@
 
-cmake_minimum_required(VERSION 3.8.0)
+cmake_minimum_required(VERSION 3.10.0)
 
 
 # Check if we are being built as part of a pybind11 module. 

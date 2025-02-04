@@ -1,7 +1,7 @@
 #This script just runs CMake's built in JPEG finding tool.  But it also checks that the
 #copy of libjpeg that cmake finds actually builds and links.
 
-cmake_minimum_required(VERSION 3.8.0)
+cmake_minimum_required(VERSION 3.10.0)
 
 if (BUILDING_PYTHON_IN_MSVC)
    # Never use any system copy of libjpeg when building python in visual studio

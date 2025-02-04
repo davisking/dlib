@@ -1,6 +1,6 @@
 # This script checks if __ARM_NEON__ is defined for your compiler
 
-cmake_minimum_required(VERSION 3.8.0)
+cmake_minimum_required(VERSION 3.10.0)
 
 # Don't rerun this script if its already been executed.
 if (DEFINED ARM_NEON_IS_AVAILABLE)

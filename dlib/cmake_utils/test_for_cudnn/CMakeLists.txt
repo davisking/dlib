@@ -1,5 +1,5 @@
 
-cmake_minimum_required(VERSION 3.8.0)
+cmake_minimum_required(VERSION 3.10.0)
 project(cudnn_test)
 
 # Override the FindCUDA.cmake setting to avoid duplication of host flags if using a toolchain:
