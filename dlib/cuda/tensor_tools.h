@@ -2336,6 +2336,17 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void copy_tensor(
+        bool add_to,
+        tensor& dest,
+        size_t dk, size_t dnr, size_t dnc,
+        const tensor& src,
+        size_t sk, size_t snr, size_t snc,
+        size_t k, size_t nr, size_t nc
+    );
+
+// ----------------------------------------------------------------------------------------
+
     void transpose(
         bool add_to,
         tensor& dest,
