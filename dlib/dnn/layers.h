@@ -4633,6 +4633,131 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        long _offset_k,
+        long _offset_nr,
+        long _offset_nc,
+        long _k,
+        long _nr,
+        long _nc
+        >
+    class slice_
+    {
+        static_assert(_offset_k >= 0, "The channel offset must be >= 0.");
+        static_assert(_offset_nr >= 0, "The row offset must be >= 0.");
+        static_assert(_offset_nc >= 0, "The column offset must be >= 0.");
+        static_assert(_k > 0,  "The number of channels must be > 0.");
+        static_assert(_nr > 0, "The number of rows must be > 0.");
+        static_assert(_nc > 0, "The number of columns must be > 0.");
+    public:
+        slice_(
+        )  
+        {
+        }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& sub)
+        {
+            DLIB_CASSERT((long)sub.get_output().size() >= sub.get_output().num_samples()*(_offset_k+_offset_nr+_offset_nc+_k*_nr*_nc), 
+                "The tensor we are trying to slice from the input tensor is too big to fit into the input tensor.");
+        }
+
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            output.set_size(sub.get_output().num_samples(), _k, _nr, _nc);
+            tt::copy_tensor(false, output, 0, 0, 0, sub.get_output(), _offset_k, _offset_nr, _offset_nc, _k, _nr, _nc);
+        } 
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
+        {
+            tt::copy_tensor(true, sub.get_gradient_input(), _offset_k, _offset_nr, _offset_nc, gradient_input, 0, 0, 0, _k, _nr, _nc);
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const slice_& /*item*/, std::ostream& out)
+        {
+            serialize("slice_", out);
+            serialize(_offset_k, out);
+            serialize(_offset_nr, out);
+            serialize(_offset_nc, out);
+            serialize(_k, out);
+            serialize(_nr, out);
+            serialize(_nc, out);
+        }
+
+        friend void deserialize(slice_& /*item*/, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "slice_")
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::slice_.");
+
+            long offset_k;
+            long offset_nr;
+            long offset_nc;
+            long k;
+            long nr;
+            long nc;
+            deserialize(offset_k, in);
+            deserialize(offset_nr, in);
+            deserialize(offset_nc, in);
+            deserialize(k, in);
+            deserialize(nr, in);
+            deserialize(nc, in);
+
+            if (offset_k != _offset_k) throw serialization_error("Wrong offset_k found while deserializing dlib::slice_");
+            if (offset_nr != _offset_nr) throw serialization_error("Wrong offset_nr found while deserializing dlib::slice_");
+            if (offset_nc != _offset_nc) throw serialization_error("Wrong offset_nc found while deserializing dlib::slice_");
+            if (k != _k)   throw serialization_error("Wrong k found while deserializing dlib::slice_");
+            if (nr != _nr) throw serialization_error("Wrong nr found while deserializing dlib::slice_");
+            if (nc != _nc) throw serialization_error("Wrong nc found while deserializing dlib::slice_");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const slice_& /*item*/)
+        {
+            out << "slice\t ("
+                << "offset_k="<<_offset_k
+                << "offset_nr="<<_offset_nr
+                << "offset_nc="<<_offset_nc
+                << ", k="<<_k
+                << ", nr="<<_nr
+                << ", nc="<<_nc
+                << ")";
+            return out;
+        }
+
+        friend void to_xml(const slice_& /*item*/, std::ostream& out)
+        {
+            out << "<slice";
+            out << " offset_k='"<<_offset_k<<"'";
+            out << " offset_nr='"<<_offset_nr<<"'";
+            out << " offset_nr='"<<_offset_nc<<"'";
+            out << " k='"<<_k<<"'";
+            out << " nr='"<<_nr<<"'";
+            out << " nc='"<<_nc<<"'";
+            out << "/>\n";
+        }
+    private:
+        resizable_tensor params; // unused
+    };
+
+    template <
+        long offset_k,
+        long offset_nr,
+        long offset_nc,
+        long k,
+        long nr,
+        long nc,
+        typename SUBNET
+        >
+    using slice = add_layer<slice_<offset_k,offset_nr,offset_nc,k,nr,nc>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     template <long long row_stride = 2, long long col_stride = 2>
     class reorg_
     {

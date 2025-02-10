@@ -3701,6 +3701,85 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        long _offset_k,
+        long _offset_nr,
+        long _offset_nc,
+        long _k,
+        long _nr,
+        long _nc
+        >
+    class slice_
+    {
+        /*!
+            REQUIREMENTS ON TEMPLATE ARGUMENTS
+                - 0 <= _offset_k
+                - 0 <= _offset_nr
+                - 0 <= _offset_nc
+                - 0 < _k
+                - 0 < _nr
+                - 0 < _nc
+
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, the output of this layer is simply a copy of
+                the input tensor. It is similar to extract in that you can configure the
+                slice layer to output only some subset of the input tensor, but slice allows
+                copies of non-contiguous regions of the input which enables three dimensional
+                cropping of a tensor. The dimensions of the tensor output by this layer
+                are as follows (letting IN be the input tensor and OUT the output tensor):
+                    - OUT.num_samples() == IN.num_samples()
+                    - OUT.k()  == _k 
+                    - OUT.nr() == _nr 
+                    - OUT.nc() == _nc 
+
+                So the output will always have the same number of samples as the input, but
+                within each sample (the k,nr,nc part) we will copy only a subset of the
+                values. Moreover, the _offset_k, _offset_nr, and _offset_nc parameters
+                control which channels, rows, and columns of each sample we take.
+                To be very precise, we will have:
+                    - let IN_SIZE   = IN.k()*IN.nr()*IN.nc()
+                    - let OUT_SIZE  = _k*_nr*_nc 
+                    - for i in range[0,IN.num_samples()) and j in range[0,OUT_SIZE):
+                        - let k = (j / (OUT.nr()*OUT.nc())) % OUT.k()
+                        - let r = (j / OUT.nc()) % IN.nr()
+                        - let c = j % OUT.nc()
+                        - OUT.host()[i*OUT_SIZE+j] == IN.host()[i*IN_SIZE+
+                                                                k_stride*(_offset_k+k)+
+                                                                row_stride*(_offset_nr+r)+
+                                                                col_stride*(_offset_nc+c)]
+
+
+                Finally, all this means that the input tensor to this layer must have a big
+                enough size to accommodate taking a _k*_nr*_nc slice from each of its
+                samples.  
+        !*/
+
+    public:
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+    };
+
+    template <
+        long offset_k,
+        long offset_nr,
+        long offset_nc,
+        long k,
+        long nr,
+        long nc,
+        typename SUBNET
+        >
+    using slice = add_layer<slice_<offset_k,offset_nr,offset_nc,k,nr,nc>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     template <long long row_stride = 2, long long col_stride = 2>
     class reorg_
     {

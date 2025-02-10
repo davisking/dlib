@@ -2211,6 +2211,24 @@ void test_embeddings()
         }
         {
             print_spinner();
+            slice_<0,0,0,2,2,2> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            slice_<1,1,1,1,1,1> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            slice_<0,0,0,1,1,1> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
             upsample_<1,1> l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
@@ -2751,6 +2769,140 @@ void test_embeddings()
             }
         }
     }
+    void test_copy_tensor_slice_cpu()
+    {
+        using namespace dlib::tt;
+        print_spinner();
+        resizable_tensor dest(10, 9, 7, 15);
+        resizable_tensor src1(10, 3, 7, 15);
+        resizable_tensor src2(10, 3, 6, 12);
+        resizable_tensor src3(10, 9, 7, 15);
+        tt::tensor_rand rnd;
+        rnd.fill_gaussian(dest);
+        rnd.fill_gaussian(src1);
+        rnd.fill_gaussian(src2);
+        rnd.fill_gaussian(src3);
+
+        const resizable_tensor old_dest = dest;
+
+        cpu::copy_tensor(false, dest, 0, 0, 0, src1, 0, 0, 0, src1.k(), src1.nr(), src1.nc()); //full copy src1->dest
+        cpu::copy_tensor(false, dest, src1.k(), 0, 0, src2, 0, 0, 0, src2.k(), src2.nr(), src2.nc()); //full copy src2->dest with offset of src1
+        cpu::copy_tensor(false, dest, src1.k() + src2.k(), 1, 1, src3, 3, 1, 1, 3, src3.nr()-2, src3.nc()-2); //partial copy src3 into the rest place of dest
+
+
+        for (long i = 0; i < dest.num_samples(); ++i)
+        {
+            for (long k = 0; k < dest.k(); ++k)
+            {
+                for (long r = 0; r < dest.nr(); ++r)
+                {
+                    for (long c = 0; c < dest.nc(); ++c)
+                    {
+                        float old_dest_value = tensor_read_cpu(old_dest, i, k, r, c);
+                        float dest_value = tensor_read_cpu(dest, i, k, r, c);
+                        // first part is from src1
+                        if (k < src1.k())
+                        {
+                            float src_value = tensor_read_cpu(src1, i, k, r, c);
+                            DLIB_TEST(src_value == dest_value);
+                        }
+                        // second part is from src2
+                        else if (k < src1.k() + src2.k())
+                        {
+                            if (r < src2.nr() && c < src2.nc())
+                            {
+                                float src_value = tensor_read_cpu(src2, i, k - src1.k(), r, c);
+                                DLIB_TEST(src_value == dest_value);
+                            }
+                            else
+                            {
+                                DLIB_TEST(old_dest_value == dest_value);
+                            }
+                        }
+                        // third part is from src3
+                        else
+                        {
+                            if (r > 0 && c > 0 && r + 1 < src3.nr() && c + 1 < src3.nc())
+                            {
+                                float src_value = tensor_read_cpu(src3, i, k - src1.k() - src2.k() + 3, r, c);
+                                DLIB_TEST(src_value == dest_value);
+                            }
+                            else {
+                                DLIB_TEST(old_dest_value == dest_value);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    void test_copy_tensor_slice_add_to_cpu()
+    {
+        using namespace dlib::tt;
+        print_spinner();
+        resizable_tensor dest(10, 9, 7, 15);
+        resizable_tensor src1(10, 3, 7, 15);
+        resizable_tensor src2(10, 3, 6, 12);
+        resizable_tensor src3(10, 9, 7, 15);
+        tt::tensor_rand rnd;
+        rnd.fill_gaussian(dest);
+        rnd.fill_gaussian(src1);
+        rnd.fill_gaussian(src2);
+        rnd.fill_gaussian(src3);
+
+        const resizable_tensor old_dest = dest;
+
+        cpu::copy_tensor(true, dest, 0, 0, 0, src1, 0, 0, 0, src1.k(), src1.nr(), src1.nc()); //full copy src1->dest
+        cpu::copy_tensor(true, dest, src1.k(), 0, 0, src2, 0, 0, 0, src2.k(), src2.nr(), src2.nc()); //full copy src2->dest with offset of src1
+        cpu::copy_tensor(true, dest, src1.k() + src2.k(), 1, 1, src3, 3, 1, 1, 3, src3.nr()-2, src3.nc()-2); //partial copy src3 into the rest place of dest
+
+        for (long i = 0; i < dest.num_samples(); ++i)
+        {
+            for (long k = 0; k < dest.k(); ++k)
+            {
+                for (long r = 0; r < dest.nr(); ++r)
+                {
+                    for (long c = 0; c < dest.nc(); ++c)
+                    {
+                        float old_dest_value = tensor_read_cpu(old_dest, i, k, r, c);
+                        float dest_value = tensor_read_cpu(dest, i, k, r, c);
+                        // first part is from src1
+                        if (k < src1.k())
+                        {
+                            float src_value = tensor_read_cpu(src1, i, k, r, c)+old_dest_value;
+                            DLIB_TEST(std::abs(src_value - dest_value) < 1e-6);
+                        }
+                        // second part is from src2
+                        else if (k < src1.k() + src2.k())
+                        {
+                            if (r < src2.nr() && c < src2.nc())
+                            {
+                                float src_value = tensor_read_cpu(src2, i, k - src1.k(), r, c)+old_dest_value;
+                                DLIB_TEST(std::abs(src_value - dest_value) < 1e-6);
+                            }
+                            else
+                            {
+                                DLIB_TEST(old_dest_value == dest_value);
+                            }
+                        }
+                        // third part is from src3
+                        else
+                        {
+                            if (r > 0 && c > 0 && r + 1 < src3.nr() && c + 1 < src3.nc())
+                            {
+                                float src_value = tensor_read_cpu(src3, i, k - src1.k() - src2.k() + 3, r, c)+old_dest_value;
+                                DLIB_TEST(std::abs(src_value - dest_value) < 1e-6);
+                            }
+                            else
+                            {
+                                DLIB_TEST(old_dest_value == dest_value);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 #ifdef DLIB_USE_CUDA
     void test_copy_tensor_gpu()
     {
@@ -2850,6 +3002,140 @@ void test_embeddings()
                         {
                             float src_value = tensor_read_cpu(src3, i, k - src1.k() - src2.k() + 3, r, c)+old_dest_value;
                             DLIB_TEST(std::abs(src_value - dest_value) < 1e-6);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    void test_copy_tensor_slice_gpu()
+    {
+        using namespace dlib::tt;
+        print_spinner();
+        resizable_tensor dest(10, 9, 7, 15);
+        resizable_tensor src1(10, 3, 7, 15);
+        resizable_tensor src2(10, 3, 6, 12);
+        resizable_tensor src3(10, 9, 7, 15);
+        tt::tensor_rand rnd;
+        rnd.fill_gaussian(dest);
+        rnd.fill_gaussian(src1);
+        rnd.fill_gaussian(src2);
+        rnd.fill_gaussian(src3);
+
+        const resizable_tensor old_dest = dest;
+
+        cuda::copy_tensor(false, dest, 0, 0, 0, src1, 0, 0, 0, src1.k(), src1.nr(), src1.nc()); //full copy src1->dest
+        cuda::copy_tensor(false, dest, src1.k(), 0, 0, src2, 0, 0, 0, src2.k(), src2.nr(), src2.nc()); //full copy src2->dest with offset of src1
+        cuda::copy_tensor(false, dest, src1.k() + src2.k(), 1, 1, src3, 3, 1, 1, 3, src3.nr()-2, src3.nc()-2); //partial copy src3 into the rest place of dest
+
+
+        for (long i = 0; i < dest.num_samples(); ++i)
+        {
+            for (long k = 0; k < dest.k(); ++k)
+            {
+                for (long r = 0; r < dest.nr(); ++r)
+                {
+                    for (long c = 0; c < dest.nc(); ++c)
+                    {
+                        float old_dest_value = tensor_read_cpu(old_dest, i, k, r, c);
+                        float dest_value = tensor_read_cpu(dest, i, k, r, c);
+                        // first part is from src1
+                        if (k < src1.k())
+                        {
+                            float src_value = tensor_read_cpu(src1, i, k, r, c);
+                            DLIB_TEST(src_value == dest_value);
+                        }
+                        // second part is from src2
+                        else if (k < src1.k() + src2.k())
+                        {
+                            if (r < src2.nr() && c < src2.nc())
+                            {
+                                float src_value = tensor_read_cpu(src2, i, k - src1.k(), r, c);
+                                DLIB_TEST(src_value == dest_value);
+                            }
+                            else
+                            {
+                                DLIB_TEST(old_dest_value == dest_value);
+                            }
+                        }
+                        // third part is from src3
+                        else
+                        {
+                            if (r > 0 && c > 0 && r + 1 < src3.nr() && c + 1 < src3.nc())
+                            {
+                                float src_value = tensor_read_cpu(src3, i, k - src1.k() - src2.k() + 3, r, c);
+                                DLIB_TEST(src_value == dest_value);
+                            }
+                            else {
+                                DLIB_TEST(old_dest_value == dest_value);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    void test_copy_tensor_slice_add_to_gpu()
+    {
+        using namespace dlib::tt;
+        print_spinner();
+        resizable_tensor dest(10, 9, 7, 15);
+        resizable_tensor src1(10, 3, 7, 15);
+        resizable_tensor src2(10, 3, 6, 12);
+        resizable_tensor src3(10, 9, 7, 15);
+        tt::tensor_rand rnd;
+        rnd.fill_gaussian(dest);
+        rnd.fill_gaussian(src1);
+        rnd.fill_gaussian(src2);
+        rnd.fill_gaussian(src3);
+
+        const resizable_tensor old_dest = dest;
+
+        cuda::copy_tensor(true, dest, 0, 0, 0, src1, 0, 0, 0, src1.k(), src1.nr(), src1.nc()); //full copy src1->dest
+        cuda::copy_tensor(true, dest, src1.k(), 0, 0, src2, 0, 0, 0, src2.k(), src2.nr(), src2.nc()); //full copy src2->dest with offset of src1
+        cuda::copy_tensor(true, dest, src1.k() + src2.k(), 1, 1, src3, 3, 1, 1, 3, src3.nr()-2, src3.nc()-2); //partial copy src3 into the rest place of dest
+
+        for (long i = 0; i < dest.num_samples(); ++i)
+        {
+            for (long k = 0; k < dest.k(); ++k)
+            {
+                for (long r = 0; r < dest.nr(); ++r)
+                {
+                    for (long c = 0; c < dest.nc(); ++c)
+                    {
+                        float old_dest_value = tensor_read_cpu(old_dest, i, k, r, c);
+                        float dest_value = tensor_read_cpu(dest, i, k, r, c);
+                        // first part is from src1
+                        if (k < src1.k())
+                        {
+                            float src_value = tensor_read_cpu(src1, i, k, r, c)+old_dest_value;
+                            DLIB_TEST(std::abs(src_value - dest_value) < 1e-6);
+                        }
+                        // second part is from src2
+                        else if (k < src1.k() + src2.k())
+                        {
+                            if (r < src2.nr() && c < src2.nc())
+                            {
+                                float src_value = tensor_read_cpu(src2, i, k - src1.k(), r, c)+old_dest_value;
+                                DLIB_TEST(std::abs(src_value - dest_value) < 1e-6);
+                            }
+                            else
+                            {
+                                DLIB_TEST(old_dest_value == dest_value);
+                            }
+                        }
+                        // third part is from src3
+                        else
+                        {
+                            if (r > 0 && c > 0 && r + 1 < src3.nr() && c + 1 < src3.nc())
+                            {
+                                float src_value = tensor_read_cpu(src3, i, k - src1.k() - src2.k() + 3, r, c)+old_dest_value;
+                                DLIB_TEST(std::abs(src_value - dest_value) < 1e-6);
+                            }
+                            else
+                            {
+                                DLIB_TEST(old_dest_value == dest_value);
+                            }
                         }
                     }
                 }
@@ -4756,6 +5042,8 @@ void test_multm_prev()
             compare_adam();
             test_copy_tensor_gpu();
             test_copy_tensor_add_to_gpu();
+            test_copy_tensor_gpu();
+            test_copy_tensor_add_to_gpu();
             test_scale_channels();
 #endif
             test_tensor_resize_bilinear(2, 3, 6,6, 11, 11);
@@ -4810,6 +5098,8 @@ void test_multm_prev()
             test_visit_functions();
             test_copy_tensor_cpu();
             test_copy_tensor_add_to_cpu();
+            test_copy_tensor_slice_cpu();
+            test_copy_tensor_slice_add_to_cpu();
             test_concat();
             test_multm_prev();
             test_simple_linear_regression();

@@ -2623,6 +2623,77 @@ namespace dlib
             }
         }
 
+        __global__ void _cuda_copy_strided_tensor_add_to (float* dest, const float* src, 
+                                                        size_t ns, size_t nk, size_t nr, size_t nc,
+                                                        size_t dk, size_t dr, size_t dc,
+                                                        size_t sk, size_t sr, size_t sc)
+        {
+            for(auto i : grid_stride_range(0, ns*nk*nr*nc)) 
+            {
+                size_t n,k,r,c;
+                unpack_idx(i, nk,nr,nc, n,k,r,c);
+                dest[pack_idx(dk,dr,dc, n,k,r,c)] += src[pack_idx(sk,sr,sc, n,k,r,c)];
+            }
+        }
+
+        __global__ void _cuda_copy_strided_tensor (float* dest, const float* src,
+                                                   size_t ns, size_t nk, size_t nr, size_t nc,
+                                                   size_t dk, size_t dr, size_t dc,
+                                                   size_t sk, size_t sr, size_t sc)
+        {
+            for(auto i : grid_stride_range(0, ns*nk*nr*nc)) 
+            {
+                size_t n,k,r,c;
+                unpack_idx(i, nk,nr,nc, n,k,r,c);
+                dest[pack_idx(dk,dr,dc, n,k,r,c)] = src[pack_idx(sk,sr,sc, n,k,r,c)];
+            }
+        }
+
+       void copy_tensor(
+            bool add_to,
+            tensor& dest,
+            size_t dk, size_t dnr, size_t dnc,
+            const tensor& src,
+            size_t sk, size_t snr, size_t snc,
+            size_t k, size_t nr, size_t nc
+        )
+        {
+
+            DLIB_CASSERT(dest.num_samples() == src.num_samples(), "All sources should fit into dest tensor size");
+            DLIB_CASSERT(dest.k() - dk >= k &&
+                dest.nr() - dnr >= nr &&
+                dest.nc() - dnc >= nc, "Not enough space in dest tensor");
+            DLIB_CASSERT(src.k() - sk >= k &&
+                src.nr() - snr >= nr &&
+                src.nc() - snc >= nc, "Not enough space in src tensor");
+
+            float* dest_p = dest.device() + dk * static_cast<size_t>(dest.nc() * dest.nr()) \
+                                          + dnr * static_cast<size_t>(dest.nc()) \
+                                          + dnc;
+
+            const float* src_p = src.device() + sk * static_cast<size_t>(src.nc() * src.nr()) \
+                                              + snr * static_cast<size_t>(src.nc()) \
+                                              + snc;
+
+            if (add_to)
+            {
+                launch_kernel(_cuda_copy_strided_tensor_add_to, max_jobs(dest.size()), 
+                              dest_p, src_p, dest.num_samples(),
+                              k, nr, nc,
+                              dest.k(), dest.nr(), dest.nc(),
+                              src.k(), src.nr(), src.nc());
+            }
+            else
+            {
+                launch_kernel(_cuda_copy_strided_tensor, max_jobs(dest.size()), 
+                              dest_p, src_p, dest.num_samples(),
+                              k, nr, nc,
+                              dest.k(), dest.nr(), dest.nc(),
+                              src.k(), src.nr(), src.nc());
+            }
+        }
+
+
     // ----------------------------------------------------------------------------------------
 
         __global__ void _cuda_transpose(size_t dsize, size_t dk, size_t dnr, size_t dnc, float* d,

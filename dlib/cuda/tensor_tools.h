@@ -2336,6 +2336,38 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void copy_tensor(
+        bool add_to,
+        tensor& dest,
+        size_t dk, size_t dnr, size_t dnc,
+        const tensor& src,
+        size_t sk, size_t snr, size_t snc,
+        size_t k, size_t nr, size_t nc
+    );
+    /*!
+        requires
+            - dest.num_samples() == src.num_samples()
+            - dest.k() - dk >= k
+            - dest.nr() - dnr >= nr
+            - dest.nc() - dnc >= nc
+            - src.k() - sk >= k
+            - src.nr() - snr >= nr
+            - src.nc() - snc >= nc
+            - is_same_object(dest,src) == false
+            - The memory areas of src and dest do not overlap.
+        ensures
+            - if (add_to) then
+                - performs: dest[i, j + dk, r + dnr, c + dnc] += src[i, j + sk, r + snr, c + snc], where j in [0..k],
+                  r in [0..nr] and c in [0..nc]
+                  i.e., adds content of each sample from src in to corresponding place of sample at dest.
+            - else
+                - performs: dest[i, j + dk, r + dnr, c + dnc]  = src[i, j + sk, r + snr, c +snc], where j in [0..k],
+                  r in [0..nr] and c in [0..nc]
+                  i.e., copies content of each sample from src in to corresponding place of sample at dest.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     void transpose(
         bool add_to,
         tensor& dest,

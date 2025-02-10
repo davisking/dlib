@@ -3107,6 +3107,76 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        void copy_tensor(
+            bool add_to,
+            tensor& dest,
+            size_t dk, size_t dnr, size_t dnc,
+            const tensor& src,
+            size_t sk, size_t snr, size_t snc,
+            size_t k, size_t nr, size_t nc
+        )
+        {
+            size_t dest_stride_sample = static_cast<size_t>(dest.nc() * dest.nr() * dest.k());
+            size_t dest_stride_k      = static_cast<size_t>(dest.nc() * dest.nr());
+            size_t dest_stride_nr     = static_cast<size_t>(dest.nc());
+
+            size_t src_stride_sample = static_cast<size_t>(src.nc() * src.nr() * src.k());
+            size_t src_stride_k      = static_cast<size_t>(src.nc() * src.nr());
+            size_t src_stride_nr     = static_cast<size_t>(src.nc());
+
+            DLIB_CASSERT(dest.num_samples() == src.num_samples(), "All sources should fit into dest tensor size");
+            DLIB_CASSERT(dest.k() - dk >= k &&
+                dest.nr() - dnr >= nr &&
+                dest.nc() - dnc >= nc, "Not enough space in dest tensor");
+            DLIB_CASSERT(src.k() - sk >= k &&
+                src.nr() - snr >= nr &&
+                src.nc() - snc >= nc, "Not enough space in src tensor");
+
+            float* dest_p = dest.host() + dk * dest_stride_k \
+                                        + dnr * dest_stride_nr \
+                                        + dnc;
+
+            const float* src_p = src.host() + sk * src_stride_k \
+                                            + snr * src_stride_nr \
+                                            + snc;
+
+            for (long i = 0; i < src.num_samples(); ++i)
+            {
+                float* dest_channel_p = dest_p;
+                const float* src_channel_p = src_p;
+
+                for (long j = 0; j < k; ++j)
+                {
+                    float* dest_row_p = dest_channel_p;
+                    const float* src_row_p = src_channel_p;
+
+                    for (long r = 0; r < nr; ++r)
+                    {
+                        if (add_to)
+                        {
+                            for (size_t c = 0; c < nc; ++c)
+                                dest_row_p[c] += src_row_p[c];
+                        }
+                        else
+                        {
+                            ::memcpy(dest_row_p, src_row_p, nc * sizeof(float));
+                        }
+
+                        dest_row_p += dest_stride_nr;
+                        src_row_p += src_stride_nr;
+                    }
+
+                    dest_channel_p += dest_stride_k;
+                    src_channel_p += src_stride_k;
+                }
+
+                dest_p += dest_stride_sample;
+                src_p  += src_stride_sample;
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+
         void transpose(
             bool add,
             tensor& dest,
