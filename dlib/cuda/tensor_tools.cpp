@@ -1335,6 +1335,24 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void copy_tensor(
+        bool add_to,
+        tensor& dest,
+        size_t dk, size_t dnr, size_t dnc,
+        const tensor& src,
+        size_t sk, size_t snr, size_t snc,
+        size_t k, size_t nr, size_t nc
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::copy_tensor(add_to, dest, dk, dnr, dnc , src, sk, snr, snc, k, nr, nc);
+#else
+        cpu::copy_tensor(add_to, dest, dk, dnr, dnc, src, sk, snr, snc, k, nr, nc);
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void inv::
     operator() (
         const tensor& m,
