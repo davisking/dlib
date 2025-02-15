@@ -1,4 +1,4 @@
-// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+﻿// Copyright (C) 2005  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 
@@ -350,9 +350,59 @@ namespace
 
     }
 
+    template <
+        typename bpe_tok
+    >
+    void bpe_tokenizer_test(
+    )
+        /*!
+            requires
+                - bpe_tok is an implementation of bpe_tokenizer.h
+            ensures
+                - runs tests on bpe_tok for compliance with the specs
+        !*/
+    {
+        print_spinner();
 
+        bpe_tok test;
 
+        std::string training_text = R"(
+        Byte Pair Encoding (BPE) is a subword tokenization algorithm widely used in Natural Language Processing (NLP).
+        It iteratively merges the most frequent pairs of bytes or characters to form a vocabulary of subword units.
+        This approach is particularly useful for handling out-of-vocabulary words and reducing the size of the vocabulary
+        while maintaining the ability to represent any text. BPE was introduced in the paper "Neural Machine Translation
+        of Rare Words with Subword Units" by Sennrich et al. in 2016. The algorithm is simple yet effective and has been
+        adopted in many state-of-the-art NLP models, including GPT and BERT.
+        )";
 
+        test.train(training_text, 300, true);
+
+        std::ofstream out_file("bpe_tokenizer_model.dat", std::ios::binary);
+        serialize(test, out_file);
+        out_file.close();
+
+        bpe_tok loaded_test;
+        std::ifstream in_file("bpe_tokenizer_model.dat", std::ios::binary);
+        deserialize(loaded_test, in_file);
+        in_file.close();
+
+        std::vector<std::string> test_strings = {
+            u8"\nThis is a test of the tokenisation process...\nimplemented in the Dlib library!\n", // English
+            u8"Ceci est un test du processus de\ntokenisation implémenté dans\nla bibliothèque Dlib!", // French
+            u8"Dette er en test af tokeniseringsprocessen implementeret i Dlib-biblioteket!", // Danish
+            u8"这是对Dlib库中实现的标记化过程的测试！" // Chinese
+        };
+
+        for (const auto& text : test_strings) {
+            std::vector<int> encoded = loaded_test.encode(text);
+            std::string decoded = loaded_test.decode(encoded);
+
+            std::cout << "Original: " << text << "\n";
+            std::cout << "Encoded: ";
+            for (int id : encoded) std::cout << id << " ";
+            std::cout << "\nDecoded: " << decoded << "\n----------------------------------------\n";
+        }
+    }
 
     class tokenizer_tester : public tester
     {
@@ -370,9 +420,9 @@ namespace
             tokenizer_kernel_test<tokenizer::kernel_1a>  ();
             dlog << LINFO << "testing kernel_1a_c";
             tokenizer_kernel_test<tokenizer::kernel_1a_c>();
+            dlog << LINFO << "testing bpe_tokenizer";
+            bpe_tokenizer_test<bpe_tokenizer>();
         }
     } a;
 
 }
-
-

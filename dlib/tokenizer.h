@@ -5,7 +5,7 @@
 
 #include "tokenizer/tokenizer_kernel_1.h"
 #include "tokenizer/tokenizer_kernel_c.h"
-
+#include "tokenizer/bpe_tokenizer.h"
 
 namespace dlib
 {
