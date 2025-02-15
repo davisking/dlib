@@ -191,7 +191,6 @@ namespace dlib
                 // Merge pairs in order of their merge priority
                 while (!pq.empty()) {
                     const auto& top_element = pq.top();
-                    int merge_order = top_element.first;
                     const std::pair<int, int>& pair = top_element.second;
                     pq.pop();
 
@@ -239,7 +238,7 @@ namespace dlib
         std::string decode(const std::vector<int>& ids, bool display_special_tokens = true)
         {
             std::vector<uint8_t> bytes;
-            size_t vocab_size = get_vocab_size();
+            int vocab_size = static_cast<int>(get_vocab_size());
             for (int id : ids)
             {
                 if (id < vocab_size)
@@ -271,7 +270,7 @@ namespace dlib
             int nb_merges = tok.merges.size();
             dlib::serialize(nb_merges, out);
             for (int idx = (BASE_VOCAB_SIZE + (int)tok.special_tokens.size());
-                    idx < (tok.vocab_size + tok.special_tokens.size()); ++idx)
+                    idx < (tok.vocab_size + (int)tok.special_tokens.size()); ++idx)
             {
                 for (const auto& merge_pair : tok.merges)
                 {
