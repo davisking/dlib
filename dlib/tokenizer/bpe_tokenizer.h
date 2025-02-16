@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <string>
 #include <vector>
+#include <future>
 #include <mutex>
 #include <thread>
 #include <map>
@@ -148,6 +149,7 @@ namespace dlib
         std::vector<int> encode(const std::string& text)
         {
             std::vector<int> result_ids;
+            std::mutex result_mutex;
 
             // Split the text into paragraphs based on newline characters
             std::vector<std::string> paragraphs;
@@ -164,67 +166,70 @@ namespace dlib
                 if (!paragraph.empty()) paragraphs.push_back(paragraph);
             }
 
-            // Encode each paragraph separately
-            int sot_tok = get_special_token_id("<text>");
-            int eot_tok = get_special_token_id("</text>");
-            for (const auto& paragraph : paragraphs)
-            {
-                // Add the <text> token at the beginning of each paragraph
-                result_ids.push_back(sot_tok);
-
-                // Convert the paragraph to byte IDs
+            // Function to encode a single paragraph
+            auto encode_paragraph = [this](const std::string& paragraph) -> std::vector<int> {
                 std::vector<int> ids;
                 ids.reserve(paragraph.size());
                 for (char c : paragraph) ids.push_back(static_cast<uint8_t>(c));
 
-                // Precompute valid pairs and their merge order
                 auto stats = get_stats(ids);
                 std::priority_queue<std::pair<int, std::pair<int, int>>> pq;
-
-                // Initialize the priority queue with valid pairs
-                for (const auto& stat : stats)
-                {
+                for (const auto& stat : stats) {
                     const std::pair<int, int>& pair = stat.first;
                     if (merges.count(pair)) pq.push({ merges.at(pair), pair });
                 }
 
-                // Merge pairs in order of their merge priority
                 while (!pq.empty()) {
                     const auto& top_element = pq.top();
                     const std::pair<int, int>& pair = top_element.second;
                     pq.pop();
 
-                    // Check if the pair still exists in the current ids sequence
                     bool pair_found = false;
                     for (size_t i = 0; i < ids.size() - 1; ++i) {
-                        if (ids[i] == pair.first && ids[i + 1] == pair.second)
-                        {
+                        if (ids[i] == pair.first && ids[i + 1] == pair.second) {
                             pair_found = true;
                             break;
                         }
                     }
                     if (!pair_found) continue;
 
-                    // Merge the pair
                     int idx = merges.at(pair);
                     ids = merge(ids, pair, idx);
 
-                    // Update statistics and priority queue with new pairs formed after merging
                     stats = get_stats(ids);
-                    for (const auto& stat : stats)
-                    {
+                    for (const auto& stat : stats) {
                         const std::pair<int, int>& new_pair = stat.first;
                         if (merges.count(new_pair)) pq.push({ merges.at(new_pair), new_pair });
                     }
                 }
 
-                // Append the encoded paragraph to the result
-                result_ids.insert(result_ids.end(), ids.begin(), ids.end());
+                return ids;
+            };
 
-                // Add the </text> token at the end of each paragraph
+            // Special case: if there's only one paragraph, no need for threads
+            int sot_tok = get_special_token_id("<text>");
+            int eot_tok = get_special_token_id("</text>");
+            if (paragraphs.size() == 1) {
+                std::vector<int> paragraph_ids = encode_paragraph(paragraphs[0]);
+                result_ids.push_back(sot_tok);
+                result_ids.insert(result_ids.end(), paragraph_ids.begin(), paragraph_ids.end());
                 result_ids.push_back(eot_tok);
+                return result_ids;
             }
 
+            // Launch encoding tasks in parallel for multiple paragraphs
+            std::vector<std::future<std::vector<int>>> futures;
+            for (const auto& paragraph : paragraphs)
+                futures.push_back(std::async(std::launch::async, encode_paragraph, paragraph));
+
+            // Collect results in order
+            for (auto& future : futures) {
+                std::vector<int> paragraph_ids = future.get();
+                std::lock_guard<std::mutex> lock(result_mutex);
+                result_ids.push_back(sot_tok);
+                result_ids.insert(result_ids.end(), paragraph_ids.begin(), paragraph_ids.end());
+                result_ids.push_back(eot_tok);
+            }
             return result_ids;
         }
 
