@@ -1383,9 +1383,11 @@ namespace dlib { namespace tt
         void clear(
         )
         {
+#ifdef DLIB_USE_CUDA
             if (use_cuda())
                 cuda_impl.clear();
             else
+#endif
                 cpu_impl.clear();
         }
 
