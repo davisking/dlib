@@ -58,7 +58,9 @@ namespace dlib
         bool flag
     )
     {
+#ifdef DLIB_USE_CUDA
         use_cuda_impl() = flag;
+#endif
     }
 }
 
