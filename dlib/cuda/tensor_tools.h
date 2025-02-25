@@ -20,6 +20,9 @@ namespace dlib
     bool dnn_prefer_fastest_algorithms();
     void set_dnn_prefer_fastest_algorithms();
     void set_dnn_prefer_smallest_algorithms();
+
+    bool use_cuda();
+    void set_use_cuda(bool flag);
 }
 
 namespace dlib { namespace tt
@@ -292,10 +295,9 @@ namespace dlib { namespace tt
         !*/
 
 #ifdef DLIB_USE_CUDA
-        cuda::curand_generator rnd;
-#else
-        dlib::rand rnd;
+        cuda::curand_generator cuda_impl;
 #endif
+        dlib::rand cpu_impl;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -1074,14 +1076,30 @@ namespace dlib { namespace tt
         tensor_conv() {}
 
         void clear(
-        ) { impl.clear(); }
+        )
+        {
+#ifdef DLIB_USE_CUDA
+            if (use_cuda())
+                cuda_impl.clear();
+            else
+#endif
+                cpu_impl.clear();
+        }
 
         void operator() (
             const bool add_to_output,
             tensor& output,
             const tensor& data,
             const tensor& filters
-        ) { impl(add_to_output,output,data,filters); }
+        )
+        {
+#ifdef DLIB_USE_CUDA
+            if (use_cuda())
+                cuda_impl(add_to_output,output,data,filters);
+            else
+#endif
+                cpu_impl(add_to_output,output,data,filters);
+        }
         /*!
             requires
                 - setup() has been called.  Specifically, setup() has been called like this:
@@ -1107,7 +1125,15 @@ namespace dlib { namespace tt
             resizable_tensor& output,
             const tensor& data,
             const tensor& filters
-        ) { impl(add_to_output,output,data,filters); }
+        )
+        {
+#ifdef DLIB_USE_CUDA
+            if (use_cuda())
+                cuda_impl(add_to_output,output,data,filters);
+            else
+#endif
+                cpu_impl(add_to_output,output,data,filters);
+        }
         /*!
             requires
                 - setup() has been called.  Specifically, setup() has been called like this:
@@ -1135,7 +1161,15 @@ namespace dlib { namespace tt
             const tensor& filters,
             const tensor& biases,
             bool use_relu
-        ) { impl(add_to_output,output,data,filters,biases,use_relu); }
+        )
+        {
+#ifdef DLIB_USE_CUDA
+            if (use_cuda())
+                cuda_impl(add_to_output,output,data,filters,biases,use_relu);
+            else
+#endif
+                cpu_impl(add_to_output,output,data,filters,biases,use_relu);
+        }
         /*!
             requires
                 - setup() has been called.  Specifically, setup() has been called like this:
@@ -1167,7 +1201,15 @@ namespace dlib { namespace tt
             const tensor& filters,
             const tensor& biases,
             bool use_relu
-        ) { impl(add_to_output,output,data,filters,biases,use_relu); }
+        )
+        {
+#ifdef DLIB_USE_CUDA
+            if (use_cuda())
+                cuda_impl(add_to_output,output,data,filters,biases,use_relu);
+            else
+#endif
+                cpu_impl(add_to_output,output,data,filters,biases,use_relu);
+        }
         /*!
             requires
                 - setup() has been called.  Specifically, setup() has been called like this:
@@ -1195,7 +1237,15 @@ namespace dlib { namespace tt
             const tensor& gradient_input, 
             const tensor& filters,
             tensor& data_gradient
-        ) { impl.get_gradient_for_data(add_to_output,gradient_input,filters,data_gradient); }
+        )
+        {
+#ifdef DLIB_USE_CUDA
+            if (use_cuda())
+                cuda_impl.get_gradient_for_data(add_to_output,gradient_input,filters,data_gradient);
+            else
+#endif
+                cpu_impl.get_gradient_for_data(add_to_output,gradient_input,filters,data_gradient);
+        }
         /*!
             requires
                 - One of the following must be true:
@@ -1230,7 +1280,15 @@ namespace dlib { namespace tt
             const tensor& gradient_input, 
             const tensor& data,
             tensor& filters_gradient
-        ) { impl.get_gradient_for_filters(add_to_output,gradient_input,data,filters_gradient); }
+        )
+        {
+#ifdef DLIB_USE_CUDA
+            if (use_cuda())
+                cuda_impl.get_gradient_for_filters(add_to_output,gradient_input,data,filters_gradient);
+            else
+#endif
+                cpu_impl.get_gradient_for_filters(add_to_output,gradient_input,data,filters_gradient);
+        }
         /*!
             requires
                 - One of the following must be true:
@@ -1268,7 +1326,15 @@ namespace dlib { namespace tt
             int stride_x,
             int padding_y,
             int padding_x
-        ) {impl.setup(data,filters,stride_y,stride_x,padding_y,padding_x); }
+        )
+        {
+#ifdef DLIB_USE_CUDA
+            if (use_cuda())
+                cuda_impl.setup(data,filters,stride_y,stride_x,padding_y,padding_x);
+            else
+#endif
+                cpu_impl.setup(data,filters,stride_y,stride_x,padding_y,padding_x);
+        }
         /*!
             requires
                 - filters.k() == data.k()
@@ -1292,11 +1358,9 @@ namespace dlib { namespace tt
 
     private:
 #ifdef DLIB_USE_CUDA
-        cuda::tensor_conv impl;
-#else
-        cpu::tensor_conv impl;
+        cuda::tensor_conv cuda_impl;
 #endif
-
+        cpu::tensor_conv cpu_impl;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -1317,7 +1381,13 @@ namespace dlib { namespace tt
         ) = default;
 
         void clear(
-        ) { impl.clear(); }
+        )
+        {
+            if (use_cuda())
+                cuda_impl.clear();
+            else
+                cpu_impl.clear();
+        }
 
         void setup_max_pooling(
             int window_height,
@@ -1326,7 +1396,15 @@ namespace dlib { namespace tt
             int stride_x,
             int padding_y,
             int padding_x
-        ) { impl.setup_max_pooling(window_height, window_width, stride_y, stride_x, padding_y, padding_x); }
+        )
+        {
+#ifdef DLIB_USE_CUDA
+            if (use_cuda())
+                cuda_impl.setup_max_pooling(window_height, window_width, stride_y, stride_x, padding_y, padding_x);
+            else
+#endif
+                cpu_impl.setup_max_pooling(window_height, window_width, stride_y, stride_x, padding_y, padding_x);
+        }
         /*!
             requires
                 - window_height > 0
@@ -1347,7 +1425,15 @@ namespace dlib { namespace tt
             int stride_x,
             int padding_y,
             int padding_x
-        ) { impl.setup_avg_pooling(window_height, window_width, stride_y, stride_x, padding_y, padding_x); }
+        )
+        {
+#ifdef DLIB_USE_CUDA
+            if (use_cuda())
+                cuda_impl.setup_avg_pooling(window_height, window_width, stride_y, stride_x, padding_y, padding_x);
+            else
+#endif
+                cpu_impl.setup_avg_pooling(window_height, window_width, stride_y, stride_x, padding_y, padding_x);
+        }
         /*!
             requires
                 - window_height > 0
@@ -1362,12 +1448,26 @@ namespace dlib { namespace tt
         !*/
 
         bool does_max_pooling(
-        ) const { return impl.does_max_pooling(); }
+        ) const
+        {
+#ifdef DLIB_USE_CUDA
+            if (use_cuda())
+                return cuda_impl.does_max_pooling();
+            else
+#endif
+                return cpu_impl.does_max_pooling();
+        }
 
         void operator() (
             resizable_tensor& dest,
             const tensor& src
-        ) { impl(dest, src); }
+        )
+        {
+            if (use_cuda())
+                cuda_impl(dest, src);
+            else
+                cpu_impl(dest, src);
+        }
         /*!
             requires
                 - is_same_object(dest,src) == false
@@ -1395,7 +1495,15 @@ namespace dlib { namespace tt
             const tensor& dest,
             const tensor& src,
             tensor& grad 
-        ) { impl.get_gradient(gradient_input, dest, src, grad); }
+        )
+        {
+#ifdef DLIB_USE_CUDA
+            if (use_cuda())
+                cuda_impl.get_gradient(gradient_input, dest, src, grad);
+            else
+#endif
+                cpu_impl.get_gradient(gradient_input, dest, src, grad);
+        }
         /*!
             requires
                 - have_same_dimensions(gradient_input,dest) == true
@@ -1413,10 +1521,9 @@ namespace dlib { namespace tt
 
         private:
 #ifdef DLIB_USE_CUDA
-        cuda::pooling impl;
-#else
-        cpu::pooling impl;
+        cuda::pooling cuda_impl;
 #endif
+        cpu::pooling cpu_impl;
     };
 
 // ----------------------------------------------------------------------------------------
