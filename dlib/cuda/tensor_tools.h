@@ -1465,9 +1465,11 @@ namespace dlib { namespace tt
             const tensor& src
         )
         {
+#ifdef DLIB_USE_CUDA
             if (use_cuda())
                 cuda_impl(dest, src);
             else
+#endif
                 cpu_impl(dest, src);
         }
         /*!
