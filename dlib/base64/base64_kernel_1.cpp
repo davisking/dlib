@@ -175,7 +175,7 @@ namespace dlib
 
         unsigned char c1, c2, c3, c4, c5, c6;
 
-        int counter = 19;
+        size_t counter = 19;
 
         // while we haven't hit the end of the input stream
         while (status != 0)
