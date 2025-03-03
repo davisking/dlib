@@ -408,17 +408,17 @@ namespace
 
 
             dlog << LINFO << "testing sort_1a_c";
-            queue_sort_test<queue<int, mm>::sort_1a_c>  ();
+            queue_sort_test<dlib::queue<int, mm>::sort_1a_c>();
             dlog << LINFO << "testing sort_1a";
-            queue_sort_test<queue<int, mm>::sort_1a>();
+            queue_sort_test<dlib::queue<int, mm>::sort_1a>();
             dlog << LINFO << "testing sort_1b";
-            queue_sort_test<queue<int, mm>::sort_1b>  ();
+            queue_sort_test<dlib::queue<int, mm>::sort_1b>();
             dlog << LINFO << "testing sort_1b_c";
-            queue_sort_test<queue<int, mm>::sort_1b_c>();
+            queue_sort_test<dlib::queue<int, mm>::sort_1b_c>();
             dlog << LINFO << "testing sort_1c";
-            queue_sort_test<queue<int, mm>::sort_1c>  ();
+            queue_sort_test<dlib::queue<int, mm>::sort_1c>();
             dlog << LINFO << "testing sort_1c_c";
-            queue_sort_test<queue<int, mm>::sort_1c_c>();
+            queue_sort_test<dlib::queue<int, mm>::sort_1c_c>();
         }
     } a;
 
