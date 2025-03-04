@@ -4,6 +4,7 @@
 
 #include <string>
 #include <sstream>
+#include <regex>
 
 #include <dlib/tokenizer.h>
 #include "tester.h"
@@ -350,6 +351,14 @@ namespace
 
     }
 
+    string postprocess_decoded_text(const string& decoded) {
+        string result = decoded;
+        result = regex_replace(result, std::regex("<text>"), "");
+        result = regex_replace(result, std::regex("</text>"), "\n");
+        if (!result.empty() && result.back() == '\n') result.pop_back();
+        return result;
+    }
+
     template <
         typename bpe_tok
     >
@@ -385,7 +394,7 @@ namespace
         deserialize(loaded_test, in_stream);
 
         std::vector<std::string> test_strings = {
-            u8"\nThis is a test of the tokenisation process...\nimplemented in the Dlib library!\n", // English
+            u8"This is a test of the tokenisation process...\nimplemented in the Dlib library!", // English
             u8"Ceci est un test du processus de\ntokenisation implémenté dans\nla bibliothèque Dlib!", // French
             u8"Dette er en test af tokeniseringsprocessen implementeret i Dlib-biblioteket!", // Danish
             u8"这是对Dlib库中实现的标记化过程的测试！" // Chinese
@@ -393,12 +402,9 @@ namespace
 
         for (const auto& text : test_strings) {
             std::vector<int> encoded = loaded_test.encode(text);
-            std::string decoded = loaded_test.decode(encoded);
+            std::string decoded = postprocess_decoded_text(loaded_test.decode(encoded));
 
-            std::cout << "Original: " << text << "\n";
-            std::cout << "Encoded: ";
-            for (int id : encoded) std::cout << id << " ";
-            std::cout << "\nDecoded: " << decoded << "\n----------------------------------------\n";
+            DLIB_TEST_MSG(text == decoded, "decoded: " << decoded);
         }
     }
 
