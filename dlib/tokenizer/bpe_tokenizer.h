@@ -18,32 +18,6 @@
 namespace dlib
 {
 
-    /**
-     * @class bpe_tokenizer
-     * @brief A Byte Pair Encoding (BPE) tokenizer for text processing.
-     *
-     * This class implements a Byte Pair Encoding (BPE) tokenizer, which is a subword tokenization algorithm
-     * commonly used in natural language processing (NLP). The BPE algorithm iteratively merges the most frequent
-     * pairs of bytes or characters to form a vocabulary of subword units. This approach is particularly useful
-     * for handling out-of-vocabulary words and reducing the size of the vocabulary while maintaining the ability
-     * to represent any text.
-     *
-     * The tokenizer supports special tokens, which can be used to mark specific elements in the text (e.g.,
-     * `<text>`, `<url>`, `<image>`, etc.). These special tokens are treated as atomic units during tokenization
-     * and are not subject to further splitting.
-     *
-     * The class provides methods for training the tokenizer on a given text corpus, encoding text into subword
-     * tokens, and decoding tokens back into text. The tokenizer can be serialized and deserialized to/from a file,
-     * allowing for easy storage and reuse.
-     *
-     * The implementation is based on the original BPE algorithm described in:
-     * - Sennrich, R., Haddow, B., & Birch, A. (2016). Neural Machine Translation of Rare Words with Subword Units.
-     *   In Proceedings of the 54th Annual Meeting of the Association for Computational Linguistics (ACL 2016).
-     *
-     * @note The tokenizer is designed to work with UTF-8 encoded text and supports a maximum token length of 8 bytes.
-     *       This limit can be adjusted by modifying the `MAX_TOKEN_LENGTH` constant.
-     *
-     */
     class bpe_tokenizer
     {
     public:
