@@ -377,14 +377,12 @@ namespace
 
         test.train(training_text, 300, true);
 
-        std::ofstream out_file("bpe_tokenizer_model.dat", std::ios::binary);
-        serialize(test, out_file);
-        out_file.close();
+        std::ostringstream out_stream;
+        serialize(test, out_stream);
 
         bpe_tok loaded_test;
-        std::ifstream in_file("bpe_tokenizer_model.dat", std::ios::binary);
-        deserialize(loaded_test, in_file);
-        in_file.close();
+        std::istringstream in_stream(out_stream.str());
+        deserialize(loaded_test, in_stream);
 
         std::vector<std::string> test_strings = {
             u8"\nThis is a test of the tokenisation process...\nimplemented in the Dlib library!\n", // English
