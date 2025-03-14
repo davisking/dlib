@@ -1,13 +1,13 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
+#include <string>
 #include "opaque_types.h"
 #include <dlib/python.h>
 #include <dlib/matrix.h>
 #include <dlib/svm_threaded.h>
 
 using namespace dlib;
-using namespace std;
 namespace py = pybind11;
 
 typedef matrix<double,0,1> dense_vect; 
@@ -277,9 +277,9 @@ struct segmenter_params
 };
 
 
-string segmenter_params__str__(const segmenter_params& p)
+std::string segmenter_params__str__(const segmenter_params& p)
 {
-    ostringstream sout;
+    std::ostringstream sout;
     if (p.use_BIO_model)
         sout << "BIO,";
     else
@@ -307,9 +307,9 @@ string segmenter_params__str__(const segmenter_params& p)
     return trim(sout.str());
 }
 
-string segmenter_params__repr__(const segmenter_params& p)
+std::string segmenter_params__repr__(const segmenter_params& p)
 {
-    ostringstream sout;
+    std::ostringstream sout;
     sout << "<";
     sout << segmenter_params__str__(p);
     sout << ">";
