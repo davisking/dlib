@@ -5026,6 +5026,7 @@ void test_multm_prev()
 
             test_tagging();
 #ifdef DLIB_USE_CUDA
+            set_use_cuda(true);
             test_affine_rect();
             test_conv();
             test_more_ops2();
@@ -5046,6 +5047,7 @@ void test_multm_prev()
             test_copy_tensor_add_to_gpu();
             test_scale_channels();
 #endif
+            set_use_cuda(false);
             test_tensor_resize_bilinear(2, 3, 6,6, 11, 11);
             test_tensor_resize_bilinear(2, 3, 6,6, 3, 4);
             test_tensor_resize_bilinear(2, 3, 5,6, 12, 21);
