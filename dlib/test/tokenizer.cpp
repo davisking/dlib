@@ -1,9 +1,10 @@
-// Copyright (C) 2005  Davis E. King (davis@dlib.net)
+﻿// Copyright (C) 2005  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 
 #include <string>
 #include <sstream>
+#include <regex>
 
 #include <dlib/tokenizer.h>
 #include "tester.h"
@@ -350,9 +351,62 @@ namespace
 
     }
 
+    string postprocess_decoded_text(const string& decoded) {
+        string result = decoded;
+        result = regex_replace(result, std::regex("<text>"), "");
+        result = regex_replace(result, std::regex("</text>"), "\n");
+        if (!result.empty() && result.back() == '\n') result.pop_back();
+        return result;
+    }
 
+    template <
+        typename bpe_tok
+    >
+    void bpe_tokenizer_test(
+    )
+        /*!
+            requires
+                - bpe_tok is an implementation of bpe_tokenizer.h
+            ensures
+                - runs tests on bpe_tok for compliance with the specs
+        !*/
+    {
+        print_spinner();
 
+        bpe_tok test;
 
+        std::string training_text = R"(
+        Byte Pair Encoding (BPE) is a subword tokenization algorithm widely used in Natural Language Processing (NLP).
+        It iteratively merges the most frequent pairs of bytes or characters to form a vocabulary of subword units.
+        This approach is particularly useful for handling out-of-vocabulary words and reducing the size of the vocabulary
+        while maintaining the ability to represent any text. BPE was introduced in the paper "Neural Machine Translation
+        of Rare Words with Subword Units" by Sennrich et al. in 2016. The algorithm is simple yet effective and has been
+        adopted in many state-of-the-art NLP models, including GPT and BERT.
+        )";
+
+        test.train(training_text, 300, true);
+
+        std::ostringstream out_stream;
+        serialize(test, out_stream);
+
+        bpe_tok loaded_test;
+        std::istringstream in_stream(out_stream.str());
+        deserialize(loaded_test, in_stream);
+
+        std::vector<std::string> test_strings = {
+            u8"This is a test of the tokenisation process...\nimplemented in the Dlib library!", // English
+            u8"Ceci est un test du processus de\ntokenisation implémenté dans\nla bibliothèque Dlib!", // French
+            u8"Dette er en test af tokeniseringsprocessen implementeret i Dlib-biblioteket!", // Danish
+            u8"这是对Dlib库中实现的标记化过程的测试！" // Chinese
+        };
+
+        for (const auto& text : test_strings) {
+            std::vector<int> encoded = loaded_test.encode(text);
+            std::string decoded = postprocess_decoded_text(loaded_test.decode(encoded));
+
+            DLIB_TEST_MSG(text == decoded, "decoded: " << decoded);
+        }
+    }
 
     class tokenizer_tester : public tester
     {
@@ -370,9 +424,9 @@ namespace
             tokenizer_kernel_test<tokenizer::kernel_1a>  ();
             dlog << LINFO << "testing kernel_1a_c";
             tokenizer_kernel_test<tokenizer::kernel_1a_c>();
+            dlog << LINFO << "testing bpe_tokenizer";
+            bpe_tokenizer_test<bpe_tokenizer>();
         }
     } a;
 
 }
-
-
