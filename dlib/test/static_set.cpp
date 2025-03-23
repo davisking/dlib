@@ -39,7 +39,7 @@ namespace
 
         srand(static_cast<unsigned int>(time(0)));
 
-        typedef queue<int>::kernel_2a_c queue_of_int;
+        typedef dlib::queue<int>::kernel_2a_c queue_of_int;
         typedef dlib::set<int>::kernel_1a_c set_of_int;
 
         queue_of_int q, qb, qc;
