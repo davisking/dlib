@@ -1,3 +1,5 @@
+// Copyright (C) 2025 Davis E. King (davis@dlib.net)
+// License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_BPE_TOKENIZER_H
 #define DLIB_BPE_TOKENIZER_H
 
@@ -14,6 +16,7 @@
 
 #include "../base64.h"
 #include "../serialize.h"
+#include "bpe_tokenizer_abstract.h"
 
 namespace dlib
 {
@@ -113,10 +116,9 @@ namespace dlib
                         << std::to_string(pair.first) << "," << std::to_string(pair.second) << ") -> " << std::to_string(idx)
                         << " (" << bytes_to_string(vocab[idx]) << ") had "
                         << std::to_string(stats[pair]) << " occurrences"
-                        << std::flush;
+                        << std::endl;
                 }
             }
-            std::cout << "\ntraining done\n";
         }
 
         // Encode the given text into subword tokens
@@ -243,65 +245,25 @@ namespace dlib
         // Save the tokenizer model and vocabulary to file
         friend void serialize(const bpe_tokenizer& tok, std::ostream& out)
         {
-            dlib::serialize("bpe_tokenizer_", out);
-            
-            //---
-            int nb_merges = tok.merges.size();
-            dlib::serialize(nb_merges, out);
-            for (int idx = (BASE_VOCAB_SIZE + (int)tok.special_tokens.size());
-                    idx < (tok.vocab_size + (int)tok.special_tokens.size()); ++idx)
-            {
-                for (const auto& merge_pair : tok.merges)
-                {
-                    if (merge_pair.second == idx)
-                    {
-                        dlib::serialize(merge_pair.first.first, out);
-                        dlib::serialize(merge_pair.first.second, out);
-                        break;
-                    }
-                }
-            }
-            
-            //---
-            int nb_vocab = (int)tok.vocab.size();
-            dlib::serialize(nb_vocab, out);
-            for (const auto& v : tok.vocab)
-            {
-                std::string token_str = tok.bytes_to_string(v.second);
-                dlib::serialize(token_str, out);
-                dlib::serialize(v.first, out);
-            }
+            serialize("bpe_tokenizer2_", out);
+            serialize(tok.special_tokens, out);
+            serialize(tok.special_token_map, out);
+            serialize(tok.merges, out);
+            serialize(tok.vocab, out);
+            serialize(tok.vocab_size, out);
         }
 
         // Load the tokenizer model and vocabulary from file
         friend void deserialize(bpe_tokenizer& tok, std::istream& in) {
             std::string version;
             dlib::deserialize(version, in);
-            if (version != "bpe_tokenizer_")
+            if (version != "bpe_tokenizer2_")
                 throw dlib::serialization_error("Unexpected version '" + version + "' found while deserializing dlib::bpe_tokenizer_.");
-            
-            //---
-            int idx = BASE_VOCAB_SIZE + (int)tok.special_tokens.size(), nb_merges, nb_vocab, a, b;
-            tok.merges.clear();
-            dlib::deserialize(nb_merges, in);
-            for (int m = 0; m < nb_merges; m++)
-            {
-                dlib::deserialize(a, in);
-                dlib::deserialize(b, in);
-                tok.merges[{a, b}] = idx;
-                idx++;
-            }
-            
-            //---
-            std::string token_str;
-            tok.vocab.clear();
-            dlib::deserialize(nb_vocab, in);
-            for (int v = 0; v < nb_vocab; v++)
-            {
-                dlib::deserialize(token_str, in);
-                dlib::deserialize(idx, in);
-                tok.vocab[idx] = tok.string_to_bytes(token_str);
-            }
+            deserialize(tok.special_tokens, in);
+            deserialize(tok.special_token_map, in);
+            deserialize(tok.merges, in);
+            deserialize(tok.vocab, in);
+            deserialize(tok.vocab_size, in);
         }
 
         // Get the ID of a special token
@@ -415,15 +377,6 @@ namespace dlib
             return new_ids;
         }
 
-        // Decode/Encode a base64 string to/from a UTF-8 string
-        static std::string base64_decode(const std::string& base64_str)
-        {
-            dlib::base64 decoder;
-            std::istringstream sin(base64_str);
-            std::ostringstream sout;
-            decoder.decode(sin, sout);
-            return sout.str();
-        }
         static std::string base64_encode(const std::string& input) {
             dlib::base64 encoder;
             std::istringstream sin(input);
@@ -439,12 +392,6 @@ namespace dlib
             return base64_encode(data);
         }
 
-        // Convert a string representation of bytes back to bytes
-        static std::vector<uint8_t> string_to_bytes(const std::string& str)
-        {
-            std::string decoded = base64_decode(str);
-            return std::vector<uint8_t>(decoded.begin(), decoded.end());
-        }
     };
 
 }
