@@ -384,7 +384,7 @@ namespace
         adopted in many state-of-the-art NLP models, including GPT and BERT.
         )";
 
-        test.train(training_text, 300, true);
+        test.train(training_text, 300);
 
         std::ostringstream out_stream;
         serialize(test, out_stream);
