@@ -71,7 +71,7 @@ namespace dlib
         // Train the tokenizer on the given text
         void train(const std::string& text, int vocab_size, bool verbose = false)
         {
-            assert(vocab_size >= BASE_VOCAB_SIZE);
+            DLIB_CASSERT(vocab_size >= BASE_VOCAB_SIZE);
             this->vocab_size = vocab_size;
             int num_merges = vocab_size - BASE_VOCAB_SIZE;
 
@@ -122,7 +122,7 @@ namespace dlib
         }
 
         // Encode the given text into subword tokens
-        std::vector<int> encode(const std::string& text)
+        std::vector<int> encode(const std::string& text) const
         {
             std::vector<int> result_ids;
             std::mutex result_mutex;
@@ -210,13 +210,13 @@ namespace dlib
         }
 
         // Decode a single token ID back into text
-        std::string decode(int id, bool display_special_tokens = true)
+        std::string decode(int id, bool display_special_tokens = true) const
         {
             return decode(std::vector<int>({ id }), display_special_tokens);
         }
 
         // Decode a sequence of token IDs back into text
-        std::string decode(const std::vector<int>& ids, bool display_special_tokens = true)
+        std::string decode(const std::vector<int>& ids, bool display_special_tokens = true) const
         {
             std::vector<uint8_t> bytes;
             int vocab_size = static_cast<int>(get_vocab_size());
@@ -275,7 +275,7 @@ namespace dlib
         }
 
         // Get the total vocabulary size
-        size_t get_vocab_size(void) const
+        size_t get_vocab_size() const
         {
             return (vocab.size() + special_tokens.size());
         }
@@ -300,7 +300,7 @@ namespace dlib
                 return hash1 ^ (hash2 << 1);
             }
         };
-        std::unordered_map<std::pair<int, int>, int, pair_hash> get_stats(const std::vector<int>& ids)
+        std::unordered_map<std::pair<int, int>, int, pair_hash> get_stats(const std::vector<int>& ids) const
         {
             std::unordered_map<std::pair<int, int>, int, pair_hash> global_stats;
             std::mutex global_stats_mutex;
@@ -332,7 +332,8 @@ namespace dlib
         }
 
         // Finds the most frequent pair of tokens in the given statistics map that does not exceed the maximum token length
-        std::pair<int, int> get_most_frequent_pair(const std::unordered_map<std::pair<int, int>, int, pair_hash>& stats) {
+        std::pair<int, int> get_most_frequent_pair(const std::unordered_map<std::pair<int, int>, int, pair_hash>& stats) const 
+        {
             std::pair<int, int> best_pair = { -1, -1 }; // Initialize the best pair to an invalid value
             double max_score = 0; // Initialize the maximum score to 0
 
@@ -342,7 +343,7 @@ namespace dlib
                 int count = stat.second; // Extract the frequency count
 
                 // Check if the new token formed by merging the pair would exceed the maximum allowed length
-                size_t new_token_length = vocab[pair.first].size() + vocab[pair.second].size();
+                size_t new_token_length = vocab.at(pair.first).size() + vocab.at(pair.second).size();
                 if (new_token_length > MAX_TOKEN_LENGTH) continue; // Skip this pair if it exceeds the maximum token length
 
                 // Calculate the score for this pair (frequency * length_penalty)
@@ -360,7 +361,8 @@ namespace dlib
         }
 
         // Merge the most frequent pair in the token sequence
-        std::vector<int> merge(std::vector<int>& ids, const std::pair<int, int>& pair, int idx) {
+        std::vector<int> merge(std::vector<int>& ids, const std::pair<int, int>& pair, int idx) const
+        {
             std::vector<int> new_ids;
             new_ids.reserve(ids.size()); // Reserve space to avoid reallocations
 

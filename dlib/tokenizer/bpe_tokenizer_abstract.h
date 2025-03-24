@@ -19,9 +19,7 @@ namespace dlib
     class bpe_tokenizer
     {
         /*!
-            CLASS bpe_tokenizer
-                A Byte Pair Encoding (BPE) tokenizer for text processing.
-
+            WHAT THIS OBJECT REPRESENTS
                 This class implements a Byte Pair Encoding (BPE) tokenizer, which is a subword
                 tokenization algorithm commonly used in natural language processing (NLP). The
                 BPE algorithm iteratively merges the most frequent pairs of bytes or characters
@@ -37,21 +35,17 @@ namespace dlib
                 text into subword tokens, and decoding tokens back into text. The tokenizer can be
                 serialized and deserialized to/from a file, allowing for easy storage and reuse.
 
-                INITIAL VALUE
-                    - The base vocabulary is initialized with single-byte tokens (0-255).
-                    - Special tokens are pre-defined and assigned IDs starting from 256.
-                    - The maximum token length is set to 8 bytes.
-
-                WHAT THIS OBJECT REPRESENTS
-                    This object represents a BPE tokenizer capable of encoding and decoding text
-                    using a learned subword vocabulary. It is designed to handle UTF-8 encoded text
-                    and supports multi-threaded processing for efficient tokenization.
-
                 REFERENCES
                     - Sennrich, R., Haddow, B., & Birch, A. (2016). Neural Machine Translation of
                       Rare Words with Subword Units. In Proceedings of the 54th Annual Meeting of
                       the Association for Computational Linguistics (ACL 2016).
+
+            INITIAL VALUE
+                - The base vocabulary is initialized with single-byte tokens (0-255).
+                - Special tokens are pre-defined and assigned IDs starting from 256.
+                - The maximum token length is set to 8 bytes.
         !*/
+
     public:
         bpe_tokenizer();
         /*!
@@ -77,7 +71,7 @@ namespace dlib
 
         std::vector<int> encode(
             const std::string& text
-        );
+        ) const;
         /*!
             ensures
                 - Encodes the input text into a sequence of subword tokens.
@@ -88,7 +82,7 @@ namespace dlib
         std::string decode(
             const std::vector<int>& ids,
             bool display_special_tokens = true
-        );
+        ) const;
         /*!
             ensures
                 - Decodes a sequence of token IDs back into a human-readable string.
@@ -96,24 +90,11 @@ namespace dlib
                 - Returns the decoded text as a UTF-8 encoded string.
         !*/
 
-        void serialize(
-            const bpe_tokenizer& tok,
-            std::ostream& out
-        );
+        std::string decode(int id, bool display_special_tokens = true) const
+        { return decode(std::vector<int>({ id }), display_special_tokens); }
         /*!
             ensures
-                - Serializes the tokenizer's vocabulary and merge operations to the output stream.
-                - The serialized data can be used to reconstruct the tokenizer later.
-        !*/
-
-        void deserialize(
-            bpe_tokenizer& tok,
-            std::istream& in
-        );
-        /*!
-            ensures
-                - Deserializes the tokenizer's vocabulary and merge operations from the input stream.
-                - Restores the tokenizer to the state it was in when serialized.
+                - decode a single token back into text.
         !*/
 
         int get_special_token_id(
@@ -130,26 +111,25 @@ namespace dlib
             ensures
                 - Returns the total size of the vocabulary, including base tokens and special tokens.
         !*/
-
-    private:
-        // Private implementation details
-        std::map<std::string, int> special_tokens;
-        std::unordered_map<int, std::string> special_token_map;
-        std::map<std::pair<int, int>, int> merges;
-        std::map<int, std::vector<uint8_t>> vocab;
-        int vocab_size;
-
-        static const size_t MAX_TOKEN_LENGTH = 8;
-        static const int BASE_VOCAB_SIZE = 256;
-
-        // Helper functions
-        std::unordered_map<std::pair<int, int>, int, pair_hash> get_stats(const std::vector<int>& ids);
-        std::pair<int, int> get_most_frequent_pair(const std::unordered_map<std::pair<int, int>, int, pair_hash>& stats);
-        std::vector<int> merge(std::vector<int>& ids, const std::pair<int, int>& pair, int idx);
-        std::string bytes_to_string(const std::vector<uint8_t>& bytes);
-        std::vector<uint8_t> string_to_bytes(const std::string& str);
     };
 
+    void serialize(
+        const bpe_tokenizer& tok,
+        std::ostream& out
+    );
+    /*!
+        ensures
+            - Saves the entire state of tok to out.
+    !*/
+
+    void deserialize(
+        bpe_tokenizer& tok,
+        std::istream& in
+    );
+    /*!
+        ensures
+            - Restores the state of a bpe_tokenizer from a serialized state.
+    !*/
 }
 
 #endif // DLIB_BPE_TOKENIZER_ABSTRACT_
