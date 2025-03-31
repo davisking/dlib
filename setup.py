@@ -231,9 +231,9 @@ def num_available_cpu_cores(ram_per_build_process_in_gb):
 def read_version_from_cmakelists(cmake_file):
     """Read version information
     """
-    major = re.findall("set\(CPACK_PACKAGE_VERSION_MAJOR.*\"(.*)\"", open(cmake_file).read())[0]
-    minor = re.findall("set\(CPACK_PACKAGE_VERSION_MINOR.*\"(.*)\"", open(cmake_file).read())[0]
-    patch = re.findall("set\(CPACK_PACKAGE_VERSION_PATCH.*\"(.*)\"", open(cmake_file).read())[0]
+    major = re.findall("set\\(CPACK_PACKAGE_VERSION_MAJOR.*\"(.*)\"", open(cmake_file).read())[0]
+    minor = re.findall("set\\(CPACK_PACKAGE_VERSION_MINOR.*\"(.*)\"", open(cmake_file).read())[0]
+    patch = re.findall("set\\(CPACK_PACKAGE_VERSION_PATCH.*\"(.*)\"", open(cmake_file).read())[0]
     return major + '.' + minor + '.' + patch
 
 def read_entire_file(fname):
