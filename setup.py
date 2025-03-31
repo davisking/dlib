@@ -252,7 +252,6 @@ setup(
     ext_modules=[CMakeExtension('_dlib_pybind11','tools/python')],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
-    #install_requires=['cmake'], # removed because the pip cmake package is busted, maybe someday it will be usable.
     packages=find_packages(exclude=['python_examples']),
     package_dir={'': 'tools/python'},
     keywords=['dlib', 'Computer Vision', 'Machine Learning'],
