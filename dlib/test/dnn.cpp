@@ -2421,6 +2421,24 @@ void test_embeddings()
         }
         {
             print_spinner();
+            linear_<1, LINEAR_NO_BIAS> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            linear_<5, LINEAR_NO_BIAS> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            linear_<4, LINEAR_NO_BIAS> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
             relu_ l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
@@ -3525,6 +3543,62 @@ void test_multm_prev()
         // Now we should have learned everything there is to it
         const double error_after = autoencoder_error();
         DLIB_TEST_MSG(error_after < 1e-6, "Autoencoder error after training = " << error_after);
+    }
+
+// ----------------------------------------------------------------------------------------
+    void test_linear()
+    {
+        print_spinner();
+
+        // Define the network
+		cout << "ICI !!!" << endl;
+        using net_type = tag2<linear_no_bias<6, tag1<input<matrix<float>>>>>;
+        net_type net;
+
+        // Input tensor
+        const int n_samples = 3, k = 1;
+        std::vector<matrix<float>> x(n_samples);
+        matrix<float> xtmp(2, 4);
+        xtmp = 1.0f, 2.0f, 3.0f, 4.0f,
+            5.0f, 6.0f, 7.0f, 8.0f;
+        x[0] = xtmp;
+        xtmp = 9.0f, 10.0f, 11.0f, 12.0f,
+            13.0f, 14.0f, 15.0f, 16.0f;
+        x[1] = xtmp;
+        xtmp = 17.0f, 18.0f, 19.0f, 20.0f,
+            21.0f, 22.0f, 23.0f, 24.0f;
+        x[2] = xtmp;
+
+        // Convert input matrix to tensor
+        resizable_tensor input_tensor;
+        net.to_tensor(&x[0], &x[0] + n_samples, input_tensor);
+        net.forward(input_tensor);
+
+        // Get the internal linear weights
+        matrix<float> w = mat(layer<tag2>(net).subnet().layer_details().get_weights());
+
+        // Theoretical calculation of the output
+        std::vector<matrix<float>> expected_outputs(n_samples);
+        for (int i = 0; i < n_samples; ++i) {
+            matrix<float> input_matrix = x[i];
+            expected_outputs[i] = input_matrix * w;
+        }
+
+        // Compare output tensor with expected output
+        auto& net_output = layer<tag2>(net).get_output();
+
+        // Display results
+        for (int i = 0; i < n_samples; ++i) {
+            matrix<float> output_sample;
+            output_sample.set_size(2, 6);
+            for (long r = 0; r < output_sample.nr(); ++r) {
+                for (long c = 0; c < output_sample.nc(); ++c) {
+                    output_sample(r, c) = net_output.host()[tensor_index(net_output, i, 0, r, c)];
+                }
+            }
+            DLIB_TEST_MSG(max(abs(output_sample - expected_outputs[i])) < 1e-5,
+                "linear layer - sample " + std::to_string(i));
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -5109,6 +5183,7 @@ void test_multm_prev()
             test_simple_linear_regression_with_mult_prev();
             test_multioutput_linear_regression();
             test_simple_autoencoder();
+            test_linear();
             test_loss_mean_squared_per_channel_and_pixel();
             test_loss_binary_log_per_pixel_learned_params_on_trivial_two_pixel_task();
             test_loss_binary_log_per_pixel_outputs_on_trivial_task();

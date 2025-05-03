@@ -689,6 +689,266 @@ namespace dlib
         >
     using fc_no_bias = add_layer<fc_<num_outputs,FC_NO_BIAS>, SUBNET>;
 
+    // ----------------------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------------------
+
+    enum linear_bias_mode
+    {
+        LINEAR_HAS_BIAS,
+        LINEAR_NO_BIAS
+    };
+
+    template <
+        unsigned long num_outputs,
+        linear_bias_mode bias_mode
+    >
+    class linear_
+    {
+        /*!
+            REQUIREMENTS ON num_outputs
+                num_outputs > 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of a linear layer, which applies a linear
+                transformation to the input data. For a layer with bias, the transformation
+                is:
+                    output = input * weights + bias
+                For a layer without bias, it's simply:
+                    output = input * weights
+
+                The input tensor can have any number of sample, k (channel), and nr (row)
+                dimensions, but the nc (column) dimension must match the number of input features.
+                The output tensor will have the same dimensions as the input tensor, except for
+                the nc dimension which will be equal to num_outputs.
+
+                This layer is similar to the fc_ layer, but optimized for the case where the
+                input and output tensors maintain the same dimensions, excluding the feature
+                dimension (nc). This makes it useful for working with multi-dimensional data.
+        !*/
+
+    public:
+        linear_(
+        );
+        /*!
+            ensures
+                - #get_num_outputs() == num_outputs
+                - #get_bias_mode() == bias_mode
+                - #get_learning_rate_multiplier() == 1
+        !*/
+
+        double get_learning_rate_multiplier(
+        ) const;
+        /*!
+            ensures
+                - returns a multiplier that will be applied to the gradient of this layer during
+                  training. This value appears as a multiplicative factor in the update rule. So
+                  if get_learning_rate_multiplier() == 1 then the learning rate will be multiplied
+                  by 1 and thus not modified. However, if get_learning_rate_multiplier() == 0.1 then
+                  the learning rate will be multiplied by 0.1, making the layer update 10 times
+                  slower than it would otherwise be.
+        !*/
+
+        void set_learning_rate_multiplier(
+            double val
+        );
+        /*!
+            ensures
+                - #get_learning_rate_multiplier() == val
+        !*/
+
+        unsigned long get_num_inputs(
+        ) const;
+        /*!
+            ensures
+                - Returns the number of input features this layer expects.
+                - For an uninitialized layer (i.e., one that has not seen any data during setup
+                  or forward pass), this will be zero.
+        !*/
+
+        unsigned long get_num_outputs(
+        ) const;
+        /*!
+            ensures
+                - Returns the number of output features this layer produces.
+                  I.e., this value is num_outputs.
+        !*/
+
+        void set_num_outputs(
+            long num
+        );
+        /*!
+            requires
+                - num > 0
+            ensures
+                - #get_num_outputs() == num
+            throws
+                - std::runtime_error if this function is called after the layer parameters
+                  have been allocated and the new number of outputs doesn't match the
+                  previously set number of outputs.
+        !*/
+
+        linear_bias_mode get_bias_mode(
+        ) const;
+        /*!
+            ensures
+                - Returns a value indicating whether this layer has a bias term.
+                  I.e. returns bias_mode.
+        !*/
+
+        template <typename SUBNET>
+        void setup(
+            const SUBNET& sub
+        );
+        /*!
+            ensures
+                - Performs the necessary setup work to process data through this layer.
+                - Sets the input size based on the dimensions of the input tensor from sub.
+                - Allocates the parameter tensor and initializes its values.
+                - #get_num_inputs() == the number of columns in sub.get_output() (i.e., nc).
+        !*/
+
+        template <typename SUBNET>
+        void forward(
+            const SUBNET& sub,
+            resizable_tensor& output
+        );
+        /*!
+            requires
+                - setup() has been called
+                - sub.get_output().nc() == get_num_inputs()
+            ensures
+                - Applies the linear transformation to the input tensor from sub and stores
+                  the results in output.
+                - #output.num_samples() == sub.get_output().num_samples()
+                - #output.k()           == sub.get_output().k()
+                - #output.nr()          == sub.get_output().nr()
+                - #output.nc()          == get_num_outputs()
+        !*/
+
+        template <typename SUBNET>
+        void backward(
+            const tensor& gradient_input,
+            SUBNET& sub,
+            tensor& params_grad
+        );
+        /*!
+            requires
+                - setup() has been called
+                - sub.get_output().nc() == get_num_inputs()
+                - gradient_input has the same dimensions as the output of forward()
+            ensures
+                - Computes the gradients of this layer with respect to the parameters
+                  and the input tensor, and updates the corresponding gradient tensors.
+                - Updates params_grad based on the gradients of the weights
+                  and biases (if present).
+                - Updates sub's gradient_input based on the gradients of the
+                  inputs to this layer.
+        !*/
+
+        alias_tensor_instance get_weights(
+        );
+        /*!
+            requires
+                - setup() has been called
+            ensures
+                - Returns a reference to the weights matrix of this layer.
+        !*/
+
+        alias_tensor_const_instance get_weights(
+        ) const;
+        /*!
+            requires
+                - setup() has been called
+            ensures
+                - Returns a const reference to the weights matrix of this layer.
+        !*/
+
+        alias_tensor_instance get_biases(
+        );
+        /*!
+            requires
+                - bias_mode == LINEAR_HAS_BIAS
+                - setup() has been called
+            ensures
+                - Returns a reference to the bias vector of this layer.
+            throws
+                - static_assert failure if bias_mode != LINEAR_HAS_BIAS
+        !*/
+
+        alias_tensor_const_instance get_biases(
+        ) const;
+        /*!
+            requires
+                - bias_mode == LINEAR_HAS_BIAS
+                - setup() has been called
+            ensures
+                - Returns a const reference to the bias vector of this layer.
+            throws
+                - static_assert failure if bias_mode != LINEAR_HAS_BIAS
+        !*/
+
+        dpoint map_input_to_output(
+            const dpoint& p
+        ) const;
+        /*!
+            ensures
+                - Returns p, since the linear layer maintains the same spatial dimensions.
+        !*/
+
+        dpoint map_output_to_input(
+            const dpoint& p
+        ) const;
+        /*!
+            ensures
+                - Returns p, since the linear layer maintains the same spatial dimensions.
+        !*/
+
+        const tensor& get_layer_params(
+        ) const;
+        /*!
+            ensures
+                - Returns the parameters that define this layer, i.e., the weights and biases
+                  (if present) that are updated during training.
+        !*/
+
+        tensor& get_layer_params(
+        );
+        /*!
+            ensures
+                - Returns the parameters that define this layer, i.e., the weights and biases
+                  (if present) that are updated during training.
+        !*/
+
+        friend void serialize(const linear_& item, std::ostream& out);
+        friend void deserialize(linear_& item, std::istream& in);
+        /*!
+            provides serialization support
+        !*/
+    };
+
+    template <
+        unsigned long num_outputs,
+        typename SUBNET
+    >
+    using linear = add_layer<linear_<num_outputs, LINEAR_HAS_BIAS>, SUBNET>;
+    /*!
+        This is a layer that applies a linear transformation with bias to the input:
+        output = input * weights + bias
+    !*/
+
+    template <
+        unsigned long num_outputs,
+        typename SUBNET
+    >
+    using linear_no_bias = add_layer<linear_<num_outputs, LINEAR_NO_BIAS>, SUBNET>;
+    /*!
+        This is a layer that applies a linear transformation without bias to the input:
+        output = input * weights
+    !*/
+
+    // ----------------------------------------------------------------------------------------
+
 // ----------------------------------------------------------------------------------------
 
     struct num_con_outputs
