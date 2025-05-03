@@ -2170,7 +2170,7 @@ namespace dlib
         unsigned long get_num_outputs() const { return num_outputs; }
         void set_num_outputs(long num)
         {
-            DLIB_CASSERT(num > 0);
+            DLIB_CASSERT(num > 0, "The number of outputs must be > 0, but num == " << num);
             if (num != (long)num_outputs)
             {
                 DLIB_CASSERT(get_layer_params().size() == 0,
