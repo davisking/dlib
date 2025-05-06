@@ -15,6 +15,18 @@
 #include "../geometry/rectangle.h"
 #include "../test_for_odr_violations.h"
 
+#ifdef DLIB_USE_CUDA
+#define IF_DLIB_USE_CUDA(...) if (use_cuda()) { __VA_ARGS__ }
+#else
+#define IF_DLIB_USE_CUDA(...) 
+#endif
+
+#ifdef DLIB_USE_CUDA
+#define IF_DLIB_NOT_USE_CUDA(...) if (!use_cuda()) { __VA_ARGS__ }
+#else
+#define IF_DLIB_NOT_USE_CUDA(...) __VA_ARGS__
+#endif
+
 namespace dlib
 {
     bool dnn_prefer_fastest_algorithms();
@@ -1078,12 +1090,13 @@ namespace dlib { namespace tt
         void clear(
         )
         {
-#ifdef DLIB_USE_CUDA
-            if (use_cuda())
+            IF_DLIB_USE_CUDA(
                 cuda_impl.clear();
-            else
-#endif
+            )
+
+            IF_DLIB_NOT_USE_CUDA(
                 cpu_impl.clear();
+            )
         }
 
         void operator() (
@@ -1093,12 +1106,13 @@ namespace dlib { namespace tt
             const tensor& filters
         )
         {
-#ifdef DLIB_USE_CUDA
-            if (use_cuda())
+            IF_DLIB_USE_CUDA(
                 cuda_impl(add_to_output,output,data,filters);
-            else
-#endif
+            )
+
+            IF_DLIB_NOT_USE_CUDA(
                 cpu_impl(add_to_output,output,data,filters);
+            )
         }
         /*!
             requires
@@ -1127,12 +1141,13 @@ namespace dlib { namespace tt
             const tensor& filters
         )
         {
-#ifdef DLIB_USE_CUDA
-            if (use_cuda())
+            IF_DLIB_USE_CUDA(
                 cuda_impl(add_to_output,output,data,filters);
-            else
-#endif
+            )
+
+            IF_DLIB_NOT_USE_CUDA(
                 cpu_impl(add_to_output,output,data,filters);
+            )
         }
         /*!
             requires
@@ -1163,12 +1178,13 @@ namespace dlib { namespace tt
             bool use_relu
         )
         {
-#ifdef DLIB_USE_CUDA
-            if (use_cuda())
+            IF_DLIB_USE_CUDA(
                 cuda_impl(add_to_output,output,data,filters,biases,use_relu);
-            else
-#endif
+            )
+
+            IF_DLIB_NOT_USE_CUDA(
                 cpu_impl(add_to_output,output,data,filters,biases,use_relu);
+            )
         }
         /*!
             requires
@@ -1203,12 +1219,13 @@ namespace dlib { namespace tt
             bool use_relu
         )
         {
-#ifdef DLIB_USE_CUDA
-            if (use_cuda())
+            IF_DLIB_USE_CUDA(
                 cuda_impl(add_to_output,output,data,filters,biases,use_relu);
-            else
-#endif
+            )
+
+            IF_DLIB_NOT_USE_CUDA(
                 cpu_impl(add_to_output,output,data,filters,biases,use_relu);
+            )
         }
         /*!
             requires
@@ -1239,12 +1256,13 @@ namespace dlib { namespace tt
             tensor& data_gradient
         )
         {
-#ifdef DLIB_USE_CUDA
-            if (use_cuda())
+            IF_DLIB_USE_CUDA(
                 cuda_impl.get_gradient_for_data(add_to_output,gradient_input,filters,data_gradient);
-            else
-#endif
+            )
+
+            IF_DLIB_NOT_USE_CUDA(
                 cpu_impl.get_gradient_for_data(add_to_output,gradient_input,filters,data_gradient);
+            )
         }
         /*!
             requires
@@ -1282,12 +1300,13 @@ namespace dlib { namespace tt
             tensor& filters_gradient
         )
         {
-#ifdef DLIB_USE_CUDA
-            if (use_cuda())
+            IF_DLIB_USE_CUDA(
                 cuda_impl.get_gradient_for_filters(add_to_output,gradient_input,data,filters_gradient);
-            else
-#endif
+            )
+
+            IF_DLIB_NOT_USE_CUDA(
                 cpu_impl.get_gradient_for_filters(add_to_output,gradient_input,data,filters_gradient);
+            )
         }
         /*!
             requires
@@ -1328,12 +1347,13 @@ namespace dlib { namespace tt
             int padding_x
         )
         {
-#ifdef DLIB_USE_CUDA
-            if (use_cuda())
+            IF_DLIB_USE_CUDA(
                 cuda_impl.setup(data,filters,stride_y,stride_x,padding_y,padding_x);
-            else
-#endif
+            )
+
+            IF_DLIB_NOT_USE_CUDA(
                 cpu_impl.setup(data,filters,stride_y,stride_x,padding_y,padding_x);
+            )
         }
         /*!
             requires
@@ -1383,12 +1403,13 @@ namespace dlib { namespace tt
         void clear(
         )
         {
-#ifdef DLIB_USE_CUDA
-            if (use_cuda())
+            IF_DLIB_USE_CUDA(
                 cuda_impl.clear();
-            else
-#endif
+            )
+
+            IF_DLIB_NOT_USE_CUDA(
                 cpu_impl.clear();
+            )
         }
 
         void setup_max_pooling(
@@ -1400,12 +1421,13 @@ namespace dlib { namespace tt
             int padding_x
         )
         {
-#ifdef DLIB_USE_CUDA
-            if (use_cuda())
+            IF_DLIB_USE_CUDA(
                 cuda_impl.setup_max_pooling(window_height, window_width, stride_y, stride_x, padding_y, padding_x);
-            else
-#endif
+            )
+
+            IF_DLIB_NOT_USE_CUDA(
                 cpu_impl.setup_max_pooling(window_height, window_width, stride_y, stride_x, padding_y, padding_x);
+            )
         }
         /*!
             requires
@@ -1429,12 +1451,13 @@ namespace dlib { namespace tt
             int padding_x
         )
         {
-#ifdef DLIB_USE_CUDA
-            if (use_cuda())
+            IF_DLIB_USE_CUDA(
                 cuda_impl.setup_avg_pooling(window_height, window_width, stride_y, stride_x, padding_y, padding_x);
-            else
-#endif
+            )
+
+            IF_DLIB_NOT_USE_CUDA(
                 cpu_impl.setup_avg_pooling(window_height, window_width, stride_y, stride_x, padding_y, padding_x);
+            )
         }
         /*!
             requires
@@ -1452,12 +1475,13 @@ namespace dlib { namespace tt
         bool does_max_pooling(
         ) const
         {
-#ifdef DLIB_USE_CUDA
-            if (use_cuda())
+            IF_DLIB_USE_CUDA(
                 return cuda_impl.does_max_pooling();
-            else
-#endif
+            )
+
+            IF_DLIB_NOT_USE_CUDA(
                 return cpu_impl.does_max_pooling();
+            )
         }
 
         void operator() (
@@ -1465,12 +1489,13 @@ namespace dlib { namespace tt
             const tensor& src
         )
         {
-#ifdef DLIB_USE_CUDA
-            if (use_cuda())
+            IF_DLIB_USE_CUDA(
                 cuda_impl(dest, src);
-            else
-#endif
+            )
+
+            IF_DLIB_NOT_USE_CUDA(
                 cpu_impl(dest, src);
+            )
         }
         /*!
             requires
@@ -1501,12 +1526,13 @@ namespace dlib { namespace tt
             tensor& grad 
         )
         {
-#ifdef DLIB_USE_CUDA
-            if (use_cuda())
+            IF_DLIB_USE_CUDA(
                 cuda_impl.get_gradient(gradient_input, dest, src, grad);
-            else
-#endif
+            )
+
+            IF_DLIB_NOT_USE_CUDA(
                 cpu_impl.get_gradient(gradient_input, dest, src, grad);
+            )
         }
         /*!
             requires
