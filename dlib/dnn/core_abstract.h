@@ -196,6 +196,24 @@ namespace dlib
             - #dnn_prefer_fastest_algorithms() == false 
     !*/
 
+    bool use_cuda(
+    );
+    /*!
+        ensures
+            - If dlib should use the CUDA implementation of a deep neural network
+              then this function returns true and false otherwise.
+            - On program startup this function will return true if DLIB_USE_CUDA is defined.
+            - This function always returns false if DLIB_USE_CUDA is not defined.
+    !*/
+
+    void set_use_cuda(
+        bool flag
+    );
+    /*!
+        ensures
+            - #use_cuda() == flag
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     template <
