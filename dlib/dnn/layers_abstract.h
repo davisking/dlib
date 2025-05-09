@@ -1644,6 +1644,176 @@ namespace dlib
     
 // ----------------------------------------------------------------------------------------
 
+    template <long k_ = -1, long nr_ = -1, long nc_ = -1>
+    class reshape_to_
+    {
+        /*!
+            REQUIREMENTS ON TEMPLATE ARGUMENTS
+                - k_, nr_, and nc_ must be either -1 or greater than 0.
+
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above. It defines a layer that reshapes or resizes an input tensor
+                into a different shape. The layer operates in two modes:
+
+                1. Pure Reshape Mode: When the total number of elements in the input tensor
+                   equals the total number of elements in the output tensor, this layer
+                   performs a simple reshaping operation without changing the values.
+
+                2. Spatial Rescaling Mode: When the channel dimension (k) remains constant
+                   but the total number of elements changes, this layer performs bilinear
+                   interpolation to resize the spatial dimensions while preserving the
+                   channel information.
+
+                The dimensions of the output tensor are determined by the template parameters:
+                    - If k_ is -1, the output tensor will have the same number of channels as the input.
+                    - If nr_ is -1, the output tensor will have the same number of rows as the input.
+                    - If nc_ is -1, the output tensor will have the same number of columns as the input.
+
+                Setting a value of -1 for any dimension means "keep the original dimension from the input."
+
+                Note that this layer will throw an exception if you attempt to change both the
+                channel count (k) and the total number of elements. Either:
+                - Keep the total number of elements the same (Pure Reshape Mode), or
+                - Keep the channel count the same and only change spatial dimensions (Spatial Rescaling Mode)
+        !*/
+
+    public:
+        explicit reshape_to_();
+        /*!
+            ensures
+                - #get_output_k() == k_
+                - #get_output_nr() == nr_
+                - #get_output_nc() == nc_
+        !*/
+
+        long get_output_k() const;
+        /*!
+            ensures
+                - Returns the number of channels in the output tensor. If this value is -1,
+                  then the output will have the same number of channels as the input.
+        !*/
+
+        long get_output_nr() const;
+        /*!
+            ensures
+                - Returns the number of rows in the output tensor. If this value is -1,
+                  then the output will have the same number of rows as the input.
+        !*/
+
+        long get_output_nc() const;
+        /*!
+            ensures
+                - Returns the number of columns in the output tensor. If this value is -1,
+                  then the output will have the same number of columns as the input.
+        !*/
+
+        void set_output_k(long k);
+        /*!
+            requires
+                - k == -1 || k > 0
+            ensures
+                - #get_output_k() == k
+        !*/
+
+        void set_output_nr(long nr);
+        /*!
+            requires
+                - nr == -1 || nr > 0
+            ensures
+                - #get_output_nr() == nr
+        !*/
+
+        void set_output_nc(long nc);
+        /*!
+            requires
+                - nc == -1 || nc > 0
+            ensures
+                - #get_output_nc() == nc
+        !*/
+
+        template <typename SUBNET> void setup(const SUBNET& sub);
+        /*!
+            requires
+                - SUBNET implements the SUBNET interface defined at the top of this file.
+            ensures
+                - Configures this layer to operate on the output of sub.
+                - If the total number of elements in the input tensor doesn't match the total
+                  number of elements in the output tensor and the channel dimension is different,
+                  an exception will be thrown.
+        !*/
+
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        /*!
+            requires
+                - SUBNET implements the SUBNET interface defined at the top of this file.
+                - setup() has been called.
+            ensures
+                - Reshapes or resizes the output of sub and stores it in #output.
+                - If is_spatial_rescale() == false, then performs a pure reshape operation.
+                - If is_spatial_rescale() == true, then performs bilinear interpolation to resize
+                  the spatial dimensions while preserving the channel information.
+                - #output.num_samples() == sub.get_output().num_samples()
+                - #output.k() == get_output_k() if get_output_k() != -1, otherwise sub.get_output().k()
+                - #output.nr() == get_output_nr() if get_output_nr() != -1, otherwise sub.get_output().nr()
+                - #output.nc() == get_output_nc() if get_output_nc() != -1, otherwise sub.get_output().nc()
+        !*/
+
+        template <typename SUBNET> void backward(
+            const tensor& gradient_input,
+            SUBNET& sub,
+            tensor& params_grad
+        );
+        /*!
+            requires
+                - SUBNET implements the SUBNET interface defined at the top of this file.
+                - setup() has been called.
+                - gradient_input has the same dimensions as the output of forward().
+            ensures
+                - Computes the gradients of this layer with respect to the input tensor and
+                  parameters, and stores them in sub.get_gradient_input() and params_grad,
+                  respectively.
+                - This function supports both pure reshaping and spatial rescaling operations.
+        !*/
+
+        dpoint map_input_to_output(dpoint p) const;
+        /*!
+            ensures
+                - Maps a point in the input tensor's coordinate system to the corresponding point
+                  in the output tensor. This is useful for tracking how spatial locations change
+                  through the network, especially during spatial rescaling.
+        !*/
+
+        dpoint map_output_to_input(dpoint p) const;
+        /*!
+            ensures
+                - Maps a point in the output tensor's coordinate system to the corresponding point
+                  in the input tensor. This is the inverse of map_input_to_output().
+        !*/
+
+        const tensor& get_layer_params() const;
+        /*!
+            ensures
+                - Returns the layer's parameters. This layer has no parameters,
+                  so this always returns an empty tensor.
+        !*/
+
+        tensor& get_layer_params();
+        /*!
+            ensures
+                - Returns the layer's parameters. This layer has no parameters,
+                  so this always returns an empty tensor.
+        !*/
+    };
+
+    template <long k, long nr, long nc, typename SUBNET>
+    using reshape_to = add_layer<reshape_to_<k, nr, nc>, SUBNET>;
+
+    template <long k, long nr, long nc, typename SUBNET>
+    using flatten = add_layer<reshape_to_<k * nr, * nc, 1, 1>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     class dropout_
     {
         /*!

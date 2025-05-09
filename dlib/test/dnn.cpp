@@ -2538,7 +2538,19 @@ void test_embeddings()
             embeddings_<7, 12> l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
-        }        
+        }
+        {
+            print_spinner();
+            reshape_to_<-1, -1, -1> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            reshape_to_<-1, 3, 5> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -4801,6 +4813,39 @@ void test_multm_prev()
         }
     }
 
+    void test_resize_to() {
+        print_spinner();
+        const long nr = 8, nc = 12;
+        const long n_samples = 5, k = 1, h = 4;
+
+        using net_type = tag1<reshape_to<k, nr, nc,
+            flatten<h, nr, nc / h, reshape_to<h, nr, nc / h,
+            input<matrix<float>>>>>>;
+        net_type net;
+
+        dlib::rand rnd;
+        std::vector<matrix<float>> x(n_samples);
+        matrix<float> xtmp(nr, nc);
+        for (int ii = 0; ii < n_samples; ++ii) {
+            for (int jj = 0; jj < nr; ++jj)
+                for (int kk = 0; kk < nc; ++kk)
+                    xtmp(jj, kk) = rnd.get_random_gaussian();
+            x[ii] = xtmp;
+        }
+
+        resizable_tensor input_tensor;
+        net.to_tensor(&x[0], &x[0] + n_samples, input_tensor);
+        net.forward(input_tensor);
+
+        auto& output_tensor = layer<tag1>(net).get_output();
+
+        DLIB_TEST(output_tensor.num_samples() == input_tensor.num_samples());
+        DLIB_TEST(output_tensor.k() == input_tensor.k());
+        DLIB_TEST(output_tensor.nr() == input_tensor.nr());
+        DLIB_TEST(output_tensor.nc() == input_tensor.nc());
+        DLIB_TEST(max(abs(mat(output_tensor) - mat(input_tensor))) < 1e-5);
+    }
+
 // ----------------------------------------------------------------------------------------
 
     template <long num_filters, long ks, int s, typename SUBNET>
@@ -5168,6 +5213,7 @@ void test_multm_prev()
             test_embeddings();
             test_tril();
             test_basic_tensor_ops();
+			test_resize_to();
             test_layers();
             test_visit_functions();
             test_copy_tensor_cpu();
