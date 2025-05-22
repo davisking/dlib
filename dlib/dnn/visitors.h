@@ -1043,10 +1043,13 @@ namespace dlib
             template <long k, long nr, long nc, typename U, typename E>
             void operator()(size_t i, const add_layer<reshape_to_<k, nr, nc>, U, E>&)
             {
-                start_node(i, "reshape_to");                
-                out << " | {k|{" << (k != -1 ? k : "unchanged") << "}}";
-                out << " | {nr|{" << (nr != -1 ? nr : "unchanged") << "}}";
-                out << " | {nc|{" << (nc != -1 ? nc : "unchanged") << "}}";
+                start_node(i, "reshape_to");
+                if (k == -1) out << " | {k|{unchanged}}";
+                else out << " | {k|{" << k << "}}";
+                if (nr == -1) out << " | {nr|{unchanged}}";
+                else out << " | {nr|{" << nr << "}}";
+                if (nc == -1) out << " | {nc|{unchanged}}";
+                else out << " | {nc|{" << nc << "}}";
                 end_node();
                 update(i);
             }
