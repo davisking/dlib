@@ -797,6 +797,15 @@ namespace dlib
                 update(i);
             }
 
+            template <unsigned long no, linear_bias_mode bm, typename U, typename E>
+            void operator()(size_t i, const add_layer<linear_<no, bm>, U, E>& l)
+            {
+                start_node(i, "linear");
+                out << " | { outputs |{" << l.layer_details().get_num_outputs() << "}}";
+                end_node();
+                update(i);
+            }
+
             template <typename U, typename E>
             void operator()(size_t i, const add_layer<dropout_, U, E>&)
             {
@@ -1027,6 +1036,20 @@ namespace dlib
                 start_node(i, "reorg");
                 if (sy != 1 || sx != 1)
                     out << " | {stride|{" << sy<< "," << sx << "}}";
+                end_node();
+                update(i);
+            }
+
+            template <long k, long nr, long nc, typename U, typename E>
+            void operator()(size_t i, const add_layer<reshape_to_<k, nr, nc>, U, E>&)
+            {
+                start_node(i, "reshape_to");
+                if (k == -1) out << " | {k|{unchanged}}";
+                else out << " | {k|{" << k << "}}";
+                if (nr == -1) out << " | {nr|{unchanged}}";
+                else out << " | {nr|{" << nr << "}}";
+                if (nc == -1) out << " | {nc|{unchanged}}";
+                else out << " | {nc|{" << nc << "}}";
                 end_node();
                 update(i);
             }
