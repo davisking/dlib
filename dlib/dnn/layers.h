@@ -977,6 +977,186 @@ namespace dlib
     
 // ----------------------------------------------------------------------------------------
 
+    template <long k_ = -1, long nr_ = -1, long nc_ = -1>
+    class reshape_to_
+    {
+    public:
+        explicit reshape_to_() :
+            output_k(k_),
+            output_nr(nr_),
+            output_nc(nc_)
+        {
+            static_assert(k_ == -1 || k_ > 0, "Output k must be positive or -1");
+            static_assert(nr_ == -1 || nr_ > 0, "Output nr must be positive or -1");
+            static_assert(nc_ == -1 || nc_ > 0, "Output nc must be positive or -1");
+
+            input_k = input_nr = input_nc = 0;
+            needs_rescale = false;
+        }
+
+        // Getters for dimensions
+        long get_output_k() const { return output_k; }
+        long get_output_nr() const { return output_nr; }
+        long get_output_nc() const { return output_nc; }
+
+        // Setters for dimensions
+        void set_output_k(long k) {
+            DLIB_CASSERT(k == -1 || k > 0, "Output k must be positive or -1 to keep original dimension");
+            output_k = k;
+        }
+        void set_output_nr(long nr) {
+            DLIB_CASSERT(nr == -1 || nr > 0, "output nr must be positive or -1 to keep original dimension");
+            output_nr = nr;
+        }
+        void set_output_nc(long nc) {
+            DLIB_CASSERT(nc == -1 || nc > 0, "output nc must be positive or -1 to keep original dimension");
+            output_nc = nc;
+        }
+
+        template <typename SUBNET>
+        void setup(const SUBNET& sub)
+        {
+            const auto& input = sub.get_output();
+            input_k = input.k();
+            input_nr = input.nr();
+            input_nc = input.nc();
+
+            // Calculate output dimensions using input dims where target is -1
+            if (k_ == -1) output_k = input_k;
+            if (nr_ == -1) output_nr = input_nr;
+            if (nc_ == -1) output_nc = input_nc;
+
+            // Check if this is well a pure reshape
+            long input_elements = input_k * input_nr * input_nc;
+            long output_elements = output_k * output_nr * output_nc;
+            if (input_elements != output_elements && input_k == output_k) needs_rescale = true;
+            DLIB_CASSERT(input_elements == output_elements || needs_rescale,
+                "Cannot reshape tensor of " << input_elements <<
+                " elements into shape with " << output_elements << " elements. " <<
+                "For spatial rescaling, the channel dimension (k) must remain constant.");
+        }
+
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            // Set the output size (always preserving batch dimension)
+            const tensor& input = sub.get_output();
+            output.set_size(input.num_samples(), output_k, output_nr, output_nc);
+
+            if (!needs_rescale)
+            {
+                // Create an alias of the input tensor with the output shape
+                alias_tensor input_alias(output.num_samples(), output_k, output_nr, output_nc);
+                // Get a view of the input tensor with the new shape
+                auto input_reshaped = input_alias(const_cast<tensor&>(input), 0);
+                // Copy the view to the output tensor
+                tt::copy_tensor(false, output, 0, input_reshaped, 0, input_reshaped.k());
+            }
+            else
+            {
+                // Only spatial dimensions need to be resized
+                tt::resize_bilinear(output, input);
+            }
+        }
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
+        {
+            auto& grad = sub.get_gradient_input();
+
+            if (!needs_rescale) {
+                // Create an alias of the gradient tensor with the original input shape
+                alias_tensor grad_alias(grad.num_samples(), grad.k(), grad.nr(), grad.nc());
+                // Get a view of the input gradient with the required shape
+                auto grad_reshaped = grad_alias(const_cast<tensor&>(gradient_input), 0);
+                // Copy the view to the output gradient
+                tt::copy_tensor(true, grad, 0, grad_reshaped, 0, grad_reshaped.k());
+            }
+            else
+            {
+                // Only spatial dimensions were resized
+                tt::resize_bilinear_gradient(grad, gradient_input);
+            }
+        }
+
+        // Mapping functions for coordinate transformations
+        inline dpoint map_input_to_output(const dpoint& p) const {
+            double scale_x = output_nc / static_cast<double>(input_nc);
+            double scale_y = output_nr / static_cast<double>(input_nr);
+            return dpoint(p.x() * scale_x, p.y() * scale_y);
+        }
+        inline dpoint map_output_to_input(const dpoint& p) const {
+            double scale_x = input_nc / static_cast<double>(output_nc);
+            double scale_y = input_nr / static_cast<double>(output_nr);
+            return dpoint(p.x() * scale_x, p.y() * scale_y);
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const reshape_to_& item, std::ostream& out)
+        {
+            serialize("reshape_to_", out);
+            serialize(item.input_k, out);
+            serialize(item.input_nr, out);
+            serialize(item.input_nc, out);
+            serialize(item.output_k, out);
+            serialize(item.output_nr, out);
+            serialize(item.output_nc, out);
+            serialize(item.needs_rescale, out);
+        }
+
+        friend void deserialize(reshape_to_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "reshape_to_")
+                throw serialization_error("Unexpected version '" + version + "' found while deserializing dlib::reshape_to_.");
+            deserialize(item.input_k, in);
+            deserialize(item.input_nr, in);
+            deserialize(item.input_nc, in);
+            deserialize(item.output_k, in);
+            deserialize(item.output_nr, in);
+            deserialize(item.output_nc, in);
+            deserialize(item.needs_rescale, in);
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const reshape_to_& item)
+        {
+            out << "reshape_to (";
+            out << "k=" << std::to_string(item.output_k);
+            out << ", nr=" << std::to_string(item.output_nr);
+            out << ", nc=" << std::to_string(item.output_nc);
+            out << ", mode=" << (item.needs_rescale ? "spatial_rescale" : "pure_reshape");
+            out << ")";
+            return out;
+        }
+
+        friend void to_xml(const reshape_to_& item, std::ostream& out)
+        {
+            out << "<reshape_to"
+                << " k='" << item.output_k << "'"
+                << " nr='" << item.output_nr << "'"
+                << " nc='" << item.output_nc << "'"
+                << " mode='" << (item.needs_rescale ? "spatial_rescale" : "pure_reshape") << "'"
+                << "/>\n";
+        }
+
+    private:        
+        long input_k, input_nr, input_nc;       // Input dimensions        
+		long output_k, output_nr, output_nc;    // Output dimensions        
+        bool needs_rescale;        
+        resizable_tensor params;                // No trainable parameters
+    };
+
+    template <long k, long nr, long nc, typename SUBNET>
+    using reshape_to = add_layer<reshape_to_<k, nr, nc>, SUBNET>;
+
+    template <long k, long nr, long nc, typename SUBNET>
+    using flatten = add_layer<reshape_to_<k * nr * nc, 1, 1>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     template <
         long _nr,
         long _nc,
