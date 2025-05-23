@@ -5213,7 +5213,7 @@ void test_multm_prev()
             test_embeddings();
             test_tril();
             test_basic_tensor_ops();
-			test_resize_to();
+            test_resize_to();
             test_layers();
             test_visit_functions();
             test_copy_tensor_cpu();
