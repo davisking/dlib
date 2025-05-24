@@ -202,8 +202,12 @@ namespace dlib
         ensures
             - If dlib should use the CUDA implementation of a deep neural network
               then this function returns true and false otherwise.
-            - On program startup this function will return true if DLIB_USE_CUDA is defined.
+            - On program startup this function will return true if DLIB_USE_CUDA is defined and
+              there is an available GPU device to use.
             - This function always returns false if DLIB_USE_CUDA is not defined.
+            - This function sets a thread local variable.  That is, each thread has its own value
+              for use_cuda().  This means that one thread may use cuda while another thread might
+              not, depending on the setting of use_cuda().
     !*/
 
     void set_use_cuda(
@@ -211,7 +215,7 @@ namespace dlib
     );
     /*!
         ensures
-            - #use_cuda() == flag
+            - #use_cuda() == flag for the calling thread.
     !*/
 
 // ----------------------------------------------------------------------------------------

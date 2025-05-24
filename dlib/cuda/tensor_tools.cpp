@@ -22,7 +22,7 @@ namespace dlib
         )
         {
 #ifdef DLIB_USE_CUDA
-            thread_local bool var(true);
+            thread_local bool var(cuda::is_available());
 #else
             thread_local bool var(false);
 #endif

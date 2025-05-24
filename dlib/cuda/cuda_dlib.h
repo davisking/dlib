@@ -25,6 +25,9 @@ namespace dlib
         int get_num_devices (
         );
 
+        bool is_available (
+        );
+
         std::string get_device_name (
             int device
         );
@@ -891,6 +894,9 @@ namespace dlib
 
         inline int get_num_devices (
         ) { return 1; }
+
+        inline bool is_available (
+        ) { return false; }
 
         inline std::string get_device_name (
             int device
