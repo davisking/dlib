@@ -95,6 +95,7 @@
          <item>is_same_object</item> 
          <item>assign_zero_if_built_in_scalar_type</item>
          <item>DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST</item>
+         <item>switch_</item>
       </section>
 
       <section>
@@ -989,6 +990,19 @@ or you can omit the error message and call it like:
                as well as user defined classes.
             </p>
             
+         </description>
+                                 
+      </component>
+            
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>switch_</name>
+         <file>dlib/constexpr_if.h</file>
+         <spec_file link="true">dlib/constexpr_if.h</spec_file>
+         <description>        
+            This function allows you to do compile time dispatch similar to what you can do with constexpr if in C++17, but only requires a C++14 compiler.
          </description>
                                  
       </component>

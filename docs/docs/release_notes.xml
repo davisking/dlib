@@ -34,7 +34,7 @@ New Features and Improvements:
 
    - Update libraries in dlib/external
       - Update libjpeg to version 9e (PR #2619)
-      - Update Pybind11 to v2.10.0 (PR #2660)
+      - Update Pybind11 to v2.12.0 (PR #2970)
 
    - YOLO improvements: Smoothed L1 loss, Focal Loss, Weighted Loss (PR #2628)
 
@@ -46,19 +46,22 @@ New Features and Improvements:
    - Add support for loading custom label fonts in imglab via --font (PR #2733)
    - Add HSV pixel support (PR #2758)
    - Add simple polygon class (PR #2750)
+   - Added a bunch of FFT tooling
+      - Added short time Fourier transforms stft(), istft(), stftr() and istftr() for variants for matrix objects (PR #2627)
+      - Added generalized FFT tooling in the dlib/fft folder (PR #2793)
+   - if constexpr like tooling for C++14 (PR #2654)
+   - Add Byte Pair Encoding (BPE) class, bpe_tokenizer, for subword tokenization (PR #3056)
+   - Many new DNN layers: input_tensor, dropout_rate_, rms_norm_, transpose_, tril_, positional_encodings_, embeddings_, multm_prev_, slice_, linear_, reshape_to_ 
      
 
   # TODO: davis update web docs for this
-   - FFT tooling
-      - stft(), istft(), stftr() and istftr() (PR #2627)
-      - [FFT] split FFT API into different layers #2793
-         - Adds the dlib/fft folder and some more overloads of fft functions.  Update doc links for sure.
-   - if constexpr() for C++14 (PR #2654)
-      - Adds dlib/constexpr_if.h, update doc links with this
    - FFMPEG wrappers: dlib::ffmpeg::decoder and dlib::ffmpeg::demuxer (PR #2707)
 
+
+
+
 Non-Backwards Compatible Changes:
-   - Dlib now requires C++14 and at least CMake version 3.8.0.
+   - Dlib now requires C++14 and at least CMake version 3.10.0.
 
 Bug fixes:
    - Various adjustments to avoid errors on unusual platforms of system configurations.
@@ -69,6 +72,7 @@ Bug fixes:
    - Problem: CUDA error having `code: 716, reason: misaligned address` (PR #2796)
    - Fix pixel saturation in interpolate_quadratic (PR #2806)
    - Fix convolution backward filter cache issue when using cudnn 7 and above (PR #2828)
+   - Fix a bug in the gradient computation code for the layer_normalize layer.
 </current>
 
 <!-- **************************************************************************************  -->

@@ -418,14 +418,6 @@
                   <link>dlib/matrix/matrix_abstract.h.html#csv</link>
                </item>
                <item>
-                  <name>fft</name>
-                  <link>dlib/matrix/matrix_fft_abstract.h.html#fft</link>
-               </item>
-               <item>
-                  <name>ifft</name>
-                  <link>dlib/matrix/matrix_fft_abstract.h.html#ifft</link>
-               </item>
-               <item>
                   <name>is_col_vector</name>
                   <link>dlib/matrix/matrix_utilities_abstract.h.html#is_col_vector</link>
                </item>
@@ -613,6 +605,84 @@
                <item>
                   <name>cartesian_product</name>
                   <link>dlib/matrix/matrix_utilities_abstract.h.html#cartesian_product</link>
+               </item>
+            </sub>
+         </item>
+         <item nolink="true">
+            <name>Fourier Transforms</name>
+            <sub>
+               <item>
+                  <name>fft</name>
+                  <link>dlib/matrix/matrix_fft_abstract.h.html#fft</link>
+               </item>
+               <item>
+                  <name>ifft</name>
+                  <link>dlib/matrix/matrix_fft_abstract.h.html#ifft</link>
+               </item>
+               <item>
+                  <name>fftr</name>
+                  <link>dlib/matrix/matrix_fft_abstract.h.html#fftr</link>
+               </item>
+               <item>
+                  <name>ifftr</name>
+                  <link>dlib/matrix/matrix_fft_abstract.h.html#ifftr</link>
+               </item>
+               <item>
+                  <name>fft_inplace</name>
+                  <link>dlib/matrix/matrix_fft_abstract.h.html#fft_inplace</link>
+               </item>
+               <item>
+                  <name>ifft_inplace</name>
+                  <link>dlib/matrix/matrix_fft_abstract.h.html#ifft_inplace</link>
+               </item>
+
+               <item>
+                  <name>make_hann</name>
+                  <link>dlib/matrix/matrix_fft_abstract.h.html#make_hann</link>
+               </item>
+               <item>
+                  <name>make_blackman</name>
+                  <link>dlib/matrix/matrix_fft_abstract.h.html#make_blackman</link>
+               </item>
+               <item>
+                  <name>make_blackman_nuttall</name>
+                  <link>dlib/matrix/matrix_fft_abstract.h.html#make_blackman_nuttall</link>
+               </item>
+               <item>
+                  <name>make_blackman_harris</name>
+                  <link>dlib/matrix/matrix_fft_abstract.h.html#make_blackman_harris</link>
+               </item>
+               <item>
+                  <name>make_blackman_harris7</name>
+                  <link>dlib/matrix/matrix_fft_abstract.h.html#make_blackman_harris7</link>
+               </item>
+               <item>
+                  <name>make_kaiser</name>
+                  <link>dlib/matrix/matrix_fft_abstract.h.html#make_kaiser</link>
+               </item>
+
+               <item>
+                  <name>stft</name>
+                  <link>dlib/matrix/matrix_fft_abstract.h.html#stft</link>
+               </item>
+               <item>
+                  <name>istft</name>
+                  <link>dlib/matrix/matrix_fft_abstract.h.html#istft</link>
+               </item>
+
+               <item>
+                  <name>stftr</name>
+                  <link>dlib/matrix/matrix_fft_abstract.h.html#stftr</link>
+               </item>
+               <item>
+                  <name>istftr</name>
+                  <link>dlib/matrix/matrix_fft_abstract.h.html#istftr</link>
+               </item>
+
+
+               <item>
+                  <name>xcorr_fft</name>
+                  <link>dlib/matrix/matrix_conv_abstract.h.html#xcorr_fft</link>
                </item>
             </sub>
          </item>
