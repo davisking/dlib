@@ -49,6 +49,7 @@
 #include <dlib/cmd_line_parser.h>
 #include <dlib/misc_api.h>
 #include <dlib/tokenizer/bpe_tokenizer.h>
+#include <dlib/serialize.h>
 #include <dlib/dnn.h>
 
 using namespace std;
@@ -99,24 +100,25 @@ namespace ernie
         tensor& get_layer_params() { return params; }
 
         friend void serialize(const rotary_positional_embedding_& item, std::ostream& out) {
-            serialize("rotary_positional_embedding_", out);
-            serialize(item.seq_len, out);
-            serialize(item.d_head, out);
-            serialize(item.angles, out);
-            serialize(item.cos_values, out);
-            serialize(item.sin_values, out);
+            std::string version = "rotary_positional_embedding_";
+            dlib::serialize(version, out);
+            dlib::serialize(item.seq_len, out);
+            dlib::serialize(item.d_head, out);
+            dlib::serialize(item.angles, out);
+            dlib::serialize(item.cos_values, out);
+            dlib::serialize(item.sin_values, out);
         }
 
         friend void deserialize(rotary_positional_embedding_& item, std::istream& in) {
             std::string version;
-            deserialize(version, in);
+            dlib::deserialize(version, in);
             if (version != "rotary_positional_embedding_")
                 throw serialization_error("Unexpected version found while deserializing rotary_positional_embedding_.");
-            deserialize(item.seq_len, in);
-            deserialize(item.d_head, in);
-            deserialize(item.angles, in);
-            deserialize(item.cos_values, in);
-            deserialize(item.sin_values, in);
+            dlib::deserialize(item.seq_len, in);
+            dlib::deserialize(item.d_head, in);
+            dlib::deserialize(item.angles, in);
+            dlib::deserialize(item.cos_values, in);
+            dlib::deserialize(item.sin_values, in);
         }
 
         friend std::ostream& operator<<(std::ostream& out, const rotary_positional_embedding_& item) {
@@ -1041,7 +1043,7 @@ int main(int argc, char** argv)
                 for (size_t i = 0; i < labels.size(); ++i)
                     if (predicted[i] == labels[i]) correct++;
                 double accuracy = (double)correct / labels.size();
-                cout << "Training accuracy: " << accuracy << "\n";
+                cout << "Training accuracy: " << (accuracy * 100.0) << "%\n";
 
                 // We need perfect accuracy to reconstruct enwiki
                 if (accuracy < 0.9999) {
