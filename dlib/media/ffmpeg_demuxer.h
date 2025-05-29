@@ -362,7 +362,7 @@ namespace dlib
                     devices (X11, webcam, microphone, ...) and network streams such as RTSP, HTTP, and more.
                     Note that a video file, e.g. MP4, can contain multiple streams: video, audio, subtitles, etc.
                     This class can decode both video and audio at the same time.
-                    For audio files, e.g. MP3, FLAG, it only decodes audio. (obs)
+                    For audio files, e.g. MP3, FLAG, it only decodes audio.
             !*/
 
             struct args

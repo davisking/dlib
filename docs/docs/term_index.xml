@@ -167,6 +167,19 @@
          <term file="dlib/dnn/layers_abstract.h.html" name="EXAMPLE_COMPUTATIONAL_LAYER_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="fc_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="con_" include="dlib/dnn.h"/>
+
+         <term file="dlib/dnn/layers_abstract.h.html" name="input_tensor_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="dropout_rate_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="rms_norm_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="transpose_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="tril_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="positional_encodings_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="embeddings_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="multm_prev_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="slice_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="linear_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="reshape_to_" include="dlib/dnn.h"/>
+
          <term file="dlib/dnn/layers_abstract.h.html" name="resize_to_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="resize_prev_to_tagged_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="mult_prev_" include="dlib/dnn.h"/>
@@ -823,9 +836,38 @@
             <term link="dlib/matrix/matrix_utilities_abstract.h.html#is_finite" name="for matrix objects" include="dlib/matrix.h"/>
             <term link="dlib/algs.h.html#is_finite" name="for scalar values" include="dlib/algs.h"/>
          </term>
-         <term file="dlib/matrix/matrix_fft_abstract.h.html" name="fft"                      include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_fft_abstract.h.html" name="ifft"                     include="dlib/matrix.h"/>
-         <term file="dlib/matrix/matrix_fft_abstract.h.html" name="is_power_of_two"          include="dlib/matrix.h"/>
+
+         <term file="dlib/matrix/matrix_fft_abstract.h.html" name="fft_inplace"                      include="dlib/matrix.h"/>
+         <term file="dlib/matrix/matrix_fft_abstract.h.html" name="ifft_inplace"                      include="dlib/matrix.h"/>
+         <term file="dlib/matrix/matrix_fft_abstract.h.html" name="make_hann"                      include="dlib/matrix.h"/>
+         <term file="dlib/matrix/matrix_fft_abstract.h.html" name="make_blackman"                      include="dlib/matrix.h"/>
+         <term file="dlib/matrix/matrix_fft_abstract.h.html" name="make_blackman_nuttall"                      include="dlib/matrix.h"/>
+         <term file="dlib/matrix/matrix_fft_abstract.h.html" name="make_blackman_harris"                      include="dlib/matrix.h"/>
+         <term file="dlib/matrix/matrix_fft_abstract.h.html" name="make_blackman_harris7"                      include="dlib/matrix.h"/>
+         <term file="dlib/matrix/matrix_fft_abstract.h.html" name="make_kaiser"                      include="dlib/matrix.h"/>
+         <term file="dlib/matrix/matrix_fft_abstract.h.html" name="stft"                      include="dlib/matrix.h"/>
+         <term file="dlib/matrix/matrix_fft_abstract.h.html" name="istft"                      include="dlib/matrix.h"/>
+         <term file="dlib/matrix/matrix_fft_abstract.h.html" name="stftr"                      include="dlib/matrix.h"/>
+         <term file="dlib/matrix/matrix_fft_abstract.h.html" name="istftr"                      include="dlib/matrix.h"/>
+
+         <term file="dlib/fft/fft.h.html" name="is_power_of_two"                      include="dlib/matrix.h"/>
+         <term file="dlib/fft/fft.h.html" name="fftr_nc_size"                      include="dlib/matrix.h"/>
+         <term file="dlib/fft/fft.h.html" name="ifftr_nc_size"                      include="dlib/matrix.h"/>
+
+         <term name="fft">
+            <term link="dlib/matrix/matrix_fft_abstract.h.html#fft" name="for matrix objects" include="dlib/matrix.h"/>
+            <term link="dlib/fft/fft.h.html#fft" name="for generic memory buffers" include="dlib/algs.h"/>
+         </term>
+         <term name="fftr">
+            <term link="dlib/matrix/matrix_fft_abstract.h.html#fftr" name="for matrix objects" include="dlib/matrix.h"/>
+            <term link="dlib/fft/fft.h.html#fftr" name="for generic memory buffers" include="dlib/algs.h"/>
+         </term>
+         <term name="ifftr">
+            <term link="dlib/matrix/matrix_fft_abstract.h.html#ifftr" name="for matrix objects" include="dlib/matrix.h"/>
+            <term link="dlib/fft/fft.h.html#ifftr" name="for generic memory buffers" include="dlib/algs.h"/>
+         </term>
+
 
 
          <term file="dlib/matrix/matrix_la_abstract.h.html" name="lu_decomposition"          include="dlib/matrix.h"/>
@@ -848,6 +890,10 @@
          <term file="dlib/matrix/matrix_la_abstract.h.html" name="chol"                      include="dlib/matrix.h"/>
 
 
+         <term file="metaprogramming.html" name="switch_"          include="dlib/constexpr_if.h"/>
+         <term file="dlib/constexpr_if.h.html" name="bools"                  include="dlib/constexpr_if.h"/>
+         <term file="dlib/constexpr_if.h.html" name="true_t"                  include="dlib/constexpr_if.h"/>
+         <term file="dlib/constexpr_if.h.html" name="false_t"                  include="dlib/constexpr_if.h"/>
 
          <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="rowm"                  include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="rowm_exp"              include="dlib/matrix.h"/>
@@ -939,6 +985,10 @@
          <term file="containers.html" name="storage_sbo"                     include="dlib/any.h"/>
          <term file="containers.html" name="storage_shared"                     include="dlib/any.h"/>
          <term file="containers.html" name="storage_view"                     include="dlib/any.h"/>
+         <term file="dlib/any/storage.h.html" name="bad_any_cast"    include="dlib/any.h"/>
+         <term file="dlib/any/storage.h.html" name="storage_base"    include="dlib/any.h"/>
+         <term file="dlib/optional.h.html" name="bad_optional_access"    include="dlib/optional.h"/>
+         <term file="dlib/optional.h.html" name="nullopt_t"    include="dlib/optional.h"/>
 
          <term file="metaprogramming.html" name="compile_time_integer_list"          include="dlib/metaprogramming.h"/>
          <term file="metaprogramming.html" name="make_compile_time_integer_range"    include="dlib/metaprogramming.h"/>
@@ -1480,7 +1530,7 @@
          <term file="dlib/type_safe_union/type_safe_union_kernel_abstract.h.html" name="type_safe_union_size"            include="dlib/type_safe_union.h"/>
          <term file="dlib/type_safe_union/type_safe_union_kernel_abstract.h.html" name="type_safe_union_alternative"            include="dlib/type_safe_union.h"/>
          <term file="dlib/type_safe_union/type_safe_union_kernel_abstract.h.html" name="for_each_type"            include="dlib/type_safe_union.h"/>
-         <term file="dlib/type_safe_union/type_safe_union_kernel_abstract.h.html" name="overloaded"            include="dlib/type_safe_union.h"/>
+         <term file="dlib/overloaded.h.html" name="overloaded"            include="dlib/overloaded.h"/>
          <term file="dlib/type_safe_union/type_safe_union_kernel_abstract.h.html" name="visit"            include="dlib/type_safe_union.h"/>
          <term file="containers.html" name="type_safe_union"            include="dlib/type_safe_union.h"/>
 
@@ -1834,6 +1884,7 @@
          <term file="parsing.html" name="string_assign"              include="dlib/string.h"/>
          <term link="parsing.html#string_assign" name="sa"           include="dlib/string.h"/>
          <term file="parsing.html" name="tokenizer"                  include="dlib/tokenizer.h"/>
+         <term file="ml.html" name="bpe_tokenizer"                  include="dlib/tokenizer.h"/>
          <term file="parsing.html" name="wrap_string"                include="dlib/string.h"/>
          <term file="parsing.html" name="xml_parser"                 include="dlib/xml_parser.h"/>
          <term file="dlib/xml_parser/xml_parser_kernel_interfaces.h.html" name="document_handler"  include="dlib/xml_parser.h"/>
@@ -1909,6 +1960,45 @@
 
          <term link="dlib/general_hash/general_hash.h.html" name="general_hash"  include="dlib/general_hash/general_hash.h"/>
 
+
+         <term file="other.html" name="decoder"                                       include="dlib/media.h"/>
+         <term file="other.html" name="demuxer"                                       include="dlib/media.h"/>
+         <term file="other.html" name="encoder"                                       include="dlib/media.h"/>
+         <term file="other.html" name="muxer"                                       include="dlib/media.h"/>
+         <term file="other.html" name="frame"                                       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_demuxer.h.html" name="wrap"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_demuxer.h.html" name="decoder_codec_args"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_demuxer.h.html" name="load_frame"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_muxer.h.html" name="encoder_image_args"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_muxer.h.html" name="encoder_audio_args"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_muxer.h.html" name="encoder_codec_args"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_muxer.h.html" name="save_frame"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="get_pixel_fmt_str"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="get_audio_fmt_str"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="get_channel_layout_str"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="logger_ffmpeg"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="logger_dlib_wrapper"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="pix_traits"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="sample_traits"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="audio"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="codec_details"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="muxer_details"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="device_details"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="device_instance"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="list_protocols"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="list_demuxers"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="list_muxers"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="list_codecs"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="list_input_device_types"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="list_output_device_types"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="list_input_device_instances"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="list_output_device_instances"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="video_enabled_t"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="audio_enabled_t"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="convert"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="resizing_args"       include="dlib/media.h"/>
+         <term file="dlib/media/ffmpeg_utils.h.html" name="resampling_args"       include="dlib/media.h"/>
+         <term file="dlib/media/sink.h.html" name="sink"       include="dlib/media.h"/>
 
          <term file="other.html" name="database"                                       include="dlib/sqlite.h"/>
          <term file="other.html" name="statement"                                      include="dlib/sqlite.h"/>

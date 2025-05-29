@@ -61,7 +61,7 @@ namespace dlib
             template<typename T>
             auto perform_correct_action(T& obj)
             {
-                return switch(
+                return switch_(
                     types_<T>{},
                     [&](types_<A>, auto _) {
                         return _(obj).set_something_specific_to_A_and_return_something();
@@ -81,7 +81,7 @@ namespace dlib
             template<typename T>
             auto transfer_state(T& a, T& b)
             {
-                return switch(
+                return switch_(
                     bools(std::is_move_constructible<T>{}, std::is_copy_constructible<T>{}),
                     [&](true_t, auto, auto _) {
                         // T is both move-constructible. Copy semantics can be anything

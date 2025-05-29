@@ -297,6 +297,10 @@
                   <link>dnn_mmod_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Deep learning Language Modeling</name>
+                  <link>slm_basic_train_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Self-supervised deep feature learning</name>
                   <link>dnn_self_supervised_learning_ex.cpp.html</link>
                </item>
@@ -649,6 +653,55 @@
                <item>
                   <name>Multithreaded Object</name>
                   <link>multithreaded_object_ex.cpp.html</link>
+               </item>
+
+               <item>
+                  <name>FFMPEG: query codec capability</name>
+                  <link>ffmpeg_info_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>FFMPEG: capture audio</name>
+                  <link>ffmpeg_file_to_speaker_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>FFMPEG: capture audio to file</name>
+                  <link>ffmpeg_microphone_to_file_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>FFMPEG: RTSP</name>
+                  <link>ffmpeg_rtsp_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>FFMPEG: screen grabbing</name>
+                  <link>ffmpeg_screen_grab_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>FFMPEG: read video with demuxer</name>
+                  <link>ffmpeg_video_demuxing_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>FFMPEG: demux images and audio</name>
+                  <link>ffmpeg_video_demuxing2_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>FFMPEG: decode video</name>
+                  <link>ffmpeg_video_decoding_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>FFMPEG: decode video another example</name>
+                  <link>ffmpeg_video_decoding2_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>FFMPEG: encode video</name>
+                  <link>ffmpeg_video_encoding_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>FFMPEG: encode video with muxer</name>
+                  <link>ffmpeg_video_muxing_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>FFMPEG: face pose from webcam</name>
+                  <link>ffmpeg_webcam_face_pose_ex.cpp.html</link>
                </item>
             </sub>
          </item>

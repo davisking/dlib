@@ -12,10 +12,14 @@
 
 <current>
 New Features and Improvements:
-   - Added auto_train_multiclass_svm_linear_classifier(), a tool that trains a multiclass
-     SVM linear classifier without requiring the user to supply any hyperparameters.
-   - Add draw_solid_polygon() (PR #2775)
-   - Add insert_image_chip() (PR #2781)
+   - Machine Learning
+      - Added auto_train_multiclass_svm_linear_classifier(), a tool that trains a multiclass
+        SVM linear classifier without requiring the user to supply any hyperparameters.
+      - YOLO improvements: Smoothed L1 loss, Focal Loss, Weighted Loss (PR #2628)
+      - Add Byte Pair Encoding (BPE) class, bpe_tokenizer, for subword tokenization (PR #3056)
+      - Many new DNN layers: input_tensor, dropout_rate_, rms_norm_, transpose_,
+        tril_, positional_encodings_, embeddings_, multm_prev_, slice_, linear_,
+        reshape_to_
 
    - Unify all conversions to UTF-32 #2737
       - Adds convert_to_utf32()
@@ -26,39 +30,34 @@ New Features and Improvements:
          - Contains type trait back ports and also many older dlib type traits that can now be
            aliased to those in C++14 or earlier.
       - dlib::optional (PR #2815)
-
+   - Added constexpr if like tooling for C++14 (PR #2654)
    - Container classes
       - Support noexcept dlib::type_safe_union::swap() (PR #2604)
-      - dlib::optional (PR #2815)
       - New type erasure tooling in dlib/any/storage.h (PR #2666)
 
    - Update libraries in dlib/external
       - Update libjpeg to version 9e (PR #2619)
-      - Update Pybind11 to v2.10.0 (PR #2660)
-
-   - YOLO improvements: Smoothed L1 loss, Focal Loss, Weighted Loss (PR #2628)
+      - Update Pybind11 to v2.12.0 (PR #2970)
 
    - Speeding things up:
       - Optimize pointer to matrix assignment (PR #2822)
       - circular_buffer : 10X speedup (PR #2779)
       - type_safe_union : visit() and apply_to_contents() performance improvements (PR #2615)
       - Speed up DNN execution.  PRs: 2656, 2839, 2842
+
    - Add support for loading custom label fonts in imglab via --font (PR #2733)
    - Add HSV pixel support (PR #2758)
+   - Add draw_solid_polygon() (PR #2775)
+   - Add insert_image_chip() (PR #2781)
    - Add simple polygon class (PR #2750)
-     
-
-  # TODO: davis update web docs for this
-   - FFT tooling
-      - stft(), istft(), stftr() and istftr() (PR #2627)
-      - [FFT] split FFT API into different layers #2793
-         - Adds the dlib/fft folder and some more overloads of fft functions.  Update doc links for sure.
-   - if constexpr() for C++14 (PR #2654)
-      - Adds dlib/constexpr_if.h, update doc links with this
+   - Added a lot of new FFT tooling
+      - Added short time Fourier transforms stft(), istft(), stftr() and istftr()
+        for variants for matrix objects (PR #2627)
+      - Added generalized FFT tooling in the dlib/fft folder (PR #2793)
    - FFMPEG wrappers: dlib::ffmpeg::decoder and dlib::ffmpeg::demuxer (PR #2707)
 
 Non-Backwards Compatible Changes:
-   - Dlib now requires C++14 and at least CMake version 3.8.0.
+   - Dlib now requires C++14 and at least CMake version 3.10.0.
 
 Bug fixes:
    - Various adjustments to avoid errors on unusual platforms of system configurations.
@@ -69,6 +68,7 @@ Bug fixes:
    - Problem: CUDA error having `code: 716, reason: misaligned address` (PR #2796)
    - Fix pixel saturation in interpolate_quadratic (PR #2806)
    - Fix convolution backward filter cache issue when using cudnn 7 and above (PR #2828)
+   - Fix a bug in the gradient computation code for the layer_normalize layer.
 </current>
 
 <!-- **************************************************************************************  -->
