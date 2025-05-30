@@ -45,6 +45,7 @@
 #include <fstream>
 #include <chrono>
 #include <algorithm>
+#include <csignal>
 #include <dlib/data_io.h>
 #include <dlib/cmd_line_parser.h>
 #include <dlib/misc_api.h>
@@ -428,10 +429,9 @@ namespace {
             cerr << "ERROR: Could not set control handler" << endl;
         }
 #else
-        struct sigaction sa;
-        sa.sa_handler = signal_handler;
+        struct sigaction sa {};
         sigemptyset(&sa.sa_mask);
-        sa.sa_flags = 0;
+        sa.sa_handler = signal_handler;
         sigaction(SIGINT, &sa, NULL);
 #endif
     }
@@ -689,7 +689,6 @@ int main(int argc, char** argv)
         parser.add_option("beta2", "Set Adam's second moment coefficient (default: 0.999)", 1);
         parser.add_option("model-file", "Path for model (default: ernie_model.dat)", 1);
         parser.add_option("output-file", "Path for output (default: enwiki_generated.txt)", 1);
-        parser.add_option("prompt-tokens", "Number of tokens for initial prompt (default: seq-len)", 1);
         parser.add_option("tokenizer", "Path to pre-trained tokenizer (default: ernie_tokenizer.vocab)", 1);
         parser.add_option("tokens-file", "Path to pre-tokenized tokens file (optional)", 1);
         parser.add_option("force-tokenize", "Force tokenization even if tokens file exists");
@@ -705,9 +704,9 @@ int main(int argc, char** argv)
 
         // Default values
         const double learning_rate = get_option(parser, "learning-rate", 1e-4);
-        const long batch_size = get_option(parser, "batch-size", 64);
+        const size_t batch_size = get_option(parser, "batch-size", 64);
         const long patience = get_option(parser, "patience", 15000);
-        const long max_epochs = get_option(parser, "max-epochs", 10);
+        const size_t max_epochs = get_option(parser, "max-epochs", 10);
         const double alpha = get_option(parser, "alpha", 0.004);
         const double beta1 = get_option(parser, "beta1", 0.9);
         const double beta2 = get_option(parser, "beta2", 0.999);
@@ -720,7 +719,6 @@ int main(int argc, char** argv)
         const long embedding_dim = 228;
         const std::string tokenizer_path = get_option(parser, "tokenizer", "ernie_tokenizer.vocab");
         // Default number of prompt tokens = input sequence length
-        const long prompt_tokens = get_option(parser, "prompt-tokens", max_seq_len);
         const bool force_tokenize = parser.option("force-tokenize");
         const long num_tokens = 1000;
 
