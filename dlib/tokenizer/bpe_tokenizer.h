@@ -71,9 +71,11 @@ namespace dlib
         // Train the tokenizer on the given text
         void train(const std::string& text, int vocab_size, bool verbose = false)
         {
-            DLIB_CASSERT(vocab_size >= (BASE_VOCAB_SIZE + special_tokens.size()));
+            int current_base = static_cast<int>(BASE_VOCAB_SIZE + special_tokens.size());
+            DLIB_CASSERT(vocab_size >= current_base);
             this->vocab_size = vocab_size;
-            int num_merges = vocab_size - (BASE_VOCAB_SIZE + special_tokens.size());
+            int num_merges = vocab_size - current_base;
+            DLIB_CASSERT(num_merges > 0);
 
             // Convert text to byte IDs
             std::vector<int> ids;
