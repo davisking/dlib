@@ -2337,8 +2337,8 @@ namespace dlib
 
     public:
         linear_() :
-            num_outputs(num_outputs_),
             num_inputs(0),
+            num_outputs(num_outputs_),            
             learning_rate_multiplier(1),
             bias_mode(bias_mode_) {
         }
