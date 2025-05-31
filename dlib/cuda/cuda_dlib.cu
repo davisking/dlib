@@ -44,6 +44,13 @@ namespace dlib
             CHECK_CUDA(cudaSetDeviceFlags(cudaDeviceScheduleBlockingSync));
         }
 
+        bool is_available(
+        ) 
+        {
+            int num_devices;
+            return cudaGetDeviceCount(&num_devices) == cudaSuccess && num_devices > 0;
+        }
+
         int get_num_devices (
         )
         {
