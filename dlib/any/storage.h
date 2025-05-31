@@ -248,7 +248,7 @@ namespace dlib
             !*/
             {
                 if (this != &other) 
-                    *this = std::move(storage_heap{other});
+                    *this = storage_heap{other};
                 return *this;
             }
 
