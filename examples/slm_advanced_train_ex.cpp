@@ -990,8 +990,9 @@ int main(int argc, char** argv)
                     batch_labels.reserve(batch_size);
 
                     for (size_t j = 0; j < batch_size; ++j) {
-                        batch_samples.push_back(samples[indices[i + j]]);
-                        batch_labels.push_back(labels[indices[i + j]]);
+                        size_t pos = (i + j) >= indices.size() ? j : (i + j);
+                        batch_samples.push_back(samples[indices[pos]]);
+                        batch_labels.push_back(labels[indices[pos]]);
                     }
 
                     // Train on this batch
