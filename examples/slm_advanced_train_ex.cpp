@@ -262,9 +262,9 @@ namespace ernie
         tag1<SUBNET>>>>>>>>>>>>>>>>>>>>>;
 
     template <template <typename> class DO, long num_experts, typename SUBNET>
-    using moe_router = softmax<fc<num_experts,
+    using moe_router = softmax<fc<num_experts, avg_pool_everything<
         DO<leaky_relu<fc<16, DO<leaky_relu<fc<32,
-        DO<fc<16, SUBNET>>>>>>>>>>;
+        DO<fc<16, SUBNET>>>>>>>>>>>;
 
     // Single expert network
     template <template <typename> class ACT, template <typename> class DO,
@@ -968,8 +968,6 @@ int main(int argc, char** argv)
             auto start_time = std::chrono::steady_clock::now();
 
             // Shuffle indices for epoch
-            std::random_device rd;
-            std::mt19937 g(rd());
             std::vector<size_t> indices(samples.size());
             std::iota(indices.begin(), indices.end(), 0);
 
@@ -977,7 +975,7 @@ int main(int argc, char** argv)
                 && !g_terminate_flag.load())
             {
                 // Shuffle for new epoch
-                std::shuffle(indices.begin(), indices.end(), g);
+                std::shuffle(indices.begin(), indices.end(), std::default_random_engine{});
 
                 // Process mini-batches
                 for (size_t i = 0; i < samples.size() && !g_terminate_flag.load(); i += batch_size)
