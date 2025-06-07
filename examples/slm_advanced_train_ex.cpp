@@ -56,8 +56,19 @@
 using namespace std;
 using namespace dlib;
 
-namespace ernie
+namespace dlib
 {
+    /*!
+        @class rotary_positional_embedding_
+        @brief Implements Rotary Positional Embeddings (RoPE) for transformers
+
+        This layer applies rotary positional embeddings to queries and keys in
+        self-attention layers, providing relative positional information without
+        absolute position embeddings.
+
+        The implementation follows the RoPE formulation from [2], where positions
+        are encoded through rotation matrices applied to pairs of dimensions.
+    !*/
     class rotary_positional_embedding_ {
     public:
         explicit rotary_positional_embedding_() = default;
@@ -386,7 +397,7 @@ namespace ernie
         struct model_info {
             static std::string describe() {
                 std::stringstream ss;
-                ss << "ERNIE Transformer model configuration:\n"
+                ss << "Transformer model configuration:\n"
                     << "- vocabulary size: " << VOCAB_SIZE << "\n"
                     << "- layers: " << NUM_LAYERS << "\n"
                     << "- attention heads: " << NUM_HEADS << "\n"
@@ -674,9 +685,9 @@ int main(int argc, char** argv)
         command_line_parser parser;
         parser.add_option("train", "Train a transformer model on enwiki");
         parser.add_option("generate", "Generate enwiki from a previously trained model");
-        parser.add_option("verify", "Verify generated output against original enwiki");
+        parser.add_option("verify", "Verify generated output against original data");
         parser.add_option("tokenize-only", "Only tokenize the input file and save tokens");
-        parser.add_option("enwiki", "Path to the enwiki file", 1);
+        parser.add_option("enwiki", "Path to the enwiki file (default: enwiki.txt)", 1);
         parser.add_option("max-tokens", "Maximum number of tokens to load in memory", 1);
         parser.add_option("max-bytes", "Maximum number of bytes to process from enwiki", 1);
         parser.add_option("percent", "Percentage of enwiki to process (0-100)", 1);
@@ -687,9 +698,9 @@ int main(int argc, char** argv)
         parser.add_option("alpha", "Set the weight decay for Adam (default: 0.004)", 1);
         parser.add_option("beta1", "Set Adam's first moment coefficient (default: 0.9)", 1);
         parser.add_option("beta2", "Set Adam's second moment coefficient (default: 0.999)", 1);
-        parser.add_option("model-file", "Path for model (default: ernie_model.dat)", 1);
+        parser.add_option("model-file", "Path for model (default: slm_enwiki_model.dat)", 1);
         parser.add_option("output-file", "Path for output (default: enwiki_generated.txt)", 1);
-        parser.add_option("tokenizer", "Path to pre-trained tokenizer (default: ernie_tokenizer.vocab)", 1);
+        parser.add_option("tokenizer", "Path to pre-trained tokenizer (default: enwiki_tokenizer.vocab)", 1);
         parser.add_option("tokens-file", "Path to pre-tokenized tokens file (optional)", 1);
         parser.add_option("force-tokenize", "Force tokenization even if tokens file exists");
         parser.parse(argc, argv);
@@ -710,14 +721,14 @@ int main(int argc, char** argv)
         const double alpha = get_option(parser, "alpha", 0.004);
         const double beta1 = get_option(parser, "beta1", 0.9);
         const double beta2 = get_option(parser, "beta2", 0.999);
-        const std::string model_file = get_option(parser, "model-file", "ernie_model.dat");
+        const std::string model_file = get_option(parser, "model-file", "slm_enwiki_model.dat");
         const std::string output_file = get_option(parser, "output-file", "enwiki_generated.txt");
-        const std::string enwiki_path = get_option(parser, "enwiki", "enwiki");
+        const std::string enwiki_path = get_option(parser, "enwiki", "enwiki.txt");
         const long max_seq_len = 180;
         const long num_layers = 2;
         const long num_heads = 6;
         const long embedding_dim = 228;
-        const std::string tokenizer_path = get_option(parser, "tokenizer", "ernie_tokenizer.vocab");
+        const std::string tokenizer_path = get_option(parser, "tokenizer", "enwiki_tokenizer.vocab");
         // Default number of prompt tokens = input sequence length
         const bool force_tokenize = parser.option("force-tokenize");
         const long num_tokens = 1000;
@@ -760,7 +771,7 @@ int main(int argc, char** argv)
             parser.option("tokens-file").argument() :
             generate_tokens_filename(enwiki_path, max_bytes);
 
-        using ernie_transformer = ernie::transformer_config<
+        using enwiki_transformer = transformer_config<
             num_tokens,     // vocab_size
             num_layers,     // number of layers
             num_heads,      // number of attention heads
@@ -945,9 +956,9 @@ int main(int argc, char** argv)
             cout << "Created " << samples.size() << " training samples (100%)...\n";
 
             // 5) Build and train the network
-            using net_type = ernie_transformer::network_type<true>;
+            using net_type = enwiki_transformer::network_type<true>;
             net_type net;
-            cout << "Model architecture:\n" << ernie_transformer::model_info::describe() << endl;
+            cout << "Model architecture:\n" << enwiki_transformer::model_info::describe() << endl;
             if (file_exists(model_file)) deserialize(model_file) >> net;
 
             // Create trainer
@@ -958,7 +969,7 @@ int main(int argc, char** argv)
             // For perfect memorization, we allow more epochs without improvement
             trainer.set_iterations_without_progress_threshold(patience);
             trainer.set_max_num_epochs(max_epochs); // More epochs for perfect memorization
-            trainer.set_synchronization_file("ernie_trainer.sync", std::chrono::minutes(10));
+            trainer.set_synchronization_file("enwiki_trainer.sync", std::chrono::minutes(10));
             trainer.be_quiet();
 
             // Custom training loop - trainer.train(samples, labels)
@@ -1027,27 +1038,29 @@ int main(int argc, char** argv)
             net.clean();
             serialize(model_file) << net;
             cout << "Model saved to " << model_file << "\n";
-            std::remove("ernie_trainer.sync");
-            std::remove("ernie_trainer.sync_");
+            std::remove("enwiki_trainer.sync");
+            std::remove("enwiki_trainer.sync_");
 
             // Evaluate on training set
-            if (!g_terminate_flag.load()) {
-                cout << "Evaluating model accuracy...\n";
-                using net_infer = ernie_transformer::network_type<false>;
-                net_infer g_infer = net;
-                auto predicted = g_infer(samples);
-                size_t correct = 0;
-                for (size_t i = 0; i < labels.size(); ++i)
-                    if (predicted[i] == labels[i]) correct++;
-                double accuracy = (double)correct / labels.size();
-                cout << "Training accuracy: " << (accuracy * 100.0) << "%\n";
+            {
+                if (!g_terminate_flag.load()) {
+                    cout << "Evaluating model accuracy...\n";
+                    using net_infer = enwiki_transformer::network_type<false>;
+                    net_infer g_infer = net;
+                    auto predicted = g_infer(samples);
+                    size_t correct = 0;
+                    for (size_t i = 0; i < labels.size(); ++i)
+                        if (predicted[i] == labels[i]) correct++;
+                    double accuracy = (double)correct / labels.size();
+                    cout << "Training accuracy: " << (accuracy * 100.0) << "%\n";
 
-                // We need perfect accuracy to reconstruct enwiki
-                if (accuracy < 0.9999) {
-                    cout << "WARNING: Model accuracy is less than 99.99%. The model may not "
-                        << "perfectly reconstruct the input text.\n";
+                    // We need perfect accuracy to reconstruct enwiki
+                    if (accuracy < 0.9999) {
+                        cout << "WARNING: Model accuracy is less than 99.99%. The model may not "
+                            << "perfectly reconstruct the input text.\n";
+                    }
                 }
-            }
+            }            
         }
 
         // ----------------------------------------------------------------------------------------
@@ -1058,7 +1071,7 @@ int main(int argc, char** argv)
             cout << "=== GENERATION MODE ===\n";
 
             // 1) Load the model
-            using net_infer = ernie_transformer::network_type<false>;
+            using net_infer = enwiki_transformer::network_type<false>;
             net_infer net;
             if (file_exists(model_file)) {
                 deserialize(model_file) >> net;
