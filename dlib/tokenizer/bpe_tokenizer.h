@@ -58,9 +58,8 @@ namespace dlib
         {
             int current_base = static_cast<int>(BASE_VOCAB_SIZE + special_tokens.size());
             DLIB_CASSERT(vocab_size >= current_base);
-            this->vocab_size = vocab_size;
             int num_merges = vocab_size - current_base;
-            DLIB_CASSERT(num_merges > 0);
+            if (num_merges <= 0) return;
 
             // Convert text to byte IDs
             std::vector<int> ids;
@@ -68,7 +67,8 @@ namespace dlib
             for (char c : text) ids.push_back(static_cast<uint8_t>(c));
 
             // Perform BPE merges
-            for (int i = 0; i < num_merges; ++i) {
+            int n_merges = 0;
+            for (; n_merges < num_merges; ++n_merges) {
                 auto stats = get_stats(ids);
                 if (stats.empty()) break;
 
@@ -80,12 +80,12 @@ namespace dlib
                 size_t new_token_length = vocab[pair.first].size() + vocab[pair.second].size();
                 if (new_token_length > MAX_TOKEN_LENGTH) {
                     if (verbose)
-                        std::cout << "\r" << std::setw(100) << std::flush << "\r[skip] merge " << (i + 1)
+                        std::cout << "\r" << std::setw(100) << std::flush << "\r[skip] merge " << (n_merges + 1)
                         << ": token too long: " << new_token_length << "/" << MAX_TOKEN_LENGTH << std::flush;
                     continue; // Skip this merge
                 }
 
-                int new_id = current_base + i;
+                int new_id = current_base + n_merges;
                 merges[pair] = new_id;
 
                 std::vector<uint8_t>& new_token = vocab[new_id];
@@ -96,10 +96,11 @@ namespace dlib
                 ids = merge(ids, pair, new_id);
 
                 if (verbose)
-                    std::cout << "\r" << std::setw(100) << std::flush << "\r[merge] " << (i + 1) << "/" << num_merges
+                    std::cout << "\r" << std::setw(100) << std::flush << "\r[merge] " << (n_merges + 1) << "/" << num_merges
                     << ": (" << pair.first << "," << pair.second << ") -> " << new_id
                     << " (" << bytes_to_string(vocab[new_id]) << ")" << std::endl;
             }
+            this->vocab_size = current_base + n_merges;
         }
 
         // Encode the given text into subword tokens without paragraph splitting or special token wrapping
@@ -271,7 +272,7 @@ namespace dlib
         // Save the tokenizer model and vocabulary to file
         friend void serialize(const bpe_tokenizer& tok, std::ostream& out)
         {
-            serialize("bpe_tokenizer2_", out);
+            serialize("bpe_tokenizer_", out);
             serialize(tok.special_tokens, out);
             serialize(tok.special_token_map, out);
             serialize(tok.merges, out);
@@ -283,7 +284,7 @@ namespace dlib
         friend void deserialize(bpe_tokenizer& tok, std::istream& in) {
             std::string version;
             dlib::deserialize(version, in);
-            if (version != "bpe_tokenizer2_")
+            if (version != "bpe_tokenizer_")
                 throw dlib::serialization_error("Unexpected version '" + version + "' found while deserializing dlib::bpe_tokenizer_.");
             deserialize(tok.special_tokens, in);
             deserialize(tok.special_token_map, in);
@@ -366,14 +367,16 @@ namespace dlib
             // Iterate over all pairs in the statistics map
             for (const auto& stat : stats) {
                 const std::pair<int, int>& pair = stat.first; // Extract the token pair
-                int count = stat.second; // Extract the frequency count
+                int frequency = stat.second; // Extract the frequency
 
                 // Check if the new token formed by merging the pair would exceed the maximum allowed length
                 size_t new_token_length = vocab.at(pair.first).size() + vocab.at(pair.second).size();
                 if (new_token_length > MAX_TOKEN_LENGTH) continue; // Skip this pair if it exceeds the maximum token length
 
                 // Calculate the score for this pair (frequency * length_penalty)
-                double score = (size_t)count * (new_token_length > (MAX_TOKEN_LENGTH / 2) ? 1.75 : 1.0);
+                double length_bonus = std::min(2.0, 1.0 + (static_cast<double>(new_token_length) - 2.0) * 0.1);
+                double frequency_weight = std::log1p(frequency);
+                double score = frequency_weight * length_bonus;
 
                 // Update the best pair if the current pair has a higher score
                 if (score > max_score)
