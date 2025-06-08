@@ -31,36 +31,21 @@ namespace dlib
                 vocab[i] = std::vector<uint8_t>{ static_cast<uint8_t>(i) };
             
             // Initialize special tokens with sequential IDs
-            special_tokens =
-            {
-                {"<text>",      BASE_VOCAB_SIZE},
-                {"</text>",     BASE_VOCAB_SIZE + 1},
-                {"<url>",       BASE_VOCAB_SIZE + 2},
-                {"</url>",      BASE_VOCAB_SIZE + 3},
-                {"<image>",     BASE_VOCAB_SIZE + 4},
-                {"</image>",    BASE_VOCAB_SIZE + 5},
-                {"<video>",     BASE_VOCAB_SIZE + 6},
-                {"</video>",    BASE_VOCAB_SIZE + 7},
-                {"<audio>",     BASE_VOCAB_SIZE + 8},
-                {"</audio>",    BASE_VOCAB_SIZE + 9},
-                {"<file>",      BASE_VOCAB_SIZE + 10},
-                {"</file>",     BASE_VOCAB_SIZE + 11},
-                {"<code>",      BASE_VOCAB_SIZE + 12},
-                {"</code>",     BASE_VOCAB_SIZE + 13},
-                {"<summary>",   BASE_VOCAB_SIZE + 14},
-                {"</summary>",  BASE_VOCAB_SIZE + 15},
-                {"<think>",     BASE_VOCAB_SIZE + 16},
-                {"</think>",    BASE_VOCAB_SIZE + 17},
-                {"<start>",     BASE_VOCAB_SIZE + 18},
-                {"<end>",       BASE_VOCAB_SIZE + 19},
-                {"<user>",      BASE_VOCAB_SIZE + 20},
-                {"<bot>",       BASE_VOCAB_SIZE + 21},
-                {"<system>",    BASE_VOCAB_SIZE + 22},
-                {"<question>",  BASE_VOCAB_SIZE + 23},
-                {"<answer>",    BASE_VOCAB_SIZE + 24},
-                {"<search>",    BASE_VOCAB_SIZE + 25},
-                {"<unk>",       BASE_VOCAB_SIZE + 26},
-                {"<pad>",       BASE_VOCAB_SIZE + 27}
+            special_tokens = {
+                {"<text>", BASE_VOCAB_SIZE},            {"</text>", BASE_VOCAB_SIZE + 1},
+                {"<url>", BASE_VOCAB_SIZE + 2},         {"</url>", BASE_VOCAB_SIZE + 3},
+                {"<image>", BASE_VOCAB_SIZE + 4},       {"</image>", BASE_VOCAB_SIZE + 5},
+                {"<video>", BASE_VOCAB_SIZE + 6},       {"</video>", BASE_VOCAB_SIZE + 7},
+                {"<audio>", BASE_VOCAB_SIZE + 8},       {"</audio>", BASE_VOCAB_SIZE + 9},
+                {"<file>", BASE_VOCAB_SIZE + 10},       {"</file>", BASE_VOCAB_SIZE + 11},
+                {"<code>", BASE_VOCAB_SIZE + 12},       {"</code>", BASE_VOCAB_SIZE + 13},
+                {"<summary>", BASE_VOCAB_SIZE + 14},    {"</summary>", BASE_VOCAB_SIZE + 15},
+                {"<think>", BASE_VOCAB_SIZE + 16},      {"</think>", BASE_VOCAB_SIZE + 17},
+                {"<start>", BASE_VOCAB_SIZE + 18},      {"<end>", BASE_VOCAB_SIZE + 19},
+                {"<user>", BASE_VOCAB_SIZE + 20},       {"<bot>", BASE_VOCAB_SIZE + 21},
+                {"<system>", BASE_VOCAB_SIZE + 22},     {"<question>", BASE_VOCAB_SIZE + 23},
+                {"<answer>", BASE_VOCAB_SIZE + 24},     {"<search>", BASE_VOCAB_SIZE + 25},
+                {"<unk>", BASE_VOCAB_SIZE + 26},        {"<pad>", BASE_VOCAB_SIZE + 27}
             };
 
             // Initialize the vector of special token IDs
@@ -79,6 +64,7 @@ namespace dlib
 
             // Convert text to byte IDs
             std::vector<int> ids;
+            ids.reserve(text.size());
             for (char c : text) ids.push_back(static_cast<uint8_t>(c));
 
             // Perform BPE merges
@@ -88,38 +74,31 @@ namespace dlib
 
                 // Find the most frequent pair that does not exceed MAX_TOKEN_LENGTH
                 auto pair = get_most_frequent_pair(stats);
+                if (pair.first == -1) break;
 
                 // Check if the resulting token would exceed MAX_TOKEN_LENGTH
                 size_t new_token_length = vocab[pair.first].size() + vocab[pair.second].size();
                 if (new_token_length > MAX_TOKEN_LENGTH) {
                     if (verbose)
-                    {
-                        std::cout << "\r"
-                            << std::setw(100) << std::flush
-                            << "\rskipping merge " << std::to_string(i + 1) << "/" << std::to_string(num_merges) << ": ("
-                            << std::to_string(pair.first) << "," << std::to_string(pair.second) << ") -> new token length "
-                            << std::to_string(new_token_length) << " exceeds limit of " << std::to_string(MAX_TOKEN_LENGTH)
-                            << std::flush;
-                    }
+                        std::cout << "\r" << std::setw(100) << std::flush << "\r[skip] merge " << (i + 1)
+                        << ": token too long: " << new_token_length << "/" << MAX_TOKEN_LENGTH << std::flush;
                     continue; // Skip this merge
                 }
 
-                int idx = (BASE_VOCAB_SIZE + (int)special_tokens.size()) + i;
-                ids = merge(ids, pair, idx);
-                merges[pair] = idx;
-                vocab[idx].insert(vocab[idx].end(), vocab[pair.first].begin(), vocab[pair.first].end());
-                vocab[idx].insert(vocab[idx].end(), vocab[pair.second].begin(), vocab[pair.second].end());
+                int new_id = current_base + i;
+                merges[pair] = new_id;
+
+                std::vector<uint8_t>& new_token = vocab[new_id];
+                new_token.reserve(new_token_length);
+                new_token.insert(new_token.end(), vocab[pair.first].begin(), vocab[pair.first].end());
+                new_token.insert(new_token.end(), vocab[pair.second].begin(), vocab[pair.second].end());
+
+                ids = merge(ids, pair, new_id);
 
                 if (verbose)
-                {
-                    std::cout << "\r"
-                        << std::setw(100) << std::flush
-                        << "\rmerge " << std::to_string(i + 1) << "/" << std::to_string(num_merges) << ": ("
-                        << std::to_string(pair.first) << "," << std::to_string(pair.second) << ") -> " << std::to_string(idx)
-                        << " (" << bytes_to_string(vocab[idx]) << ") had "
-                        << std::to_string(stats[pair]) << " occurrences"
-                        << std::endl;
-                }
+                    std::cout << "\r" << std::setw(100) << std::flush << "\r[merge] " << (i + 1) << "/" << num_merges
+                    << ": (" << pair.first << "," << pair.second << ") -> " << new_id
+                    << " (" << bytes_to_string(vocab[new_id]) << ")" << std::endl;
             }
         }
 
