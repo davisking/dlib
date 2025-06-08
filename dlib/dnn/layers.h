@@ -2337,8 +2337,8 @@ namespace dlib
 
     public:
         explicit linear_() :
-            num_inputs(0),
-            num_outputs(num_outputs_),            
+            num_outputs(num_outputs_),
+            num_inputs(0),                        
             learning_rate_multiplier(1),
             bias_mode(bias_mode_) {
         }
@@ -2368,8 +2368,7 @@ namespace dlib
 
         double get_learning_rate_multiplier() const { return learning_rate_multiplier; }
         void set_learning_rate_multiplier(double val) { learning_rate_multiplier = val; }
-
-        unsigned long get_num_inputs() const { return num_inputs; }
+        
         unsigned long get_num_outputs() const { return num_outputs; }
         void set_num_outputs(long num)
         {
@@ -2381,6 +2380,7 @@ namespace dlib
                 num_outputs = num;
             }
         }
+        unsigned long get_num_inputs() const { return num_inputs; }
         linear_bias_mode get_bias_mode() const { return bias_mode; }
 
         template <typename SUBNET>
@@ -2526,8 +2526,8 @@ namespace dlib
         }
 
     private:
-        unsigned long num_inputs;
         unsigned long num_outputs;
+        unsigned long num_inputs;        
         double learning_rate_multiplier;
         linear_bias_mode bias_mode;
         resizable_tensor params;
