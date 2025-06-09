@@ -26,7 +26,7 @@ namespace dlib
             for (long i = -2; i <= 2; ++i)
                 for (long j = -2; j <= 2; ++j)
                     if (i!=0||j!=0)
-                        neighbors.push_back(point(p.x()+i,p.y()+j));
+                        neighbors.emplace_back(p.x()+i,p.y()+j);
         }
     };
 
@@ -37,16 +37,16 @@ namespace dlib
             std::vector<point>& neighbors
         ) const
         {
-            neighbors.push_back(point(p.x()+1,p.y()+1));
-            neighbors.push_back(point(p.x()+1,p.y()  ));
-            neighbors.push_back(point(p.x()+1,p.y()-1));
+            neighbors.emplace_back(p.x()+1,p.y()+1);
+            neighbors.emplace_back(p.x()+1,p.y()  );
+            neighbors.emplace_back(p.x()+1,p.y()-1);
 
-            neighbors.push_back(point(p.x(),p.y()+1));
-            neighbors.push_back(point(p.x(),p.y()-1));
+            neighbors.emplace_back(p.x(),p.y()+1);
+            neighbors.emplace_back(p.x(),p.y()-1);
 
-            neighbors.push_back(point(p.x()-1,p.y()+1));
-            neighbors.push_back(point(p.x()-1,p.y()  ));
-            neighbors.push_back(point(p.x()-1,p.y()-1));
+            neighbors.emplace_back(p.x()-1,p.y()+1);
+            neighbors.emplace_back(p.x()-1,p.y()  );
+            neighbors.emplace_back(p.x()-1,p.y()-1);
         }
     };
 
@@ -57,10 +57,10 @@ namespace dlib
             std::vector<point>& neighbors
         ) const
         {
-            neighbors.push_back(point(p.x()+1,p.y()));
-            neighbors.push_back(point(p.x()-1,p.y()));
-            neighbors.push_back(point(p.x(),p.y()+1));
-            neighbors.push_back(point(p.x(),p.y()-1));
+            neighbors.emplace_back(p.x()+1,p.y());
+            neighbors.emplace_back(p.x()-1,p.y());
+            neighbors.emplace_back(p.x(),p.y()+1);
+            neighbors.emplace_back(p.x(),p.y()-1);
         }
     };
 
