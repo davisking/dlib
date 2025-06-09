@@ -13,7 +13,7 @@ if(POLICY CMP0077)
    cmake_policy(SET CMP0077 NEW)
 endif()
 
-project(dlib LANGUAGES C CXX CUDA)
+project(dlib LANGUAGES C CXX)
 
 set(CPACK_PACKAGE_NAME "dlib")
 set(CPACK_PACKAGE_VERSION_MAJOR "20")
@@ -639,6 +639,7 @@ if (NOT TARGET dlib)
 
 
       if (DLIB_USE_CUDA)
+         enable_language(CUDA)
          find_package(CUDAToolkit)
          find_package(CUDNN)
 
