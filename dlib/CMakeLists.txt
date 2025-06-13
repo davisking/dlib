@@ -664,6 +664,8 @@ if (NOT TARGET dlib)
 
             include_directories(${CUDAToolkit_INCLUDE_DIRS} ${CUDNN_INCLUDE_PATH})
             message(STATUS "Enabling CUDA support for dlib.  DLIB WILL USE CUDA, compute capabilities: ${DLIB_CUDA_COMPUTE_CAPABILITIES}")
+
+
          else()
             set(DLIB_USE_CUDA OFF CACHE STRING ${DLIB_USE_BLAS_STR} FORCE )
             toggle_preprocessor_switch(DLIB_USE_CUDA)
@@ -719,6 +721,10 @@ if (NOT TARGET dlib)
       endif()
 
       add_library(dlib ${source_files})
+
+      if(DLIB_USE_CUDA)
+         set_property(TARGET dlib PROPERTY CUDA_ARCHITECTURES native) 
+      endif()
 
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
 
