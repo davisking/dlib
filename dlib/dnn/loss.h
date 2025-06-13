@@ -3863,7 +3863,7 @@ namespace dlib
                 }
 
                 // The loss is the squared norm of the gradient
-                loss += length_squared(rowm(mat(grad), n));
+                loss += 0.5 * length_squared(rowm(mat(grad), n));
             }
         };
     }
