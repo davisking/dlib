@@ -731,7 +731,7 @@ int main(int argc, char** argv)
         const std::string tokenizer_path = get_option(parser, "tokenizer", "enwiki_tokenizer.vocab");
         // Default number of prompt tokens = input sequence length
         const bool force_tokenize = parser.option("force-tokenize");
-        const long num_tokens = 50000;
+        const long num_tokens = 5000;
 
         // Calculate max bytes to process
         size_t max_bytes = 0, max_tokens = 0;
@@ -803,7 +803,7 @@ int main(int argc, char** argv)
             // 2) Train a new tokenizer if needed
             if (!file_exists(tokenizer_path)) {
                 cout << "Training new BPE tokenizer with vocabulary size " << num_tokens << "...\n";
-                tokenizer.train(enwiki_text, num_tokens, true);
+                tokenizer.train(enwiki_text, num_tokens, 1e6, true);
                 serialize(tokenizer_path) << tokenizer;
                 cout << "Tokenizer saved to " << tokenizer_path << endl;
             }
@@ -874,7 +874,7 @@ int main(int argc, char** argv)
                 // 2) Train a new tokenizer if needed
                 if (!file_exists(tokenizer_path)) {
                     cout << "Training new BPE tokenizer with vocabulary size " << num_tokens << "...\n";
-                    tokenizer.train(enwiki_text, num_tokens, true);
+                    tokenizer.train(enwiki_text, num_tokens, 1e6, true);
                     serialize(tokenizer_path) << tokenizer;
                     cout << "Tokenizer saved to " << tokenizer_path << endl;
                 }
