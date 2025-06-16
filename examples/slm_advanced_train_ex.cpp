@@ -694,11 +694,11 @@ int main(int argc, char** argv)
         parser.add_option("learning-rate", "Set the learning rate (default: 1e-4)", 1);
         parser.add_option("batch-size", "Set the mini-batch size (default: 64)", 1);
         parser.add_option("patience", "Iterations without progress before early stopping (default: 15000)", 1);
-        parser.add_option("max-epochs", "Maximum number of training epochs (default: 10)", 1);
+        parser.add_option("max-epochs", "Maximum number of training epochs (default: 50)", 1);
         parser.add_option("alpha", "Set the weight decay for Adam (default: 0.004)", 1);
         parser.add_option("beta1", "Set Adam's first moment coefficient (default: 0.9)", 1);
         parser.add_option("beta2", "Set Adam's second moment coefficient (default: 0.999)", 1);
-        parser.add_option("model-file", "Path for model (default: slm_enwiki_model.dat)", 1);
+        parser.add_option("model-file", "Path for model (default: dlib_slm_enwiki_model.dat)", 1);
         parser.add_option("output-file", "Path for output (default: enwiki_generated.txt)", 1);
         parser.add_option("tokenizer", "Path to pre-trained tokenizer (default: enwiki_tokenizer.vocab)", 1);
         parser.add_option("tokens-file", "Path to pre-tokenized tokens file (optional)", 1);
@@ -717,11 +717,11 @@ int main(int argc, char** argv)
         const double learning_rate = get_option(parser, "learning-rate", 1e-4);
         const size_t batch_size = get_option(parser, "batch-size", 64);
         const long patience = get_option(parser, "patience", 15000);
-        const size_t max_epochs = get_option(parser, "max-epochs", 10);
+        const size_t max_epochs = get_option(parser, "max-epochs", 50);
         const double alpha = get_option(parser, "alpha", 0.004);
         const double beta1 = get_option(parser, "beta1", 0.9);
         const double beta2 = get_option(parser, "beta2", 0.999);
-        const std::string model_file = get_option(parser, "model-file", "slm_enwiki_model.dat");
+        const std::string model_file = get_option(parser, "model-file", "dlib_slm_enwiki_model.dat");
         const std::string output_file = get_option(parser, "output-file", "enwiki_generated.txt");
         const std::string enwiki_path = get_option(parser, "enwiki", "enwiki.txt");
         const long max_seq_len = 180;
@@ -731,7 +731,7 @@ int main(int argc, char** argv)
         const std::string tokenizer_path = get_option(parser, "tokenizer", "enwiki_tokenizer.vocab");
         // Default number of prompt tokens = input sequence length
         const bool force_tokenize = parser.option("force-tokenize");
-        const long num_tokens = 1000;
+        const long num_tokens = 50000;
 
         // Calculate max bytes to process
         size_t max_bytes = 0, max_tokens = 0;
@@ -817,7 +817,7 @@ int main(int argc, char** argv)
                 cout << "Warning: Special tokens not found in tokenizer vocabulary.\n";
             full_tokens.clear();
             full_tokens.push_back(text_start_id);
-            auto encoded_tokens = tokenizer.encode_raw(enwiki_text);
+            auto encoded_tokens = tokenizer.encode(enwiki_text);
             full_tokens.insert(full_tokens.end(), encoded_tokens.begin(), encoded_tokens.end());
             full_tokens.push_back(text_end_id);
             auto end_time = std::chrono::high_resolution_clock::now();
@@ -888,7 +888,7 @@ int main(int argc, char** argv)
                 auto start_time = std::chrono::high_resolution_clock::now();
                 full_tokens.clear();
                 full_tokens.push_back(text_start_id);
-                auto encoded_tokens = tokenizer.encode_raw(enwiki_text);
+                auto encoded_tokens = tokenizer.encode(enwiki_text);
                 full_tokens.insert(full_tokens.end(), encoded_tokens.begin(), encoded_tokens.end());
                 full_tokens.push_back(text_end_id);
                 auto end_time = std::chrono::high_resolution_clock::now();
@@ -1145,7 +1145,7 @@ int main(int argc, char** argv)
                 int text_start_id = tokenizer.get_special_token_id("<text>");
                 prompt_tokens.clear();                
                 prompt_tokens.push_back(text_start_id);
-                auto encoded_tokens = tokenizer.encode_raw(enwiki_prompt);
+                auto encoded_tokens = tokenizer.encode(enwiki_prompt);
                 prompt_tokens.insert(prompt_tokens.end(), encoded_tokens.begin(), encoded_tokens.end());
             }
 
@@ -1266,7 +1266,7 @@ int main(int argc, char** argv)
         // ----------------------------------------------------------------------------------------
         if (parser.option("verify"))
         {
-            cout << "=== VERIFicAtiON MODE ===\n";
+            cout << "=== VERIFICATION MODE ===\n";
 
             if (!file_exists(enwiki_path)) {
                 cerr << "Error: Original enwiki file not found at " << enwiki_path << "\n";
