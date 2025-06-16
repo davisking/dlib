@@ -213,7 +213,8 @@ namespace dlib
                     const std::vector<uint8_t>& pattern = merges[token].pattern;
                     result.insert(result.end(), pattern.begin(), pattern.end());
                 }
-                else if (token >= static_cast<int>(merges.size()) && token < get_vocab_without_specials_size()) {
+                else if (token >= static_cast<int>(merges.size()) &&
+                    token < static_cast<int>(get_vocab_without_specials_size())) {
                     // Special token
                     int special_idx = token - static_cast<int>(merges.size());
                     if (display_special_tokens) {
@@ -321,7 +322,7 @@ namespace dlib
             "<user>", "<bot>", "<system>", "<question>",
             "<answer>", "<search>", "<unk>", "<pad>"
         };
-        static const size_t BPE_BASE_VOCAB_SIZE = 256;
+        static const int BPE_BASE_VOCAB_SIZE = 256;
 
         // Merge structure
         struct Merge {
