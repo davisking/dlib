@@ -214,11 +214,10 @@ namespace dlib
                     result.insert(result.end(), pattern.begin(), pattern.end());
                 }
                 else if (token >= static_cast<int>(merges.size()) &&
-                    token < static_cast<int>(get_vocab_without_specials_size())) {
+                    token < static_cast<int>(get_vocab_size())) {
                     // Special token
-                    int special_idx = token - static_cast<int>(merges.size());
                     if (display_special_tokens) {
-                        auto it = special_token_map.find(special_idx);
+                        auto it = special_token_map.find(token);
                         if (it != special_token_map.end()) {
                             const std::string& special_str = it->second;
                             result.insert(result.end(), special_str.begin(), special_str.end());
