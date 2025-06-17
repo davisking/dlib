@@ -2329,24 +2329,46 @@ namespace dlib
 
     template <
         unsigned long num_outputs_,
-        linear_bias_mode bias_mode_
+        linear_bias_mode bias_mode_ = LINEAR_HAS_BIAS
     >
     class linear_
     {
         static_assert(num_outputs_ > 0, "The number of outputs from a linear_ layer must be > 0");
 
     public:
-        linear_() :
+        explicit linear_() :
             num_outputs(num_outputs_),
-            num_inputs(0),
+            num_inputs(0),                        
             learning_rate_multiplier(1),
             bias_mode(bias_mode_) {
         }
 
+        linear_(const linear_& other) :
+            num_outputs(other.num_outputs),
+            num_inputs(other.num_inputs),
+            learning_rate_multiplier(other.learning_rate_multiplier),
+            bias_mode(other.bias_mode),
+            params(other.params),
+            weights(other.weights),
+            biases(other.biases) {
+        }
+
+        linear_& operator=(const linear_& other) {
+            if (this != &other) {
+                num_outputs = other.num_outputs;
+                num_inputs = other.num_inputs;
+                learning_rate_multiplier = other.learning_rate_multiplier;
+                bias_mode = other.bias_mode;
+                params = other.params;
+                weights = other.weights;
+                biases = other.biases;
+            }
+            return *this;
+        }
+
         double get_learning_rate_multiplier() const { return learning_rate_multiplier; }
         void set_learning_rate_multiplier(double val) { learning_rate_multiplier = val; }
-
-        unsigned long get_num_inputs() const { return num_inputs; }
+        
         unsigned long get_num_outputs() const { return num_outputs; }
         void set_num_outputs(long num)
         {
@@ -2358,6 +2380,7 @@ namespace dlib
                 num_outputs = num;
             }
         }
+        unsigned long get_num_inputs() const { return num_inputs; }
         linear_bias_mode get_bias_mode() const { return bias_mode; }
 
         template <typename SUBNET>
@@ -2503,8 +2526,8 @@ namespace dlib
         }
 
     private:
-        unsigned long num_inputs;
         unsigned long num_outputs;
+        unsigned long num_inputs;        
         double learning_rate_multiplier;
         linear_bias_mode bias_mode;
         resizable_tensor params;
@@ -2515,7 +2538,7 @@ namespace dlib
         unsigned long num_outputs,
         typename SUBNET
     >
-    using linear = add_layer<linear_<num_outputs, LINEAR_HAS_BIAS>, SUBNET>;
+    using linear = add_layer<linear_<num_outputs>, SUBNET>;
 
     template <
         unsigned long num_outputs,
