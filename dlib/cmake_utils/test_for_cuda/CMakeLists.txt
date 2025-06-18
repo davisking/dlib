@@ -6,10 +6,9 @@ include_directories(../../cuda)
 add_definitions(-DDLIB_USE_CUDA)
 
 # Override the FindCUDA.cmake setting to avoid duplication of host flags if using a toolchain:
+# Do we still need this/
 option(CUDA_PROPAGATE_HOST_FLAGS "Propage C/CXX_FLAGS and friends to the host compiler via -Xcompile" OFF)
 
-
-# find_package(CUDA 7.5 REQUIRED)
 enable_language(CUDA)
 find_package(CUDAToolkit)
 
