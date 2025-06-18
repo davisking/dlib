@@ -723,7 +723,7 @@ if (NOT TARGET dlib)
       add_library(dlib ${source_files})
 
       if(DLIB_USE_CUDA)
-         set_property(TARGET dlib PROPERTY CUDA_ARCHITECTURES native) 
+         set_property(TARGET dlib PROPERTY CUDA_ARCHITECTURES all) 
       endif()
 
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
