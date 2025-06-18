@@ -26,7 +26,8 @@ list(APPEND CMAKE_PREFIX_PATH ${CUDNN_ROOT})
 set(CUDNN_INCLUDE_DIR $ENV{CUDNN_INCLUDE_DIR} CACHE PATH "Folder containing NVIDIA cuDNN header files")
 
 find_path(CUDNN_INCLUDE_PATH cudnn.h
-  HINTS ${CUDNN_INCLUDE_DIR}
+  HINTS ${CUDNN_INCLUDE_DIR} ENV CUDNN_INCLUDE_DIR  ENV CUDNN_HOME
+  PATHS /usr/local /usr/local/cuda "C:/Program Files/NVIDIA/CUDNN/*/include/${CUDA_VERSION}" "C:/Program Files/NVIDIA/CUDNN/*/include/*" ENV CPATH
   PATH_SUFFIXES cuda/include cuda include)
 
 option(CUDNN_STATIC "Look for static CUDNN" OFF)
@@ -42,7 +43,7 @@ if (CUDNN_LIBRARY MATCHES ".*cudnn_static.a" AND NOT CUDNN_STATIC)
 endif()
 
 find_library(CUDNN_LIBRARY_PATH ${CUDNN_LIBNAME}
-  PATHS ${CUDNN_LIBRARY}
+  PATHS ${CUDNN_LIBRARY} /usr/local /usr/local/cuda "C:/Program Files/NVIDIA/CUDNN/*/lib/${CUDA_VERSION}" "C:/Program Files/NVIDIA/CUDNN/*/lib/*" ENV LD_LIBRARY_PATH
   PATH_SUFFIXES lib lib64 cuda/lib cuda/lib64 lib/x64)
 
 find_package_handle_standard_args(CUDNN DEFAULT_MSG CUDNN_LIBRARY_PATH CUDNN_INCLUDE_PATH)
