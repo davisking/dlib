@@ -319,7 +319,7 @@ namespace dlib
     }
 
     template <typename pixel_type>
-    long width_step (const numpy_image<pixel_type>& img)
+    size_t width_step (const numpy_image<pixel_type>& img)
     {
         if (img.size()==0)
             return 0;
