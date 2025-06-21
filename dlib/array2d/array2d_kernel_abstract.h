@@ -242,7 +242,7 @@ namespace dlib
                 - returns #*this
         !*/
 
-        long width_step (
+        size_t width_step (
         ) const;
         /*!
             ensures

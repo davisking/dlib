@@ -96,7 +96,7 @@ namespace dlib
         long NC,
         typename MM
         >
-    inline long width_step(
+    inline size_t width_step(
         const matrix<T,NR,NC,MM>& img
     ) 
     { 
