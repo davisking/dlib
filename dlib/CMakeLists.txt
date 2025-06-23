@@ -639,33 +639,40 @@ if (NOT TARGET dlib)
 
 
       if (DLIB_USE_CUDA)
-         enable_language(CUDA)
          find_package(CUDAToolkit)
-         find_package(CUDNN)
+      
+         if (CUDAToolkit_FOUND)
+            enable_language(CUDA)
 
-         if (CUDAToolkit_FOUND AND CUDNN_FOUND)
-            set(source_files ${source_files} 
-               cuda/cuda_dlib.cu 
-               cuda/cudnn_dlibapi.cpp
-               cuda/cublas_dlibapi.cpp
-               cuda/cusolver_dlibapi.cu
-               cuda/curand_dlibapi.cpp
-               cuda/cuda_data_ptr.cpp
-               cuda/gpu_data.cpp
-               )
-            list (APPEND dlib_needed_private_libraries CUDA::cublas)
-            list (APPEND dlib_needed_private_libraries ${CUDNN_LIBRARY_PATH})
-            list (APPEND dlib_needed_private_libraries CUDA::curand)
-            list (APPEND dlib_needed_private_libraries CUDA::cusolver)
-            list (APPEND dlib_needed_private_libraries CUDA::cudart)
-            if(openmp_libraries)
-               list (APPEND dlib_needed_private_libraries ${openmp_libraries})
-            endif()
+            find_package(CUDNN)
 
-            include_directories(${CUDAToolkit_INCLUDE_DIRS} ${CUDNN_INCLUDE_PATH})
-            message(STATUS "Enabling CUDA support for dlib.  DLIB WILL USE CUDA, compute capabilities: ${DLIB_CUDA_COMPUTE_CAPABILITIES}")
+            if(CUDNN_FOUND)
+               set(source_files ${source_files} 
+                  cuda/cuda_dlib.cu 
+                  cuda/cudnn_dlibapi.cpp
+                  cuda/cublas_dlibapi.cpp
+                  cuda/cusolver_dlibapi.cu
+                  cuda/curand_dlibapi.cpp
+                  cuda/cuda_data_ptr.cpp
+                  cuda/gpu_data.cpp
+                  )
+               list (APPEND dlib_needed_private_libraries CUDA::cublas)
+               list (APPEND dlib_needed_private_libraries ${CUDNN_LIBRARY_PATH})
+               list (APPEND dlib_needed_private_libraries CUDA::curand)
+               list (APPEND dlib_needed_private_libraries CUDA::cusolver)
+               list (APPEND dlib_needed_private_libraries CUDA::cudart)
+               if(openmp_libraries)
+                  list (APPEND dlib_needed_private_libraries ${openmp_libraries})
+               endif()
 
-
+               include_directories(${CUDAToolkit_INCLUDE_DIRS} ${CUDNN_INCLUDE_PATH})
+               message(STATUS "Enabling CUDA support for dlib.  DLIB WILL USE CUDA, compute capabilities: ${DLIB_CUDA_COMPUTE_CAPABILITIES}")
+            else()
+                set(DLIB_USE_CUDA OFF CACHE STRING ${DLIB_USE_BLAS_STR} FORCE )
+               toggle_preprocessor_switch(DLIB_USE_CUDA)
+               message(STATUS "DID NOT FIND CUDNN")
+               message(STATUS "Disabling CUDA support for dlib.  DLIB WILL NOT USE CUDA")
+               endif()
          else()
             set(DLIB_USE_CUDA OFF CACHE STRING ${DLIB_USE_BLAS_STR} FORCE )
             toggle_preprocessor_switch(DLIB_USE_CUDA)
