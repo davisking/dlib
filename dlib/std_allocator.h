@@ -66,17 +66,17 @@ namespace dlib
         /*constructors and destructor
          *-nothing to do because the std_allocator has no state
         */
-        std_allocator() throw() { }
+        std_allocator() noexcept { }
 
-        std_allocator(const std_allocator&) throw() { } 
+        std_allocator(const std_allocator&) noexcept { } 
 
         template <typename U>
-        std_allocator (const std_allocator<U,M>&) throw() { }
+        std_allocator (const std_allocator<U,M>&) noexcept { }
 
-        ~std_allocator() throw() { }
+        ~std_allocator() noexcept { }
 
         //return maximum number of elements that can be allocated
-        size_type max_size () const throw() 
+        size_type max_size () const noexcept 
         {
             //for numeric_limits see Section 4.3, page 59
             return std::numeric_limits<size_t>::max() / sizeof(T);
@@ -173,14 +173,14 @@ namespace dlib
     bool operator== (
         const std_allocator<T1,M1>&,
         const std_allocator<T2,M2>&
-    ) throw() 
+    ) noexcept 
     { return std_alloc_compare<M1,M2>::are_interchangeable; }
 
     template <typename T1, typename M1, typename T2, typename M2>
     bool operator!= (
         const std_allocator<T1,M1>&,
         const std_allocator<T2,M2>&
-    ) throw() 
+    ) noexcept 
     { return !std_alloc_compare<M1,M2>::are_interchangeable; }
 
 // ----------------------------------------------------------------------------------------

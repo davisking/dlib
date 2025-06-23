@@ -20,7 +20,7 @@ namespace dlib
         !*/
 
     public:
-          virtual const char* what() const throw() { return "bad_any_cast"; }
+          virtual const char* what() const noexcept { return "bad_any_cast"; }
     };
 
 // ----------------------------------------------------------------------------------------

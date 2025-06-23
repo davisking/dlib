@@ -93,7 +93,7 @@ namespace dlib
                 ) : dlib::error(msg), l1(l1_), l2(l2_) {};
 
             virtual ~invalid_label(
-            ) throw() {}
+            ) noexcept {}
 
             label_type l1, l2;
         };

@@ -82,7 +82,7 @@ namespace dlib
                 required_opts()
             { set_info_string(); }
 
-            ~cmd_line_check_error() throw() {}
+            ~cmd_line_check_error() noexcept {}
 
             void set_info_string (
             )

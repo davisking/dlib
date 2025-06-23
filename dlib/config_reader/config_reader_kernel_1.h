@@ -90,7 +90,7 @@ namespace dlib
                 file_name(file_name_)
             {}
 
-            ~file_not_found() throw() {}
+            ~file_not_found() noexcept {}
 
         public:
             const std::string file_name;
@@ -117,7 +117,7 @@ namespace dlib
                 const_cast<std::string&>(info) = sout.str();
             }
 
-            ~config_reader_access_error() throw() {}
+            ~config_reader_access_error() noexcept {}
             const std::string block_name;
             const std::string key_name;
         };
