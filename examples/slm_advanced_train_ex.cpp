@@ -178,38 +178,36 @@ namespace dlib
             tensor_type& x,
             bool is_backward = false
         ) const {
+            DLIB_CASSERT(x.nc() == d_head, "Input dimension must match d_head param");
+            DLIB_CASSERT(x.nr() == seq_len, "Sequence length must match seq_len param");
+
             const long batch_size = x.num_samples();
             const long num_heads = x.k();
-            const long seq_length = x.nr();
-            const long dim = x.nc();
-            const bool is_odd = (dim % 2 != 0);
-            const long rot_dim = is_odd ? dim - 1 : dim;
-
-            DLIB_CASSERT(dim == d_head, "Input dimension must match d_head param");
-            DLIB_CASSERT(seq_length == seq_len, "Sequence length must match seq_len param");
-
+            const bool is_odd = (d_head % 2 != 0);
+            const long rot_dim = is_odd ? d_head - 1 : d_head;
+            
             auto* ptr = x.host();
-            const long stride = seq_length * dim;
+            const long stride = seq_len * d_head;
 
             for (long n = 0; n < batch_size; ++n) {
                 for (long h = 0; h < num_heads; ++h) {
                     auto* x_ptr = ptr + (n * num_heads + h) * stride;
 
-                    for (long pos = 0; pos < seq_length; ++pos) {
+                    for (long pos = 0; pos < seq_len; ++pos) {
                         const float* cos = &cos_values(pos, 0);
                         const float* sin = &sin_values(pos, 0);
 
                         for (long i = 0; i < rot_dim; i += 2) {
-                            const float x0 = x_ptr[pos * dim + i];
-                            const float x1 = x_ptr[pos * dim + i + 1];
+                            const float x0 = x_ptr[pos * d_head + i];
+                            const float x1 = x_ptr[pos * d_head + i + 1];
 
                             if (!is_backward) {
-                                x_ptr[pos * dim + i] = x0 * cos[i / 2] - x1 * sin[i / 2];
-                                x_ptr[pos * dim + i + 1] = x0 * sin[i / 2] + x1 * cos[i / 2];
+                                x_ptr[pos * d_head + i] = x0 * cos[i / 2] - x1 * sin[i / 2];
+                                x_ptr[pos * d_head + i + 1] = x0 * sin[i / 2] + x1 * cos[i / 2];
                             }
                             else {
-                                x_ptr[pos * dim + i] = x0 * cos[i / 2] + x1 * sin[i / 2];
-                                x_ptr[pos * dim + i + 1] = -x0 * sin[i / 2] + x1 * cos[i / 2];
+                                x_ptr[pos * d_head + i] = x0 * cos[i / 2] + x1 * sin[i / 2];
+                                x_ptr[pos * d_head + i + 1] = -x0 * sin[i / 2] + x1 * cos[i / 2];
                             }
                         }
                     }
@@ -280,7 +278,7 @@ namespace dlib
     // Single expert network
     template <template <typename> class ACT, template <typename> class DO,
         long d_model, typename SUBNET>
-    using expert = DO<linear<d_model, ACT<DO<linear<d_model * 4, SUBNET>>>>>;
+    using expert = DO<linear<d_model, DO<ACT<linear<d_model * 4, SUBNET>>>>>;
 
     // Combines expert outputs using router probabilities
     // Performs weighted sum of experts with residual connection
@@ -320,12 +318,13 @@ namespace dlib
         multihead_attention<ACT, DO, seq_len, d_model, num_heads, SUBNET>>;
 
     // Positional Embeddings
-    template <long num_embeddings, long embedding_length, typename SUBNET>
-    using positional_embeddings = layer_norm<positional_encodings<embeddings<num_embeddings, embedding_length, SUBNET>>>;
+    template <template <typename> class DO, long num_embeddings, long embedding_length, typename SUBNET>
+    using positional_embeddings = rms_norm<DO<positional_encodings<
+        embeddings<num_embeddings, embedding_length, SUBNET>>>>;
 
     // Classification Head   
-    template <template <typename> class ACT, long num_logits, long embedding_length, typename SUBNET>
-    using classification_head = loss_multiclass_log<fc<num_logits, avg_pool_everything<SUBNET>>>;
+    template <long num_logits, typename SUBNET>
+    using classification_head = loss_multiclass_log<fc<num_logits, SUBNET>>;
 
     /**
      * @brief Transformer Model Configuration Template
@@ -343,10 +342,10 @@ namespace dlib
      * @param dropout_policy Dropout regularization policy
      */
     template <
-        long vocab_size = 5000,                                 // Default vocabulary size
+        long vocab_size = 15000,                                // Default vocabulary size
         long num_layers = 6,                                    // Default number of layers
         long num_heads = 8,                                     // Default number of attention heads
-        long embedding_dim = 128,                               // Default embedding dimension
+        long embedding_dim = 512,                               // Default embedding dimension
         long max_seq_len = 300,                                 // Default maximum sequence length
         template <typename> class activation_func = gelu,       // Default activation function
         template <typename> class dropout_policy = dropout_10   // Default dropout policy
@@ -373,11 +372,6 @@ namespace dlib
 
         // Network component definitions
         template <typename SUBNET>
-        using t_projection = fc<EMBEDDING_DIM, relu<bn_fc<fc<EMBEDDING_DIM * 2, SUBNET>>>>;
-        template <typename SUBNET>
-        using i_projection = fc<EMBEDDING_DIM, relu<affine<fc<EMBEDDING_DIM * 2, SUBNET>>>>;
-
-        template <typename SUBNET>
         using t_transformer_block =
             transformer_block<activation_func, dropout_policy, MAX_SEQ_LEN, EMBEDDING_DIM, NUM_HEADS, SUBNET>;
 
@@ -387,12 +381,12 @@ namespace dlib
 
         template<bool is_training>
         using network_type = std::conditional_t<is_training,
-            classification_head<activation_func, VOCAB_SIZE, EMBEDDING_DIM,
-            t_projection<repeat<NUM_LAYERS, t_transformer_block,
-            positional_embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>,
-            classification_head<activation_func, VOCAB_SIZE, EMBEDDING_DIM,
-            i_projection<repeat<NUM_LAYERS, i_transformer_block,
-            positional_embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>>;
+            classification_head<VOCAB_SIZE,
+            repeat<NUM_LAYERS, t_transformer_block,
+            positional_embeddings<dropout_policy, VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>,
+            classification_head<VOCAB_SIZE,
+            repeat<NUM_LAYERS, i_transformer_block,
+            positional_embeddings<multiply, VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>;
 
         struct model_info {
             static std::string describe() {
@@ -674,6 +668,78 @@ bool verify_match(const std::string& original, const std::string& generated) {
 }
 
 // ----------------------------------------------------------------------------------------
+class context_manager {
+public:
+    context_manager(size_t max_context_tokens = 1024, size_t min_prompt_tokens = 100,
+        int padding_token = -1) : max_context_size_(max_context_tokens),
+        min_prompt_size_(min_prompt_tokens), padding_token_(padding_token) {
+
+        if (min_prompt_tokens >= max_context_tokens)
+            throw std::invalid_argument("Minimum prompt size must be smaller than maximum context size");
+
+        if (min_prompt_tokens < 10)
+            throw std::invalid_argument("Minimum prompt size must be at least 10");
+    }
+
+    // Add a single token to the context
+    void add_token(int token) {
+        if (current_context_.size() >= max_context_size_) current_context_.pop_front();
+        current_context_.push_back(token);
+    }
+
+    // Add multiple tokens to the context
+    void add_tokens(const std::vector<int>& tokens) {
+        for (const auto& token : tokens) add_token(token);
+    }
+
+    // Get the next input sequence for the model
+    matrix<int, 0, 1> get_input_sequence(size_t desired_length) const {
+        if (desired_length < min_prompt_size_)
+            throw std::invalid_argument("Requested length is smaller than minimum prompt size");
+        matrix<int, 0, 1> input_sequence(desired_length, 1);
+
+        // Determine how many tokens we'll copy from context
+        size_t tokens_to_copy = std::min(current_context_.size(), desired_length);
+        size_t start_pos = current_context_.size() > desired_length ?
+            current_context_.size() - desired_length : 0;
+
+        // Fill the matrix with tokens from context
+        for (size_t i = 0; i < tokens_to_copy; ++i)
+            input_sequence(i, 0) = current_context_[start_pos + i];
+
+        // Fill remaining positions with padding token if needed
+        for (size_t i = tokens_to_copy; i < desired_length; ++i)
+            input_sequence(i, 0) = padding_token_;
+
+        return input_sequence;
+    }
+
+    // Calculate maximum output tokens that can be generated
+    size_t get_max_output_tokens() const {
+        if (current_context_.size() < min_prompt_size_)
+            return 0;  // Not enough context for even minimal prompt
+        return max_context_size_ - current_context_.size();
+    }
+
+    // Get current context size
+    size_t get_current_context_size() const { return current_context_.size(); }
+    // Get maximum context size
+    size_t get_max_context_size() const { return max_context_size_; }
+    // Get prompt size
+    size_t get_prompt_size() const { return min_prompt_size_; }
+    // Get padding token
+    int get_padding_token() const { return padding_token_; }
+    // Clear the current context
+    void clear_context() { current_context_.clear(); }
+
+private:
+    const size_t max_context_size_;    // Maximum total tokens in context
+    const size_t min_prompt_size_;     // Minimum tokens required for prompt
+    const int padding_token_;          // Token used for padding
+
+    // Using deque for efficient insertion/removal at both ends
+    std::deque<int> current_context_;  // Current context
+};
 
 int main(int argc, char** argv)
 {
@@ -691,10 +757,10 @@ int main(int argc, char** argv)
         parser.add_option("max-tokens", "Maximum number of tokens to load in memory", 1);
         parser.add_option("max-bytes", "Maximum number of bytes to process from enwiki", 1);
         parser.add_option("percent", "Percentage of enwiki to process (0-100)", 1);
-        parser.add_option("learning-rate", "Set the learning rate (default: 1e-4)", 1);
+        parser.add_option("learning-rate", "Set the learning rate (default: 3e-4)", 1);
         parser.add_option("batch-size", "Set the mini-batch size (default: 64)", 1);
         parser.add_option("patience", "Iterations without progress before early stopping (default: 15000)", 1);
-        parser.add_option("max-epochs", "Maximum number of training epochs (default: 50)", 1);
+        parser.add_option("max-epochs", "Maximum number of training epochs (default: 10)", 1);
         parser.add_option("alpha", "Set the weight decay for Adam (default: 0.004)", 1);
         parser.add_option("beta1", "Set Adam's first moment coefficient (default: 0.9)", 1);
         parser.add_option("beta2", "Set Adam's second moment coefficient (default: 0.999)", 1);
@@ -714,24 +780,24 @@ int main(int argc, char** argv)
         }
 
         // Default values
-        const double learning_rate = get_option(parser, "learning-rate", 1e-4);
+        const double learning_rate = get_option(parser, "learning-rate", 3e-4);
         const size_t batch_size = get_option(parser, "batch-size", 64);
         const long patience = get_option(parser, "patience", 15000);
-        const size_t max_epochs = get_option(parser, "max-epochs", 50);
+        const size_t max_epochs = get_option(parser, "max-epochs", 10);
         const double alpha = get_option(parser, "alpha", 0.004);
         const double beta1 = get_option(parser, "beta1", 0.9);
         const double beta2 = get_option(parser, "beta2", 0.999);
         const std::string model_file = get_option(parser, "model-file", "dlib_slm_enwiki_model.dat");
         const std::string output_file = get_option(parser, "output-file", "enwiki_generated.txt");
         const std::string enwiki_path = get_option(parser, "enwiki", "enwiki.txt");
-        const long max_seq_len = 180;
-        const long num_layers = 2;
+        const long max_seq_len = 30;
+        const long num_layers = 4;
         const long num_heads = 6;
         const long embedding_dim = 228;
         const std::string tokenizer_path = get_option(parser, "tokenizer", "enwiki_tokenizer.vocab");
         // Default number of prompt tokens = input sequence length
         const bool force_tokenize = parser.option("force-tokenize");
-        const long num_tokens = 5000;
+        const long num_tokens = 8000;
 
         // Calculate max bytes to process
         size_t max_bytes = 0, max_tokens = 0;
@@ -792,7 +858,7 @@ int main(int argc, char** argv)
         if (parser.option("tokenize-only")) {
             cout << "=== TOKENIZE-ONLY MODE ===\n";
 
-            // 1) Read the enwiki file (or portion)
+            // Read the enwiki file (or portion)
             cout << "Reading enwiki file from: " << enwiki_path;
             if (max_bytes > 0) cout << " (limited to " << max_bytes << " bytes)";
             cout << endl;
@@ -800,7 +866,7 @@ int main(int argc, char** argv)
             std::string enwiki_text = read_enwiki(enwiki_path, max_bytes);
             cout << "Read " << enwiki_text.size() << " bytes\n";
 
-            // 2) Train a new tokenizer if needed
+            // Train a new tokenizer if needed
             if (!file_exists(tokenizer_path)) {
                 cout << "Training new BPE tokenizer with vocabulary size " << num_tokens << "...\n";
                 tokenizer.train(enwiki_text, num_tokens, 1e6, true);
@@ -808,7 +874,7 @@ int main(int argc, char** argv)
                 cout << "Tokenizer saved to " << tokenizer_path << endl;
             }
 
-            // 3) Tokenize the full text
+            // Tokenize the full text
             cout << "Tokenizing input text...\n";
             auto start_time = std::chrono::high_resolution_clock::now();
             int text_start_id = tokenizer.get_special_token_id("<text>"),
@@ -826,7 +892,7 @@ int main(int argc, char** argv)
             cout << "Tokenization completed in " << tokenize_time << " seconds.\n";
             cout << "Number of tokens: " << full_tokens.size() << endl;
 
-            // 4) Save tokens
+            // Save tokens
             cout << "Saving tokens to file: " << tokens_file << endl;
             if (save_tokens_to_file(full_tokens, tokens_file)) {
                 cout << "Tokens successfully saved.\n";
@@ -871,7 +937,7 @@ int main(int argc, char** argv)
                 std::string enwiki_text = read_enwiki(enwiki_path, max_bytes);
                 cout << "Read " << enwiki_text.size() << " bytes\n";
 
-                // 2) Train a new tokenizer if needed
+                // Train a new tokenizer if needed
                 if (!file_exists(tokenizer_path)) {
                     cout << "Training new BPE tokenizer with vocabulary size " << num_tokens << "...\n";
                     tokenizer.train(enwiki_text, num_tokens, 1e6, true);
@@ -879,7 +945,7 @@ int main(int argc, char** argv)
                     cout << "Tokenizer saved to " << tokenizer_path << endl;
                 }
 
-                // 3) Tokenize the full text
+                // Tokenize the full text
                 cout << "Tokenizing input text...\n";
                 int text_start_id = tokenizer.get_special_token_id("<text>"),
                     text_end_id = tokenizer.get_special_token_id("</text>");
@@ -907,7 +973,7 @@ int main(int argc, char** argv)
                 }
             }
 
-            // 4) Prepare training sequences (sliding window)
+            // Prepare training sequences (sliding window)
             cout << "Preparing training sequences...\n";
             std::vector<matrix<int, 0, 1>> samples;
             std::vector<unsigned long> labels;
@@ -925,7 +991,7 @@ int main(int argc, char** argv)
             // For very large datasets, using a stride can reduce training time 
             // without significantly affecting model quality
             size_t stride = 1;  // Default: use every possible sequence
-            const size_t max_samples = 10000000;  // Optional: limit total samples to prevent memory issues
+            const size_t max_samples = 10e6;  // Optional: limit total samples to prevent memory issues
 
             // If dataset is very large, use adaptive stride
             if (num_sequences > max_samples && max_samples > 0) {
@@ -955,7 +1021,7 @@ int main(int argc, char** argv)
             full_tokens.clear();
             cout << "Created " << samples.size() << " training samples (100%)...\n";
 
-            // 5) Build and train the network
+            // Build and train the network
             using net_type = enwiki_transformer::network_type<true>;
             net_type net;
             cout << "Model architecture:\n" << enwiki_transformer::model_info::describe() << endl;
@@ -1036,7 +1102,7 @@ int main(int argc, char** argv)
 
             // Save model
             net.clean();
-            serialize(model_file) << net;
+            serialize(model_file) << net << tokenizer;
             cout << "Model saved to " << model_file << "\n";
             std::remove("enwiki_trainer.sync");
             std::remove("enwiki_trainer.sync_");
@@ -1055,8 +1121,8 @@ int main(int argc, char** argv)
                     cout << "Training accuracy: " << (accuracy * 100.0) << "%\n";
 
                     // We need perfect accuracy to reconstruct enwiki
-                    if (accuracy < 0.9999) {
-                        cout << "WARNING: Model accuracy is less than 99.99%. The model may not "
+                    if (accuracy < 0.999) {
+                        cout << "WARNING: Model accuracy is less than 99.90%. The model may not "
                             << "perfectly reconstruct the input text.\n";
                     }
                 }
@@ -1070,25 +1136,26 @@ int main(int argc, char** argv)
         {
             cout << "=== GENERATION MODE ===\n";
 
-            // 1) Load the model
+            // Load the model
             using net_infer = enwiki_transformer::network_type<false>;
             net_infer net;
             if (file_exists(model_file)) {
-                deserialize(model_file) >> net;
+                deserialize(model_file) >> net >> tokenizer;
                 cout << "Loaded model from " << model_file << "\n";
+                cout << "Number of model parameters: " << count_parameters(net) << endl;
             }
             else {
                 cerr << "Error: model file not found. Please run --train first.\n";
                 return 0;
             }
 
-            // 2) Check that tokenizer is loaded
+            // Check that tokenizer is loaded
             if (tokenizer.get_vocab_size() == 0) {
                 cerr << "Error: Tokenizer not loaded. Please provide a valid tokenizer file.\n";
                 return 0;
             }
 
-            // 3) Read beginning of enwiki file for prompt
+            // Read beginning of enwiki file for prompt
             std::vector<int> prompt_tokens;
 
             // Check if we have pre-tokenized tokens
@@ -1160,38 +1227,27 @@ int main(int argc, char** argv)
             }
             cout << "Using " << prompt_tokens.size() << " tokens for initial prompt\n";
 
-            // 5) Put prompt in input sequence
-            matrix<int, 0, 1> input_seq(max_seq_len, 1);
-            for (long i = 0; i < max_seq_len; ++i) {
-                input_seq(i, 0) = prompt_tokens[i];
-            }
+            // Put prompt in input sequence
+            context_manager llm_context(max_seq_len * 4, max_seq_len, tokenizer.get_special_token_id("<pad>"));
+            llm_context.add_tokens(prompt_tokens);
+            auto input_seq = llm_context.get_input_sequence(max_seq_len);            
 
-            // 6) Determine text size to generate
-            size_t target_size = 0;
-            if (max_bytes > 0) {
-                target_size = max_bytes;
-            }
-            else {
-                // Default: generate 1K or original file size
-                target_size = get_file_size(enwiki_path);
-                if (target_size == 0) {
-                    target_size = 1024;
-                }
-            }
+            // Determine text size to generate
+            size_t target_size = (max_bytes > 0) ? max_bytes : get_file_size(enwiki_path);
             cout << "Will generate approximately " << target_size << " bytes\n";
 
-            // 7) Open output file
+            // Open output file
             std::ofstream outfile(output_file, std::ios::binary);
             if (!outfile) {
                 cerr << "Error: Cannot open output file: " << output_file << "\n";
                 return 0;
             }
 
-            // 8) Write initial text (corresponding to prompt tokens)
+            // Write initial text (corresponding to prompt tokens)
             std::string initial_text = tokenizer.decode(prompt_tokens, false);
             outfile.write(initial_text.c_str(), initial_text.size());
 
-            // 9) Generate the rest of the text autoregressively
+            // Generate the rest of the text autoregressively
             cout << "Starting autoregressive generation...\n";
 
             // Buffer for accumulation before writing
@@ -1209,14 +1265,15 @@ int main(int argc, char** argv)
             while (total_bytes < target_size && next_token != start_of_text && next_token != end_of_text
                 && !g_terminate_flag.load()) {
                 // Predict next token
-                next_token = net(input_seq);
+                std::vector<matrix<int, 0, 1>> in_tokens = { input_seq, input_seq };
+                auto out_token = net(in_tokens);
+                next_token = static_cast<int>(out_token[0]);
                 token_buffer.push_back(next_token);
                 token_count++;
 
                 // Shift the input window
-                for (long i = 0; i < max_seq_len - 1; ++i)
-                    input_seq(i, 0) = input_seq(i + 1, 0);
-                input_seq(max_seq_len - 1, 0) = next_token;
+                llm_context.add_token(next_token);
+                input_seq = llm_context.get_input_sequence(max_seq_len);                
 
                 // If buffer is full, write to file
                 if (token_buffer.size() >= buffer_size) {
@@ -1229,9 +1286,9 @@ int main(int argc, char** argv)
                     auto current_time = std::chrono::high_resolution_clock::now();
                     auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
                         current_time - start_time).count();
-                    double tokens_per_second = (token_count - prompt_tokens.size()) / (elapsed > 0 ? elapsed : 1);
+                    double tokens_per_second = (token_count - input_seq.size()) / (elapsed > 0 ? elapsed : 1);
 
-                    cout << "Generated " << (token_count - prompt_tokens.size()) << " tokens, "
+                    cout << "Generated " << (token_count - input_seq.size()) << " tokens, "
                         << total_bytes << " bytes ("
                         << (total_bytes * 100.0 / target_size) << "%) - "
                         << tokens_per_second << " tokens/sec - "
@@ -1256,7 +1313,7 @@ int main(int argc, char** argv)
                 end_time - start_time).count();
 
             cout << "Generation complete in " << total_time << " seconds!\n";
-            cout << "Generated " << (token_count - prompt_tokens.size()) << " tokens after prompt, "
+            cout << "Generated " << (token_count - input_seq.size()) << " tokens after prompt, "
                 << total_bytes << " bytes total\n";
             cout << "Output saved to " << output_file << "\n";
         }
