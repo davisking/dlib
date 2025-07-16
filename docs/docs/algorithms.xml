@@ -117,6 +117,35 @@
          <item>find_optimal_momentum_filter</item> 
       </section>
 
+      <section>
+         <name>Fourier Transforms</name>
+         <item>
+            <name>fft</name>
+            <link>dlib/fft/fft.h.html#fft</link>
+         </item>
+         <item>
+            <name>fftr</name>
+            <link>dlib/fft/fft.h.html#fftr</link>
+         </item>
+         <item>
+            <name>ifftr</name>
+            <link>dlib/fft/fft.h.html#ifftr</link>
+         </item>
+         <item>
+            <name>fft_size</name>
+            <link>dlib/fft/fft.h.html#fft_size</link>
+         </item>
+
+         <item>
+            <name>fft_inplace</name>
+            <link>dlib/fft/fft.h.html#fft_inplace</link>
+         </item>
+         <item>
+            <name>ifft_inplace</name>
+            <link>dlib/fft/fft.h.html#ifft_inplace</link>
+         </item>
+      </section>
+
     </top>  
    </menu>
 

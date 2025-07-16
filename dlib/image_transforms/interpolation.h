@@ -42,7 +42,7 @@ namespace dlib
         }
 
         void* _data = 0;
-        long _width_step = 0;
+        size_t _width_step = 0;
         long _nr = 0;
         long _nc = 0;
     };
@@ -67,7 +67,7 @@ namespace dlib
         }
 
         const void* _data = 0;
-        long _width_step = 0;
+        size_t _width_step = 0;
         long _nr = 0;
         long _nc = 0;
     };
@@ -121,12 +121,12 @@ namespace dlib
     }
 
     template <typename T>
-    inline long width_step(
+    inline size_t width_step(
         const sub_image_proxy<T>& img
     ) { return img._width_step; }
 
     template <typename T>
-    inline long width_step(
+    inline size_t width_step(
         const const_sub_image_proxy<T>& img
     ) { return img._width_step; }
 

@@ -90,7 +90,7 @@ namespace dlib
             name(dir_name)
         {}
 
-        ~dir_create_error() throw() {}
+        ~dir_create_error() noexcept {}
         const std::string name;
     }; 
 

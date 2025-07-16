@@ -39,7 +39,7 @@ namespace dlib
             if (contains<T_>())
                 storage.unsafe_get<T_>() = std::forward<T>(item);
             else
-                *this = std::move(any{std::forward<T>(item)});
+                *this = any{std::forward<T>(item)};
             return *this;
         }
 

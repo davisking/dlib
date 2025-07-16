@@ -18,7 +18,7 @@ namespace dlib
     class bad_type_safe_union_cast : public std::bad_cast 
     {
     public:
-          virtual const char * what() const throw()
+          virtual const char * what() const noexcept
           {
               return "bad_type_safe_union_cast";
           }

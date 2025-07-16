@@ -19,7 +19,7 @@ namespace dlib
             - void        set_image_size(      image_type& img, long rows, long cols)
             - void*       image_data    (      image_type& img)
             - const void* image_data    (const image_type& img)
-            - long        width_step    (const image_type& img)
+            - size_t      width_step    (const image_type& img)
             - void        swap          (      image_type& a, image_type& b)
         And also provides a specialization of the image_traits template that looks like:
             namespace dlib
@@ -98,7 +98,7 @@ namespace dlib
                       width_step(img).
             *!/
 
-            long width_step(
+            size_t width_step(
                 const image_type& img
             );
             /!*
@@ -345,12 +345,12 @@ namespace dlib
                 - sets the image to have 0 pixels in it.
         !*/
 
-        long get_width_step() const { return _width_step; }
+        size_t get_width_step() const { return _width_step; }
 
     private:
 
         char* _data;
-        long _width_step;
+        size_t _width_step;
         long _nr;
         long _nc;
         image_type* _img;
@@ -416,11 +416,11 @@ namespace dlib
         }
 #endif
 
-        long get_width_step() const { return _width_step; }
+        size_t get_width_step() const { return _width_step; }
 
     private:
         const char* _data;
-        long _width_step;
+        size_t _width_step;
         long _nr;
         long _nc;
     };
@@ -555,7 +555,7 @@ namespace dlib
     }
 
     template <typename T>
-    inline long width_step( const image_view<T>& img) { return img.get_width_step(); }
+    inline size_t width_step( const image_view<T>& img) { return img.get_width_step(); }
 
 // ----------------------------------------------------------------------------------------
 
@@ -582,7 +582,7 @@ namespace dlib
     }
 
     template <typename T>
-    inline long width_step( const const_image_view<T>& img) { return img.get_width_step(); }
+    inline size_t width_step( const const_image_view<T>& img) { return img.get_width_step(); }
 
 // ----------------------------------------------------------------------------------------
 

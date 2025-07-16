@@ -320,7 +320,7 @@ namespace dlib
         size_t size (
         ) const { return static_cast<size_t>(nc_) * static_cast<size_t>(nr_); }
 
-        long width_step (
+        size_t width_step (
         ) const
         {
             return nc_*sizeof(T);

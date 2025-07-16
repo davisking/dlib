@@ -3564,7 +3564,6 @@ void test_multm_prev()
         print_spinner();
 
         // Define the network
-		cout << "ICI !!!" << endl;
         using net_type = tag2<linear_no_bias<6, tag1<input<matrix<float>>>>>;
         net_type net;
 

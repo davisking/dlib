@@ -20,47 +20,49 @@
 
 namespace dlib
 {
+    constexpr size_t BPE_TOKENIZER_MAX_TOKEN_LENGTH = 8;
+    constexpr int BPE_TOKENIZER_BASE_VOCAB_SIZE = 256;
 
     class bpe_tokenizer
     {
     public:
-        bpe_tokenizer() : vocab_size(BASE_VOCAB_SIZE)
+        bpe_tokenizer() : vocab_size(BPE_TOKENIZER_BASE_VOCAB_SIZE)
         {
             // Initialize the base vocabulary with single bytes
-            for (int i = 0; i < BASE_VOCAB_SIZE; ++i)
+            for (int i = 0; i < BPE_TOKENIZER_BASE_VOCAB_SIZE; ++i)
                 vocab[i] = std::vector<uint8_t>{ static_cast<uint8_t>(i) };
             
             // Initialize special tokens with sequential IDs
             special_tokens =
             {
-                {"<text>",      BASE_VOCAB_SIZE},
-                {"</text>",     BASE_VOCAB_SIZE + 1},
-                {"<url>",       BASE_VOCAB_SIZE + 2},
-                {"</url>",      BASE_VOCAB_SIZE + 3},
-                {"<image>",     BASE_VOCAB_SIZE + 4},
-                {"</image>",    BASE_VOCAB_SIZE + 5},
-                {"<video>",     BASE_VOCAB_SIZE + 6},
-                {"</video>",    BASE_VOCAB_SIZE + 7},
-                {"<audio>",     BASE_VOCAB_SIZE + 8},
-                {"</audio>",    BASE_VOCAB_SIZE + 9},
-                {"<file>",      BASE_VOCAB_SIZE + 10},
-                {"</file>",     BASE_VOCAB_SIZE + 11},
-                {"<code>",      BASE_VOCAB_SIZE + 12},
-                {"</code>",     BASE_VOCAB_SIZE + 13},
-                {"<summary>",   BASE_VOCAB_SIZE + 14},
-                {"</summary>",  BASE_VOCAB_SIZE + 15},
-                {"<think>",     BASE_VOCAB_SIZE + 16},
-                {"</think>",    BASE_VOCAB_SIZE + 17},
-                {"<start>",     BASE_VOCAB_SIZE + 18},
-                {"<end>",       BASE_VOCAB_SIZE + 19},
-                {"<user>",      BASE_VOCAB_SIZE + 20},
-                {"<bot>",       BASE_VOCAB_SIZE + 21},
-                {"<system>",    BASE_VOCAB_SIZE + 22},
-                {"<question>",  BASE_VOCAB_SIZE + 23},
-                {"<answer>",    BASE_VOCAB_SIZE + 24},
-                {"<search>",    BASE_VOCAB_SIZE + 25},
-                {"<unk>",       BASE_VOCAB_SIZE + 26},
-                {"<pad>",       BASE_VOCAB_SIZE + 27}
+                {"<text>",      BPE_TOKENIZER_BASE_VOCAB_SIZE},
+                {"</text>",     BPE_TOKENIZER_BASE_VOCAB_SIZE + 1},
+                {"<url>",       BPE_TOKENIZER_BASE_VOCAB_SIZE + 2},
+                {"</url>",      BPE_TOKENIZER_BASE_VOCAB_SIZE + 3},
+                {"<image>",     BPE_TOKENIZER_BASE_VOCAB_SIZE + 4},
+                {"</image>",    BPE_TOKENIZER_BASE_VOCAB_SIZE + 5},
+                {"<video>",     BPE_TOKENIZER_BASE_VOCAB_SIZE + 6},
+                {"</video>",    BPE_TOKENIZER_BASE_VOCAB_SIZE + 7},
+                {"<audio>",     BPE_TOKENIZER_BASE_VOCAB_SIZE + 8},
+                {"</audio>",    BPE_TOKENIZER_BASE_VOCAB_SIZE + 9},
+                {"<file>",      BPE_TOKENIZER_BASE_VOCAB_SIZE + 10},
+                {"</file>",     BPE_TOKENIZER_BASE_VOCAB_SIZE + 11},
+                {"<code>",      BPE_TOKENIZER_BASE_VOCAB_SIZE + 12},
+                {"</code>",     BPE_TOKENIZER_BASE_VOCAB_SIZE + 13},
+                {"<summary>",   BPE_TOKENIZER_BASE_VOCAB_SIZE + 14},
+                {"</summary>",  BPE_TOKENIZER_BASE_VOCAB_SIZE + 15},
+                {"<think>",     BPE_TOKENIZER_BASE_VOCAB_SIZE + 16},
+                {"</think>",    BPE_TOKENIZER_BASE_VOCAB_SIZE + 17},
+                {"<start>",     BPE_TOKENIZER_BASE_VOCAB_SIZE + 18},
+                {"<end>",       BPE_TOKENIZER_BASE_VOCAB_SIZE + 19},
+                {"<user>",      BPE_TOKENIZER_BASE_VOCAB_SIZE + 20},
+                {"<bot>",       BPE_TOKENIZER_BASE_VOCAB_SIZE + 21},
+                {"<system>",    BPE_TOKENIZER_BASE_VOCAB_SIZE + 22},
+                {"<question>",  BPE_TOKENIZER_BASE_VOCAB_SIZE + 23},
+                {"<answer>",    BPE_TOKENIZER_BASE_VOCAB_SIZE + 24},
+                {"<search>",    BPE_TOKENIZER_BASE_VOCAB_SIZE + 25},
+                {"<unk>",       BPE_TOKENIZER_BASE_VOCAB_SIZE + 26},
+                {"<pad>",       BPE_TOKENIZER_BASE_VOCAB_SIZE + 27}
             };
 
             // Initialize the vector of special token IDs
@@ -71,9 +73,9 @@ namespace dlib
         // Train the tokenizer on the given text
         void train(const std::string& text, int vocab_size, bool verbose = false)
         {
-            DLIB_CASSERT(vocab_size >= BASE_VOCAB_SIZE);
+            DLIB_CASSERT(vocab_size >= BPE_TOKENIZER_BASE_VOCAB_SIZE);
             this->vocab_size = vocab_size;
-            int num_merges = vocab_size - BASE_VOCAB_SIZE;
+            int num_merges = vocab_size - BPE_TOKENIZER_BASE_VOCAB_SIZE;
 
             // Convert text to byte IDs
             std::vector<int> ids;
@@ -84,25 +86,25 @@ namespace dlib
                 auto stats = get_stats(ids);
                 if (stats.empty()) break;
 
-                // Find the most frequent pair that does not exceed MAX_TOKEN_LENGTH
+                // Find the most frequent pair that does not exceed BPE_TOKENIZER_MAX_TOKEN_LENGTH
                 auto pair = get_most_frequent_pair(stats);
 
-                // Check if the resulting token would exceed MAX_TOKEN_LENGTH
+                // Check if the resulting token would exceed BPE_TOKENIZER_MAX_TOKEN_LENGTH
                 size_t new_token_length = vocab[pair.first].size() + vocab[pair.second].size();
-                if (new_token_length > MAX_TOKEN_LENGTH) {
+                if (new_token_length > BPE_TOKENIZER_MAX_TOKEN_LENGTH) {
                     if (verbose)
                     {
                         std::cout << "\r"
                             << std::setw(100) << std::flush
                             << "\rskipping merge " << std::to_string(i + 1) << "/" << std::to_string(num_merges) << ": ("
                             << std::to_string(pair.first) << "," << std::to_string(pair.second) << ") -> new token length "
-                            << std::to_string(new_token_length) << " exceeds limit of " << std::to_string(MAX_TOKEN_LENGTH)
+                            << std::to_string(new_token_length) << " exceeds limit of " << std::to_string(BPE_TOKENIZER_MAX_TOKEN_LENGTH)
                             << std::flush;
                     }
                     continue; // Skip this merge
                 }
 
-                int idx = (BASE_VOCAB_SIZE + (int)special_tokens.size()) + i;
+                int idx = (BPE_TOKENIZER_BASE_VOCAB_SIZE + (int)special_tokens.size()) + i;
                 ids = merge(ids, pair, idx);
                 merges[pair] = idx;
                 vocab[idx].insert(vocab[idx].end(), vocab[pair.first].begin(), vocab[pair.first].end());
@@ -287,9 +289,6 @@ namespace dlib
         std::map<int, std::vector<uint8_t>> vocab;
         int vocab_size;
 
-        static const size_t MAX_TOKEN_LENGTH = 8;
-        static const int BASE_VOCAB_SIZE = 256;
-
         // Get frequency statistics of adjacent token pairs
         struct pair_hash {
             template <class T1, class T2>
@@ -344,10 +343,10 @@ namespace dlib
 
                 // Check if the new token formed by merging the pair would exceed the maximum allowed length
                 size_t new_token_length = vocab.at(pair.first).size() + vocab.at(pair.second).size();
-                if (new_token_length > MAX_TOKEN_LENGTH) continue; // Skip this pair if it exceeds the maximum token length
+                if (new_token_length > BPE_TOKENIZER_MAX_TOKEN_LENGTH) continue; // Skip this pair if it exceeds the maximum token length
 
                 // Calculate the score for this pair (frequency * length_penalty)
-                double score = (size_t)count * (new_token_length > (MAX_TOKEN_LENGTH / 2) ? 1.75 : 1.0);
+                double score = (size_t)count * (new_token_length > (BPE_TOKENIZER_MAX_TOKEN_LENGTH / 2) ? 1.75 : 1.0);
 
                 // Update the best pair if the current pair has a higher score
                 if (score > max_score)

@@ -54,7 +54,7 @@ namespace dlib
     }
 
     template <typename T, typename mm>
-    inline long width_step(
+    inline size_t width_step(
         const array2d<T,mm>& img
     ) 
     { 

@@ -117,7 +117,7 @@ namespace dlib
 
         long nr() const { return _nr; }
         long nc() const { return _nc; }
-        long width_step() const { return _widthStep; }
+        size_t width_step() const { return _widthStep; }
 
     private:
 
@@ -191,7 +191,7 @@ namespace dlib
     }
 
     template <typename T>
-    inline long width_step(
+    inline size_t width_step(
         const cv_image<T>& img
     ) 
     { 

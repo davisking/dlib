@@ -123,6 +123,15 @@
       </section>
 
       <section>
+         <name>ffmpeg</name>
+         <item>decoder</item>
+         <item>demuxer</item>
+         <item>encoder</item>
+         <item>muxer</item>
+         <item>frame</item>
+      </section>
+
+      <section>
          <name>Other</name>
          <item>dlib_testing_suite</item>
          <item>MATLAB</item>
@@ -1078,6 +1087,126 @@ deserialize(ramdump(yourobject), in); </code_box>
             thrown.  The point of this function is to make checking version strings in
             serialized files a little more convenient.
          </description>
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>decoder</name>
+         <file>dlib/media.h</file>
+         <spec_file link="true">dlib/media/ffmpeg_demuxer.h</spec_file>
+         <description>
+            This class is a libavcodec wrapper which decodes video or audio from raw memory.
+            Note, if you are reading raw memory from file, it is easier to use <a href="#demuxer">demuxer</a>
+            as it also works with raw codec files like .h264 files.
+            This class is suitable for example when reading raw encoded data from a socket,
+            or interfacing with another library that provides encoded data.
+         </description>
+         <examples>
+            <example>ffmpeg_video_decoding2_ex.cpp.html</example>
+            <example>ffmpeg_video_decoding_ex.cpp.html</example>
+         </examples>
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>demuxer</name>
+         <file>dlib/media.h</file>
+         <spec_file link="true">dlib/media/ffmpeg_demuxer.h</spec_file>
+         <description>
+            This class is a libavformat wrapper which demuxes video and/or audio streams from file and decodes them.
+            It is analogous to OpenCV's cv::VideoCapture class but is more configurable, supports audio, 
+            devices (X11, webcam, microphone, ...) and network streams such as RTSP, HTTP, and more.
+            Note that a video file, e.g. MP4, can contain multiple streams: video, audio, subtitles, etc.
+            This class can decode both video and audio at the same time.
+            For audio files, e.g. MP3, FLAG, it only decodes audio.
+         </description>
+         <examples>
+            <example>ffmpeg_file_to_speaker_ex.cpp.html</example>
+            <example>ffmpeg_info_ex.cpp.html</example>
+            <example>ffmpeg_microphone_to_file_ex.cpp.html</example>
+            <example>ffmpeg_rtsp_ex.cpp.html</example>
+            <example>ffmpeg_screen_grab_ex.cpp.html</example>
+            <example>ffmpeg_video_decoding_ex.cpp.html</example>
+            <example>ffmpeg_video_demuxing2_ex.cpp.html</example>
+            <example>ffmpeg_video_demuxing_ex.cpp.html</example>
+            <example>ffmpeg_video_encoding_ex.cpp.html</example>
+            <example>ffmpeg_video_muxing_ex.cpp.html</example>
+            <example>ffmpeg_webcam_face_pose_ex.cpp.html</example>
+         </examples>
+
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>encoder</name>
+         <file>dlib/media.h</file>
+         <spec_file link="true">dlib/media/ffmpeg_muxer.h</spec_file>
+         <description>
+            This class is a libavcodec wrapper which encodes video or audio to raw memory.
+            Note, if you are creating a media file, it is easier to use the <a href="#muxer">muxer</a> object
+            as it also works with raw codec files like .h264 files.
+            This class is suitable for example if you need to send raw packets over a socket
+            or interface with another library that requires encoded data, not raw images
+            or raw audio samples.
+         </description>
+         <examples>
+            <example>ffmpeg_video_encoding_ex.cpp.html</example>
+         </examples>
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>muxer</name>
+         <file>dlib/media.h</file>
+         <spec_file link="true">dlib/media/ffmpeg_muxer.h</spec_file>
+         <description>
+            This class is a libavformat wrapper which muxes video and/or audio streams to file.
+            It is analogous to OpenCV's cv::VideoWriter class but is more configurable, supports audio, 
+            devices (X11, speaker, ...) and network streams such as RTSP, HTTP, and more.
+            Note that a video file, e.g. MP4, can contain multiple streams: video, audio, subtitles, etc.
+            This class can encode both video and audio at the same time.
+         </description>
+         <examples>
+            <example>ffmpeg_file_to_speaker_ex.cpp.html</example>
+            <example>ffmpeg_info_ex.cpp.html</example>
+            <example>ffmpeg_microphone_to_file_ex.cpp.html</example>
+            <example>ffmpeg_rtsp_ex.cpp.html</example>
+            <example>ffmpeg_screen_grab_ex.cpp.html</example>
+            <example>ffmpeg_video_decoding_ex.cpp.html</example>
+            <example>ffmpeg_video_demuxing2_ex.cpp.html</example>
+            <example>ffmpeg_video_demuxing_ex.cpp.html</example>
+            <example>ffmpeg_video_encoding_ex.cpp.html</example>
+            <example>ffmpeg_video_muxing_ex.cpp.html</example>
+            <example>ffmpeg_webcam_face_pose_ex.cpp.html</example>
+         </examples>
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>frame</name>
+         <file>dlib/media.h</file>
+         <spec_file link="true">dlib/media/ffmpeg_utils.h</spec_file>
+         <description>
+            This class wraps ffmpeg's AVFrame* into a cleaner RAII C++ class.
+         </description>
+         <examples>
+            <example>ffmpeg_file_to_speaker_ex.cpp.html</example>
+            <example>ffmpeg_microphone_to_file_ex.cpp.html</example>
+            <example>ffmpeg_rtsp_ex.cpp.html</example>
+            <example>ffmpeg_screen_grab_ex.cpp.html</example>
+            <example>ffmpeg_video_decoding2_ex.cpp.html</example>
+            <example>ffmpeg_video_decoding_ex.cpp.html</example>
+            <example>ffmpeg_video_demuxing2_ex.cpp.html</example>
+            <example>ffmpeg_video_demuxing_ex.cpp.html</example>
+            <example>ffmpeg_video_encoding_ex.cpp.html</example>
+            <example>ffmpeg_video_muxing_ex.cpp.html</example>
+            <example>ffmpeg_webcam_face_pose_ex.cpp.html</example>
+         </examples>
       </component>
             
    <!-- ************************************************************************* -->
