@@ -15,26 +15,11 @@
 #include "../geometry/rectangle.h"
 #include "../test_for_odr_violations.h"
 
-#ifdef DLIB_USE_CUDA
-#define IF_DLIB_USE_CUDA(...) if (use_cuda()) { __VA_ARGS__ }
-#else
-#define IF_DLIB_USE_CUDA(...) 
-#endif
-
-#ifdef DLIB_USE_CUDA
-#define IF_DLIB_NOT_USE_CUDA(...) if (!use_cuda()) { __VA_ARGS__ }
-#else
-#define IF_DLIB_NOT_USE_CUDA(...) __VA_ARGS__
-#endif
-
 namespace dlib
 {
     bool dnn_prefer_fastest_algorithms();
     void set_dnn_prefer_fastest_algorithms();
     void set_dnn_prefer_smallest_algorithms();
-
-    bool use_cuda();
-    void set_use_cuda(bool flag);
 }
 
 namespace dlib { namespace tt

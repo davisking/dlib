@@ -17,17 +17,6 @@ namespace dlib
             static std::atomic<bool> var(true);
             return var;
         }
-
-        bool& use_cuda_impl (
-        )
-        {
-#ifdef DLIB_USE_CUDA
-            thread_local bool var(cuda::is_available());
-#else
-            thread_local bool var(false);
-#endif
-            return var;
-        }
     }
 
     bool dnn_prefer_fastest_algorithms (
@@ -46,21 +35,6 @@ namespace dlib
     )
     {
         dnn_prefer_fastest_algo() = false;
-    }
-
-    bool use_cuda(
-    )
-    {
-        return use_cuda_impl();
-    }
-
-    void set_use_cuda(
-        bool flag
-    )
-    {
-#ifdef DLIB_USE_CUDA
-        use_cuda_impl() = flag;
-#endif
     }
 }
 

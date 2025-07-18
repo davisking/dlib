@@ -28,6 +28,13 @@ namespace dlib
         bool is_available (
         );
 
+        bool use_cuda(
+        );
+
+        void set_use_cuda(
+            bool flag
+        );
+
         std::string get_device_name (
             int device
         );
@@ -897,6 +904,13 @@ namespace dlib
 
         inline bool is_available (
         ) { return false; }
+
+        inline bool use_cuda(
+        ) { return false; }
+
+        inline void set_use_cuda(
+            bool flag
+        ) {}
 
         inline std::string get_device_name (
             int device
