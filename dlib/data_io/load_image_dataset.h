@@ -406,7 +406,7 @@ namespace dlib
                     }
                     else
                     {
-                        std::vector<point> partlist(parts_idx.size(), OBJECT_PART_NOT_PRESENT);
+                        std::vector<dpoint> partlist(parts_idx.size(), OBJECT_PART_NOT_PRESENT);
 
                         // populate partlist with all the parts present in this box.
                         const std::map<std::string,point>& parts = data.images[i].boxes[j].parts;

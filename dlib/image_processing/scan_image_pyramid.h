@@ -874,7 +874,7 @@ namespace dlib
         // convert into feature space.
         object_box = object_box.intersect(get_rect(feats[best_level]));
 
-        std::vector<point> movable_parts;
+        std::vector<dpoint> movable_parts;
         movable_parts.reserve(get_num_movable_components_per_detection_template());
         for (unsigned long i = 0; i < get_num_movable_components_per_detection_template(); ++i)
         {
