@@ -701,7 +701,7 @@ namespace dlib
 
     template <
         unsigned long num_outputs,
-        linear_bias_mode bias_mode
+        linear_bias_mode bias_mode = LINEAR_HAS_BIAS
     >
     class linear_
     {
