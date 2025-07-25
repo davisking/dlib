@@ -97,13 +97,15 @@ namespace dlib
             deserialize(item.rect, in);
 
             // Legacy support: read vector<point, 2> and cast to vector<dpoint, 2>
-            if (version == 1) {
+            if (version == 1) 
+            {
                 std::vector<point> legacy_parts;
                 deserialize(legacy_parts, in);
                 item.parts = std::vector<dpoint>(legacy_parts.begin(), legacy_parts.end());
             }
-
-            else { // version 2 - deserialize into vector<dpoint, 2>
+            else 
+            { 
+                // version 2 - deserialize into vector<dpoint, 2>
                 deserialize(item.parts, in);
             }
 
