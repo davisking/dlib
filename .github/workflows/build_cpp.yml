@@ -190,20 +190,6 @@ jobs:
     - name: Build ancillary tools
       run: cmake --build build --config Release --target imglab htmlify dtoc --parallel 4
 
-  windows-2019:
-    runs-on: 'windows-2019'
-    steps:
-    - uses: actions/checkout@v2
-    - name: Configure
-      run: |
-        # don't use CMake 3.25.0 https://gitlab.kitware.com/cmake/cmake/-/issues/23975
-        pip3 install cmake==3.24.0
-        cmake . -B build
-    - name: Build just tests
-      run: cmake --build build --config Debug --target dtest --parallel 4
-    - name: Build ancillary tools
-      run: cmake --build build --config Release --target imglab htmlify dtoc --parallel 4
-  
   # Disable this because macos targets aren't working on github actions right now.
   #macos-latest:
   #  runs-on: 'macos-latest'
