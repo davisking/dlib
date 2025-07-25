@@ -27,24 +27,20 @@ namespace dlib
                 handling out-of-vocabulary words and reducing the size of the vocabulary while
                 maintaining the ability to represent any text.
 
-                The tokenizer supports special tokens, which can be used to mark specific elements
-                in the text (e.g., `<text>`, `<url>`, `<image>`, etc.). These special tokens are
-                treated as atomic units during tokenization and are not subject to further splitting.
-
-                The class provides methods for training the tokenizer on a given text corpus, encoding
-                text into subword tokens, and decoding tokens back into text. The tokenizer can be
-                serialized and deserialized to/from a file, allowing for easy storage and reuse.
+                Key Features:
+                - Base vocabulary of 256 single-byte tokens (0-255)
+                - 28 predefined special tokens (e.g., <text>, <url>, <unk>, etc.)
+                - Dynamic vocabulary expansion through merges during training
+                - Configurable training with:
+                  * Vocabulary size control
+                  * Byte-level truncation (via max_bytes)
+                  * Progress reporting
 
                 REFERENCES
                     - Sennrich, R., Haddow, B., & Birch, A. (2016). Neural Machine Translation of
                       Rare Words with Subword Units. In Proceedings of the 54th Annual Meeting of
                       the Association for Computational Linguistics (ACL 2016).
-
-            INITIAL VALUE
-                - The base vocabulary is initialized with single-byte tokens (0-255).
-                - Special tokens are pre-defined and assigned IDs starting from 256.
-                - The maximum token length is set to 8 bytes.
-        !*/
+        */
 
     public:
         bpe_tokenizer();
@@ -56,16 +52,18 @@ namespace dlib
 
         void train(
             const std::string& text,
-            int vocab_size,
+            size_t vocab_size,
+            size_t max_bytes = 0,
             bool verbose = false
         );
         /*!
             requires
                 - vocab_size >= 256
             ensures
-                - Trains the tokenizer on the provided text corpus.
+                - Trains the tokenizer on the provided text corpus, or up to `max_bytes`.
                 - Iteratively merges the most frequent pairs of tokens to form a subword vocabulary
                   of size `vocab_size`.
+                - If max_bytes==0, uses entire text.
                 - If `verbose` is true, progress information is printed to the standard output.
         !*/
 
@@ -90,8 +88,10 @@ namespace dlib
                 - Returns the decoded text as a UTF-8 encoded string.
         !*/
 
-        std::string decode(int id, bool display_special_tokens = true) const
-        { return decode(std::vector<int>({ id }), display_special_tokens); }
+        std::string decode(
+            int id,
+            bool display_special_tokens = true
+        ) const;
         /*!
             ensures
                 - decode a single token back into text.
@@ -106,11 +106,23 @@ namespace dlib
                 - Throws an exception if the token is not found in the special tokens map.
         !*/
 
+        size_t get_specials_size() const;
+        /*!
+            ensures
+                - Returns count of special tokens
+        */
+
         size_t get_vocab_size() const;
         /*!
             ensures
                 - Returns the total size of the vocabulary, including base tokens and special tokens.
         !*/
+
+        size_t get_vocab_without_specials_size() const;
+        /*!
+            ensures
+                - Returns vocabulary size excluding special tokens
+        */
     };
 
     void serialize(
