@@ -1125,7 +1125,7 @@ namespace dlib
             const full_object_detection& obj
         )
         {
-            std::vector<point> parts; 
+            std::vector<dpoint> parts; 
             parts.reserve(obj.num_parts());
             for (unsigned long i = 0; i < obj.num_parts(); ++i)
             {

@@ -11,9 +11,9 @@ namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
-
-    const static point OBJECT_PART_NOT_PRESENT(0x7FFFFFFF,
-                                               0x7FFFFFFF);
+    
+    const static dpoint OBJECT_PART_NOT_PRESENT(0x7FFFFFFFFFFFF,
+                                                0x7FFFFFFFFFFFF);
 
 // ----------------------------------------------------------------------------------------
 
@@ -29,7 +29,7 @@ namespace dlib
 
         full_object_detection(
             const rectangle& rect,
-            const std::vector<point>& parts
+            const std::vector<dpoint>& parts
         );
         /*!
             ensures
@@ -37,6 +37,16 @@ namespace dlib
                 - #num_parts() == parts.size()
                 - for all valid i:
                     - part(i) == parts[i]
+        !*/
+
+        full_object_detection(
+            const rectangle& rect_,
+            const std::vector<point>& parts_
+        );
+        /*!
+            ensures
+                - #get_rect() == rect
+                - #num_parts() == parts.size()
         !*/
 
         full_object_detection(
@@ -79,7 +89,7 @@ namespace dlib
                 - returns the number of parts in this object.  
         !*/
 
-        const point& part(
+        const dpoint& part(
             unsigned long idx
         ) const; 
         /*!
@@ -92,7 +102,7 @@ namespace dlib
                   This is useful for modeling object parts that are not always observed.
         !*/
 
-        point& part(
+        dpoint& part(
             unsigned long idx
         ); 
         /*!
