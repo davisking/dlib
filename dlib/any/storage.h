@@ -525,7 +525,7 @@ namespace dlib
             }
 
         private:
-            std::aligned_storage_t<Size, Alignment> data;
+            alignas(Alignment) unsigned char data[Size];
             void (*del)(storage_stack&)                         = nullptr;
             void (*copy)(const storage_stack&, storage_stack&)  = nullptr;
             void (*move)(storage_stack&, storage_stack&)        = nullptr;
@@ -773,7 +773,7 @@ namespace dlib
             }
 
         private:
-            std::aligned_storage_t<Size, Alignment> data;
+            alignas(Alignment) unsigned char data[Size];
             void* ptr                                       = nullptr;
             void (*del)(storage_sbo&)                       = nullptr;
             void (*copy)(const storage_sbo&, storage_sbo&)  = nullptr;
