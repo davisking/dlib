@@ -2440,11 +2440,13 @@ namespace dlib
                     tt::assign_bias_gradient(pb, gi);
                 }
             }
-
-            const auto& prev_gradient = sub.get_gradient_input();
-            auto sgi = alias_tensor(prev_gradient.num_samples() * prev_gradient.k() * prev_gradient.nr(), num_inputs)(prev_gradient, 0);
+            
+            //prev_gradient is not const, so that sgi isn't const
+            //since sgi is used as a destination for tt::gemm
+            auto& prev_gradient = sub.get_gradient_input();
+            alias_tensor_instance sgi = alias_tensor(prev_gradient.num_samples() * prev_gradient.k() * prev_gradient.nr(), num_inputs)(prev_gradient, 0);
             auto w = weights(params, 0);
-            tt::gemm(1, (tensor&)sgi, 1, gi, false, w, true);
+            tt::gemm(1, sgi, 1, gi, false, w, true);
         }
 
         alias_tensor_instance get_weights() { return weights(params, 0); }
