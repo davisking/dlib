@@ -268,6 +268,8 @@ if (NOT TARGET dlib)
    toggle_preprocessor_switch(DLIB_JXL_SUPPORT) 
    #toggle_preprocessor_switch(DLIB_USE_FFTW)
    toggle_preprocessor_switch(DLIB_USE_MKL_FFT)
+   toggle_preprocessor_switch(DLIB_USE_MKL_SEQUENTIAL)
+   toggle_preprocessor_switch(DLIB_USE_MKL_WITH_TBB)
    toggle_preprocessor_switch(DLIB_USE_FFMPEG)
 
 

@@ -86,7 +86,8 @@ if (UNIX OR MINGW)
 
    if (SIZE_OF_VOID_PTR EQUAL 8)
       set( mkl_search_path
-         /opt/intel/oneapi/mkl/latest/lib/intel64
+         /opt/intel/oneapi/mkl/latest/lib
+         /opt/intel/oneapi/tbb/latest/lib
          /opt/intel/mkl/*/lib/em64t
          /opt/intel/mkl/lib/intel64
          /opt/intel/lib/intel64

@@ -174,6 +174,37 @@ jobs:
     - name: Build ffmpeg example
       run: cmake --build build --config Release --target ffmpeg_video_muxing_ex --parallel 4
 
+  ubuntu-latest-mkl:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Cache MKL
+      uses: actions/cache@v3
+      id: cache-mkl
+      with:
+        path: /opt/intel/oneapi/mkl/latest
+        key: mkl_try1
+        
+    - name: Download MKL
+      if: steps.cache-mkl.outputs.cache-hit != 'true'
+      run: |
+        wget https://registrationcenter-download.intel.com/akdlm/IRC_NAS/bd1d0273-a931-4f7e-ab76-6a2a67d646c7/intel-oneapi-base-toolkit-2025.2.0.592_offline.sh
+        sudo sh ./intel-oneapi-base-toolkit-2025.2.0.592_offline.sh -a --silent --eula accept
+
+    - name: Configure
+      run: |
+        cmake ${{ github.workspace }}/dlib/test -B build
+
+    - name: Build just tests
+      run: cmake --build build --config Release --target dtest --parallel 4
+
+    - name: Test
+      run: build/dtest --runall -q
+      
+    - name: Build examples, etc
+      run: cmake --build build --config Release --parallel 2
+
   windows-latest:
     runs-on: 'windows-latest'
     steps:
