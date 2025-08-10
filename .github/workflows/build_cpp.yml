@@ -179,12 +179,17 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Prepare MKL dir for cache restore
+      run: sudo mkdir -p /opt/intel
+
     - name: Cache MKL
       uses: actions/cache@v3
       id: cache-mkl
       with:
-        path: /opt/intel/oneapi/mkl/latest
-        key: mkl_try1
+        path: |
+          /opt/intel/oneapi/mkl
+          /opt/intel/oneapi/tbb
+        key: mkl_try2
         
     - name: Download MKL
       if: steps.cache-mkl.outputs.cache-hit != 'true'
@@ -206,12 +211,17 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Prepare MKL dir for cache restore
+      run: sudo mkdir -p /opt/intel
+
     - name: Cache MKL
       uses: actions/cache@v3
       id: cache-mkl
       with:
-        path: /opt/intel/oneapi/mkl/latest
-        key: mkl_try1
+        path: |
+          /opt/intel/oneapi/mkl
+          /opt/intel/oneapi/tbb
+        key: mkl_try2
         
     - name: Download MKL
       if: steps.cache-mkl.outputs.cache-hit != 'true'
@@ -233,12 +243,17 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Prepare MKL dir for cache restore
+      run: sudo mkdir -p /opt/intel
+
     - name: Cache MKL
       uses: actions/cache@v3
       id: cache-mkl
       with:
-        path: /opt/intel/oneapi/mkl/latest
-        key: mkl_try1
+        path: |
+          /opt/intel/oneapi/mkl
+          /opt/intel/oneapi/tbb
+        key: mkl_try2
         
     - name: Download MKL
       if: steps.cache-mkl.outputs.cache-hit != 'true'
