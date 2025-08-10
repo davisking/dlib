@@ -47,6 +47,8 @@ namespace dlib
             bool        is_inverse{};
         };
 
+//----------------------------------------------------------------------------------------------------------------
+
         inline bool operator==(const plan_key& a, const plan_key& b)
         {
             return  a.size                   == b.size                   && 
@@ -57,40 +59,26 @@ namespace dlib
         }
 
 //----------------------------------------------------------------------------------------------------------------
-    
-    }
-}
-
-//----------------------------------------------------------------------------------------------------------------
-
-template<>
-struct std::hash<dlib::mkl_details::plan_key>
-{
-    std::size_t operator()(const dlib::mkl_details::plan_key& s) const noexcept
-    {
-        uint32_t hash = 0;
-        hash = dlib::hash(s.size,                           hash);
-        hash = dlib::hash((uint32_t)s.is_inplace,           hash);
-        hash = dlib::hash((uint32_t)s.is_single_precision,  hash);
-        hash = dlib::hash((uint32_t)s.is_complex,           hash);
-        hash = dlib::hash((uint32_t)s.is_inverse,           hash);
-        return hash;
-    }
-};
-
-//----------------------------------------------------------------------------------------------------------------
-
-namespace dlib
-{
-
-    namespace mkl_details
-    {
+        
+        struct hasher
+        {
+            uint32_t operator()(const plan_key& s) const noexcept
+            {
+                uint32_t hash = 0;
+                hash = dlib::hash(s.size,                           hash);
+                hash = dlib::hash((uint32_t)s.is_inplace,           hash);
+                hash = dlib::hash((uint32_t)s.is_single_precision,  hash);
+                hash = dlib::hash((uint32_t)s.is_complex,           hash);
+                hash = dlib::hash((uint32_t)s.is_inverse,           hash);
+                return hash;
+            }
+        };
 
 //----------------------------------------------------------------------------------------------------------------
 
         inline const auto& get_handle(const plan_key& key)
         {
-            thread_local std::unordered_map<plan_key, mkl_ptr> plans;
+            thread_local std::unordered_map<plan_key, mkl_ptr, hasher> plans;
 
             if (plans.find(key) == plans.end())
             {
@@ -191,7 +179,7 @@ namespace dlib
         DLIB_ASSERT(dims.num_dims() < 3, "we currently only support up to 2D FFT. Please submit an issue on github if 3D or above is required.");
         DLIB_ASSERT(dims.back() % 2 == 0, "last dimension needs to be even");
         
-        #ifdef QDSP_USE_MKL_WITH_TBB
+        #ifdef DLIB_USE_MKL_WITH_TBB
         (void)TBB_runtime_version();
         #endif
 
@@ -223,7 +211,7 @@ namespace dlib
         DLIB_ASSERT(dims.num_dims() < 3, "we currently only support up to 2D FFT. Please submit an issue on github if 3D or above is required.");
         DLIB_ASSERT(dims.back() % 2 == 0, "last dimension needs to be even");
 
-        #ifdef QDSP_USE_MKL_WITH_TBB
+        #ifdef DLIB_USE_MKL_WITH_TBB
         (void)TBB_runtime_version();
         #endif
 
