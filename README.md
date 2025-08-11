@@ -37,22 +37,17 @@ vcpkg install dlib
 
 ## Compiling dlib Python API
 
-Before you can run the Python example programs you must install the build requirement.
-```bash
-python -m venv venv
-pip install build
-```
-
-Then you must compile dlib and install it in your environment. Type:
-```bash
-python -m build --wheel
-pip install dist/dlib-<version>.whl
-```
-
-Or download dlib using PyPi:
+Either fetch the latest stable release of dlib from PyPi and install that:
 ```bash
 pip install dlib
 ```
+Or fetch the very latest version from github and install that:
+```bash
+git clone https://github.com/davisking/dlib.git
+cd dlib
+pip install .
+```
+
 
 ## Running the unit test suite
 
