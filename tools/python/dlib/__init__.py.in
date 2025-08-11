@@ -1,5 +1,29 @@
 # Copyright (C) 2020  Davis E. King (davis@dlib.net)
 # License: Boost Software License   See LICENSE.txt for the full license.
 
+def add_lib_to_dll_path(path):
+    """ On windows you must call os.add_dll_directory() to allow linking to external DLLs.  See
+    https://docs.python.org/3.8/whatsnew/3.8.html#bpo-36085-whatsnew.  This function adds the folder
+    containing path to the dll search path. 
+    """
+    try:
+        import os
+
+        # Work out where the various bin folders that hold nvidia's dlls are.
+        lib_folder = os.path.dirname(path)
+        dll_folder = lib_folder.replace("/lib/", "/bin/")
+
+        if os.path.isdir(dll_folder):
+            os.add_dll_directory(dll_folder)
+        else:
+            os.add_dll_directory(os.path.dirname(dll_folder))
+    except (AttributeError,KeyError,FileNotFoundError):
+        pass
+
+if '@DLIB_USE_CUDA@' == 'ON':
+    add_lib_to_dll_path('@CUDNN_LIBRARY_PATH@')
+    add_lib_to_dll_path('@CUDA_CUDART@')
+
+
 from _dlib_pybind11 import *
 from _dlib_pybind11 import __version__, __time_compiled__
