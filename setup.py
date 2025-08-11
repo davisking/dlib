@@ -28,17 +28,21 @@ Additional options:
 import os
 import re
 import sys
+import errno
+import stat
 import shutil
 import platform
 import subprocess
 import multiprocessing
-from distutils import log
-from math import ceil,floor
+from math import floor
 
+from packaging.version import Version, parse as parse_version
 from setuptools import find_packages, setup, Extension
 from setuptools.command.build_ext import build_ext
-from distutils.version import LooseVersion
+import logging
 
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger("setup")
 
 def get_extra_cmake_options():
     """read --clean, --no, --set, --compiler-flags, and -G options from the command line and add them as cmake switches.
@@ -90,7 +94,7 @@ cmake_extra_options,clean_build_folder = get_extra_cmake_options()
 
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
-        Extension.__init__(self, name, sources=[])
+        super().__init__(name, sources=[])
         self.sourcedir = os.path.abspath(sourcedir)
 
 def rmtree(name):
@@ -160,7 +164,7 @@ class CMakeBuild(build_ext):
     def run(self):
         cmake_version = self.get_cmake_version()
         if platform.system() == "Windows":
-            if LooseVersion(cmake_version) < '3.1.0':
+            if parse_version(cmake_version) < Version('3.1.0'):
                 sys.stderr.write("\nERROR: CMake >= 3.1.0 is required on Windows\n\n")
                 sys.exit(1)
 
@@ -235,10 +239,6 @@ def read_version_from_cmakelists(cmake_file):
     minor = re.findall("set\\(CPACK_PACKAGE_VERSION_MINOR.*\"(.*)\"", open(cmake_file).read())[0]
     patch = re.findall("set\\(CPACK_PACKAGE_VERSION_PATCH.*\"(.*)\"", open(cmake_file).read())[0]
     return major + '.' + minor + '.' + patch
-
-def read_entire_file(fname):
-    """Read text out of a file relative to setup.py.  """
-    return open(os.path.join(fname)).read()
 
 setup(
     name='dlib',
