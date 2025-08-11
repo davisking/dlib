@@ -9,8 +9,12 @@ cmake_minimum_required(VERSION 3.10.0)
 set (target_name dtest)
 PROJECT(${target_name})
 
+option(Werror "Error on warnings" ON)
+
 # compile the dlib/all/source.cpp file into its own object just to make sure it compiles
 set(DLIB_TEST_COMPILE_ALL_SOURCE_CPP ON)
+
+
 
 add_subdirectory(.. dlib_build)
 
@@ -170,7 +174,11 @@ target_compile_definitions(${target_name} PRIVATE DLIB_FFMPEG_DATA="${DLIB_FFMPE
 
 if (CMAKE_COMPILER_IS_GNUCXX)
    # Turn on all warnings, and treat them as errors.
-   add_compile_options(-W -Wall -Wextra -Wpedantic -Werror)
+   add_compile_options(-W -Wall -Wextra -Wpedantic)
+   if (Werror)
+       add_compile_options(-Werror)
+   endif()
+
    add_compile_options(-fdiagnostics-color=always)
    # I don't care about unused testing functions though.  I like to keep them
    # around.  Don't warn about it.
@@ -205,11 +213,16 @@ if (CMAKE_COMPILER_IS_GNUCXX)
    endif()
 
 elseif (MSVC)
-   # Treat warnings as errors.
-   add_compile_options(/WX)
+   if (Werror)
+      # Treat warnings as errors.
+      add_compile_options(/WX)
+   endif()
 else() # basically Clang
    # Treat warnings as errors, but do not turn on all warnings.
-   add_compile_options(-W -Werror)
+   add_compile_options(-W)
+   if (Werror)
+      add_compile_options(-Werror)
+   endif()
    # This is for the comment in face_detection_ex.cpp that says "faces/*.jpg"
    add_compile_options(-Wno-comment)
 
