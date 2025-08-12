@@ -82,6 +82,10 @@ namespace dlib
 
             if (plans.find(key) == plans.end())
             {
+#ifdef DLIB_USE_MKL_WITH_TBB
+        (void)TBB_runtime_version();
+#endif
+
                 const DFTI_CONFIG_VALUE dfti_type   = key.is_single_precision   ? DFTI_SINGLE   : DFTI_DOUBLE;
                 const DFTI_CONFIG_VALUE inplacefft  = key.is_inplace            ? DFTI_INPLACE  : DFTI_NOT_INPLACE;
                 const DFTI_CONFIG_VALUE domain      = key.is_complex            ? DFTI_COMPLEX  : DFTI_REAL;
@@ -146,10 +150,6 @@ namespace dlib
         DLIB_ASSERT(dims.num_dims() > 0, "dims can't be empty");
         DLIB_ASSERT(dims.num_dims() < 3, "we currently only support up to 2D FFT. Please submit an issue on github if 3D or above is required.");
 
-        #ifdef DLIB_USE_MKL_WITH_TBB
-        (void)TBB_runtime_version();
-        #endif
-
         const auto& h = get_handle(plan_key{dims, in == out, std::is_same<T,float>::value, true, is_inverse});
         if (is_inverse) check_status(DftiComputeBackward(h.get(), (void*)in, (void*)out));
         else            check_status(DftiComputeForward(h.get(), (void*)in, (void*)out));
@@ -178,10 +178,6 @@ namespace dlib
         DLIB_ASSERT(dims.num_dims() > 0, "dims can't be empty");
         DLIB_ASSERT(dims.num_dims() < 3, "we currently only support up to 2D FFT. Please submit an issue on github if 3D or above is required.");
         DLIB_ASSERT(dims.back() % 2 == 0, "last dimension needs to be even");
-        
-        #ifdef DLIB_USE_MKL_WITH_TBB
-        (void)TBB_runtime_version();
-        #endif
 
         const auto& h = get_handle(plan_key{dims, (void*)in == (void*)out, std::is_same<T,float>::value, false, false});
         check_status(DftiComputeForward(h.get(), (void*)in, (void*)out));
@@ -210,10 +206,6 @@ namespace dlib
         DLIB_ASSERT(dims.num_dims() > 0, "dims can't be empty");
         DLIB_ASSERT(dims.num_dims() < 3, "we currently only support up to 2D FFT. Please submit an issue on github if 3D or above is required.");
         DLIB_ASSERT(dims.back() % 2 == 0, "last dimension needs to be even");
-
-        #ifdef DLIB_USE_MKL_WITH_TBB
-        (void)TBB_runtime_version();
-        #endif
 
         const auto& h = get_handle(plan_key{dims, (void*)in == (void*)out, std::is_same<T,float>::value, false, true});
         check_status(DftiComputeBackward(h.get(), (void*)in, (void*)out));
