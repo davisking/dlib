@@ -12,7 +12,7 @@
 #  mkl_tbb_found              - True if the Intel MKL tbb library is available
 #  mkl_thread_found           - True if the Intel MKL thread library is available
 #  mkl_found                  - True if at least one of (mkl_seq_found,mkl_tbb_found,mkl_thread_found) is true
-#  mkl_include_dir            - add to the include path to use the MKL library
+#  mkl_include_dir            - MKL include directory
 #  mkl_libraries_sequential   - MKL sequential libraries if found
 #  mkl_libraries_tbb          - MKL tbb libraries if found
 #  mkl_libraries_thread       - MKL thread libraries if found
