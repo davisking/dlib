@@ -600,6 +600,8 @@ if (NOT TARGET dlib)
       endif()
 
       if (DLIB_USE_MKL_SEQUENTIAL OR DLIB_USE_MKL_WITH_TBB OR DLIB_USE_MKL_THREAD)
+         set(DLIB_USE_MKL_FFT 1)
+         enable_preprocessor_switch(DLIB_USE_MKL_FFT)
          list (APPEND dlib_needed_public_includes ${mkl_include_dir})
          if (DLIB_USE_MKL_SEQUENTIAL)
             message(STATUS "Using MKL sequential")
