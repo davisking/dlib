@@ -83,7 +83,7 @@ namespace dlib
             if (plans.find(key) == plans.end())
             {
 #ifdef DLIB_USE_MKL_WITH_TBB
-        (void)TBB_runtime_version();
+                (void)TBB_runtime_version();
 #endif
 
                 const DFTI_CONFIG_VALUE dfti_type   = key.is_single_precision   ? DFTI_SINGLE   : DFTI_DOUBLE;
