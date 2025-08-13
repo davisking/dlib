@@ -688,13 +688,21 @@ namespace dlib
             )
             {
                 // Video properties
-                if (pCodec->supported_framerates && pCodecCtx->framerate != 0)
+                const AVRational*   supported_framerates{nullptr};
+                int                 nsupported_framerates{0};
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
+                avcodec_get_supported_config(pCodecCtx, NULL, AV_CODEC_CONFIG_FRAME_RATE, 0, (const void**)&supported_framerates, &nsupported_framerates);
+#else
+                supported_framerates = pCodec->supported_framerates;
+                for (; supported_framerates != nullptr && supported_framerates[nsupported_framerates] != AVRational{0,0}  ; ++nsupported_framerates) {}
+#endif
+                if (supported_framerates && nsupported_framerates > 0 && pCodecCtx->framerate != 0)
                 {
                     bool framerate_supported = false;
 
-                    for (int i = 0 ; pCodec->supported_framerates[i] != AVRational{0,0} ; i++)
+                    for (int i = 0 ; i < nsupported_framerates ; ++i)
                     {
-                        if (pCodecCtx->framerate == pCodec->supported_framerates[i])
+                        if (pCodecCtx->framerate == supported_framerates[i])
                         {
                             framerate_supported = true;
                             break;
@@ -707,19 +715,26 @@ namespace dlib
                             << "Requested framerate "
                             << pCodecCtx->framerate.num / pCodecCtx->framerate.den
                             << " not supported. Changing to default "
-                            << pCodec->supported_framerates[0].num / pCodec->supported_framerates[0].den;
+                            << supported_framerates[0].num / supported_framerates[0].den;
 
-                        pCodecCtx->framerate = pCodec->supported_framerates[0];
+                        pCodecCtx->framerate = supported_framerates[0];
                     }
                 }
-
-                if (pCodec->pix_fmts)
+                const enum AVPixelFormat* pix_fmts{nullptr};
+                int                       npix_fmts{0};
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
+                avcodec_get_supported_config(pCodecCtx, NULL, AV_CODEC_CONFIG_PIX_FORMAT, 0, (const void**)&pix_fmts, &npix_fmts);
+#else
+                pix_fmts = pCodec->pix_fmts;
+                for (; pix_fmts != nullptr && pix_fmts[npix_fmts] != AV_PIX_FMT_NONE ; ++npix_fmts) {}
+#endif
+                if (pix_fmts && npix_fmts > 0)
                 {
                     bool pix_fmt_supported = false;
 
-                    for (int i = 0 ; pCodec->pix_fmts[i] != AV_PIX_FMT_NONE ; i++)
+                    for (int i = 0 ; i < npix_fmts; ++i)
                     {
-                        if (pCodecCtx->pix_fmt == pCodec->pix_fmts[i])
+                        if (pCodecCtx->pix_fmt == pix_fmts[i])
                         {
                             pix_fmt_supported = true;
                             break;
@@ -732,20 +747,28 @@ namespace dlib
                             << "Requested pixel format "
                             << av_get_pix_fmt_name(pCodecCtx->pix_fmt)
                             << " not supported. Changing to default "
-                            << av_get_pix_fmt_name(pCodec->pix_fmts[0]);
+                            << av_get_pix_fmt_name(pix_fmts[0]);
 
-                        pCodecCtx->pix_fmt = pCodec->pix_fmts[0];
+                        pCodecCtx->pix_fmt = pix_fmts[0];
                     }
                 }
 
                 // Audio properties
-                if (pCodec->supported_samplerates)
+                const int*  supported_samplerates{nullptr};
+                int         nsupported_samplerates{0};
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
+                avcodec_get_supported_config(pCodecCtx, NULL, AV_CODEC_CONFIG_SAMPLE_RATE, 0, (const void**)&supported_samplerates, &nsupported_samplerates);
+#else
+                supported_samplerates = pCodec->supported_samplerates;
+                for (; supported_samplerates != nullptr && supported_samplerates[nsupported_samplerates] != 0 ; ++nsupported_samplerates) {}
+#endif
+                if (supported_samplerates && nsupported_samplerates > 0)
                 {
                     bool sample_rate_supported = false;
 
-                    for (int i = 0 ; pCodec->supported_samplerates[i] != 0 ; i++)
+                    for (int i = 0 ; i < nsupported_samplerates ; ++i)
                     {
-                        if (pCodecCtx->sample_rate == pCodec->supported_samplerates[i])
+                        if (pCodecCtx->sample_rate == supported_samplerates[i])
                         {
                             sample_rate_supported = true;
                             break;
@@ -758,19 +781,26 @@ namespace dlib
                             << "Requested sample rate "
                             << pCodecCtx->sample_rate
                             << " not supported. Changing to default "
-                            << pCodec->supported_samplerates[0];
+                            << supported_samplerates[0];
 
-                        pCodecCtx->sample_rate = pCodec->supported_samplerates[0];
+                        pCodecCtx->sample_rate = supported_samplerates[0];
                     }
                 }
-
-                if (pCodec->sample_fmts)
+                const AVSampleFormat* sample_fmts{nullptr};
+                int                   nsample_fmts{0};
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
+                avcodec_get_supported_config(pCodecCtx, NULL, AV_CODEC_CONFIG_SAMPLE_FORMAT, 0, (const void**)&sample_fmts, &nsample_fmts);
+#else
+                sample_fmts = pCodec->sample_fmts;
+                for (; sample_fmts != nullptr && sample_fmts[nsample_fmts] != AV_SAMPLE_FMT_NONE ; ++nsample_fmts) {}
+#endif
+                if (sample_fmts && nsample_fmts > 0)
                 {
                     bool sample_fmt_supported = false;
 
-                    for (int i = 0 ; pCodec->sample_fmts[i] != AV_SAMPLE_FMT_NONE ; i++)
+                    for (int i = 0 ; i < nsample_fmts ; ++i)
                     {
-                        if (pCodecCtx->sample_fmt == pCodec->sample_fmts[i])
+                        if (pCodecCtx->sample_fmt == sample_fmts[i])
                         {
                             sample_fmt_supported = true;
                             break;
@@ -783,20 +813,28 @@ namespace dlib
                             << "Requested sample format "
                             << av_get_sample_fmt_name(pCodecCtx->sample_fmt)
                             << " not supported. Changing to default "
-                            << av_get_sample_fmt_name(pCodec->sample_fmts[0]);
+                            << av_get_sample_fmt_name(sample_fmts[0]);
 
-                        pCodecCtx->sample_fmt = pCodec->sample_fmts[0];
+                        pCodecCtx->sample_fmt = sample_fmts[0];
                     }
                 }
 
 #if FFMPEG_HAS_CH_LAYOUT
-                if (pCodec->ch_layouts)
+                const AVChannelLayout* ch_layouts{nullptr};
+                int                    nch_layouts{0};
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
+                avcodec_get_supported_config(pCodecCtx, NULL, AV_CODEC_CONFIG_CHANNEL_LAYOUT, 0, (const void**)&ch_layouts, &nch_layouts);
+#else
+                ch_layouts = pCodec->ch_layouts;
+                for (; ch_layouts != nullptr && av_channel_layout_check(&ch_layouts[nch_layouts]) ; ++nch_layouts) {}
+#endif
+                if (ch_layouts && nch_layouts > 0)
                 {
                     bool channel_layout_supported = false;
 
-                    for (int i = 0 ; av_channel_layout_check(&pCodec->ch_layouts[i]) ; ++i)
+                    for (int i = 0 ; i < nch_layouts ; ++i)
                     {
-                        if (av_channel_layout_compare(&pCodecCtx->ch_layout, &pCodec->ch_layouts[i]) == 0)
+                        if (av_channel_layout_compare(&pCodecCtx->ch_layout, &ch_layouts[i]) == 0)
                         {
                             channel_layout_supported = true;
                             break;
@@ -809,9 +847,9 @@ namespace dlib
                             << "Channel layout "
                             << details::get_channel_layout_str(pCodecCtx)
                             << " not supported. Changing to default "
-                            << details::get_channel_layout_str(pCodec->ch_layouts[0]);
+                            << details::get_channel_layout_str(ch_layouts[0]);
 
-                        av_channel_layout_copy(&pCodecCtx->ch_layout, &pCodec->ch_layouts[0]);
+                        av_channel_layout_copy(&pCodecCtx->ch_layout, &ch_layouts[0]);
                     }
                 }
 #else
