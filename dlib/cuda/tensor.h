@@ -12,6 +12,18 @@
 #include <memory>
 #include "../any.h"
 
+#ifdef DLIB_USE_CUDA
+#define IF_DLIB_USE_CUDA(...) if (cuda::use_cuda()) { __VA_ARGS__ }
+#else
+#define IF_DLIB_USE_CUDA(...)
+#endif
+
+#ifdef DLIB_USE_CUDA
+#define IF_DLIB_NOT_USE_CUDA(...) if (!cuda::use_cuda()) { __VA_ARGS__ }
+#else
+#define IF_DLIB_NOT_USE_CUDA(...) __VA_ARGS__
+#endif
+
 namespace dlib
 {
 
@@ -77,17 +89,18 @@ namespace dlib
 
         tensor& operator= (float val)
         {
-#ifdef DLIB_USE_CUDA
-            // If you are using CUDA then presumably you will be mostly using tensors on
-            // the GPU.  So unless you seem to be actively working with the host side's
-            // data then we do this initialization on the device side since this avoids a
-            // host to device transfer that would likely immediately follow.
-            if (data().device_ready())
-            {
-                cuda::set_tensor(*this, val);
-                return *this;
-            }
-#endif
+            IF_DLIB_USE_CUDA(
+                // If you are using CUDA then presumably you will be mostly using tensors on
+                // the GPU.  So unless you seem to be actively working with the host side's
+                // data then we do this initialization on the device side since this avoids a
+                // host to device transfer that would likely immediately follow.
+                if (data().device_ready())
+                {
+                    cuda::set_tensor(*this, val);
+                    return *this;
+                }
+            )
+
             auto d = host_write_only();
             for (size_t i = 0; i < size(); ++i)
                 d[i] = val;
@@ -97,15 +110,16 @@ namespace dlib
 
         tensor& operator*= (float val)
         {
-#ifdef DLIB_USE_CUDA
-            cuda::scale_tensor(*this, val);
-            return *this;
-#else
-            for (auto& d : *this)
-                d *= val;
+            IF_DLIB_USE_CUDA(
+                cuda::scale_tensor(*this, val);
+            )
+
+            IF_DLIB_NOT_USE_CUDA(
+                for (auto& d : *this)
+                    d *= val;
+            )
 
             return *this;
-#endif
         }
         
         tensor& operator/= (float val)
