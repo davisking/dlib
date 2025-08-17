@@ -208,7 +208,7 @@ jobs:
         run: choco install --no-progress --yes cmake
 
       - name: Configure
-        run: cmake -S . -B build
+        run: cmake dlib\test -B build
 
       - name: Build just tests
         run: cmake --build build --config Release --target dtest --parallel 4
