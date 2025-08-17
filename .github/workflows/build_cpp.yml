@@ -71,7 +71,7 @@ jobs:
             c_compiler            : gcc
             cxx_compiler          : g++
             extra_apt             : make yasm 
-            configure_extra       : -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n7.1.1_installation'
+            configure_extra       : -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n7.1.1_installation
 
           - name: ubuntu-latest-gcc11-default-deps
             os                    : ubuntu-latest
@@ -214,7 +214,7 @@ jobs:
         run: cmake --build build --config Release --target dtest --parallel 4
 
       - name: Test
-        run: build/Release/dtest.exe --runall -q
+        run: build\Release\dtest.exe --runall -q
 
       - name: Build ancillary tools
         run: cmake --build build --config Release --target imglab htmlify dtoc --parallel 4
