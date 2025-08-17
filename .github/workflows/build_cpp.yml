@@ -2,337 +2,219 @@ name: C++
 
 on:
   push:
-    branches:
-    - master
+    branches: [ master ]
     paths:
-    - ".github/workflows/build_cpp.yml"
-    - "**.cpp"
-    - "**.h"
-    - "**.c"
-    - "**.cu"
-    - "**.cmake"
-    - "**CMakeLists.txt"
+      - ".github/workflows/build_cpp.yml"
+      - "**.cpp"
+      - "**.h"
+      - "**.c"
+      - "**.cu"
+      - "**.cmake"
+      - "**CMakeLists.txt"
   pull_request:
-    branches:
-    - master
+    branches: [ master ]
     paths:
-    - ".github/workflows/build_cpp.yml"
-    - "**.cpp"
-    - "**.h"
-    - "**.c"
-    - "**.cu"
-    - "**.cmake"
-    - "**CMakeLists.txt"
+      - ".github/workflows/build_cpp.yml"
+      - "**.cpp"
+      - "**.h"
+      - "**.c"
+      - "**.cu"
+      - "**.cmake"
+      - "**CMakeLists.txt"
 
 defaults:
   run:
     shell: bash
-    working-directory: dlib/test
 
 jobs:
-  ubuntu-22-04-gcc-default-cmake-3-10-ffmpeg5:
-    runs-on: 'ubuntu-22.04'
+  linux:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: ubuntu-22.04-default-deps
+            os                    : ubuntu-22.04
+            build_tests           : true
+            build_examples        : true
+            build_blas_bindings   : true
+            c_compiler            : gcc
+            cxx_compiler          : g++
+            extra_apt             : libwebp-dev libavformat-dev libavcodec-dev libavdevice-dev libavfilter-dev libswresample-dev libswscale-dev libavutil-dev libopenblas-dev liblapack-dev
+
+          - name: ubuntu-22.04-ffmpeg-513
+            os                    : ubuntu-22.04
+            build_tests           : true
+            build_ffmpeg          : true
+            ffmpeg_version        : 5.1.3
+            c_compiler            : gcc
+            cxx_compiler          : g++
+            extra_apt             : make yasm 
+            configure_extra       : -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n5.1.3_installation
+
+          - name: ubuntu-22.04-ffmpeg-701
+            os                    : ubuntu-22.04
+            build_ffmpeg          : true
+            build_ffmpeg_examples : true
+            ffmpeg_version        : 7.0.1
+            c_compiler            : gcc
+            cxx_compiler          : g++
+            extra_apt             : make yasm 
+            configure_extra       : -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n7.0.1_installation
+
+          - name: ubuntu-22.04-ffmpeg-711
+            os                    : ubuntu-22.04
+            build_ffmpeg          : true
+            build_ffmpeg_examples : true
+            ffmpeg_version        : 7.1.1
+            c_compiler            : gcc
+            cxx_compiler          : g++
+            extra_apt             : make yasm 
+            configure_extra       : -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n7.1.1_installation'
+
+          - name: ubuntu-latest-gcc11-default-deps
+            os                    : ubuntu-latest
+            build_tests           : true
+            build_examples        : true
+            build_blas_bindings   : true
+            c_compiler            : gcc-11
+            cxx_compiler          : g++-11
+            extra_apt             : "libwebp-dev libavformat-dev libavcodec-dev libavdevice-dev libavfilter-dev libswresample-dev libswscale-dev libavutil-dev libopenblas-dev liblapack-dev gcc-11 g++-11"
+
+          - name: ubuntu-latest-clang-default-avx
+            os                    : ubuntu-latest
+            build_tests           : true
+            build_examples        : true
+            c_compiler            : clang
+            cxx_compiler          : clang++
+            extra_apt             : "libwebp-dev libavformat-dev libavcodec-dev libavdevice-dev libavfilter-dev libswresample-dev libswscale-dev libavutil-dev clang"
+            configure_extra       : -DUSE_AVX_INSTRUCTIONS=1
+
+          - name: ubuntu-latest-mkl-sequential
+            os                    : ubuntu-latest
+            build_tests           : true
+            build_mkl             : true
+            c_compiler            : gcc
+            cxx_compiler          : g++
+            configure_extra       : -DDLIB_USE_MKL_SEQUENTIAL=ON
+          
+          - name: ubuntu-latest-mkl-tbb
+            os                    : ubuntu-latest
+            build_tests           : true
+            build_mkl             : true
+            c_compiler            : gcc
+            cxx_compiler          : g++
+            configure_extra       : -DDLIB_USE_MKL_SEQUENTIAL=OFF -DDLIB_USE_MKL_WITH_TBB=ON
+
+          - name: ubuntu-latest-mkl-thread
+            os                    : ubuntu-latest
+            build_tests           : true
+            build_mkl             : true
+            c_compiler            : gcc
+            cxx_compiler          : g++
+            configure_extra       : -DDLIB_USE_MKL_SEQUENTIAL=OFF -DDLIB_USE_MKL_WITH_TBB=OFF -DDLIB_USE_MKL_THREAD=ON
+
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-    - name: Install dependencies
-      run: |
-        sudo apt update
-        sudo apt install libwebp-dev make yasm
-        
-    - name: Cache cmake 3.10.0
-      uses: actions/cache@v3
-      id: cache-cmake-download
-      with:
-        # cache this folder:
-        path: ~/cmake-3.10.0-Linux-x86_64
-        key: cmake-3.10.0_try3
-        
-    - run: |
-        # Get the minimum version of cmake dlib supports
-        wget https://cmake.org/files/v3.10/cmake-3.10.0-Linux-x86_64.tar.gz
-        tar -xf cmake-3.10.0-Linux-x86_64.tar.gz -C ~
-      if: steps.cache-cmake-download.outputs.cache-hit != 'true'
+      - name: Install system dependencies
+        if: ${{ matrix.extra_apt != '' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ${{ matrix.extra_apt }}
 
-    - name: Cache FFmpeg 5
-      uses: actions/cache@v3
-      id: cache-ffmpeg5
-      with:
-        path: /home/runner/ffmpeg-n5.1.3_installation
-        key: ffmpeg-n5.1.3_try4
-        
-    - name: Build FFmpeg 5
-      if: steps.cache-ffmpeg5.outputs.cache-hit != 'true'
-      run: |
-        wget https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n5.1.3.tar.gz
-        tar -xf n5.1.3.tar.gz
-        cd FFmpeg-n5.1.3
-        ./configure --prefix=/home/runner/ffmpeg-n5.1.3_installation --disable-doc --disable-programs
-        make -j4
-        make install
-        cd ..
-        
-    - name: Configure
-      run: |
-        mkdir build
-        cd build
-        ~/cmake-3.10.0-Linux-x86_64/bin/cmake -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n5.1.3_installation .. 
+      - name: Cache FFmpeg
+        if: ${{ matrix.build_ffmpeg }}
+        id: cache-ffmpeg
+        uses: actions/cache@v3
+        with:
+          path: /home/runner/ffmpeg-n${{ matrix.ffmpeg_version }}_installation
+          key: ffmpeg-n${{ matrix.ffmpeg_version }}
+
+      - name: Build FFmpeg
+        if: ${{ matrix.build_ffmpeg && steps.cache-ffmpeg.outputs.cache-hit != 'true' }}
+        run: |
+          wget https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n${{ matrix.ffmpeg_version }}.tar.gz
+          tar -xf n${{ matrix.ffmpeg_version }}.tar.gz
+          cd FFmpeg-n${{ matrix.ffmpeg_version }}
+          ./configure --prefix=/home/runner/ffmpeg-n${{ matrix.ffmpeg_version }}_installation --disable-doc --disable-programs
+          make -j4
+          make install
+
+      - name: Prepare MKL dir for cache restore
+        if: ${{ matrix.build_mkl }}
+        run: sudo mkdir -p /opt/intel
     
-    - name: Build just tests
-      run: |
-        cd build
-        make -j4 dtest
-        
-    - name: Test
-      run: build/dtest --runall -q
-      
-    - name: Build examples, etc
-      run: |
-        cd build
-        make -j2
-
-  ubuntu-latest-gcc-11-blas:
-    runs-on: 'ubuntu-latest'
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install dependencies
-      run: |
-        sudo apt update
-        sudo apt install libwebp-dev libavformat-dev libavcodec-dev libavdevice-dev libavfilter-dev libswresample-dev libswscale-dev libavutil-dev 
-        sudo apt install libopenblas-dev liblapack-dev
-    - name: Install gcc 11
-      run: |
-        sudo apt install gcc-11 g++-11
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110 --slave /usr/bin/g++ g++ /usr/bin/g++-11 --slave /usr/bin/gcov gcov /usr/bin/gcov-11
-    - name: Configure
-      run: cmake ${{ github.workspace }}/dlib/test -B build
-    - name: Build just tests
-      run: cmake --build build --config Release --target dtest --parallel 4
-    - name: Test
-      run: build/dtest --runall -q
-    - name: Build examples, etc
-      run: cmake --build build --config Release --parallel 2
-
-    # Test the BLAS bindings
-    - name: Configure BLAS binding tests
-      run: cmake ${{ github.workspace }}/dlib/test/blas_bindings -B build_blas_bindings
-    - name: Build blas binding tests
-      run: cmake --build build_blas_bindings --config Debug --parallel 4
-    - name: Test BLAS bindings
-      run: build_blas_bindings/dtest --runall -q
-
-  ubuntu-latest-clang-default-avx:
-    runs-on: 'ubuntu-latest'
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install dependencies
-      run: |
-        sudo apt update
-        sudo apt install libwebp-dev libavformat-dev libavcodec-dev libavdevice-dev libavfilter-dev libswresample-dev libswscale-dev libavutil-dev 
-    - name: Configure
-      run: |
-        export CC=/usr/bin/clang
-        export CXX=/usr/bin/clang++
-        cmake ${{ github.workspace }}/dlib/test -B build -DUSE_AVX_INSTRUCTIONS=1
-    - name: Build just tests
-      run: cmake --build build --config Release --target dtest --parallel 4
-    - name: Test
-      run: build/dtest --runall -q
-    - name: Build examples, etc
-      run: cmake --build build --config Release --parallel 2
-
-  ubuntu-22-04-ffmpeg701:
-    runs-on: 'ubuntu-22.04'
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Install dependencies
-      run: |
-        sudo apt update
-        sudo apt install make yasm 
-
-    - name: Cache FFmpeg 7
-      uses: actions/cache@v3
-      id: cache-ffmpeg7
-      with:
-        path: /home/runner/ffmpeg-n7.0.1_installation
-        key: ffmpeg-n7.0.1_try2
-        
-    - name: Build FFmpeg 7
-      if: steps.cache-ffmpeg7.outputs.cache-hit != 'true'
-      run: |
-        wget https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n7.0.1.tar.gz
-        tar -xf n7.0.1.tar.gz
-        cd FFmpeg-n7.0.1
-        ./configure --prefix=/home/runner/ffmpeg-n7.0.1_installation --disable-doc --disable-programs
-        make -j4
-        make install
-        cd ..
-        
-    - name: Configure
-      run: cmake . -B build -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n7.0.1_installation
-    - name: Build ffmpeg example
-      run: cmake --build build --config Release --target ffmpeg_video_muxing_ex --parallel 4
-
-  ubuntu-22-04-ffmpeg711:
-    runs-on: 'ubuntu-22.04'
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Install dependencies
-      run: |
-        sudo apt update
-        sudo apt install make yasm 
-
-    - name: Cache FFmpeg 7
-      uses: actions/cache@v3
-      id: cache-ffmpeg7
-      with:
-        path: /home/runner/ffmpeg-n7.1.1_installation
-        key: ffmpeg-n7.1.1_try1
-        
-    - name: Build FFmpeg 7
-      if: steps.cache-ffmpeg7.outputs.cache-hit != 'true'
-      run: |
-        wget https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n7.1.1.tar.gz
-        tar -xf n7.1.1.tar.gz
-        cd FFmpeg-n7.1.1
-        ./configure --prefix=/home/runner/ffmpeg-n7.1.1_installation --disable-doc --disable-programs
-        make -j4
-        make install
-        cd ..
-        
-    - name: Configure
-      run: cmake . -B build -DCMAKE_PREFIX_PATH=/home/runner/ffmpeg-n7.1.1_installation
-    - name: Build ffmpeg example
-      run: cmake --build build --config Release --target ffmpeg_video_muxing_ex --parallel 4
+      - name: Cache MKL
+        if: ${{ matrix.build_mkl}}
+        uses: actions/cache@v3
+        id: cache-mkl
+        with:
+          path: |
+            /opt/intel/oneapi/mkl
+            /opt/intel/oneapi/tbb
+            /opt/intel/oneapi/compiler
+          key: mkl_try3
   
-  ubuntu-latest-mkl-sequential:
-    runs-on: 'ubuntu-latest'
-    steps:
-    - uses: actions/checkout@v2
+      - name: Download MKL
+        if: ${{ matrix.build_mkl && steps.cache-mkl.outputs.cache-hit != 'true' }}
+        run: |
+          wget https://registrationcenter-download.intel.com/akdlm/IRC_NAS/bd1d0273-a931-4f7e-ab76-6a2a67d646c7/intel-oneapi-base-toolkit-2025.2.0.592_offline.sh
+          sudo sh ./intel-oneapi-base-toolkit-2025.2.0.592_offline.sh -a --silent --eula accept
+          
+      - name: Configure
+        run: |
+          cmake dlib/test -B build \
+            -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
+            -DCMAKE_CXX_COMPILER=${{ matrix.cxx_compiler }} \
+            ${{ matrix.configure_extra }}
 
-    - name: Prepare MKL dir for cache restore
-      run: sudo mkdir -p /opt/intel
+      - name: Build tests
+        if: ${{ matrix.build_tests }}
+        run: cmake --build build --config Release --target dtest --parallel 4
 
-    - name: Cache MKL
-      uses: actions/cache@v3
-      id: cache-mkl
-      with:
-        path: |
-          /opt/intel/oneapi/mkl
-          /opt/intel/oneapi/tbb
-          /opt/intel/oneapi/compiler
-        key: mkl_try3
+      - name: Test
+        if: ${{ matrix.build_tests }}
+        run: ./build/dtest --runall -q
+
+      - name: Build examples
+        if: ${{ matrix.build_examples }}
+        run: cmake --build build --config Release --parallel 4
+
+      - name: Build FFMPEG examples
+        if: ${{ matrix.build_ffmpeg_examples }}
+        run: cmake --build build --config Release --target ffmpeg_video_muxing_ex --parallel 4
+
+      - name: Configure BLAS binding tests
+        if: ${{ matrix.build_blas_bindings }}
+        run: cmake dlib/test/blas_bindings -B build_blas_bindings
+
+      - name: Build BLAS binding tests
+        if: ${{ matrix.build_blas_bindings }}
+        run: cmake --build build_blas_bindings --config Debug --parallel 4
         
-    - name: Download MKL
-      if: steps.cache-mkl.outputs.cache-hit != 'true'
-      run: |
-        wget https://registrationcenter-download.intel.com/akdlm/IRC_NAS/bd1d0273-a931-4f7e-ab76-6a2a67d646c7/intel-oneapi-base-toolkit-2025.2.0.592_offline.sh
-        sudo sh ./intel-oneapi-base-toolkit-2025.2.0.592_offline.sh -a --silent --eula accept
+      - name: Test BLAS bindings
+        if: ${{ matrix.build_blas_bindings }}
+        run: ./build_blas_bindings/dtest --runall -q
 
-    - name: Configure
-      run: cmake ${{ github.workspace }}/dlib/test -B build -DDLIB_USE_MKL_SEQUENTIAL=ON
-
-    - name: Build tests
-      run: cmake --build build --config Release --target dtest --parallel 4
-  
-    - name: Test
-      run: build/dtest --runall -q
-
-  ubuntu-latest-mkl-tbb:
-    runs-on: 'ubuntu-latest'
+  windows:
+    runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Prepare MKL dir for cache restore
-      run: sudo mkdir -p /opt/intel
+      - name: Install dependencies
+        run: choco install --no-progress --yes cmake
 
-    - name: Cache MKL
-      uses: actions/cache@v3
-      id: cache-mkl
-      with:
-        path: |
-          /opt/intel/oneapi/mkl
-          /opt/intel/oneapi/tbb
-          /opt/intel/oneapi/compiler
-        key: mkl_try3
-        
-    - name: Download MKL
-      if: steps.cache-mkl.outputs.cache-hit != 'true'
-      run: |
-        wget https://registrationcenter-download.intel.com/akdlm/IRC_NAS/bd1d0273-a931-4f7e-ab76-6a2a67d646c7/intel-oneapi-base-toolkit-2025.2.0.592_offline.sh
-        sudo sh ./intel-oneapi-base-toolkit-2025.2.0.592_offline.sh -a --silent --eula accept
+      - name: Configure
+        run: cmake -S . -B build
 
-    - name: Configure
-      run: cmake ${{ github.workspace }}/dlib/test -B build -DDLIB_USE_MKL_SEQUENTIAL=OFF -DDLIB_USE_MKL_WITH_TBB=ON
+      - name: Build just tests
+        run: cmake --build build --config Release --target dtest --parallel 4
 
-    - name: Build
-      run: cmake --build build --config Release --target dtest --parallel 4
-  
-    - name: Test
-      run: build/dtest --runall -q
+      - name: Test
+        run: build/Release/dtest.exe --runall -q
 
-  ubuntu-latest-mkl-thread:
-    runs-on: 'ubuntu-latest'
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Prepare MKL dir for cache restore
-      run: sudo mkdir -p /opt/intel
-
-    - name: Cache MKL
-      uses: actions/cache@v3
-      id: cache-mkl
-      with:
-        path: |
-          /opt/intel/oneapi/mkl
-          /opt/intel/oneapi/tbb
-          /opt/intel/oneapi/compiler
-        key: mkl_try3
-        
-    - name: Download MKL
-      if: steps.cache-mkl.outputs.cache-hit != 'true'
-      run: |
-        wget https://registrationcenter-download.intel.com/akdlm/IRC_NAS/bd1d0273-a931-4f7e-ab76-6a2a67d646c7/intel-oneapi-base-toolkit-2025.2.0.592_offline.sh
-        sudo sh ./intel-oneapi-base-toolkit-2025.2.0.592_offline.sh -a --silent --eula accept
-
-    - name: Configure
-      run: cmake ${{ github.workspace }}/dlib/test -B build -DDLIB_USE_MKL_SEQUENTIAL=OFF -DDLIB_USE_MKL_WITH_TBB=OFF -DDLIB_USE_MKL_THREAD=ON
-
-    - name: Build tests
-      run: cmake --build build --config Release --target dtest --parallel 4
-  
-    - name: Test
-      run: build/dtest --runall -q
-      
-  windows-latest:
-    runs-on: 'windows-latest'
-    steps:
-    - uses: actions/checkout@v2
-    - name: Configure
-      run: |
-        # don't use CMake 3.25.0 https://gitlab.kitware.com/cmake/cmake/-/issues/23975
-        pip3 install cmake==3.24.0
-        cmake . -B build
-    - name: Build just tests
-      run: cmake --build build --config Release --target dtest --parallel 4
-    - name: Test
-      run: build/Release/dtest.exe --runall -q
-    - name: Build ancillary tools
-      run: cmake --build build --config Release --target imglab htmlify dtoc --parallel 4
-
-  # Disable this because macos targets aren't working on github actions right now.
-  #macos-latest:
-  #  runs-on: 'macos-latest'
-  #  steps:
-  #  - uses: actions/checkout@v2
-  #  - name: Configure
-  #    # MacOS machines often come with low quality BLAS libraries installed, so don't use those.
-  #    run: cmake ${{ github.workspace }}/dlib/test -B build -DDLIB_USE_BLAS=0 -DDLIB_USE_LAPACK=0
-  #  - name: Build just tests
-  #    run: cmake --build build --config Release --target dtest --parallel 4
-  #  - name: Test
-  #    run: build/dtest --runall --no_test_timer -q
-  #  - name: Build examples, etc
-  #    run: cmake --build build --config Release --parallel 2
+      - name: Build ancillary tools
+        run: cmake --build build --config Release --target imglab htmlify dtoc --parallel 4
