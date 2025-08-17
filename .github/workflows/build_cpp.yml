@@ -208,13 +208,13 @@ jobs:
         run: choco install --no-progress --yes cmake
 
       - name: Configure
-        run: cmake dlib\test -B build
+        run: cmake dlib/test -B build
 
       - name: Build just tests
         run: cmake --build build --config Release --target dtest --parallel 4
 
       - name: Test
-        run: build\Release\dtest.exe --runall -q
+        run: build/Release/dtest.exe --runall -q
 
       - name: Build ancillary tools
         run: cmake --build build --config Release --target imglab htmlify dtoc --parallel 4
