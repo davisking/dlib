@@ -126,14 +126,14 @@ jobs:
 
       - name: Cache FFmpeg
         if: ${{ matrix.build_ffmpeg }}
-        id: cache-ffmpeg
         uses: actions/cache@v3
+        id: cache-ffmpeg
         with:
           path: /home/runner/ffmpeg-n${{ matrix.ffmpeg_version }}_installation
           key: ffmpeg-n${{ matrix.ffmpeg_version }}
 
       - name: Build FFmpeg
-        if: ${{ matrix.build_ffmpeg && steps.cache-ffmpeg.outputs.cache-hit != 'true' }}
+        if: ${{ matrix.build_ffmpeg && (steps.cache-ffmpeg.outputs.cache-hit != 'true') }}
         run: |
           wget https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n${{ matrix.ffmpeg_version }}.tar.gz
           tar -xf n${{ matrix.ffmpeg_version }}.tar.gz
@@ -158,7 +158,7 @@ jobs:
           key: mkl_try3
   
       - name: Download MKL
-        if: ${{ matrix.build_mkl && steps.cache-mkl.outputs.cache-hit != 'true' }}
+        if: ${{ matrix.build_mkl && (steps.cache-mkl.outputs.cache-hit != 'true') }}
         run: |
           wget https://registrationcenter-download.intel.com/akdlm/IRC_NAS/bd1d0273-a931-4f7e-ab76-6a2a67d646c7/intel-oneapi-base-toolkit-2025.2.0.592_offline.sh
           sudo sh ./intel-oneapi-base-toolkit-2025.2.0.592_offline.sh -a --silent --eula accept
