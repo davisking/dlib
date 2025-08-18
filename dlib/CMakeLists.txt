@@ -641,7 +641,8 @@ if (NOT TARGET dlib)
       if (DLIB_USE_CUDA)
          find_package(CUDAToolkit)
       
-         if (CUDAToolkit_FOUND)
+         if (CUDAToolkit_FOUND AND CUDAToolkit_NVCC_EXECUTABLE)
+            set(CMAKE_CUDA_COMPILER ${CUDAToolkit_NVCC_EXECUTABLE})
             enable_language(CUDA)
 
             find_package(CUDNN)
