@@ -184,6 +184,7 @@ endif()
 
 if (mkl_seq_found OR mkl_tbb_found OR mkl_thread_found)
    set(mkl_found 1)
+   return()
 endif()
 
 # Search for BLAS - pkgconfig
