@@ -23,9 +23,6 @@
 
 include(CheckTypeSize)
 include(CheckFunctionExists)
-include(CheckLibraryExists)
-include(CheckFortranFunctionExists)
-find_package(PkgConfig)
 
 # setting this makes CMake allow normal looking if else statements (TODO: check if this is still necessary)
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
@@ -187,57 +184,22 @@ if (mkl_seq_found OR mkl_tbb_found OR mkl_thread_found)
    return()
 endif()
 
-# Search for BLAS - pkgconfig
-if (PKG_CONFIG_FOUND)
-   pkg_check_modules(BLAS_REFERENCE   IMPORTED_TARGET GLOBAL blas)
-   pkg_check_modules(LAPACK_REFERENCE IMPORTED_TARGET GLOBAL lapack)
+# Search for BLAS - FindBLAS
+set(BLA_PREFER_PKGCONFIG 1)
+find_package(BLAS)
 
-   # Make sure the cblas found by pkgconfig actually has cblas symbols.
-   set(CMAKE_REQUIRED_LIBRARIES "${BLAS_REFERENCE_LDFLAGS}")   
-   check_function_exists(cblas_ddot PKGCFG_HAVE_CBLAS)
-
-   if (BLAS_REFERENCE_FOUND AND LAPACK_REFERENCE_FOUND AND PKGCFG_HAVE_CBLAS)
-      message(STATUS "Found BLAS and LAPACK via pkg-config")
-      set(blas_found       1)
-      set(lapack_found     1)
-      set(blas_libraries   ${BLAS_REFERENCE_LDFLAGS})
-      set(lapack_libraries ${LAPACK_REFERENCE_LDFLAGS})
-      return()
-   endif()
+if (BLAS_FOUND)
+   message(STATUS "Found BLAS library")
+   set(blas_found       1)
+   set(blas_libraries   ${BLAS_LIBRARIES})
 endif()
 
-# Search for BLAS - openblas
-if (NOT blas_found)
-   set(extra_paths
-      /usr/lib64
-      /usr/lib64/atlas-sse3
-      /usr/lib64/atlas-sse2
-      /usr/lib64/atlas
-      /usr/lib
-      /usr/lib/atlas-sse3
-      /usr/lib/atlas-sse2
-      /usr/lib/atlas
-      /usr/lib/openblas-base
-      /opt/OpenBLAS/lib
-      $ENV{OPENBLAS_HOME}/lib)
+# Search for LAPACK - FindLAPACK
+set(BLA_PREFER_PKGCONFIG 1)
+find_package(LAPACK)
 
-   find_library(cblas_lib NAMES openblasp openblas PATHS ${extra_paths})
-   mark_as_advanced(cblas_lib)
-
-   if (cblas_lib)
-      message(STATUS "Found OpenBLAS library")
-      set(blas_found       1)
-      set(blas_libraries   ${cblas_lib})
-      
-      # If you compiled OpenBLAS with LAPACK in it then it should have the
-      # sgetrf_single function in it.  So if we find that function in
-      # OpenBLAS then just use OpenBLAS's LAPACK. 
-      set(CMAKE_REQUIRED_LIBRARIES ${blas_libraries})
-      check_function_exists(sgetrf_single OPENBLAS_HAS_LAPACK)
-
-      if (OPENBLAS_HAS_LAPACK)
-         message(STATUS "Using OpenBLAS's built in LAPACK")
-         set(lapack_found 1)
-      endif()
-   endif()
+if (LAPACK_FOUND)
+   message(STATUS "Found LAPACK library")
+   set(lapack_found     1)
+   set(lapack_libraries ${LAPACK_LIBRARIES})
 endif()
