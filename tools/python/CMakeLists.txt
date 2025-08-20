@@ -1,39 +1,40 @@
-
 CMAKE_MINIMUM_REQUIRED(VERSION 3.10.0)
-
-if (WIN32 AND NOT "${CMAKE_GENERATOR}" MATCHES "Visual Studio") 
-   message(FATAL_ERROR "\n"
-      "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"
-      "You must use Visual Studio to build a python extension on windows. If you "
-      "are getting this error it means you have not installed Visual C++.  Note that "
-      "there are many flavors of Visual Studio, like Visual Studio for C\# development. " 
-      "You need to install Visual Studio for C++. \n"
-      "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
-endif()
 
 project(dlib_python_bindings)
 
-# Pybind11's cmake scripts enable link time optimization by default.  However,
-# it makes linking take a really long time and doesn't seem to substantively
-# improve runtime performance.  So we disable LTO here to make building dlib
-# faster.
-set(PYBIND11_LTO_CXX_FLAGS "")
+# Detect if building for Android
+if(CMAKE_SYSTEM_NAME STREQUAL "Android")
+    message(STATUS "Building dlib Python bindings for Android")
 
+    # Paths to Python include and library (from environment)
+    if(NOT DEFINED ENV{PYTHON_INCLUDE_DIR})
+        message(FATAL_ERROR "PYTHON_INCLUDE_DIR environment variable not set")
+    endif()
+    if(NOT DEFINED ENV{PYTHON_LIBRARY})
+        message(FATAL_ERROR "PYTHON_LIBRARY environment variable not set")
+    endif()
 
-# Avoid cmake warnings about changes in behavior of some Mac OS X path 
-# variable we don't care about.
-if (POLICY CMP0042)
-    cmake_policy(SET CMP0042 NEW)
+    set(PYTHON_INCLUDE_DIR $ENV{PYTHON_INCLUDE_DIR})
+    set(PYTHON_LIBRARY $ENV{PYTHON_LIBRARY})
+
+    # Paths to pybind11 include
+    if(NOT DEFINED ENV{PYBIND11_INCLUDE_DIR})
+        message(FATAL_ERROR "PYBIND11_INCLUDE_DIR environment variable not set")
+    endif()
+    set(PYBIND11_INCLUDE_DIR $ENV{PYBIND11_INCLUDE_DIR})
+
+    include_directories(${PYTHON_INCLUDE_DIR} ${PYBIND11_INCLUDE_DIR})
+else()
+    # Desktop build: include pybind11 normally
+    add_subdirectory(../../dlib/external/pybind11 pybind11_build)
+    #include_directories(${PYBIND11_INCLUDE_DIR})
 endif()
 
-
-
-add_subdirectory(../../dlib/external/pybind11 pybind11_build)
+# Add dlib core
 add_subdirectory(../../dlib dlib_build)
-
 add_definitions(-DDLIB_VERSION=${DLIB_VERSION})
 
-# Tell cmake to compile all these cpp files into a dlib python module.
+# Source files
 set(python_srcs
    src/dlib.cpp
    src/matrix.cpp
@@ -62,17 +63,22 @@ set(python_srcs
    src/line.cpp
 )
 
-# Only add the GUI module if requested
 if(NOT ${DLIB_NO_GUI_SUPPORT})
    list(APPEND python_srcs src/gui.cpp)
 endif()
 
-pybind11_add_module(_dlib_pybind11 ${python_srcs})
-target_link_libraries(_dlib_pybind11 PRIVATE dlib::dlib)
+# --- Module target ---
+if(CMAKE_SYSTEM_NAME STREQUAL "Android")
+    # Android: build shared library manually
+    add_library(_dlib_pybind11 SHARED ${python_srcs})
+    target_link_libraries(_dlib_pybind11 PRIVATE dlib::dlib ${PYTHON_LIBRARY})
+else()
+    # Desktop: use pybind11 helper
+    pybind11_add_module(_dlib_pybind11 ${python_srcs})
+    target_link_libraries(_dlib_pybind11 PRIVATE dlib::dlib)
+endif()
 
-# When invoked from setup.py CMAKE_LIBRARY_OUTPUT_DIRECTORY will be set.  But when you are just building via say
-# `cd dlib/tools/python; mkdir build; cd build; cmake ..` it won't be set.  It only matters for building the actual
-# distribution.  So skip this for people building directly with cmake (which they might do when testing stuff).
+# Copy __init__.py for Python package
 if (CMAKE_LIBRARY_OUTPUT_DIRECTORY) 
    configure_file(${PROJECT_SOURCE_DIR}/dlib/__init__.py.in ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/dlib/__init__.py)
 endif()
