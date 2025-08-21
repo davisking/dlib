@@ -124,7 +124,7 @@ namespace dlib
         // Convert
         std::string out(n, '\0');
         st = std::mbstate_t{};
-        n  = std::wcsrtombs(out.data(), &p, out.size(), &st);
+        n  = std::wcsrtombs(&out[0], &p, out.size(), &st);
         if (n == static_cast<std::size_t>(-1)) throw std::runtime_error("Conversion failed");
         return out;
     }
