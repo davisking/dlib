@@ -105,7 +105,7 @@ namespace dlib
         // Convert
         std::wstring out(n, L'\0');
         st = std::mbstate_t{};
-        n  = std::mbsrtowcs(out.data(), &p, out.size(), &st);
+        n  = std::mbsrtowcs(&out[0], &p, out.size(), &st);
         if (n == static_cast<size_t>(-1)) throw std::runtime_error("Conversion failed");
         return out;
     }
