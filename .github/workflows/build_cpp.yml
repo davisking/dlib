@@ -43,6 +43,14 @@ jobs:
             cxx_compiler          : g++
             extra_apt             : libwebp-dev libavformat-dev libavcodec-dev libavdevice-dev libavfilter-dev libswresample-dev libswscale-dev libavutil-dev libopenblas-dev liblapack-dev
 
+          - name: ubuntu-22.04-atlas
+            os                    : ubuntu-22.04
+            build_tests           : true
+            build_blas_bindings   : true
+            c_compiler            : gcc
+            cxx_compiler          : g++
+            extra_apt             : libatlas-base-dev
+
           - name: ubuntu-22.04-ffmpeg-513
             os                    : ubuntu-22.04
             build_tests           : true
