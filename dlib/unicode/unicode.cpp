@@ -96,9 +96,18 @@ namespace dlib
 
     const std::wstring convert_mbstring_to_wstring(const std::string &src)
     {
-        std::vector<wchar_t> wstr(src.length()+5);
-        std::mbstowcs(&wstr[0], src.c_str(), src.length()+1);
-        return std::wstring(&wstr[0]);
+        // Compute dst length
+        std::mbstate_t st{};
+        const char* p = src.c_str();
+        size_t n = std::mbsrtowcs(nullptr, &p, 0, &st);
+        if (n == static_cast<size_t>(-1)) throw std::runtime_error("Invalid multibyte sequence / wrong locale");
+
+        // Convert
+        std::wstring out(n, L'\0');
+        st = std::mbstate_t{};
+        n  = std::mbsrtowcs(out.data(), &p, out.size(), &st);
+        if (n == static_cast<size_t>(-1)) throw std::runtime_error("Conversion failed");
+        return out;
     }
 
 // ----------------------------------------------------------------------------------------
