@@ -181,7 +181,7 @@ namespace dlib
                   of this image
         !*/
 
-        long width_step (
+        size_t width_step (
         ) const;
         /*!
             ensures

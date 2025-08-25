@@ -171,7 +171,6 @@ target_compile_definitions(${target_name} PRIVATE DLIB_FFMPEG_DATA="${DLIB_FFMPE
 if (CMAKE_COMPILER_IS_GNUCXX)
    # Turn on all warnings, and treat them as errors.
    add_compile_options(-W -Wall -Wextra -Wpedantic -Werror)
-   add_compile_options(-fdiagnostics-color=always)
    # I don't care about unused testing functions though.  I like to keep them
    # around.  Don't warn about it.
    add_compile_options(-Wno-unused-function)
@@ -179,7 +178,7 @@ if (CMAKE_COMPILER_IS_GNUCXX)
    add_compile_options(-Wno-maybe-uninitialized)
 
    if ((CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 11.3.0 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS_EQUAL 11.4.0) OR
-      (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 14.0.0 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS_EQUAL 14.0.1))
+      (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13.3.0 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS_EQUAL 14.0.1))
       # These versions of gcc wrongly yield this warning:
       #  dlib::row_major_layout::layout<double, 0, 2, dlib::memory_manager_stateless_kernel_1<char> >::data’ with nonzero offset 8 [-Werror=free-nonheap-object]
       #   61 |                 delete [] item;

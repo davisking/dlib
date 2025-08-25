@@ -53,7 +53,7 @@ cd build
 cmake ..
 cmake --build . --config Release
 </code_box>
-Note that you need to have a C++11 compiler installed on your system.  There are free C++11 compilers
+Note that you need to have a C++14 compiler installed on your system.  There are free C++14 compilers
 for most operating systems.  For example, Visual Studio is free on Windows and GCC is free and
 works well on Mac OS X and Linux systems.  If you have multiple compilers/IDEs installed then you can
 tell CMake which one you want it to use via the -G option.
@@ -119,7 +119,7 @@ tell CMake which one you want it to use via the -G option.
         <h3>Compiling on Linux From Command Line</h3>
         From within the examples folder, you can compile nearly all of the examples with a single command like so:
 <code_box>
-g++ -std=c++11 -O3 -I.. ../dlib/all/source.cpp -lpthread -lX11 example_program_name.cpp
+g++ -std=c++14 -O3 -I.. ../dlib/all/source.cpp -lpthread -lX11 example_program_name.cpp
 </code_box>
 
 On non-Linux systems like Solaris, you might have to link to other libraries.  For example, I have seen systems

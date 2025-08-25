@@ -119,7 +119,7 @@ namespace dlib
                 num(0)
             { set_info_string();}
 
-            ~cmd_line_parse_error() throw() {}
+            ~cmd_line_parse_error() noexcept {}
 
             const std::basic_string<charT> item;
             const unsigned long num;
