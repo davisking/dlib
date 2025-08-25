@@ -207,13 +207,26 @@ jobs:
         run: ./build_blas_bindings/dtest --runall -q
 
   windows:
-    runs-on: windows-latest
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: windows-latest-openblas
+            os              : windows-latest
+            extra_packages  : openblas:x64-windows
+
+          - name: windows-latest-mkl
+            os              : windows-latest
+            extra_packages  : intel-mkl:x64-windows
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: choco install --no-progress --yes cmake
+        run: vcpkg install ${{ matrix.extra_packages }}
 
       - name: Configure
         run: cmake dlib/test -B build
