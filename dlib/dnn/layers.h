@@ -1,4 +1,4 @@
-// Copyright (C) 2015  Davis E. King (davis@dlib.net)
+﻿// Copyright (C) 2015  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_DNn_LAYERS_H_
 #define DLIB_DNn_LAYERS_H_
@@ -5710,6 +5710,383 @@ namespace dlib
 
     template <long diag, long num, long den, typename SUBNET>
     using tril_diag = add_layer<tril_<diag, void, num, den>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    /*!
+        Implements Adaptive Computation Time following Graves (2016)
+        "Adaptive Computation Time for Recurrent Neural Networks" (arXiv:1603.08983)
+
+        Mathematical foundation:
+            Core ACT Formulation:
+            - For each position t in sequence, perform N(t) computation steps
+            - At step n, compute halting probability: p_t^n = sigma(W_halt * s_t^n + b_halt)
+            - Cumulative halting probability: h_t^n = sum_{i=1}^n p_t^i
+            - Stop when h_t^n >= theta (threshold, typically 0.99)
+            - Final output: y_t = sum_{n=1}^{N(t)} alpha_t^n * y_hat_t^n
+
+            Where alpha_t^n (effective weight) is computed as:
+            - alpha_t^n = p_t^n for n < N(t)
+            - alpha_t^{N(t)} = 1 - h_t^{N(t)-1} (remainder for final step)
+
+            Ponder Cost (regularization):
+            - R(x) = sum_t (N(t) + rho_t) / T, where rho_t = 1 - h_t^{N(t)-1}
+            - Total loss: L = L_task + lambda * R(x)
+
+        Optional extensions:
+            - Depth-dependent gradient scaling
+            - Adaptive halting threshold and penalty weights
+            - Early termination when all positions converge
+    !*/
+    template <long max_steps = 8>
+    class adaptive_computation_time_ {
+    public:
+        explicit adaptive_computation_time_() :
+            max_steps_(max_steps),
+            halt_threshold_(0.99f),     // θ in Graves' notation
+            ponder_penalty_(0.01f),     // λ (ponder cost weight)
+            enable_depth_scaling_(true),
+            batch_size_(0),
+            seq_len_(0),
+            d_model_(0),
+            num_channels_(0),
+            feature_dim_(0),
+            ponder_cost_(0),
+            avg_steps_(0)
+        {
+        }
+
+        adaptive_computation_time_(const adaptive_computation_time_& item) :
+            max_steps_(item.max_steps_),
+            halt_threshold_(item.halt_threshold_),
+            ponder_penalty_(item.ponder_penalty_),
+            enable_depth_scaling_(item.enable_depth_scaling_),
+            batch_size_(item.batch_size_),
+            seq_len_(item.seq_len_),
+            d_model_(item.d_model_),
+            num_channels_(item.num_channels_),
+            feature_dim_(item.feature_dim_),
+            ponder_cost_(item.ponder_cost_),
+            avg_steps_(item.avg_steps_),
+            params(item.params),
+            halting_probs_(item.halting_probs_),
+            cumulative_halting_(item.cumulative_halting_),
+            remainders_(item.remainders_),
+            n_steps_(item.n_steps_),
+            logits_(item.logits_),
+            grad_logits_(item.grad_logits_),
+            input_cache_(item.input_cache_)
+        {
+        }
+
+        adaptive_computation_time_& operator=(const adaptive_computation_time_& item)
+        {
+            if (this == &item)
+                return *this;
+
+            max_steps_ = item.max_steps_;
+            halt_threshold_ = item.halt_threshold_;
+            ponder_penalty_ = item.ponder_penalty_;
+            enable_depth_scaling_ = item.enable_depth_scaling_;
+            batch_size_ = item.batch_size_;
+            seq_len_ = item.seq_len_;
+            d_model_ = item.d_model_;
+            num_channels_ = item.num_channels_;
+            feature_dim_ = item.feature_dim_;
+            ponder_cost_ = item.ponder_cost_;
+            avg_steps_ = item.avg_steps_;
+            params = item.params;
+            halting_probs_ = item.halting_probs_;
+            cumulative_halting_ = item.cumulative_halting_;
+            remainders_ = item.remainders_;
+            n_steps_ = item.n_steps_;
+            logits_ = item.logits_;
+            grad_logits_ = item.grad_logits_;
+            input_cache_ = item.input_cache_;
+
+            return *this;
+        }
+
+        template <typename SUBNET>
+        void setup(const SUBNET& sub) {
+            const auto& input = sub.get_output();
+
+            // Store expected dimensions for parameter initialization
+            batch_size_ = input.num_samples();
+            seq_len_ = input.nr();
+            d_model_ = input.nc();
+            num_channels_ = input.k();
+            feature_dim_ = d_model_ * num_channels_;
+
+            // Initialize halting parameters: W_halt ∈ ℝ^{d×1}, b_halt ∈ ℝ
+            params.set_size(1, 1, feature_dim_ + 1, 1);
+
+            // He initialization for stability (√(2/fan_in))
+            dlib::rand rnd(std::rand());
+            const float scale = std::sqrt(2.0f / feature_dim_);
+            float* p = params.host();
+
+            // Initialize weight matrix W_halt
+            for (long i = 0; i < feature_dim_; ++i)
+                p[i] = rnd.get_random_gaussian() * scale;
+
+            // Initialize bias b_halt (typically zero)
+            p[feature_dim_] = 0.0f;
+
+            // Pre-allocate workspace for maximum expected size
+            allocate_workspace();
+        }
+
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output) {
+            const tensor& input = sub.get_output();
+            output.copy_size(input);
+
+            // Get current actual dimensions
+            const long curr_batch = input.num_samples();
+            if (curr_batch != batch_size_) {
+                // Reallocate if needed (mainly for batch size changes)
+                if (curr_batch != batch_size_) {
+                    batch_size_ = curr_batch;
+                    allocate_workspace();
+                }
+            }
+
+            // Initialize output to zero for accumulation: y_t = 0
+            output = 0;
+
+            // Initialize ACT state tensors for current batch size
+            // h_t^0 = 0, rho_t = 1, N(t) = 0 for all positions
+            const long total_positions = batch_size_ * seq_len_;
+            for (long i = 0; i < total_positions; ++i) {
+                cumulative_halting_.host()[i] = 0;  // h_t^n
+                remainders_.host()[i] = 1.0f;       // rho_t = 1 - h_t^{N(t)-1}
+                n_steps_.host()[i] = 0;             // N(t)
+            }
+
+            // Cache input for backward pass gradient computation
+            input_cache_.copy_size(input);
+            tt::copy_tensor(false, input_cache_, 0, input, 0, input.k());
+
+            // Main ACT loop: Adaptive Computation Time iterations
+            // For n = 1 to max_steps (or until all positions halt)
+            bool any_active = true;
+            for (long step = 0; step < max_steps_; ++step) {
+                // Step 1: Compute halting probabilities p_t^n = sigma(W_halt^T * s_t^n + b_halt)
+                tt::compute_act_halt_probabilities(
+                    halting_probs_, logits_, input, params,
+                    batch_size_, seq_len_, feature_dim_);
+
+                // Step 2: Update ACT state and accumulate weighted outputs
+                // y_t += alpha_t^n * y_hat_t^n where alpha_t^n is the effective weight
+                tt::update_act_state(
+                    output, input, halting_probs_,
+                    cumulative_halting_, remainders_, n_steps_,
+                    batch_size_, seq_len_, d_model_, num_channels_,
+                    halt_threshold_, step
+                );
+
+                // Early stopping optimization: check if all positions have halted
+                if (all_positions_halted()) break;
+            }
+
+            // Step 3: Add remainder contribution for any remaining probability mass
+            // For positions that didn't fully halt: y_t += rho_t * y_hat_t^{final}
+            tt::finalize_act_output(
+                output, input, remainders_,
+                batch_size_, seq_len_, d_model_, num_channels_);
+
+            // Step 4: Compute ponder cost statistics for regularization
+            compute_ponder_stats();
+        }
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad) {
+            tensor& prev_grad = sub.get_gradient_input();
+
+            // Pass through main gradient (dL/dx)
+            tt::copy_tensor(false, prev_grad, 0, gradient_input, 0, gradient_input.k());
+
+            // Compute ACT-specific gradients for halting parameters
+            // dL/dW_halt and dL/db_halt using chain rule
+            tt::compute_act_gradients(
+                params_grad, grad_logits_, input_cache_,
+                halting_probs_, n_steps_,
+                batch_size_, seq_len_, feature_dim_,
+                ponder_penalty_, static_cast<float>(max_steps_));
+
+            // Apply depth-dependent gradient scaling (optional enhancement)
+            if (enable_depth_scaling_) {
+                tt::apply_act_depth_scaling(
+                    prev_grad, n_steps_,
+                    batch_size_, seq_len_, d_model_, num_channels_,
+                    static_cast<float>(max_steps_), 0.1f);
+            }
+        }
+
+        // Accessor methods
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+        long get_max_steps() const { return max_steps_; }
+        float get_halt_threshold() const { return halt_threshold_; }
+        float get_ponder_penalty() const { return ponder_penalty_; }
+
+        void set_halt_threshold(float threshold) {
+            if (threshold > 0 && threshold <= 1.0f)
+                halt_threshold_ = threshold;
+        }
+        void set_ponder_penalty(float penalty) {
+            if (penalty >= 0)
+                ponder_penalty_ = penalty;
+        }
+
+        // Statistics for monitoring and regularization
+        float get_ponder_cost() const { return ponder_cost_; }  // R(x)
+        float get_average_steps() const { return avg_steps_; }  // Average N(t)
+
+        // Depth scaling control
+        void enable_depth_scaling() { enable_depth_scaling_ = true; }
+        void disable_depth_scaling() { enable_depth_scaling_ = false; }
+        bool depth_scaling_enabled() const { return enable_depth_scaling_; }
+
+        inline dpoint map_input_to_output(const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input(const dpoint& p) const { return p; }
+
+        // Serialization methods
+        friend void serialize(const adaptive_computation_time_& item, std::ostream& out) {
+            dlib::serialize("act_", out);
+            dlib::serialize(item.max_steps_, out);
+            dlib::serialize(item.halt_threshold_, out);
+            dlib::serialize(item.ponder_penalty_, out);
+            dlib::serialize(item.enable_depth_scaling_, out);
+            dlib::serialize(item.batch_size_, out);
+            dlib::serialize(item.seq_len_, out);
+            dlib::serialize(item.d_model_, out);
+            dlib::serialize(item.num_channels_, out);
+            dlib::serialize(item.feature_dim_, out);
+            dlib::serialize(item.params, out);
+        }
+
+        friend void deserialize(adaptive_computation_time_& item, std::istream& in) {
+            std::string version;
+            dlib::deserialize(version, in);
+            if (version != "act_")
+                throw serialization_error("Unexpected version: " + version);
+            dlib::deserialize(item.max_steps_, in);
+            dlib::deserialize(item.halt_threshold_, in);
+            dlib::deserialize(item.ponder_penalty_, in);
+            dlib::deserialize(item.enable_depth_scaling_, in);
+            dlib::deserialize(item.batch_size_, in);
+            dlib::deserialize(item.seq_len_, in);
+            dlib::deserialize(item.d_model_, in);
+            dlib::deserialize(item.num_channels_, in);
+            dlib::deserialize(item.feature_dim_, in);
+            dlib::deserialize(item.params, in);
+
+            item.allocate_workspace();
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const adaptive_computation_time_& item) {
+            out << "act (steps=" << item.max_steps_
+                << ", dim=" << item.feature_dim_
+                << ", threshold=" << item.halt_threshold_
+                << ", penalty=" << item.ponder_penalty_ << ")";
+            return out;
+        }
+
+        friend void to_xml(const adaptive_computation_time_& item, std::ostream& out) {
+            out << "<act"
+                << " steps='" << item.max_steps_ << "'"
+                << " dim='" << item.feature_dim_ << "'"
+                << " threshold='" << item.halt_threshold_ << "'"
+                << " penalty='" << item.ponder_penalty_ << "'"
+                << " depth_scaling='" << (item.enable_depth_scaling_ ? "true" : "false") << "'"
+                << ">\n";
+            out << mat(item.params);
+            out << "</act>\n";
+        }
+
+    private:
+        void allocate_workspace() {
+            const long total_positions = batch_size_ * seq_len_;
+
+            // Allocate state tensors for maximum expected size
+            // These track the ACT state for each position (batch, sequence)
+            halting_probs_.set_size(total_positions, 1, 1, 1);      // p_t^n
+            cumulative_halting_.set_size(total_positions, 1, 1, 1); // h_t^n
+            remainders_.set_size(total_positions, 1, 1, 1);         // rho_t
+            n_steps_.set_size(total_positions, 1, 1, 1);            // N(t)
+            logits_.set_size(total_positions, 1, 1, 1);             // logits before sigmoid
+            grad_logits_.set_size(total_positions, 1, 1, 1);        // gradient w.r.t. logits
+
+            // Input cache needs full dimensions for gradient computation
+            input_cache_.set_size(batch_size_, num_channels_, seq_len_, d_model_);
+        }
+
+        bool all_positions_halted() const {
+            const float* cum_halt = cumulative_halting_.host();
+            const long total = batch_size_ * seq_len_;
+
+            for (long i = 0; i < total; ++i) {
+                if (cum_halt[i] < halt_threshold_) return false;
+            }
+            return true;
+        }
+
+        void compute_ponder_stats() {
+            const float* steps = n_steps_.host();
+            const long total = batch_size_ * seq_len_;
+
+            // Compute average number of steps: (1/T) * Σ N(t)
+            float sum_steps = 0;
+            for (long i = 0; i < total; ++i) sum_steps += steps[i];
+            avg_steps_ = sum_steps / total;
+
+            // Normalize ponder cost by maximum possible steps
+            ponder_cost_ = avg_steps_ / max_steps_;
+        }
+
+        // Configuration parameters
+        long max_steps_;                // Maximum computation steps per position
+        float halt_threshold_;          // theta: Halting threshold (typically 0.99)
+        float ponder_penalty_;          // lambda: Ponder cost weight for regularization
+        bool enable_depth_scaling_;     // Enable depth-dependent gradient scaling
+
+        // Dimension tracking
+        long batch_size_;
+        long seq_len_;
+        long d_model_;
+        long num_channels_;
+        long feature_dim_;
+
+        // Learnable parameters
+        resizable_tensor params;
+
+        // Working memory
+        resizable_tensor halting_probs_;        // p_t^n: Halting probabilities
+        resizable_tensor cumulative_halting_;   // h_t^n: Cumulative halting probabilities
+        resizable_tensor remainders_;           // rho_t: Remaining probability mass
+        resizable_tensor n_steps_;              // N(t): Number of steps taken
+        resizable_tensor logits_;               // Raw logits before sigmoid
+        resizable_tensor grad_logits_;          // Gradients w.r.t. logits
+        resizable_tensor input_cache_;          // Cached input for backward pass
+
+        // Statistics for monitoring
+        float ponder_cost_;      // R(x): Current ponder cost
+        float avg_steps_;        // Average number of computation steps
+    };
+
+    template <long max_steps, typename SUBNET>
+    using adaptive_computation_time = add_layer<adaptive_computation_time_<max_steps>, SUBNET>;
+
+    template <typename SUBNET>
+    using act = add_layer<adaptive_computation_time_<8>, SUBNET>;       // Default 8 steps
+
+    template <typename SUBNET>
+    using act4 = add_layer<adaptive_computation_time_<4>, SUBNET>;      // Fast version
+
+    template <typename SUBNET>
+    using act16 = add_layer<adaptive_computation_time_<16>, SUBNET>;    // Deep version
 
 // ----------------------------------------------------------------------------------------
 

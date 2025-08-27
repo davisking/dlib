@@ -4701,6 +4701,123 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <long max_steps>
+    class adaptive_computation_time_
+    {
+        /*!
+            REQUIREMENTS ON TEMPLATE ARGUMENTS
+                - max_steps > 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above. It implements Adaptive Computation Time (ACT) following
+                Graves (2016) "Adaptive Computation Time for Recurrent Neural Networks"
+                (arXiv:1603.08983).
+
+                ACT allows the network to adaptively determine how many computational steps
+                to perform for each position in the input sequence, spending more computation
+                on difficult parts while quickly processing easier parts.
+
+                Core algorithm:
+                - For each position t, perform up to max_steps computation steps
+                - At step n, compute halting probability: p_t^n = sigma(W_halt * s_t^n + b_halt)
+                - Stop when cumulative probability h_t^n >= threshold (default 0.99)
+                - Final output: y_t = sum over n of (alpha_t^n * y_hat_t^n)
+                - Ponder cost: R(x) = average_steps / max_steps (for regularization)
+
+                The output tensor has identical dimensions to the input tensor.
+        !*/
+
+    public:
+        adaptive_computation_time_();
+        /*!
+            ensures
+                - #get_max_steps() == max_steps
+                - #get_halt_threshold() == 0.99f
+                - #get_ponder_penalty() == 0.01f
+        !*/
+
+        long get_max_steps() const;
+        /*!
+            ensures
+                - returns the maximum computation steps per sequence position
+        !*/
+
+        float get_halt_threshold() const;
+        /*!
+            ensures
+                - returns the halting threshold (typically 0.99)
+        !*/
+
+        float get_ponder_penalty() const;
+        /*!
+            ensures
+                - returns the ponder penalty weight for regularization
+        !*/
+
+        void set_halt_threshold(float threshold);
+        /*!
+            requires
+                - 0 < threshold <= 1.0f
+            ensures
+                - #get_halt_threshold() == threshold
+        !*/
+
+        void set_ponder_penalty(float penalty);
+        /*!
+            requires
+                - penalty >= 0
+            ensures
+                - #get_ponder_penalty() == penalty
+        !*/
+
+        float get_ponder_cost() const;
+        /*!
+            ensures
+                - returns the ponder cost from the most recent forward pass
+        !*/
+
+        float get_average_steps() const;
+        /*!
+            ensures
+                - returns the average computation steps per position from the most recent forward pass
+        !*/
+
+        template <typename SUBNET> void setup(const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+            The layer has learnable parameters W_halt and b_halt for the halting decision mechanism.
+        !*/
+
+        friend void serialize(const adaptive_computation_time_& item, std::ostream& out);
+        friend void deserialize(adaptive_computation_time_& item, std::istream& in);
+        friend std::ostream& operator<<(std::ostream& out, const adaptive_computation_time_& item);
+        friend void to_xml(const adaptive_computation_time_& item, std::ostream& out);
+        /*!
+            provides serialization support and output operators
+        !*/
+    };
+
+    template <long max_steps, typename SUBNET>
+    using adaptive_computation_time = add_layer<adaptive_computation_time_<max_steps>, SUBNET>;
+
+    template <typename SUBNET>
+    using act = add_layer<adaptive_computation_time_<8>, SUBNET>;
+
+    template <typename SUBNET>
+    using act4 = add_layer<adaptive_computation_time_<4>, SUBNET>;
+
+    template <typename SUBNET>
+    using act16 = add_layer<adaptive_computation_time_<16>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_LAYERS_ABSTRACT_H_

@@ -2394,6 +2394,69 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    // ACT (Adaptive Computation Time) operations
+
+    void compute_act_halt_probabilities(
+        resizable_tensor& halt_probs,
+        resizable_tensor& logits,
+        const tensor& input_data,
+        const tensor& halt_params,
+        long batch_size,
+        long seq_len,
+        long feature_dim
+    );
+
+    void update_act_state(
+        resizable_tensor& output,
+        const tensor& input_data,
+        const tensor& halt_probs,
+        resizable_tensor& cumulative_halting,
+        resizable_tensor& remainders,
+        resizable_tensor& n_steps,
+        long batch_size,
+        long seq_len,
+        long d_model,
+        long num_channels,
+        float halt_threshold,
+        long current_step
+    );
+
+    void finalize_act_output(
+        resizable_tensor& output,
+        const tensor& input_data,
+        const tensor& remainders,
+        long batch_size,
+        long seq_len,
+        long d_model,
+        long num_channels
+    );
+
+    void compute_act_gradients(
+        tensor& params_grad,
+        resizable_tensor& gradient_logits,
+        const tensor& input_cache,
+        const tensor& halt_probs,
+        const tensor& n_steps,
+        long batch_size,
+        long seq_len,
+        long feature_dim,
+        float ponder_penalty,
+        float max_steps
+    );
+
+    void apply_act_depth_scaling(
+        tensor& gradients,
+        const tensor& n_steps,
+        long batch_size,
+        long seq_len,
+        long d_model,
+        long num_channels,
+        float max_steps,
+        float scale_factor
+    );
+
+// ----------------------------------------------------------------------------------------
+
 }}
 
 #ifdef NO_MAKEFILE
