@@ -2749,16 +2749,13 @@ namespace dlib
             size_t feature_dim
         )
         {
-            const size_t total_positions = batch_size * seq_len;
-
-            for (auto pos : grid_stride_range(0, total_positions))
+            for (auto pos : grid_stride_range(0, batch_size * seq_len))
             {
                 const size_t n = pos / seq_len;
                 const size_t s = pos % seq_len;
 
                 float logit = b_halt;
 
-                // Compute dot product: W_halt^T · s_t^n
                 for (size_t c = 0; c < num_channels; ++c) {
                     for (size_t d = 0; d < d_model; ++d) {
                         const size_t in_idx = ((n * num_channels + c) * seq_len + s) * d_model + d;
@@ -2768,7 +2765,7 @@ namespace dlib
                 }
 
                 logits[pos] = logit;
-                halt_probs[pos] = 1.0f / (1.0f + ::expf(-logit));  // σ(logit)
+                halt_probs[pos] = 1.0f / (1.0f + ::expf(-logit));
             }
         }
 
@@ -2792,14 +2789,12 @@ namespace dlib
                 logits.device(),
                 input_data.device(),
                 halt_params.device(),
-                halt_params.host()[feature_dim], // b_halt (bias)
+                halt_params.host()[feature_dim],
                 batch_size,
                 seq_len,
                 d_model,
                 num_channels,
                 feature_dim);
-
-            CHECK_CUDA(cudaPeekAtLastError());
         }
 
         __global__ void _cuda_update_act_state(
@@ -2817,9 +2812,7 @@ namespace dlib
             long current_step
         )
         {
-            const size_t total_positions = batch_size * seq_len;
-
-            for (auto pos : grid_stride_range(0, total_positions))
+            for (auto pos : grid_stride_range(0, batch_size * seq_len))
             {
                 if (cumulative_halting[pos] < halt_threshold) {
                     const size_t n = pos / seq_len;
@@ -2827,20 +2820,16 @@ namespace dlib
 
                     float p = halt_probs[pos];
                     float r = remainders[pos];
-
-                    // Compute effective weight: min(p·r, remaining_threshold)
                     float effective = fminf(p * r, halt_threshold - cumulative_halting[pos]);
 
-                    // Update ACT state
                     cumulative_halting[pos] += effective;
                     remainders[pos] -= effective;
                     n_steps[pos] = static_cast<float>(current_step + 1);
 
-                    // Accumulate weighted output: y_t += α_t^n · ŷ_t^n
                     for (size_t c = 0; c < num_channels; ++c) {
                         for (size_t d = 0; d < d_model; ++d) {
                             const size_t idx = ((n * num_channels + c) * seq_len + s) * d_model + d;
-                            atomicAdd(&output[idx], effective * input_data[idx]);
+                            output[idx] += effective * input_data[idx];
                         }
                     }
                 }
@@ -2878,8 +2867,6 @@ namespace dlib
                 num_channels,
                 halt_threshold,
                 current_step);
-
-            CHECK_CUDA(cudaPeekAtLastError());
         }
 
         __global__ void _cuda_finalize_act_output(
@@ -2892,20 +2879,17 @@ namespace dlib
             size_t num_channels
         )
         {
-            const size_t total_positions = batch_size * seq_len;
-
-            for (auto pos : grid_stride_range(0, total_positions))
+            for (auto pos : grid_stride_range(0, batch_size * seq_len))
             {
                 float r = remainders[pos];
-                if (r > 1e-6f) {  // Only process positions with significant remainder
+                if (r > 1e-6f) {
                     const size_t n = pos / seq_len;
                     const size_t s = pos % seq_len;
 
-                    // Add final step contribution: y_t += ρ_t · ŷ_t^{final}
                     for (size_t c = 0; c < num_channels; ++c) {
                         for (size_t d = 0; d < d_model; ++d) {
                             const size_t idx = ((n * num_channels + c) * seq_len + s) * d_model + d;
-                            atomicAdd(&output[idx], r * input_data[idx]);
+                            output[idx] += r * input_data[idx];
                         }
                     }
                 }
@@ -2933,131 +2917,6 @@ namespace dlib
                 seq_len,
                 d_model,
                 num_channels);
-
-            CHECK_CUDA(cudaPeekAtLastError());
-        }
-
-        __global__ void _cuda_compute_act_gradient_logits(
-            float* gradient_logits,
-            const float* halt_probs,
-            const float* n_steps,
-            float ponder_penalty,
-            float max_steps,
-            size_t total_positions
-        )
-        {
-            for (auto i : grid_stride_range(0, total_positions))
-            {
-                float p = halt_probs[i];
-                // Chain rule: ∂σ/∂logit = σ(1-σ)
-                float sigmoid_grad = p * (1.0f - p);
-                // Ponder cost gradient contribution
-                float ponder_grad = ponder_penalty * n_steps[i] / max_steps;
-                gradient_logits[i] = sigmoid_grad * ponder_grad;
-            }
-        }
-
-        __global__ void _cuda_compute_act_weight_gradients(
-            float* params_grad,
-            const float* input_cache,
-            const float* gradient_logits,
-            size_t batch_size,
-            size_t seq_len,
-            size_t d_model,
-            size_t num_channels,
-            size_t feature_dim
-        )
-        {
-            const size_t total_positions = batch_size * seq_len;
-
-            for (auto pos : grid_stride_range(0, total_positions))
-            {
-                const size_t n = pos / seq_len;
-                const size_t s = pos % seq_len;
-                const float grad_logit = gradient_logits[pos];
-
-                // ∂L/∂W = ∂L/∂logit · ∂logit/∂W = grad_logit · input
-                for (size_t c = 0; c < num_channels; ++c) {
-                    for (size_t d = 0; d < d_model; ++d) {
-                        const size_t in_idx = ((n * num_channels + c) * seq_len + s) * d_model + d;
-                        const size_t weight_idx = c * d_model + d;
-                        const float contribution = input_cache[in_idx] * grad_logit;
-
-                        atomicAdd(&params_grad[weight_idx], contribution);
-                    }
-                }
-            }
-        }
-
-        __global__ void _cuda_compute_act_bias_gradient(
-            float* bias_grad,
-            const float* gradient_logits,
-            size_t total_positions
-        )
-        {
-            float temp = 0;
-            for (auto i : grid_stride_range(0, total_positions))
-            {
-                temp += gradient_logits[i];
-            }
-            warp_reduce_atomic_add(*bias_grad, temp);
-        }
-
-        void compute_act_gradients(
-            tensor& params_grad,
-            resizable_tensor& gradient_logits,
-            const tensor& input_cache,
-            const tensor& halt_probs,
-            const tensor& n_steps,
-            long batch_size,
-            long seq_len,
-            long feature_dim,
-            float ponder_penalty,
-            float max_steps
-        )
-        {
-            const long total_positions = batch_size * seq_len;
-            const long d_model = feature_dim / input_cache.k();
-            const long num_channels = input_cache.k();
-
-            // Step 1: Compute gradients w.r.t. logits
-            launch_kernel(_cuda_compute_act_gradient_logits,
-                max_jobs(total_positions),
-                gradient_logits.device(),
-                halt_probs.device(),
-                n_steps.device(),
-                ponder_penalty,
-                max_steps,
-                total_positions);
-
-            // Step 2: Compute weight gradients
-            launch_kernel(_cuda_compute_act_weight_gradients,
-                max_jobs(total_positions),
-                params_grad.device(),
-                input_cache.device(),
-                gradient_logits.device(),
-                batch_size,
-                seq_len,
-                d_model,
-                num_channels,
-                feature_dim);
-
-            // Step 3: Compute bias gradient
-            launch_kernel(_cuda_compute_act_bias_gradient,
-                max_jobs(total_positions),
-                params_grad.device() + feature_dim,
-                gradient_logits.device(),
-                total_positions);
-
-            // Step 4: Normalize by total positions
-            launch_kernel(_cuda_affine_transform1_0,
-                max_jobs(feature_dim + 1),
-                params_grad.device(),
-                params_grad.device(),
-                feature_dim + 1,
-                1.0f / total_positions);
-
-            CHECK_CUDA(cudaPeekAtLastError());
         }
 
         __global__ void _cuda_apply_act_depth_scaling(
@@ -3071,11 +2930,8 @@ namespace dlib
             float scale_factor
         )
         {
-            const size_t total_positions = batch_size * seq_len;
-
-            for (auto pos : grid_stride_range(0, total_positions))
+            for (auto pos : grid_stride_range(0, batch_size * seq_len))
             {
-                // Depth-dependent scaling: scale = 1 + factor * (steps/max_steps)
                 const float scale = 1.0f + scale_factor * (n_steps[pos] / max_steps);
                 const size_t n = pos / seq_len;
                 const size_t s = pos % seq_len;
@@ -3110,8 +2966,6 @@ namespace dlib
                 num_channels,
                 max_steps,
                 scale_factor);
-
-            CHECK_CUDA(cudaPeekAtLastError());
         }
 
     // ----------------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-// Copyright (C) 2015  Davis E. King (davis@dlib.net)
+﻿// Copyright (C) 2015  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_TeNSOR_TOOLS_H_
 #define DLIB_TeNSOR_TOOLS_H_
@@ -2405,6 +2405,14 @@ namespace dlib { namespace tt
         long seq_len,
         long feature_dim
     );
+    /*!
+          requires
+              - halt_params.size() == feature_dim + 1 (weights + bias)
+              - input_data dimensions match batch_size x seq_len x ...
+          ensures
+              - halt_probs contains sigmoid(W_halt^T * input + b_halt) for each position
+              - logits contains the pre-sigmoid values
+    !*/
 
     void update_act_state(
         resizable_tensor& output,
@@ -2420,6 +2428,15 @@ namespace dlib { namespace tt
         float halt_threshold,
         long current_step
     );
+    /*!
+        requires
+            - 0 < halt_threshold <= 1.0
+            - current_step >= 0
+        ensures
+            - Updates ACT state for all positions
+            - Accumulates weighted outputs: output += α_t^n · input_data
+            - Updates cumulative_halting, remainders, and n_steps
+    !*/
 
     void finalize_act_output(
         resizable_tensor& output,
@@ -2430,19 +2447,11 @@ namespace dlib { namespace tt
         long d_model,
         long num_channels
     );
-
-    void compute_act_gradients(
-        tensor& params_grad,
-        resizable_tensor& gradient_logits,
-        const tensor& input_cache,
-        const tensor& halt_probs,
-        const tensor& n_steps,
-        long batch_size,
-        long seq_len,
-        long feature_dim,
-        float ponder_penalty,
-        float max_steps
-    );
+    /*!
+        ensures
+            - Adds final remainder contributions: output += ρ_t · input_data
+            - Applied only to positions with significant remainder (> 1e-6)
+    !*/
 
     void apply_act_depth_scaling(
         tensor& gradients,
@@ -2454,6 +2463,13 @@ namespace dlib { namespace tt
         float max_steps,
         float scale_factor
     );
+    /*!
+        requires
+            - scale_factor >= 0
+        ensures
+            - Applies depth-dependent gradient scaling
+            - scale = 1 + scale_factor * (n_steps[pos] / max_steps)
+    !*/
 
 // ----------------------------------------------------------------------------------------
 

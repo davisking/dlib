@@ -3238,7 +3238,6 @@ namespace dlib
             const long d_model = feature_dim / input_data.k();
             const long num_channels = input_data.k();
 
-            // Compute logits in parallel
             #pragma omp parallel for
             for (long pos = 0; pos < batch_size * seq_len; ++pos) {
                 const long n = pos / seq_len;
@@ -3246,7 +3245,6 @@ namespace dlib
 
                 float logit = b_halt;
 
-                // Dot product across all channels and model dimensions
                 for (long c = 0; c < num_channels; ++c) {
                     for (long d = 0; d < d_model; ++d) {
                         const long in_idx = ((n * num_channels + c) * seq_len + s) * d_model + d;
@@ -3257,7 +3255,6 @@ namespace dlib
 
                 logits_ptr[pos] = logit;
 
-                // Apply sigmoid: p = 1 / (1 + exp(-logit))
                 halt_probs_ptr[pos] = 1.0f / (1.0f + std::exp(-logit));
             }
         }
@@ -3294,12 +3291,10 @@ namespace dlib
                     float r = remain[pos];
                     float effective = std::min(p * r, halt_threshold - cum_halt[pos]);
 
-                    // Update ACT state
                     cum_halt[pos] += effective;
                     remain[pos] -= effective;
                     steps[pos] = static_cast<float>(current_step + 1);
 
-                    // Accumulate weighted output
                     for (long c = 0; c < num_channels; ++c) {
                         for (long d = 0; d < d_model; ++d) {
                             const long idx = ((n * num_channels + c) * seq_len + s) * d_model + d;
@@ -3341,63 +3336,6 @@ namespace dlib
             }
         }
 
-        void compute_act_gradients(
-            tensor& params_grad,
-            resizable_tensor& gradient_logits,
-            const tensor& input_cache,
-            const tensor& halt_probs,
-            const tensor& n_steps,
-            long batch_size,
-            long seq_len,
-            long feature_dim,
-            float ponder_penalty,
-            float max_steps
-        )
-        {
-            const float* p_halt = halt_probs.host();
-            const float* steps = n_steps.host();
-            const float* in_ptr = input_cache.host();
-            float* p_grad = params_grad.host();
-            float* g_logits = gradient_logits.host();
-
-            const long total = batch_size * seq_len;
-            const long d_model = feature_dim / input_cache.k();
-            const long num_channels = input_cache.k();
-
-            // Compute gradient w.r.t. logits
-            #pragma omp parallel for
-            for (long i = 0; i < total; ++i) {
-                float p = p_halt[i];
-                float sigmoid_grad = p * (1.0f - p);
-                float ponder_grad = ponder_penalty * steps[i] / max_steps;
-                g_logits[i] = sigmoid_grad * ponder_grad;
-            }
-
-            // Compute gradient w.r.t. weights
-            #pragma omp parallel for
-            for (long f = 0; f < feature_dim; ++f) {
-                const long c = f / d_model;
-                const long d = f % d_model;
-                float grad_w = 0;
-
-                for (long pos = 0; pos < total; ++pos) {
-                    const long n = pos / seq_len;
-                    const long s = pos % seq_len;
-                    const long in_idx = ((n * num_channels + c) * seq_len + s) * d_model + d;
-                    grad_w += in_ptr[in_idx] * g_logits[pos];
-                }
-
-                p_grad[f] += grad_w / total + 0.0001f * params_grad.host()[f]; // L2 reg
-            }
-
-            // Compute gradient w.r.t. bias
-            float grad_b = 0;
-            for (long i = 0; i < total; ++i) {
-                grad_b += g_logits[i];
-            }
-            p_grad[feature_dim] += grad_b / total;
-        }
-
         void apply_act_depth_scaling(
             tensor& gradients,
             const tensor& n_steps,
@@ -3413,13 +3351,16 @@ namespace dlib
             float* grad_ptr = gradients.host();
 
             #pragma omp parallel for
-            for (long pos = 0; pos < batch_size * seq_len; ++pos) {
-                float scale = 1.0f + scale_factor * (steps[pos] / max_steps);
+            for (long pos = 0; pos < batch_size * seq_len; ++pos)
+            {
+                const float scale = 1.0f + scale_factor * (steps[pos] / max_steps);
                 const long n = pos / seq_len;
                 const long s = pos % seq_len;
 
-                for (long c = 0; c < num_channels; ++c) {
-                    for (long d = 0; d < d_model; ++d) {
+                for (long c = 0; c < num_channels; ++c)
+                {
+                    for (long d = 0; d < d_model; ++d)
+                    {
                         const long idx = ((n * num_channels + c) * seq_len + s) * d_model + d;
                         grad_ptr[idx] *= scale;
                     }

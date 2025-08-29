@@ -4718,14 +4718,29 @@ namespace dlib
                 to perform for each position in the input sequence, spending more computation
                 on difficult parts while quickly processing easier parts.
 
-                Core algorithm:
-                - For each position t, perform up to max_steps computation steps
-                - At step n, compute halting probability: p_t^n = sigma(W_halt * s_t^n + b_halt)
-                - Stop when cumulative probability h_t^n >= threshold (default 0.99)
-                - Final output: y_t = sum over n of (alpha_t^n * y_hat_t^n)
-                - Ponder cost: R(x) = average_steps / max_steps (for regularization)
+            MATHEMATICAL FOUNDATION:
+                Core ACT Algorithm:
+                - For each sequence position t, perform up to max_steps computational steps
+                - At step n, compute halting probability: p_t^n = sigmoid(W_halt^T * s_t^n + b_halt)
+                - Cumulative halting probability: h_t^n = sum_{i=1 to n} p_t^i
+                - Stop when h_t^n >= theta (threshold, typically 0.99)
+                - Final output: y_t = sum_{n=1 to N(t)} alpha_t^n * y_hat_t^n
 
-                The output tensor has identical dimensions to the input tensor.
+                Where alpha_t^n (effective weight) is computed as:
+                - alpha_t^n = p_t^n * rho_t^{n-1} for intermediate steps
+                - alpha_t^{N(t)} = 1 - h_t^{N(t)-1} (remainder for final step)
+                - rho_t^n = 1 - h_t^n (remaining probability mass)
+
+                PONDER COST (Regularization):
+                - R(x) = (1/T) * sum_t (N(t) + rho_t^{N(t)})
+                - Total loss: L = L_task + lambda * R(x)
+                - lambda is controlled by get_ponder_penalty()
+
+            IMPLEMENTATION DETAILS:
+                - Input/Output tensors have identical dimensions
+                - Learnable parameters: W_halt in R^{d x k}, b_halt in R
+                - State tracking per position: cumulative halting, remainders, step counts
+                - Early termination when all positions halt
         !*/
 
     public:
@@ -4737,23 +4752,10 @@ namespace dlib
                 - #get_ponder_penalty() == 0.01f
         !*/
 
+        // Configuration accessors
         long get_max_steps() const;
-        /*!
-            ensures
-                - returns the maximum computation steps per sequence position
-        !*/
-
         float get_halt_threshold() const;
-        /*!
-            ensures
-                - returns the halting threshold (typically 0.99)
-        !*/
-
         float get_ponder_penalty() const;
-        /*!
-            ensures
-                - returns the ponder penalty weight for regularization
-        !*/
 
         void set_halt_threshold(float threshold);
         /*!
@@ -4771,18 +4773,22 @@ namespace dlib
                 - #get_ponder_penalty() == penalty
         !*/
 
+        // Runtime statistics
         float get_ponder_cost() const;
         /*!
             ensures
-                - returns the ponder cost from the most recent forward pass
+                - returns the ponder cost R(x) from the most recent forward pass
+                - value represents average computational cost per position
         !*/
 
         float get_average_steps() const;
         /*!
             ensures
-                - returns the average computation steps per position from the most recent forward pass
+                - returns the average number of computation steps per position
+                - value is between 1.0 and max_steps
         !*/
 
+        // Layer interface
         template <typename SUBNET> void setup(const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
         template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
@@ -4790,10 +4796,6 @@ namespace dlib
         dpoint map_output_to_input(dpoint p) const;
         const tensor& get_layer_params() const;
         tensor& get_layer_params();
-        /*!
-            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
-            The layer has learnable parameters W_halt and b_halt for the halting decision mechanism.
-        !*/
 
         friend void serialize(const adaptive_computation_time_& item, std::ostream& out);
         friend void deserialize(adaptive_computation_time_& item, std::istream& in);

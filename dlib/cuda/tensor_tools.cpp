@@ -1425,9 +1425,11 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::compute_act_halt_probabilities(halt_probs, logits, input_data, halt_params, batch_size, seq_len, feature_dim);
+        cuda::compute_act_halt_probabilities(halt_probs, logits, input_data, halt_params,
+            batch_size, seq_len, feature_dim);
 #else
-        cpu::compute_act_halt_probabilities(halt_probs, logits, input_data, halt_params, batch_size, seq_len, feature_dim);
+        cpu::compute_act_halt_probabilities(halt_probs, logits, input_data, halt_params,
+            batch_size, seq_len, feature_dim);
 #endif
     }
 
@@ -1471,28 +1473,6 @@ namespace dlib { namespace tt
 #else
         cpu::finalize_act_output(output, input_data, remainders,
             batch_size, seq_len, d_model, num_channels);
-#endif
-    }
-
-    void compute_act_gradients(
-        tensor& params_grad,
-        resizable_tensor& gradient_logits,
-        const tensor& input_cache,
-        const tensor& halt_probs,
-        const tensor& n_steps,
-        long batch_size,
-        long seq_len,
-        long feature_dim,
-        float ponder_penalty,
-        float max_steps
-    )
-    {
-#ifdef DLIB_USE_CUDA
-        cuda::compute_act_gradients(params_grad, gradient_logits, input_cache, halt_probs,
-            n_steps, batch_size, seq_len, feature_dim, ponder_penalty, max_steps);
-#else
-        cpu::compute_act_gradients(params_grad, gradient_logits, input_cache, halt_probs,
-            n_steps, batch_size, seq_len, feature_dim, ponder_penalty, max_steps);
 #endif
     }
 

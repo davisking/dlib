@@ -645,19 +645,6 @@ namespace dlib
             long num_channels
         );
 
-        void compute_act_gradients(
-            tensor& params_grad,
-            resizable_tensor& gradient_logits,
-            const tensor& input_cache,
-            const tensor& halt_probs,
-            const tensor& n_steps,
-            long batch_size,
-            long seq_len,
-            long feature_dim,
-            float ponder_penalty,
-            float max_steps
-        );
-
         void apply_act_depth_scaling(
             tensor& gradients,
             const tensor& n_steps,

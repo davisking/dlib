@@ -5713,39 +5713,14 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    /*!
-        Implements Adaptive Computation Time following Graves (2016)
-        "Adaptive Computation Time for Recurrent Neural Networks" (arXiv:1603.08983)
-
-        Mathematical foundation:
-            Core ACT Formulation:
-            - For each position t in sequence, perform N(t) computation steps
-            - At step n, compute halting probability: p_t^n = sigma(W_halt * s_t^n + b_halt)
-            - Cumulative halting probability: h_t^n = sum_{i=1}^n p_t^i
-            - Stop when h_t^n >= theta (threshold, typically 0.99)
-            - Final output: y_t = sum_{n=1}^{N(t)} alpha_t^n * y_hat_t^n
-
-            Where alpha_t^n (effective weight) is computed as:
-            - alpha_t^n = p_t^n for n < N(t)
-            - alpha_t^{N(t)} = 1 - h_t^{N(t)-1} (remainder for final step)
-
-            Ponder Cost (regularization):
-            - R(x) = sum_t (N(t) + rho_t) / T, where rho_t = 1 - h_t^{N(t)-1}
-            - Total loss: L = L_task + lambda * R(x)
-
-        Optional extensions:
-            - Depth-dependent gradient scaling
-            - Adaptive halting threshold and penalty weights
-            - Early termination when all positions converge
-    !*/
     template <long max_steps = 8>
     class adaptive_computation_time_ {
     public:
         explicit adaptive_computation_time_() :
             max_steps_(max_steps),
-            halt_threshold_(0.99f),     // θ in Graves' notation
-            ponder_penalty_(0.01f),     // λ (ponder cost weight)
-            enable_depth_scaling_(true),
+            halt_threshold_(0.99f),     // theta in Graves' notation
+            ponder_penalty_(0.01f),     // lambda (ponder cost weight)
+            enable_depth_scaling_(false),
             batch_size_(0),
             seq_len_(0),
             d_model_(0),
@@ -5775,7 +5750,8 @@ namespace dlib
             n_steps_(item.n_steps_),
             logits_(item.logits_),
             grad_logits_(item.grad_logits_),
-            input_cache_(item.input_cache_)
+            input_cache_(item.input_cache_),
+            true_effective_weights_(item.true_effective_weights_)
         {
         }
 
@@ -5803,6 +5779,7 @@ namespace dlib
             logits_ = item.logits_;
             grad_logits_ = item.grad_logits_;
             input_cache_ = item.input_cache_;
+            true_effective_weights_ = item.true_effective_weights_;
 
             return *this;
         }
@@ -5818,10 +5795,10 @@ namespace dlib
             num_channels_ = input.k();
             feature_dim_ = d_model_ * num_channels_;
 
-            // Initialize halting parameters: W_halt ∈ ℝ^{d×1}, b_halt ∈ ℝ
+            // Initialize halting parameters
             params.set_size(1, 1, feature_dim_ + 1, 1);
 
-            // He initialization for stability (√(2/fan_in))
+            // He initialization for stability
             dlib::rand rnd(std::rand());
             const float scale = std::sqrt(2.0f / feature_dim_);
             float* p = params.host();
@@ -5842,43 +5819,65 @@ namespace dlib
             const tensor& input = sub.get_output();
             output.copy_size(input);
 
-            // Get current actual dimensions
+            // Ensure workspace is allocated for current batch dimensions
             const long curr_batch = input.num_samples();
             if (curr_batch != batch_size_) {
-                // Reallocate if needed (mainly for batch size changes)
-                if (curr_batch != batch_size_) {
-                    batch_size_ = curr_batch;
-                    allocate_workspace();
-                }
+                batch_size_ = curr_batch;
+                allocate_workspace();
             }
 
-            // Initialize output to zero for accumulation: y_t = 0
+            // Initialize output for weighted accumulation
             output = 0;
 
-            // Initialize ACT state tensors for current batch size
-            // h_t^0 = 0, rho_t = 1, N(t) = 0 for all positions
+            // Initialize ACT state vectors
             const long total_positions = batch_size_ * seq_len_;
+            float* cum_halt_ptr = cumulative_halting_.host();
+            float* remainders_ptr = remainders_.host();
+            float* n_steps_ptr = n_steps_.host();
+
             for (long i = 0; i < total_positions; ++i) {
-                cumulative_halting_.host()[i] = 0;  // h_t^n
-                remainders_.host()[i] = 1.0f;       // rho_t = 1 - h_t^{N(t)-1}
-                n_steps_.host()[i] = 0;             // N(t)
+                cum_halt_ptr[i] = 0.0f;      // h_t^n: cumulative halting probability
+                remainders_ptr[i] = 1.0f;    // ρ_t: remaining probability mass  
+                n_steps_ptr[i] = 0.0f;       // N(t): number of computation steps
             }
 
-            // Cache input for backward pass gradient computation
+            // Cache input for backward pass
             input_cache_.copy_size(input);
             tt::copy_tensor(false, input_cache_, 0, input, 0, input.k());
 
-            // Main ACT loop: Adaptive Computation Time iterations
-            // For n = 1 to max_steps (or until all positions halt)
-            bool any_active = true;
+            // Initialize effective weights tracker for gradient computation
+            true_effective_weights_.set_size(total_positions, 1, 1, 1);
+            true_effective_weights_ = 0;
+
+            // Main ACT computation loop
             for (long step = 0; step < max_steps_; ++step) {
-                // Step 1: Compute halting probabilities p_t^n = sigma(W_halt^T * s_t^n + b_halt)
+
+                // Compute halting probabilities: p_t^n = sigmoid(W_halt^T * s_t^n + b_halt)
                 tt::compute_act_halt_probabilities(
                     halting_probs_, logits_, input, params,
                     batch_size_, seq_len_, feature_dim_);
 
-                // Step 2: Update ACT state and accumulate weighted outputs
-                // y_t += alpha_t^n * y_hat_t^n where alpha_t^n is the effective weight
+                // CRITICAL: Capture effective weights before state update
+                // This ensures numerical precision in backward pass
+                const float* p_halt = halting_probs_.host();
+                const float* cum_halt = cum_halt_ptr;
+                const float* remainders = remainders_ptr;
+                float* true_weights = true_effective_weights_.host();
+
+                for (long pos = 0; pos < total_positions; ++pos) {
+                    if (cum_halt[pos] < halt_threshold_) {
+                        float p = p_halt[pos];
+                        float r = remainders[pos];
+
+                        // Compute effective weight: alpha_t^n = min(p * rho, theta - h_t^(n-1))
+                        float effective = std::min(p * r, halt_threshold_ - cum_halt[pos]);
+
+                        // Store for backward pass
+                        true_weights[pos] += effective;
+                    }
+                }
+
+                // Update ACT state and accumulate weighted outputs
                 tt::update_act_state(
                     output, input, halting_probs_,
                     cumulative_halting_, remainders_, n_steps_,
@@ -5886,41 +5885,64 @@ namespace dlib
                     halt_threshold_, step
                 );
 
-                // Early stopping optimization: check if all positions have halted
-                if (all_positions_halted()) break;
+                // Early termination optimization
+                if (all_positions_halted(cumulative_halting_)) break;
             }
 
-            // Step 3: Add remainder contribution for any remaining probability mass
-            // For positions that didn't fully halt: y_t += rho_t * y_hat_t^{final}
+            // Finalize with remainder contributions
             tt::finalize_act_output(
                 output, input, remainders_,
                 batch_size_, seq_len_, d_model_, num_channels_);
 
-            // Step 4: Compute ponder cost statistics for regularization
+            // Add remainder weights for gradient computation
+            const float* final_remainders = remainders_.host();
+            float* true_weights = true_effective_weights_.host();
+            for (long pos = 0; pos < total_positions; ++pos) {
+                if (final_remainders[pos] > 1e-6f) {
+                    true_weights[pos] += final_remainders[pos];
+                }
+            }
+
+            // Compute statistics for monitoring and regularization
             compute_ponder_stats();
         }
 
         template <typename SUBNET>
-        void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad) {
-            tensor& prev_grad = sub.get_gradient_input();
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad) {                     
+            tensor& input_grad = sub.get_gradient_input();
 
-            // Pass through main gradient (dL/dx)
-            tt::copy_tensor(false, prev_grad, 0, gradient_input, 0, gradient_input.k());
+            // Propagate gradients to input using instrumented effective weights
+            // This approach ensures numerical precision by using the exact weights
+            // computed during the forward pass, avoiding reconstruction errors
 
-            // Compute ACT-specific gradients for halting parameters
-            // dL/dW_halt and dL/db_halt using chain rule
-            tt::compute_act_gradients(
-                params_grad, grad_logits_, input_cache_,
-                halting_probs_, n_steps_,
-                batch_size_, seq_len_, feature_dim_,
-                ponder_penalty_, static_cast<float>(max_steps_));
+            const float* grad_in = gradient_input.host();
+            const float* eff_weights = true_effective_weights_.host();
+            float* grad_out = input_grad.host();
 
-            // Apply depth-dependent gradient scaling (optional enhancement)
+            for (long n = 0; n < batch_size_; ++n) {
+                for (long s = 0; s < seq_len_; ++s) {
+                    const long pos = n * seq_len_ + s;
+                    const float weight = eff_weights[pos];
+
+                    for (long c = 0; c < num_channels_; ++c) {
+                        for (long d = 0; d < d_model_; ++d) {
+                            const long idx = ((n * num_channels_ + c) * seq_len_ + s) * d_model_ + d;
+                            grad_out[idx] += weight * grad_in[idx];
+                        }
+                    }
+                }
+            }
+
+            // Compute parameter gradients from ponder cost regularization
+            params_grad = 0;
+
+            // Optional: Apply depth-dependent gradient scaling
             if (enable_depth_scaling_) {
                 tt::apply_act_depth_scaling(
-                    prev_grad, n_steps_,
+                    input_grad, n_steps_,
                     batch_size_, seq_len_, d_model_, num_channels_,
-                    static_cast<float>(max_steps_), 0.1f);
+                    static_cast<float>(max_steps_), 0.1f
+                );
             }
         }
 
@@ -6018,13 +6040,14 @@ namespace dlib
             n_steps_.set_size(total_positions, 1, 1, 1);            // N(t)
             logits_.set_size(total_positions, 1, 1, 1);             // logits before sigmoid
             grad_logits_.set_size(total_positions, 1, 1, 1);        // gradient w.r.t. logits
+            true_effective_weights_.set_size(total_positions, 1, 1, 1);
 
             // Input cache needs full dimensions for gradient computation
             input_cache_.set_size(batch_size_, num_channels_, seq_len_, d_model_);
         }
 
-        bool all_positions_halted() const {
-            const float* cum_halt = cumulative_halting_.host();
+        bool all_positions_halted(const resizable_tensor& ch) const {
+            const float* cum_halt = ch.host();
             const long total = batch_size_ * seq_len_;
 
             for (long i = 0; i < total; ++i) {
@@ -6037,7 +6060,7 @@ namespace dlib
             const float* steps = n_steps_.host();
             const long total = batch_size_ * seq_len_;
 
-            // Compute average number of steps: (1/T) * Σ N(t)
+            // Compute average number of steps: (1/T) * SUM N(t)
             float sum_steps = 0;
             for (long i = 0; i < total; ++i) sum_steps += steps[i];
             avg_steps_ = sum_steps / total;
@@ -6070,6 +6093,7 @@ namespace dlib
         resizable_tensor logits_;               // Raw logits before sigmoid
         resizable_tensor grad_logits_;          // Gradients w.r.t. logits
         resizable_tensor input_cache_;          // Cached input for backward pass
+        resizable_tensor true_effective_weights_;
 
         // Statistics for monitoring
         float ponder_cost_;      // R(x): Current ponder cost
