@@ -231,7 +231,7 @@ jobs:
       - name: Configure
         run: |
           cmake dlib/test -B build \
-          -DCMAKE_TOOLCHAIN_FILE="%VCPKG_INSTALLATION_ROOT%\scripts\buildsystems\vcpkg.cmake" \
+          -DCMAKE_TOOLCHAIN_FILE="$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" \
           -DVCPKG_TARGET_TRIPLET=x64-windows 
 
       - name: Build just tests
