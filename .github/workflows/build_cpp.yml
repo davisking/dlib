@@ -229,7 +229,10 @@ jobs:
         run: vcpkg install ${{ matrix.extra_packages }}
 
       - name: Configure
-        run: cmake dlib/test -B build
+        run: |
+          cmake dlib/test -B build \
+          -DCMAKE_TOOLCHAIN_FILE="%VCPKG_INSTALLATION_ROOT%\scripts\buildsystems\vcpkg.cmake" \
+          -DVCPKG_TARGET_TRIPLET=x64-windows 
 
       - name: Build just tests
         run: cmake --build build --config Release --target dtest --parallel 4
