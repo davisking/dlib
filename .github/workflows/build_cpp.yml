@@ -249,21 +249,21 @@ jobs:
 
       - name: Prepare OpenBLAS dir for cache restore
         if: ${{ matrix.build_openblas}}
-        run: mkdir -p "C:Program Files (x86)/openblas"
+        run: mkdir -p "C:/Program Files (x86)/openblas"
   
       - name: Cache OpenBLAS (Windows)
         if: ${{ matrix.build_openblas}}
         uses: actions/cache@v3
         id: cache-openblas
         with:
-          path: C:Program Files (x86)/openblas
+          path: C:/Program Files (x86)/openblas
           key: openblas_try0
   
       - name: Download OpenBLAS
         if: ${{ matrix.build_openblas && (steps.cache-openblas.outputs.cache-hit != 'true') }}
         run: |
           curl -L -o openblas.zip https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.30/OpenBLAS-0.3.30-x64.zip
-          powershell -Command "Expand-Archive -Path openblas.zip -DestinationPath '\C:Program Files (x86)\openblas' -Force"
+          powershell -Command "Expand-Archive -Path openblas.zip -DestinationPath 'C:\Program Files (x86)\openblas' -Force"
 
       - name: Configure
         run: |

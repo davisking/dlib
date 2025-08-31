@@ -77,6 +77,7 @@ set(mkl_search_path_win_64
    "C:/Program Files/Intel/Composer XE/compiler/lib/intel64"
    "C:/Program Files (x86)/Intel/oneAPI/mkl/*/lib"
    "C:/Program Files (x86)/Intel/oneAPI/compiler/*/lib"
+   "C:/Program Files (x86)/Intel/oneAPI/tbb/*/lib"
    "C:/Program Files (x86)/Intel/oneAPI/mkl/*/lib/intel64"
    "C:/Program Files (x86)/Intel/oneAPI/compiler/*/windows/compiler/lib/intel64_win")
 
