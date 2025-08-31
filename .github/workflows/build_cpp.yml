@@ -269,8 +269,7 @@ jobs:
 
       - name: Configure tests
         if: ${{ matrix.build_tests }}
-        run: |
-          cmake dlib/test -B build ${{ matrix.configure_extra }}
+        run: cmake dlib/test -B build ${{ matrix.configure_extra }}
 
       - name: Build tests
         if: ${{ matrix.build_tests }}
@@ -282,7 +281,7 @@ jobs:
 
       - name: Configure BLAS binding tests
         if: ${{ matrix.build_blas_bindings }}
-        run: cmake dlib/test/blas_bindings -B build_blas_bindings
+        run: cmake dlib/test/blas_bindings -B build_blas_bindings ${{ matrix.configure_extra }}
 
       - name: Build BLAS binding tests
         if: ${{ matrix.build_blas_bindings }}
