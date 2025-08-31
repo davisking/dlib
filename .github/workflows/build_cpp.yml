@@ -244,7 +244,26 @@ jobs:
         if: ${{ matrix.build_mkl && (steps.cache-oneapi.outputs.cache-hit != 'true') }}
         run: |
           curl -L -o base.exe https://registrationcenter-download.intel.com/akdlm/IRC_NAS/f5881e61-dcdc-40f1-9bd9-717081ac623c/intel-oneapi-base-toolkit-2025.2.1.46_offline.exe
-          base.exe -a --silent --eula accept
+          ./base.exe -a --silent --eula accept
+
+      # - name: Prepare deps dir
+      #   run: mkdir -p "C:/deps/openblas-${OPENBLAS_VER}"
+  
+      # - name: Cache OpenBLAS
+      #   id: cache-openblas
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: C:/deps/openblas-${{ env.OPENBLAS_VER }}
+      #     key: openblas-win-${{ env.OPENBLAS_VER }}-x64
+  
+      # - name: Download & extract OpenBLAS (LP64) if cache miss
+      #   if: steps.cache-openblas.outputs.cache-hit != 'true'
+      #   run: |
+      #     ZIP="OpenBLAS-${OPENBLAS_VER}-x64.zip"   # use ...-x64-64.zip for ILP64
+      #     URL="https://sourceforge.net/projects/openblas/files/v${OPENBLAS_VER}/${ZIP}/download"
+      #     curl -L -o openblas.zip "$URL"
+      #     # Extract into our prefix (PowerShell Expand-Archive is reliable)
+      #     powershell -Command "Expand-Archive -Path openblas.zip -DestinationPath 'C:\deps\openblas-${env:OPENBLAS_VER}' -Force"
 
       - name: Configure
         run: |
