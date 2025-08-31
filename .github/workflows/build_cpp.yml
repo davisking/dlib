@@ -53,8 +53,8 @@ jobs:
 
           - name: ubuntu-22.04-ffmpeg-513
             os                    : ubuntu-22.04
-            build_tests           : true
             build_ffmpeg          : true
+            build_ffmpeg_examples : true
             ffmpeg_version        : 5.1.3
             c_compiler            : gcc
             cxx_compiler          : g++
@@ -215,24 +215,40 @@ jobs:
         include:
           - name: windows-latest-openblas
             os              : windows-latest
-            extra_packages  : openblas:x64-windows
+            build_openblas  : true
 
           - name: windows-latest-mkl
             os              : windows-latest
-            extra_packages  : intel-mkl:x64-windows
+            build_mkl       : true
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: vcpkg install ${{ matrix.extra_packages }}
+      - name: Prepare oneAPI dir for cache restore
+        if: ${{ matrix.build_mkl }}
+        run: mkdir -p "C:/Program Files (x86)/Intel/oneAPI/"
+
+      - name: Cache oneMKL (Windows)
+        if: ${{ matrix.build_mkl}}
+        uses: actions/cache@v3
+        id: cache-oneapi
+        with:
+          path: |
+            C:/Program Files (x86)/Intel/oneAPI/mkl
+            C:/Program Files (x86)/Intel/oneAPI/tbb
+            C:/Program Files (x86)/Intel/oneAPI/compiler
+          key: oneapi-mkl-try0
+
+      - name: Download MKL
+        if: ${{ matrix.build_mkl && (steps.cache-oneapi.outputs.cache-hit != 'true') }}
+        run: |
+          wget https://registrationcenter-download.intel.com/akdlm/IRC_NAS/f5881e61-dcdc-40f1-9bd9-717081ac623c/intel-oneapi-base-toolkit-2025.2.1.46_offline.exe
+          intel-oneapi-base-toolkit-2025.2.1.46_offline.exe -a --silent --eula accept --install-dir
 
       - name: Configure
         run: |
-          cmake dlib/test -B build \
-          -DCMAKE_TOOLCHAIN_FILE="$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" \
-          -DVCPKG_TARGET_TRIPLET=x64-windows 
+          cmake dlib/test -B build
 
       - name: Build just tests
         run: cmake --build build --config Release --target dtest --parallel 4
