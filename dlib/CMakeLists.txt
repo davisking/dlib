@@ -4,7 +4,7 @@
 #
 
 
-cmake_minimum_required(VERSION 3.10.0)
+cmake_minimum_required(VERSION 3.18.0)
 
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
@@ -239,7 +239,6 @@ if (NOT TARGET dlib)
       option(DLIB_USE_BLAS ${DLIB_USE_BLAS_STR} ON)
       option(DLIB_USE_LAPACK ${DLIB_USE_LAPACK_STR} ON)
       option(DLIB_USE_CUDA ${DLIB_USE_CUDA_STR} ON)
-      set(DLIB_USE_CUDA_COMPUTE_CAPABILITIES 50 CACHE STRING ${DLIB_USE_CUDA_COMPUTE_CAPABILITIES_STR})
       option(DLIB_PNG_SUPPORT ${DLIB_PNG_SUPPORT_STR} ON)
       option(DLIB_GIF_SUPPORT ${DLIB_GIF_SUPPORT_STR} ON)
       option(DLIB_WEBP_SUPPORT ${DLIB_WEBP_SUPPORT_STR} ON)
@@ -643,7 +642,41 @@ if (NOT TARGET dlib)
       
          if (CUDAToolkit_FOUND AND CUDAToolkit_NVCC_EXECUTABLE)
             set(CMAKE_CUDA_COMPILER ${CUDAToolkit_NVCC_EXECUTABLE})
+
+            # Set USER_DID_NOT_SPECIFY_WHAT_CUDA_ARCH_TO_USE before calling
+            # enable_language(CUDA) because enable_language() sets
+            # CMAKE_CUDA_ARCHITECTURES to a default that isn't especially
+            # helpful for most users in newer cmake versions.  E.g. it picks
+            # the oldest supported arch the cuda toolkit you have can build for
+            # which is often so old your GPU can't actually run the resulting
+            # kernels.
+            set(USER_DID_NOT_SPECIFY_WHAT_CUDA_ARCH_TO_USE FALSE)
+            if (NOT DEFINED CMAKE_CUDA_ARCHITECTURES AND (NOT DEFINED ENV{CUDAARCHS} OR "$ENV{CUDAARCHS}" STREQUAL ""))
+               set(USER_DID_NOT_SPECIFY_WHAT_CUDA_ARCH_TO_USE TRUE)
+            endif()
+
             enable_language(CUDA)
+
+            # If the user didn't say what cuda arch they want to use try to pick something reasonable
+            if(USER_DID_NOT_SPECIFY_WHAT_CUDA_ARCH_TO_USE)
+               if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
+                  # Auto-detect host GPU(s); safest default on modern CMake.
+                  set(CMAKE_CUDA_ARCHITECTURES native)  # requires CMake ≥ 3.24
+               else()
+                  # Fallback by nvcc version to avoid asking for archs it doesn't know yet
+                  if (CMAKE_CUDA_COMPILER_VERSION VERSION_LESS 11)
+                     # CUDA 10.x and older
+                     set(CMAKE_CUDA_ARCHITECTURES 52;60;61;70;75)
+                  elseif (CMAKE_CUDA_COMPILER_VERSION VERSION_LESS 12)
+                     # CUDA 11.x
+                     set(CMAKE_CUDA_ARCHITECTURES 60;61;70;75;80;86)
+                  else()
+                     # CUDA 12.x+
+                     # (Keep this conservative; add 89/90 only on toolkits that support them.)
+                     set(CMAKE_CUDA_ARCHITECTURES 70;75;80;86;89;90)
+                  endif()
+               endif()
+            endif()
 
             find_package(CUDNN)
 
@@ -667,7 +700,7 @@ if (NOT TARGET dlib)
                endif()
 
                include_directories(${CUDAToolkit_INCLUDE_DIRS} ${CUDNN_INCLUDE_PATH})
-               message(STATUS "Enabling CUDA support for dlib.  DLIB WILL USE CUDA, compute capabilities: ${DLIB_CUDA_COMPUTE_CAPABILITIES}")
+               message(STATUS "Enabling CUDA support for dlib.  DLIB WILL USE CUDA using cuda arch ${CMAKE_CUDA_ARCHITECTURES}.  If you don't want to use that arch set the CUDAARCHS env var or CMAKE_CUDA_ARCHITECTURES cmake variable.")
             else()
                 set(DLIB_USE_CUDA OFF CACHE STRING ${DLIB_USE_BLAS_STR} FORCE )
                toggle_preprocessor_switch(DLIB_USE_CUDA)
@@ -730,9 +763,6 @@ if (NOT TARGET dlib)
 
       add_library(dlib ${source_files})
 
-      if(DLIB_USE_CUDA)
-         set_property(TARGET dlib PROPERTY CUDA_ARCHITECTURES all) 
-      endif()
 
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
 
