@@ -243,7 +243,7 @@ jobs:
       - name: Download MKL
         if: ${{ matrix.build_mkl && (steps.cache-oneapi.outputs.cache-hit != 'true') }}
         run: |
-          wget https://registrationcenter-download.intel.com/akdlm/IRC_NAS/f5881e61-dcdc-40f1-9bd9-717081ac623c/intel-oneapi-base-toolkit-2025.2.1.46_offline.exe
+          curl -L -o https://registrationcenter-download.intel.com/akdlm/IRC_NAS/f5881e61-dcdc-40f1-9bd9-717081ac623c/intel-oneapi-base-toolkit-2025.2.1.46_offline.exe
           intel-oneapi-base-toolkit-2025.2.1.46_offline.exe -a --silent --eula accept --install-dir
 
       - name: Configure
