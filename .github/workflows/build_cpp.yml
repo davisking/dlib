@@ -216,6 +216,7 @@ jobs:
           - name: windows-latest-openblas
             os              : windows-latest
             build_openblas  : true
+            configure_extra : -DCMAKE_PREFIX_PATH="C:Program Files (x86)/openblas"
 
           - name: windows-latest-mkl
             os              : windows-latest
@@ -246,28 +247,27 @@ jobs:
           curl -L -o base.exe https://registrationcenter-download.intel.com/akdlm/IRC_NAS/f5881e61-dcdc-40f1-9bd9-717081ac623c/intel-oneapi-base-toolkit-2025.2.1.46_offline.exe
           ./base.exe -a --silent --eula accept
 
-      # - name: Prepare deps dir
-      #   run: mkdir -p "C:/deps/openblas-${OPENBLAS_VER}"
+      - name: Prepare OpenBLAS dir for cache restore
+        if: ${{ matrix.build_openblas}}
+        run: mkdir -p "C:Program Files (x86)/openblas"
   
-      # - name: Cache OpenBLAS
-      #   id: cache-openblas
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: C:/deps/openblas-${{ env.OPENBLAS_VER }}
-      #     key: openblas-win-${{ env.OPENBLAS_VER }}-x64
+      - name: Cache OpenBLAS (Windows)
+        if: ${{ matrix.build_openblas}}
+        uses: actions/cache@v3
+        id: cache-openblas
+        with:
+          path: C:Program Files (x86)/openblas
+          key: openblas_try0
   
-      # - name: Download & extract OpenBLAS (LP64) if cache miss
-      #   if: steps.cache-openblas.outputs.cache-hit != 'true'
-      #   run: |
-      #     ZIP="OpenBLAS-${OPENBLAS_VER}-x64.zip"   # use ...-x64-64.zip for ILP64
-      #     URL="https://sourceforge.net/projects/openblas/files/v${OPENBLAS_VER}/${ZIP}/download"
-      #     curl -L -o openblas.zip "$URL"
-      #     # Extract into our prefix (PowerShell Expand-Archive is reliable)
-      #     powershell -Command "Expand-Archive -Path openblas.zip -DestinationPath 'C:\deps\openblas-${env:OPENBLAS_VER}' -Force"
+      - name: Download OpenBLAS
+        if: ${{ matrix.build_openblas && (steps.cache-openblas.outputs.cache-hit != 'true') }}
+        run: |
+          curl -L -o openblas.zip https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.30/OpenBLAS-0.3.30-x64.zip
+          powershell -Command "Expand-Archive -Path openblas.zip -DestinationPath '\C:Program Files (x86)\openblas' -Force"
 
       - name: Configure
         run: |
-          cmake dlib/test -B build
+          cmake dlib/test -B build ${{ matrix.configure_extra }}
 
       - name: Build just tests
         run: cmake --build build --config Release --target dtest --parallel 4

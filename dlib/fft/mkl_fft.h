@@ -25,11 +25,11 @@ namespace dlib
 
 //----------------------------------------------------------------------------------------------------------------
 
-        constexpr auto check_status = [](auto s)
+        inline void check_status(MKL_LONG s)
         {
             if(s != 0 && !DftiErrorClass(s, DFTI_NO_ERROR))
                 throw std::runtime_error(DftiErrorMessage(s));
-        };
+        }
 
 //----------------------------------------------------------------------------------------------------------------
 
