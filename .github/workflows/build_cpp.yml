@@ -222,6 +222,7 @@ jobs:
           - name: windows-latest-mkl
             os                    : windows-latest
             build_mkl             : true
+            build_tests           : true
             build_blas_bindings   : true
 
     steps:
@@ -267,6 +268,10 @@ jobs:
           curl -L -o openblas.zip https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.30/OpenBLAS-0.3.30-x64.zip
           powershell -Command "Expand-Archive -Path openblas.zip -DestinationPath 'C:\Program Files (x86)\openblas' -Force"
 
+      - name: Add OpenBLAS to PATH
+        if: ${{ matrix.build_openblas }}
+        run: echo 'C:\Program Files (x86)\openblas\bin' >> $GITHUB_PATH
+
       - name: Configure tests
         if: ${{ matrix.build_tests }}
         run: cmake dlib/test -B build ${{ matrix.configure_extra }}
@@ -292,4 +297,5 @@ jobs:
         run: build_blas_bindings/Debug/dtest --runall -q
 
       - name: Build ancillary tools
+        if: ${{ matrix.build_tests }}
         run: cmake --build build --config Release --target imglab htmlify dtoc --parallel 4
