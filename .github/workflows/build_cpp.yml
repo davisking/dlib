@@ -216,7 +216,7 @@ jobs:
           - name: windows-latest-openblas
             os              : windows-latest
             build_openblas  : true
-            configure_extra : -DCMAKE_PREFIX_PATH="C:Program Files (x86)/openblas"
+            configure_extra : -DCMAKE_PREFIX_PATH="C:/Program Files (x86)/openblas"
 
           - name: windows-latest-mkl
             os              : windows-latest
