@@ -216,13 +216,13 @@ jobs:
           - name: windows-latest-openblas
             os                    : windows-latest
             build_openblas        : true
+            build_tests           : true
             build_blas_bindings   : true
             configure_extra       : -DCMAKE_PREFIX_PATH="C:/Program Files (x86)/openblas"
 
           - name: windows-latest-mkl
             os                    : windows-latest
             build_mkl             : true
-            build_tests           : true
             build_blas_bindings   : true
 
     steps:
@@ -249,28 +249,13 @@ jobs:
         run: |
           curl -L -o base.exe https://registrationcenter-download.intel.com/akdlm/IRC_NAS/f5881e61-dcdc-40f1-9bd9-717081ac623c/intel-oneapi-base-toolkit-2025.2.1.46_offline.exe
           ./base.exe -a --silent --eula accept
-
-      - name: Prepare OpenBLAS dir for cache restore
-        if: ${{ matrix.build_openblas}}
-        run: mkdir -p "C:/Program Files (x86)/openblas"
-  
-      - name: Cache OpenBLAS (Windows)
-        if: ${{ matrix.build_openblas}}
-        uses: actions/cache@v3
-        id: cache-openblas
-        with:
-          path: C:/Program Files (x86)/openblas
-          key: openblas_try0
   
       - name: Download OpenBLAS
-        if: ${{ matrix.build_openblas && (steps.cache-openblas.outputs.cache-hit != 'true') }}
+        if: ${{ matrix.build_openblas}}
         run: |
           curl -L -o openblas.zip https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.30/OpenBLAS-0.3.30-x64.zip
           powershell -Command "Expand-Archive -Path openblas.zip -DestinationPath 'C:\Program Files (x86)\openblas' -Force"
-
-      - name: Add OpenBLAS to PATH
-        if: ${{ matrix.build_openblas }}
-        run: echo 'C:\Program Files (x86)\openblas\bin' >> $GITHUB_PATH
+          echo 'C:\Program Files (x86)\openblas\bin' >> $GITHUB_PATH
 
       - name: Configure tests
         if: ${{ matrix.build_tests }}
