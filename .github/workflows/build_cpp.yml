@@ -223,6 +223,7 @@ jobs:
           - name: windows-latest-mkl
             os                    : windows-latest
             build_mkl             : true
+            build_tests           : true
             build_blas_bindings   : true
 
     steps:
