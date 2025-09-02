@@ -4505,7 +4505,7 @@ void test_multm_prev()
         trainer.train(samples, labels);
         const auto error_after = compute_error();
 
-        DLIB_TEST_MSG(error_after < error_before && error_after == 0, "multibinary_log error increased after training");
+        DLIB_TEST_MSG(error_after < error_before && error_after == 0, "multibinary_log error increased after training error_after = " << error_after << " error_before " << error_before);
     }
 
 // ----------------------------------------------------------------------------------------
