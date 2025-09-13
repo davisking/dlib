@@ -5720,7 +5720,7 @@ namespace dlib
             max_steps_(max_steps),
             halt_threshold_(0.99f),     // theta in Graves' notation
             ponder_penalty_(0.01f),     // lambda (ponder cost weight)
-            enable_depth_scaling_(true),
+            enable_depth_scaling_(false),
             batch_size_(0),
             seq_len_(0),
             d_model_(0),
