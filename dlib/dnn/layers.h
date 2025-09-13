@@ -5720,7 +5720,7 @@ namespace dlib
             max_steps_(max_steps),
             halt_threshold_(0.99f),     // theta in Graves' notation
             ponder_penalty_(0.01f),     // lambda (ponder cost weight)
-            enable_depth_scaling_(false),
+            enable_depth_scaling_(true),
             batch_size_(0),
             seq_len_(0),
             d_model_(0),
@@ -5857,8 +5857,7 @@ namespace dlib
                     halting_probs_, logits_, input, params,
                     batch_size_, seq_len_, feature_dim_);
 
-                // CRITICAL: Capture effective weights before state update
-                // This ensures numerical precision in backward pass
+                // Capture effective weights before state update
                 const float* p_halt = halting_probs_.host();
                 const float* cum_halt = cum_halt_ptr;
                 const float* remainders = remainders_ptr;
@@ -5910,10 +5909,6 @@ namespace dlib
         template <typename SUBNET>
         void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad) {                     
             tensor& input_grad = sub.get_gradient_input();
-
-            // Propagate gradients to input using instrumented effective weights
-            // This approach ensures numerical precision by using the exact weights
-            // computed during the forward pass, avoiding reconstruction errors
 
             const float* grad_in = gradient_input.host();
             const float* eff_weights = true_effective_weights_.host();

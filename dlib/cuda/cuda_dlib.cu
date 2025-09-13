@@ -2749,23 +2749,35 @@ namespace dlib
             size_t feature_dim
         )
         {
-            for (auto pos : grid_stride_range(0, batch_size * seq_len))
+            const long total_positions = batch_size * seq_len;
+
+            for (auto pos : grid_stride_range_y(0, total_positions))
+                for (auto i : grid_stride_range(0, 1))
+                    logits[pos] = b_halt;
+            __syncthreads();
+
+            for (auto pos : grid_stride_range_y(0, total_positions))
             {
-                const size_t n = pos / seq_len;
-                const size_t s = pos % seq_len;
+                const long n = pos / seq_len;
+                const long s = pos % seq_len;
 
-                float logit = b_halt;
+                float temp = 0;
+                for (auto feat_idx : grid_stride_range(0, feature_dim))
+                {
+                    const long c = feat_idx / d_model;
+                    const long d = feat_idx % d_model;
 
-                for (size_t c = 0; c < num_channels; ++c) {
-                    for (size_t d = 0; d < d_model; ++d) {
-                        const size_t in_idx = ((n * num_channels + c) * seq_len + s) * d_model + d;
-                        const size_t weight_idx = c * d_model + d;
-                        logit += input_data[in_idx] * W_halt[weight_idx];
-                    }
+                    const long in_idx = ((n * num_channels + c) * seq_len + s) * d_model + d;
+                    temp += input_data[in_idx] * W_halt[feat_idx];
                 }
 
-                logits[pos] = logit;
-                halt_probs[pos] = 1.0f / (1.0f + ::expf(-logit));
+                warp_reduce_atomic_add(logits[pos], temp);
+            }
+            __syncthreads();
+
+            for (auto pos : grid_stride_range(0, total_positions))
+            {
+                halt_probs[pos] = 1.0f / (1.0f + expf(-logits[pos]));
             }
         }
 
@@ -2783,8 +2795,11 @@ namespace dlib
             const long d_model = feature_dim / input_data.k();
             const long num_channels = input_data.k();
 
+            halt_probs.set_size(total_positions, 1, 1, 1);
+            logits.set_size(total_positions, 1, 1, 1);
+
             launch_kernel(_cuda_compute_act_halt_probabilities,
-                max_jobs(total_positions),
+                max_jobs(feature_dim, total_positions),
                 halt_probs.device(),
                 logits.device(),
                 input_data.device(),
@@ -2814,7 +2829,8 @@ namespace dlib
         {
             for (auto pos : grid_stride_range(0, batch_size * seq_len))
             {
-                if (cumulative_halting[pos] < halt_threshold) {
+                if (cumulative_halting[pos] < halt_threshold)
+                {
                     const size_t n = pos / seq_len;
                     const size_t s = pos % seq_len;
 
@@ -2930,17 +2946,21 @@ namespace dlib
             float scale_factor
         )
         {
-            for (auto pos : grid_stride_range(0, batch_size * seq_len))
-            {
-                const float scale = 1.0f + scale_factor * (n_steps[pos] / max_steps);
-                const size_t n = pos / seq_len;
-                const size_t s = pos % seq_len;
+            const long total_positions = batch_size * seq_len;
+            const long feature_dim = num_channels * d_model;
 
-                for (size_t c = 0; c < num_channels; ++c) {
-                    for (size_t d = 0; d < d_model; ++d) {
-                        const size_t idx = ((n * num_channels + c) * seq_len + s) * d_model + d;
-                        gradients[idx] *= scale;
-                    }
+            for (auto pos : grid_stride_range_y(0, total_positions))
+            {
+                const long n = pos / seq_len;
+                const long s = pos % seq_len;
+                const float scale = 1.0f + scale_factor * (n_steps[pos] / max_steps);
+
+                for (auto feat_idx : grid_stride_range(0, feature_dim))
+                {
+                    const long c = feat_idx / d_model;
+                    const long d = feat_idx % d_model;
+                    const long idx = ((n * num_channels + c) * seq_len + s) * d_model + d;
+                    gradients[idx] *= scale;
                 }
             }
         }
@@ -2956,8 +2976,11 @@ namespace dlib
             float scale_factor
         )
         {
+            const long total_positions = batch_size * seq_len;
+            const long feature_dim = num_channels * d_model;
+
             launch_kernel(_cuda_apply_act_depth_scaling,
-                max_jobs(batch_size * seq_len),
+                max_jobs(feature_dim, total_positions),
                 gradients.device(),
                 n_steps.device(),
                 batch_size,

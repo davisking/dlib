@@ -3238,7 +3238,6 @@ namespace dlib
             const long d_model = feature_dim / input_data.k();
             const long num_channels = input_data.k();
 
-            #pragma omp parallel for
             for (long pos = 0; pos < batch_size * seq_len; ++pos) {
                 const long n = pos / seq_len;
                 const long s = pos % seq_len;
@@ -3281,7 +3280,6 @@ namespace dlib
             float* remain = remainders.host();
             float* steps = n_steps.host();
 
-            #pragma omp parallel for
             for (long pos = 0; pos < batch_size * seq_len; ++pos) {
                 if (cum_halt[pos] < halt_threshold) {
                     const long n = pos / seq_len;
@@ -3319,7 +3317,6 @@ namespace dlib
             const float* remain = remainders.host();
             float* out_ptr = output.host();
 
-            #pragma omp parallel for
             for (long pos = 0; pos < batch_size * seq_len; ++pos) {
                 float r = remain[pos];
                 if (r > 1e-6f) {
@@ -3350,7 +3347,6 @@ namespace dlib
             const float* steps = n_steps.host();
             float* grad_ptr = gradients.host();
 
-            #pragma omp parallel for
             for (long pos = 0; pos < batch_size * seq_len; ++pos)
             {
                 const float scale = 1.0f + scale_factor * (steps[pos] / max_steps);
