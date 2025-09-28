@@ -4701,6 +4701,125 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <long max_steps>
+    class adaptive_computation_time_
+    {
+        /*!
+            REQUIREMENTS ON TEMPLATE ARGUMENTS
+                - max_steps > 0
+
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above. It implements Adaptive Computation Time (ACT) following
+                Graves (2016) "Adaptive Computation Time for Recurrent Neural Networks"
+                (arXiv:1603.08983).
+
+                ACT allows the network to adaptively determine how many computational steps
+                to perform for each position in the input sequence, spending more computation
+                on difficult parts while quickly processing easier parts.
+
+            MATHEMATICAL FOUNDATION:
+                Core ACT Algorithm:
+                - For each sequence position t, perform up to max_steps computational steps
+                - At step n, compute halting probability: p_t^n = sigmoid(W_halt^T * s_t^n + b_halt)
+                - Cumulative halting probability: h_t^n = sum_{i=1 to n} p_t^i
+                - Stop when h_t^n >= theta (threshold, typically 0.99)
+                - Final output: y_t = sum_{n=1 to N(t)} alpha_t^n * y_hat_t^n
+
+                Where alpha_t^n (effective weight) is computed as:
+                - alpha_t^n = p_t^n * rho_t^{n-1} for intermediate steps
+                - alpha_t^{N(t)} = 1 - h_t^{N(t)-1} (remainder for final step)
+                - rho_t^n = 1 - h_t^n (remaining probability mass)
+
+                PONDER COST (Regularization):
+                - R(x) = (1/T) * sum_t (N(t) + rho_t^{N(t)})
+                - Total loss: L = L_task + lambda * R(x)
+                - lambda is controlled by get_ponder_penalty()
+
+            IMPLEMENTATION DETAILS:
+                - Input/Output tensors have identical dimensions
+                - Learnable parameters: W_halt in R^{d x k}, b_halt in R
+                - State tracking per position: cumulative halting, remainders, step counts
+                - Early termination when all positions halt
+        !*/
+
+    public:
+        adaptive_computation_time_();
+        /*!
+            ensures
+                - #get_max_steps() == max_steps
+                - #get_halt_threshold() == 0.99f
+                - #get_ponder_penalty() == 0.01f
+        !*/
+
+        // Configuration accessors
+        long get_max_steps() const;
+        float get_halt_threshold() const;
+        float get_ponder_penalty() const;
+
+        void set_halt_threshold(float threshold);
+        /*!
+            requires
+                - 0 < threshold <= 1.0f
+            ensures
+                - #get_halt_threshold() == threshold
+        !*/
+
+        void set_ponder_penalty(float penalty);
+        /*!
+            requires
+                - penalty >= 0
+            ensures
+                - #get_ponder_penalty() == penalty
+        !*/
+
+        // Runtime statistics
+        float get_ponder_cost() const;
+        /*!
+            ensures
+                - returns the ponder cost R(x) from the most recent forward pass
+                - value represents average computational cost per position
+        !*/
+
+        float get_average_steps() const;
+        /*!
+            ensures
+                - returns the average number of computation steps per position
+                - value is between 1.0 and max_steps
+        !*/
+
+        // Layer interface
+        template <typename SUBNET> void setup(const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
+
+        friend void serialize(const adaptive_computation_time_& item, std::ostream& out);
+        friend void deserialize(adaptive_computation_time_& item, std::istream& in);
+        friend std::ostream& operator<<(std::ostream& out, const adaptive_computation_time_& item);
+        friend void to_xml(const adaptive_computation_time_& item, std::ostream& out);
+        /*!
+            provides serialization support and output operators
+        !*/
+    };
+
+    template <long max_steps, typename SUBNET>
+    using adaptive_computation_time = add_layer<adaptive_computation_time_<max_steps>, SUBNET>;
+
+    template <typename SUBNET>
+    using act = add_layer<adaptive_computation_time_<8>, SUBNET>;
+
+    template <typename SUBNET>
+    using act4 = add_layer<adaptive_computation_time_<4>, SUBNET>;
+
+    template <typename SUBNET>
+    using act16 = add_layer<adaptive_computation_time_<16>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_LAYERS_ABSTRACT_H_

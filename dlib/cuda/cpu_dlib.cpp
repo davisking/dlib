@@ -3219,6 +3219,153 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        void compute_act_halt_probabilities(
+            resizable_tensor& halt_probs,
+            resizable_tensor& logits,
+            const tensor& input_data,
+            const tensor& halt_params,
+            long batch_size,
+            long seq_len,
+            long feature_dim
+        )
+        {
+            const float* in_ptr = input_data.host();
+            const float* W_halt = halt_params.host();
+            const float b_halt = halt_params.host()[feature_dim];
+            float* logits_ptr = logits.host();
+            float* halt_probs_ptr = halt_probs.host();
+
+            const long d_model = feature_dim / input_data.k();
+            const long num_channels = input_data.k();
+
+            for (long pos = 0; pos < batch_size * seq_len; ++pos) {
+                const long n = pos / seq_len;
+                const long s = pos % seq_len;
+
+                float logit = b_halt;
+
+                for (long c = 0; c < num_channels; ++c) {
+                    for (long d = 0; d < d_model; ++d) {
+                        const long in_idx = ((n * num_channels + c) * seq_len + s) * d_model + d;
+                        const long weight_idx = c * d_model + d;
+                        logit += in_ptr[in_idx] * W_halt[weight_idx];
+                    }
+                }
+
+                logits_ptr[pos] = logit;
+
+                halt_probs_ptr[pos] = 1.0f / (1.0f + std::exp(-logit));
+            }
+        }
+
+        void update_act_state(
+            resizable_tensor& output,
+            const tensor& input_data,
+            const tensor& halt_probs,
+            resizable_tensor& cumulative_halting,
+            resizable_tensor& remainders,
+            resizable_tensor& n_steps,
+            long batch_size,
+            long seq_len,
+            long d_model,
+            long num_channels,
+            float halt_threshold,
+            long current_step
+        )
+        {
+            const float* in_ptr = input_data.host();
+            const float* p_halt = halt_probs.host();
+            float* out_ptr = output.host();
+            float* cum_halt = cumulative_halting.host();
+            float* remain = remainders.host();
+            float* steps = n_steps.host();
+
+            for (long pos = 0; pos < batch_size * seq_len; ++pos) {
+                if (cum_halt[pos] < halt_threshold) {
+                    const long n = pos / seq_len;
+                    const long s = pos % seq_len;
+
+                    float p = p_halt[pos];
+                    float r = remain[pos];
+                    float effective = std::min(p * r, halt_threshold - cum_halt[pos]);
+
+                    cum_halt[pos] += effective;
+                    remain[pos] -= effective;
+                    steps[pos] = static_cast<float>(current_step + 1);
+
+                    for (long c = 0; c < num_channels; ++c) {
+                        for (long d = 0; d < d_model; ++d) {
+                            const long idx = ((n * num_channels + c) * seq_len + s) * d_model + d;
+                            out_ptr[idx] += effective * in_ptr[idx];
+                        }
+                    }
+                }
+            }
+        }
+
+        void finalize_act_output(
+            resizable_tensor& output,
+            const tensor& input_data,
+            const tensor& remainders,
+            long batch_size,
+            long seq_len,
+            long d_model,
+            long num_channels
+        )
+        {
+            const float* in_ptr = input_data.host();
+            const float* remain = remainders.host();
+            float* out_ptr = output.host();
+
+            for (long pos = 0; pos < batch_size * seq_len; ++pos) {
+                float r = remain[pos];
+                if (r > 1e-6f) {
+                    const long n = pos / seq_len;
+                    const long s = pos % seq_len;
+
+                    for (long c = 0; c < num_channels; ++c) {
+                        for (long d = 0; d < d_model; ++d) {
+                            const long idx = ((n * num_channels + c) * seq_len + s) * d_model + d;
+                            out_ptr[idx] += r * in_ptr[idx];
+                        }
+                    }
+                }
+            }
+        }
+
+        void apply_act_depth_scaling(
+            tensor& gradients,
+            const tensor& n_steps,
+            long batch_size,
+            long seq_len,
+            long d_model,
+            long num_channels,
+            float max_steps,
+            float scale_factor
+        )
+        {
+            const float* steps = n_steps.host();
+            float* grad_ptr = gradients.host();
+
+            for (long pos = 0; pos < batch_size * seq_len; ++pos)
+            {
+                const float scale = 1.0f + scale_factor * (steps[pos] / max_steps);
+                const long n = pos / seq_len;
+                const long s = pos % seq_len;
+
+                for (long c = 0; c < num_channels; ++c)
+                {
+                    for (long d = 0; d < d_model; ++d)
+                    {
+                        const long idx = ((n * num_channels + c) * seq_len + s) * d_model + d;
+                        grad_ptr[idx] *= scale;
+                    }
+                }
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+    
     } 
 }
 
