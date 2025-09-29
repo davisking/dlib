@@ -507,7 +507,7 @@ namespace
         using namespace dlib::tt;
         print_spinner();
         resizable_tensor src, gamma, beta, dest, dest2, dest3, means, vars, gradient_input;
-        src = matrix_cast<float>(gaussian_randm(5,5, 0));
+        src = matrix_cast<float>(gaussian_randm(5,5, 0) + 10);
         gamma = matrix_cast<float>(gaussian_randm(1,5, 1));
         beta = matrix_cast<float>(gaussian_randm(1,5, 2));
         gradient_input = matrix_cast<float>(gaussian_randm(5,5, 3));
@@ -593,7 +593,7 @@ namespace
         print_spinner();
         resizable_tensor src(5,5,4,4), gamma, beta, dest, dest2, dest3, means, vars, gradient_input(5,5,4,4);
         tt::tensor_rand rnd;
-        rnd.fill_gaussian(src);
+        rnd.fill_gaussian(src,10);
         rnd.fill_gaussian(gradient_input);
         gamma = matrix_cast<float>(gaussian_randm(1,5, 1));
         beta = matrix_cast<float>(gaussian_randm(1,5, 2));
@@ -4513,13 +4513,50 @@ void test_multm_prev()
 
         for (size_t i = 0; i < labels.size(); ++i)
         {
-            matrix<float, 0, 1> x = matrix_cast<float>(randm(dims, 1)) * rnd.get_double_in_range(1, 9);
-            const auto norm = sqrt(sum(squared(x)));
-            if (norm < 3)
+            const double class_boundary_1 = 3.0;
+            const double class_boundary_2 = 6.0;
+
+            const double desired_margin = 0.1;
+
+            const auto get_random_matrix = [&rnd, dims]()
+            {
+                return matrix<float, 0, 1>(matrix_cast<float>(randm(dims, 1)) * rnd.get_double_in_range(1, 9));
+            };
+
+            const auto get_distance_from_nearest_class_boundary = [class_boundary_1, class_boundary_2](double norm)
+            {
+                return std::min(
+                    std::abs(norm - class_boundary_1),
+                    std::abs(norm - class_boundary_2)
+                );
+            };
+
+            auto x = get_random_matrix();
+            auto norm = sqrt(sum(squared(x)));
+            auto distance_from_nearest_class_boundary = get_distance_from_nearest_class_boundary(norm);
+
+            // Try again if the newly generated sample is very close to either of the class boundaries
+            int retry_counter = 0;
+            const int max_retry_counter = 10;
+            while (distance_from_nearest_class_boundary < desired_margin && ++retry_counter <= max_retry_counter)
+            {
+                const auto new_x = get_random_matrix();
+                const auto new_norm = sqrt(sum(squared(new_x)));
+                const auto new_distance_from_nearest_class_boundary = get_distance_from_nearest_class_boundary(new_norm);
+
+                if (new_distance_from_nearest_class_boundary > distance_from_nearest_class_boundary)
+                {
+                    x = new_x;
+                    norm = new_norm;
+                    distance_from_nearest_class_boundary = new_distance_from_nearest_class_boundary;
+                }
+            }
+
+            if (norm < class_boundary_1)
             {
                 labels[i][0] = 1.f;
             }
-            else if (3 <= norm && norm < 6)
+            else if (class_boundary_1 <= norm && norm < class_boundary_2)
             {
                 labels[i][0] = 1.f;
                 labels[i][1] = 1.f;
