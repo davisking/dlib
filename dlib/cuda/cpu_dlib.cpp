@@ -816,37 +816,38 @@ namespace dlib
             dest.copy_size(src);
             means.set_size(1, src.k(), src.nr(), src.nc());
             invstds.set_size(1, src.k(), src.nr(), src.nc());
+            running_means.set_size(1, src.k(), src.nr(), src.nc());
+            running_variances.set_size(1, src.k(), src.nr(), src.nc());
 
             // first compute means and invstds
-            means = 0;
-            invstds = 0;
             const auto p_invstds = invstds.host();
             const auto p_means = means.host();
             auto p_src = src.host();
+            const auto rvar = running_variances.host();
             const long num = src.k()*src.nr()*src.nc();
-            // compute means, and sum of squares
+
+            // This scale makes the running variances unbiased.
+            const double scale = (src.num_samples())/(src.num_samples()-1.0);
+
+            // Apply Welford's algorithm to improve numerical stability
             for (long i = 0; i < num; ++i)
             {
+                double mean = 0.0;
+                double M2 = 0.0;
+
                 for (long n = 0; n < src.num_samples(); ++n)
                 {
                     float val = p_src[n*num+i];
-                    p_means[i] += val;
-                    p_invstds[i] += val*val;
+                    const double delta1 = val - mean;
+                    mean += delta1 / (n + 1);
+                    const double delta2 = val - mean;
+                    M2 += delta1 * delta2;
                 }
-            }
-            means /= src.num_samples();
-            invstds /= src.num_samples();
-            // copy data back to host
-            invstds.host(); means.host();
 
-            // compute variances 
-            running_variances.copy_size(invstds);
-            auto rvar = running_variances.host();
-            // This scale makes the running variances unbiased.
-            const double scale = (src.num_samples())/(src.num_samples()-1.0);
-            for (long i = 0; i < num; ++i)
-            {
-                auto actual_var = p_invstds[i] - p_means[i]*p_means[i];
+                p_means[i] = mean;
+
+                const auto actual_var = (src.num_samples() > 1) ? (M2 / src.num_samples()) : 0.0;
+
                 if (averaging_factor == 1)
                     rvar[i] = scale*actual_var;
                 else
@@ -855,7 +856,6 @@ namespace dlib
                 p_invstds[i] = 1.0f/std::sqrt(actual_var + eps);
             }
 
-            p_src = src.host();
             auto p_dest = dest.host();
             const auto p_gamma = gamma.host();   
             const auto p_beta = beta.host();   
@@ -871,7 +871,6 @@ namespace dlib
             }
 
             // now keep track of the running means 
-            running_means.copy_size(means);
             if (averaging_factor != 1)
                 running_means = (1-averaging_factor)*mat(running_means) + averaging_factor*mat(means);
             else
@@ -1083,52 +1082,56 @@ namespace dlib
             dest.copy_size(src);
             means.set_size(1, src.k());
             invstds.set_size(1, src.k());
+            running_means.set_size(1, src.k());
+            running_variances.set_size(1, src.k());
 
             // first compute means and invstds
-            means = 0;
-            invstds = 0;
             const auto p_invstds = invstds.host();
             const auto p_means = means.host();
             const auto p_gamma = gamma.host();   
             const auto p_beta = beta.host();   
             auto p_src = src.host();
-            const long num = src.nr()*src.nc();
-            // compute means, and sum of squares
-            for (long n = 0; n < src.num_samples(); ++n)
-            {
-                for (long k = 0; k < src.k(); ++k)
-                {
-                    for (long i = 0; i < num; ++i)
-                    {
-                        p_means[k] += *p_src;
-                        p_invstds[k] += (*p_src)*(*p_src);
-                        ++p_src;
-                    }
-                }
-            }
-            means /= src.num_samples()*num;
-            invstds /= src.num_samples()*num;
-            // copy data back to host
-            invstds.host(); means.host();
-
-            p_src = src.host();
-            // compute variances 
-            running_variances.copy_size(invstds);
             auto rvar = running_variances.host();
+            const long num = src.nr()*src.nc();
+
             // This scale makes the running variances unbiased.
             const double scale = (src.num_samples()*num)/(src.num_samples()*num-1.0);
+
+            // Apply Welford's algorithm to improve numerical stability
             for (long k = 0; k < src.k(); ++k)
             {
-                float actual_var = p_invstds[k] - p_means[k]*p_means[k];
+                double mean = 0.0;
+                double M2 = 0.0;
+                long count = 0;
+
+                for (long n = 0; n < src.num_samples(); ++n)
+                {
+                    long start_index = tensor_index(src, n, k, 0, 0);
+                    auto p = p_src + start_index;
+
+                    for (long i = 0; i < num; ++i)
+                    {
+                        const float val = *p;
+                        const double delta1 = val - mean;
+                        mean += delta1 / (count + 1);
+                        const double delta2 = val - mean;
+                        M2 += delta1 * delta2;
+                        ++count;
+                        ++p;
+                    }
+                }
+
+                const auto actual_var = (count > 1) ? (M2 / count) : 0.0;
+
                 if (averaging_factor == 1)
                     rvar[k] = scale*actual_var;
                 else
                     rvar[k] = (1-averaging_factor)*rvar[k] + scale*averaging_factor*actual_var;
 
+                p_means[k] = mean;
                 p_invstds[k] = 1.0f/std::sqrt(actual_var + eps);
             }
 
-            p_src = src.host();
             auto p_dest = dest.host();
             for (long n = 0; n < src.num_samples(); ++n)
             {
@@ -1145,7 +1148,6 @@ namespace dlib
             }
 
             // now keep track of the running means 
-            running_means.copy_size(means);
             if (averaging_factor != 1)
                 running_means = (1-averaging_factor)*mat(running_means) + averaging_factor*mat(means);
             else

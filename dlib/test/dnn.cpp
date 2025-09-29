@@ -507,7 +507,7 @@ namespace
         using namespace dlib::tt;
         print_spinner();
         resizable_tensor src, gamma, beta, dest, dest2, dest3, means, vars, gradient_input;
-        src = matrix_cast<float>(gaussian_randm(5,5, 0));
+        src = matrix_cast<float>(gaussian_randm(5,5, 0) + 10);
         gamma = matrix_cast<float>(gaussian_randm(1,5, 1));
         beta = matrix_cast<float>(gaussian_randm(1,5, 2));
         gradient_input = matrix_cast<float>(gaussian_randm(5,5, 3));
@@ -593,7 +593,7 @@ namespace
         print_spinner();
         resizable_tensor src(5,5,4,4), gamma, beta, dest, dest2, dest3, means, vars, gradient_input(5,5,4,4);
         tt::tensor_rand rnd;
-        rnd.fill_gaussian(src);
+        rnd.fill_gaussian(src,10);
         rnd.fill_gaussian(gradient_input);
         gamma = matrix_cast<float>(gaussian_randm(1,5, 1));
         beta = matrix_cast<float>(gaussian_randm(1,5, 2));
