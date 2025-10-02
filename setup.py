@@ -249,7 +249,7 @@ setup(
     author_email='davis@dlib.net',
     url='https://github.com/davisking/dlib',
     license='Boost Software License',
-    ext_modules=[CMakeExtension('_dlib_pybind11','tools/python')],
+    # ext_modules=[CMakeExtension('_dlib_pybind11','tools/python')],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
     #install_requires=['cmake'], # removed because the pip cmake package is busted, maybe someday it will be usable.
