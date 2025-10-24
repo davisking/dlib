@@ -586,6 +586,15 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
+        void apply_rotary_positional_embedding(
+            bool is_backward,
+            resizable_tensor& data,
+            const resizable_tensor& cos_cache,
+            const resizable_tensor& sin_cache
+        );
+
+    // -----------------------------------------------------------------------------------
+
         class pooling
         {
         public:

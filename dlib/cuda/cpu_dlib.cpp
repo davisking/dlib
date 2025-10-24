@@ -3367,6 +3367,78 @@ namespace dlib
         }
 
     // ------------------------------------------------------------------------------------
+
+        void apply_rotary_positional_embedding(
+            bool is_backward,
+            resizable_tensor& data,
+            const resizable_tensor& cos_cache,
+            const resizable_tensor& sin_cache)
+        {
+            const long batch_size = data.num_samples();
+            const long num_heads = data.k();
+            const long seq_len = data.nr();
+            const long d_head = data.nc();
+            const long half_d = d_head / 2;
+
+            DLIB_CASSERT(cos_cache.nr() == seq_len, "cos_cache rows must match seq_len");
+            DLIB_CASSERT(cos_cache.nc() == half_d, "cos_cache cols must be d_head/2");
+            DLIB_CASSERT(sin_cache.nr() == seq_len, "sin_cache rows must match seq_len");
+            DLIB_CASSERT(sin_cache.nc() == half_d, "sin_cache cols must be d_head/2");
+
+            const bool is_odd = (d_head % 2 != 0);
+            const long rot_dim = is_odd ? d_head - 1 : d_head;
+
+            float* data_ptr = data.host();
+            const float* cos_ptr = cos_cache.host();
+            const float* sin_ptr = sin_cache.host();
+
+            const long head_stride = seq_len * d_head;
+
+            // Parallelize over batch and heads
+            parallel_for(0, batch_size * num_heads, [&](long bh_idx)
+            {
+                const long batch_idx = bh_idx / num_heads;
+                const long head_idx = bh_idx % num_heads;
+
+                float* x_ptr = data_ptr + (batch_idx * num_heads + head_idx) * head_stride;
+
+                // Process each position in the sequence
+                for (long pos = 0; pos < seq_len; ++pos)
+                {
+                    const float* cos_row = cos_ptr + pos * half_d;
+                    const float* sin_row = sin_ptr + pos * half_d;
+                    float* pos_ptr = x_ptr + pos * d_head;
+
+                    // Apply rotation to each pair of dimensions
+                    for (long i = 0; i < rot_dim; i += 2)
+                    {
+                        const long pair_idx = i / 2;
+                        const float c = cos_row[pair_idx];
+                        const float s = sin_row[pair_idx];
+
+                        const float x0 = pos_ptr[i];
+                        const float x1 = pos_ptr[i + 1];
+
+                        if (!is_backward)
+                        {
+                            // Forward: [cos -sin] [x0]
+                            //          [sin  cos] [x1]
+                            pos_ptr[i]      = x0 * c - x1 * s;
+                            pos_ptr[i + 1]  = x0 * s + x1 * c;
+                        }
+                        else
+                        {
+                            // Backward (inverse rotation): [cos  sin] [x0]
+                            //                              [-sin cos] [x1]
+                            pos_ptr[i]      = x0 * c + x1 * s;
+                            pos_ptr[i + 1]  = -x0 * s + x1 * c;
+                        }
+                    }
+                }
+            });
+        }
+
+    // ------------------------------------------------------------------------------------
     
     } 
 }

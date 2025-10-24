@@ -21,6 +21,7 @@
 //             this seems to be a trial-and-error process.
 #ifndef __INTELLISENSE__
 #include "dnn/layers.h"
+#include "dnn/transformer.h"
 #endif // __INTELLISENSE__
 
 #include "dnn/loss.h"

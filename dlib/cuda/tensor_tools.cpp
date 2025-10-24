@@ -1498,6 +1498,22 @@ namespace dlib { namespace tt
     
 // ----------------------------------------------------------------------------------------
 
+    void apply_rotary_positional_embedding(
+        bool is_backward,
+        resizable_tensor& data,
+        const resizable_tensor& cos_cache,
+        const resizable_tensor& sin_cache
+    )
+    {
+#ifdef DLIB_USE_CUDA
+		cuda::apply_rotary_positional_embedding(is_backward, data, cos_cache, sin_cache);
+#else
+        cpu::apply_rotary_positional_embedding(is_backward, data, cos_cache, sin_cache);
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }}
 
 #endif // DLIB_TeNSOR_TOOLS_CPP_

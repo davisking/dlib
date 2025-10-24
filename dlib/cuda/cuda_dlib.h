@@ -658,6 +658,15 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        void apply_rotary_positional_embedding(
+            bool is_backward,
+            tensor& data,
+            const tensor& cos_cache,
+            const tensor& sin_cache
+        );
+
+    // ----------------------------------------------------------------------------------------
+
         class compute_loss_binary_log_per_pixel
         {
             /*!

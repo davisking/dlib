@@ -58,218 +58,6 @@ using namespace dlib;
 
 namespace dlib
 {
-    /*!
-        @class rotary_positional_embedding_
-        @brief Implements Rotary Positional Embeddings (RoPE) for transformers
-
-        This layer applies rotary positional embeddings to queries and keys in
-        self-attention layers, providing relative positional information without
-        absolute position embeddings.
-
-        The implementation follows the RoPE formulation from [2], where positions
-        are encoded through rotation matrices applied to pairs of dimensions.
-    !*/
-    class rotary_positional_embedding_ {
-    public:
-        explicit rotary_positional_embedding_() = default;
-
-        template <typename SUBNET>
-        void setup(const SUBNET& sub) {
-            // Precompute the rotation angles and their trigonometric values
-            seq_len = sub.get_output().nr();
-            d_head = sub.get_output().nc();
-            compute_rotation_angles();
-            precompute_trigonometric_values();
-        }
-
-        template <typename SUBNET>
-        void forward(const SUBNET& sub, resizable_tensor& output) {
-            const tensor& input = sub.get_output();
-            output.copy_size(input);
-            tt::copy_tensor(false, output, 0, input, 0, input.k());
-
-            // Apply rotary embedding to the output
-            apply_rotary_embedding(output);
-        }
-
-        template <typename SUBNET>
-        void backward(
-            const tensor& gradient_input,
-            SUBNET& sub,
-            tensor& params_grad
-        ) {
-            tensor& prev = sub.get_gradient_input();
-            resizable_tensor grad_output;
-            grad_output.copy_size(gradient_input);
-            tt::copy_tensor(false, grad_output, 0, gradient_input, 0, gradient_input.k());
-
-            // Apply the inverse rotation to the gradient (transpose of the rotation matrix)
-            apply_rotary_embedding(grad_output, true);
-            tt::copy_tensor(true, prev, 0, grad_output, 0, grad_output.k());
-        }
-
-        const tensor& get_layer_params() const { return params; }
-        tensor& get_layer_params() { return params; }
-
-        friend void serialize(const rotary_positional_embedding_& item, std::ostream& out) {
-            std::string version = "rotary_positional_embedding_";
-            dlib::serialize(version, out);
-            dlib::serialize(item.seq_len, out);
-            dlib::serialize(item.d_head, out);
-            dlib::serialize(item.angles, out);
-            dlib::serialize(item.cos_values, out);
-            dlib::serialize(item.sin_values, out);
-        }
-
-        friend void deserialize(rotary_positional_embedding_& item, std::istream& in) {
-            std::string version;
-            dlib::deserialize(version, in);
-            if (version != "rotary_positional_embedding_")
-                throw serialization_error("Unexpected version found while deserializing rotary_positional_embedding_.");
-            dlib::deserialize(item.seq_len, in);
-            dlib::deserialize(item.d_head, in);
-            dlib::deserialize(item.angles, in);
-            dlib::deserialize(item.cos_values, in);
-            dlib::deserialize(item.sin_values, in);
-        }
-
-        friend std::ostream& operator<<(std::ostream& out, const rotary_positional_embedding_& item) {
-            out << "rotary_positional_embedding";
-            out << " (d_head=" << item.d_head << ", seq_len=" << item.seq_len << ")";
-            return out;
-        }
-
-        friend void to_xml(const rotary_positional_embedding_& item, std::ostream& out)
-        {
-            out << "<rotary_positional_embedding"
-                << " d_head='" << item.d_head << "'"
-                << " seq_len='" << item.seq_len << "'"
-                << "/>\n";
-        }
-
-    protected:
-        void compute_rotation_angles() {
-            // Following the original RoPE paper formulation
-            const float base = 10000.0f;
-            const long half_dim = d_head / 2;
-            angles.set_size(seq_len, half_dim);
-
-            for (long pos = 0; pos < seq_len; ++pos) {
-                for (long i = 0; i < half_dim; ++i) {
-                    float inv_freq = std::pow(base, -2.0f * (i + 0.5f) / d_head);
-                    angles(pos, i) = pos * inv_freq;
-                }
-            }
-        }
-
-        void precompute_trigonometric_values() {
-            // Precompute cos and sin for all angles
-            cos_values.set_size(angles.nr(), angles.nc());
-            sin_values.set_size(angles.nr(), angles.nc());
-
-            for (long i = 0; i < angles.size(); ++i) {
-                cos_values(i) = std::cos(angles(i));
-                sin_values(i) = std::sin(angles(i));
-            }
-        }
-
-        template <typename tensor_type>
-        void apply_rotary_embedding(
-            tensor_type& x,
-            bool is_backward = false
-        ) const {
-            DLIB_CASSERT(x.nc() == d_head, "Input dimension must match d_head param");
-            DLIB_CASSERT(x.nr() == seq_len, "Sequence length must match seq_len param");
-
-            const long batch_size = x.num_samples();
-            const long num_heads = x.k();
-            const bool is_odd = (d_head % 2 != 0);
-            const long rot_dim = is_odd ? d_head - 1 : d_head;
-            
-            auto* ptr = x.host();
-            const long stride = seq_len * d_head;
-
-            for (long n = 0; n < batch_size; ++n) {
-                for (long h = 0; h < num_heads; ++h) {
-                    auto* x_ptr = ptr + (n * num_heads + h) * stride;
-
-                    for (long pos = 0; pos < seq_len; ++pos) {
-                        const float* cos = &cos_values(pos, 0);
-                        const float* sin = &sin_values(pos, 0);
-
-                        for (long i = 0; i < rot_dim; i += 2) {
-                            const float x0 = x_ptr[pos * d_head + i];
-                            const float x1 = x_ptr[pos * d_head + i + 1];
-
-                            if (!is_backward) {
-                                x_ptr[pos * d_head + i] = x0 * cos[i / 2] - x1 * sin[i / 2];
-                                x_ptr[pos * d_head + i + 1] = x0 * sin[i / 2] + x1 * cos[i / 2];
-                            }
-                            else {
-                                x_ptr[pos * d_head + i] = x0 * cos[i / 2] + x1 * sin[i / 2];
-                                x_ptr[pos * d_head + i + 1] = -x0 * sin[i / 2] + x1 * cos[i / 2];
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-    private:
-        long seq_len, d_head;       // Sequence length and dimension of each head
-        matrix<float> angles;       // Precomputed rotation angles (seq_len x d_head/2)
-        matrix<float> cos_values;   // Precomputed cosine values
-        matrix<float> sin_values;   // Precomputed sine values
-        resizable_tensor params;    // Empty tensor (no learnable parameters)
-    };
-
-    // Helper to easily add RoPE to a network
-    template <typename SUBNET>
-    using rope = add_layer<rotary_positional_embedding_, SUBNET>;
-
-    template <long d_k_>
-    class scale_weights_ : public multiply_ {
-    public:
-        explicit scale_weights_() : multiply_(1.0f / std::sqrt(static_cast<float>(d_k_))) {}
-    };
-
-    template <long d_k, typename SUBNET>
-    using scale_weights = add_layer<scale_weights_<d_k>, SUBNET>;
-
-    // Attention mechanism component extractors
-    template <long seq_len, long d_model, long num_heads, typename SUBNET>
-    using query = reshape_to<num_heads, seq_len, d_model / num_heads, linear_no_bias<d_model, SUBNET>>;
-
-    template <long seq_len, long d_model, long num_heads, typename SUBNET>
-    using key = reshape_to<num_heads, seq_len, d_model / num_heads, linear_no_bias<d_model, SUBNET>>;
-
-    template <long seq_len, long d_model, long num_heads, typename SUBNET>
-    using value = reshape_to<num_heads, seq_len, d_model / num_heads, linear_no_bias<d_model, SUBNET>>;
-
-    /*!
-        This layer implements multi-head self-attention.
-
-        Template parameters:
-            - ACT: Activation function type
-            - DO: Dropout layer type for regularization
-            - d_model: Model dimension (must be divisible by num_heads)
-            - num_heads: Number of attention heads
-    !*/
-    template <template <typename> class ACT, template <typename> class DO,
-        long seq_len, long d_model, long num_heads, typename SUBNET>
-    using multihead_attention =
-        rms_norm<add_prev1<
-        DO<linear_no_bias<d_model, reshape_to<1, seq_len, d_model,
-        multm_prev2<softmaxm<tril_mask<
-        scale_weights<d_model / num_heads,
-        multm_prev3<
-        // Apply RoPE to queries & keys
-        rope<query<seq_len, d_model, num_heads, skip1<
-        tag3<transpose<
-        rope<key<seq_len, d_model, num_heads, skip1<
-        tag2<value<seq_len, d_model, num_heads,
-        tag1<SUBNET>>>>>>>>>>>>>>>>>>>>>;
-
     template <template <typename> class DO, long num_experts, typename SUBNET>
     using moe_router = softmax<fc<num_experts, avg_pool_everything<
         DO<leaky_relu<fc<16, DO<leaky_relu<fc<32,
@@ -313,14 +101,9 @@ namespace dlib
     !*/
     template <template <typename> class ACT, template <typename> class DO,
         long seq_len, long d_model, long num_heads, typename SUBNET>
-    using transformer_block =
+    using trans_moe_block =
         moe_feed_forward<ACT, DO, d_model,
         multihead_attention<ACT, DO, seq_len, d_model, num_heads, SUBNET>>;
-
-    // Positional Embeddings
-    template <template <typename> class DO, long num_embeddings, long embedding_length, typename SUBNET>
-    using positional_embeddings = rms_norm<DO<positional_encodings<
-        embeddings<num_embeddings, embedding_length, SUBNET>>>>;
 
     // Classification Head   
     template <long num_logits, typename SUBNET>
@@ -373,20 +156,20 @@ namespace dlib
         // Network component definitions
         template <typename SUBNET>
         using t_transformer_block =
-            transformer_block<activation_func, dropout_policy, MAX_SEQ_LEN, EMBEDDING_DIM, NUM_HEADS, SUBNET>;
+            trans_moe_block<activation_func, dropout_policy, MAX_SEQ_LEN, EMBEDDING_DIM, NUM_HEADS, SUBNET>;
 
         template <typename SUBNET>
         using i_transformer_block =
-            transformer_block<activation_func, multiply, MAX_SEQ_LEN, EMBEDDING_DIM, NUM_HEADS, SUBNET>;
+            trans_moe_block<activation_func, multiply, MAX_SEQ_LEN, EMBEDDING_DIM, NUM_HEADS, SUBNET>;
 
         template<bool is_training>
         using network_type = std::conditional_t<is_training,
             classification_head<VOCAB_SIZE,
             repeat<NUM_LAYERS, t_transformer_block,
-            positional_embeddings<dropout_policy, VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>,
+            token_embeddings<dropout_policy, VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>,
             classification_head<VOCAB_SIZE,
             repeat<NUM_LAYERS, i_transformer_block,
-            positional_embeddings<multiply, VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>;
+            token_embeddings<multiply, VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>;
 
         struct model_info {
             static std::string describe() {

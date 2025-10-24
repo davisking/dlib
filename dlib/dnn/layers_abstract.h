@@ -4820,6 +4820,180 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class rotary_positional_embedding_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object implements a rotary positional embedding (RoPE) layer for neural
+                networks, as described in "RoFormer: Enhanced Transformer with Rotary Position
+                Embedding" by Su et al.
+
+                Rotary positional embeddings encode positional information by rotating pairs
+                of feature dimensions according to their position in the sequence. This method
+                provides better relative position encoding compared to traditional learned
+                positional embeddings, particularly for sequence-to-sequence tasks.
+
+                The transformation is applied as a rotation matrix in 2D subspaces:
+                    For each pair of dimensions (i, i+1) at position pos:
+                        [x'_i  ]   [cos(θ)  -sin(θ)] [x_i  ]
+                        [x'_i+1] = [sin(θ)   cos(θ)] [x_i+1]
+
+                where θ(pos, i) = pos * base^(-2i/d_head) and base is typically 10000.
+
+                This layer has no trainable parameters. All rotation angles are precomputed
+                during setup based on the sequence length and head dimension.
+        !*/
+
+    public:
+
+        rotary_positional_embedding_(
+        );
+        /*!
+            ensures
+                - #get_theta_base() == 10000.0
+                - #get_seq_len() == 0
+                - #get_d_head() == 0
+        !*/
+
+        rotary_positional_embedding_(
+            const rotary_positional_embedding_& item
+        );
+        /*!
+            ensures
+                - Creates a copy of item
+                - #get_theta_base() == item.get_theta_base()
+                - #get_seq_len() == item.get_seq_len()
+                - #get_d_head() == item.get_d_head()
+                - All precomputed trigonometric caches are copied
+        !*/
+
+        rotary_positional_embedding_& operator=(
+            const rotary_positional_embedding_& item
+            );
+        /*!
+            ensures
+                - Assigns item to *this
+                - returns #*this
+        !*/
+
+        void set_theta_base(
+            float base
+        );
+        /*!
+            requires
+                - base > 0
+            ensures
+                - #get_theta_base() == base
+                - Sets the base frequency for computing rotation angles
+                - Higher values result in slower rotation with increasing position
+                - Common values: 10000 (default), 500000 (for longer sequences)
+                - This should be called before setup() to take effect
+        !*/
+
+        float get_theta_base(
+        ) const;
+        /*!
+            ensures
+                - Returns the base frequency used for rotation angle computation
+        !*/
+
+        long get_seq_len(
+        ) const;
+        /*!
+            ensures
+                - Returns the sequence length that this layer was configured for
+                - Returns 0 if setup() has not been called yet
+        !*/
+
+        long get_d_head(
+        ) const;
+        /*!
+            ensures
+                - Returns the head dimension that this layer was configured for
+                - Returns 0 if setup() has not been called yet
+        !*/
+
+        template <typename SUBNET>
+        void setup(
+            const SUBNET& sub
+        );
+        /*!
+            requires
+                - sub.get_output().nr() > 0
+                - sub.get_output().nc() >= 2
+            ensures
+                - Initializes this layer based on the input dimensions
+                - #get_seq_len() == sub.get_output().nr()
+                - #get_d_head() == sub.get_output().nc()
+                - Precomputes and caches all cosine and sine values for the rotation
+                  angles based on the sequence length and head dimension
+                - The cos_cache and sin_cache tensors are allocated with shape:
+                  (1, 1, seq_len, d_head/2)
+                - If d_head is odd, only (d_head-1) dimensions will be rotated
+        !*/
+
+        template <typename SUBNET>
+        void forward(
+            const SUBNET& sub,
+            resizable_tensor& output
+        );
+        /*!
+            requires
+                - setup(sub) has been called
+                - sub.get_output().nr() == get_seq_len()
+                - sub.get_output().nc() == get_d_head()
+            ensures
+                - Applies rotary positional embeddings to the input
+                - #output has the same dimensions as sub.get_output()
+                - For each position pos and dimension pair (i, i+1):
+                    output[pos,i]   = input[pos,i] * cos(θ_pos,i/2) - input[pos,i+1] * sin(θ_pos,i/2)
+                    output[pos,i+1] = input[pos,i] * sin(θ_pos,i/2) + input[pos,i+1] * cos(θ_pos,i/2)
+                - The rotation preserves the magnitude of feature vectors while encoding
+                  relative positional information
+                - If d_head is odd, the last dimension is copied without rotation
+                - Expected input shape: (batch_size, num_heads, seq_len, d_head)
+        !*/
+
+        template <typename SUBNET>
+        void backward(
+            const tensor& gradient_input,
+            SUBNET& sub,
+            tensor& params_grad
+        );
+        /*!
+            requires
+                - setup() has been called
+                - gradient_input has the same dimensions as the output from forward()
+            ensures
+                - Computes gradients with respect to the input
+                - Applies the inverse rotation to gradient_input
+                - The inverse rotation is:
+                    grad_input[pos,i]   = grad_out[pos,i] * cos(θ) + grad_out[pos,i+1] * sin(θ)
+                    grad_input[pos,i+1] = -grad_out[pos,i] * sin(θ) + grad_out[pos,i+1] * cos(θ)
+                - Accumulated gradients are added to sub.get_gradient_input()
+                - params_grad is not used (this layer has no trainable parameters)
+        !*/
+
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
+        inline dpoint map_input_to_output(const dpoint& p) const;
+        inline dpoint map_output_to_input(const dpoint& p) const;
+
+        friend void serialize(const rotary_positional_embedding_& item, std::ostream& out);
+        friend void deserialize(rotary_positional_embedding_& item, std::istream& in);
+        friend std::ostream& operator<<(std::ostream& out, const rotary_positional_embedding_& item);
+        friend void to_xml(const rotary_positional_embedding_& item, std::ostream& out);
+        /*!
+            provides serialization support and output operators
+        !*/
+
+    };
+
+    template <typename SUBNET>
+    using rope = add_layer<rotary_positional_embedding_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_LAYERS_ABSTRACT_H_

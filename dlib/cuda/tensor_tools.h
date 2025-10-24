@@ -2518,6 +2518,39 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void apply_rotary_positional_embedding(
+        bool is_backward,
+        resizable_tensor& data,
+        const resizable_tensor& cos_cache,
+        const resizable_tensor& sin_cache
+    );
+    /*!
+        requires
+            - data.nr() == cos_cache.nr()
+            - data.nr() == sin_cache.nr()
+            - cos_cache.nc() == data.nc() / 2
+            - sin_cache.nc() == data.nc() / 2
+            - cos_cache.num_samples() == 1
+            - cos_cache.k() == 1
+            - sin_cache.num_samples() == 1
+            - sin_cache.k() == 1
+            - data.nc() >= 2
+        ensures
+            - Applies rotary positional embeddings (RoPE) to the input tensor
+            - data is modified in-place with the rotation applied pairwise to dimensions
+            - For each position pos and dimension pair (i, i+1):
+                if (!is_backward):
+                    // Forward rotation (encoding)
+                    data[pos,i]   = data[pos,i] * cos_cache[pos,i/2] - data[pos,i+1] * sin_cache[pos,i/2]
+                    data[pos,i+1] = data[pos,i] * sin_cache[pos,i/2] + data[pos,i+1] * cos_cache[pos,i/2]
+                else:
+                    // Backward rotation (decoding, inverse transformation for gradients)
+                    data[pos,i]   = data[pos,i] * cos_cache[pos,i/2] + data[pos,i+1] * sin_cache[pos,i/2]
+                    data[pos,i+1] = -data[pos,i] * sin_cache[pos,i/2] + data[pos,i+1] * cos_cache[pos,i/2]
+        !*/
+
+// ----------------------------------------------------------------------------------------
+
 }}
 
 #ifdef NO_MAKEFILE
