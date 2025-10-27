@@ -21,7 +21,6 @@
 //             this seems to be a trial-and-error process.
 #ifndef __INTELLISENSE__
 #include "dnn/layers.h"
-#include "dnn/transformer.h"
 #endif // __INTELLISENSE__
 
 #include "dnn/loss.h"
@@ -33,6 +32,7 @@
 #include "dnn/utilities.h"
 #include "dnn/validation.h"
 #include "dnn/visitors.h"
+#include "dnn/transformer.h"
 
 #endif // DLIB_DNn_
 

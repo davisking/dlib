@@ -8,13 +8,6 @@
     2) --generate: Generate new text from a trained model, given an initial prompt
                    extracted from "slm_data.h" (named shakespeare_prompt).
 
-    The "slm_defs.h" header is expected to provide a comprehensive Transformer
-    definition with the following key elements:
-      - A configurable transformer_config
-      - The use of classification_head to output a single token
-      - The network_type<true> or network_type<false> for training vs inference
-      - The typical dlib constructs (input<matrix<int>>, etc.)
-
     Character-level tokenization is used here. Each character is directly transformed
     into an integer token. The model attempts to learn the sequence of characters in
     shakespeare_text. Then you can ask the model to generate new text from a short
@@ -35,12 +28,10 @@
 #include <algorithm>
 #include <cmath>
 #include <random>
+#include <dlib/dnn.h>
 #include <dlib/data_io.h>
 #include <dlib/cmd_line_parser.h>
 #include <dlib/misc_api.h>
-
-// Include Transformer definitions
-#include "slm_defs.h"
 
 // This header "slm_data.h" is assumed to contain:
 //   const std::string shakespeare_text;
@@ -132,18 +123,18 @@ int main(int argc, char** argv)
         const long num_heads = 4;
         const long embedding_dim = 64;
         const long max_seq_len = 80;                      // a small sequence length for the example
-        const bool use_squeezing = false;
 
-        using my_transformer_cfg = transformer::transformer_config<
-            vocab_size,
-            num_layers,
-            num_heads,
-            embedding_dim,
-            max_seq_len,
-            use_squeezing,
-            gelu,
-            dropout_10
-        > ;
+        using train_fused_transformer =
+            loss_multiclass_log<fc<vocab_size,
+            fused_transformer::transformer_stack<num_layers, gelu, dropout_10, embedding_dim, max_seq_len, num_heads,
+            token_embeddings<dropout_10, vocab_size, embedding_dim,
+            input<matrix<int, 0, 1>>>>>>;
+
+        using infer_fused_transformer =
+            loss_multiclass_log<fc<vocab_size,
+            fused_transformer::transformer_stack<num_layers, gelu, multiply, embedding_dim, max_seq_len, num_heads,
+            token_embeddings<dropout_10, vocab_size, embedding_dim,
+            input<matrix<int, 0, 1>>>>>>;
 
         // For GPU usage (if any), set gpus = {0} for a single GPU, etc.
         std::vector<int> gpus{ 0 };
@@ -197,8 +188,7 @@ int main(int argc, char** argv)
             }
 
             // 2) Construct the network in training mode
-            using net_type = my_transformer_cfg::network_type<true>;
-            net_type net;
+            train_fused_transformer net;
             if (file_exists(model_file))
             {
                 cout << "Loading existing model from " << model_file << "\n";
@@ -206,7 +196,7 @@ int main(int argc, char** argv)
             }
 
             // 3) Create dnn_trainer
-            dnn_trainer<net_type, adam> trainer(net, adam(alpha, beta1, beta2), gpus);
+            dnn_trainer<train_fused_transformer, adam> trainer(net, adam(alpha, beta1, beta2), gpus);
             trainer.set_learning_rate(learning_rate);
             trainer.set_min_learning_rate(1e-6);
             trainer.set_mini_batch_size(batch_size);
@@ -239,8 +229,7 @@ int main(int argc, char** argv)
             cout << "=== GENERATE MODE ===\n";
 
             // 1) Load the trained model
-            using net_infer = my_transformer_cfg::network_type<false>;
-            net_infer net;
+            infer_fused_transformer net;
             if (file_exists(model_file))
             {
                 deserialize(model_file) >> net;
@@ -251,8 +240,6 @@ int main(int argc, char** argv)
                 cerr << "Error: model file not found. Please run --train first.\n";
                 return 0;
             }
-
-            cout << my_transformer_cfg::model_info::describe() << endl;
             cout << "Model parameters: " << count_parameters(net) << endl << endl;
 
             // 2) Get the prompt from the included slm_data.h
@@ -316,8 +303,8 @@ int main(int argc, char** argv)
  * > ./slm_basic_train_ex --train --shuffle
  *
  * After this phase, the model achieves perfect prediction accuracy (i.e acc=1).
- * The generation option produces text that is very close to the original training data,
- * as illustrated by the example below:
+ * The generation option produces text that is very similar or identical to the original
+ * training data, as illustrated by the example below:
  * > Generated text:
  * > QUEEN ELIZABETH:
  * > But thou didst kill my children.
