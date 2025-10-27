@@ -26,7 +26,7 @@
         Mixture-of-Experts Layer" (MoE architecture) arXiv:1701.06538
 
     Usage modes:
-    --train         Train model on enwiki dataset
+    --train         Train model on dataset
     --generate      Generate text from trained model
     --verify        Compare generated output with original
     --tokenize-only Only perform tokenization step
@@ -46,12 +46,12 @@
 #include <chrono>
 #include <algorithm>
 #include <csignal>
+#include <dlib/dnn.h>
 #include <dlib/data_io.h>
 #include <dlib/cmd_line_parser.h>
 #include <dlib/misc_api.h>
 #include <dlib/tokenizer/bpe_tokenizer.h>
 #include <dlib/serialize.h>
-#include <dlib/dnn.h>
 
 using namespace std;
 using namespace dlib;
@@ -103,7 +103,7 @@ namespace dlib
         long seq_len, long d_model, long num_heads, typename SUBNET>
     using trans_moe_block =
         moe_feed_forward<ACT, DO, d_model,
-        multihead_attention<ACT, DO, seq_len, d_model, num_heads, SUBNET>>;
+        canonical_transformer::multihead_attention<ACT, DO, seq_len, d_model, num_heads, SUBNET>>;
 
     // Classification Head   
     template <long num_logits, typename SUBNET>
@@ -165,11 +165,13 @@ namespace dlib
         template<bool is_training>
         using network_type = std::conditional_t<is_training,
             classification_head<VOCAB_SIZE,
+            projection_head<activation_func, 4, EMBEDDING_DIM,
             repeat<NUM_LAYERS, t_transformer_block,
-            token_embeddings<dropout_policy, VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>,
+            token_embeddings<dropout_policy, VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>,
             classification_head<VOCAB_SIZE,
+            projection_head<activation_func, 4, EMBEDDING_DIM,
             repeat<NUM_LAYERS, i_transformer_block,
-            token_embeddings<multiply, VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>;
+            token_embeddings<multiply, VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>>;
 
         struct model_info {
             static std::string describe() {
@@ -294,11 +296,11 @@ bool load_tokens_from_file(std::vector<int>& tokens, const std::string& filename
     return true;
 }
 
-// Function to read the "enwiki" file (entire or portion)
-std::string read_enwiki(const std::string& filepath, size_t max_bytes = 0) {
+// Function to read the data file (entire or portion)
+std::string read_data(const std::string& filepath, size_t max_bytes = 0) {
     std::ifstream file(filepath, std::ios::binary);
     if (!file) {
-        throw std::runtime_error("Cannot open enwiki file: " + filepath);
+        throw std::runtime_error("Cannot open data file: " + filepath);
     }
     size_t file_size = get_file_size(filepath);
 
@@ -332,7 +334,7 @@ bool verify_match(const std::string& original, const std::string& generated) {
             ss << "\\x" << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(c);
             return ss.str();
         }
-    };
+        };
 
     // Helper function to display context around a position
     auto show_context = [&](size_t pos, size_t context_size) {
@@ -360,7 +362,7 @@ bool verify_match(const std::string& original, const std::string& generated) {
             << "'): " << orig_context << "\n";
         cout << "Generated (" << (int)generated[pos] << " = '" << gen_highlight
             << "'): " << gen_context << "\n";
-    };
+        };
 
     size_t mismatch_count = 0;
     const size_t max_detailed_mismatches = 10;  // Maximum number of detailed errors to display
@@ -532,14 +534,14 @@ int main(int argc, char** argv)
         setup_interrupt_handler();
 
         command_line_parser parser;
-        parser.add_option("train", "Train a transformer model on enwiki");
-        parser.add_option("generate", "Generate enwiki from a previously trained model");
+        parser.add_option("train", "Train a transformer model");
+        parser.add_option("generate", "Generate data from a previously trained model");
         parser.add_option("verify", "Verify generated output against original data");
         parser.add_option("tokenize-only", "Only tokenize the input file and save tokens");
-        parser.add_option("enwiki", "Path to the enwiki file (default: enwiki.txt)", 1);
+        parser.add_option("data", "Path to the data file (default: data.txt)", 1);
         parser.add_option("max-tokens", "Maximum number of tokens to load in memory", 1);
-        parser.add_option("max-bytes", "Maximum number of bytes to process from enwiki", 1);
-        parser.add_option("percent", "Percentage of enwiki to process (0-100)", 1);
+        parser.add_option("max-bytes", "Maximum number of bytes to process from data", 1);
+        parser.add_option("percent", "Percentage of data to process (0-100)", 1);
         parser.add_option("learning-rate", "Set the learning rate (default: 3e-4)", 1);
         parser.add_option("batch-size", "Set the mini-batch size (default: 64)", 1);
         parser.add_option("patience", "Iterations without progress before early stopping (default: 15000)", 1);
@@ -547,9 +549,9 @@ int main(int argc, char** argv)
         parser.add_option("alpha", "Set the weight decay for Adam (default: 0.004)", 1);
         parser.add_option("beta1", "Set Adam's first moment coefficient (default: 0.9)", 1);
         parser.add_option("beta2", "Set Adam's second moment coefficient (default: 0.999)", 1);
-        parser.add_option("model-file", "Path for model (default: dlib_slm_enwiki_model.dat)", 1);
-        parser.add_option("output-file", "Path for output (default: enwiki_generated.txt)", 1);
-        parser.add_option("tokenizer", "Path to pre-trained tokenizer (default: enwiki_tokenizer.vocab)", 1);
+        parser.add_option("model-file", "Path for model (default: dlib_slm_data_model.dat)", 1);
+        parser.add_option("output-file", "Path for output (default: data_generated.txt)", 1);
+        parser.add_option("tokenizer", "Path to pre-trained tokenizer (default: data_tokenizer.vocab)", 1);
         parser.add_option("tokens-file", "Path to pre-tokenized tokens file (optional)", 1);
         parser.add_option("force-tokenize", "Force tokenization even if tokens file exists");
         parser.parse(argc, argv);
@@ -570,31 +572,31 @@ int main(int argc, char** argv)
         const double alpha = get_option(parser, "alpha", 0.004);
         const double beta1 = get_option(parser, "beta1", 0.9);
         const double beta2 = get_option(parser, "beta2", 0.999);
-        const std::string model_file = get_option(parser, "model-file", "dlib_slm_enwiki_model.dat");
-        const std::string output_file = get_option(parser, "output-file", "enwiki_generated.txt");
-        const std::string enwiki_path = get_option(parser, "enwiki", "enwiki.txt");
+        const std::string model_file = get_option(parser, "model-file", "data_model.dat");
+        const std::string output_file = get_option(parser, "output-file", "data_generated.txt");
+        const std::string data_path = get_option(parser, "data", "data.txt");
         const long max_seq_len = 30;
         const long num_layers = 4;
         const long num_heads = 6;
         const long embedding_dim = 228;
-        const std::string tokenizer_path = get_option(parser, "tokenizer", "enwiki_tokenizer.vocab");
+        const std::string tokenizer_path = get_option(parser, "tokenizer", "data_tokenizer.vocab");
         // Default number of prompt tokens = input sequence length
         const bool force_tokenize = parser.option("force-tokenize");
-        const long num_tokens = 8000;
+        const long num_tokens = 1500;
 
         // Calculate max bytes to process
         size_t max_bytes = 0, max_tokens = 0;
         if (parser.option("max-tokens"))
-            max_tokens = std::stoul(parser.option("max-tokens").argument());        
+            max_tokens = std::stoul(parser.option("max-tokens").argument());
         if (parser.option("max-bytes")) {
             max_bytes = std::stoul(parser.option("max-bytes").argument());
         }
         else if (parser.option("percent")) {
             double percent = std::stod(parser.option("percent").argument());
-            size_t file_size = get_file_size(enwiki_path);
+            size_t file_size = get_file_size(data_path);
             if (file_size > 0) {
                 max_bytes = static_cast<size_t>(file_size * percent / 100.0);
-                cout << "Processing " << percent << "% of enwiki = " << max_bytes << " bytes\n";
+                cout << "Processing " << percent << "% of data = " << max_bytes << " bytes\n";
             }
             else {
                 cerr << "Warning: Cannot determine file size for percentage calculation\n";
@@ -618,9 +620,9 @@ int main(int argc, char** argv)
         // Determine tokens filename
         std::string tokens_file = parser.option("tokens-file") ?
             parser.option("tokens-file").argument() :
-            generate_tokens_filename(enwiki_path, max_bytes);
+            generate_tokens_filename(data_path, max_bytes);
 
-        using enwiki_transformer = transformer_config<
+        using my_transformer = transformer_config<
             num_tokens,     // vocab_size
             num_layers,     // number of layers
             num_heads,      // number of attention heads
@@ -641,18 +643,18 @@ int main(int argc, char** argv)
         if (parser.option("tokenize-only")) {
             cout << "=== TOKENIZE-ONLY MODE ===\n";
 
-            // Read the enwiki file (or portion)
-            cout << "Reading enwiki file from: " << enwiki_path;
+            // Read the data file (or portion)
+            cout << "Reading data file from: " << data_path;
             if (max_bytes > 0) cout << " (limited to " << max_bytes << " bytes)";
             cout << endl;
 
-            std::string enwiki_text = read_enwiki(enwiki_path, max_bytes);
-            cout << "Read " << enwiki_text.size() << " bytes\n";
+            std::string data_text = read_data(data_path, max_bytes);
+            cout << "Read " << data_text.size() << " bytes\n";
 
             // Train a new tokenizer if needed
             if (!file_exists(tokenizer_path)) {
                 cout << "Training new BPE tokenizer with vocabulary size " << num_tokens << "...\n";
-                tokenizer.train(enwiki_text, num_tokens, 1e6, true);
+                tokenizer.train(data_text, num_tokens, 1e6, true);
                 serialize(tokenizer_path) << tokenizer;
                 cout << "Tokenizer saved to " << tokenizer_path << endl;
             }
@@ -666,7 +668,7 @@ int main(int argc, char** argv)
                 cout << "Warning: Special tokens not found in tokenizer vocabulary.\n";
             full_tokens.clear();
             full_tokens.push_back(text_start_id);
-            auto encoded_tokens = tokenizer.encode(enwiki_text);
+            auto encoded_tokens = tokenizer.encode(data_text);
             full_tokens.insert(full_tokens.end(), encoded_tokens.begin(), encoded_tokens.end());
             full_tokens.push_back(text_end_id);
             auto end_time = std::chrono::high_resolution_clock::now();
@@ -712,18 +714,18 @@ int main(int argc, char** argv)
             }
 
             if (!tokens_loaded) {
-                // 1) Read the enwiki file (or portion)
-                cout << "Reading enwiki file from: " << enwiki_path;
+                // 1) Read the data file (or portion)
+                cout << "Reading data file from: " << data_path;
                 if (max_bytes > 0) cout << " (limited to " << max_bytes << " bytes)";
                 cout << endl;
 
-                std::string enwiki_text = read_enwiki(enwiki_path, max_bytes);
-                cout << "Read " << enwiki_text.size() << " bytes\n";
+                std::string data_text = read_data(data_path, max_bytes);
+                cout << "Read " << data_text.size() << " bytes\n";
 
                 // Train a new tokenizer if needed
                 if (!file_exists(tokenizer_path)) {
                     cout << "Training new BPE tokenizer with vocabulary size " << num_tokens << "...\n";
-                    tokenizer.train(enwiki_text, num_tokens, 1e6, true);
+                    tokenizer.train(data_text, num_tokens, 1e6, true);
                     serialize(tokenizer_path) << tokenizer;
                     cout << "Tokenizer saved to " << tokenizer_path << endl;
                 }
@@ -737,7 +739,7 @@ int main(int argc, char** argv)
                 auto start_time = std::chrono::high_resolution_clock::now();
                 full_tokens.clear();
                 full_tokens.push_back(text_start_id);
-                auto encoded_tokens = tokenizer.encode(enwiki_text);
+                auto encoded_tokens = tokenizer.encode(data_text);
                 full_tokens.insert(full_tokens.end(), encoded_tokens.begin(), encoded_tokens.end());
                 full_tokens.push_back(text_end_id);
                 auto end_time = std::chrono::high_resolution_clock::now();
@@ -805,9 +807,9 @@ int main(int argc, char** argv)
             cout << "Created " << samples.size() << " training samples (100%)...\n";
 
             // Build and train the network
-            using net_type = enwiki_transformer::network_type<true>;
+            using net_type = my_transformer::network_type<true>;
             net_type net;
-            cout << "Model architecture:\n" << enwiki_transformer::model_info::describe() << endl;
+            cout << "Model architecture:\n" << my_transformer::model_info::describe() << endl;
             if (file_exists(model_file)) deserialize(model_file) >> net;
 
             // Create trainer
@@ -818,11 +820,11 @@ int main(int argc, char** argv)
             // For perfect memorization, we allow more epochs without improvement
             trainer.set_iterations_without_progress_threshold(patience);
             trainer.set_max_num_epochs(max_epochs); // More epochs for perfect memorization
-            trainer.set_synchronization_file("enwiki_trainer.sync", std::chrono::minutes(10));
+            trainer.set_synchronization_file("data_trainer.sync", std::chrono::minutes(10));
             trainer.be_quiet();
 
             // Custom training loop - trainer.train(samples, labels)
-            cout << "Starting training...\n";            
+            cout << "Starting training...\n";
             size_t epoch = 0, samples_seen = 0, batches_seen = 0;
             double total_loss = 0;
             auto start_time = std::chrono::steady_clock::now();
@@ -887,14 +889,14 @@ int main(int argc, char** argv)
             net.clean();
             serialize(model_file) << net << tokenizer;
             cout << "Model saved to " << model_file << "\n";
-            std::remove("enwiki_trainer.sync");
-            std::remove("enwiki_trainer.sync_");
+            std::remove("data_trainer.sync");
+            std::remove("data_trainer.sync_");
 
             // Evaluate on training set
             {
                 if (!g_terminate_flag.load()) {
                     cout << "Evaluating model accuracy...\n";
-                    using net_infer = enwiki_transformer::network_type<false>;
+                    using net_infer = my_transformer::network_type<false>;
                     net_infer g_infer = net;
                     auto predicted = g_infer(samples);
                     size_t correct = 0;
@@ -903,13 +905,13 @@ int main(int argc, char** argv)
                     double accuracy = (double)correct / labels.size();
                     cout << "Training accuracy: " << (accuracy * 100.0) << "%\n";
 
-                    // We need perfect accuracy to reconstruct enwiki
+                    // We need perfect accuracy to reconstruct data
                     if (accuracy < 0.999) {
                         cout << "WARNING: Model accuracy is less than 99.90%. The model may not "
                             << "perfectly reconstruct the input text.\n";
                     }
                 }
-            }            
+            }
         }
 
         // ----------------------------------------------------------------------------------------
@@ -920,7 +922,7 @@ int main(int argc, char** argv)
             cout << "=== GENERATION MODE ===\n";
 
             // Load the model
-            using net_infer = enwiki_transformer::network_type<false>;
+            using net_infer = my_transformer::network_type<false>;
             net_infer net;
             if (file_exists(model_file)) {
                 deserialize(model_file) >> net >> tokenizer;
@@ -938,7 +940,7 @@ int main(int argc, char** argv)
                 return 0;
             }
 
-            // Read beginning of enwiki file for prompt
+            // Read beginning of data file for prompt
             std::vector<int> prompt_tokens;
 
             // Check if we have pre-tokenized tokens
@@ -973,29 +975,29 @@ int main(int argc, char** argv)
 
             // If we couldn't load tokens, tokenize the prompt text
             if (prompt_tokens.empty()) {
-                cout << "Reading initial prompt from enwiki...\n";
-                std::string enwiki_prompt;
+                cout << "Reading initial prompt from data...\n";
+                std::string data_prompt;
 
-                if (file_exists(enwiki_path)) {
+                if (file_exists(data_path)) {
                     // Read a portion large enough to cover the first tokens
-                    std::ifstream file(enwiki_path, std::ios::binary);
+                    std::ifstream file(data_path, std::ios::binary);
                     // Buffer intentionally large to ensure we have enough text for tokens
                     char buffer[max_seq_len * 10];
                     file.read(buffer, sizeof(buffer));
                     size_t bytes_read = file.gcount();
-                    enwiki_prompt = std::string(buffer, bytes_read);
+                    data_prompt = std::string(buffer, bytes_read);
                 }
                 else {
-                    cerr << "Error: Cannot find original enwiki file for initial prompt.\n";
+                    cerr << "Error: Cannot find original data file for initial prompt.\n";
                     return 0;
                 }
 
                 // Tokenize the prompt
                 cout << "Tokenizing prompt...\n";
                 int text_start_id = tokenizer.get_special_token_id("<text>");
-                prompt_tokens.clear();                
+                prompt_tokens.clear();
                 prompt_tokens.push_back(text_start_id);
-                auto encoded_tokens = tokenizer.encode(enwiki_prompt);
+                auto encoded_tokens = tokenizer.encode(data_prompt);
                 prompt_tokens.insert(prompt_tokens.end(), encoded_tokens.begin(), encoded_tokens.end());
             }
 
@@ -1013,10 +1015,10 @@ int main(int argc, char** argv)
             // Put prompt in input sequence
             context_manager llm_context(max_seq_len * 4, max_seq_len, tokenizer.get_special_token_id("<pad>"));
             llm_context.add_tokens(prompt_tokens);
-            auto input_seq = llm_context.get_input_sequence(max_seq_len);            
+            auto input_seq = llm_context.get_input_sequence(max_seq_len);
 
             // Determine text size to generate
-            size_t target_size = (max_bytes > 0) ? max_bytes : get_file_size(enwiki_path);
+            size_t target_size = (max_bytes > 0) ? max_bytes : get_file_size(data_path);
             cout << "Will generate approximately " << target_size << " bytes\n";
 
             // Open output file
@@ -1056,7 +1058,7 @@ int main(int argc, char** argv)
 
                 // Shift the input window
                 llm_context.add_token(next_token);
-                input_seq = llm_context.get_input_sequence(max_seq_len);                
+                input_seq = llm_context.get_input_sequence(max_seq_len);
 
                 // If buffer is full, write to file
                 if (token_buffer.size() >= buffer_size) {
@@ -1108,8 +1110,8 @@ int main(int argc, char** argv)
         {
             cout << "=== VERIFICATION MODE ===\n";
 
-            if (!file_exists(enwiki_path)) {
-                cerr << "Error: Original enwiki file not found at " << enwiki_path << "\n";
+            if (!file_exists(data_path)) {
+                cerr << "Error: Original data file not found at " << data_path << "\n";
                 return 0;
             }
 
@@ -1120,11 +1122,11 @@ int main(int argc, char** argv)
 
             // Read generated file
             cout << "Reading generated file...\n";
-            std::string generated = read_enwiki(output_file);
+            std::string generated = read_data(output_file);
 
             // Read the same portion of original file
             cout << "Reading original file (same size as generated)...\n";
-            std::string original = read_enwiki(enwiki_path, generated.size());
+            std::string original = read_data(data_path, generated.size());
 
             cout << "Verifying byte-for-byte match...\n";
             bool match = verify_match(original, generated);
