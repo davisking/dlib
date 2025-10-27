@@ -93,11 +93,11 @@ namespace dlib
         followed by a feed-forward network, each with residual connections.
 
         Template parameters:
-            - ACT: Activation function type
-            - DO: Dropout layer type for regularization
-            - seq_len: Sequence length (number of tokens/patches)
-            - d_model: Model dimension
-            - num_heads: Number of attention heads
+            - ACT: activation function type
+            - DO: dropout layer type for regularization
+            - seq_len: sequence length (number of tokens/patches)
+            - d_model: model dimension
+            - num_heads: number of attention heads
     !*/
     template <template <typename> class ACT, template <typename> class DO,
         long seq_len, long d_model, long num_heads, typename SUBNET>
@@ -413,7 +413,7 @@ bool verify_match(const std::string& original, const std::string& generated) {
     }
 
     if (mismatch_count > 0) {
-        cout << "\n===== Error Summary =====\n";
+        cout << "\n===== Error summary =====\n";
         cout << "Total mismatches: " << mismatch_count << " bytes ("
             << (mismatch_count * 100.0 / original.size()) << "%)\n";
 
@@ -453,78 +453,6 @@ bool verify_match(const std::string& original, const std::string& generated) {
 }
 
 // ----------------------------------------------------------------------------------------
-class context_manager {
-public:
-    context_manager(size_t max_context_tokens = 1024, size_t min_prompt_tokens = 100,
-        int padding_token = -1) : max_context_size_(max_context_tokens),
-        min_prompt_size_(min_prompt_tokens), padding_token_(padding_token) {
-
-        if (min_prompt_tokens >= max_context_tokens)
-            throw std::invalid_argument("Minimum prompt size must be smaller than maximum context size");
-
-        if (min_prompt_tokens < 10)
-            throw std::invalid_argument("Minimum prompt size must be at least 10");
-    }
-
-    // Add a single token to the context
-    void add_token(int token) {
-        if (current_context_.size() >= max_context_size_) current_context_.pop_front();
-        current_context_.push_back(token);
-    }
-
-    // Add multiple tokens to the context
-    void add_tokens(const std::vector<int>& tokens) {
-        for (const auto& token : tokens) add_token(token);
-    }
-
-    // Get the next input sequence for the model
-    matrix<int, 0, 1> get_input_sequence(size_t desired_length) const {
-        if (desired_length < min_prompt_size_)
-            throw std::invalid_argument("Requested length is smaller than minimum prompt size");
-        matrix<int, 0, 1> input_sequence(desired_length, 1);
-
-        // Determine how many tokens we'll copy from context
-        size_t tokens_to_copy = std::min(current_context_.size(), desired_length);
-        size_t start_pos = current_context_.size() > desired_length ?
-            current_context_.size() - desired_length : 0;
-
-        // Fill the matrix with tokens from context
-        for (size_t i = 0; i < tokens_to_copy; ++i)
-            input_sequence(i, 0) = current_context_[start_pos + i];
-
-        // Fill remaining positions with padding token if needed
-        for (size_t i = tokens_to_copy; i < desired_length; ++i)
-            input_sequence(i, 0) = padding_token_;
-
-        return input_sequence;
-    }
-
-    // Calculate maximum output tokens that can be generated
-    size_t get_max_output_tokens() const {
-        if (current_context_.size() < min_prompt_size_)
-            return 0;  // Not enough context for even minimal prompt
-        return max_context_size_ - current_context_.size();
-    }
-
-    // Get current context size
-    size_t get_current_context_size() const { return current_context_.size(); }
-    // Get maximum context size
-    size_t get_max_context_size() const { return max_context_size_; }
-    // Get prompt size
-    size_t get_prompt_size() const { return min_prompt_size_; }
-    // Get padding token
-    int get_padding_token() const { return padding_token_; }
-    // Clear the current context
-    void clear_context() { current_context_.clear(); }
-
-private:
-    const size_t max_context_size_;    // Maximum total tokens in context
-    const size_t min_prompt_size_;     // Minimum tokens required for prompt
-    const int padding_token_;          // Token used for padding
-
-    // Using deque for efficient insertion/removal at both ends
-    std::deque<int> current_context_;  // Current context
-};
 
 int main(int argc, char** argv)
 {
@@ -1013,9 +941,9 @@ int main(int argc, char** argv)
             cout << "Using " << prompt_tokens.size() << " tokens for initial prompt\n";
 
             // Put prompt in input sequence
-            context_manager llm_context(max_seq_len * 4, max_seq_len, tokenizer.get_special_token_id("<pad>"));
+            inference_context llm_context(max_seq_len, 4, tokenizer.get_special_token_id("<pad>"));
             llm_context.add_tokens(prompt_tokens);
-            auto input_seq = llm_context.get_input_sequence(max_seq_len);
+            auto input_seq = llm_context.get_input_window();
 
             // Determine text size to generate
             size_t target_size = (max_bytes > 0) ? max_bytes : get_file_size(data_path);
@@ -1058,7 +986,7 @@ int main(int argc, char** argv)
 
                 // Shift the input window
                 llm_context.add_token(next_token);
-                input_seq = llm_context.get_input_sequence(max_seq_len);
+                input_seq = llm_context.get_input_window();
 
                 // If buffer is full, write to file
                 if (token_buffer.size() >= buffer_size) {
