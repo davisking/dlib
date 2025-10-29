@@ -165,11 +165,11 @@ namespace dlib
         template<bool is_training>
         using network_type = std::conditional_t<is_training,
             classification_head<VOCAB_SIZE,
-            projection_head<activation_func, 4, EMBEDDING_DIM,
+            projection_head<activation_func, 2, EMBEDDING_DIM,
             repeat<NUM_LAYERS, t_transformer_block,
             token_embeddings<dropout_policy, VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>,
             classification_head<VOCAB_SIZE,
-            projection_head<activation_func, 4, EMBEDDING_DIM,
+            projection_head<activation_func, 2, EMBEDDING_DIM,
             repeat<NUM_LAYERS, i_transformer_block,
             token_embeddings<multiply, VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>>;
 
@@ -503,7 +503,7 @@ int main(int argc, char** argv)
         const std::string model_file = get_option(parser, "model-file", "data_model.dat");
         const std::string output_file = get_option(parser, "output-file", "data_generated.txt");
         const std::string data_path = get_option(parser, "data", "data.txt");
-        const long max_seq_len = 30;
+        const long max_seq_len = 50;
         const long num_layers = 4;
         const long num_heads = 6;
         const long embedding_dim = 228;
@@ -737,7 +737,7 @@ int main(int argc, char** argv)
             // Build and train the network
             using net_type = my_transformer::network_type<true>;
             net_type net;
-            cout << "Model architecture:\n" << my_transformer::model_info::describe() << endl;
+            cout << my_transformer::model_info::describe() << endl;
             if (file_exists(model_file)) deserialize(model_file) >> net;
 
             // Create trainer
