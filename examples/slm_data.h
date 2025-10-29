@@ -1,5 +1,5 @@
-#ifndef SlmData_H
-#define SlmData_H
+#ifndef SLM_DATA_H
+#define SLM_DATA_H
 
 #include <string>
 #include <vector>
@@ -15,6 +15,7 @@ inline std::string concatenateTexts(const std::vector<std::string>& texts) {
 }
 
 // Text parts for training
+// Used by the <slm_basic_train_ex.cpp> example
 const std::vector<std::string> shakespeare_text_parts = {
     R"(QUEEN ELIZABETH:
 Send to her, by the man that slew her brothers,
@@ -590,4 +591,159 @@ And you shall understand from me her mind.
 
 )";
 
-#endif // SlmData_H
+// Retrieves the contents of an internal "plain text" file
+// Used by the <slm_advanced_train_ex.cpp> example
+const std::string get_internal_data_file()
+{
+    dlib::base64 base64_coder;
+    dlib::compress_stream::kernel_1ea compressor;
+    std::ostringstream sout;
+    std::istringstream sin;
+
+    sout << "QT8JNRyIvUkLem5lyDM28N2jHsZ8QbVJftbxUAb+POOMDyYijyrFN3tmZ2bGDEr2sp+RI6hYVcrs";
+    sout << "iWZ6IuTswZDqPQfxnObLRcOjNf8volT05DrVOEV3jGYnVKakok2oU1ptoKozH3fVhj3L6+Gmd17D";
+    sout << "MsgzBDH2xF74KyhsPmvn7PICSGEeipD4kSf28nRGUZbqW+C0zbVjFH5+ct0An3x70dH6orb51ZG4";
+    sout << "5n+A2170qip5ScyTUcaT1jI2vxS5pNkRa7bvg4ambdY1F2w3rdgKqiJZMHhP6BKfE3f5YNhpWTRc";
+    sout << "Wr8komzNMVxD3URfSsNnzsgk8XKVbzsAvxWE9hr/6M/ObA2WviOEqh6Kk1xtSGyodq9r7xfaYUyf";
+    sout << "YDz5BSqZzsL1Zp+MqE0s/BhFBG/QYU0MbV9x6v2qvkLJQndkEOSfeMqPU6mItZahqnWhRi2cLRbU";
+    sout << "wRflvZPttqxoT+8TijkhYWs3hTdJs7I8fIJGKN58eY8QPt5j3OmLFFmJux2Cs+CIJWaNs0l1nJgb";
+    sout << "/rSbDR2ksyR7fr1n5qxwKpVhHzWxnHLbXwkChZ4q7bFKKXgoH7AnHz3wu2ToES7yfv34rQLO9bY1";
+    sout << "AXMetkdqntJ+AETV9UvWzpOHYOxGocZfWw5Fyz+6txoWJ+5iroOy1IoA2KBonIqG8g5F6LfWgwSp";
+    sout << "gaFkWQrBgWp+Ump4PnA5OP+/OJAP2TF3eVbr34N/BO7tLFmrQi6ukPM3CfmE6FmflNqaCvgyLs2G";
+    sout << "DOJY8kylAp779fCWBpd/kTm7BDBTPOMLWYAcT6OK02EAcanlV88Ldd4DOM7pLP3PhPZBBNhl/MYZ";
+    sout << "5tOkpwV4Ivmz57C97Q6TzMAU2/gBtjAKteIYYbvMl7xdPI2toImavLI9MpPYXJw0TGHymAacJ+yF";
+    sout << "FpD7kjTxwQF+ILgRSjTH8At54cbI4Y2Gyf+mCVr9qNvOTOvnDo0uIlxCiLK2oilOriV70QVMa8pU";
+    sout << "dVnew4z32w0MATHYjQgWg/TFXpimLbQst/lRKhW0+l5KdVe/P/jPIwB7UR3MQPg3T8p8WIuXB+TX";
+    sout << "VKEF+vJN2NJ1icNpA/4I9X/o8DMPXnl70r5HAFIiCulQ8mqkYaDIACOCX1xq/sGLUXmElWTxgars";
+    sout << "EfXzjQTsgATtaARWatOasbTZh7SBH4CCpRnB7fYfIDlB/LJbVPsW4fhOxh5FST92QBUmjKSFNWwd";
+    sout << "BMv6JNqY1h516Yd3WG1lOoFdvDPD0dOnhZL1sOy2jya4o4nIFPQ5+TEtjbsf06Phi9cEYeYdf409";
+    sout << "pNpY6losWJOZUiraf5QFv3rbPryHMx+Zj2z+FHgZ+vsJurMvlHNgGCzpS26azM0l4Ed86g0qd7lc";
+    sout << "nBl40tu+4s3GoZulbscBuofA9wjjRc012TTq40/08o43m/ihTeFM/KoGFlOf2v60OIsq27eab61F";
+    sout << "OsJ1vKycYLZXEzCvMdN66fgetGkTPzF9b5hRILG1PpBtHIJH/+FDUoFVzUJznYWT8EZ7qdW0F5+9";
+    sout << "WlXsL5gQJ7PV4ffSjWYHbw3R50xcsbU8m56VlufWW+L0jhSoCEahYn05HYBGf8D7fDspkGF24La4";
+    sout << "MJhjOSs6r2c4ICgLo9X5Bfncee9nsXLTmi+QdKszy0TmQbEpTrhtP2wzpgMleUHHxMlbin7MP5YW";
+    sout << "4MITFI53rh06whYd/IbwE7siF4JV7iFNPtT9qu7VC10MqPtIbm8AFxRQfgINAXcokh62bkqVEBEM";
+    sout << "o+H1Lzoji6+TalslrSiyjgYmqQcdtP+47KWPwnOorGud1dYfQu6yplRWhHhmGWUAHKrR4j8XhSbz";
+    sout << "gd5xgfm3kAj1WiIjYWJ5cuZws+KUnQVqDs+3v6w6oDn//pty2Xk4ogVXHVqqzCwWGNmr30ywPjMR";
+    sout << "ce15ZPue6TQZ+hRRaq4RN4m6CZdX0nM684xZNvRsG/JmCbzTrUacjvhBWNOjrbg3PyqrFFIGfnIX";
+    sout << "CRWNJPur+r0tlERGA54kW+8EofT7XwM8co1NdCoPhthnioJNnkEYE7OEhPu3OVwjLTmtC1/fxg4w";
+    sout << "sAeKkrPaPkJWl/rvnTFBZz7iVbAYkMBkps4EwxfzT02hY4H9aWmFqHXhGbuglimDAdBTTr+1FLgJ";
+    sout << "N5kII9wy3x6zSib8T7UGxgLEHp5Z06LZflvCp1PzAYu/m6EzPGx2mKV9zoxeCcP2KLXjXt/k5BQs";
+    sout << "JJvxMg+2cr5ztZOeGmGH5l256HPB6PAX7CqKae5EWgJsVNpk5l5zBiCAL+zZ6ff8bDM0MXlYm7U8";
+    sout << "LvaWOafIAXQEmTsEtsu6Cta/l57M5VxrNLtUgEUB1g/mLiCxZK5CoVhB/O38bGn1los3BJRNUAuA";
+    sout << "f9aUMfyJdg4GcdD6LqhGhiMlgPNcXNRDw+gcpZWbcbBrzJEDEJwxa0unaRCPz3ofVBGuBGcNVOaC";
+    sout << "sRcYWqCud1X1uhteo2wAsQa2PL1OG334n/EK/gn+fmQ++gZtj9hQBZB+OWPu8Ne61J/vuS21AumA";
+    sout << "art4I6UhX05mIlfX9jXqkiRKNyzYmrWDXuKXxRYPsXfA71gmjIix3DIRhOm4ck60LkyRgHX4Rd1Z";
+    sout << "WNEdXGWZLuA5supwGBxP84JkIqP6dJlgG7J+uJJkxWRUrrmuPhJtAKqc2wuk1hQhNh8uPCovj4r7";
+    sout << "8PQ7T1y3Qb4A4It6we95qScZ+CYxJJuRMn2CTFqWGVXQG4IGSAYYdxrsvhq+COlInIPuuMhLNOWH";
+    sout << "A9AnVXoKA2d6Ai00DGCH+up7prj62JAv+OIZ4MyskajttAQ78pT7N+JfCMAlVPnN5+QUEqIVVpbN";
+    sout << "X2hLZ66Zelxq3NQlxRpcoKfM642bbZdgtIywsRF0tgJw6EkD5HRobz2KqdtS49XjH2j2JwN+wRnC";
+    sout << "2UJJP45pv3Q6usif9O/FsKZuoLlsZHQQyVZe7+mmvdCY2MGFV/zs4PF3Vsg5wJuNmEnEw2FIiR3Y";
+    sout << "iXal6mZcIIqwi6S7X4KMOF4a210Oij8CpUfMHKvH44tNKavWUO+em4Jr6r/Q9WqKZP2ypv50igVq";
+    sout << "V/Y22dL4RkzlfVAH8/ZzrhlXB0fdFK5zqWiN5wN2oiMSeUtQ/znRLCCNlM8WE57zaZM+eruc5jxy";
+    sout << "dwh0PoidlnqIkrjLntDBnT6yGKDsDieDBv9WLQ0AZVUQXINHnoQAO2dgpzB46KaJNYDJ+ZH3djFW";
+    sout << "LMvuP6s2Ac83ruEJ3NeB03a/neqViQx34PMYKX/zmOvf7DXVj5QVao56CXp1ITOnviEo31PTQ5s4";
+    sout << "pjUlrtEcMwhzvW+yOTLfDLWiUKNOV4MNrVEoBFcGN+X85pHluOFDBSARKaT8vQmVWKcSow7lOGsy";
+    sout << "vLj236mqpUdpDvIHylonTjtnD+JGu1PWJflKEVXB/YDOh8ASovudwgAhCJE1enKNIUcngdRXYDUZ";
+    sout << "d2KNal8mYOmRti3aBCGWv9BFKYn3dLMCP3BAS0V7VXf4tDVAKYOWljOFvOoJv7IGKhfHeLQURaJ7";
+    sout << "RFtx3+4KBXEgBOKDeGu9/XnSkY4Dj9m2sFmjXT9/NRcLZZWOxYbXmD47QjVaV0cUW0G4iJ6xnAnv";
+    sout << "SS+13UFj3xbtlMrIz7Na/B2yTKiw0QTJbSXZ3lSHbELvglDfpUP5re/bb90e3G+IViHdtQKEsaKA";
+    sout << "R71aO4wM6zM6avPomduTxBsd5WpQoHSvvzSNwGzN3C2ATxKXx4XcizZAyjsOqY2oHFS3g+PmRnmp";
+    sout << "we06v0Ea/CX+dZ7Y2Pmx0oGJ6FEgYL7MBPKhJerfjLtEeS9VQe5zPrhO7FpuEqZ1MUV0MO3MaOSF";
+    sout << "Ytn9L63Gc91NTrvcocHnJ6faZ8f7va13+kJVSr9/Y9+07g6LcMezeJKDW0fQ//6JahNi1/VFfP2a";
+    sout << "/G0qFGJrx0hO64NubdS4IcAnmVsyXhxKP1igo3QhlXcw5ZFATcfljYlbh8vkQ5MXRc6+7BILEGRy";
+    sout << "n533RXrIDTAO9tTG8V4G5zqq57X4yMmbh+ALtI9Xteqk4RvcrKXb5PjXeqx9GwL4t0OMLD+cF41n";
+    sout << "su8x7IDh62AdXf7EkIXLjActcdpnsFIR12nzvyhxs+flpCWSCyMwpqy7ASaO/0yYttcTJNNhvlC5";
+    sout << "zp0WgOfvzPu9/CnnARrsYnkJaKSrZAgLvxQf6FZv4ECnQ6yyJIWZOG3BQ3YrWCNYHbHn1hfWaKl2";
+    sout << "esmRMpsNqrlTiIihNwL1ySzJ+oZT9H1M11iqqdUUIyIpDSDOBxN8VyKM38ykqQpl+kCO5rSon7fT";
+    sout << "sagqrJR5wCfXHOUY55ixmf32gq5iq00Ih6WRjLGpHRiSl/dhbAGzxYKSgrBeGZKaTWKpt7BPATcl";
+    sout << "nWLYJsPQYdqSncyLJ3fNzAS1gIoxuAxqbuEpRYobX4wXFZBEn6rn1I9wnivjRgpt+BNOBj2QcFgw";
+    sout << "aJLinc1pcGFaY/mLhH4I9PTYq903a3w4tuw0xALDL/cQKjvbOPXp/lhl67Eyi6ZVOVbkJB34ccKE";
+    sout << "wjWG7LU45b1v2WtzDVfOhu17GM1rk1q9VWKVftDixnIDDeUjx12wsJRZ5V0Jnxs1/ajWrzLbmnND";
+    sout << "EBsiloE1ng3yajyhH4qL9VL/7r4n8MwXlQanpCsIwmiaydKbnjKTxfGMqSeEwHSq0sA0k+hSJXxW";
+    sout << "hDLdgRMdmk/22Z8grtkpJvhU8tamcEPD6QT2xxZP2AunCnsI0FyP/MhFWIfxxFbAxqAAMEZKzl+U";
+    sout << "AjBusrUfEKjTwFCXMzQ63ArMVDl96hmRvQYMmDiBddaoS0QZqaljSWOWO7Syyqht4p8kTZ9zMQ1S";
+    sout << "7ntDdB63y7GEIOutDpm6LP0Tu+piROxhdrmrf3w3s2u6XmMwhXntIFxbxes04EsqFxQfK6xmb3ws";
+    sout << "NZiidakdtSbOj2QOistt7agZz0JVwe6N863TOVID6FS2fp/73u7mOn5yTTKjFjp83pOf6cQADCzw";
+    sout << "GWdhc5eULE7U9Tx8JSCn7/X48hKbtQT9LS/WcH7lRN96eWG1p+uSLe4Bu5LnW8MvosxIJXdAhNRy";
+    sout << "ct6XLuT5CZt5rGITmKICiKyFdrtPpueLyFIQ0Q3jByNWNrtFo6aQENMSmGM3hQgQfVJNHiKajM9t";
+    sout << "ugsXtQb29TK1SpjyvY4sHLaEiXAPywbHQ14eVcEWa/sjqOavrnrTtWjIEvL2XiZ6KHZYf7yDx6Xq";
+    sout << "NibtkmOtiVxlFXuk1Y52iZ4UUuJft5liEo/jFUX67RHY6xFUqk/tCpzeSL/hME5qw7cx55ROGTcg";
+    sout << "QqLzD3U5G2QqtfBXokVzsXgmY9H4O40VBJi84Im0tWHyhVe/p6oLzLeRevjcDfmuNXM7o3veJajU";
+    sout << "Vu/8X+Zng/m4JF55LWDKpf6ArsxweoThhTmdtrhLjhzkHABhYaZXEd93+jGoY+iKClS2B1/2AOqP";
+    sout << "V5O7zO35eoU99xzIDC6+ZglcGhxFn6uVc13oOwqyQJgojvT7LGtHOsBxpAz8j3+E9S8WDmMzUkEl";
+    sout << "3J4tO5gZZKVi3qrNqXKs9SowG+mGid170UnPrlp+9XeYorlNdwNVbkOM8/gBDgIZ28LFega2nFtX";
+    sout << "/D8ckqTz2E6bkU6yljZ8rzpCmrHB++8h5W3izJPgsw2JpyTxgeGvq/R6JSqlhccADAc7qHsFBT9c";
+    sout << "W37yC0S0TPQu1E202GQ6dI5a6IPFvhVfhZ+XwByWBm+qyI5BkXFhd7aDXiPJ/6i72InsuQUr6YV6";
+    sout << "qS33wlXMdT69KjNDmJvNMY6H3WWdW7uawPpt4TJCwzGZsw6o8Z51q5Gj1l7mSmENiZUIFBYe/uku";
+    sout << "AE07Z/K5DsamWDrCzB/HByaLCSouElNvRgD0dy74YSuir5o6gkWMlgtLif9Q12tg9a2VN4aEbRGz";
+    sout << "WqiR2REmklVmiSHy6Eqp9kKvtoKHECIaWWXk2i3qqZ79xaBrYuh66Qtq7TTnnoeZSY0APDewwMsX";
+    sout << "7J0O1sOd7pzxBKoCUpmccPgcOmLzUNU28j1Hz4ehbJX2F1kU6F+IL3kZlOLk+U4Z5Llwz757AS/4";
+    sout << "IuQqtqkfgnLco88sFTlfSezhuMyO0q1d3GFPuqIOBEi5bEBGQG7niZPGfdPeE5al4drM8iMWcXpF";
+    sout << "M1L4Rv7B1BrIhmj+a1tSRYF9j/kNfvW7m7bXjhfeJ4FgSTzrM7F9Q5PAqPeN9UEGHtSviyAiWcqG";
+    sout << "p/ttcZfEcHXqaMZ/SUmhvCasHVEZQTtqaojjIdDh55pOLd/HYQZEiiqZumwSWirmaKEnEFpYIvmn";
+    sout << "gHhvZ03jEoMbkDec3/hCfyKf9iboM0Or6VZyZ5emKv/Gvyz/YEUYOGvWIkyMWJ5SwnEFSMF1Hhvx";
+    sout << "GKZ+VUv7D7yEa/XMcM7llUJ7mPW2ErQa1qM5eLp5kinFDtEw63xYG+nAg8XAT2pss1js/pprv05P";
+    sout << "53Bu5GaxNw8TiTgJTT9LCRWyc5XmuB+KudTz27gkB+vuX9LQgjwRZxRFZjF0WhvDZZGE8LHCcYuF";
+    sout << "EdIMbihlEeNxJq+0mbyzno5eDQIwl5FdCl+i4cD7dUhhuMVeNFjMuPxEdbXX3RQ0EXkVphZX3N6R";
+    sout << "3iJJ7H7oLfQhe7W23+UmvCaCx0VLqfdwWt9l+R2mrUItecivLKjSVptHUk3kAK1nTnjBCFFPMhKk";
+    sout << "gVynIOzQp+xasG0OW+3rZxR97TDWnbFj7kl7qY4tGxeln+xfouCRWJCpjTpKlZ45sJH1zSpkqmoh";
+    sout << "xBv9TGmxahVA8flkcKrYP6VdsmY58o4EN1mO0eZKRiZi8kSoDGihIf/agcYNN6gTzJdxYLQVcKjc";
+    sout << "69KGvZOM8o5ERaPM9Mi5+bctSKCMb9e2OlP1aYPum/84y4IvjAXVK0jecnvwZgNivF//4rDrmNNS";
+    sout << "r+YwTr9wsg4B1fak6GdkwWPSjEnHX1R+Sn+X3i42DF0YJ3AwSB6my5hcXhBo7odoUYeTpSmGTjNo";
+    sout << "N4KKogzsCKnyTIIa2mK+jdtqiDLWJB0jcHnusL3kGRDM6Kd+XhJk4nG6mA5xRFoYuu2IfGkAIwRK";
+    sout << "xlSl9RKix6/VL/OgRIrLLO3Loi6tFvOikTqS7AUMiPzRs0ZHarsx65ThhAHw8u95R+7iSZd+juTZ";
+    sout << "KHjlCgOCXxhTUqkXNc+dQh6coqRI6+Zr8+ETCzRQJMxdY4RFgyYFpAiQf5fYxf11CMZArd0X/L6C";
+    sout << "0fjkI0ICHiAJGT1/qzaqqoTEFDybcue3EmNv/ZtkE+4nLjX7It8za9cGTSvRGeorOL0fCMEO/Pa+";
+    sout << "/cbY6/D7QdO/cY4unu3CJIB1JmrDL4VV5vo1WaglQHbtpnv+r4+HWO7KLf8dm/f2VcAoIJ4NOvGa";
+    sout << "tGMuiuLJn3Yj0jh/+k/rjgxVDo2yqkJSIUFIwJ9Zd0JK7I9f2vtQwJw0C0grk70rdivsqheSxWWW";
+    sout << "ot/TyryX9Nmsm+igbSzGs2rer4DJb2T4H/vm50cnGOHVs5ttYD9N/SNLb75xXk7FRWV8TXvOSuyh";
+    sout << "QU7Ntc6qDLktj8n4Zc3bXdtuEPNDkWPdJQvcOizwyrMjjd8zZeLWTjWGZtHl/85Km+kob8uYqEmS";
+    sout << "8pejfi/NuCyvZ3KGRKX90qu6ZRvGLhqMIjwFzzuR1PSSe6SuJkYALMyI5LfDQXoHQ1ksxwFQVLy7";
+    sout << "PHv10rr88rxRbmr6EyqeSrKdGoS6Dee/tpq+8lZsf/eeKb7k/ZhcZEfNumSf7WPsjMgkatsXkikn";
+    sout << "B7CL4IgDWgUWIhE8FS6h3ZK5D2HNeDbzD0jT6iKW7MpT+XcbvcajqPkIs+UsMbL5X9Jrss/b1MkI";
+    sout << "I+1GSj8emDxZA9xUbhjBzX5zGFBBxHzI6FZutmMMdgDRMMwuhpQ9OSgTvTMxK7TnyHVoDcfoHd+4";
+    sout << "e9IywxCOUcKfehSF/AA8U9mSK1QRVd8wEefq04K+iOmwGrnxzKooa3MsFt95/9Fty5CVO6DJ9ABi";
+    sout << "bseoMNu6sAN1rwOBez/v4+u/gXh95MFq/Ps3kLNVOscPACMztm2FpRR+4D1UKJtiw4aMcPLVw2U4";
+    sout << "Re9fg6yUttVnT/2Zpi40DYYBWwcEpu9jYqNXfVvpPnaFEyYyqyuvlO3xAeY9xOU9LBt11wnxqAU/";
+    sout << "d3IsXqMRW/fg3aD0li1uWBMXOtxltWHZiwehDFmQuEvIO801I8DsuZHniGKnVGvs18gwT3+xw79V";
+    sout << "JooLIlUFAB3qPtsMPlgXBlRrjsp4aPZReLwFz5thoI4pXDDjr0FoXfpja8SR8y/2A1JAYkhBoQn1";
+    sout << "eCbp+Lj0GCks1q/BKck3CLJYmfGlEdNRnKbureBdyS9FP+QXivlcYHGX9I3tNE9aaJwGj+x1pXgJ";
+    sout << "FDCHwZS/rI4Z+MYuaDKNPv0gnMAqozvpW7V55nXQn1UpYzfq6bMEB1jVaivfHtFsPaAs5NH3lPNJ";
+    sout << "KTvp9lyce++JND5ucXEy4gbU6KIqjydn92fKiVGitPo2+cdksINDjNuZ0kp/FNpaJZ7eTEzlsoQL";
+    sout << "1Yuvj23499OP/Ic2eczI0sHb/3etqRtiqlGSJt0tEmviwugXesu/W6h90rw4B6SNJieKtI0BjJdn";
+    sout << "XA7/IdIkFJBhbP+bUWbmyVP3e1gkrumx37i4pk8vUTc4mUgmgEiUtQT5jPPoxLP4Gv/XkihKDJfn";
+    sout << "39F/u4D4GwK0E2SQCTgvzdFox9RF82Jcr8mqTG4ZioN0eUiztSRKSeCDstFuio61MMXVHZYP7vPR";
+    sout << "UOqHO0JEjHvVxBaliN0rcr3OIGyXnbNMQp7SqLOX6fxgvXTmiBvKDyKrD/uDDuc1h5JhlHr6oqHi";
+    sout << "lRJb9cjWQL5+I4bV4OJcwUsXihSo0aIjgTtgN55MiKlh2tpzyuHo5uJ5v4Yjc/nGAZb5vgt/nK2z";
+    sout << "+4RsfCJ2YEWM5x9/RfShO0RB11qXesVlzCYiI7n9a9theAMWx8GbQNMRFepAkLroxrbhi+r8kBi7";
+    sout << "aD830HnkdsZ+J/xARtgP+hP4AVy62+YTTZmMwmL2o7NsYmnJFEm3StJBfYlVhxvYfi7XksYnh8aC";
+    sout << "1dpxGlAgnlVkJYrByDKRDN8pl71AfXjco0qEFWX7qNOvnwrIjw6tbhXNwJvnUaltkh928POn2du4";
+    sout << "fScR7d8o3zwKxJsl4ToTArOJ4iMwBKtQm246acDAk6kUigELMmU5/AWN7SbHgmtyGAfhSlp6fj/9";
+    sout << "aq8xRTAeptxyHYVsSQw+23SwGnKLIYscVE3Z8nf6rVff3doYKofr0sgEUKoC6f5ZrIftCg2jWZjh";
+    sout << "QPOR5DtQToLK4qDikasT4MzxumifQgNETkprdBrknTO0FgX9/u6dglySnKuHa3LSTTOg/zN9Wpyq";
+    sout << "pR5lJVWAhj7GDCBePEFdDT76sP7wn8gMzqlECOXNNMjKPINC/T2Y9YxCT2g4N8IEnm4L1cpaEjqF";
+    sout << "idiTgGd1jGhNhC7jLKMzSaC2ZVesNP+kl90zuRTphhQ584qPe3UsvcD9SwQqf2sG/GebOAZOKuir";
+    sout << "RLVHSoehVin2xRsNs6CKF7DhQbxSBrsFq+C9i+1Wvmm9TDtpxcnjhnIrvd/72+F2ltTNBXVls16f";
+    sout << "WDSbZtuATt2VQzq5CfnGlu6u+1VPogAt7LeucGmpQkcfPwL41MysG7DIvs0Wn3eytTcb9bmez/xp";
+    sout << "IxnqFH+fFicLyEt+Cci+uHzuq8TOLXGUoIksdL4yXtNUmGwgq0cIFa6tafOjRe7Zb4wI25K3V6dt";
+    sout << "KxEiyMq1iLSwbEiHZoQg5KMLnhFpRpdk3GEqkjJW9V+r4WV9sR3gPgOtD2HpUfBw3z2Y";
+
+    // Put the data into the istream sin
+    sin.str(sout.str());
+    sout.str("");
+
+    // Decode the base64 text into its compressed binary form
+    base64_coder.decode(sin, sout);
+    sin.clear();
+    sin.str(sout.str());
+    sout.str("");
+
+    // Decompress the data into its original form
+    compressor.decompress(sin, sout);
+
+    // Return the decoded and decompressed data
+    return sout.str();
+}
+
+#endif // SLM_DATA_H
