@@ -522,47 +522,11 @@ int main(int argc, char** argv)
             std::vector<matrix<int, 0, 1>> samples;
             std::vector<unsigned long> labels;
 
-            // Calculate the maximum number of sequences we can create
-            size_t num_sequences = full_tokens.size() - max_seq_len;
-            if (num_sequences <= 0) {
-                cerr << "Error: Not enough tokens to create training sequences. Need at least "
-                    << (max_seq_len + 1) << " tokens.\n";
-                return 1;
-            }
-
-            cout << "Creating training samples...\n";
-
-            // For very large datasets, using a stride can reduce training time
-            size_t stride = 1;  // Default: use every possible sequence
-            const size_t max_samples = 10e6;  // Optional: limit total samples
-
-            // If dataset is very large, use adaptive stride
-            if (num_sequences > max_samples && max_samples > 0) {
-                stride = num_sequences / max_samples + 1;
-                cout << "Dataset is large. Using stride of " << stride
-                    << " to limit samples to approximately " << max_samples << "\n";
-            }
-
-            // Reserve memory for better performance
-            samples.reserve(num_sequences / stride + 1);
-            labels.reserve(num_sequences / stride + 1);
-
-            // Create training samples with stride
-            for (size_t start = 0; start < num_sequences; start += stride) {
-                matrix<int, 0, 1> seq(max_seq_len, 1);
-                for (long t = 0; t < max_seq_len; ++t) {
-                    seq(t, 0) = full_tokens[start + t];
-                }
-                samples.push_back(seq);
-                labels.push_back(full_tokens[start + max_seq_len]);
-
-                if (samples.size() % 10000 == 0) {
-                    cout << "Created " << samples.size() << " training samples ("
-                        << (start * 100 / num_sequences) << "%)...\r";
-                }
-            }
+            build_single_token_prediction_dataset(full_tokens, max_seq_len,
+                tokenizer.get_special_token_id("<pad>"), false,
+                samples, labels);
             full_tokens.clear();
-            cout << "Created " << samples.size() << " training samples (100%)...\n";
+            cout << "Created " << samples.size() << " training samples\n";
 
             // Build and train the network
             using net_type = my_transformer::network_type<true>;
