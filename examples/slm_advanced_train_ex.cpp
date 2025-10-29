@@ -522,7 +522,7 @@ int main(int argc, char** argv)
             std::vector<matrix<int, 0, 1>> samples;
             std::vector<unsigned long> labels;
 
-            build_single_token_prediction_dataset(full_tokens, max_seq_len,
+            build_single_token_prediction_dataset({ full_tokens }, max_seq_len,
                 tokenizer.get_special_token_id("<pad>"), false,
                 samples, labels);
             full_tokens.clear();
