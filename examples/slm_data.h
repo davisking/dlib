@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <dlib/compress_stream.h>
 
 // Utility function to concatenate text parts
 inline std::string concatenateTexts(const std::vector<std::string>& texts) {
