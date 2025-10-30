@@ -54,9 +54,7 @@
 #include <dlib/dnn.h>
 #include <dlib/data_io.h>
 #include <dlib/cmd_line_parser.h>
-#include <dlib/misc_api.h>
 #include <dlib/tokenizer/bpe_tokenizer.h>
-#include <dlib/serialize.h>
 #include "slm_data.h"
 
 using namespace std;
