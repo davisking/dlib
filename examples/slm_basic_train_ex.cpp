@@ -263,7 +263,7 @@ int main(int argc, char** argv)
             for (int i = 0; i < generation_length; ++i)
             {
                 // Get input window from context
-                //auto input_seq = ctx.get_input_window();
+                auto input_seq = ctx.get_input_window();
 
                 // Predict next token
                 //const unsigned long next_token = net(input_seq);
