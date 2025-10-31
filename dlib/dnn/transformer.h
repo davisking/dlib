@@ -23,13 +23,13 @@ namespace dlib
     // ----------------------------------------------------------------------------------------
 
     template <template <typename> class ACT, long reduction_factor, long d_model, typename SUBNET>
-    using projection_head = rms_norm<ACT<fc<d_model / reduction_factor, SUBNET>>>;
+    using projection_head = ACT<fc<d_model / reduction_factor, rms_norm<SUBNET>>>;
 
     // ----------------------------------------------------------------------------------------
 
     template <template <typename> class DO, long num_embeddings, long embedding_length, typename SUBNET>
-    using token_embeddings = rms_norm<DO<positional_encodings<
-        embeddings<num_embeddings, embedding_length, SUBNET>>>>;
+    using token_embeddings = DO<positional_encodings<
+        embeddings<num_embeddings, embedding_length, SUBNET>>>;
 
     // ----------------------------------------------------------------------------------------
 
@@ -51,7 +51,7 @@ namespace dlib
 
         template <template <typename> class ACT, template <typename> class DO,
             long seq_len, long d_model, long num_heads, typename SUBNET>
-        using multihead_attention = rms_norm<add_prev1<
+        using multihead_attention = add_prev1<
             DO<linear_no_bias<d_model, reshape_to<1, seq_len, d_model,
             multm_prev2<softmaxm<tril_mask<
             scale_weights<d_model / num_heads,
@@ -60,13 +60,13 @@ namespace dlib
             tag3<transpose<
             rope<key<seq_len, d_model, num_heads, skip1<
             tag2<value<seq_len, d_model, num_heads,
-            tag1<SUBNET>>>>>>>>>>>>>>>>>>>>>;
+            rms_norm<tag1<SUBNET>>>>>>>>>>>>>>>>>>>>>;
 
         template <template <typename> class ACT, template <typename> class DO,
             long d_model, typename SUBNET>
         using feed_forward =
-            rms_norm<add_prev4<
-            DO<linear<d_model, DO<ACT<linear<d_model * 4, tag4<SUBNET>>>>>>>>;
+            add_prev4<
+            DO<linear<d_model, DO<ACT<linear<d_model * 4, rms_norm<tag4<SUBNET>>>>>>>>;
 
         template <template <typename> class ACT, template <typename> class DO,
             long seq_len, long d_model, long num_heads, typename SUBNET>
@@ -110,7 +110,7 @@ namespace dlib
 
         template <template <typename> class ACT, template <typename> class DO,
             long d_model, long num_heads, typename SUBNET>
-        using multihead_attention = rms_norm<add_prev1<
+        using multihead_attention = add_prev1<
             DO<extract<0, 1, 1, d_model,
             multm_prev3<softmaxm<tril_mask<
             scale_weights<d_model / num_heads,
@@ -119,13 +119,13 @@ namespace dlib
             tag4<key<num_heads, d_model, skip2<
             tag3<value<num_heads, d_model,
             tag2<fc_no_bias<d_model * 3, rms_norm<
-            tag1<SUBNET>>>>>>>>>>>>>>>>>>>>;
+            tag1<SUBNET>>>>>>>>>>>>>>>>>>>;
 
         template <template <typename> class ACT, template <typename> class DO,
             long d_model, typename SUBNET>
         using feed_forward =
-            rms_norm<add_prev5<extract<0, 1, 1, d_model,
-            DO<fc<d_model, DO<ACT<fc<d_model * 4, tag5<SUBNET>>>>>>>>>;
+            add_prev5<extract<0, 1, 1, d_model,
+            DO<fc<d_model, DO<ACT<fc<d_model * 4, rms_norm<tag5<SUBNET>>>>>>>>>;
 
         template <template <typename> class ACT, template <typename> class DO,
             long seq_len, long d_model, long num_heads, typename SUBNET>

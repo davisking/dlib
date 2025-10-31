@@ -266,9 +266,7 @@ int main(int argc, char** argv)
                 auto input_seq = ctx.get_input_window();
 
                 // Predict next token
-                //const unsigned long next_token = net(input_seq);
-                auto out_token = net(std::vector<matrix<int, 0, 1>>{ input_seq, input_seq });
-                const unsigned long next_token = static_cast<int>(out_token[0]);
+                const unsigned long next_token = net(input_seq);
 
                 // Print the generated character
                 cout << static_cast<char>(std::min(static_cast<int>(next_token), MAX_TOKEN_ID)) << flush;
