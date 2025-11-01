@@ -27,9 +27,9 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-    template <template <typename> class DO, long num_embeddings, long embedding_length, typename SUBNET>
-    using token_embeddings = DO<positional_encodings<
-        embeddings<num_embeddings, embedding_length, SUBNET>>>;
+    template <long num_embeddings, long embedding_length, typename SUBNET>
+    using token_embeddings = positional_encodings<
+        embeddings<num_embeddings, embedding_length, SUBNET>>;
 
     // ----------------------------------------------------------------------------------------
 
@@ -118,8 +118,8 @@ namespace dlib
             query<num_heads, d_model, skip2<
             tag4<key<num_heads, d_model, skip2<
             tag3<value<num_heads, d_model,
-            tag2<fc_no_bias<d_model * 3, rms_norm<
-            tag1<SUBNET>>>>>>>>>>>>>>>>>>>;
+            tag2<fc_no_bias<d_model * 3,
+            rms_norm<tag1<SUBNET>>>>>>>>>>>>>>>>>>>;
 
         template <template <typename> class ACT, template <typename> class DO,
             long d_model, typename SUBNET>

@@ -94,7 +94,7 @@ int main(int argc, char** argv)
         parser.add_option("generate", "Generate text from a previously trained model (needs shakespeare_prompt)");
         parser.add_option("learning-rate", "Set the learning rate for training (default: 1e-4)", 1);
         parser.add_option("batch-size", "Set the mini-batch size for training (default: 64)", 1);
-        parser.add_option("generation-length", "Set the length of generated text (default: 400)", 1);
+        parser.add_option("generation-length", "Set the length of generated text (default: 550)", 1);
         parser.add_option("alpha", "Set the weight decay for Adam optimizer (default: 0.004)", 1);
         parser.add_option("beta1", "Set the first moment coefficient (default: 0.9)", 1);
         parser.add_option("beta2", "Set the second moment coefficient (default: 0.999)", 1);
@@ -111,7 +111,7 @@ int main(int argc, char** argv)
         // Default values
         const double learning_rate = get_option(parser, "learning-rate", 1e-4);
         const long batch_size = get_option(parser, "batch-size", 64);
-        const int generation_length = get_option(parser, "generation-length", 500);
+        const int generation_length = get_option(parser, "generation-length", 550);
         const double alpha = get_option(parser, "alpha", 0.004);            // Initial learning rate for Adam
         const double beta1 = get_option(parser, "beta1", 0.9);              // Decay rate for the first moment estimate
         const double beta2 = get_option(parser, "beta2", 0.999);            // Decay rate for the second moment estimate
@@ -125,16 +125,14 @@ int main(int argc, char** argv)
         const long max_seq_len = 80;                      // a small sequence length for the example
 
         using train_fused_transformer =
-            loss_multiclass_log<fc<vocab_size,
+            loss_multiclass_log<fc<vocab_size, rms_norm<
             fused_transformer::transformer_stack<num_layers, gelu, dropout_10, embedding_dim, max_seq_len, num_heads,
-            token_embeddings<dropout_10, vocab_size, embedding_dim,
-            input<matrix<int, 0, 1>>>>>>;
+            token_embeddings<vocab_size, embedding_dim, input<matrix<int, 0, 1>>>>>>>;
 
         using infer_fused_transformer =
-            loss_multiclass_log<fc<vocab_size,
+            loss_multiclass_log<fc<vocab_size, rms_norm<
             fused_transformer::transformer_stack<num_layers, gelu, multiply, embedding_dim, max_seq_len, num_heads,
-            token_embeddings<dropout_10, vocab_size, embedding_dim,
-            input<matrix<int, 0, 1>>>>>>;
+            token_embeddings<vocab_size, embedding_dim, input<matrix<int, 0, 1>>>>>>>;
 
         // For GPU usage (if any), set gpus = {0} for a single GPU, etc.
         std::vector<int> gpus{ 0 };
@@ -297,31 +295,28 @@ int main(int argc, char** argv)
  *    + attention heads: 4
  *    + embedding dimension: 64
  *    + max sequence length: 80
- * - Number of parameters: 8,247,496
+ * - Number of parameters: 12,167,863
  *
  * The training can be performed using the following command line:
  * > ./slm_basic_train_ex --train --shuffle
  *
- * After this phase, the model achieves perfect prediction accuracy (i.e acc=1).
+ * After this phase, the model achieves perfect prediction accuracy (i.e acc~1).
  * The generation option produces text that is very similar or identical to the original
  * training data, as illustrated by the example below:
  * > Generated text:
- * > QUEEN ELIZABETH:
- * > But thou didst kill my children.
- * >
+ * > (...)
  * > KING RICHARD III:
- * > But in your daughter's womb I bury them:
- * > Where in that nest of spicery they shall breed
- * > Selves of themselves, to your recomforture.
+ * > Bear her my true love's kiss; and so, farewell.
+ * > Relenting fool, and shallow, changing woman!
+ * > How now! what news?
  * >
- * > QUEEN ELIZABETH:
- * > Shall I go win my daughter to thy will?
- * >
- * > KING RICHARD III:
- * > And be a happy mother by the deed.
- * >
- * > QUEEN ELIZABETH:
- * > I go. Write to me very shortly.
- * > And you shall understand from me her mind.
+ * > RATCLIFF:
+ * > My gracious sovereign, on the western coast
+ * > Rideth a puissant navy; to the shore
+ * > Throng many doubtful hollow-hearted friends,
+ * > Unarm'd, and unresolved to beat them back:
+ * > 'Tis thought that Richmond is their admiral;
+ * > And there they hull, expecting but the aid
+ * > Of Buckingham to welcome them ashore.
  * > (...)
  */

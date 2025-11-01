@@ -95,10 +95,10 @@ namespace dlib
     template <template <typename> class ACT, template <typename> class DO,
         long d_model, typename SUBNET>
     using moe_feed_forward =
-        rms_norm<add_prev5<
+        add_prev5<
         weighted_sum_of_experts<ACT, DO, d_model, skip5<
         tag6<moe_router<DO, 2,
-        tag5<SUBNET>>>>>>>;
+        rms_norm<tag5<SUBNET>>>>>>>;
 
     /*!
         This transformer block is assembled from individual components:
@@ -146,7 +146,7 @@ namespace dlib
         long num_heads = 8,
         long embedding_dim = 512,
         long max_seq_len = 300,
-        template <typename> class activation_func = gelu,
+        template <typename> class activation_func = silu,
         template <typename> class dropout_policy = dropout_10
     >
     struct transformer_config {
@@ -181,11 +181,11 @@ namespace dlib
             classification_head<VOCAB_SIZE,
             projection_head<activation_func, 2, EMBEDDING_DIM,
             repeat<NUM_LAYERS, t_transformer_block,
-            token_embeddings<dropout_policy, VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>,
+            token_embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>,
             classification_head<VOCAB_SIZE,
             projection_head<activation_func, 2, EMBEDDING_DIM,
             repeat<NUM_LAYERS, i_transformer_block,
-            token_embeddings<multiply, VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>>;
+            token_embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>>;
 
         struct model_info {
             static std::string describe() {
@@ -363,7 +363,7 @@ int main(int argc, char** argv)
         parser.add_option("learning-rate", "Set the learning rate (default: 3e-4)", 1);
         parser.add_option("batch-size", "Set the mini-batch size (default: 64)", 1);
         parser.add_option("patience", "Iterations without progress before early stopping (default: 15000)", 1);
-        parser.add_option("max-epochs", "Maximum number of training epochs (default: 10)", 1);
+        parser.add_option("max-epochs", "Maximum number of training epochs (default: 100)", 1);
         parser.add_option("alpha", "Set the weight decay for Adam (default: 0.004)", 1);
         parser.add_option("beta1", "Set Adam's first moment coefficient (default: 0.9)", 1);
         parser.add_option("beta2", "Set Adam's second moment coefficient (default: 0.999)", 1);
@@ -383,7 +383,7 @@ int main(int argc, char** argv)
         const double learning_rate = get_option(parser, "learning-rate", 3e-4);
         const size_t batch_size = get_option(parser, "batch-size", 64);
         const long patience = get_option(parser, "patience", 15000);
-        const size_t max_epochs = get_option(parser, "max-epochs", 10);
+        const size_t max_epochs = get_option(parser, "max-epochs", 100);
         const double alpha = get_option(parser, "alpha", 0.004);
         const double beta1 = get_option(parser, "beta1", 0.9);
         const double beta2 = get_option(parser, "beta2", 0.999);
@@ -539,8 +539,7 @@ int main(int argc, char** argv)
             trainer.set_mini_batch_size(batch_size);
             trainer.set_iterations_without_progress_threshold(patience);
             trainer.set_max_num_epochs(max_epochs);
-            trainer.set_synchronization_file("data_trainer.sync", std::chrono::seconds(120));
-            trainer.be_verbose();
+            trainer.be_quiet();
 
             cout << "Number of model parameters: " << count_parameters(net) << endl;
             cout << "Starting training...\n";
@@ -599,8 +598,6 @@ int main(int argc, char** argv)
             net.clean();
             serialize(model_file) << net << tokenizer;
             cout << "Model saved to " << model_file << "\n";
-            std::remove("data_trainer.sync");
-            std::remove("data_trainer.sync_");
 
             // Evaluate on training set
             {
