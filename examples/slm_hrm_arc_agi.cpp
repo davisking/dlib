@@ -111,13 +111,15 @@ namespace dlib
         template<bool is_training>
         using network_type = std::conditional_t<is_training,
             loss_multiclass_log<fc<VOCAB_SIZE,
+            projection_head<activation_func, 8, EMBEDDING_DIM,
             tag10<hrm<t_h_net_type, t_l_net_type, HRM_N, HRM_T,
             token_embeddings<VOCAB_SIZE, EMBEDDING_DIM,
-            input<matrix<long, 0, 1>>>>>>>,
+            input<matrix<long, 0, 1>>>>>>>>,
             loss_multiclass_log<fc<VOCAB_SIZE,
+            projection_head<activation_func, 8, EMBEDDING_DIM,
             tag10<hrm<i_h_net_type, i_l_net_type, HRM_N, HRM_T,
             token_embeddings<VOCAB_SIZE, EMBEDDING_DIM,
-            input<matrix<long, 0, 1>>>>>>>>;
+            input<matrix<long, 0, 1>>>>>>>>>;
 
         struct model_info {
             static std::string describe() {
@@ -479,6 +481,7 @@ inline bool should_keep_sample(const arc_token_sequence_t& input_window,
     bool has_padding = false;
 
     // Check for padding in the window
+    if (target_token == TOKEN_PADDING) return false;
     for (long i = 0; i < window_len; ++i)
     {
         if (input_window(i) == TOKEN_PADDING)
@@ -546,7 +549,7 @@ int main(int argc, char** argv)
         parser.add_option("learning-rate", "Learning rate (default: 1e-4)", 1);
         parser.add_option("batch-size", "Mini-batch size (default: 8)", 1);
         parser.add_option("max-epochs", "Maximum training epochs (default: 1000)", 1);
-        parser.add_option("patience", "Early stopping patience (default: 50000)", 1);
+        parser.add_option("patience", "Early stopping patience (default: 5000)", 1);
         parser.add_option("task-id", "Specific task ID to evaluate/generate", 1);
         parser.add_option("verbose", "Show detailed output during generation");
         parser.parse(argc, argv);
@@ -569,16 +572,16 @@ int main(int argc, char** argv)
         const double learning_rate = get_option(parser, "learning-rate", 1e-4);
         const size_t batch_size = get_option(parser, "batch-size", 8);
         const size_t max_epochs = get_option(parser, "max-epochs", 1000);
-        const long patience = get_option(parser, "patience", 50000);
+        const long patience = get_option(parser, "patience", 5000);
 
         // Model configuration
         // Window length: 128 for quick testing, 512-1024 for better performance, 4096 for maximum context
-        constexpr long WINDOW_LEN = 128;
+        constexpr long WINDOW_LEN = 512;
 
         using arc_net_config = hrm_config<
             ARC_VOCAB_SIZE_TOTAL,   // vocab_size
             2,                      // num_h_layers
-            1,                      // num_l_layers
+            4,                      // num_l_layers
             6,                      // num_heads
             228,                    // embedding_dim
             WINDOW_LEN,             // window_len

@@ -361,7 +361,7 @@ int main(int argc, char** argv)
         parser.add_option("max-bytes", "Maximum number of bytes to process from data", 1);
         parser.add_option("percent", "Percentage of data to process (0-100)", 1);
         parser.add_option("learning-rate", "Set the learning rate (default: 2e-4)", 1);
-        parser.add_option("batch-size", "Set the mini-batch size (default: 128)", 1);
+        parser.add_option("batch-size", "Set the mini-batch size (default: 64)", 1);
         parser.add_option("patience", "Iterations without progress before early stopping (default: 10000)", 1);
         parser.add_option("max-epochs", "Maximum number of training epochs (default: 200)", 1);
         parser.add_option("alpha", "Set the weight decay for Adam (default: 0.004)", 1);
@@ -381,7 +381,7 @@ int main(int argc, char** argv)
 
         // Default values
         const double learning_rate = get_option(parser, "learning-rate", 2e-4);
-        const size_t batch_size = get_option(parser, "batch-size", 128);
+        const size_t batch_size = get_option(parser, "batch-size", 64);
         const long patience = get_option(parser, "patience", 10000);
         const size_t max_epochs = get_option(parser, "max-epochs", 200);
         const double alpha = get_option(parser, "alpha", 0.004);
@@ -392,8 +392,8 @@ int main(int argc, char** argv)
         const long max_seq_len = 50;
         const long num_layers = 4;
         const long num_heads = 6;
-        const long embedding_dim = 288;
-        const long num_tokens = 1500;
+        const long embedding_dim = 228;
+        const long num_tokens = 2500;
 
         // Fixed paths for tokenizer and tokens
         const std::string tokenizer_path = "data_tokenizer.vocab";
@@ -545,10 +545,10 @@ int main(int argc, char** argv)
             cout << "Starting training...\n";
 
             size_t epoch = 0;
+            size_t steps = 0;
             double total_loss = 0.0;
             size_t batches_seen = 0;
-            size_t samples_seen = 0;
-			size_t steps = 0;
+            size_t samples_seen = 0;			
             auto epoch_start = std::chrono::high_resolution_clock::now();
 
             // Training loop
