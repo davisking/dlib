@@ -391,8 +391,8 @@ int main(int argc, char** argv)
         const std::string output_file = get_option(parser, "output-file", "data_generated.txt");
         const long max_seq_len = 50;
         const long num_layers = 4;
-        const long num_heads = 6;
-        const long embedding_dim = 228;
+        const long num_heads = 8;
+        const long embedding_dim = 256;
         const long num_tokens = 1500;
 
         // Fixed paths for tokenizer and tokens

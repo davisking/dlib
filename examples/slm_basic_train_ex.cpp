@@ -115,9 +115,9 @@ int main(int argc, char** argv)
         const double learning_rate = get_option(parser, "learning-rate", 1e-4);
         const long batch_size = get_option(parser, "batch-size", 64);
         const int generation_length = get_option(parser, "generation-length", 550);
-        const double alpha = get_option(parser, "alpha", 0.004);            // Initial learning rate for Adam
-        const double beta1 = get_option(parser, "beta1", 0.9);              // Decay rate for the first moment estimate
-        const double beta2 = get_option(parser, "beta2", 0.999);            // Decay rate for the second moment estimate
+        const double alpha = get_option(parser, "alpha", 0.004);             // Initial learning rate for Adam
+        const double beta1 = get_option(parser, "beta1", 0.9);               // Decay rate for the first moment estimate
+        const double beta2 = get_option(parser, "beta2", 0.999);             // Decay rate for the second moment estimate
         const size_t max_samples = get_option(parser, "max-samples", 50000); // Default maximum number of training samples
 
         // We define a minimal config for demonstration
@@ -201,8 +201,8 @@ int main(int argc, char** argv)
             trainer.set_learning_rate(learning_rate);
             trainer.set_min_learning_rate(1e-6);
             trainer.set_mini_batch_size(batch_size);
-            trainer.set_iterations_without_progress_threshold(15000);
-            trainer.set_max_num_epochs(400);
+            trainer.set_iterations_without_progress_threshold(6500);
+            trainer.set_max_num_epochs(200);
             trainer.be_verbose();
 
             // 4) Train
@@ -298,7 +298,7 @@ int main(int argc, char** argv)
  *    + attention heads: 4
  *    + embedding dimension: 64
  *    + max sequence length: 80
- * - Number of parameters: 12,167,863
+ * - Number of parameters: 8,247,496
  *
  * The training can be performed using the following command line:
  * > ./slm_basic_train_ex --train --shuffle
