@@ -426,6 +426,143 @@ namespace dlib
 
     } // namespace fused_transformer
 
+    // ----------------------------------------------------------------------------------------
+
+    template<
+        typename H_NET,
+        typename L_NET,
+        int N,
+        int T
+    >
+        class hrm_
+    {
+        /*!
+            REQUIREMENTS ON TEMPLATE ARGUMENTS
+                - H_NET must be a valid dlib network type (complete network with input layer)
+                - L_NET must be a valid dlib network type (complete network with input layer)
+                - N > 0 (number of high-level cycles)
+                - T > 0 (number of low-level steps per cycle)
+
+            WHAT THIS OBJECT REPRESENTS
+                This object implements a Hierarchical Reasoning Model (HRM) layer, a dual-
+                recurrent architecture inspired by hierarchical and multi-timescale processing
+                in cognitive systems.
+
+                The model consists of two interdependent recurrent modules:
+                    - High-level module (H_NET): executes N slow cycles for abstract planning
+                      and global reasoning
+                    - Low-level module (L_NET): executes T fast iterations per H-cycle for
+                      detailed, rapid computations
+
+                During forward propagation, the network performs N×T total recurrent steps
+                with hierarchical convergence. For each of the N high-level cycles, the
+                low-level module performs T iterations, converging locally before the
+                high-level module updates.
+
+                Mathematical formulation:
+                    For each high-level cycle n ∈ [0, N):
+                        For each low-level step t ∈ [0, T):
+                            z_L^{n,t} = f_L(z_L^{prev} + z_H^n + x̃)
+                        z_H^{n+1} = f_H(z_H^n + z_L^{n,T-1})
+                    Output: z_H^N
+
+                where:
+                    - x̃ is the input with positional encodings
+                    - z_H and z_L are the hidden states of the H and L modules
+                    - f_H and f_L are the recurrent transformations (H_NET and L_NET)
+
+                The backward pass uses a one-step gradient approximation, computing gradients
+                only through the final update of each module. This provides O(1) memory
+                complexity instead of O(N×T) required by full Backpropagation Through Time
+                (BPTT), while maintaining training stability.
+
+                Key features:
+                    - Hierarchical processing with temporal separation of concerns
+                    - Memory-efficient training (O(1) vs O(N×T) for BPTT)
+                    - Biologically-plausible recurrent computation
+                    - Suitable for complex reasoning tasks requiring iterative refinement
+
+                References:
+                    - Wang et al., "Hierarchical Reasoning Model", arXiv:2506.21734
+                    - Bai et al., "Deep Equilibrium Models", NeurIPS 2019
+        !*/
+
+    public:
+
+        hrm_();
+        /*!
+            ensures
+                - #seq_len == 0
+                - #hidden_dim == 0
+                - Internal networks (h_net, l_net) are default-constructed
+        !*/
+
+        template <typename SUBNET>
+        void setup(
+            const SUBNET& sub
+        );
+        /*!
+            ensures
+                - Initializes the internal H and L networks based on input dimensions
+                - Initializes hidden state vectors z_h_init and z_l_init with truncated
+                  normal distribution (std=1, truncated at ±2)
+                - Stores sequence length and hidden dimension from input
+        !*/
+
+        template <typename SUBNET>
+        void forward(
+            const SUBNET& sub,
+            resizable_tensor& output
+        );
+        /*!
+            ensures
+                - Performs hierarchical recurrent computation:
+                    * N high-level cycles, each with T low-level steps
+                    * Total of N×T recurrent iterations
+                    * All but the last iteration executed without gradient tracking
+                    * Final iteration computes gradients for one-step approximation
+                - #output contains the final high-level state z_H^{NT}
+                - output has the same dimensions as sub.get_output()
+        !*/
+
+        template <typename SUBNET>
+        void backward(
+            const tensor& gradient_input,
+            SUBNET& sub,
+            tensor& params_grad
+        );
+        /*!
+            ensures
+                - Performs one-step gradient approximation:
+                    * Backpropagates through final H-module update
+                    * Backpropagates through final L-module update
+                    * Accumulates gradients to input
+                - Memory complexity: O(1) instead of O(N×T) for full BPTT
+        !*/
+
+        const h_net_type& get_h_net() const;
+        h_net_type& get_h_net();
+        const l_net_type& get_l_net() const;
+        l_net_type& get_l_net();
+        /*!
+            ensures
+                - Returns a reference to the high-level (H) or low-level (L) network
+                - Allows inspection and manipulation of internal modules
+        !*/
+
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
+        /*!
+            ensures
+                - Returns the parameters tensor
+                - Note: hrm_ has no direct trainable parameters; all parameters
+                  are contained within H_NET and L_NET
+        !*/
+    };
+
+    template<typename H_NET, typename L_NET, int N, int T, typename SUBNET>
+    using hrm = add_layer<hrm_<H_NET, L_NET, N, T>, SUBNET>;    
+
 }
 
 #endif // DLIB_DNN_TRANSFORMER_H_

@@ -146,7 +146,7 @@ namespace dlib
         long num_heads = 8,
         long embedding_dim = 512,
         long max_seq_len = 300,
-        template <typename> class activation_func = silu,
+        template <typename> class activation_func = gelu,
         template <typename> class dropout_policy = dropout_10
     >
     struct transformer_config {
@@ -164,7 +164,7 @@ namespace dlib
             static_assert(VOCAB_SIZE > 0, "Vocabulary size must be positive");
             static_assert(NUM_LAYERS > 0, "Number of layers must be positive");
             static_assert(NUM_HEADS > 0, "Number of attention heads must be positive");
-            static_assert(EMBEDDING_DIM% NUM_HEADS == 0, "Embedding dimension must be divisible by number of heads");
+            static_assert(EMBEDDING_DIM % NUM_HEADS == 0, "Embedding dimension must be divisible by number of heads");
         };
 
         // Network component definitions
@@ -363,7 +363,7 @@ int main(int argc, char** argv)
         parser.add_option("learning-rate", "Set the learning rate (default: 3e-4)", 1);
         parser.add_option("batch-size", "Set the mini-batch size (default: 64)", 1);
         parser.add_option("patience", "Iterations without progress before early stopping (default: 15000)", 1);
-        parser.add_option("max-epochs", "Maximum number of training epochs (default: 100)", 1);
+        parser.add_option("max-epochs", "Maximum number of training epochs (default: 150)", 1);
         parser.add_option("alpha", "Set the weight decay for Adam (default: 0.004)", 1);
         parser.add_option("beta1", "Set Adam's first moment coefficient (default: 0.9)", 1);
         parser.add_option("beta2", "Set Adam's second moment coefficient (default: 0.999)", 1);
@@ -383,7 +383,7 @@ int main(int argc, char** argv)
         const double learning_rate = get_option(parser, "learning-rate", 3e-4);
         const size_t batch_size = get_option(parser, "batch-size", 64);
         const long patience = get_option(parser, "patience", 15000);
-        const size_t max_epochs = get_option(parser, "max-epochs", 100);
+        const size_t max_epochs = get_option(parser, "max-epochs", 150);
         const double alpha = get_option(parser, "alpha", 0.004);
         const double beta1 = get_option(parser, "beta1", 0.9);
         const double beta2 = get_option(parser, "beta2", 0.999);
