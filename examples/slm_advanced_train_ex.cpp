@@ -548,6 +548,7 @@ int main(int argc, char** argv)
             double total_loss = 0.0;
             size_t batches_seen = 0;
             size_t samples_seen = 0;
+			size_t steps = 0;
             auto epoch_start = std::chrono::high_resolution_clock::now();
 
             // Training loop
@@ -571,6 +572,7 @@ int main(int argc, char** argv)
                     total_loss += batch_loss;
                     batches_seen++;
                     samples_seen += batch_samples.size();
+					steps += batch_samples.size();
 
                     // Progress reporting
                     if (batches_seen % 100 == 0) {
@@ -581,7 +583,7 @@ int main(int argc, char** argv)
                         double samples_per_sec = samples_seen / (elapsed > 0 ? elapsed : 1);
 
                         cout << "epoch#: " << (epoch + 1) << "/" << max_epochs
-							<< " \t kstep#: " << ((samples_seen * batches_seen) / 1000)
+							<< " \t ksteps#: " << (steps / 1000)
                             << " \t loss: " << avg_loss
                             << " \t speed: " << samples_per_sec << " samples/sec\n";
                         cout.flush();
