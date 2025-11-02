@@ -581,17 +581,13 @@ int main(int argc, char** argv)
                         double samples_per_sec = samples_seen / (elapsed > 0 ? elapsed : 1);
 
                         cout << "epoch#: " << (epoch + 1) << "/" << max_epochs
-                            << " \t batch: " << batches_seen
-                            << " \t samples: " << samples_seen
+							<< " \t kstep#: " << ((samples_seen * batches_seen) / 1000)
                             << " \t loss: " << avg_loss
                             << " \t speed: " << samples_per_sec << " samples/sec\n";
                         cout.flush();
                     }
                 }
                 epoch++;
-
-                // Evaluate progress at end of epoch
-                cout << ">>> completed epoch " << epoch << " - average loss: " << (total_loss / batches_seen) << endl;
             }
 
             // Save model
@@ -742,8 +738,6 @@ int main(int argc, char** argv)
                 && !g_terminate_flag.load()) {
                 // Predict next token
                 next_token = net(input_seq);
-                //auto out_token = net(std::vector<matrix<int, 0, 1>>{ input_seq, input_seq });
-                //next_token = static_cast<int>(out_token[0]);
                 token_buffer.push_back(next_token);
                 token_count++;
 
@@ -788,7 +782,7 @@ int main(int argc, char** argv)
             auto total_time = std::chrono::duration_cast<std::chrono::seconds>(
                 end_time - start_time).count();
 
-            cout << "Generation complete in " << total_time << " seconds!\n";
+            cout << "\nGeneration complete in " << total_time << " seconds! (100%)\n";
             cout << "Generated " << (token_count - input_seq.size()) << " tokens after prompt, "
                 << total_bytes << " bytes total\n";
             cout << "Output saved to " << output_file << "\n";
