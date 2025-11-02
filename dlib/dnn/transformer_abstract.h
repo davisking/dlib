@@ -67,8 +67,8 @@ namespace dlib
                 loss_multiclass_log<fc<vocab_size,
                 projection_head<gelu, 3, d_model,
                 transformer_stack<6, gelu, dropout_10, seq_len, d_model, num_heads,
-                token_embeddings<dropout_10, vocab_size, d_model,
-                input<matrix<long>>>>>>>;
+                token_embeddings<vocab_size, d_model,
+                input<matrix<int, 0, 1>>>>>>>;
 
         RECOMMENDATIONS
             - vocab_size > 10,000: Strongly recommended
@@ -78,21 +78,18 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-    template <template <typename> class DO, long num_embeddings, long embedding_length, typename SUBNET>
+    template <long num_embeddings, long embedding_length, typename SUBNET>
     using token_embeddings = some_template_expression;
     /*!
         WHAT THIS OBJECT REPRESENTS
             Converts discrete token IDs to continuous embedding vectors with positional
-            encoding, dropout regularization, and RMS normalization.
+            encoding.
 
         ARCHITECTURE FLOW
             1. Token embedding lookup: maps token IDs to dense vectors
             2. Positional encoding: adds learnable position information
-            3. Dropout: regularization during training
-            4. RMS normalization: stabilizes embedding magnitudes
 
         TEMPLATE PARAMETERS
-            - DO: dropout policy (e.g., dropout_10 for training, multiply for inference)
             - num_embeddings: vocabulary size (number of unique tokens)
             - embedding_length: embedding dimension (typically d_model)
 
@@ -104,8 +101,8 @@ namespace dlib
             using my_model =
                 loss_multiclass_log<fc<vocab_size,
                 transformer_stack<6, gelu, dropout_10, seq_len, d_model, num_heads,
-                token_embeddings<dropout_10, vocab_size, d_model,
-                input<matrix<long>>>>>>;
+                token_embeddings<vocab_size, d_model,
+                input<matrix<int, 0, 1>>>>>>;
 
         NOTES
             - Input tokens must be integers in range [0, num_embeddings)
@@ -176,15 +173,15 @@ namespace dlib
                 Where Q, K, V are the Query, Key, and Value projections respectively.
 
             ARCHITECTURE FLOW
-                1. Input is split into Query, Key, and Value projections
-                2. RoPE is applied to Query and Key for positional encoding
-                3. Scaled dot-product attention: Q*K^T / sqrt(d_head)
-                4. Causal masking (tril_mask) prevents attending to future positions
-                5. Softmax normalization across the sequence dimension
-                6. Attention weights multiply Values: softmax(scores)*V
-                7. Reshape and project back to d_model dimension
-                8. Residual connection with input
-                9. RMS normalization
+                1. RMS normalization
+                2. Input is split into Query, Key, and Value projections
+                3. RoPE is applied to Query and Key for positional encoding
+                4. Scaled dot-product attention: Q*K^T / sqrt(d_head)
+                5. Causal masking (tril_mask) prevents attending to future positions
+                6. Softmax normalization across the sequence dimension
+                7. Attention weights multiply Values: softmax(scores)*V
+                8. Reshape and project back to d_model dimension
+                9. Residual connection with input                
 
             TEMPLATE PARAMETERS
                 - ACT: activation function template (e.g., silu, gelu, relu)
@@ -218,13 +215,13 @@ namespace dlib
                 where the hidden dimension is typically 4x the model dimension.
 
             ARCHITECTURE FLOW
-                1. Linear projection: d_model => d_model * 4 (expansion)
-                2. Activation function
-                3. Dropout (during training)
-                4. Linear projection: d_model * 4 => d_model (compression)
-                5. Dropout (during training)
-                6. Residual connection with input
-                7. RMS normalization
+                1. RMS normalization
+                2. Linear projection: d_model => d_model * 4 (expansion)
+                3. Activation function
+                4. Dropout (during training)
+                5. Linear projection: d_model * 4 => d_model (compression)
+                6. Dropout (during training)
+                7. Residual connection with input                
 
             TEMPLATE PARAMETERS
                 - ACT: activation function template (e.g., silu, gelu, relu)
@@ -291,10 +288,10 @@ namespace dlib
                 Create a 6-layer transformer:
 
                 using my_model =
-                    loss_multiclass_log<fc<vocab_size,
+					loss_multiclass_log<fc<vocab_size, rms_norm<
                     transformer_stack<6, silu, dropout_10, 512, 256, 8,
-                    token_embeddings<dropout_10, vocab_size, 256,
-                    input<matrix<long>>>>>>;
+                    token_embeddings<vocab_size, 256,
+                    input<matrix<int, 0, 1>>>>>>>;
 
             NOTES
                 - Each layer has independent trainable parameters
@@ -369,8 +366,9 @@ namespace dlib
                 Functionally equivalent to canonical version but with better performance.
 
             ARCHITECTURE FLOW
-                1. Single fused projection: d_model => 3*d_model for Q, K, V
-                2. Extract Q, K, V from combined output
+                1. RMS normalization
+                2. Single fused projection: d_model => 3*d_model for Q, K, V
+                3. Extract Q, K, V from combined output
                 4. Compute attention with causal masking
                 5. Concatenate heads and project
                 6. Residual connection and normalization
@@ -396,12 +394,13 @@ namespace dlib
 
             ARCHITECTURE FLOW
                 Same as canonical version but uses fc instead of linear:
-                1. fc expansion: d_model => d_model * 4
-                2. Activation function
-                3. Dropout
-                4. fc compression: d_model * 4 => d_model
-                5. Dropout
-                6. Residual connection and normalization
+                1. RMS normalization
+                2. fc expansion: d_model => d_model * 4
+                3. Activation function
+                4. Dropout
+                5. fc compression: d_model * 4 => d_model
+                6. Dropout
+                7. Residual connection
 
             PERFORMANCE NOTES
                 - Better utilization of optimized BLAS routines
