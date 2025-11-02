@@ -1,4 +1,7 @@
 /*
+    @file slm_basic_train_ex.cpp
+    @brief Minimal character-level Transformer language model for training and text generation
+
     This program demonstrates a minimal example of a Very Small Language Model (VSLM)
     using dlib's deep learning tools. It includes two modes:
 
