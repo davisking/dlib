@@ -179,12 +179,10 @@ namespace dlib
         template<bool is_training>
         using network_type = std::conditional_t<is_training,
             classification_head<VOCAB_SIZE,
-            projection_head<activation_func, 2, EMBEDDING_DIM,
-            repeat<NUM_LAYERS, t_transformer_block,
+            rms_norm<repeat<NUM_LAYERS, t_transformer_block,
             token_embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>,
             classification_head<VOCAB_SIZE,
-            projection_head<activation_func, 2, EMBEDDING_DIM,
-            repeat<NUM_LAYERS, i_transformer_block,
+            rms_norm<repeat<NUM_LAYERS, i_transformer_block,
             token_embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>>;
 
         struct model_info {
