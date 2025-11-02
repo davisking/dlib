@@ -367,7 +367,7 @@ int main(int argc, char** argv)
         parser.add_option("alpha", "Set the weight decay for Adam (default: 0.004)", 1);
         parser.add_option("beta1", "Set Adam's first moment coefficient (default: 0.9)", 1);
         parser.add_option("beta2", "Set Adam's second moment coefficient (default: 0.999)", 1);
-        parser.add_option("model-file", "Path for model (default: data_model.dat)", 1);
+        parser.add_option("model-file", "Path for model (default: data_lm_tok_model.dat)", 1);
         parser.add_option("output-file", "Path for output (default: data_generated.txt)", 1);
         parser.parse(argc, argv);
 
@@ -387,7 +387,7 @@ int main(int argc, char** argv)
         const double alpha = get_option(parser, "alpha", 0.004);
         const double beta1 = get_option(parser, "beta1", 0.9);
         const double beta2 = get_option(parser, "beta2", 0.999);
-        const std::string model_file = get_option(parser, "model-file", "data_model.dat");
+        const std::string model_file = get_option(parser, "model-file", "data_lm_tok_model.dat");
         const std::string output_file = get_option(parser, "output-file", "data_generated.txt");
         const long max_seq_len = 50;
         const long num_layers = 4;
