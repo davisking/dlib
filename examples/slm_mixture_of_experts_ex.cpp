@@ -58,6 +58,300 @@ using namespace dlib;
 
 namespace dlib
 {
+    template <long num_experts, template <typename> class DO, typename SUBNET>
+    using gate = softmax<fc<num_experts, avg_pool_everything<
+        DO<leaky_relu<fc<32,
+        DO<leaky_relu<fc<64,
+        DO<fc<32, SUBNET>>>>>>>>>>>;
+
+    namespace layer_test {
+        template <template <typename> class DO>
+        struct is_multiply { static constexpr bool value = false; };
+
+        template <>
+        struct is_multiply<multiply> { static constexpr bool value = true; };
+    }
+
+    /*!
+        @class moe_
+        @brief Implements a Mixture-of-Experts (MoE) layer with dynamic routing
+
+        This layer implements a sparse mixture-of-experts architecture where:
+        - Inputs are dynamically routed to top-k experts
+        - Experts are simple feed-forward networks
+        - Routing is learned through a gating network
+        - Auxiliary loss encourages balanced expert utilization
+
+        The implementation supports:
+        - Training/inference modes with different behaviors
+        - Configurable number of experts and top-k selection
+        - Noise injection for exploration during training
+        - Usage tracking and balancing mechanism
+
+        Template parameters:
+            @param d_model      Model dimension size
+            @param ACT          Activation function type for experts
+            @param DO           Dropout policy for experts
+            @param TAG          Tag type for gating network input
+    !*/
+    template <long d_model, template<typename> class ACT,
+        template<typename> class DO, template<typename> class TAG>
+    class moe_
+    {
+    public:
+        //using expert_net_type = DO<linear<d_model, ACT<linear<d_model * 4, input<matrix<float>>>>>>;
+        using expert_net_type = linear<d_model, ACT<linear<d_model * 4, input<matrix<float>>>>>;
+
+        explicit moe_() :
+            n_experts(0),
+            balance_loss_weight(0.01f),
+            noise_scale(0.2f),
+            training_phase(!layer_test::is_multiply<DO>::value),
+            top_n(1),
+            usage_update_rate(0.05f)
+        {
+        }
+
+        moe_(const moe_& other) :
+            n_experts(other.n_experts),
+            balance_loss_weight(other.balance_loss_weight),
+            noise_scale(other.noise_scale),
+            training_phase(other.training_phase),
+            top_n(other.top_n),
+            usage_update_rate(other.usage_update_rate),
+            experts(other.experts),
+            expert_weights(other.expert_weights),
+            expert_usage(other.expert_usage),
+            indices(other.indices)
+        {
+        }
+
+        template <typename SUBNET>
+        void setup(const SUBNET& sub) {
+            const tensor& gate_input = layer<TAG>(sub).get_output();
+            long new_n_experts = gate_input.k();
+            if (new_n_experts != n_experts) {
+                n_experts = new_n_experts;
+                expert_weights.resize(n_experts, 0.0f);
+                expert_usage.resize(n_experts, 0.0f);
+                indices.resize(n_experts);
+
+                experts.clear();
+                experts.reserve(n_experts);
+                for (long i = 0; i < n_experts; ++i)
+                    experts.emplace_back(expert_net_type{});
+                top_n = std::max(1L, static_cast<long>(std::floor(n_experts * 0.2f)));
+
+                initialize_experts(sub.get_output());
+            }
+        }
+
+        moe_& operator=(const moe_& other)
+        {
+            if (this != &other) {
+                n_experts = other.n_experts;
+                balance_loss_weight = other.balance_loss_weight;
+                noise_scale = other.noise_scale;
+                training_phase = other.training_phase;
+                top_n = other.top_n;
+                usage_update_rate = other.usage_update_rate;
+                experts = other.experts;
+                expert_weights = other.expert_weights;
+                expert_usage = other.expert_usage;
+                indices = other.indices;
+            }
+            return *this;
+        }
+
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            const tensor& expert_input = sub.get_output();
+            const tensor& gate_input = layer<TAG>(sub).get_output();
+
+            DLIB_CASSERT(gate_input.k() == n_experts &&
+                gate_input.nr() == 1 && gate_input.nc() == 1,
+                "\nExpected gate output shape [batch_size, " << n_experts << ", 1, 1]"
+                << "\nReceived shape [" << gate_input.num_samples() << ", "
+                << gate_input.k() << ", " << gate_input.nr() << ", "
+                << gate_input.nc() << "]");
+
+            const long num_samples = gate_input.num_samples();
+            const float* gate_probs = gate_input.host();
+            output.copy_size(expert_input);
+            output = 0;
+
+            std::fill(expert_weights.begin(), expert_weights.end(), 0.0f);
+            for (long n = 0; n < num_samples; ++n) {
+                for (long e = 0; e < n_experts; ++e) {
+                    expert_weights[e] += gate_probs[n * n_experts + e];
+                }
+            }
+            if (training_phase) {
+                static dlib::rand rnd(std::time(0));
+                for (auto& w : expert_weights)
+                    w = w / num_samples + noise_scale * rnd.get_random_float();
+            }
+            else {
+                for (auto& w : expert_weights) w /= num_samples;
+            }
+
+            std::iota(indices.begin(), indices.end(), 0);
+            std::partial_sort(indices.begin(), indices.begin() + top_n, indices.end(),
+                [&](size_t a, size_t b) {
+                return expert_weights[a] > expert_weights[b];
+            });
+
+            float sum_top_weights = 0.0f;
+            for (size_t i = 0; i < top_n; ++i)
+                sum_top_weights += expert_weights[indices[i]];
+
+            for (size_t i = 0; i < top_n; ++i) {
+                const size_t eidx = indices[i];
+                expert_weights[eidx] /= sum_top_weights;
+
+                experts[eidx].forward(expert_input);
+                auto& expert_out = experts[eidx].get_output();
+
+                tt::add(1, output, expert_weights[eidx], expert_out);
+                expert_usage[eidx] += expert_weights[eidx];
+            }
+        }
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
+        {
+            tensor& expert_input_grad = sub.get_gradient_input();
+
+            float aux_loss = compute_auxiliary_loss();
+
+            for (size_t i = 0; i < top_n; ++i) {
+                const size_t eidx = indices[i];
+                //cout << "backward - selected expert: " << eidx << endl;
+                resizable_tensor adjusted_gradient = gradient_input;
+                if (aux_loss > 0)
+                    tt::add(1, adjusted_gradient, aux_loss, experts[eidx].get_output());
+
+                experts[eidx].back_propagate_error(sub.get_output(), adjusted_gradient);
+                auto& expert_grad = experts[eidx].get_gradient_input();
+
+                tt::add(1, expert_input_grad, expert_weights[eidx], expert_grad);
+                experts[eidx].clean();
+            }
+
+            if (usage_update_rate > 0 && usage_update_rate <= 1.0f) {
+                for (size_t i = 0; i < top_n; ++i) {
+                    const size_t eidx = indices[i];
+                    expert_usage[eidx] = (1.0f - usage_update_rate) * expert_usage[eidx] +
+                        usage_update_rate * expert_weights[eidx];
+                }
+            }
+        }
+
+        void set_training_phase(bool t) { training_phase = t; }
+        bool is_training_phase() const { return training_phase; }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const moe_& item, std::ostream& out)
+        {
+            serialize("moe_", out);
+            serialize(item.n_experts, out);
+            serialize(item.top_n, out);
+            serialize(item.balance_loss_weight, out);
+            serialize(item.noise_scale, out);
+            serialize(item.usage_update_rate, out);
+            serialize(item.experts, out);
+        }
+
+        friend void deserialize(moe_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "moe_")
+                throw serialization_error("Incorrect version found while deserializing moe_.");
+
+            deserialize(item.n_experts, in);
+            deserialize(item.top_n, in);
+            deserialize(item.balance_loss_weight, in);
+            deserialize(item.noise_scale, in);
+            deserialize(item.usage_update_rate, in);
+
+            item.expert_weights.resize(item.n_experts, 0.0f);
+            item.expert_usage.resize(item.n_experts, 0.0f);
+            item.indices.resize(item.n_experts);
+            item.experts.reserve(item.n_experts);
+
+            deserialize(item.experts, in);
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const moe_& item)
+        {
+            out << "moe (num_experts=" << item.n_experts << ")";
+            return out;
+        }
+
+        friend void to_xml(const moe_& item, std::ostream& out)
+        {
+            out << "<moe>\n";
+            out << "<num_experts>" << item.n_experts << "</num_experts>\n";
+            out << "</moe>\n";
+        }
+
+    private:
+        void initialize_experts(const tensor& expert_input) {
+            const long nr = expert_input.nr(), nc = expert_input.nc();
+            matrix<float> input_data(nr, nc);
+            input_data = 0.0f;
+
+            resizable_tensor input_tensor(1, 1, nr, nc);
+            std::vector<matrix<float>> x(1, input_data);
+
+            for (size_t i = 0; i < experts.size(); ++i)
+                experts[i].to_tensor(&x[0], &x[0] + 1, input_tensor);
+        }
+
+        float compute_auxiliary_loss() const {
+            if (n_experts < 2) return 0.0f;
+            float mean_usage = std::accumulate(expert_usage.begin(), expert_usage.end(), 0.0f) / n_experts;
+            if (mean_usage < 1e-8f) return 0.0f;
+
+            float var = 0.0f;
+            for (float usage : expert_usage) {
+                float diff = usage - mean_usage;
+                var += diff * diff;
+            }
+            var /= n_experts;
+            float stddev = std::sqrt(var);
+
+            float normalized_stddev = stddev / (mean_usage + 1e-6f);
+            return balance_loss_weight * normalized_stddev;
+        }
+
+        long n_experts;
+        size_t top_n;
+        float balance_loss_weight, noise_scale, usage_update_rate;
+        bool training_phase;
+
+        std::vector<expert_net_type> experts;
+        std::vector<float> expert_weights, expert_usage;
+        std::vector<size_t> indices;
+        resizable_tensor params;
+    };
+
+    template <long d_model, template<typename> class ACT,
+        template<typename> class DO, template<typename> class TAG, typename SUBNET>
+    using moe = add_layer<moe_<d_model, ACT, DO, TAG>, SUBNET>;
+
+    // Complete MoE feed-forward layer
+    template <long d_model, template <typename> class ACT, template <typename> class DO,
+        long num_experts, typename SUBNET>
+    using moe_feed_forward = rms_norm<add_prev5<
+        moe<d_model, ACT, DO, tag6, skip5<
+        tag6<gate<num_experts, DO, tag5<SUBNET>>>>>>>;
+
+
     template <template <typename> class DO, long num_experts, typename SUBNET>
     using moe_router = softmax<fc<num_experts, avg_pool_everything<
         DO<leaky_relu<fc<16, DO<leaky_relu<fc<32,

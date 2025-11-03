@@ -154,8 +154,8 @@ namespace dlib
 
     } // namespace fused_transformer
 
-    // Default to fused transformer implementation
-    using namespace fused_transformer;
+    // Default to canonical transformer implementation
+    using namespace canonical_transformer;
 
 	// ----------------------------------------------------------------------------------------
 

@@ -244,18 +244,18 @@ namespace dlib
         };
 
         // Network component definitions for training (with dropout)
-        using t_h_net_type = transformer_stack<NUM_H_LAYERS, activation_func, dropout_policy,
+        using t_h_net_type = canonical_transformer::transformer_stack<NUM_H_LAYERS, activation_func, dropout_policy,
             WINDOW_LEN, EMBEDDING_DIM, NUM_HEADS,
             input<matrix<float>>>;
-        using t_l_net_type = transformer_stack<NUM_L_LAYERS, activation_func, dropout_policy,
+        using t_l_net_type = canonical_transformer::transformer_stack<NUM_L_LAYERS, activation_func, dropout_policy,
             WINDOW_LEN, EMBEDDING_DIM, NUM_HEADS,
             input<matrix<float>>>;
 
         // Network component definitions for inference (without dropout)
-        using i_h_net_type = transformer_stack<NUM_H_LAYERS, activation_func, multiply,
+        using i_h_net_type = canonical_transformer::transformer_stack<NUM_H_LAYERS, activation_func, multiply,
             WINDOW_LEN, EMBEDDING_DIM, NUM_HEADS,
             input<matrix<float>>>;
-        using i_l_net_type = transformer_stack<NUM_L_LAYERS, activation_func, multiply,
+        using i_l_net_type = canonical_transformer::transformer_stack<NUM_L_LAYERS, activation_func, multiply,
             WINDOW_LEN, EMBEDDING_DIM, NUM_HEADS,
             input<matrix<float>>>;
 
@@ -695,8 +695,8 @@ int main(int argc, char** argv)
         parser.add_option("eval-path", "Path to evaluation JSON files", 1);
         parser.add_option("model-file", "Path for model file", 1);
         parser.add_option("learning-rate", "Learning rate (default: 1e-4)", 1);
-        parser.add_option("batch-size", "Mini-batch size (default: 8)", 1);
-        parser.add_option("max-epochs", "Maximum training epochs (default: 100000)", 1);
+        parser.add_option("batch-size", "Mini-batch size (default: 4)", 1);
+        parser.add_option("max-epochs", "Maximum training epochs (default: 10000)", 1);
         parser.add_option("patience", "Early stopping patience (default: 5000)", 1);
         parser.add_option("task-id", "Specific task ID to evaluate/generate", 1);
         parser.add_option("verbose", "Show detailed output during generation");
@@ -708,8 +708,8 @@ int main(int argc, char** argv)
             parser.print_options();
             cout << "\nExample usage:\n"
                 << "  Training:   " << argv[0] << " --train --training-path data/training --eval-path data/evaluation\n"
-                << "  Evaluation: " << argv[0] << " --eval --eval-path data/evaluation --model-file model.dat\n"
-                << "  Single task: " << argv[0] << " --eval --task-id 007bbfb7 --model-file model.dat --verbose\n";
+                << "  Evaluation: " << argv[0] << " --eval --eval-path data/evaluation\n"
+                << "  Single task: " << argv[0] << " --eval --task-id 007bbfb7 --verbose\n";
             return 0;
         }
 
@@ -718,20 +718,20 @@ int main(int argc, char** argv)
         const std::string eval_path = get_option(parser, "eval-path", "data/evaluation");
         const std::string model_file = get_option(parser, "model-file", "arc_agi_model.dat");
         const double learning_rate = get_option(parser, "learning-rate", 1e-4);
-        const size_t batch_size = get_option(parser, "batch-size", 8);
-        const size_t max_epochs = get_option(parser, "max-epochs", 100000);
+        const size_t batch_size = get_option(parser, "batch-size", 4);
+        const size_t max_epochs = get_option(parser, "max-epochs", 10000);
         const long patience = get_option(parser, "patience", 5000);
+        
+        // Window length: 128 for quick testing, 512-1024 for better performance, 4096 for maximum context
+        constexpr long WINDOW_LEN = 768;
 
         // Model configuration
-        // Window length: 128 for quick testing, 512-1024 for better performance, 4096 for maximum context
-        constexpr long WINDOW_LEN = 512;
-
         using arc_net_config = hrm_config<
             ARC_VOCAB_SIZE_TOTAL,   // vocab_size
-            2,                      // num_h_layers
-            2,                      // num_l_layers
+            4,                      // num_h_layers
+            4,                      // num_l_layers
             8,                      // num_heads
-            128,                    // embedding_dim
+            256,                    // embedding_dim
             WINDOW_LEN,             // window_len
             2,                      // hrm_N (high-level cycles)
             2                       // hrm_T (low-level steps)
@@ -797,18 +797,18 @@ int main(int argc, char** argv)
             std::vector<int> gpus{ 0 };
             dnn_trainer<train_net_type, adam> trainer(net, adam(0.1, 0.9, 0.95), gpus);
             trainer.set_learning_rate(learning_rate);
-            trainer.set_min_learning_rate(1e-7);
+            trainer.set_min_learning_rate(1e-6);
             trainer.set_mini_batch_size(batch_size);
             trainer.set_iterations_without_progress_threshold(patience);
             trainer.set_max_num_epochs(max_epochs);
-            trainer.be_verbose();
+            trainer.be_quiet();
 
             // Training loop
             cout << "Starting training...\n";
             size_t epoch = 0;
             auto start_time = std::chrono::steady_clock::now();
 
-            while (epoch < max_epochs && !g_terminate_flag.load())
+            while (trainer.get_learning_rate() >= 1e-6 && epoch < max_epochs && !g_terminate_flag.load())
             {
                 // Shuffle indices
                 std::vector<size_t> indices(all_X.size());
@@ -816,6 +816,7 @@ int main(int argc, char** argv)
                 std::shuffle(indices.begin(), indices.end(), std::default_random_engine());
 
                 // Train epoch
+                size_t batches_seen = 0;
                 for (size_t i = 0; i < all_X.size() && !g_terminate_flag.load(); i += batch_size)
                 {
                     std::vector<arc_token_sequence_t> batch_X;
@@ -828,19 +829,26 @@ int main(int argc, char** argv)
                         size_t idx = indices[i + j];
                         batch_X.push_back(all_X[idx]);
                         batch_Y.push_back(all_Y[idx]);
-                    }
+                    }                    
 
                     trainer.train_one_step(batch_X, batch_Y);
+                    batches_seen++;
+
+                    // Progress reporting
+                    if (batches_seen % 50 == 0) {
+                        auto now = std::chrono::steady_clock::now();
+                        auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - start_time).count();
+
+                        cout << "epoch#: " << (epoch + 1) << "/" << max_epochs
+                            << " \t batches: " << batches_seen
+                            << " \t learning rate: " << trainer.get_learning_rate()
+                            << " \t average loss: " << trainer.get_average_loss()
+                            << " \t time: " << elapsed << "s\n";
+                        cout.flush();
+                    }
                 }
 
                 epoch++;
-                auto now = std::chrono::steady_clock::now();
-                auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - start_time).count();
-
-                cout << "Epoch " << epoch << "/" << max_epochs
-                    << " - Loss: " << trainer.get_average_loss()
-                    << " - LR: " << trainer.get_learning_rate()
-                    << " - Time: " << elapsed << "s\n";
             }
 
             // Save model
