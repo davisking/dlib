@@ -1,46 +1,34 @@
 ﻿/*!
     @file slm_advanced_train_ex.cpp
-    @brief Advanced transformer construction with Dlib building blocks
+    @brief Transformer-based language model training and generation example
 
-    This program demonstrates how to construct a complete transformer-based language
-    model by manually assembling Dlib's neural network components rather than using
-    pre-packaged transformer layers.
+    This program demonstrates how to build a complete transformer-based language model
+    using Dlib's multi-head attention mechanism combined with standard neural network
+    layers. The example shows how to construct transformer blocks manually, providing
+    insight into the architectural components and their assembly.
 
-    Key architectural features:
-    1. Manual transformer block construction using Dlib's canonical multi-head attention
-    2. Custom feed-forward network with advanced architecture patterns
-    3. BPE tokenization with learned vocabulary
-    4. Complete training/generation/verification pipeline
-
-    The feed-forward component uses an advanced construction pattern that demonstrates
-    how to build complex network architectures by composing standard Dlib layers.
-    This approach provides flexibility in customizing transformer components while
-    maintaining compatibility with Dlib's training infrastructure.
+    Key features:
+    - Manual transformer block construction using Dlib's building blocks
+    - Multi-head self-attention with causal masking
+    - Advanced feed-forward networks with routing mechanisms
+    - BPE tokenization for efficient vocabulary management
+    - Complete training, generation, and verification pipeline
 
     Educational objectives:
-    - Understand the modular structure of transformer networks
-    - Learn to compose custom architectures using Dlib's layer primitives
-    - Explore alternatives to monolithic transformer implementations
-    - Demonstrate integration with Dlib's training and optimization framework
-
-    Training capabilities:
-    - Perfect memorization and reproduction of training text
-    - Efficient autoregressive text generation
-    - Byte-level verification of generated output
-
-    References:
-    [1] Vaswani et al., "Attention Is All You Need" (Transformer architecture)
-        arXiv:1706.03762
+    - Understand transformer component assembly
+    - Learn to combine attention mechanisms with feed-forward layers
+    - Master autoregressive text generation
+    - Explore custom network architecture design
 
     Usage modes:
-    --train         Train model on internal dataset
-    --generate      Generate text from trained model
-    --verify        Compare generated output with original
+    --train      Train model on internal dataset
+    --generate   Generate text from trained model
+    --verify     Compare generated output with original dataset
 
     Configuration:
     - Adjust template parameters in transformer_config for model architecture
-    - Modify training parameters for optimization
-    - Set sequence length and memory limits according to available hardware
+    - Modify training parameters via command-line for optimization
+    - Set sequence length according to available hardware resources
 !*/
 #include <iostream>
 #include <string>
@@ -51,10 +39,13 @@
 #include <fstream>
 #include <chrono>
 #include <csignal>
+
 #include <dlib/dnn.h>
 #include <dlib/data_io.h>
 #include <dlib/cmd_line_parser.h>
 #include <dlib/tokenizer/bpe_tokenizer.h>
+
+// Include internal dataset
 #include "slm_data.h"
 
 using namespace std;
@@ -237,59 +228,47 @@ namespace {
 std::string generate_tokens_filename(size_t max_bytes)
 {
     if (max_bytes > 0) {
-        return "internal_data_" + std::to_string(max_bytes) + "_tokens.bin";
+        return "dlib_dataset_" + std::to_string(max_bytes) + "_tokens.bin";
     }
-    return "internal_data_tokens.bin";
+    return "dlib_dataset_tokens.bin";
 }
 
 bool save_tokens_to_file(const std::vector<int>& tokens, const std::string& filename)
 {
-    try {
-        std::ofstream file(filename, std::ios::binary);
-        if (!file) return false;
+    std::ofstream file(filename, std::ios::binary);
+    if (!file) return false;
 
-        // Write number of tokens
-        uint64_t num_tokens = tokens.size();
-        file.write(reinterpret_cast<const char*>(&num_tokens), sizeof(num_tokens));
+    uint64_t num_tokens = tokens.size();
+    file.write(reinterpret_cast<const char*>(&num_tokens), sizeof(num_tokens));
 
-        // Write tokens
-        for (int token : tokens) {
-            uint32_t t = static_cast<uint32_t>(token);
-            file.write(reinterpret_cast<const char*>(&t), sizeof(t));
-        }
-
-        return true;
+    for (int token : tokens) {
+        uint32_t t = static_cast<uint32_t>(token);
+        file.write(reinterpret_cast<const char*>(&t), sizeof(t));
     }
-    catch (...) {
-        return false;
-    }
+
+    return file.good();
 }
 
 bool load_tokens_from_file(std::vector<int>& tokens, const std::string& filename)
 {
-    try {
-        std::ifstream file(filename, std::ios::binary);
-        if (!file) return false;
+    std::ifstream file(filename, std::ios::binary);
+    if (!file) return false;
 
-        // Read number of tokens
-        uint64_t num_tokens;
-        file.read(reinterpret_cast<char*>(&num_tokens), sizeof(num_tokens));
+    uint64_t num_tokens;
+    file.read(reinterpret_cast<char*>(&num_tokens), sizeof(num_tokens));
+    if (!file.good()) return false;
 
-        // Read tokens
-        tokens.clear();
-        tokens.reserve(num_tokens);
+    tokens.clear();
+    tokens.reserve(num_tokens);
 
-        for (uint64_t i = 0; i < num_tokens; ++i) {
-            uint32_t t;
-            file.read(reinterpret_cast<char*>(&t), sizeof(t));
-            tokens.push_back(static_cast<int>(t));
-        }
-
-        return true;
+    for (uint64_t i = 0; i < num_tokens; ++i) {
+        uint32_t t;
+        file.read(reinterpret_cast<char*>(&t), sizeof(t));
+        if (!file.good()) return false;
+        tokens.push_back(static_cast<int>(t));
     }
-    catch (...) {
-        return false;
-    }
+
+    return true;
 }
 
 std::string read_file_content(const std::string& filename, size_t max_bytes = 0)
@@ -352,21 +331,22 @@ int main(int argc, char** argv)
         setup_interrupt_handler();
 
         command_line_parser parser;
-        parser.add_option("train", "Train a transformer model on internal data");
-        parser.add_option("generate", "Generate data from a previously trained model");
-        parser.add_option("verify", "Verify generated output against original data");
-        parser.add_option("max-tokens", "Maximum number of tokens to process", 1);
-        parser.add_option("max-bytes", "Maximum number of bytes to process from data", 1);
-        parser.add_option("percent", "Percentage of data to process (0-100)", 1);
-        parser.add_option("learning-rate", "Set the learning rate (default: 2e-4)", 1);
-        parser.add_option("batch-size", "Set the mini-batch size (default: 64)", 1);
+        parser.add_option("train", "Train a transformer model on internal dataset");
+        parser.add_option("generate", "Generate text from a previously trained model");
+        parser.add_option("verify", "Verify generated output against original dataset");
+        parser.add_option("learning-rate", "Set the learning rate (default: 3e-4)", 1);
+        parser.add_option("batch-size", "Set the mini-batch size (default: 32)", 1);
         parser.add_option("patience", "Iterations without progress before early stopping (default: 10000)", 1);
-        parser.add_option("max-epochs", "Maximum number of training epochs (default: 200)", 1);
+        parser.add_option("max-epochs", "Maximum number of training epochs (default: 100)", 1);
         parser.add_option("alpha", "Set the weight decay for Adam (default: 0.004)", 1);
         parser.add_option("beta1", "Set Adam's first moment coefficient (default: 0.9)", 1);
         parser.add_option("beta2", "Set Adam's second moment coefficient (default: 0.999)", 1);
-        parser.add_option("model-file", "Path for model (default: data_lm_tok_model.dat)", 1);
-        parser.add_option("output-file", "Path for output (default: data_generated.txt)", 1);
+        parser.add_option("model-file", "Path for model (default: dlib_slm_model.dat)", 1);
+        parser.add_option("tokenizer-file", "Path for tokenizer (default: slm_tokenizer.vocab)", 1);
+        parser.add_option("output-file", "Path for generated output (default: generated_text.txt)", 1);
+        parser.add_option("max-tokens", "Maximum number of tokens to process (default: all)", 1);
+        parser.add_option("max-bytes", "Maximum number of bytes to process (default: all)", 1);
+        parser.add_option("percent", "Percentage of bytes to process (0-100 - default: all)", 1);
         parser.parse(argc, argv);
 
         if (parser.number_of_arguments() == 0 &&
@@ -378,29 +358,38 @@ int main(int argc, char** argv)
         }
 
         // Default values
-        const double learning_rate = get_option(parser, "learning-rate", 2e-4);
-        const size_t batch_size = get_option(parser, "batch-size", 64);
+        const double learning_rate = get_option(parser, "learning-rate", 3e-4);
+        const size_t batch_size = get_option(parser, "batch-size", 32);
         const long patience = get_option(parser, "patience", 10000);
-        const size_t max_epochs = get_option(parser, "max-epochs", 200);
+        const size_t max_epochs = get_option(parser, "max-epochs", 100);
         const double alpha = get_option(parser, "alpha", 0.004);
         const double beta1 = get_option(parser, "beta1", 0.9);
         const double beta2 = get_option(parser, "beta2", 0.999);
-        const std::string model_file = get_option(parser, "model-file", "data_lm_tok_model.dat");
-        const std::string output_file = get_option(parser, "output-file", "data_generated.txt");
-        const long max_seq_len = 50;
+        const std::string model_file = get_option(parser, "model-file", "dlib_slm_model.dat");
+        const std::string tokenizer_file = get_option(parser, "tokenizer-file", "slm_tokenizer.vocab");
+        const std::string output_file = get_option(parser, "output-file", "generated_text.txt");
+        
+        // Model architecture parameters
+        const long num_tokens = 1500;
         const long num_layers = 4;
-        const long num_heads = 6;
+        const long num_heads = 6;        
         const long embedding_dim = 228;
-        const long num_tokens = 2500;
+        const long max_seq_len = 50;
 
-        // Fixed paths for tokenizer and tokens
-        const std::string tokenizer_path = "data_tokenizer.vocab";
+        // Define transformer configuration
+        using my_transformer = transformer_config<
+            num_tokens,     // vocab_size
+            num_layers,     // number of layers
+            num_heads,      // number of attention heads
+            embedding_dim,  // embedding dimension
+            max_seq_len     // maximum sequence length
+        >;
 
-        // Load internal data
-        cout << "Loading internal training data...\n";
-        std::string data_text = get_internal_data_file();
-        size_t original_size = data_text.size();
-        cout << "Loaded " << original_size << " bytes from internal data\n";
+        // Load internal dataset
+        cout << "Loading internal training dataset...\n";
+        std::string training_text = get_internal_dataset();
+        size_t original_size = training_text.size();
+        cout << "Loaded " << original_size << " bytes from internal dataset\n";
 
         // Calculate max bytes to process
         size_t max_bytes = 0, max_tokens_limit = 0;
@@ -412,13 +401,13 @@ int main(int argc, char** argv)
         else if (parser.option("percent")) {
             double percent = std::stod(parser.option("percent").argument());
             max_bytes = static_cast<size_t>(original_size * percent / 100.0);
-            cout << "Processing " << percent << "% of data = " << max_bytes << " bytes\n";
+            cout << "Processing " << percent << "% of dataset = " << max_bytes << " bytes\n";
         }
 
-        // Apply size limits to data
-        if (max_bytes > 0 && max_bytes < data_text.size()) {
-            data_text.resize(max_bytes);
-            cout << "Limited to " << data_text.size() << " bytes\n";
+        // Apply size limits to dataset
+        if (max_bytes > 0 && max_bytes < training_text.size()) {
+            training_text.resize(max_bytes);
+            cout << "Limited to " << training_text.size() << " bytes\n";
         }
 
         // Determine tokens filename
@@ -428,23 +417,15 @@ int main(int argc, char** argv)
         bpe_tokenizer tokenizer;
 
         // Load pre-trained tokenizer if it exists
-        if (file_exists(tokenizer_path)) {
-            cout << "Loading pre-trained tokenizer from: " << tokenizer_path << endl;
-            deserialize(tokenizer_path) >> tokenizer;
+        if (file_exists(tokenizer_file)) {
+            cout << "Loading pre-trained tokenizer from: " << tokenizer_file << endl;
+            deserialize(tokenizer_file) >> tokenizer;
             cout << "Tokenizer loaded successfully with vocabulary size: " << tokenizer.get_vocab_size() << endl;
         }
         else {
-            cout << "Pre-trained tokenizer not found at: " << tokenizer_path << endl;
+            cout << "Pre-trained tokenizer not found at: " << tokenizer_file << endl;
             cout << "Will train a new tokenizer if needed." << endl;
         }
-
-        using my_transformer = transformer_config<
-            num_tokens,     // vocab_size
-            num_layers,     // number of layers
-            num_heads,      // number of attention heads
-            embedding_dim,  // embedding dimension
-            max_seq_len     // maximum sequence length
-        >;
 
         // For GPU usage (if available)
         std::vector<int> gpus{ 0 };
@@ -478,11 +459,11 @@ int main(int argc, char** argv)
 
             if (!tokens_loaded) {
                 // Train a new tokenizer if needed
-                if (!file_exists(tokenizer_path)) {
+                if (!file_exists(tokenizer_file)) {
                     cout << "Training new BPE tokenizer with vocabulary size " << num_tokens << "...\n";
-                    tokenizer.train(data_text, num_tokens, 1e6, true);
-                    serialize(tokenizer_path) << tokenizer;
-                    cout << "Tokenizer saved to " << tokenizer_path << endl;
+                    tokenizer.train(training_text + build_qa_text(qa_pairs), num_tokens, 1e6, true);
+                    serialize(tokenizer_file) << tokenizer;
+                    cout << "Tokenizer saved to " << tokenizer_file << endl;
                 }
 
                 // Tokenize the full text
@@ -494,7 +475,7 @@ int main(int argc, char** argv)
                 auto start_time = std::chrono::high_resolution_clock::now();
                 full_tokens.clear();
                 full_tokens.push_back(text_start_id);
-                auto encoded_tokens = tokenizer.encode(data_text);
+                auto encoded_tokens = tokenizer.encode(training_text);
                 full_tokens.insert(full_tokens.end(), encoded_tokens.begin(), encoded_tokens.end());
                 full_tokens.push_back(text_end_id);
                 auto end_time = std::chrono::high_resolution_clock::now();
@@ -608,7 +589,7 @@ int main(int argc, char** argv)
                     double accuracy = (double)correct / labels.size();
                     cout << "Training accuracy: " << (accuracy * 100.0) << "%\n";
 
-                    // We need perfect accuracy to reconstruct data
+                    // We need perfect accuracy to reconstruct the internal dataset
                     if (accuracy < 0.999) {
                         cout << "WARNING: Model accuracy is less than 99.90%. The model may not "
                             << "perfectly reconstruct the input text.\n";
@@ -641,7 +622,7 @@ int main(int argc, char** argv)
                 return 0;
             }
 
-            // Read beginning of data for prompt
+            // Read beginning of the dataset for prompt
             std::vector<int> prompt_tokens;
 
             // Check if we have pre-tokenized tokens
@@ -675,10 +656,10 @@ int main(int argc, char** argv)
 
             // If we couldn't load tokens, tokenize the prompt text
             if (prompt_tokens.empty()) {
-                cout << "Tokenizing initial prompt from internal data...\n";
+                cout << "Tokenizing initial prompt from internal dataset...\n";
 
-                // Use beginning of internal data for prompt
-                std::string prompt_text = data_text.substr(0, std::min(data_text.size(),
+                // Use beginning of internal dataset for prompt
+                std::string prompt_text = training_text.substr(0, std::min(training_text.size(),
                     static_cast<size_t>(max_seq_len * 10)));
 
                 int text_start_id = tokenizer.get_special_token_id("<text>");
@@ -705,7 +686,7 @@ int main(int argc, char** argv)
             auto input_seq = llm_context.get_input_window();
 
             // Determine text size to generate
-            size_t target_size = (max_bytes > 0) ? max_bytes : data_text.size();
+            size_t target_size = (max_bytes > 0) ? max_bytes : training_text.size();
             cout << "Will generate approximately " << target_size << " bytes\n";
 
             // Open output file
@@ -802,9 +783,9 @@ int main(int argc, char** argv)
             cout << "Reading generated file...\n";
             std::string generated = read_file_content(output_file);
 
-            // Read the same portion of original data
-            cout << "Reading original data (same size as generated)...\n";
-            std::string original = data_text.substr(0, std::min(data_text.size(), generated.size()));
+            // Read the same portion of original dataset
+            cout << "Reading original dataset (same size as generated)...\n";
+            std::string original = training_text.substr(0, std::min(training_text.size(), generated.size()));
 
             cout << "Verifying byte-for-byte match...\n";
             bool verify = verify_match(original, generated);

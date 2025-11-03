@@ -6,7 +6,7 @@
     using dlib's deep learning tools. It includes two modes:
 
     1) --train  : Train a small Transformer-based language model on a character-based
-                  corpus extracted from "slm_data.h" (named shakespeare_text).
+                  corpus extracted from "slm_data.h".
 
     2) --generate: Generate new text from a trained model, given an initial prompt
                    extracted from "slm_data.h" (named shakespeare_prompt).
@@ -31,17 +31,14 @@
 #include <algorithm>
 #include <cmath>
 #include <random>
+
 #include <dlib/dnn.h>
 #include <dlib/data_io.h>
 #include <dlib/cmd_line_parser.h>
 #include <dlib/misc_api.h>
 
-// This header "slm_data.h" is assumed to contain:
-//   const std::string shakespeare_text;
-//   const std::string shakespeare_prompt;
+// Include internal dataset
 #include "slm_data.h"
-
-// ----------------------------------------------------------------------------------------
 
 using namespace std;
 using namespace dlib;
@@ -289,7 +286,7 @@ int main(int argc, char** argv)
 }
 
 /*
- * This program demonstrates the training of a language model on about 15k sequences.
+ * This program demonstrates the training of a language model on about 14.5k sequences.
  * The training process produces a data file of approximately 32MB on disk.
  *
  * - Transformer model configuration:
