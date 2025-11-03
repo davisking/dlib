@@ -40,6 +40,158 @@ using namespace dlib;
 
 namespace dlib
 {
+    class loss_cross_entropy_per_logit_
+    {
+    public:
+        typedef unsigned long training_label_type;
+        typedef unsigned long output_label_type;
+
+        template <typename SUB_TYPE, typename label_iterator>
+        void to_label(
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const
+        {
+            const tensor& output_tensor = sub.get_output();
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+            DLIB_CASSERT(output_tensor.k() == 1);
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+
+            const long batch_size = output_tensor.num_samples();
+            const long seq_len = output_tensor.nr();
+            const long vocab_size = output_tensor.nc();
+            const float* out_data = output_tensor.host();
+
+            for (long i = 0; i < batch_size; ++i, ++iter)
+            {
+                long max_idx = 0;
+                float max_val = out_data[tensor_index(output_tensor, i, 0, seq_len - 1, 0)];
+                for (long c = 1; c < vocab_size; ++c)
+                {
+                    const float val = out_data[tensor_index(output_tensor, i, 0, seq_len - 1, c)];
+                    if (val > max_val)
+                    {
+                        max_val = val;
+                        max_idx = c;
+                    }
+                }
+                *iter = static_cast<unsigned long>(max_idx);
+            }
+        }
+
+        template <typename const_label_iterator, typename SUBNET>
+        double compute_loss_value_and_gradient(
+            const tensor& input_tensor,
+            const_label_iterator truth,
+            SUBNET& sub
+        ) const
+        {
+            const tensor& output_tensor = sub.get_output();
+            tensor& grad = sub.get_gradient_input();
+
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+            DLIB_CASSERT(input_tensor.num_samples() != 0);
+            DLIB_CASSERT(input_tensor.num_samples() % sub.sample_expansion_factor() == 0);
+            DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+            DLIB_CASSERT(output_tensor.k() == 1);
+            DLIB_CASSERT(output_tensor.nr() == grad.nr() &&
+                output_tensor.nc() == grad.nc() &&
+                output_tensor.k() == grad.k());
+
+            const long batch_size = output_tensor.num_samples();
+            const long seq_len = output_tensor.nr();
+            const long vocab_size = output_tensor.nc();
+            const double scale = 1.0 / batch_size;
+
+            double loss = 0;
+            const float* out_data = output_tensor.host();
+            float* g = grad.host();
+
+            // Zero out all gradients first
+            for (long i = 0; i < grad.size(); ++i)
+                g[i] = 0;
+
+            // Compute loss and gradients only for the last position of each sequence
+            for (long i = 0; i < batch_size; ++i)
+            {
+                const unsigned long target_class = *(truth + i);
+                DLIB_CASSERT(target_class < static_cast<unsigned long>(vocab_size));
+
+                // Find max for numerical stability
+                float max_val = out_data[tensor_index(output_tensor, i, 0, seq_len - 1, 0)];
+                for (long c = 1; c < vocab_size; ++c)
+                {
+                    const float val = out_data[tensor_index(output_tensor, i, 0, seq_len - 1, c)];
+                    max_val = std::max(max_val, val);
+                }
+
+                // Compute exp and sum for softmax
+                float sum_exp = 0;
+                for (long c = 0; c < vocab_size; ++c)
+                {
+                    const unsigned long idx = tensor_index(output_tensor, i, 0, seq_len - 1, c);
+                    const float exp_val = std::exp(out_data[idx] - max_val);
+                    g[idx] = exp_val;
+                    sum_exp += exp_val;
+                }
+
+                // Normalize softmax, compute loss and gradients
+                for (long c = 0; c < vocab_size; ++c)
+                {
+                    const unsigned long idx = tensor_index(output_tensor, i, 0, seq_len - 1, c);
+                    const float softmax_val = g[idx] / sum_exp;
+
+                    if (static_cast<unsigned long>(c) == target_class)
+                    {
+                        loss += scale * (-std::log(std::max(softmax_val, 1e-10f)));
+                        g[idx] = scale * (softmax_val - 1.0f);
+                    }
+                    else
+                    {
+                        g[idx] = scale * softmax_val;
+                    }
+                }
+            }
+
+            return loss;
+        }
+
+        friend void serialize(const loss_cross_entropy_per_logit_&, std::ostream& out)
+        {
+            serialize("loss_cross_entropy_per_logit_", out);
+        }
+
+        friend void deserialize(loss_cross_entropy_per_logit_&, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "loss_cross_entropy_per_logit_")
+                throw serialization_error("Unexpected version found while deserializing dlib::loss_cross_entropy_per_logit_.");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const loss_cross_entropy_per_logit_&)
+        {
+            out << "loss_cross_entropy_per_logit";
+            return out;
+        }
+
+        friend void to_xml(const loss_cross_entropy_per_logit_&, std::ostream& out)
+        {
+            out << "<loss_cross_entropy_per_logit/>\n";
+        }
+    };
+
+    template <typename SUBNET>
+    using loss_cross_entropy_per_logit = add_loss_layer<loss_cross_entropy_per_logit_, SUBNET>;
+
+    // ----------------------------------------------------------------------------------------
+
+} // namespace dlib
+
+namespace dlib
+{
     /*!
         Provides a flexible configuration for HRM-based transformer models with dual
         recurrent modules (H and L) for hierarchical reasoning.
@@ -110,14 +262,14 @@ namespace dlib
         // Complete network type selector
         template<bool is_training>
         using network_type = std::conditional_t<is_training,
-            loss_multiclass_log<fc<VOCAB_SIZE,
+            loss_cross_entropy_per_logit<linear<VOCAB_SIZE, rms_norm<
             tag10<hrm<t_h_net_type, t_l_net_type, HRM_N, HRM_T,
             token_embeddings<VOCAB_SIZE, EMBEDDING_DIM,
-            input<matrix<long, 0, 1>>>>>>>,
-            loss_multiclass_log<fc<VOCAB_SIZE,
+            input<matrix<long, 0, 1>>>>>>>>,
+            loss_cross_entropy_per_logit<linear<VOCAB_SIZE, rms_norm<
             tag10<hrm<i_h_net_type, i_l_net_type, HRM_N, HRM_T,
             token_embeddings<VOCAB_SIZE, EMBEDDING_DIM,
-            input<matrix<long, 0, 1>>>>>>>>;
+            input<matrix<long, 0, 1>>>>>>>>>;
 
         struct model_info {
             static std::string describe() {
@@ -403,8 +555,7 @@ generation_result generate_output_for_test_pair_with_info(
             input_seq(i) = context_window[i];
         }
 
-        auto predictions = net(std::vector<arc_token_sequence_t>{input_seq, input_seq});
-        long next_token = static_cast<long>(predictions[0]);
+        const long next_token = net(input_seq);
 
         if (next_token == TOKEN_END_OF_OUTPUT) {
             if (verbose) {
@@ -545,8 +696,8 @@ int main(int argc, char** argv)
         parser.add_option("model-file", "Path for model file", 1);
         parser.add_option("learning-rate", "Learning rate (default: 1e-4)", 1);
         parser.add_option("batch-size", "Mini-batch size (default: 8)", 1);
-        parser.add_option("max-epochs", "Maximum training epochs (default: 1000)", 1);
-        parser.add_option("patience", "Early stopping patience (default: 50000)", 1);
+        parser.add_option("max-epochs", "Maximum training epochs (default: 100000)", 1);
+        parser.add_option("patience", "Early stopping patience (default: 5000)", 1);
         parser.add_option("task-id", "Specific task ID to evaluate/generate", 1);
         parser.add_option("verbose", "Show detailed output during generation");
         parser.parse(argc, argv);
@@ -568,8 +719,8 @@ int main(int argc, char** argv)
         const std::string model_file = get_option(parser, "model-file", "arc_agi_model.dat");
         const double learning_rate = get_option(parser, "learning-rate", 1e-4);
         const size_t batch_size = get_option(parser, "batch-size", 8);
-        const size_t max_epochs = get_option(parser, "max-epochs", 1000);
-        const long patience = get_option(parser, "patience", 50000);
+        const size_t max_epochs = get_option(parser, "max-epochs", 100000);
+        const long patience = get_option(parser, "patience", 5000);
 
         // Model configuration
         // Window length: 128 for quick testing, 512-1024 for better performance, 4096 for maximum context
@@ -580,7 +731,7 @@ int main(int argc, char** argv)
             2,                      // num_h_layers
             2,                      // num_l_layers
             8,                      // num_heads
-            256,                    // embedding_dim
+            128,                    // embedding_dim
             WINDOW_LEN,             // window_len
             2,                      // hrm_N (high-level cycles)
             2                       // hrm_T (low-level steps)
@@ -644,7 +795,7 @@ int main(int argc, char** argv)
 
             // Setup trainer
             std::vector<int> gpus{ 0 };
-            dnn_trainer<train_net_type, adam> trainer(net, adam(1e-2, 0.9, 0.95), gpus);
+            dnn_trainer<train_net_type, adam> trainer(net, adam(0.1, 0.9, 0.95), gpus);
             trainer.set_learning_rate(learning_rate);
             trainer.set_min_learning_rate(1e-7);
             trainer.set_mini_batch_size(batch_size);
