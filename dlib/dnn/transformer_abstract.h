@@ -49,35 +49,6 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-    template <template <typename> class ACT, long reduction_factor, long d_model, typename SUBNET>
-    using projection_head = some_template_expression;
-    /*!
-        WHAT THIS OBJECT REPRESENTS
-            Reduces dimensionality before the final output layer to minimize parameters
-            when vocab_size is large. Performs intermediate projection:
-            d_model => d_model/reduction_factor using fully-connected layer.
-
-        TEMPLATE PARAMETERS
-            - ACT: activation function (gelu, relu, or silu recommended)
-            - reduction_factor: compression ratio (3 recommended, typically 2-4)
-            - d_model: input dimension from transformer stack
-
-        TYPICAL USAGE
-            using my_model =
-                loss_multiclass_log<fc<vocab_size,
-                projection_head<gelu, 3, d_model,
-                transformer_stack<6, gelu, dropout_10, seq_len, d_model, num_heads,
-                token_embeddings<vocab_size, d_model,
-                input<matrix<int, 0, 1>>>>>>>;
-
-        RECOMMENDATIONS
-            - vocab_size > 10,000: Strongly recommended
-            - vocab_size > 30,000: Almost mandatory
-            - vocab_size < 5,000:  Optional (minimal gains)
-    !*/
-
-    // ----------------------------------------------------------------------------------------
-
     template <long num_embeddings, long embedding_length, typename SUBNET>
     using token_embeddings = some_template_expression;
     /*!
@@ -562,6 +533,23 @@ namespace dlib
     template<typename H_NET, typename L_NET, int N, int T, typename SUBNET>
     using hrm = add_layer<hrm_<H_NET, L_NET, N, T>, SUBNET>;    
 
+    template <long num_experts, template <typename> class DO, typename SUBNET>
+    using gate = softmax < fc < num_experts, avg_pool_everything
+    /*!
+        WHAT THIS OBJECT REPRESENTS
+
+            Produces probability distribution over experts using a learned gating function.
+            The gate network architecture:
+            - Projects input through several fc layers with activation
+            - Applies dropout for regularization during training
+            - Final softmax layer produces expert selection probabilities
+
+            @param num_experts  Number of experts in the mixture
+            @param DO          Dropout policy (dropout during training, multiply during inference)
+            @param SUBNET      Input network providing features for routing decision
+    !*/
+    template <long num_experts, template <typename> class DO, typename SUBNET>
+    using gate = some_template_expression;
 }
 
 #endif // DLIB_DNN_TRANSFORMER_H_

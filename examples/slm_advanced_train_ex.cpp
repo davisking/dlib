@@ -85,7 +85,7 @@ namespace dlib
     // Complete advanced feed-forward layer with routing
     template <template <typename> class ACT, template <typename> class DO,
         long d_model, typename SUBNET>
-    using moe_feed_forward =
+    using moe_ff =
         add_prev5<
         weighted_sum_of_experts<ACT, DO, d_model, skip5<
         tag6<moe_router<DO, 2,
@@ -109,7 +109,7 @@ namespace dlib
     template <template <typename> class ACT, template <typename> class DO,
         long seq_len, long d_model, long num_heads, typename SUBNET>
     using trans_moe_block =
-        moe_feed_forward<ACT, DO, d_model,
+        moe_ff<ACT, DO, d_model,
         canonical_transformer::multihead_attention<ACT, DO, seq_len, d_model, num_heads, SUBNET>>;
 
     // Classification head for next-token prediction
