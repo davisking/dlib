@@ -869,8 +869,8 @@ namespace dlib
         template <typename> class DO,
         typename SUBNET
     >
-    using moe_feed_forward = add_prev5<tag7<moe<EXPERT_NET, top_k, MODE, tag6, skip5<
-        tag6<gate<num_experts, DO, rms_norm<tag5<SUBNET>>>>>>>>;
+    using moe_feed_forward = add_prev5<moe<EXPERT_NET, top_k, MODE, tag6, skip5<
+        tag6<gate<num_experts, DO, rms_norm<tag5<SUBNET>>>>>>>;
 }
 
 #endif // DLIB_DNN_TRANSFORMER_H_

@@ -328,7 +328,7 @@ moe_param_info get_moe_param_info(const net_type& net, long num_layers)
     moe_param_info info;
 
     // Access first MoE layer
-    const auto& moe_layer = layer<4>(net).subnet().layer_details();
+    const auto& moe_layer = layer<4>(net).layer_details();
 
     // Get MoE configuration
     info.num_experts = moe_layer.num_experts();
