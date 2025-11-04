@@ -510,7 +510,7 @@ int main(int argc, char** argv)
             using net_type = my_transformer::network_type<true>;
             net_type net;
             cout << my_transformer::model_info::describe() << endl;
-            if (file_exists(model_file)) deserialize(model_file) >> net;
+            if (file_exists(model_file)) deserialize(model_file) >> net >> tokenizer;
 
             // Create trainer
             dnn_trainer<net_type, adam> trainer(net, adam(alpha, beta1, beta2), gpus);

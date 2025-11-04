@@ -289,6 +289,88 @@ bool verify_match(const std::string& original, const std::string& generated)
 
 // ----------------------------------------------------------------------------------------
 
+// Structure to hold MoE parameter information with breakdown
+// by component and computation mode
+struct moe_param_info
+{
+    size_t expert_params;           // Parameters per single expert
+    size_t other_params;            // Non-MoE layers (embeddings, attention, etc.)
+    size_t total_training_params;   // Total parameters during training
+    size_t total_inference_params;  // Active parameters during inference
+    long num_experts;               // Number of experts per MoE layer
+    long num_moe_layers;            // Number of MoE layers in the network
+    long top_k;                     // Number of active experts during inference
+    float efficiency_ratio;         // Ratio of inference/training params
+
+    void print() const
+    {
+        std::cout << "=== MoE network parameter analysis ===\n"
+            << "Architecture:\n"
+            << "  MoE layers: " << num_moe_layers << "\n"
+            << "  Experts per layer: " << num_experts << "\n"
+            << "  Active experts (top-k): " << top_k << "\n\n"
+            << "Parameter breakdown per MoE layer:\n"
+            << "  Single expert: " << expert_params << " params\n"
+            << "Total network parameters:\n"
+            << "  Other layers (attn, embed, etc.): " << other_params << " params\n"
+            << "  Training (all experts): " << total_training_params << " params\n"
+            << "  Inference (top-k experts): " << total_inference_params << " params\n\n"
+            << "Efficiency:\n"
+            << "  Inference uses " << (efficiency_ratio * 100.0f) << "% of training params\n"
+            << "  Savings: " << ((1.0f - efficiency_ratio) * 100.0f) << "% fewer active params\n\n";
+    }
+};
+
+// Computes detailed parameter counts for MoE-enhanced networks
+template <typename net_type>
+moe_param_info get_moe_param_info(const net_type& net, long num_layers)
+{
+    moe_param_info info;
+
+    // Access first MoE layer via tag7 (placed before moe layer in moe_feed_forward)
+    const auto& moe_layer = layer<tag7>(net).subnet().layer_details();
+
+    // Get MoE configuration
+    info.num_experts = moe_layer.num_experts();
+    info.num_moe_layers = num_layers;
+
+    // Count parameters in one expert network
+    if (info.num_experts > 0) {
+        info.expert_params = count_parameters(moe_layer.get_expert(0));
+
+        // Determine top_k (either fixed or auto-calculated as 20% of experts)
+        info.top_k = std::max(1L, static_cast<long>(std::floor(info.num_experts * 0.2f)));
+    }
+    else {
+        info.expert_params = 0;
+        info.top_k = 0;
+    }
+
+    // Count other parameters (embeddings, attention layers, output layer)
+    info.other_params = count_parameters(net);
+
+    // Calculate total parameters for training (all experts in all MoE layers)
+    size_t moe_training_params = info.num_moe_layers *
+        (info.num_experts * info.expert_params);
+    info.total_training_params = info.other_params + moe_training_params;
+
+    // Calculate active parameters during inference (only top-k experts)
+    size_t moe_inference_params = info.num_moe_layers *
+        (info.top_k * info.expert_params);
+    info.total_inference_params = info.other_params + moe_inference_params;
+
+    // Calculate efficiency ratio
+    if (info.total_training_params > 0) {
+        info.efficiency_ratio = static_cast<float>(info.total_inference_params) /
+            static_cast<float>(info.total_training_params);
+    }
+    else {
+        info.efficiency_ratio = 1.0f;
+    }
+
+    return info;
+}
+
 int main(int argc, char** argv)
 {
     try
@@ -475,7 +557,8 @@ int main(int argc, char** argv)
             using net_type = my_transformer::network_type<true>;
             net_type net;
             cout << my_transformer::model_info::describe() << endl;
-            if (file_exists(model_file)) deserialize(model_file) >> net;
+            if (file_exists(model_file)) deserialize(model_file) >> net >> tokenizer;
+            cout << net << endl << endl;
 
             // Create trainer
             dnn_trainer<net_type, adam> trainer(net, adam(alpha, beta1, beta2), gpus);
@@ -485,8 +568,6 @@ int main(int argc, char** argv)
             trainer.set_iterations_without_progress_threshold(patience);
             trainer.set_max_num_epochs(max_epochs);
             trainer.be_quiet();
-
-            cout << "Number of model parameters: " << count_parameters(net) << endl;
             cout << "Starting training...\n";
 
             size_t epoch = 0;
@@ -576,12 +657,16 @@ int main(int argc, char** argv)
             if (file_exists(model_file)) {
                 deserialize(model_file) >> net >> tokenizer;
                 cout << "Loaded model from " << model_file << "\n";
-                cout << "Number of model parameters: " << count_parameters(net) << endl;
             }
             else {
                 cerr << "Error: model file not found. Please run --train first.\n";
                 return 0;
             }
+
+            // Display model structure information
+            //auto param_info = get_moe_param_info<net_infer>(net, num_layers);
+            //param_info.print();
+
 
             // Check that tokenizer is loaded
             if (tokenizer.get_vocab_size() == 0) {

@@ -722,7 +722,7 @@ int main(int argc, char** argv)
 
             deserialize(model_file) >> net;
             cout << "Model loaded.\n";
-            auto info_params = get_hrm_param_info(net);
+            auto info_params = get_hrm_param_info<infer_net_type>(net);
             info_params.print();
 
             const bool verbose = parser.option("verbose");
