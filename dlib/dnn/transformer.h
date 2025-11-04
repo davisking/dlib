@@ -689,9 +689,6 @@ namespace dlib
 
                 // Accumulate weighted gradients to input
                 tt::add(1, expert_input_grad, expert_weights[eidx], expert_grad);
-
-                // Clean expert state for next iteration
-                experts[eidx].clean();
             }
 
             // Update exponential moving average of expert usage
@@ -702,6 +699,13 @@ namespace dlib
                         usage_update_rate * expert_weights[eidx];
                 }
             }
+        }
+
+        // Cleans up the internal expert networks
+        void clean()
+        {
+            for (auto& expert : experts)
+                clean_subnet(expert);
         }
 
         const tensor& get_layer_params() const { return params; }
@@ -818,6 +822,18 @@ namespace dlib
             float normalized_stddev = stddev / (mean_usage + 1e-6f);
 
             return balance_loss_weight * normalized_stddev;
+        }
+
+        template<typename NET>
+        auto clean_subnet(NET& net) -> decltype(net.clean(), void())
+        {
+            net.clean();
+        }
+
+        template<typename NET>
+        void clean_subnet(...)
+        {
+            // No-op if network doesn't have clean() method
         }
 
         // Model parameters

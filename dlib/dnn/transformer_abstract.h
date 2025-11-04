@@ -404,7 +404,7 @@ namespace dlib
         int N,
         int T
     >
-        class hrm_
+    class hrm_
     {
         /*!
             REQUIREMENTS ON TEMPLATE ARGUMENTS
@@ -533,23 +533,252 @@ namespace dlib
     template<typename H_NET, typename L_NET, int N, int T, typename SUBNET>
     using hrm = add_layer<hrm_<H_NET, L_NET, N, T>, SUBNET>;    
 
-    template <long num_experts, template <typename> class DO, typename SUBNET>
-    using gate = softmax < fc < num_experts, avg_pool_everything
-    /*!
-        WHAT THIS OBJECT REPRESENTS
+    // ----------------------------------------------------------------------------------------
 
-            Produces probability distribution over experts using a learned gating function.
-            The gate network architecture:
-            - Projects input through several fc layers with activation
-            - Applies dropout for regularization during training
-            - Final softmax layer produces expert selection probabilities
+    // Tags and type definitions for Mixture of Experts (MoE)
+    struct training_mode_tag {};
+    struct inference_mode_tag {};
 
-            @param num_experts  Number of experts in the mixture
-            @param DO          Dropout policy (dropout during training, multiply during inference)
-            @param SUBNET      Input network providing features for routing decision
-    !*/
     template <long num_experts, template <typename> class DO, typename SUBNET>
     using gate = some_template_expression;
+    /*!
+        WHAT THIS OBJECT REPRESENTS
+            Gating network that learns to route inputs to experts in a Mixture of Experts model.
+            Produces a probability distribution over experts using a learned hierarchical function.
+
+        TEMPLATE PARAMETERS
+            - num_experts: number of experts to choose from
+            - DO: dropout policy template (e.g., dropout_10 for training, multiply for inference)
+
+        OUTPUT
+            Tensor with shape (batch_size, num_experts, 1, 1) containing expert selection probabilities
+    !*/
+
+    template<
+        typename EXPERT_NET,
+        long top_k,
+        typename MODE,
+        template<typename> class TAG,
+        typename SUBNET
+    >
+    class moe_
+    {
+        /*!
+            REQUIREMENTS ON TEMPLATE PARAMETERS
+                - EXPERT_NET must be a valid Dlib network type that can process tensors
+                - top_k >= 0 (use 0 for automatic selection based on 20% of experts)
+                - MODE must be either training_mode_tag or inference_mode_tag
+                - TAG must be a valid layer tag template (e.g., tag6, tag5, etc.)
+                - SUBNET must be a valid Dlib network type
+
+            WHAT THIS OBJECT REPRESENTS
+                This layer implements a Mixture of Experts (MoE) architecture that dynamically
+                routes inputs through a set of specialized expert networks. The layer provides:
+
+                - Dynamic expert selection using learned gating from a separate gate network
+                - Sparse activation where only top-k experts process each input
+                - Load balancing through auxiliary loss to prevent expert collapse
+                - Different behaviors in training vs inference modes
+                - Exploration through noise injection during training mode
+                - Efficient conditional computation with reduced computational cost
+
+                The MoE layer is designed to increase model capacity without proportionally
+                increasing computation. Only the most relevant experts are activated for each
+                input, while an auxiliary loss encourages balanced expert utilization.
+
+            ARCHITECTURE
+                The forward pass consists of the following steps:
+                1. Read expert selection probabilities from the gate network (via TAG)
+                2. Aggregate probabilities across batch to compute expert importance
+                3. Add exploration noise during training for better expert discovery
+                4. Select top-k experts based on aggregated weights
+                5. Route input through selected experts in parallel
+                6. Combine expert outputs using normalized selection weights
+
+                The backward pass:
+                1. Computes auxiliary load balancing loss based on expert usage variance
+                2. Backpropagates through activated experts only (sparse gradient flow)
+                3. Scales gradients by expert weights for proper credit assignment
+                4. Updates expert usage statistics using exponential moving average
+
+            TEMPLATE PARAMETERS
+                - EXPERT_NET: Network architecture for each expert (typically a feed-forward block)
+                - top_k: Number of experts to activate per input (0 = auto select 20%)
+                - MODE: Compile-time mode tag (training_mode_tag or inference_mode_tag)
+                - TAG: Layer tag for accessing gate network output
+
+            HYPERPARAMETERS
+                The following hyperparameters control MoE behavior:
+                - balance_loss_weight (default: 0.01): Controls strength of load balancing
+                - noise_scale (default: 0.2): Magnitude of exploration noise in training
+                - usage_update_rate (default: 0.05): EMA rate for usage statistics tracking
+        !*/
+
+    public:
+        explicit moe_();
+        /*!
+            ensures
+                - #num_experts() == 0 (experts created during setup based on gate output)
+                - Initializes hyperparameters with default values:
+                    - balance_loss_weight = 0.01
+                    - noise_scale = 0.2
+                    - usage_update_rate = 0.05
+                    - top_n = top_k (or will be auto-selected if top_k == 0)
+                - Expert networks will be created during first setup() call
+        !*/
+
+        moe_(const moe_& other);
+        /*!
+            ensures
+                - Performs deep copy of all expert networks
+                - Copies all hyperparameters and state from other
+                - #num_experts() == other.num_experts()
+                - Each expert is independently copied (not shared)
+        !*/
+
+        moe_& operator=(const moe_& other);
+        /*!
+            ensures
+                - Performs deep copy assignment
+                - All expert networks are independently copied
+                - Previous experts are properly cleaned up
+                - Returns reference to *this
+        !*/
+
+        template <typename SUBNET_TYPE>
+        void setup(const SUBNET_TYPE& sub);
+        /*!
+            requires
+                - SUBNET_TYPE implements the SUBNET interface
+                - layer<TAG>(sub).get_output() returns a tensor with shape (N, E, 1, 1)
+                  where N is batch size and E is the number of experts
+            ensures
+                - Initializes expert networks based on gate output dimensions
+                - Creates E expert network instances if not already created
+                - #num_experts() == E (where E = layer<TAG>(sub).get_output().k())
+                - If top_k == 0, sets top_n to max(1, floor(E * 0.2))
+                - If top_k > 0, sets top_n to min(top_k, E)
+                - Initializes all expert networks with appropriate input dimensions
+                - Allocates internal buffers for weights, usage tracking, and indices
+        !*/
+
+        template <typename SUBNET_TYPE>
+        void forward(const SUBNET_TYPE& sub, resizable_tensor& output);
+        /*!
+            requires
+                - setup(sub) has been called at least once
+                - sub.get_output() has compatible dimensions for expert processing
+                - layer<TAG>(sub).get_output() has shape (batch_size, num_experts(), 1, 1)
+            ensures
+                - Performs expert routing and computation:
+                    1. Reads gate probabilities from layer<TAG>(sub).get_output()
+                    2. Aggregates probabilities across batch dimension
+                    3. If MODE == training_mode_tag: adds exploration noise
+                    4. If MODE == inference_mode_tag: uses pure probability averaging
+                    5. Selects top_n experts with highest aggregated weights
+                    6. Routes sub.get_output() through each selected expert
+                    7. Combines expert outputs using normalized weights
+                - #output.num_samples() == sub.get_output().num_samples()
+                - #output.k() == sub.get_output().k()
+                - #output.nr() == sub.get_output().nr()
+                - #output.nc() == sub.get_output().nc()
+                - Updates expert usage statistics for load balancing
+                - Only top_n experts are activated (sparse computation)
+        !*/
+
+        template <typename SUBNET_TYPE>
+        void backward(
+            const tensor& gradient_input,
+            SUBNET_TYPE& sub,
+            tensor& params_grad
+        );
+        /*!
+            requires
+                - setup(sub) has been called
+                - forward(sub, output) was previously called for the same input
+                - gradient_input has same dimensions as the output from forward()
+                - all tensors have proper dimensions and are properly allocated
+            ensures
+                - Computes gradients through the MoE layer:
+                    1. Computes auxiliary load balancing loss (if MODE == training_mode_tag)
+                    2. Backpropagates through each activated expert
+                    3. Adjusts gradients with auxiliary loss if needed
+                    4. Scales expert gradients by their selection weights
+                    5. Accumulates weighted gradients to sub.get_gradient_input()
+                - Updates expert usage statistics using exponential moving average
+                - Only backpropagates through the top_n experts that were activated
+                - Cleans expert internal states after backpropagation
+                - If MODE == training_mode_tag and usage_update_rate > 0:
+                    Updates expert_usage statistics for load balancing
+        !*/
+
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
+
+        EXPERT_NET& get_expert(size_t idx);
+        const EXPERT_NET& get_expert(size_t idx) const;
+        /*!
+            requires
+                - idx < num_experts()
+            ensures
+                - Returns reference to the expert network at position idx
+                - Can be used to access or modify individual expert networks
+                - Useful for expert-specific analysis or initialization
+        !*/
+
+        long num_experts() const;
+        /*!
+            ensures
+                - Returns the number of expert networks in this MoE layer
+                - Value is determined during setup() from gate output dimensions
+                - Returns 0 if setup() has not been called yet
+        !*/
+
+        bool is_training_mode() const;
+        /*!
+            ensures
+                - Returns true if MODE == training_mode_tag
+                - Returns false if MODE == inference_mode_tag
+                - This is a compile-time property determined by the template parameter
+        !*/
+
+        friend void serialize(const moe_& item, std::ostream& out);
+        friend void deserialize(moe_& item, std::istream& in);
+       
+        friend std::ostream& operator<<(std::ostream& out, const moe_& item);
+        friend void to_xml(const moe_& item, std::ostream& out);
+    };
+
+    template<
+        typename EXPERT_NET,
+        long top_k,
+        typename MODE,
+        template<typename> class TAG,
+        typename SUBNET
+    >
+    using moe = add_layer<moe_<EXPERT_NET, top_k, MODE, TAG, SUBNET>, SUBNET>;
+
+    template<
+        typename EXPERT_NET,
+        long num_experts,
+        long top_k,
+        typename MODE,
+        template <typename> class DO,
+        typename SUBNET
+    >
+    using moe_feed_forward = some_template_expression;
+    /*!
+        WHAT THIS OBJECT REPRESENTS
+            A drop-in replacement for transformer feed-forward layers using MoE architecture.
+            Combines gating, expert routing, and skip connections in a single template.
+
+        TEMPLATE PARAMETERS
+            - EXPERT_NET: Expert network architecture (typically feed-forward network)
+            - num_experts: Total number of experts in the mixture
+            - top_k: Number of experts to activate per forward pass
+            - MODE: training_mode_tag or inference_mode_tag
+            - DO: Dropout policy template
+    !*/
 }
 
 #endif // DLIB_DNN_TRANSFORMER_H_
