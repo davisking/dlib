@@ -911,6 +911,172 @@ namespace dlib
     using loss_multibinary_log = add_loss_layer<loss_multibinary_log_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
+
+    class loss_cross_entropy_per_logit_
+    {
+    public:
+        typedef unsigned long training_label_type;
+        typedef unsigned long output_label_type;
+
+        template <typename SUB_TYPE, typename label_iterator>
+        void to_label(
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const
+        {
+            const tensor& output_tensor = sub.get_output();
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+            DLIB_CASSERT(output_tensor.k() == 1,
+                "output_tensor.k() = " << output_tensor.k());
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+
+            const long batch_size = output_tensor.num_samples();
+            const long seq_len = output_tensor.nr();
+            const long vocab_size = output_tensor.nc();
+
+            // Note that output_tensor.nc() should match the vocabulary size.
+            const float* out_data = output_tensor.host();
+
+            for (long i = 0; i < batch_size; ++i, ++iter)
+            {
+                // For each sample, find the class with the maximum logit at the last
+                // position of the sequence (position seq_len-1). This is the predicted
+                // next token for autoregressive generation.
+                long max_idx = 0;
+                float max_val = out_data[tensor_index(output_tensor, i, 0, seq_len - 1, 0)];
+                for (long c = 1; c < vocab_size; ++c)
+                {
+                    const float val = out_data[tensor_index(output_tensor, i, 0, seq_len - 1, c)];
+                    if (val > max_val)
+                    {
+                        max_val = val;
+                        max_idx = c;
+                    }
+                }
+                *iter = static_cast<unsigned long>(max_idx);
+            }
+        }
+
+        template <typename const_label_iterator, typename SUBNET>
+        double compute_loss_value_and_gradient(
+            const tensor& input_tensor,
+            const_label_iterator truth,
+            SUBNET& sub
+        ) const
+        {
+            const tensor& output_tensor = sub.get_output();
+            tensor& grad = sub.get_gradient_input();
+
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+            DLIB_CASSERT(input_tensor.num_samples() != 0);
+            DLIB_CASSERT(input_tensor.num_samples() % sub.sample_expansion_factor() == 0);
+            DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+            DLIB_CASSERT(output_tensor.k() == 1,
+                "output_tensor.k() = " << output_tensor.k());
+            DLIB_CASSERT(output_tensor.nr() == grad.nr() &&
+                output_tensor.nc() == grad.nc() &&
+                output_tensor.k() == grad.k());
+
+            const long batch_size = output_tensor.num_samples();
+            const long seq_len = output_tensor.nr();
+            const long vocab_size = output_tensor.nc();
+
+            // The loss we output is the average loss over the mini-batch.
+            const double scale = 1.0 / batch_size;
+            double loss = 0;
+
+            const float* out_data = output_tensor.host();
+            float* g = grad.host();
+
+            // Zero out all gradients first. Gradients will only be non-zero at the
+            // last position (seq_len-1) of each sequence where the loss is computed.
+            std::fill(g, g + grad.size(), 0.0f);
+
+            // Compute loss and gradients only for the last position of each sequence.
+            // This implements the standard next token prediction objective used in
+            // autoregressive language models.
+            for (long i = 0; i < batch_size; ++i)
+            {
+                const unsigned long target_class = *(truth + i);
+
+                // The network must produce a number of outputs that is equal to the number
+                // of labels when using this type of loss.
+                DLIB_CASSERT(target_class < static_cast<unsigned long>(vocab_size),
+                    "target_class: " << target_class << ", vocab_size: " << vocab_size);
+
+                // Compute softmax for numerical stability using the log-sum-exp trick.
+                // First, find the maximum value for this position to prevent overflow.
+                float max_val = out_data[tensor_index(output_tensor, i, 0, seq_len - 1, 0)];
+                for (long c = 1; c < vocab_size; ++c)
+                {
+                    const float val = out_data[tensor_index(output_tensor, i, 0, seq_len - 1, c)];
+                    max_val = std::max(max_val, val);
+                }
+
+                // Compute exp(x - max) and sum for the softmax denominator.
+                float sum_exp = 0;
+                for (long c = 0; c < vocab_size; ++c)
+                {
+                    const unsigned long idx = tensor_index(output_tensor, i, 0, seq_len - 1, c);
+                    const float exp_val = std::exp(out_data[idx] - max_val);
+                    g[idx] = exp_val;  // Temporarily store exp values
+                    sum_exp += exp_val;
+                }
+
+                // Normalize to get softmax probabilities, compute loss, and set gradients.
+                for (long c = 0; c < vocab_size; ++c)
+                {
+                    const unsigned long idx = tensor_index(output_tensor, i, 0, seq_len - 1, c);
+                    const float softmax_val = g[idx] / sum_exp;
+
+                    if (static_cast<unsigned long>(c) == target_class)
+                    {
+                        // Cross-entropy loss: -log(p(target_class))
+                        loss += scale * (-std::log(std::max(softmax_val, 1e-10f)));
+                        // Gradient for the target class: scale * (p - 1)
+                        g[idx] = scale * (softmax_val - 1.0f);
+                    }
+                    else
+                    {
+                        // Gradient for non-target classes: scale * p
+                        g[idx] = scale * softmax_val;
+                    }
+                }
+            }
+
+            return loss;
+        }
+
+        friend void serialize(const loss_cross_entropy_per_logit_&, std::ostream& out)
+        {
+            serialize("loss_cross_entropy_per_logit_", out);
+        }
+
+        friend void deserialize(loss_cross_entropy_per_logit_&, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "loss_cross_entropy_per_logit_")
+                throw serialization_error("Unexpected version found while deserializing dlib::loss_cross_entropy_per_logit_.");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const loss_cross_entropy_per_logit_&)
+        {
+            out << "loss_cross_entropy_per_logit";
+            return out;
+        }
+
+        friend void to_xml(const loss_cross_entropy_per_logit_& /*item*/, std::ostream& out)
+        {
+            out << "<loss_cross_entropy_per_logit/>\n";
+        }
+    };
+
+    template <typename SUBNET>
+    using loss_cross_entropy_per_logit = add_loss_layer<loss_cross_entropy_per_logit_, SUBNET>;
+
 // ----------------------------------------------------------------------------------------
 
     enum class use_image_pyramid : uint8_t

@@ -810,6 +810,134 @@ namespace dlib
     using loss_multibinary_log = add_loss_layer<loss_multibinary_log_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
+
+    class loss_cross_entropy_per_logit_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This loss layer implements cross-entropy loss for next token prediction
+                in transformer-based language models. Unlike loss_multiclass_log_ which
+                requires the output to be flattened through an fc layer, this loss function
+                is designed to work directly with sequence outputs from linear layers.
+
+                This loss expects the network to produce an output tensor with these dimensions:
+                    - output_tensor.num_samples() == batch size
+                    - output_tensor.k() == 1 (always)
+                    - output_tensor.nr() == sequence length
+                    - output_tensor.nc() == vocabulary size (number of classes)
+
+                The key feature of this loss is that it computes the cross-entropy loss
+                only on the LAST position of each sequence (position nr()-1), which is
+                the standard approach for autoregressive next token prediction.
+
+                TYPICAL NETWORK ARCHITECTURE:
+                    using net_type = loss_cross_entropy_per_logit
+                        linear<vocab_size,              // Projects to vocabulary logits
+                            rms_norm<                   // Optional normalization
+                                // ... transformer layers ...
+                                token_embeddings<vocab_size, embedding_dim,
+                                    input<matrix<int,0,1>>
+                                >
+                            >
+                        >
+                    >;
+
+                TRAINING LABELS:
+                    - Label type: unsigned long (scalar value per sample)
+                    - Each label represents the target token ID: 0 <= label < vocab_size
+                    - One label per sequence (predicting the token after the last position)
+
+                LOSS COMPUTATION:
+                    For each sample i in the batch:
+                        1. Extract logits at position [i, 0, seq_len-1, :]
+                        2. Compute softmax: probs = softmax(logits)
+                        3. Compute loss: loss += -log(probs[target_label])
+
+                    Final loss = sum(all_losses) / batch_size
+        !*/
+
+    public:
+        typedef unsigned long training_label_type;
+        typedef unsigned long output_label_type;
+
+        template <typename SUB_TYPE, typename label_iterator>
+        void to_label(
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const;
+        /*!
+            requires
+                - SUBNET implements the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                - sub.get_output().k() == 1
+                - sub.sample_expansion_factor() == 1
+            ensures
+                - Converts the output of the subnetwork into predicted labels.
+                - For each sample in the batch, extracts the logits at the last
+                  sequence position (nr()-1) and assigns the index of the maximum
+                  logit as the predicted label.
+                - Interprets the output tensor as:
+                    output[i, 0, nr()-1, c] = logit for class c in sample i
+        !*/
+
+        template <typename const_label_iterator, typename SUBNET>
+        double compute_loss_value_and_gradient(
+            const tensor& input_tensor,
+            const_label_iterator truth,
+            SUBNET& sub
+        ) const;
+        /*!
+            requires
+                - SUBNET implements the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                - sub.sample_expansion_factor() == 1
+                - sub.get_output().k() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - The output tensor has shape [batch_size, 1, seq_len, vocab_size]
+                - truth == an iterator pointing to the first label in a sequence
+                  of input_tensor.num_samples() labels
+                - All values pointed to by truth are < sub.get_output().nc()
+                  (i.e., valid token IDs within vocabulary)
+            ensures
+                - Computes the cross-entropy loss for next token prediction.
+                - For each sample, the loss is computed only at the last sequence
+                  position (nr()-1) using the corresponding label from truth.
+                - The loss is averaged over all samples in the batch.
+                - this function returns the loss value.
+                - Computes gradients with respect to the output logits and stores
+                  them in sub.get_gradient_input().
+                - Gradients are non-zero only at the last position of each sequence.
+                - The gradient computation uses numerically stable softmax.
+        !*/
+
+        friend void serialize(const loss_cross_entropy_per_logit_& item, std::ostream& out);
+        friend void deserialize(loss_cross_entropy_per_logit_& item, std::istream& in);
+        /*!
+            provides serialization support for loss_cross_entropy_per_logit_
+        !*/
+
+        friend std::ostream& operator<<(std::ostream& out, const loss_cross_entropy_per_logit_& item);
+        /*!
+            prints a human readable string describing the loss layer to the output stream
+        !*/
+
+        friend void to_xml(const loss_cross_entropy_per_logit_& item, std::ostream& out);
+        /*!
+            provides XML serialization support for loss_cross_entropy_per_logit_
+        !*/
+    };
+
+    template <typename SUBNET>
+    using loss_cross_entropy_per_logit = add_loss_layer<loss_cross_entropy_per_logit_, SUBNET>;
+    /*!
+        This adds the loss_cross_entropy_per_logit_ loss layer onto SUBNET.
+
+        TYPICAL USAGE IN TRANSFORMER NETWORKS:
+            This loss layer is specifically designed for transformer-based language
+            models that use autoregressive next token prediction. It should be used
+            as the final layer of a network that outputs logits for each position
+            in a sequence.
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     enum class use_image_pyramid : uint8_t

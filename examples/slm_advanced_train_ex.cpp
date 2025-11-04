@@ -53,152 +53,6 @@ using namespace dlib;
 
 namespace dlib
 {
-    class loss_cross_entropy_per_logit_
-    {
-    public:
-        typedef unsigned long training_label_type;
-        typedef unsigned long output_label_type;
-
-        template <typename SUB_TYPE, typename label_iterator>
-        void to_label(
-            const tensor& input_tensor,
-            const SUB_TYPE& sub,
-            label_iterator iter
-        ) const
-        {
-            const tensor& output_tensor = sub.get_output();
-            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
-            DLIB_CASSERT(output_tensor.k() == 1);
-            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
-
-            const long batch_size = output_tensor.num_samples();
-            const long seq_len = output_tensor.nr();
-            const long vocab_size = output_tensor.nc();
-            const float* out_data = output_tensor.host();
-
-            for (long i = 0; i < batch_size; ++i, ++iter)
-            {
-                long max_idx = 0;
-                float max_val = out_data[tensor_index(output_tensor, i, 0, seq_len - 1, 0)];
-                for (long c = 1; c < vocab_size; ++c)
-                {
-                    const float val = out_data[tensor_index(output_tensor, i, 0, seq_len - 1, c)];
-                    if (val > max_val)
-                    {
-                        max_val = val;
-                        max_idx = c;
-                    }
-                }
-                *iter = static_cast<unsigned long>(max_idx);
-            }
-        }
-
-        template <typename const_label_iterator, typename SUBNET>
-        double compute_loss_value_and_gradient(
-            const tensor& input_tensor,
-            const_label_iterator truth,
-            SUBNET& sub
-        ) const
-        {
-            const tensor& output_tensor = sub.get_output();
-            tensor& grad = sub.get_gradient_input();
-
-            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
-            DLIB_CASSERT(input_tensor.num_samples() != 0);
-            DLIB_CASSERT(input_tensor.num_samples() % sub.sample_expansion_factor() == 0);
-            DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
-            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
-            DLIB_CASSERT(output_tensor.k() == 1);
-            DLIB_CASSERT(output_tensor.nr() == grad.nr() &&
-                output_tensor.nc() == grad.nc() &&
-                output_tensor.k() == grad.k());
-
-            const long batch_size = output_tensor.num_samples();
-            const long seq_len = output_tensor.nr();
-            const long vocab_size = output_tensor.nc();
-            const double scale = 1.0 / batch_size;
-
-            double loss = 0;
-            const float* out_data = output_tensor.host();
-            float* g = grad.host();
-
-            // Zero out all gradients first
-            for (long i = 0; i < grad.size(); ++i)
-                g[i] = 0;
-
-            // Compute loss and gradients only for the last position of each sequence
-            for (long i = 0; i < batch_size; ++i)
-            {
-                const unsigned long target_class = *(truth + i);
-                DLIB_CASSERT(target_class < static_cast<unsigned long>(vocab_size));
-
-                // Find max for numerical stability
-                float max_val = out_data[tensor_index(output_tensor, i, 0, seq_len - 1, 0)];
-                for (long c = 1; c < vocab_size; ++c)
-                {
-                    const float val = out_data[tensor_index(output_tensor, i, 0, seq_len - 1, c)];
-                    max_val = std::max(max_val, val);
-                }
-
-                // Compute exp and sum for softmax
-                float sum_exp = 0;
-                for (long c = 0; c < vocab_size; ++c)
-                {
-                    const unsigned long idx = tensor_index(output_tensor, i, 0, seq_len - 1, c);
-                    const float exp_val = std::exp(out_data[idx] - max_val);
-                    g[idx] = exp_val;
-                    sum_exp += exp_val;
-                }
-
-                // Normalize softmax, compute loss and gradients
-                for (long c = 0; c < vocab_size; ++c)
-                {
-                    const unsigned long idx = tensor_index(output_tensor, i, 0, seq_len - 1, c);
-                    const float softmax_val = g[idx] / sum_exp;
-
-                    if (static_cast<unsigned long>(c) == target_class)
-                    {
-                        loss += scale * (-std::log(std::max(softmax_val, 1e-10f)));
-                        g[idx] = scale * (softmax_val - 1.0f);
-                    }
-                    else
-                    {
-                        g[idx] = scale * softmax_val;
-                    }
-                }
-            }
-
-            return loss;
-        }
-
-        friend void serialize(const loss_cross_entropy_per_logit_&, std::ostream& out)
-        {
-            serialize("loss_cross_entropy_per_logit_", out);
-        }
-
-        friend void deserialize(loss_cross_entropy_per_logit_&, std::istream& in)
-        {
-            std::string version;
-            deserialize(version, in);
-            if (version != "loss_cross_entropy_per_logit_")
-                throw serialization_error("Unexpected version found while deserializing dlib::loss_cross_entropy_per_logit_.");
-        }
-
-        friend std::ostream& operator<<(std::ostream& out, const loss_cross_entropy_per_logit_&)
-        {
-            out << "loss_cross_entropy_per_logit";
-            return out;
-        }
-
-        friend void to_xml(const loss_cross_entropy_per_logit_&, std::ostream& out)
-        {
-            out << "<loss_cross_entropy_per_logit/>\n";
-        }
-    };
-
-    template <typename SUBNET>
-    using loss_cross_entropy_per_logit = add_loss_layer<loss_cross_entropy_per_logit_, SUBNET>;
-
     /*!
         This demonstrates an advanced feed-forward architecture using a mixture-of-experts
         inspired pattern. It shows how to build complex network components by composing
@@ -482,12 +336,12 @@ int main(int argc, char** argv)
         parser.add_option("generate", "Generate text from a previously trained model");
         parser.add_option("verify", "Verify generated output against original dataset");
         parser.add_option("learning-rate", "Set the learning rate (default: 2e-4)", 1);
-        parser.add_option("batch-size", "Set the mini-batch size (default: 32)", 1);
+        parser.add_option("batch-size", "Set the mini-batch size (default: 48)", 1);
         parser.add_option("patience", "Iterations without progress before early stopping (default: 5000)", 1);
-        parser.add_option("max-epochs", "Maximum number of training epochs (default: 200)", 1);
+        parser.add_option("max-epochs", "Maximum number of training epochs (default: 300)", 1);
         parser.add_option("alpha", "Set the weight decay for Adam (default: 0.004)", 1);
         parser.add_option("beta1", "Set Adam's first moment coefficient (default: 0.9)", 1);
-        parser.add_option("beta2", "Set Adam's second moment coefficient (default: 0.95)", 1);
+        parser.add_option("beta2", "Set Adam's second moment coefficient (default: 0.999)", 1);
         parser.add_option("model-file", "Path for model (default: dlib_slm_model.dat)", 1);
         parser.add_option("tokenizer-file", "Path for tokenizer (default: slm_tokenizer.vocab)", 1);
         parser.add_option("output-file", "Path for generated output (default: generated_text.txt)", 1);
@@ -506,12 +360,12 @@ int main(int argc, char** argv)
 
         // Default values
         const double learning_rate = get_option(parser, "learning-rate", 2e-4);
-        const size_t batch_size = get_option(parser, "batch-size", 32);
+        const size_t batch_size = get_option(parser, "batch-size", 48);
         const long patience = get_option(parser, "patience", 5000);
-        const size_t max_epochs = get_option(parser, "max-epochs", 200);
+        const size_t max_epochs = get_option(parser, "max-epochs", 300);
         const double alpha = get_option(parser, "alpha", 0.004);
         const double beta1 = get_option(parser, "beta1", 0.9);
-        const double beta2 = get_option(parser, "beta2", 0.95);
+        const double beta2 = get_option(parser, "beta2", 0.999);
         const std::string model_file = get_option(parser, "model-file", "dlib_slm_model.dat");
         const std::string tokenizer_file = get_option(parser, "tokenizer-file", "slm_tokenizer.vocab");
         const std::string output_file = get_option(parser, "output-file", "generated_text.txt");
@@ -519,8 +373,8 @@ int main(int argc, char** argv)
         // Model architecture parameters
         const long num_tokens = 1500;
         const long num_layers = 4;
-        const long num_heads = 8;        
-        const long embedding_dim = 256;
+        const long num_heads = 6;        
+        const long embedding_dim = 228;
         const long max_seq_len = 50;
 
         // Define transformer configuration
