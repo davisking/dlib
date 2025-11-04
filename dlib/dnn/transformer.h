@@ -472,24 +472,15 @@ namespace dlib
         DO<leaky_relu<fc<64,
         DO<fc<32, SUBNET>>>>>>>>>>>;
 
-    namespace layer_test {
-        /*!
-            Used to distinguish between training (with dropout) and inference (with multiply)
-            modes without explicit runtime flags.
-        !*/
-        template <template <typename> class DO>
-        struct is_multiply { static constexpr bool value = false; };
-
-        template <>
-        struct is_multiply<multiply> { static constexpr bool value = true; };
-    }
+    struct training_mode_tag {};
+    struct inference_mode_tag {};
 
     template<
         typename EXPERT_NET,                    // Expert network architecture
-        long top_k = 0,                         // Number of experts to activate (0 = auto)
-        template<typename> class DO = dropout,  // Dropout policy
-        template<typename> class TAG = tag6,    // Tag for gate input
-        typename SUBNET = void                  // Input subnet type
+        long top_k,                             // Number of experts to activate (0 = auto)
+        typename MODE,                          // Tag-based mode selection
+        template<typename> class TAG,           // Tag for gate input
+        typename SUBNET                         // Input subnet type
     >
     class moe_
     {
@@ -504,7 +495,6 @@ namespace dlib
             n_experts(0),
             balance_loss_weight(0.01f),
             noise_scale(0.2f),
-            training_phase(!layer_test::is_multiply<DO>::value),
             top_n(top_k),
             usage_update_rate(0.05f)
         {
@@ -514,7 +504,6 @@ namespace dlib
             n_experts(other.n_experts),
             balance_loss_weight(other.balance_loss_weight),
             noise_scale(other.noise_scale),
-            training_phase(other.training_phase),
             top_n(other.top_n),
             usage_update_rate(other.usage_update_rate),
             expert_usage(other.expert_usage),
@@ -533,7 +522,6 @@ namespace dlib
                 n_experts = other.n_experts;
                 balance_loss_weight = other.balance_loss_weight;
                 noise_scale = other.noise_scale;
-                training_phase = other.training_phase;
                 top_n = other.top_n;
                 usage_update_rate = other.usage_update_rate;
                 expert_usage = other.expert_usage;
@@ -625,7 +613,7 @@ namespace dlib
             }
 
             // Normalize weights and add exploration noise during training
-            if (training_phase) {
+            if (std::is_same<MODE, training_mode_tag>::value) {
                 static dlib::rand rnd(std::time(0));
                 for (auto& w : expert_weights) {
                     // Average over batch + exploration noise
@@ -681,6 +669,7 @@ namespace dlib
             tensor& expert_input_grad = sub.get_gradient_input();
 
             // Compute auxiliary loss for load balancing
+            const bool is_training = std::is_same<MODE, training_mode_tag>::value;
             float aux_loss = compute_auxiliary_loss();
 
             // Backpropagate through each activated expert
@@ -706,7 +695,7 @@ namespace dlib
             }
 
             // Update exponential moving average of expert usage
-            if (usage_update_rate > 0 && usage_update_rate <= 1.0f) {
+            if (is_training && usage_update_rate > 0 && usage_update_rate <= 1.0f) {
                 for (size_t i = 0; i < top_n; ++i) {
                     const size_t eidx = indices[i];
                     expert_usage[eidx] = (1.0f - usage_update_rate) * expert_usage[eidx] +
@@ -714,12 +703,6 @@ namespace dlib
                 }
             }
         }
-
-        // Set training or inference mode
-        void set_training_phase(bool t) { training_phase = t; }
-
-        // Check if in training mode
-        bool is_training_phase() const { return training_phase; }
 
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
@@ -734,8 +717,8 @@ namespace dlib
             return experts[idx];
         }
 
-        // Get number of experts
         long num_experts() const { return n_experts; }
+        bool is_training_mode() const { return std::is_same<MODE, training_mode_tag>::value; }
         
         friend void serialize(const moe_& item, std::ostream& out)
         {
@@ -745,7 +728,6 @@ namespace dlib
             serialize(item.balance_loss_weight, out);
             serialize(item.noise_scale, out);
             serialize(item.usage_update_rate, out);
-            serialize(item.training_phase, out);
             serialize(item.experts, out);
             serialize(item.expert_usage, out);
         }
@@ -762,7 +744,6 @@ namespace dlib
             deserialize(item.balance_loss_weight, in);
             deserialize(item.noise_scale, in);
             deserialize(item.usage_update_rate, in);
-            deserialize(item.training_phase, in);
 
             item.expert_weights.resize(item.n_experts, 0.0f);
             item.indices.resize(item.n_experts);
@@ -773,19 +754,21 @@ namespace dlib
 
         friend std::ostream& operator<<(std::ostream& out, const moe_& item)
         {
+            const bool is_training = std::is_same<MODE, training_mode_tag>::value;
             out << "moe"
                 << " (experts=" << item.n_experts
                 << ", top_k=" << item.top_n
-                << ", mode=" << (item.training_phase ? "train" : "infer") << ")";
+                << ", mode=" << (is_training ? "train" : "infer") << ")";
             return out;
         }
 
         friend void to_xml(const moe_& item, std::ostream& out)
         {
+            const bool is_training = std::is_same<MODE, training_mode_tag>::value;
             out << "<moe>\n";
             out << "  <num_experts>" << item.n_experts << "</num_experts>\n";
             out << "  <top_k>" << item.top_n << "</top_k>\n";
-            out << "  <training>" << item.training_phase << "</training>\n";
+            out << "  <training>" << is_training << "</training>\n";
             out << "</moe>\n";
         }
 
@@ -843,7 +826,6 @@ namespace dlib
         float balance_loss_weight;               // Weight for auxiliary balancing loss
         float noise_scale;                       // Exploration noise magnitude (training)
         float usage_update_rate;                 // EMA rate for usage statistics
-        bool training_phase;                     // Training vs inference mode
 
         // Expert networks and state
         std::vector<EXPERT_NET> experts;         // Expert network instances
@@ -856,21 +838,22 @@ namespace dlib
     template<
         typename EXPERT_NET,
         long top_k,
-        template<typename> class DO,
+        typename MODE,
         template<typename> class TAG,
         typename SUBNET
     >
-    using moe = add_layer<moe_<EXPERT_NET, top_k, DO, TAG, SUBNET>, SUBNET>;
+    using moe = add_layer<moe_<EXPERT_NET, top_k, MODE, TAG, SUBNET>, SUBNET>;
 
     // This is a drop-in replacement for standard transformer feed-forward layers
     template<
         typename EXPERT_NET,
         long num_experts,
         long top_k,
+        typename MODE,
         template <typename> class DO,
         typename SUBNET
     >
-    using moe_feed_forward = add_prev5<moe<EXPERT_NET, top_k, DO, tag6, skip5<
+    using moe_feed_forward = add_prev5<moe<EXPERT_NET, top_k, MODE, tag6, skip5<
         tag6<gate<num_experts, DO, rms_norm<tag5<SUBNET>>>>>>>;
 }
 
