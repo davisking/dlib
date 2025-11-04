@@ -327,8 +327,8 @@ moe_param_info get_moe_param_info(const net_type& net, long num_layers)
 {
     moe_param_info info;
 
-    // Access first MoE layer via tag7 (placed before moe layer in moe_feed_forward)
-    const auto& moe_layer = layer<tag7>(net).subnet().layer_details();
+    // Access first MoE layer
+    const auto& moe_layer = layer<4>(net).subnet().layer_details();
 
     // Get MoE configuration
     info.num_experts = moe_layer.num_experts();
@@ -664,8 +664,8 @@ int main(int argc, char** argv)
             }
 
             // Display model structure information
-            //auto param_info = get_moe_param_info<net_infer>(net, num_layers);
-            //param_info.print();
+            auto param_info = get_moe_param_info<net_infer>(net, num_layers);
+            param_info.print();
 
 
             // Check that tokenizer is loaded
