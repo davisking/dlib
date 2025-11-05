@@ -1,34 +1,31 @@
 ﻿/*!
     @file slm_advanced_train_ex.cpp
-    @brief Transformer-based language model training and generation example
+    @brief Modern transformer language model with optimized training pipeline
 
-    This program demonstrates how to build a complete transformer-based language model
-    using Dlib's multi-head attention mechanism combined with standard neural network
-    layers. The example shows how to construct transformer blocks manually, providing
-    insight into the architectural components and their assembly.
+    This program demonstrates a production-ready transformer-based language model
+    implementation using contemporary architectural patterns and training techniques.
+    The example showcases efficient text tokenization, specialized loss computation
+    for autoregressive generation, and streamlined transformer construction using
+    Dlib's high-level building blocks.
 
     Key features:
-    - Manual transformer block construction using Dlib's building blocks
-    - Multi-head self-attention with causal masking
-    - Advanced feed-forward networks with routing mechanisms
-    - BPE tokenization for efficient vocabulary management
+    - BPE tokenization for efficient vocabulary management and text encoding
+    - Specialized loss function (loss_cross_entropy_per_logit) optimized for
+      next-token prediction without requiring sequence flattening
+    - Modern transformer architecture using transformer_stack for compact definition
+    - Token-level input/output for direct sequence modeling
     - Complete training, generation, and verification pipeline
 
-    Educational objectives:
-    - Understand transformer component assembly
-    - Learn to combine attention mechanisms with feed-forward layers
-    - Master autoregressive text generation
-    - Explore custom network architecture design
-
     Usage modes:
-    --train      Train model on internal dataset
-    --generate   Generate text from trained model
-    --verify     Compare generated output with original dataset
+    --train      Train model on internal dataset with BPE tokenization
+    --generate   Generate text autoregressively from trained model
+    --verify     Validate generated output byte-for-byte against original
 
     Configuration:
-    - Adjust template parameters in transformer_config for model architecture
-    - Modify training parameters via command-line for optimization
-    - Set sequence length according to available hardware resources
+    - Adjust transformer_config template parameters for model size
+    - Modify learning rate, batch size, and training epochs via command-line
+    - Control dataset size with --max-bytes or --percent options
+    - Set sequence length based on available GPU memory
 !*/
 #include <iostream>
 #include <string>
@@ -53,72 +50,12 @@ using namespace dlib;
 
 namespace dlib
 {
-    /*!
-        This demonstrates an advanced feed-forward architecture using a mixture-of-experts
-        inspired pattern. It shows how to build complex network components by composing
-        Dlib's standard layers with routing mechanisms.
-
-        The router selects between multiple expert networks dynamically, demonstrating
-        how to implement conditional computation paths within the Dlib framework.
-    !*/
-
-    template <template <typename> class DO, long num_experts, typename SUBNET>
-    using moe_router = softmax<fc<num_experts, avg_pool_everything<
-        DO<leaky_relu<fc<16, DO<leaky_relu<fc<32,
-        DO<fc<16, SUBNET>>>>>>>>>>>;
-
-    // Single expert network - a standard feed-forward block
-    template <template <typename> class ACT, template <typename> class DO,
-        long d_model, typename SUBNET>
-    using expert = DO<linear<d_model, DO<ACT<linear<d_model * 4, SUBNET>>>>>;
-
-    // Weighted combination of expert outputs
-    template <template <typename> class ACT, template <typename> class DO,
-        long d_model, typename SUBNET>
-    using weighted_sum_of_experts = add_prev<itag3,
-        mult_prev<itag1, extract<0, 1, 1, 1, skip6<         // Expert 1
-        itag1<expert<ACT, DO, d_model, iskip<
-        itag3<mult_prev<itag2, extract<1, 1, 1, 1, skip6<   // Expert 2
-        itag2<expert<ACT, DO, d_model,
-        itag0<SUBNET>>>>>>>>>>>>>>;
-
-    // Complete advanced feed-forward layer with routing
-    template <template <typename> class ACT, template <typename> class DO,
-        long d_model, typename SUBNET>
-    using moe_ff =
-        add_prev5<
-        weighted_sum_of_experts<ACT, DO, d_model, skip5<
-        tag6<moe_router<DO, 2,
-        rms_norm<tag5<SUBNET>>>>>>>;
-
-    /*!
-        This transformer block is assembled from individual components:
-        1. Multi-head self-attention (from canonical_transformer namespace)
-        2. Advanced feed-forward network (custom construction above)
-
-        This demonstrates how to build a complete transformer by composing
-        Dlib's modular components rather than using pre-packaged solutions.
-
-        Template parameters:
-            - ACT: activation function type
-            - DO: dropout layer type for regularization
-            - seq_len: sequence length (number of tokens)
-            - d_model: model dimension
-            - num_heads: number of attention heads
-    !*/
-    template <template <typename> class ACT, template <typename> class DO,
-        long seq_len, long d_model, long num_heads, typename SUBNET>
-    using trans_moe_block =
-        moe_ff<ACT, DO, d_model,
-        canonical_transformer::multihead_attention<ACT, DO, seq_len, d_model, num_heads, SUBNET>>;
-
     // Classification head for next-token prediction
     template <long num_logits, typename SUBNET>
-    //using classification_head = loss_multiclass_log<fc<num_logits, SUBNET>>;
-	using classification_head = loss_cross_entropy_per_logit<linear<num_logits, SUBNET>>;
+	using classification_head = loss_cross_entropy_per_logit<linear<num_logits, rms_norm<SUBNET>>>;
 
     /**
-     * @brief Transformer Model Configuration Template
+     * @brief Transformer model configuration template
      *
      * Provides a flexible and type-safe configuration mechanism for transformer models
      * with compile-time parameter validation and network generation.
@@ -149,9 +86,7 @@ namespace dlib
         static constexpr long EMBEDDING_DIM = embedding_dim;
         static constexpr long MAX_SEQ_LEN = max_seq_len;
 
-        /**
-         * @brief Compile-time validation of model configuration
-         */
+        // Compile-time validation of model configuration
         struct validation {
             static_assert(VOCAB_SIZE > 0, "Vocabulary size must be positive");
             static_assert(NUM_LAYERS > 0, "Number of layers must be positive");
@@ -159,23 +94,14 @@ namespace dlib
             static_assert(EMBEDDING_DIM % NUM_HEADS == 0, "Embedding dimension must be divisible by number of heads");
         };
 
-        // Network component definitions
-        template <typename SUBNET>
-        using t_transformer_block =
-            trans_moe_block<activation_func, dropout_policy, MAX_SEQ_LEN, EMBEDDING_DIM, NUM_HEADS, SUBNET>;
-
-        template <typename SUBNET>
-        using i_transformer_block =
-            trans_moe_block<activation_func, multiply, MAX_SEQ_LEN, EMBEDDING_DIM, NUM_HEADS, SUBNET>;
-
         template<bool is_training>
         using network_type = std::conditional_t<is_training,
             classification_head<VOCAB_SIZE,
-            rms_norm<repeat<NUM_LAYERS, t_transformer_block,
-            token_embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>,
+            transformer_stack<NUM_LAYERS, activation_func, dropout_policy, MAX_SEQ_LEN, EMBEDDING_DIM, NUM_HEADS,
+            token_embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>,
             classification_head<VOCAB_SIZE,
-            rms_norm<repeat<NUM_LAYERS, i_transformer_block,
-            token_embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>>;
+            transformer_stack<NUM_LAYERS, activation_func, multiply, MAX_SEQ_LEN, EMBEDDING_DIM, NUM_HEADS,
+            token_embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>;
 
         struct model_info {
             static std::string describe() {
@@ -375,7 +301,7 @@ int main(int argc, char** argv)
         const long num_layers = 4;
         const long num_heads = 6;        
         const long embedding_dim = 228;
-        const long max_seq_len = 50;
+        const long max_seq_len = 100;
 
         // Define transformer configuration
         using my_transformer = transformer_config<

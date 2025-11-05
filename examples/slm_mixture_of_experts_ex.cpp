@@ -422,7 +422,7 @@ int main(int argc, char** argv)
         const long num_layers = 4;
         const long num_heads = 6;
         const long embedding_dim = 228;
-        const long max_seq_len = 50;
+        const long max_seq_len = 100;
 
         // Define transformer configuration with MoE
         using my_transformer = transformer_config<
