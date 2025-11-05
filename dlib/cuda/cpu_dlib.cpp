@@ -1648,14 +1648,22 @@ namespace dlib
                             for (long k = 0; k < num_channels; ++k)
                                 max_val = std::max(max_val, ss[k * num_locations]);
 
-                            float sum = 0.0f;
-                            for (long k = 0; k < num_channels; ++k)
+                            if (max_val == -std::numeric_limits<float>::infinity())
                             {
-                                dd[k * num_locations] = std::exp(ss[k * num_locations] - max_val);
-                                sum += dd[k * num_locations];
+                                for (long k = 0; k < num_channels; ++k)
+                                    dd[k * num_locations] = 0.0f;
                             }
-                            for (long k = 0; k < num_channels; ++k)
-                                dd[k * num_locations] /= sum;
+                            else
+                            {
+                                float sum = 0.0f;
+                                for (long k = 0; k < num_channels; ++k)
+                                {
+                                    dd[k * num_locations] = std::exp(ss[k * num_locations] - max_val);
+                                    sum += dd[k * num_locations];
+                                }
+                                for (long k = 0; k < num_channels; ++k)
+									dd[k * num_locations] /= sum;
+                            }
 
                             ++ss;
                             ++dd;
@@ -3392,48 +3400,39 @@ namespace dlib
             const float* cos_ptr = cos_cache.host();
             const float* sin_ptr = sin_cache.host();
 
-            const long head_stride = seq_len * d_head;
+            const size_t total_elements = batch_size * num_heads * seq_len * half_d;
 
-            // Parallelize over batch and heads
-            parallel_for(0, batch_size * num_heads, [&](long bh_idx)
+            parallel_for(0, total_elements, [&](long idx)
             {
-                const long batch_idx = bh_idx / num_heads;
-                const long head_idx = bh_idx % num_heads;
+                const long pair_idx = idx % half_d;
+                const long pos = (idx / half_d) % seq_len;
+                const long head = (idx / (half_d * seq_len)) % num_heads;
+                const long batch = idx / (half_d * seq_len * num_heads);
 
-                float* x_ptr = data_ptr + (batch_idx * num_heads + head_idx) * head_stride;
+                const long dim_i = pair_idx * 2;
+                if (dim_i >= rot_dim) return;
 
-                // Process each position in the sequence
-                for (long pos = 0; pos < seq_len; ++pos)
+                const long data_offset = ((batch * num_heads + head) * seq_len + pos) * d_head + dim_i;
+                const long trig_offset = pos * half_d + pair_idx;
+
+                const float c = cos_ptr[trig_offset];
+                const float s = sin_ptr[trig_offset];
+                const float x0 = data_ptr[data_offset];
+                const float x1 = data_ptr[data_offset + 1];
+
+                if (!is_backward)
                 {
-                    const float* cos_row = cos_ptr + pos * half_d;
-                    const float* sin_row = sin_ptr + pos * half_d;
-                    float* pos_ptr = x_ptr + pos * d_head;
-
-                    // Apply rotation to each pair of dimensions
-                    for (long i = 0; i < rot_dim; i += 2)
-                    {
-                        const long pair_idx = i / 2;
-                        const float c = cos_row[pair_idx];
-                        const float s = sin_row[pair_idx];
-
-                        const float x0 = pos_ptr[i];
-                        const float x1 = pos_ptr[i + 1];
-
-                        if (!is_backward)
-                        {
-                            // Forward: [cos -sin] [x0]
-                            //          [sin  cos] [x1]
-                            pos_ptr[i]      = x0 * c - x1 * s;
-                            pos_ptr[i + 1]  = x0 * s + x1 * c;
-                        }
-                        else
-                        {
-                            // Backward (inverse rotation): [cos  sin] [x0]
-                            //                              [-sin cos] [x1]
-                            pos_ptr[i]      = x0 * c + x1 * s;
-                            pos_ptr[i + 1]  = -x0 * s + x1 * c;
-                        }
-                    }
+                    // Forward: [cos -sin] [x0]
+                    //          [sin  cos] [x1]
+                    data_ptr[data_offset] = x0 * c - x1 * s;
+                    data_ptr[data_offset + 1] = x0 * s + x1 * c;
+                }
+                else
+                {
+                    // Backward (inverse rotation): [cos  sin] [x0]
+                    //                              [-sin cos] [x1]
+                    data_ptr[data_offset] = x0 * c + x1 * s;
+                    data_ptr[data_offset + 1] = -x0 * s + x1 * c;
                 }
             });
         }

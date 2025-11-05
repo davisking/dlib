@@ -645,7 +645,7 @@ int main(int argc, char** argv)
             while (total_bytes < target_size && next_token != start_of_text && next_token != end_of_text
                 && !g_terminate_flag.load()) {
                 // Predict next token
-                next_token = net(input_seq);
+                next_token = net(input_seq);				
                 token_buffer.push_back(next_token);
                 token_count++;
 
