@@ -264,7 +264,7 @@ int main(int argc, char** argv)
         parser.add_option("learning-rate", "Set the learning rate (default: 2e-4)", 1);
         parser.add_option("batch-size", "Set the mini-batch size (default: 48)", 1);
         parser.add_option("patience", "Iterations without progress before early stopping (default: 5000)", 1);
-        parser.add_option("max-epochs", "Maximum number of training epochs (default: 300)", 1);
+        parser.add_option("max-epochs", "Maximum number of training epochs (default: 200)", 1);
         parser.add_option("alpha", "Set the weight decay for Adam (default: 0.004)", 1);
         parser.add_option("beta1", "Set Adam's first moment coefficient (default: 0.9)", 1);
         parser.add_option("beta2", "Set Adam's second moment coefficient (default: 0.999)", 1);
@@ -288,7 +288,7 @@ int main(int argc, char** argv)
         const double learning_rate = get_option(parser, "learning-rate", 2e-4);
         const size_t batch_size = get_option(parser, "batch-size", 48);
         const long patience = get_option(parser, "patience", 5000);
-        const size_t max_epochs = get_option(parser, "max-epochs", 300);
+        const size_t max_epochs = get_option(parser, "max-epochs", 200);
         const double alpha = get_option(parser, "alpha", 0.004);
         const double beta1 = get_option(parser, "beta1", 0.9);
         const double beta2 = get_option(parser, "beta2", 0.999);
@@ -301,7 +301,7 @@ int main(int argc, char** argv)
         const long num_layers = 4;
         const long num_heads = 6;        
         const long embedding_dim = 228;
-        const long max_seq_len = 100;
+        const long max_seq_len = 50;
 
         // Define transformer configuration
         using my_transformer = transformer_config<
