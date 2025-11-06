@@ -106,7 +106,7 @@ namespace dlib
         template <template <typename> class ACT, template <typename> class DO,
             long d_model, long num_heads, typename SUBNET>
         using multihead_attention = add_prev1<
-            DO<extract<0, 1, 1, d_model,
+            DO<extract<0, 1, 1, d_model, fc_no_bias<d_model,
             multm_prev3<softmaxm<tril_mask<
             scale_weights<d_model / num_heads,
             multm_prev4<
@@ -114,7 +114,7 @@ namespace dlib
             tag4<key<num_heads, d_model, skip2<
             tag3<value<num_heads, d_model,
             tag2<fc_no_bias<d_model * 3,
-            rms_norm<tag1<SUBNET>>>>>>>>>>>>>>>>>>>;
+            rms_norm<tag1<SUBNET>>>>>>>>>>>>>>>>>>>>;
 
         template <template <typename> class ACT, template <typename> class DO,
             long d_model, typename SUBNET>
