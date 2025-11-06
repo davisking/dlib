@@ -3011,35 +3011,31 @@ namespace dlib
                 const long pos = (pair_id / half_d) % seq_len;
                 const long head = (pair_id / (half_d * seq_len)) % num_heads;
                 const long batch = pair_id / (half_d * seq_len * num_heads);
-
+        
                 const long dim_i = pair_idx * 2;
                 if (dim_i >= rot_dim) continue;
-
+        
                 const long base_offset = ((batch * num_heads + head) * seq_len + pos) * d_head;
                 const long data_offset = base_offset + dim_i;
                 const long trig_offset = pos * half_d + pair_idx;
-
-                if (data_offset + 1 >= base_offset + d_head) continue;
-
+        
                 const float c = cos_cache[trig_offset];
                 const float s = sin_cache[trig_offset];
                 const float x0 = data[data_offset];
                 const float x1 = data[data_offset + 1];
-
-                float result0, result1;
+        
                 if (!is_backward)
                 {
-                    result0 = x0 * c - x1 * s;
-                    result1 = x0 * s + x1 * c;
+                    // Forward: rotation standard
+                    data[data_offset]     = x0 * c - x1 * s;
+                    data[data_offset + 1] = x0 * s + x1 * c;
                 }
                 else
                 {
-                    result0 = x0 * c + x1 * s;
-                    result1 = -x0 * s + x1 * c;
+                    // Backward: rotation inverse
+                    data[data_offset]     = x0 * c + x1 * s;
+                    data[data_offset + 1] = -x0 * s + x1 * c;
                 }
-
-                data[data_offset] = result0;
-                data[data_offset + 1] = result1;
             }
         }
 
