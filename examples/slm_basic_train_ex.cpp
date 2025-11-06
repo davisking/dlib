@@ -199,7 +199,7 @@ int main(int argc, char** argv)
             trainer.set_min_learning_rate(1e-6);
             trainer.set_mini_batch_size(batch_size);
             trainer.set_iterations_without_progress_threshold(5000);
-            trainer.set_max_num_epochs(100);
+            trainer.set_max_num_epochs(150);
             trainer.be_verbose();
 
             // 4) Train
@@ -294,8 +294,8 @@ int main(int argc, char** argv)
  *    + layers: 3
  *    + attention heads: 4
  *    + embedding dimension: 64
- *    + max sequence length: 80
- * - Number of parameters: 8,247,496
+ *    + max sequence length: 50
+ * - Number of parameters: 5,185,864
  *
  * The training can be performed using the following command line:
  * > ./slm_basic_train_ex --train --shuffle
