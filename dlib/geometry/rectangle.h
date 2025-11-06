@@ -148,6 +148,11 @@ namespace dlib
         const point br_corner (
         ) const { return point(right(), bottom()); }
        
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable: 4723)  // potential divide by 0
+#endif
+
         unsigned long width (
         ) const 
         { 
@@ -171,6 +176,10 @@ namespace dlib
         {
             return width()*height();
         }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
         bool is_empty (
         ) const { return (t > b || l > r); }
@@ -748,35 +757,27 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    // Circumvent what appears to be a bug in Visual Studio 2019's optimizer
-    // (see: https://forum.juce.com/t/warning-in-the-lastest-vs2019/38267)
-#if defined (_MSC_VER)
-#pragma warning ( push )
-#pragma warning ( disable: 4723 )
-#endif
     inline rectangle set_rect_area (
         const rectangle& rect,
         unsigned long area
     )
     {
         DLIB_ASSERT(area > 0);
+        const unsigned long rect_area = rect.area();
 
-        if (rect.area() == 0)
+        if (rect_area == 0)
         {
-            // In this case we will make the output rectangle a square with the requested
-            // area.
             unsigned long scale = std::round(std::sqrt(area));
             return centered_rect(rect, scale, scale);
         }
         else
         {
-            const double scale = std::sqrt(area/static_cast<double>(rect.area()));
-            return centered_rect(rect, std::lround(rect.width()*scale), std::lround(rect.height()*scale));
+            // Le compilateur sait maintenant que rect_area != 0
+            const double scale = std::sqrt(area / static_cast<double>(rect_area));
+            return centered_rect(rect, std::lround(rect.width() * scale),
+                std::lround(rect.height() * scale));
         }
     }
-#if defined (_MSC_VER)
-#pragma warning ( pop )
-#endif
 
 // ----------------------------------------------------------------------------------------
 
