@@ -58,6 +58,17 @@ using namespace dlib;
 namespace dlib
 {
     /*!
+        Expert network architecture for MoE layer.
+        Each expert is a feed-forward network with:
+        - Expansion layer: d_model -> d_model * 4
+        - Activation function
+        - Projection layer: d_model * 4 -> d_model
+        - Residual connection for gradient flow
+    !*/
+    template <template <typename> class ACT, template <typename> class DO, long d_model>
+    using expert_net_type = canonical_transformer::std_ffn<ACT, DO, d_model, input<matrix<float>>>;
+
+    /*!
         Complete transformer block with MoE-based feed-forward layer.
         Architecture:
         1. Multi-head self-attention (from canonical_transformer)
@@ -70,7 +81,7 @@ namespace dlib
     template <template <typename> class ACT, template <typename> class DO,
         long seq_len, long d_model, long num_heads, typename MODE, typename SUBNET>
     using trans_moe_block =
-        moe_ffn<canonical_transformer::std_ffn<ACT, DO, d_model>, 4, 0, MODE, DO,
+        moe_ffn<expert_net_type<ACT, DO, d_model>, 4, 0, MODE, DO,
         canonical_transformer::multihead_attention<ACT, DO, seq_len, d_model, num_heads, SUBNET>>;
 
     /*!

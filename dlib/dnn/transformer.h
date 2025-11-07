@@ -476,9 +476,9 @@ namespace dlib
 
     template <long num_experts, template <typename> class DO, typename SUBNET>
     using gate = softmax<fc<num_experts, avg_pool_everything<
+        DO<leaky_relu<fc<16,
         DO<leaky_relu<fc<32,
-        DO<leaky_relu<fc<64,
-        DO<fc<32, SUBNET>>>>>>>>>>>;
+        DO<fc<16, SUBNET>>>>>>>>>>>;
 
     struct training_mode_tag {};
     struct inference_mode_tag {};
