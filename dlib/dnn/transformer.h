@@ -59,15 +59,19 @@ namespace dlib
 
         template <template <typename> class ACT, template <typename> class DO,
             long d_model, typename SUBNET>
-        using feed_forward =
-            add_prev4<
-            DO<linear<d_model, DO<ACT<linear<d_model * 4, rms_norm<tag4<SUBNET>>>>>>>>;
+        using std_ffn = DO<linear<d_model, DO<ACT<linear<d_model * 4, SUBNET>>>>>;
+
+        // Standard SwiGLU FFN implementation
+        // Reference: Noam Shazeer's "GLU Variants Improve Transformer" (https://arxiv.org/abs/2002.05202)
+        template <long d_model, typename SUBNET>
+        using swiglu = linear<d_model, multm_prev6<linear<(d_model * 8) / 3, skip5<
+            tag6<silu<linear<(d_model * 8) / 3, tag5<SUBNET>>>>>>>>;
 
         template <template <typename> class ACT, template <typename> class DO,
             long seq_len, long d_model, long num_heads, typename SUBNET>
-        using transformer_block =
-            act<feed_forward<ACT, DO, d_model,
-            multihead_attention<ACT, DO, seq_len, d_model, num_heads, SUBNET>>>;
+        using transformer_block = act<
+            add_prev4<swiglu<d_model, rms_norm<tag4<
+            multihead_attention<ACT, DO, seq_len, d_model, num_heads, SUBNET>>>>>>;
 
         template<long remaining_layers, template <typename> class ACT, template <typename> class DO,
             long seq_len, long d_model, long num_heads, typename SUBNET, typename enabled = void>
@@ -118,15 +122,19 @@ namespace dlib
 
         template <template <typename> class ACT, template <typename> class DO,
             long d_model, typename SUBNET>
-        using feed_forward =
-            add_prev5<extract<0, 1, 1, d_model,
-            DO<fc<d_model, DO<ACT<fc<d_model * 4, rms_norm<tag5<SUBNET>>>>>>>>>;
+        using std_ffn = extract<0, 1, 1, d_model,
+            DO<fc<d_model, DO<ACT<fc<d_model * 4, SUBNET>>>>>>;
+
+        template <long d_model, typename SUBNET>
+        using swiglu = extract<0, 1, 1, d_model,
+            fc<d_model, mult_prev7<fc<(d_model * 8) / 3, skip6<
+            tag7<silu<fc<(d_model * 8) / 3, tag6<SUBNET>>>>>>>>>;
 
         template <template <typename> class ACT, template <typename> class DO,
             long seq_len, long d_model, long num_heads, typename SUBNET>
         using transformer_block =
-            feed_forward<ACT, DO, d_model,
-            multihead_attention<ACT, DO, d_model, num_heads, SUBNET>>;
+            add_prev5<swiglu<d_model, rms_norm<tag5<
+            multihead_attention<ACT, DO, d_model, num_heads, SUBNET>>>>>;
 
         template<long remaining_layers, template <typename> class ACT, template <typename> class DO,
             long seq_len, long d_model, long num_heads, typename SUBNET, typename enabled = void>
@@ -869,8 +877,8 @@ namespace dlib
         template <typename> class DO,
         typename SUBNET
     >
-    using moe_feed_forward = add_prev5<moe<EXPERT_NET, top_k, MODE, tag6, skip5<
-        tag6<gate<num_experts, DO, rms_norm<tag5<SUBNET>>>>>>>;
+    using moe_ffn = add_prev8<moe<EXPERT_NET, top_k, MODE, tag9, skip8<
+        tag9<gate<num_experts, DO, rms_norm<tag8<SUBNET>>>>>>>;
 }
 
 #endif // DLIB_DNN_TRANSFORMER_H_
