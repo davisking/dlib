@@ -174,40 +174,67 @@ namespace dlib
 
         template <template <typename> class ACT, template <typename> class DO,
             long d_model, typename SUBNET>
-        using feed_forward = some_template_expression;
+        using std_ffn = some_template_expression;
         /*!
             WHAT THIS REPRESENTS
-                This template implements the position-wise feed-forward network used in
-                transformer blocks. It consists of two linear transformations with an
-                activation function in between.
-
-                The FFN applies the same transformation independently to each position:
-                    FFN(x) = activation(x * W1 + b1) * W2 + b2
-                where the hidden dimension is typically 4x the model dimension.
+                Standard position-wise feed-forward network used in transformer blocks.
+                Implements a two-layer MLP with one intermediate activation and dropout
+                regularization.
 
             ARCHITECTURE FLOW
-                1. RMS normalization
-                2. Linear projection: d_model => d_model * 4 (expansion)
-                3. Activation function
-                4. Dropout (during training)
-                5. Linear projection: d_model * 4 => d_model (compression)
-                6. Dropout (during training)
-                7. Residual connection with input                
+                1. Linear expansion: d_model => 4*d_model
+                2. Activation function (ACT)
+                3. Linear projection: 4*d_model => d_model
+                4. Dropout (DO) for regularization
 
             TEMPLATE PARAMETERS
-                - ACT: activation function template (e.g., silu, gelu, relu)
-                - DO: dropout policy template (e.g., dropout_10, multiply for inference)
-                - d_model: model dimension
+                - ACT: activation function template (e.g., gelu, silu, relu)
+                - DO: dropout policy template (dropout_10 in training, multiply in inference)
+                - d_model: model dimension (input and output size)
 
             INPUT/OUTPUT SHAPES
                 Input:  (batch_size, 1, seq_len, d_model)
                 Output: (batch_size, 1, seq_len, d_model)
 
             NOTES
-                - Expansion ratio of 4x is standard in transformers
-                - Each position is processed independently (no cross-position interaction)
-                - Provides the bulk of the transformer's parameter count
-                - The residual connection helps gradient flow during training
+                - Expansion factor is fixed at 4x (standard transformer practice)
+                - Single dropout applied after final projection
+                - No normalization inside FFN (handled by transformer_block)
+        !*/
+
+        template <template <typename> class ACT, template <typename> class DO,
+            long d_model, typename SUBNET>
+        using swiglu = some_template_expression;
+        /*!
+            WHAT THIS REPRESENTS
+                SwiGLU (Swish-Gated Linear Unit) feed-forward network, an alternative to
+                standard FFN with improved performance on language modeling tasks.
+
+            REFERENCE
+                Noam Shazeer, "GLU Variants Improve Transformer" (https://arxiv.org/abs/2002.05202)
+
+            ARCHITECTURE FLOW
+                1. Split into two branches from input:
+                   - Gate branch: W1 projection => ACT activation
+                   - Linear branch: V projection
+                2. Element-wise multiplication of branches (Hadamard product)
+                3. Final projection: W2 => d_model
+                4. Dropout for regularization
+
+            TEMPLATE PARAMETERS
+                - ACT: activation function template (typically silu for true SwiGLU)
+                - DO: dropout policy template (dropout_10 in training, multiply in inference)
+                - d_model: model dimension (input and output size)
+
+            INPUT/OUTPUT SHAPES
+                Input:  (batch_size, 1, seq_len, d_model)
+                Output: (batch_size, 1, seq_len, d_model)
+
+            NOTES
+                - Uses (8*d_model)/3 for hidden dimension (equivalent parameters to 4x expansion)
+                - More expressive than standard FFN due to gating mechanism
+                - Single dropout applied after final projection
+                - ACT is typically silu (Swish) for standard SwiGLU
         !*/
 
         template <template <typename> class ACT, template <typename> class DO,
@@ -280,7 +307,7 @@ namespace dlib
                 sometimes referred to as "kernel-fused" attention in the literature
 
                 This architecture uses a single fc_no_bias layer to compute all Q, K, V
-                projections simultaneously (dimension: d_model -> 3*d_model), then uses
+                projections simultaneously (dimension: d_model => 3*d_model), then uses
                 extract layers to separate them. This approach leverages Dlib's fc_ layer
                 optimizations and reduces memory access patterns.
 
@@ -358,24 +385,55 @@ namespace dlib
 
         template <template <typename> class ACT, template <typename> class DO,
             long d_model, typename SUBNET>
-        using feed_forward = some_template_expression;
+        using std_ffn = some_template_expression;
         /*!
-            WHAT THIS OBJECT REPRESENTS
-                Optimized feed-forward network using fc layers with dimension flattening.
+            WHAT THIS REPRESENTS
+                Fused implementation of standard feed-forward network using fc layers with
+                automatic dimension flattening for better BLAS/GEMM utilization.
 
             ARCHITECTURE FLOW
-                Same as canonical version but uses fc instead of linear:
-                1. RMS normalization
-                2. fc expansion: d_model => d_model * 4
-                3. Activation function
-                4. Dropout
-                5. fc compression: d_model * 4 => d_model
-                6. Dropout
-                7. Residual connection
+                1. fc layer: d_model => 4*d_model (with dimension flattening)
+                2. Activation function (ACT)
+                3. fc layer: 4*d_model => d_model
+                4. Dropout (DO)
+                5. extract operation to restore proper tensor dimensions
 
-            PERFORMANCE NOTES
-                - Better utilization of optimized BLAS routines
-                - Dimension flattening improves memory access
+            TEMPLATE PARAMETERS
+                - ACT: activation function template (e.g., gelu, silu, relu)
+                - DO: dropout policy template (dropout_10 in training, multiply in inference)
+                - d_model: model dimension (input and output size)
+
+            INPUT/OUTPUT SHAPES
+                Input:  (batch_size, 1, seq_len, d_model)
+                Output: (batch_size, 1, seq_len, d_model)
+        !*/
+
+        template <template <typename> class ACT, template <typename> class DO,
+            long d_model, typename SUBNET>
+        using swiglu = some_template_expression;
+        /*!
+            WHAT THIS REPRESENTS
+                Fused implementation of SwiGLU using fc layers with automatic dimension
+                flattening for better BLAS/GEMM utilization.
+
+            REFERENCE
+                Noam Shazeer, "GLU Variants Improve Transformer" (https://arxiv.org/abs/2002.05202)
+
+            ARCHITECTURE FLOW
+                1. fc projections with dimension flattening
+                2. Split into gate and linear branches
+                3. Element-wise multiplication
+                4. Final fc projection with extraction
+                5. Dropout for regularization
+
+            TEMPLATE PARAMETERS
+                - ACT: activation function template (typically silu)
+                - DO: dropout policy template
+                - d_model: model dimension
+
+            INPUT/OUTPUT SHAPES
+                Input:  (batch_size, 1, seq_len, d_model)
+                Output: (batch_size, 1, seq_len, d_model)
         !*/
 
         template <template <typename> class ACT, template <typename> class DO,
@@ -430,14 +488,14 @@ namespace dlib
                 high-level module updates.
 
                 Mathematical formulation:
-                    For each high-level cycle n ∈ [0, N):
-                        For each low-level step t ∈ [0, T):
-                            z_L^{n,t} = f_L(z_L^{prev} + z_H^n + x̃)
+                    For each high-level cycle n E [0, N):
+                        For each low-level step t E [0, T):
+                            z_L^{n,t} = f_L(z_L^{prev} + z_H^n + x0)
                         z_H^{n+1} = f_H(z_H^n + z_L^{n,T-1})
                     Output: z_H^N
 
                 where:
-                    - x̃ is the input with positional encodings
+                    - x0 is the input with positional encodings
                     - z_H and z_L are the hidden states of the H and L modules
                     - f_H and f_L are the recurrent transformations (H_NET and L_NET)
 
