@@ -879,8 +879,8 @@ namespace dlib
         template <typename> class DO,
         typename SUBNET
     >
-    using moe_ffn = add_prev8<moe<EXPERT_NET, top_k, MODE, tag9, skip8<
-        tag9<gate<num_experts, DO, rms_norm<tag8<SUBNET>>>>>>>;
+    using moe_ffn = add_prev8<moe<EXPERT_NET, top_k, MODE, tag9, rms_norm<skip8<
+        tag9<gate<num_experts, DO, tag8<SUBNET>>>>>>>;
 }
 
 #endif // DLIB_DNN_TRANSFORMER_H_
