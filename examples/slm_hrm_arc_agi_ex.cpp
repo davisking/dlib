@@ -29,6 +29,7 @@
 #include <fstream>
 #include <chrono>
 #include <csignal>
+
 #include <dlib/data_io.h>
 #include <dlib/cmd_line_parser.h>
 #include <dlib/misc_api.h>
@@ -40,6 +41,108 @@ using namespace dlib;
 
 namespace dlib
 {
+    class display_
+    {
+    public:
+        explicit display_(const std::string& label = "") :
+            layer_label(label)
+        {
+        }
+
+        display_(const display_& other) :
+            layer_label(other.layer_label)
+        {
+        }
+
+        display_& operator=(const display_& other)
+        {
+            if (this != &other) {
+                layer_label = other.layer_label;
+            }
+            return *this;
+        }
+
+        template <typename SUBNET>
+        void setup(const SUBNET& /*sub*/)
+        {
+            // No setup needed
+        }
+
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            const tensor& input = sub.get_output();
+
+            // Display tensor dimensions
+            std::cout << "[DISPLAY";
+            if (!layer_label.empty())
+                std::cout << " " << layer_label;
+            std::cout << "] "
+                << "num_samples=" << input.num_samples() << ", "
+                << "k=" << input.k() << ", "
+                << "nr=" << input.nr() << ", "
+                << "nc=" << input.nc()
+                << std::endl;
+
+            // Copy input to output (transparent pass-through)
+            output.copy_size(input);
+            tt::copy_tensor(false, output, 0, input, 0, input.k());
+        }
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
+        {
+            // Simply propagate gradients unchanged
+            tensor& prev_grad = sub.get_gradient_input();
+            tt::copy_tensor(true, prev_grad, 0, gradient_input, 0, gradient_input.k());
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const display_& item, std::ostream& out)
+        {
+            serialize("display_", out);
+            serialize(item.layer_label, out);
+        }
+
+        friend void deserialize(display_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "display_")
+                throw serialization_error("Unexpected version '" + version +
+                    "' while deserializing display_");
+            deserialize(item.layer_label, in);
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const display_& item)
+        {
+            out << "display";
+            if (!item.layer_label.empty())
+                out << " (" << item.layer_label << ")";
+            return out;
+        }
+
+        friend void to_xml(const display_& item, std::ostream& out)
+        {
+            out << "<display";
+            if (!item.layer_label.empty())
+                out << " label='" << item.layer_label << "'";
+            out << "/>\n";
+        }
+
+        inline dpoint map_input_to_output(const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input(const dpoint& p) const { return p; }
+
+    private:
+        std::string layer_label;
+        resizable_tensor params; // No trainable parameters
+    };
+
+    template <typename SUBNET>
+    using display = add_layer<display_, SUBNET>;
+
     /*!
         Provides a flexible configuration for HRM-based transformer models with dual
         recurrent modules (H and L) for hierarchical reasoning.
@@ -58,11 +161,11 @@ namespace dlib
     !*/
     template<
         long vocab_size = ARC_VOCAB_SIZE_TOTAL,                    // 17 tokens for ARC-AGI
-        long num_h_layers = 2,                                     // H module depth
-        long num_l_layers = 1,                                     // L module depth
+        long num_h_layers = 4,                                     // H module depth
+        long num_l_layers = 4,                                     // L module depth
         long num_heads = 8,                                        // Attention heads
         long embedding_dim = 512,                                  // Embedding dimension
-        long window_len = 256,                                     // Context window
+        long window_len = 768,                                     // Context window
         long hrm_N = 2,                                            // High-level cycles
         long hrm_T = 2,                                            // Low-level steps
         template <typename> class activation_func = gelu,          // Activation
@@ -85,11 +188,38 @@ namespace dlib
             static_assert(NUM_H_LAYERS > 0, "Number of H layers must be positive");
             static_assert(NUM_L_LAYERS > 0, "Number of L layers must be positive");
             static_assert(NUM_HEADS > 0, "Number of attention heads must be positive");
-            static_assert(EMBEDDING_DIM% NUM_HEADS == 0, "Embedding dimension must be divisible by number of heads");
+            static_assert(EMBEDDING_DIM % NUM_HEADS == 0, "Embedding dimension must be divisible by number of heads");
             static_assert(WINDOW_LEN > 0, "Window length must be positive");
             static_assert(HRM_N > 0, "HRM N cycles must be positive");
             static_assert(HRM_T > 0, "HRM T steps must be positive");
         };
+
+        // Basic 3x3 convolution with padding=1, stride=2 for exact 2x downsampling
+        template <typename SUBNET>
+        using con3d = add_layer<con_<1, 3, 3, 2, 2, 1, 1>, SUBNET>;
+
+        // Recursive implementation of signal compressor
+        template <int depth, template<typename> class NORM, typename SUBNET>
+        struct signal_compressor_impl
+        {
+            using type = relu<NORM<
+                con3d<typename signal_compressor_impl<depth - 1, NORM, SUBNET>::type>>>;
+        };
+
+        // Base case: depth=0 returns input unchanged
+        template <template<typename> class NORM, typename SUBNET>
+        struct signal_compressor_impl<0, NORM, SUBNET>
+        {
+            using type = SUBNET;
+        };
+
+        // Signal compressor for training mode (with batch normalization)
+        template <int depth, typename SUBNET>
+        using signal_compressor_t = typename signal_compressor_impl<depth, bn_con, SUBNET>::type;
+
+        // Signal compressor for inference mode (with affine transform)
+        template <int depth, typename SUBNET>
+        using signal_compressor_i = typename signal_compressor_impl<depth, affine, SUBNET>::type;
 
         // Network component definitions for training (with dropout)
         using t_h_net_type = canonical_transformer::transformer_stack<NUM_H_LAYERS, activation_func, dropout_policy,

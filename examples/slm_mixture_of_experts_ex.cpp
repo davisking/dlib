@@ -413,9 +413,9 @@ int main(int argc, char** argv)
         // Model architecture parameters
         const long num_tokens = 1500;
         const long num_layers = 4;
-        const long num_heads = 6;
-        const long embedding_dim = 228;
-        const long max_seq_len = 50;
+        const long num_heads = 8;
+        const long embedding_dim = 256;
+        const long max_seq_len = 70;
 
         // Define transformer configuration with MoE
         using my_transformer = transformer_config<
