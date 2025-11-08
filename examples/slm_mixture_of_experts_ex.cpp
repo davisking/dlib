@@ -57,16 +57,9 @@ using namespace dlib;
 
 namespace dlib
 {
-    /*!
-        Expert network architecture for MoE layer.
-        Each expert is a feed-forward network with:
-        - Expansion layer: d_model -> d_model * 4
-        - Activation function
-        - Projection layer: d_model * 4 -> d_model
-        - Residual connection for gradient flow
-    !*/
+    // Expert network architecture for MoE layer
     template <template <typename> class ACT, template <typename> class DO, long d_model>
-    using expert_net_type = canonical_transformer::std_ffn<ACT, DO, d_model, input<matrix<float>>>;
+    using expert_net_type = std_ffn<ACT, DO, d_model, input<matrix<float>>>;
 
     /*!
         Complete transformer block with MoE-based feed-forward layer.
@@ -82,7 +75,7 @@ namespace dlib
         long seq_len, long d_model, long num_heads, typename MODE, typename SUBNET>
     using trans_moe_block =
         moe_ffn<expert_net_type<ACT, DO, d_model>, 4, 0, MODE, DO,
-        canonical_transformer::multihead_attention<ACT, DO, seq_len, d_model, num_heads, SUBNET>>;
+        multihead_attention<ACT, DO, seq_len, d_model, num_heads, SUBNET>>;
 
     /*!
         Classification head for next-token prediction.
@@ -385,7 +378,7 @@ int main(int argc, char** argv)
         parser.add_option("learning-rate", "Set the learning rate (default: 2e-4)", 1);
         parser.add_option("batch-size", "Set the mini-batch size (default: 48)", 1);
         parser.add_option("patience", "Iterations without progress before early stopping (default: 5000)", 1);
-        parser.add_option("max-epochs", "Maximum number of training epochs (default: 200)", 1);
+        parser.add_option("max-epochs", "Maximum number of training epochs (default: 300)", 1);
         parser.add_option("alpha", "Set the weight decay for Adam (default: 0.004)", 1);
         parser.add_option("beta1", "Set Adam's first moment coefficient (default: 0.9)", 1);
         parser.add_option("beta2", "Set Adam's second moment coefficient (default: 0.999)", 1);
@@ -409,7 +402,7 @@ int main(int argc, char** argv)
         const double learning_rate = get_option(parser, "learning-rate", 2e-4);
         const size_t batch_size = get_option(parser, "batch-size", 48);
         const long patience = get_option(parser, "patience", 5000);
-        const size_t max_epochs = get_option(parser, "max-epochs", 200);
+        const size_t max_epochs = get_option(parser, "max-epochs", 300);
         const double alpha = get_option(parser, "alpha", 0.004);
         const double beta1 = get_option(parser, "beta1", 0.9);
         const double beta2 = get_option(parser, "beta2", 0.999);

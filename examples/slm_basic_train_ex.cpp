@@ -126,12 +126,12 @@ int main(int argc, char** argv)
 
         using train_fused_transformer =
             loss_multiclass_log<fc<vocab_size, rms_norm<
-            fused_transformer::transformer_stack<num_layers, silu, dropout_10, max_seq_len, embedding_dim, num_heads,
+            fused_transformer::transformer_stack<num_layers, gelu, dropout_10, max_seq_len, embedding_dim, num_heads,
             token_embeddings<vocab_size, embedding_dim, input<matrix<int, 0, 1>>>>>>>;
 
         using infer_fused_transformer =
             loss_multiclass_log<fc<vocab_size, rms_norm<
-            fused_transformer::transformer_stack<num_layers, silu, multiply, max_seq_len, embedding_dim, num_heads,
+            fused_transformer::transformer_stack<num_layers, gelu, multiply, max_seq_len, embedding_dim, num_heads,
             token_embeddings<vocab_size, embedding_dim, input<matrix<int, 0, 1>>>>>>>;
 
         // For GPU usage (if any), set gpus = {0} for a single GPU, etc.
@@ -273,7 +273,7 @@ int main(int argc, char** argv)
                 ctx.add_token(next_token);
             }
 
-            cout << "\n\n(end of generation)\n";
+            cout << "...\n\n(end of generation)\n";
         }
 
         return 0;

@@ -59,18 +59,19 @@ namespace dlib
 
         template <template <typename> class ACT, template <typename> class DO,
             long d_model, typename SUBNET>
-        using std_ffn = DO<linear<d_model, DO<ACT<linear<d_model * 4, SUBNET>>>>>;
+        using std_ffn = DO<linear<d_model, ACT<linear<d_model * 4, SUBNET>>>>;
 
         // Standard SwiGLU FFN implementation
         // Reference: Noam Shazeer's "GLU Variants Improve Transformer" (https://arxiv.org/abs/2002.05202)
-        template <long d_model, typename SUBNET>
-        using swiglu = linear<d_model, multm_prev6<linear<(d_model * 8) / 3, skip5<
-            tag6<silu<linear<(d_model * 8) / 3, tag5<SUBNET>>>>>>>>;
+        template <template <typename> class ACT, template <typename> class DO,
+            long d_model, typename SUBNET>
+        using swiglu = DO<linear<d_model, multm_prev6<linear<(d_model * 8) / 3, skip5<
+            tag6<ACT<linear<(d_model * 8) / 3, tag5<SUBNET>>>>>>>>>;
 
         template <template <typename> class ACT, template <typename> class DO,
             long seq_len, long d_model, long num_heads, typename SUBNET>
         using transformer_block = act<
-            add_prev4<swiglu<d_model, rms_norm<tag4<
+            add_prev4<std_ffn<ACT, DO, d_model, rms_norm<tag4<
             multihead_attention<ACT, DO, seq_len, d_model, num_heads, SUBNET>>>>>>;
 
         template<long remaining_layers, template <typename> class ACT, template <typename> class DO,
@@ -123,17 +124,18 @@ namespace dlib
         template <template <typename> class ACT, template <typename> class DO,
             long d_model, typename SUBNET>
         using std_ffn = extract<0, 1, 1, d_model,
-            DO<fc<d_model, DO<ACT<fc<d_model * 4, SUBNET>>>>>>;
+            DO<fc<d_model, ACT<fc<d_model * 4, SUBNET>>>>>;
 
-        template <long d_model, typename SUBNET>
-        using swiglu = extract<0, 1, 1, d_model,
+        template <template <typename> class ACT, template <typename> class DO,
+            long d_model, typename SUBNET>
+        using swiglu = DO<extract<0, 1, 1, d_model,
             fc<d_model, mult_prev7<fc<(d_model * 8) / 3, skip6<
-            tag7<silu<fc<(d_model * 8) / 3, tag6<SUBNET>>>>>>>>>;
+            tag7<silu<fc<(d_model * 8) / 3, tag6<SUBNET>>>>>>>>>>;
 
         template <template <typename> class ACT, template <typename> class DO,
             long seq_len, long d_model, long num_heads, typename SUBNET>
         using transformer_block =
-            add_prev5<swiglu<d_model, rms_norm<tag5<
+            add_prev5<std_ffn<ACT, DO, d_model, rms_norm<tag5<
             multihead_attention<ACT, DO, d_model, num_heads, SUBNET>>>>>;
 
         template<long remaining_layers, template <typename> class ACT, template <typename> class DO,
