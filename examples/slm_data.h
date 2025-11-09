@@ -29,7 +29,7 @@ enum class dataset_id
 {
     SHAKESPEARE_EXTRACT,    // Classic literature excerpt (RAW_TEXT format)
     SHAKESPEARE_PROMPT,     // Shakespeare text formatted as training prompt (RAW_TEXT format)
-    INTERNAL_TRAINING,      // Internal training corpus (RAW_TEXT format)
+    BLACK_HOLE_ARTICLE,     // Black hole physics comprehensive article (RAW_TEXT format)
     PHYSICS_PARAGRAPHS,     // Physics text segments (DELIMITED_TEXT format)
     BLACK_HOLE_QA           // Question-answer pairs on black holes (PAIRED_TEXT format)
 };
@@ -209,9 +209,9 @@ namespace datasets
         return sout.str();
     }
 
-    // Returns compressed internal training dataset.
+    // Returns compressed black hole article dataset.
     // Decompressed format : RAW_TEXT(plain continuous text)
-    inline std::string get_internal_compressed()
+    inline std::string get_blackhole_article_compressed()
     {
         std::ostringstream sout;
         sout << "QmkhNakiJokjz9X67ik9R4tiXRfyJ0qpPsCCjNk0/lrwHo0niflnAjdaCwx6qr64oSP5WprkZ4kC";
@@ -685,14 +685,14 @@ inline std::string get_dataset_raw(dataset_id id)
     case dataset_id::SHAKESPEARE_PROMPT:
         return detail::decompress_data(datasets::get_shakespeare_prompt_compressed());
 
-    case dataset_id::INTERNAL_TRAINING:
-        return detail::decompress_data(datasets::get_internal_compressed());
-
-    case dataset_id::BLACK_HOLE_QA:
-        return detail::decompress_data(datasets::get_blackhole_qa_compressed());
+    case dataset_id::BLACK_HOLE_ARTICLE:
+        return detail::decompress_data(datasets::get_blackhole_article_compressed());
 
     case dataset_id::PHYSICS_PARAGRAPHS:
         return detail::decompress_data(datasets::get_physics_paragraphs_compressed());
+
+    case dataset_id::BLACK_HOLE_QA:
+        return detail::decompress_data(datasets::get_blackhole_qa_compressed());
 
     default:
         throw std::invalid_argument("Unknown dataset_id");

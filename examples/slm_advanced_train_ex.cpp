@@ -314,7 +314,7 @@ int main(int argc, char** argv)
 
         // Load internal dataset
         cout << "Loading internal training dataset...\n";
-        std::string training_text = get_dataset_as_text(dataset_id::INTERNAL_TRAINING);
+        std::string training_text = get_dataset_as_text(dataset_id::BLACK_HOLE_ARTICLE);
         size_t original_size = training_text.size();
         cout << "Loaded " << original_size << " bytes from internal dataset\n";
 
@@ -390,7 +390,7 @@ int main(int argc, char** argv)
                     cout << "Training new BPE tokenizer with vocabulary size " << num_tokens << "...\n";
 
                     // Compose training corpus from multiple datasets
-                    std::string tokenizer_corpus = get_dataset_as_text(dataset_id::INTERNAL_TRAINING) + " " + 
+                    std::string tokenizer_corpus = get_dataset_as_text(dataset_id::BLACK_HOLE_ARTICLE) + " " + 
                         get_dataset_raw(dataset_id::PHYSICS_PARAGRAPHS) + " " + get_dataset_raw(dataset_id::BLACK_HOLE_QA);
 
                     // Replace all "@@" delimiters with spaces
