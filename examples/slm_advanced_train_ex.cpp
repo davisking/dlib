@@ -314,7 +314,7 @@ int main(int argc, char** argv)
 
         // Load internal dataset
         cout << "Loading internal training dataset...\n";
-        std::string training_text = get_internal_dataset();
+        std::string training_text = get_dataset_as_text(dataset_id::INTERNAL_TRAINING);
         size_t original_size = training_text.size();
         cout << "Loaded " << original_size << " bytes from internal dataset\n";
 
@@ -388,7 +388,20 @@ int main(int argc, char** argv)
                 // Train a new tokenizer if needed
                 if (!file_exists(tokenizer_file)) {
                     cout << "Training new BPE tokenizer with vocabulary size " << num_tokens << "...\n";
-                    tokenizer.train(training_text + build_qa_text(qa_pairs), num_tokens, 1e6, true);
+
+                    // Compose training corpus from multiple datasets
+                    std::string tokenizer_corpus = get_dataset_as_text(dataset_id::INTERNAL_TRAINING) + " " + 
+                        get_dataset_raw(dataset_id::PHYSICS_PARAGRAPHS) + " " + get_dataset_raw(dataset_id::BLACK_HOLE_QA);
+
+                    // Replace all "@@" delimiters with spaces
+                    std::string delimiter = "@@";
+                    size_t pos = 0;
+                    while ((pos = tokenizer_corpus.find(delimiter, pos)) != std::string::npos) {
+                        tokenizer_corpus.replace(pos, delimiter.length(), " ");
+                        pos += 1; // Move past the replacement space
+                    }
+
+                    tokenizer.train(tokenizer_corpus, num_tokens, 1e6, true);
                     serialize(tokenizer_file) << tokenizer;
                     cout << "Tokenizer saved to " << tokenizer_file << endl;
                 }

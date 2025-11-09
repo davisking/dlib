@@ -47,6 +47,9 @@ using namespace dlib;
 const int MAX_TOKEN_ID = 255;
 const int PAD_TOKEN = 256; // an extra "pad" token if needed
 
+const std::string shakespeare_text = get_dataset_as_text(dataset_id::SHAKESPEARE_EXTRACT);
+const std::string prompt_text = get_dataset_as_text(dataset_id::SHAKESPEARE_PROMPT);
+
 // For simplicity, we assume each line from shakespeare_text is appended, ignoring them.
 std::vector<int> char_based_tokenize(const std::string& text)
 {
@@ -241,7 +244,6 @@ int main(int argc, char** argv)
             cout << "Model parameters: " << count_parameters(net) << endl << endl;
 
             // 2) Get the prompt from the included slm_data.h
-            std::string prompt_text = shakespeare_prompt;
             if (prompt_text.empty())
             {
                 cerr << "No prompt found in slm_data.h.\n";
