@@ -2441,8 +2441,6 @@ namespace dlib
                 }
             }
             
-            //prev_gradient is not const, so that sgi isn't const
-            //since sgi is used as a destination for tt::gemm
             auto& prev_gradient = sub.get_gradient_input();
             alias_tensor_instance sgi = alias_tensor(prev_gradient.num_samples() * prev_gradient.k() * prev_gradient.nr(), num_inputs)(prev_gradient, 0);
             auto w = weights(params, 0);
