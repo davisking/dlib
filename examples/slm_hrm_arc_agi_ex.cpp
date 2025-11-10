@@ -778,7 +778,6 @@ int main(int argc, char** argv)
             trainer.set_min_learning_rate(1e-6);
             trainer.set_mini_batch_size(batch_size);
             trainer.set_iterations_without_progress_threshold(patience);
-            trainer.set_max_num_epochs(max_epochs);
             trainer.be_quiet();
 
             // Training loop
@@ -786,6 +785,7 @@ int main(int argc, char** argv)
             size_t epoch = 0;
             auto start_time = std::chrono::steady_clock::now();
 
+            size_t batches_count = 0;
             while (trainer.get_learning_rate() >= 1e-6 && epoch < max_epochs && !g_terminate_flag.load())
             {
                 // Shuffle indices
@@ -813,7 +813,7 @@ int main(int argc, char** argv)
                     batches_seen++;
 
                     // Progress reporting
-                    if (batches_seen % 50 == 0) {
+                    if (batches_count++ % 50 == 0) {
                         auto now = std::chrono::steady_clock::now();
                         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - start_time).count();
 
