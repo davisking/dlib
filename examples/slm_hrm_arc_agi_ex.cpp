@@ -694,7 +694,7 @@ int main(int argc, char** argv)
         // Configuration
         const std::string training_path = get_option(parser, "training-path", "data/training");
         const std::string eval_path = get_option(parser, "eval-path", "data/evaluation");
-        const std::string model_file = get_option(parser, "model-file", "arc_agi_model.dat");
+        const std::string model_file = get_option(parser, "model-file", "dlib_lm_arc_agi_model.dat");
         const double learning_rate = get_option(parser, "learning-rate", 1e-4);
         const size_t batch_size = get_option(parser, "batch-size", 4);
         const size_t max_epochs = get_option(parser, "max-epochs", 10000);
