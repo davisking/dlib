@@ -2,3 +2,20 @@
 requires = ["setuptools", "wheel", "packaging"]
 build-backend = "setuptools.build_meta"
 
+[tool.cibuildwheel]
+# Build for Python 3.8 through 3.12
+build = "cp38-* cp39-* cp310-* cp311-* cp312-*"
+
+# Skip 32-bit builds and musl builds on Linux
+skip = "*-win32 *-manylinux_i686 *-musllinux_*"
+
+# Install test dependencies
+test-requires = ["pytest", "numpy"]
+
+# Run tests
+test-command = "pytest {project} --ignore {project}/docs --ignore {project}/dlib"
+
+# Windows-specific: use CMake 3.24.0 to avoid known issues with 3.25.0
+[tool.cibuildwheel.windows]
+before-build = "pip install cmake==3.24.0"
+

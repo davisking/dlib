@@ -26,55 +26,36 @@ on:
     - "**CMakeLists.txt"
     - "**py"
 
-defaults:
-  run:
-    shell: bash
-
 jobs:
-  Windows:
-    runs-on: 'windows-latest'
-    steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
-    - name: Install python deps
-      run: |
-        pip install pytest numpy
-        # don't use CMake 3.25.0 https://gitlab.kitware.com/cmake/cmake/-/issues/23975
-        pip3 install cmake==3.24.0
-    - name: Build
-      run: |
-        pip3 install cmake==3.24.0
-        python setup.py build
-        python setup.py install --user
-    - name: Test
-      run: python -m pytest --ignore docs --ignore dlib
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
-  Ubuntu:
-    runs-on: 'ubuntu-latest'
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
-    - name: Install python deps
-      run: pip install pytest numpy
-    - name: Build
-      run: |
-        python setup.py build
-        python setup.py install --user
-    - name: Test
-      run: python -m pytest --ignore docs --ignore dlib
+    - uses: actions/checkout@v4
 
-# Disabled for now since something is going sideways with python packages on github actions
-# MacOS:
-#   runs-on: 'macos-latest'
-#   steps:
-#   - uses: actions/checkout@v3
-#   - uses: actions/setup-python@v4
-#   - name: Install python deps
-#     run: pip3 install pytest numpy
-#   - name: Build
-#     run: |
-#       python3 setup.py build
-#       python3 setup.py install --user
-#   - name: Test
-#     run: python3 -m pytest --ignore docs --ignore dlib
+    - name: Build wheels
+      uses: pypa/cibuildwheel@v2.21
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+        path: ./wheelhouse/*.whl
+
+  build_sdist:
+    name: Build source distribution
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build sdist
+      run: pipx run build --sdist
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: cibw-sdist
+        path: dist/*.tar.gz
 
