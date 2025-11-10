@@ -163,11 +163,14 @@ namespace dlib
                 long num_channels = std::min({ lhs.k(), rhs.k(), dest.k() });
 
                 auto is_matrix = [](const auto& tensor) {
-                    return ((tensor.num_samples() * tensor.k() == 1 && tensor.nr() * tensor.nc() > 1) ||
-                        (tensor.num_samples() * tensor.k() > 1 && tensor.nr() * tensor.nc() == 1));
+                    const bool is_2d_matrix = (tensor.num_samples() == 1 && tensor.k() == 1 &&
+                        tensor.nr() > 1 && tensor.nc() > 1);
+                    const bool is_1d_vector = (tensor.num_samples() * tensor.k() > 1 &&
+                        tensor.nr() == 1 && tensor.nc() == 1);
+                    return is_2d_matrix || is_1d_vector;
                 };
-                const bool lhs_is_matrix = is_matrix(lhs), rhs_is_matrix = is_matrix(rhs), dest_is_matrix = is_matrix(dest);
 
+                const bool lhs_is_matrix = is_matrix(lhs), rhs_is_matrix = is_matrix(rhs), dest_is_matrix = is_matrix(dest);
                 if (lhs_is_matrix && rhs_is_matrix && dest_is_matrix) num_samples = num_channels = 1;
 
                 size_t lhs_rows = lhs.nr();

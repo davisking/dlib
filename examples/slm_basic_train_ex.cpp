@@ -45,7 +45,7 @@ using namespace dlib;
 
 // We treat each character as a token ID in [0..255].
 const int MAX_TOKEN_ID = 255;
-const int PAD_TOKEN = 256; // an extra "pad" token if needed
+const int PAD_TOKEN = 256; // Extra "pad" token if needed
 
 const std::string shakespeare_text = get_dataset_as_text(dataset_id::SHAKESPEARE_EXTRACT);
 const std::string prompt_text = get_dataset_as_text(dataset_id::SHAKESPEARE_PROMPT);
