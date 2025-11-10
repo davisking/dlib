@@ -25,6 +25,7 @@ on:
     - "**.cmake"
     - "**CMakeLists.txt"
     - "**py"
+  workflow_dispatch:
 
 jobs:
   build_wheels:
