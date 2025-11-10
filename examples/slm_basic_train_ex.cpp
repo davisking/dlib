@@ -129,19 +129,19 @@ int main(int argc, char** argv)
 
         using train_fused_transformer =
             loss_multiclass_log<fc<vocab_size, rms_norm<
-            canonical_transformer::transformer_stack<num_layers, gelu, dropout_10, max_seq_len, embedding_dim, num_heads,
+            fused_transformer::transformer_stack<num_layers, gelu, dropout_10, max_seq_len, embedding_dim, num_heads,
             token_embeddings<vocab_size, embedding_dim, input<matrix<int, 0, 1>>>>>>>;
 
         using infer_fused_transformer =
             loss_multiclass_log<fc<vocab_size, rms_norm<
-            canonical_transformer::transformer_stack<num_layers, gelu, multiply, max_seq_len, embedding_dim, num_heads,
+            fused_transformer::transformer_stack<num_layers, gelu, multiply, max_seq_len, embedding_dim, num_heads,
             token_embeddings<vocab_size, embedding_dim, input<matrix<int, 0, 1>>>>>>>;
 
         // For GPU usage (if any), set gpus = {0} for a single GPU, etc.
         std::vector<int> gpus{ 0 };
 
         // The model file to store or load
-        const std::string model_file = "dlib_lm_char_model.dat";
+        const std::string model_file = "dlib_lm_chars_model.dat";
 
         // ----------------------------------------------------------------------------------------
         // Train mode
@@ -202,7 +202,7 @@ int main(int argc, char** argv)
             trainer.set_min_learning_rate(1e-6);
             trainer.set_mini_batch_size(batch_size);
             trainer.set_iterations_without_progress_threshold(5000);
-            trainer.set_max_num_epochs(50);
+            trainer.set_max_num_epochs(100);
             trainer.be_verbose();
 
             // 4) Train

@@ -376,7 +376,7 @@ int main(int argc, char** argv)
         parser.add_option("generate", "Generate text from a previously trained model");
         parser.add_option("verify", "Verify generated output against original dataset");
         parser.add_option("learning-rate", "Set the learning rate (default: 2e-4)", 1);
-        parser.add_option("batch-size", "Set the mini-batch size (default: 48)", 1);
+        parser.add_option("batch-size", "Set the mini-batch size (default: 64)", 1);
         parser.add_option("patience", "Iterations without progress before early stopping (default: 15000)", 1);
         parser.add_option("max-epochs", "Maximum number of training epochs (default: 500)", 1);
         parser.add_option("alpha", "Set the weight decay for Adam (default: 0.004)", 1);
@@ -400,7 +400,7 @@ int main(int argc, char** argv)
 
         // Default values
         const double learning_rate = get_option(parser, "learning-rate", 2e-4);
-        const size_t batch_size = get_option(parser, "batch-size", 48);
+        const size_t batch_size = get_option(parser, "batch-size", 64);
         const long patience = get_option(parser, "patience", 15000);
         const size_t max_epochs = get_option(parser, "max-epochs", 500);
         const double alpha = get_option(parser, "alpha", 0.004);
@@ -411,7 +411,7 @@ int main(int argc, char** argv)
         const std::string output_file = get_option(parser, "output-file", "generated_text.txt");
 
         // Model architecture parameters
-        const long num_tokens = 1500;
+        const long num_tokens = 2500;
         const long num_layers = 4;
         const long num_heads = 6;
         const long embedding_dim = 228;
@@ -573,23 +573,19 @@ int main(int argc, char** argv)
             trainer.set_min_learning_rate(1e-6);
             trainer.set_mini_batch_size(batch_size);
             trainer.set_iterations_without_progress_threshold(patience);
-            trainer.set_max_num_epochs(max_epochs);
             trainer.be_quiet();
             cout << "Starting training...\n";
 
-            size_t epoch = 0;
-            size_t steps = 0;
+            size_t epoch = 0, steps = 0;
             double total_loss = 0.0;
-            size_t batches_seen = 0;
-            size_t samples_seen = 0;
+            size_t batches_count = 0, batches_seen = 0, samples_seen = 0;
             auto epoch_start = std::chrono::high_resolution_clock::now();
 
             // Training loop
             while (trainer.get_learning_rate() >= 1e-6 && epoch < max_epochs && !g_terminate_flag.load())
             {
                 total_loss = 0.0;
-                batches_seen = 0;
-                samples_seen = 0;
+                batches_seen = 0, samples_seen = 0;
                 epoch_start = std::chrono::high_resolution_clock::now();
 
                 for (size_t i = 0; i < samples.size() && !g_terminate_flag.load(); i += batch_size)
@@ -608,7 +604,7 @@ int main(int argc, char** argv)
                     steps += batch_samples.size();
 
                     // Progress reporting
-                    if (batches_seen % 50 == 0) {
+                    if (batches_count++ % 50 == 0) {
                         double avg_loss = total_loss / batches_seen;
                         auto current_time = std::chrono::high_resolution_clock::now();
                         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
