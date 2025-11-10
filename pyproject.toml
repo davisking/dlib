@@ -3,8 +3,8 @@ requires = ["setuptools", "wheel", "packaging"]
 build-backend = "setuptools.build_meta"
 
 [tool.cibuildwheel]
-# Build for Python 3.8 through 3.12
-build = "cp38-* cp39-* cp310-* cp311-* cp312-*"
+# Build for Python 3.8 through 3.14
+build = "cp38-* cp39-* cp310-* cp311-* cp312-* cp313-* cp314-*"
 
 # Skip 32-bit builds and musl builds on Linux
 skip = "*-win32 *-manylinux_i686 *-musllinux_*"
