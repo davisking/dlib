@@ -21,7 +21,7 @@ namespace dlib
             long context_multiplier = 10,
             long padding_token = 0
         ) : window_size_(window_size),
-            context_capacity_(window_size* context_multiplier),
+            context_capacity_(window_size * context_multiplier),
             padding_token_(padding_token),
             current_size_(0)
         {
@@ -163,8 +163,8 @@ namespace dlib
 
     private:
         std::vector<int> context_;      // Full context history
-        long context_capacity_;          // Maximum context size
         long window_size_;               // Window size for model input
+        long context_capacity_;          // Maximum context size
         long padding_token_;             // Token used for left padding
         long current_size_;              // Current number of tokens
     };
