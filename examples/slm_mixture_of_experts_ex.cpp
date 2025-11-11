@@ -671,7 +671,6 @@ int main(int argc, char** argv)
             auto param_info = get_moe_param_info<net_infer>(net, num_layers);
             param_info.print();
 
-
             // Check that tokenizer is loaded
             if (tokenizer.get_vocab_size() == 0) {
                 cerr << "Error: Tokenizer not loaded. Please provide a valid tokenizer file.\n";
@@ -769,10 +768,8 @@ int main(int argc, char** argv)
             size_t token_count = prompt_tokens.size();
 
             // Generate until target size is reached
-            int start_of_text = tokenizer.get_special_token_id("<text>"),
-                end_of_text = tokenizer.get_special_token_id("</text>"), next_token = 0;
-            while (total_bytes < target_size && next_token != start_of_text && next_token != end_of_text
-                && !g_terminate_flag.load()) {
+            int end_of_text = tokenizer.get_special_token_id("</text>"), next_token = 0;
+            while (total_bytes < target_size && next_token != end_of_text && !g_terminate_flag.load()) {
                 // Predict next token
                 next_token = net(input_seq);
                 token_buffer.push_back(next_token);
