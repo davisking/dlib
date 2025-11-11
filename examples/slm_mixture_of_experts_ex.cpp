@@ -377,7 +377,7 @@ int main(int argc, char** argv)
         parser.add_option("verify", "Verify generated output against original dataset");
         parser.add_option("learning-rate", "Set the learning rate (default: 2e-4)", 1);
         parser.add_option("batch-size", "Set the mini-batch size (default: 64)", 1);
-        parser.add_option("patience", "Iterations without progress before early stopping (default: 15000)", 1);
+        parser.add_option("patience", "Iterations without progress before early stopping (default: 7500)", 1);
         parser.add_option("max-epochs", "Maximum number of training epochs (default: 500)", 1);
         parser.add_option("alpha", "Set the weight decay for Adam (default: 0.004)", 1);
         parser.add_option("beta1", "Set Adam's first moment coefficient (default: 0.9)", 1);
@@ -401,7 +401,7 @@ int main(int argc, char** argv)
         // Default values
         const double learning_rate = get_option(parser, "learning-rate", 2e-4);
         const size_t batch_size = get_option(parser, "batch-size", 64);
-        const long patience = get_option(parser, "patience", 15000);
+        const long patience = get_option(parser, "patience", 7500);
         const size_t max_epochs = get_option(parser, "max-epochs", 500);
         const double alpha = get_option(parser, "alpha", 0.004);
         const double beta1 = get_option(parser, "beta1", 0.9);
@@ -614,7 +614,7 @@ int main(int argc, char** argv)
                         cout << "epoch#: " << (epoch + 1) << "/" << max_epochs
                             << " (ksteps: " << (steps / 1000) << ")"
                             << " \t loss: " << avg_loss
-                            << " \t patience: " << trainer.get_iterations_without_progress_threshold()
+                            << " \t patience: " << trainer.get_steps_without_progress()
                             << " \t speed: " << samples_per_sec << " samples/sec\n";
                         cout.flush();
                     }

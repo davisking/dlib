@@ -51,8 +51,9 @@ using namespace dlib;
 namespace dlib
 {
     // Classification head for next-token prediction
-    template <long num_logits, typename SUBNET>
-	using classification_head = loss_cross_entropy_per_logit<linear<num_logits, rms_norm<SUBNET>>>;
+    template <long num_logits, long embedding_dim, typename SUBNET>
+	using classification_head = loss_cross_entropy_per_logit<linear<num_logits,
+        linear<embedding_dim / 2, rms_norm<SUBNET>>>>;
 
     /**
      * @brief Transformer model configuration template
@@ -96,10 +97,10 @@ namespace dlib
 
         template<bool is_training>
         using network_type = std::conditional_t<is_training,
-            classification_head<VOCAB_SIZE,
+            classification_head<VOCAB_SIZE, EMBEDDING_DIM,
             transformer_stack<NUM_LAYERS, activation_func, dropout_policy, MAX_SEQ_LEN, EMBEDDING_DIM, NUM_HEADS,
             token_embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>,
-            classification_head<VOCAB_SIZE,
+            classification_head<VOCAB_SIZE, EMBEDDING_DIM,
             transformer_stack<NUM_LAYERS, activation_func, multiply, MAX_SEQ_LEN, EMBEDDING_DIM, NUM_HEADS,
             token_embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>;
 
@@ -264,7 +265,7 @@ int main(int argc, char** argv)
         parser.add_option("learning-rate", "Set the learning rate (default: 2e-4)", 1);
         parser.add_option("batch-size", "Set the mini-batch size (default: 64)", 1);
         parser.add_option("patience", "Iterations without progress before early stopping (default: 5000)", 1);
-        parser.add_option("max-epochs", "Maximum number of training epochs (default: 400)", 1);
+        parser.add_option("max-epochs", "Maximum number of training epochs (default: 500)", 1);
         parser.add_option("alpha", "Set the weight decay for Adam (default: 0.004)", 1);
         parser.add_option("beta1", "Set Adam's first moment coefficient (default: 0.9)", 1);
         parser.add_option("beta2", "Set Adam's second moment coefficient (default: 0.999)", 1);
@@ -288,7 +289,7 @@ int main(int argc, char** argv)
         const double learning_rate = get_option(parser, "learning-rate", 2e-4);
         const size_t batch_size = get_option(parser, "batch-size", 64);
         const long patience = get_option(parser, "patience", 5000);
-        const size_t max_epochs = get_option(parser, "max-epochs", 450);
+        const size_t max_epochs = get_option(parser, "max-epochs", 500);
         const double alpha = get_option(parser, "alpha", 0.004);
         const double beta1 = get_option(parser, "beta1", 0.9);
         const double beta2 = get_option(parser, "beta2", 0.999);
@@ -501,7 +502,7 @@ int main(int argc, char** argv)
                         cout << "epoch#: " << (epoch + 1) << "/" << max_epochs
 							<< " (ksteps: " << (steps / 1000) << ")"
                             << " \t loss: " << avg_loss
-                            << " \t patience: " << trainer.get_iterations_without_progress_threshold()
+                            << " \t patience: " << trainer.get_steps_without_progress()
                             << " \t speed: " << samples_per_sec << " samples/sec\n";
                         cout.flush();
                     }
