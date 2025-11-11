@@ -301,7 +301,7 @@ int main(int argc, char** argv)
         const long num_layers = 4;
         const long num_heads = 6;        
         const long embedding_dim = 228;
-        const long max_seq_len = 50;
+        const long max_seq_len = 60;
 
         // Define transformer configuration
         using my_transformer = transformer_config<
@@ -450,6 +450,8 @@ int main(int argc, char** argv)
             using net_type = my_transformer::network_type<true>;
             net_type net;
             cout << my_transformer::model_info::describe() << endl;
+
+            // Tokenizer stored with model for simplified inference
             if (file_exists(model_file)) deserialize(model_file) >> net >> tokenizer;
 
             // Create trainer
@@ -464,8 +466,8 @@ int main(int argc, char** argv)
             cout << "Starting training...\n";
 
             size_t epoch = 0, steps = 0;
+            size_t batches_count = 0, batches_seen = 0, samples_seen = 0;
             double total_loss = 0.0;
-            size_t batches_count = 0, batches_seen = 0, samples_seen = 0;			
             auto epoch_start = std::chrono::high_resolution_clock::now();
 
             // Training loop
@@ -484,8 +486,7 @@ int main(int argc, char** argv)
                         labels.begin() + i, labels.begin() + batch_end);
 
                     trainer.train_one_step(batch_samples, batch_labels);
-                    double batch_loss = trainer.get_average_loss();
-                    total_loss += batch_loss;
+                    total_loss += trainer.get_average_loss();
                     batches_seen++;
                     samples_seen += batch_samples.size();
 					steps += batch_samples.size();
@@ -493,14 +494,14 @@ int main(int argc, char** argv)
                     // Progress reporting
                     if (batches_count++ % 50 == 0) {
                         double avg_loss = total_loss / batches_seen;
-                        auto current_time = std::chrono::high_resolution_clock::now();
                         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
-                            current_time - epoch_start).count();
+                            std::chrono::high_resolution_clock::now() - epoch_start).count();
                         double samples_per_sec = samples_seen / (elapsed > 0 ? elapsed : 1);
 
                         cout << "epoch#: " << (epoch + 1) << "/" << max_epochs
-							<< " \t ksteps#: " << (steps / 1000)
+							<< " (ksteps: " << (steps / 1000) << ")"
                             << " \t loss: " << avg_loss
+                            << " \t patience: " << trainer.get_iterations_without_progress_threshold()
                             << " \t speed: " << samples_per_sec << " samples/sec\n";
                         cout.flush();
                     }
@@ -671,9 +672,8 @@ int main(int argc, char** argv)
                     token_buffer.clear();
 
                     // Display progress
-                    auto current_time = std::chrono::high_resolution_clock::now();
                     auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
-                        current_time - start_time).count();
+                        std::chrono::high_resolution_clock::now() - start_time).count();
                     double tokens_per_second = (token_count - input_seq.size()) / (elapsed > 0 ? elapsed : 1);
 
                     cout << "Generated " << (token_count - input_seq.size()) << " tokens, "

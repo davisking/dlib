@@ -6,10 +6,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <dlib/matrix.h>
-#include <dlib/serialize.h>
-//#include "../matrix.h"
-//#include "../serialize.h"
+#include "../matrix.h"
+#include "../serialize.h"
 
 namespace dlib
 {
@@ -56,10 +54,10 @@ namespace dlib
             for (int token : tokens) add_token(static_cast<unsigned long>(token));
         }
 
-        dlib::matrix<int, 0, 1> get_input_window(long custom_window_size = -1) const
+        matrix<int, 0, 1> get_input_window(long custom_window_size = -1) const
         {
             long win_size = (custom_window_size > 0) ? custom_window_size : window_size_;
-            dlib::matrix<int, 0, 1> window(win_size, 1);
+            matrix<int, 0, 1> window(win_size, 1);
 
             if (current_size_ >= win_size)
             {
@@ -174,7 +172,7 @@ namespace dlib
         long window_len,
         long padding_token,
         bool use_left_padding,
-        std::vector<dlib::matrix<int, 0, 1>>& X,
+        std::vector<matrix<int, 0, 1>>& X,
         std::vector<unsigned long>& Y)
     {
         X.clear();
@@ -197,7 +195,7 @@ namespace dlib
             {
                 for (long pos = 1; pos < window_len; ++pos)
                 {
-                    dlib::matrix<int, 0, 1> window(window_len, 1);
+                    matrix<int, 0, 1> window(window_len, 1);
                     long pad = window_len - pos;
 
                     for (long i = 0; i < pad; ++i) window(i) = padding_token;
@@ -211,7 +209,7 @@ namespace dlib
             // Slide window through sequence
             for (long pos = start; pos < len - 1; ++pos)
             {
-                dlib::matrix<int, 0, 1> window(window_len, 1);
+                matrix<int, 0, 1> window(window_len, 1);
 
                 for (long i = 0; i < window_len; ++i)
                 {
@@ -235,8 +233,8 @@ namespace dlib
         long src_window_len,
         long tgt_window_len,
         long padding_token,
-        std::vector<dlib::matrix<int, 0, 1>>& X,
-        std::vector<dlib::matrix<unsigned long, 0, 1>>& Y)
+        std::vector<matrix<int, 0, 1>>& X,
+        std::vector<matrix<unsigned long, 0, 1>>& Y)
     {
         DLIB_CASSERT(source_sequences.size() == target_sequences.size(),
             "Source and target must have same size");
@@ -260,7 +258,7 @@ namespace dlib
             while (true)
             {
                 // Build source window
-                dlib::matrix<int, 0, 1> src_window(src_window_len, 1);
+                matrix<int, 0, 1> src_window(src_window_len, 1);
                 long src_real = 0;
 
                 for (long j = 0; j < src_window_len; ++j)
@@ -278,7 +276,7 @@ namespace dlib
                 }
 
                 // Build target window
-                dlib::matrix<unsigned long, 0, 1> tgt_window(tgt_window_len, 1);
+                matrix<unsigned long, 0, 1> tgt_window(tgt_window_len, 1);
                 long tgt_real = 0;
 
                 for (long j = 0; j < tgt_window_len; ++j)
