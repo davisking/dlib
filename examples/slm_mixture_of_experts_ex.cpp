@@ -59,7 +59,7 @@ namespace dlib
 {
     // Expert network architecture for MoE layer
     template <template <typename> class ACT, template <typename> class DO, long d_model>
-    using expert_net_type = std_ffn<ACT, DO, d_model, input<matrix<float>>>;
+    using expert_net_type = swiglu<ACT, DO, d_model, input<matrix<float>>>;
 
     /*!
         Complete transformer block with MoE-based feed-forward layer.
@@ -84,8 +84,9 @@ namespace dlib
         - Computes loss only on the last sequence position
         - Optimized for autoregressive language modeling
     !*/
-    template <long num_logits, typename SUBNET>
-    using classification_head = loss_cross_entropy_per_logit<linear<num_logits, rms_norm<SUBNET>>>;
+    template <long num_logits, long embedding_dim, typename SUBNET>
+    using classification_head = loss_cross_entropy_per_logit<linear<num_logits,
+        linear<embedding_dim / 2, rms_norm<SUBNET>>>>;
 
     // Core model parameters
     template<
@@ -126,10 +127,10 @@ namespace dlib
         // Complete network type selector based on training/inference mode
         template<bool is_training>
         using network_type = std::conditional_t<is_training,
-            classification_head<VOCAB_SIZE,
+            classification_head<VOCAB_SIZE, EMBEDDING_DIM,
             repeat<NUM_LAYERS, t_transformer_block,
             token_embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>,
-            classification_head<VOCAB_SIZE,
+            classification_head<VOCAB_SIZE, EMBEDDING_DIM,
             repeat<NUM_LAYERS, i_transformer_block,
             token_embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>;
 
