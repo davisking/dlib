@@ -58,8 +58,8 @@ using namespace dlib;
 namespace dlib
 {
     // Expert network architecture for MoE layer
-    template <template <typename> class ACT, template <typename> class DO, long d_model>
-    using expert_net_type = swiglu<ACT, DO, d_model, input<matrix<float>>>;
+    template <template <typename> class DO, long d_model>
+    using expert_net_type = swiglu<DO, d_model, input<matrix<float>>>;
 
     /*!
         Complete transformer block with MoE-based feed-forward layer.
@@ -74,7 +74,7 @@ namespace dlib
     template <template <typename> class ACT, template <typename> class DO,
         long seq_len, long d_model, long num_heads, typename MODE, typename SUBNET>
     using trans_moe_block =
-        moe_ffn<expert_net_type<ACT, DO, d_model>, 4, 0, MODE, DO,
+        moe_ffn<expert_net_type<DO, d_model>, 4, 0, MODE, DO,
         multihead_attention<ACT, DO, seq_len, d_model, num_heads, SUBNET>>;
 
     /*!

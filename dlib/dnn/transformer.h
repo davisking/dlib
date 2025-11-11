@@ -63,10 +63,9 @@ namespace dlib
 
         // Standard SwiGLU FFN implementation
         // Reference: Noam Shazeer's "GLU Variants Improve Transformer" (https://arxiv.org/abs/2002.05202)
-        template <template <typename> class ACT, template <typename> class DO,
-            long d_model, typename SUBNET>
-        using swiglu = DO<linear<d_model, multm_prev6<linear<(d_model * 8) / 3, skip5<
-            tag6<ACT<linear<(d_model * 8) / 3, tag5<SUBNET>>>>>>>>>;
+        template <template <typename> class DO, long d_model, typename SUBNET>
+        using swiglu = DO<linear<d_model, multm_prev6<linear<d_model * 3, skip5<
+            tag6<silu<linear<d_model * 3, tag5<SUBNET>>>>>>>>>;
 
         template <template <typename> class ACT, template <typename> class DO,
             long seq_len, long d_model, long num_heads, typename SUBNET>
@@ -126,11 +125,10 @@ namespace dlib
         using std_ffn = extract<0, 1, 1, d_model,
             DO<fc<d_model, ACT<fc<d_model * 4, SUBNET>>>>>;
 
-        template <template <typename> class ACT, template <typename> class DO,
-            long d_model, typename SUBNET>
+        template <template <typename> class DO, long d_model, typename SUBNET>
         using swiglu = DO<extract<0, 1, 1, d_model,
-            fc<d_model, mult_prev7<fc<(d_model * 8) / 3, skip6<
-            tag7<silu<fc<(d_model * 8) / 3, tag6<SUBNET>>>>>>>>>>;
+            fc<d_model, mult_prev7<fc<d_model * 3, skip6<
+            tag7<silu<fc<d_model * 3, tag6<SUBNET>>>>>>>>>>;
 
         template <template <typename> class ACT, template <typename> class DO,
             long seq_len, long d_model, long num_heads, typename SUBNET>
@@ -516,8 +514,7 @@ namespace dlib
             noise_scale(other.noise_scale),
             top_n(other.top_n),
             usage_update_rate(other.usage_update_rate),
-            expert_usage(other.expert_usage),
-            indices(other.indices)
+            expert_usage(other.expert_usage)
         {
             // Deep copy of expert networks
             experts.reserve(other.experts.size());
@@ -535,7 +532,6 @@ namespace dlib
                 top_n = other.top_n;
                 usage_update_rate = other.usage_update_rate;
                 expert_usage = other.expert_usage;
-                indices = other.indices;
 
                 // Deep copy of expert networks
                 experts.clear();
@@ -548,8 +544,10 @@ namespace dlib
         }
 
         /*!
-            Sets up the expert networks based on gate output dimensions.
-            The number of experts is determined by gate_input.k().
+            SETUP
+                Initializes expert networks based on gate output dimensions.
+                The number of experts is automatically determined from gate_input.k().
+                If top_k == 0 (auto mode), activates 20% of experts by default.
         !*/
         template <typename SUBNET_TYPE>
         void setup(const SUBNET_TYPE& sub) {
@@ -560,9 +558,7 @@ namespace dlib
             // Initialize experts if needed
             if (new_n_experts != n_experts) {
                 n_experts = new_n_experts;
-                expert_weights.resize(n_experts, 0.0f);
                 expert_usage.resize(n_experts, 0.0f);
-                indices.resize(n_experts);
 
                 // Create expert network instances
                 experts.clear();
@@ -579,19 +575,22 @@ namespace dlib
                     top_n = std::min(top_k, n_experts);
                 }
 
-                // Initialize expert networks with dummy input
+                // Initialize expert networks with proper forward pass
                 initialize_experts(sub.get_output());
             }
         }
 
         /*!
-            Process:
-            1. Read gate probabilities for expert selection
-            2. Compute aggregated expert weights across batch
-            3. Add exploration noise during training
-            4. Select top-k experts based on weights
-            5. Route inputs through selected experts
-            6. Combine expert outputs using normalized weights
+            FORWARD PASS
+                Process:
+                1. Extract gate probabilities for each sample independently
+                2. For each sample:
+                   a. Add exploration noise during training
+                   b. Select top-k experts based on (possibly noisy) probabilities
+                   c. Normalize expert weights
+                   d. Route sample through selected experts
+                   e. Combine expert outputs with normalized weights
+                3. Update global expert usage statistics for load balancing
         !*/
         template <typename SUBNET_TYPE>
         void forward(const SUBNET_TYPE& sub, resizable_tensor& output)
@@ -599,7 +598,6 @@ namespace dlib
             const tensor& expert_input = sub.get_output();
             const tensor& gate_input = layer<TAG>(sub).get_output();
 
-            // Validate gate output dimensions
             DLIB_CASSERT(gate_input.k() == n_experts &&
                 gate_input.nr() == 1 && gate_input.nc() == 1,
                 "\nExpected gate output shape [batch_size, " << n_experts << ", 1, 1]"
@@ -608,110 +606,205 @@ namespace dlib
                 << gate_input.nc() << "]");
 
             const long num_samples = gate_input.num_samples();
+            const long k = expert_input.k();
+            const long nr = expert_input.nr();
+            const long nc = expert_input.nc();
+            const long sample_size = k * nr * nc;
             const float* gate_probs = gate_input.host();
 
             // Initialize output tensor
             output.copy_size(expert_input);
             output = 0;
 
-            // Aggregate gate probabilities across batch to compute expert importance
-            std::fill(expert_weights.begin(), expert_weights.end(), 0.0f);
+            // Track expert usage across batch for load balancing
+            std::vector<float> batch_expert_usage(n_experts, 0.0f);
+
+            // Create alias_tensor for zero-copy sample extraction
+            alias_tensor sample_alias(1, k, nr, nc);
+
+            // Process each sample independently with its own expert routing
             for (long n = 0; n < num_samples; ++n) {
+                // Get gate probabilities for this specific sample
+                const float* sample_gates = gate_probs + n * n_experts;
+
+                // Build scored expert list
+                std::vector<std::pair<float, size_t>> expert_scores;
+                expert_scores.reserve(n_experts);
+
                 for (long e = 0; e < n_experts; ++e) {
-                    expert_weights[e] += gate_probs[n * n_experts + e];
-                }
-            }
+                    float score = sample_gates[e];
 
-            // Normalize weights and add exploration noise during training
-            if (std::is_same<MODE, training_mode_tag>::value) {
-                static dlib::rand rnd(std::time(0));
-                for (auto& w : expert_weights) {
-                    // Average over batch + exploration noise
-                    w = w / num_samples + noise_scale * rnd.get_random_float();
-                }
-            }
-            else {
-                // Pure averaging during inference
-                for (auto& w : expert_weights) {
-                    w /= num_samples;
-                }
-            }
+                    // Add exploration noise during training to encourage diversity
+                    if (std::is_same<MODE, training_mode_tag>::value && noise_scale > 0) {
+                        static thread_local dlib::rand rnd(std::time(0));
+                        score += noise_scale * (rnd.get_random_float() - 0.5f) * 2.0f;
+                    }
 
-            // Select top-k experts based on aggregated weights
-            std::iota(indices.begin(), indices.end(), 0);
-            std::partial_sort(indices.begin(), indices.begin() + top_n, indices.end(),
-                [&](size_t a, size_t b) {
-                    return expert_weights[a] > expert_weights[b];
+                    expert_scores.emplace_back(score, e);
+                }
+
+                // Select top-k experts
+                std::partial_sort(expert_scores.begin(),
+                    expert_scores.begin() + top_n,
+                    expert_scores.end(),
+                    [](const auto& a, const auto& b) {
+                    return a.first > b.first;
                 });
 
-            // Normalize weights of selected experts
-            float sum_top_weights = 0.0f;
-            for (size_t i = 0; i < top_n; ++i)
-                sum_top_weights += expert_weights[indices[i]];
+                // Normalize weights of selected experts
+                float sum_weights = 0.0f;
+                for (long i = 0; i < top_n; ++i) {
+                    sum_weights += std::max(0.0f, expert_scores[i].first);
+                }
 
-            // Forward through selected experts and combine outputs
-            for (size_t i = 0; i < top_n; ++i) {
-                const size_t eidx = indices[i];
-                expert_weights[eidx] /= sum_top_weights;
+                // Handle edge case of zero total weight
+                if (sum_weights < 1e-8f) {
+                    sum_weights = top_n;
+                    for (long i = 0; i < top_n; ++i) {
+                        expert_scores[i].first = 1.0f;
+                    }
+                }
 
-                // Process input through expert
-                experts[eidx].forward(expert_input);
-                auto& expert_out = experts[eidx].get_output();
+                // Create zero-copy views
+                const long sample_offset = n * sample_size;
+                auto sample_input = sample_alias(expert_input, sample_offset);
+                auto sample_output = sample_alias(output, sample_offset);
 
-                // Add weighted expert output to final result
-                tt::add(1, output, expert_weights[eidx], expert_out);
+                // Route through selected experts and accumulate weighted outputs
+                for (long i = 0; i < top_n; ++i) {
+                    const size_t expert_idx = expert_scores[i].second;
+                    const float weight = expert_scores[i].first / sum_weights;
 
-                // Track expert usage for load balancing
-                expert_usage[eidx] += expert_weights[eidx];
+                    // Forward this sample through the selected expert
+                    experts[expert_idx].forward(sample_input);
+                    const auto& expert_out = experts[expert_idx].get_output();
+
+                    // Add weighted expert output to this sample's position
+                    tt::add(1, sample_output, weight, expert_out);
+
+                    // Track usage for load balancing
+                    batch_expert_usage[expert_idx] += weight;
+                }
+            }
+
+            // Update exponential moving average of expert usage
+            if (std::is_same<MODE, training_mode_tag>::value && usage_update_rate > 0) {
+                for (long e = 0; e < n_experts; ++e) {
+                    float avg_usage = batch_expert_usage[e] / num_samples;
+                    expert_usage[e] = (1.0f - usage_update_rate) * expert_usage[e] +
+                        usage_update_rate * avg_usage;
+                }
             }
         }
 
         /*!
-            Process:
-            1. Compute auxiliary load balancing loss
-            2. Backpropagate through activated experts only
-            3. Scale gradients by expert weights
-            4. Update expert usage statistics
+            BACKWARD PASS
+                Process:
+                1. For each sample:
+                   a. Reconstruct expert selection (same logic as forward)
+                   b. Scale incoming gradient by expert weights
+                   c. Optionally add auxiliary load balancing gradient
+                   d. Backpropagate through each activated expert
+                   e. Accumulate expert gradients to input
+                2. Gradients flow back to gate network automatically via Dlib's graph
+
+            LOAD BALANCING
+                Auxiliary loss encourages balanced expert usage by adding a small
+                gradient term proportional to usage variance. This gradient affects
+                both the expert outputs and (via backprop) the gate network.
         !*/
         template <typename SUBNET_TYPE>
         void backward(const tensor& gradient_input, SUBNET_TYPE& sub, tensor& params_grad)
         {
             tensor& expert_input_grad = sub.get_gradient_input();
+            expert_input_grad = 0;  // Initialize gradient accumulator
 
-            // Compute auxiliary loss for load balancing
-            const bool is_training = std::is_same<MODE, training_mode_tag>::value;
-            float aux_loss = compute_auxiliary_loss();
+            const tensor& expert_input = sub.get_output();
+            const tensor& gate_input = layer<TAG>(sub).get_output();
+            const long num_samples = gate_input.num_samples();
+            const long k = gradient_input.k();
+            const long nr = gradient_input.nr();
+            const long nc = gradient_input.nc();
+            const long sample_size = k * nr * nc;
+            const float* gate_probs = gate_input.host();
 
-            // Backpropagate through each activated expert
-            for (size_t i = 0; i < top_n; ++i) {
-                const size_t eidx = indices[i];
-
-                // Prepare gradient for this expert
-                resizable_tensor adjusted_gradient = gradient_input;
-
-                // Add auxiliary loss gradient if needed
-                if (aux_loss > 0)
-                    tt::add(1, adjusted_gradient, aux_loss, experts[eidx].get_output());
-
-                // Backpropagate through expert network
-                experts[eidx].back_propagate_error(sub.get_output(), adjusted_gradient);
-                auto& expert_grad = experts[eidx].get_gradient_input();
-
-                // Accumulate weighted gradients to input
-                tt::add(1, expert_input_grad, expert_weights[eidx], expert_grad);
+            // Compute auxiliary load balancing loss factor
+            float aux_loss_factor = 0.0f;
+            if (std::is_same<MODE, training_mode_tag>::value) {
+                aux_loss_factor = compute_auxiliary_loss();
             }
 
-            // Update exponential moving average of expert usage
-            if (is_training && usage_update_rate > 0 && usage_update_rate <= 1.0f) {
+            // Create alias_tensor for zero-copy slicing
+            alias_tensor sample_alias(1, k, nr, nc);
+
+            // Backpropagate through each sample independently
+            for (long n = 0; n < num_samples; ++n) {
+                const float* sample_gates = gate_probs + n * n_experts;
+
+                // Reconstruct expert selection
+                std::vector<std::pair<float, size_t>> expert_scores;
+                expert_scores.reserve(n_experts);
+
+                for (long e = 0; e < n_experts; ++e) {
+                    expert_scores.emplace_back(sample_gates[e], e);
+                }
+
+                std::partial_sort(expert_scores.begin(),
+                    expert_scores.begin() + top_n,
+                    expert_scores.end(),
+                    [](const auto& a, const auto& b) {
+                    return a.first > b.first;
+                });
+
+                float sum_weights = 0.0f;
                 for (size_t i = 0; i < top_n; ++i) {
-                    const size_t eidx = indices[i];
-                    expert_usage[eidx] = (1.0f - usage_update_rate) * expert_usage[eidx] +
-                        usage_update_rate * expert_weights[eidx];
+                    sum_weights += std::max(0.0f, expert_scores[i].first);
+                }
+                if (sum_weights < 1e-8f) sum_weights = top_n;
+
+                // Calculate offset
+                const long sample_offset = n * sample_size;
+
+                // Create zero-copy views
+                auto sample_grad = sample_alias(gradient_input, sample_offset);
+                auto sample_input = sample_alias(expert_input, sample_offset);
+                auto sample_input_grad = sample_alias(expert_input_grad, sample_offset);
+
+                // Backprop through each activated expert
+                for (size_t i = 0; i < top_n; ++i) {
+                    const size_t expert_idx = expert_scores[i].second;
+                    float weight = expert_scores[i].first / sum_weights;
+
+                    // Create weighted gradient: copy and scale in one pass
+                    resizable_tensor weighted_grad;
+                    weighted_grad.copy_size(sample_grad);
+
+                    const float* src_data = gradient_input.host() + sample_offset;
+                    float* dst_data = weighted_grad.host();
+                    std::transform(src_data, src_data + sample_size, dst_data,
+                        [weight](float v) { return v * weight; });
+
+                    // Add auxiliary load balancing gradient if needed
+                    if (aux_loss_factor > 0) {
+                        const auto& expert_out = experts[expert_idx].get_output();
+                        tt::add(1, weighted_grad, aux_loss_factor, expert_out);
+                    }
+
+                    // Backpropagate through expert network
+                    experts[expert_idx].back_propagate_error(sample_input, weighted_grad);
+                    const auto& expert_grad = experts[expert_idx].get_gradient_input();
+
+                    // Accumulate expert gradient
+                    tt::add(1, sample_input_grad, 1, expert_grad);
                 }
             }
         }
 
-        // Cleans up the internal expert networks
+        /*!
+            Cleans up internal expert networks by calling their clean() methods
+            if available. This is typically called after training to prepare
+            the network for inference or serialization.
+        !*/
         void clean()
         {
             for (auto& expert : experts)
@@ -721,7 +814,10 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        // Get reference to expert network
+        /*!
+            Provides direct access to expert networks for inspection or modification.
+            Useful for debugging or implementing custom expert-specific operations.
+        !*/
         EXPERT_NET& get_expert(size_t idx) {
             DLIB_CASSERT(idx < experts.size(), "Expert index out of bounds");
             return experts[idx];
@@ -732,8 +828,12 @@ namespace dlib
         }
 
         long num_experts() const { return n_experts; }
+        long num_active_experts() const { return top_n; }
         bool is_training_mode() const { return std::is_same<MODE, training_mode_tag>::value; }
-        
+
+        // Access to usage statistics for monitoring
+        const std::vector<float>& get_expert_usage() const { return expert_usage; }
+
         friend void serialize(const moe_& item, std::ostream& out)
         {
             serialize("moe_", out);
@@ -751,17 +851,13 @@ namespace dlib
             std::string version;
             deserialize(version, in);
             if (version != "moe_")
-                throw serialization_error("Incorrect version found while deserializing moe_.");
+                throw serialization_error("Incorrect version '" + version + "' found while deserializing moe_.");
 
             deserialize(item.n_experts, in);
             deserialize(item.top_n, in);
             deserialize(item.balance_loss_weight, in);
             deserialize(item.noise_scale, in);
             deserialize(item.usage_update_rate, in);
-
-            item.expert_weights.resize(item.n_experts, 0.0f);
-            item.indices.resize(item.n_experts);
-
             deserialize(item.experts, in);
             deserialize(item.expert_usage, in);
         }
@@ -782,6 +878,8 @@ namespace dlib
             out << "<moe>\n";
             out << "  <num_experts>" << item.n_experts << "</num_experts>\n";
             out << "  <top_k>" << item.top_n << "</top_k>\n";
+            out << "  <balance_weight>" << item.balance_loss_weight << "</balance_weight>\n";
+            out << "  <noise_scale>" << item.noise_scale << "</noise_scale>\n";
             out << "  <training>" << is_training << "</training>\n";
             out << "</moe>\n";
         }
@@ -808,30 +906,33 @@ namespace dlib
         }
 
         /*!
-            Encourages balanced expert utilization by penalizing high variance
-            in expert usage. Returns normalized standard deviation of usage.
+            Computes auxiliary load balancing loss as the coefficient of variation
+            (normalized standard deviation) of expert usage. High variance indicates
+            imbalanced usage, which the loss penalizes.
+
+            Returns a scaling factor to be applied to gradients for load balancing.
         !*/
         float compute_auxiliary_loss() const {
-            if (n_experts < 2) return 0.0f;
+            if (n_experts < 2 || balance_loss_weight <= 0.0f) return 0.0f;
 
-            // Compute mean usage
+            // Compute mean usage across experts
             float mean_usage = std::accumulate(expert_usage.begin(),
                 expert_usage.end(), 0.0f) / n_experts;
+
             if (mean_usage < 1e-8f) return 0.0f;
 
-            // Compute variance
-            float var = 0.0f;
+            // Compute variance of usage
+            float variance = 0.0f;
             for (float usage : expert_usage) {
                 float diff = usage - mean_usage;
-                var += diff * diff;
+                variance += diff * diff;
             }
-            var /= n_experts;
+            variance /= n_experts;
 
-            // Normalized standard deviation as load imbalance measure
-            float stddev = std::sqrt(var);
-            float normalized_stddev = stddev / (mean_usage + 1e-6f);
+            // Coefficient of variation: std / mean
+            float cv = std::sqrt(variance) / mean_usage;
 
-            return balance_loss_weight * normalized_stddev;
+            return balance_loss_weight * cv;
         }
 
         template<typename NET>
@@ -846,19 +947,17 @@ namespace dlib
             // No-op if network doesn't have clean() method
         }
 
-        // Model parameters
-        long n_experts;                          // Number of experts (detected from gate)
-        long top_n;                              // Number of experts to activate
-        float balance_loss_weight;               // Weight for auxiliary balancing loss
-        float noise_scale;                       // Exploration noise magnitude (training)
-        float usage_update_rate;                 // EMA rate for usage statistics
+        // Core parameters
+        long n_experts;                          // Number of expert networks (auto-detected from gate)
+        long top_n;                              // Number of experts to activate per sample
+        float balance_loss_weight;               // Auxiliary loss weight for load balancing
+        float noise_scale;                       // Exploration noise magnitude (training only)
+        float usage_update_rate;                 // EMA smoothing factor for usage statistics
 
-        // Expert networks and state
+        // Expert networks and tracking
         std::vector<EXPERT_NET> experts;         // Expert network instances
-        std::vector<float> expert_weights;       // Current expert selection weights
-        std::vector<float> expert_usage;         // Exponential moving average of usage
-        std::vector<size_t> indices;             // Helper for top-k selection
-        resizable_tensor params;                 // Layer parameters (if any)
+        std::vector<float> expert_usage;         // Exponential moving average of expert usage
+        resizable_tensor params;                 // Layer parameters (currently unused)
     };
 
     template<
