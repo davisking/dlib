@@ -21,8 +21,7 @@
     patterns or concepts. However, it effectively illustrates the principle of
     attention and the ability to perfectly memorize and reproduce sequences from
     the training data. This makes it a useful educational tool for understanding
-    the mechanics of Transformer models, even if it lacks the capacity for
-    sophisticated language understanding.
+    the mechanics of Transformer models.
 */
 
 #include <iostream>
@@ -43,14 +42,14 @@
 using namespace std;
 using namespace dlib;
 
-// We treat each character as a token ID in [0..255].
+// We treat each character as a token ID in [0..255]
 const int MAX_TOKEN_ID = 255;
 const int PAD_TOKEN = 256; // Extra "pad" token if needed
 
 const std::string shakespeare_text = get_dataset_as_text(dataset_id::SHAKESPEARE_EXTRACT);
 const std::string prompt_text = get_dataset_as_text(dataset_id::SHAKESPEARE_PROMPT);
 
-// For simplicity, we assume each line from shakespeare_text is appended, ignoring them.
+// For simplicity, we assume each line from shakespeare_text is appended, ignoring them
 std::vector<int> char_based_tokenize(const std::string& text)
 {
     std::vector<int> tokens;
@@ -121,11 +120,11 @@ int main(int argc, char** argv)
         const size_t max_samples = get_option(parser, "max-samples", 50000); // Default maximum number of training samples
 
         // We define a minimal config for demonstration
-        const long vocab_size = (MAX_TOKEN_ID + 1) + 1;   // 256 for chars + 1 pad token
+        const long vocab_size = (MAX_TOKEN_ID + 1) + 1; // 256 for chars + 1 pad token
         const long num_layers = 3;
         const long num_heads = 4;
         const long embedding_dim = 64;
-        const long max_seq_len = 50;                      // Small sequence length for the example
+        const long max_seq_len = 50; // Small sequence length for the example
 
         using train_fused_transformer =
             loss_multiclass_log<fc<vocab_size, rms_norm<
@@ -143,9 +142,7 @@ int main(int argc, char** argv)
         // The model file to store or load
         const std::string model_file = "dlib_lm_chars_model.dat";
 
-        // ----------------------------------------------------------------------------------------
-        // Train mode
-        // ----------------------------------------------------------------------------------------
+        // Training mode
         if (parser.option("train"))
         {
             cout << "=== TRAIN MODE ===\n";
@@ -222,9 +219,7 @@ int main(int argc, char** argv)
             cout << "Model saved to " << model_file << "\n";
         }
 
-        // ----------------------------------------------------------------------------------------
-        // Generate mode
-        // ----------------------------------------------------------------------------------------
+        // Generation mode
         if (parser.option("generate"))
         {
             cout << "=== GENERATE MODE ===\n";
@@ -288,8 +283,8 @@ int main(int argc, char** argv)
 }
 
 /*
- * This program demonstrates the training of a language model on about 14.5k sequences.
- * The training process produces a data file of approximately 32MB on disk.
+ * This program demonstrates the training of a language model on about 14.6k sequences.
+ * The training process produces a data file of approximately 20MB on disk.
  *
  * - Transformer model configuration:
  *    + vocabulary size: 257
@@ -302,11 +297,11 @@ int main(int argc, char** argv)
  * The training can be performed using the following command line:
  * > ./slm_basic_train_ex --train --shuffle
  *
- * After this phase, the model achieves perfect prediction accuracy (i.e acc~1).
+ * After this phase, the model achieves perfect prediction accuracy (i.e acc~99.98%).
  * The generation option produces text that is very similar or identical to the original
  * training data, as illustrated by the example below:
+ * 
  * > Generated text:
- * > (...)
  * > KING RICHARD III:
  * > Bear her my true love's kiss; and so, farewell.
  * > Relenting fool, and shallow, changing woman!
@@ -320,5 +315,8 @@ int main(int argc, char** argv)
  * > 'Tis thought that Richmond is their admiral;
  * > And there they hull, expecting but the aid
  * > Of Buckingham to welcome them ashore.
- * > (...)
+ * 
+ * > KING RICHARD III:
+ * > Some light-foot friend post to the Duke of Norfolk:
+ * > Ratcliff, thyself, or Cate...
  */
