@@ -878,7 +878,7 @@ class moe_
         template <typename> class DO,
         typename SUBNET
     >
-    using moe_feed_forward = some_template_expression;
+    using moe_ffn = some_template_expression;
     /*!
         WHAT THIS OBJECT REPRESENTS
             A drop-in replacement for transformer feed-forward layers using MoE architecture.
