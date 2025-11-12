@@ -64,7 +64,7 @@ namespace dlib
         // Standard SwiGLU FFN implementation
         // Reference: Noam Shazeer's "GLU Variants Improve Transformer" (https://arxiv.org/abs/2002.05202)
         template <template <typename> class DO, long d_model, typename SUBNET>
-        using swiglu = DO<linear<d_model, multm_prev6<linear<(d_model * 2) / 7, skip5<
+        using swiglu = DO<linear<d_model, mult_prev6<linear<(d_model * 2) / 7, skip5<
             tag6<silu<linear<(d_model * 2) / 7, tag5<SUBNET>>>>>>>>>;
 
         template <template <typename> class ACT, template <typename> class DO,
@@ -475,7 +475,7 @@ namespace dlib
     // ----------------------------------------------------------------------------------------
 
     template <long num_experts, template <typename> class DO, typename SUBNET>
-    using gate = softmax<fc<num_experts, DO<leaky_relu<fc<128, SUBNET>>>>>;
+    using gate = softmax<fc<num_experts, DO<leaky_relu<fc<num_experts * 8, SUBNET>>>>>;
 
     struct training_mode_tag {};
     struct inference_mode_tag {};

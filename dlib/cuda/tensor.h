@@ -222,6 +222,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline bool is_2d_matrix(
+        const tensor& t
+    )
+    {
+        return !is_vector(t) &&
+            (t.size() == (size_t)(t.num_samples() * t.k()) ||
+            t.size() == (size_t)(t.nr() * t.nc()));
+    }
+
+// ----------------------------------------------------------------------------------------
+
     inline const matrix_op<op_pointer_to_mat<float> > mat (
         const tensor& t,
         long long nr,
