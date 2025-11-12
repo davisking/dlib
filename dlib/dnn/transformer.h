@@ -64,8 +64,8 @@ namespace dlib
         // Standard SwiGLU FFN implementation
         // Reference: Noam Shazeer's "GLU Variants Improve Transformer" (https://arxiv.org/abs/2002.05202)
         template <template <typename> class DO, long d_model, typename SUBNET>
-        using swiglu = DO<linear<d_model, multm_prev6<linear<d_model * 3, skip5<
-            tag6<silu<linear<d_model * 3, tag5<SUBNET>>>>>>>>>;
+        using swiglu = DO<linear<d_model, multm_prev6<linear<(d_model * 2) / 7, skip5<
+            tag6<silu<linear<(d_model * 2) / 7, tag5<SUBNET>>>>>>>>>;
 
         template <template <typename> class ACT, template <typename> class DO,
             long seq_len, long d_model, long num_heads, typename SUBNET>
@@ -126,9 +126,9 @@ namespace dlib
             DO<fc<d_model, ACT<fc<d_model * 4, SUBNET>>>>>;
 
         template <template <typename> class DO, long d_model, typename SUBNET>
-        using swiglu = DO<extract<0, 1, 1, d_model,
-            fc<d_model, mult_prev7<fc<d_model * 3, skip6<
-            tag7<silu<fc<d_model * 3, tag6<SUBNET>>>>>>>>>>;
+        using swiglu = extract<0, 1, 1, d_model,
+            DO<fc<d_model, mult_prev7<fc<(d_model * 2) / 7, skip6<
+            tag7<silu<fc<(d_model * 2) / 7, tag6<SUBNET>>>>>>>>>>;
 
         template <template <typename> class ACT, template <typename> class DO,
             long seq_len, long d_model, long num_heads, typename SUBNET>
