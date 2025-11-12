@@ -159,19 +159,27 @@ namespace dlib
                 const auto transa = trans_lhs ? CUBLAS_OP_T : CUBLAS_OP_N;
                 const auto transb = trans_rhs ? CUBLAS_OP_T : CUBLAS_OP_N;
 
-                long num_samples = std::min({ lhs.num_samples(), rhs.num_samples(), dest.num_samples() });
-                long num_channels = std::min({ lhs.k(), rhs.k(), dest.k() });
+                const bool lhs_is_matrix = is_2d_matrix(lhs);
+                const bool rhs_is_matrix = is_2d_matrix(rhs);
+                const bool dest_is_matrix = is_2d_matrix(dest);
 
-                auto is_matrix = [](const auto& tensor) {
-                    const bool is_2d_matrix = (tensor.num_samples() == 1 && tensor.k() == 1 &&
-                        tensor.nr() > 1 && tensor.nc() > 1);
-                    const bool is_1d_vector = (tensor.num_samples() * tensor.k() > 1 &&
-                        tensor.nr() == 1 && tensor.nc() == 1);
-                    return is_2d_matrix || is_1d_vector;
-                };
+                const size_t lhs_plane_size = lhs.nr() * lhs.nc();
+                const size_t rhs_plane_size = rhs.nr() * rhs.nc();
+                const size_t dest_plane_size = dest.nr() * dest.nc();
 
-                const bool lhs_is_matrix = is_matrix(lhs), rhs_is_matrix = is_matrix(rhs), dest_is_matrix = is_matrix(dest);
-                if (lhs_is_matrix && rhs_is_matrix && dest_is_matrix) num_samples = num_channels = 1;
+                long num_samples, num_channels;
+                if (lhs_is_matrix && rhs_is_matrix && dest_is_matrix) {
+                    num_samples = 1;
+                    num_channels = 1;
+                }
+                else if (!lhs_is_matrix && rhs_is_matrix) {
+                    num_samples = lhs.num_samples();
+                    num_channels = lhs.k();
+                }
+                else {
+                    num_samples = std::min({ lhs.num_samples(), rhs.num_samples(), dest.num_samples() });
+                    num_channels = std::min({ lhs.k(), rhs.k(), dest.k() });
+                }
 
                 size_t lhs_rows = lhs.nr();
                 size_t lhs_cols = lhs.nc();
@@ -179,22 +187,20 @@ namespace dlib
                     lhs_rows = lhs.num_samples();
                     lhs_cols = lhs.k();
                 }
+
                 size_t rhs_rows = rhs.nr();
                 size_t rhs_cols = rhs.nc();
                 if (rhs_is_matrix && (rhs.num_samples() > 1 || rhs.k() > 1)) {
                     rhs_rows = rhs.num_samples();
                     rhs_cols = rhs.k();
                 }
+
                 size_t dest_rows = dest.nr();
                 size_t dest_cols = dest.nc();
                 if (dest_is_matrix && (dest.num_samples() > 1 || dest.k() > 1)) {
                     dest_rows = dest.num_samples();
                     dest_cols = dest.k();
                 }
-
-                const size_t lhs_plane_size = lhs_rows * lhs_cols;
-                const size_t rhs_plane_size = rhs_rows * rhs_cols;
-                const size_t dest_plane_size = dest_rows * dest_cols;
 
                 for (long b = 0; b < num_samples; ++b)
                 {
@@ -206,12 +212,18 @@ namespace dlib
                             rhs.device() + (b * num_channels + c) * rhs_plane_size;
                         auto dest_slice = dest_is_matrix ? dest.device() :
                             dest.device() + (b * num_channels + c) * dest_plane_size;
+
                         const int k = trans_rhs ? rhs_cols : rhs_rows;
 
                         CHECK_CUBLAS(cublasSgemm(
-                            context(), transb, transa, dest_cols, dest_rows, k,
-                            &alpha, rhs_slice, rhs_cols, lhs_slice, lhs_cols,
-                            &beta, dest_slice, dest_cols
+                            context(),
+                            transb, transa,
+                            dest_cols, dest_rows, k,
+                            &alpha,
+                            rhs_slice, rhs_cols,
+                            lhs_slice, lhs_cols,
+                            &beta,
+                            dest_slice, dest_cols
                         ));
                     }
                 }
