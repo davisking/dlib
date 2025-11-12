@@ -59,7 +59,7 @@ namespace dlib
 {
     // Expert network architecture for MoE layer
     template <template <typename> class DO, long d_model>
-    using expert_net_type = swiglu<DO, d_model, input<matrix<float>>>;
+    using expert_net_type = std_ffn<silu, DO, d_model, input<matrix<float>>>;
 
     /*!
         Complete transformer block with MoE-based feed-forward layer.
