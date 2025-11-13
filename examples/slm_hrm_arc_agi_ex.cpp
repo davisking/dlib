@@ -222,29 +222,29 @@ namespace dlib
         using signal_compressor_i = typename signal_compressor_impl<depth, affine, SUBNET>::type;
 
         // Network component definitions for training (with dropout)
-        using t_h_net_type = canonical_transformer::transformer_stack<NUM_H_LAYERS, activation_func, dropout_policy,
+        using t_h_net_type = transformer_stack<NUM_H_LAYERS, activation_func, dropout_policy,
             WINDOW_LEN, EMBEDDING_DIM, NUM_HEADS,
             input<matrix<float>>>;
-        using t_l_net_type = canonical_transformer::transformer_stack<NUM_L_LAYERS, activation_func, dropout_policy,
+        using t_l_net_type = transformer_stack<NUM_L_LAYERS, activation_func, dropout_policy,
             WINDOW_LEN, EMBEDDING_DIM, NUM_HEADS,
             input<matrix<float>>>;
 
         // Network component definitions for inference (without dropout)
-        using i_h_net_type = canonical_transformer::transformer_stack<NUM_H_LAYERS, activation_func, multiply,
+        using i_h_net_type = transformer_stack<NUM_H_LAYERS, activation_func, multiply,
             WINDOW_LEN, EMBEDDING_DIM, NUM_HEADS,
             input<matrix<float>>>;
-        using i_l_net_type = canonical_transformer::transformer_stack<NUM_L_LAYERS, activation_func, multiply,
+        using i_l_net_type = transformer_stack<NUM_L_LAYERS, activation_func, multiply,
             WINDOW_LEN, EMBEDDING_DIM, NUM_HEADS,
             input<matrix<float>>>;
 
         // Complete network type selector
         template<bool is_training>
         using network_type = std::conditional_t<is_training,
-            loss_cross_entropy_per_logit<linear<VOCAB_SIZE, rms_norm<
+            loss_multiclass_log<fc<VOCAB_SIZE, rms_norm<
             tag10<hrm<t_h_net_type, t_l_net_type, HRM_N, HRM_T,
             token_embeddings<VOCAB_SIZE, EMBEDDING_DIM,
             input<matrix<long, 0, 1>>>>>>>>,
-            loss_cross_entropy_per_logit<linear<VOCAB_SIZE, rms_norm<
+            loss_multiclass_log<fc<VOCAB_SIZE, rms_norm<
             tag10<hrm<i_h_net_type, i_l_net_type, HRM_N, HRM_T,
             token_embeddings<VOCAB_SIZE, EMBEDDING_DIM,
             input<matrix<long, 0, 1>>>>>>>>>;
@@ -701,15 +701,15 @@ int main(int argc, char** argv)
         const long patience = get_option(parser, "patience", 5000);
         
         // Window length: 128 for quick testing, 512-1024 for better performance, 4096 for maximum context
-        constexpr long WINDOW_LEN = 768;
+        constexpr long WINDOW_LEN = 128;
 
         // Model configuration
         using arc_net_config = hrm_config<
             ARC_VOCAB_SIZE_TOTAL,   // vocab_size
             4,                      // num_h_layers
             4,                      // num_l_layers
-            8,                      // num_heads
-            256,                    // embedding_dim
+            6,                      // num_heads
+            228,                    // embedding_dim
             WINDOW_LEN,             // window_len
             2,                      // hrm_N (high-level cycles)
             2                       // hrm_T (low-level steps)
@@ -770,6 +770,7 @@ int main(int argc, char** argv)
                 cout << "Loading existing model from " << model_file << endl;
                 deserialize(model_file) >> net;
             }
+            cout << net << endl << endl; // Show the model architecture
 
             // Setup trainer
             std::vector<int> gpus{ 0 };
