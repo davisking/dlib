@@ -270,7 +270,7 @@ int main(int argc, char** argv)
         parser.add_option("beta1", "Set Adam's first moment coefficient (default: 0.9)", 1);
         parser.add_option("beta2", "Set Adam's second moment coefficient (default: 0.999)", 1);
         parser.add_option("model-file", "Path for model (default: dlib_lm_tokens_model.dat)", 1);
-        parser.add_option("tokenizer-file", "Path for tokenizer (default: slm_tokenizer.vocab)", 1);
+        parser.add_option("tokenizer-file", "Path for tokenizer (default: dlib_lm_tokenizer.vocab)", 1);
         parser.add_option("output-file", "Path for generated output (default: generated_text.txt)", 1);
         parser.add_option("max-tokens", "Maximum number of tokens to process (default: all)", 1);
         parser.add_option("max-bytes", "Maximum number of bytes to process (default: all)", 1);
@@ -294,7 +294,7 @@ int main(int argc, char** argv)
         const double beta1 = get_option(parser, "beta1", 0.9);
         const double beta2 = get_option(parser, "beta2", 0.999);
         const std::string model_file = get_option(parser, "model-file", "dlib_lm_tokens_model.dat");
-        const std::string tokenizer_file = get_option(parser, "tokenizer-file", "slm_tokenizer.vocab");
+        const std::string tokenizer_file = get_option(parser, "tokenizer-file", "dlib_lm_tokenizer.vocab");
         const std::string output_file = get_option(parser, "output-file", "generated_text.txt");
         
         // Model architecture parameters
@@ -391,12 +391,15 @@ int main(int argc, char** argv)
                     cout << "Training new BPE tokenizer with vocabulary size " << num_tokens << "...\n";
 
                     // Compose training corpus from multiple datasets
-                    std::string tokenizer_corpus = get_dataset_as_text(dataset_id::BLACK_HOLE_ARTICLE) + " " + 
-                        get_dataset_raw(dataset_id::PHYSICS_PARAGRAPHS) + " " + get_dataset_raw(dataset_id::BLACK_HOLE_QA_PARTA) +
-                        get_dataset_raw(dataset_id::BLACK_HOLE_QA_PARTB) + get_dataset_raw(dataset_id::BLACK_HOLE_QA_PARTC);
-
-                    // Replace all "@@" delimiters with spaces
                     std::string delimiter = "@@";
+                    std::string tokenizer_corpus = get_dataset_as_text(dataset_id::BLACK_HOLE_ARTICLE) + delimiter
+                        + get_dataset_raw(dataset_id::PHYSICS_PARAGRAPHS) + delimiter
+                        + get_dataset_raw(dataset_id::BLACK_HOLE_QA_PARTA) + delimiter
+                        + get_dataset_raw(dataset_id::BLACK_HOLE_QA_PARTB) + delimiter
+                        + get_dataset_raw(dataset_id::BLACK_HOLE_QA_PARTC) + delimiter
+                        + get_dataset_raw(dataset_id::GENERAL_KNOWLEDGE);
+
+                    // Replace all "@@" delimiters with spaces                    
                     size_t pos = 0;
                     while ((pos = tokenizer_corpus.find(delimiter, pos)) != std::string::npos) {
                         tokenizer_corpus.replace(pos, delimiter.length(), " ");
