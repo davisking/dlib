@@ -39,26 +39,55 @@
 using namespace std;
 using namespace dlib;
 
+// Window length: 128 for quick testing, 512-1024 for better performance, 4096 for maximum context
+constexpr long WINDOW_LEN = 256;
+
+namespace densenet
+{
+    using namespace dlib;
+
+    // ACT can be any activation layer, BN must be bn_con or affine layer and k is the growth rate
+    template <template <typename> class ACT, template <typename> class BN, long k>
+    struct def {
+        template <long num_filters, long ks, int s, typename SUBNET>
+        using conp = add_layer<con_<num_filters, ks, ks, s, s, ks / 2, ks / 2>, SUBNET>;
+
+        template <typename INPUT>
+        using stem = add_layer<max_pool_<3, 3, 2, 2, 1, 1>, ACT<BN<conp<2 * k, 7, 2, INPUT>>>>;
+
+        template <long num_filters, typename SUBNET>
+        using transition = avg_pool<2, 2, 2, 2, con<num_filters, 1, 1, 1, 1, ACT<BN<SUBNET>>>>;
+
+        template <typename SUBNET>
+        using dense_layer = concat2<tag1, tag2,
+            tag2<conp<k, 3, 1,
+            ACT<BN<conp<4 * k, 1, 1,
+            ACT<BN<tag1<SUBNET>>>>>>>>>;
+
+        template <size_t n4, size_t n3, size_t n2, size_t n1, typename INPUT>
+        using backbone = ACT<BN<
+            repeat<n4, dense_layer, transition<k* (2 + n1 + 2 * n2 + 4 * n3) / 8,
+            repeat<n3, dense_layer, transition<k* (2 + n1 + 2 * n2) / 4,
+            repeat<n2, dense_layer, transition<k* (2 + n1) / 2,
+            repeat<n1, dense_layer, stem<INPUT>>>>>>>>>>;
+    };
+}
+
 namespace dlib
 {
     class display_
     {
     public:
-        explicit display_(const std::string& label = "") :
-            layer_label(label)
+        explicit display_()
         {
         }
 
-        display_(const display_& other) :
-            layer_label(other.layer_label)
+        display_(const display_& other)
         {
         }
 
         display_& operator=(const display_& other)
-        {
-            if (this != &other) {
-                layer_label = other.layer_label;
-            }
+        {            
             return *this;
         }
 
@@ -74,10 +103,7 @@ namespace dlib
             const tensor& input = sub.get_output();
 
             // Display tensor dimensions
-            std::cout << "[DISPLAY";
-            if (!layer_label.empty())
-                std::cout << " " << layer_label;
-            std::cout << "] "
+            std::cout << "[DISPLAY] "
                 << "num_samples=" << input.num_samples() << ", "
                 << "k=" << input.k() << ", "
                 << "nr=" << input.nr() << ", "
@@ -103,7 +129,6 @@ namespace dlib
         friend void serialize(const display_& item, std::ostream& out)
         {
             serialize("display_", out);
-            serialize(item.layer_label, out);
         }
 
         friend void deserialize(display_& item, std::istream& in)
@@ -113,30 +138,23 @@ namespace dlib
             if (version != "display_")
                 throw serialization_error("Unexpected version '" + version +
                     "' while deserializing display_");
-            deserialize(item.layer_label, in);
         }
 
         friend std::ostream& operator<<(std::ostream& out, const display_& item)
         {
             out << "display";
-            if (!item.layer_label.empty())
-                out << " (" << item.layer_label << ")";
             return out;
         }
 
         friend void to_xml(const display_& item, std::ostream& out)
         {
-            out << "<display";
-            if (!item.layer_label.empty())
-                out << " label='" << item.layer_label << "'";
-            out << "/>\n";
+            out << "<display />";
         }
 
         inline dpoint map_input_to_output(const dpoint& p) const { return p; }
         inline dpoint map_output_to_input(const dpoint& p) const { return p; }
 
     private:
-        std::string layer_label;
         resizable_tensor params; // No trainable parameters
     };
 
@@ -164,8 +182,8 @@ namespace dlib
         long num_h_layers = 4,                                     // H module depth
         long num_l_layers = 4,                                     // L module depth
         long num_heads = 8,                                        // Attention heads
-        long embedding_dim = 512,                                  // Embedding dimension
-        long window_len = 768,                                     // Context window
+        long embedding_dim = 256,                                  // Embedding dimension
+        long window_len = WINDOW_LEN,                              // Context window
         long hrm_N = 2,                                            // High-level cycles
         long hrm_T = 2,                                            // Low-level steps
         template <typename> class activation_func = gelu,          // Activation
@@ -241,13 +259,15 @@ namespace dlib
         template<bool is_training>
         using network_type = std::conditional_t<is_training,
             loss_multiclass_log<fc<VOCAB_SIZE, rms_norm<
+            display<densenet::def<relu, bn_con, 16>::backbone<8, 12, 6, 3, display<
             tag10<hrm<t_h_net_type, t_l_net_type, HRM_N, HRM_T,
             token_embeddings<VOCAB_SIZE, EMBEDDING_DIM,
-            input<matrix<long, 0, 1>>>>>>>>,
+            input<matrix<long, 0, 1>>>>>>>>>>>,
             loss_multiclass_log<fc<VOCAB_SIZE, rms_norm<
+            densenet::def<relu, affine, 16>::backbone<8, 12, 6, 3,
             tag10<hrm<i_h_net_type, i_l_net_type, HRM_N, HRM_T,
             token_embeddings<VOCAB_SIZE, EMBEDDING_DIM,
-            input<matrix<long, 0, 1>>>>>>>>>;
+            input<matrix<long, 0, 1>>>>>>>>>>;
 
         struct model_info {
             static std::string describe() {
@@ -700,20 +720,8 @@ int main(int argc, char** argv)
         const size_t max_epochs = get_option(parser, "max-epochs", 10000);
         const long patience = get_option(parser, "patience", 5000);
         
-        // Window length: 128 for quick testing, 512-1024 for better performance, 4096 for maximum context
-        constexpr long WINDOW_LEN = 128;
-
         // Model configuration
-        using arc_net_config = hrm_config<
-            ARC_VOCAB_SIZE_TOTAL,   // vocab_size
-            4,                      // num_h_layers
-            4,                      // num_l_layers
-            6,                      // num_heads
-            228,                    // embedding_dim
-            WINDOW_LEN,             // window_len
-            2,                      // hrm_N (high-level cycles)
-            2                       // hrm_T (low-level steps)
-        >;
+        using arc_net_config = hrm_config<>;
         cout << arc_net_config::model_info::describe() << "\n\n";
         using train_net_type = arc_net_config::network_type<true>;
         using infer_net_type = arc_net_config::network_type<false>;
