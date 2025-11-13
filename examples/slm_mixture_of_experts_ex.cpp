@@ -85,8 +85,7 @@ namespace dlib
         - Optimized for autoregressive language modeling
     !*/
     template <long num_logits, long embedding_dim, typename SUBNET>
-    using classification_head = loss_cross_entropy_per_logit<linear<num_logits,
-        linear<embedding_dim / 2, rms_norm<SUBNET>>>>;
+    using classification_head = loss_cross_entropy_per_logit<linear<num_logits, rms_norm<SUBNET>>>;
 
     // Core model parameters
     template<
