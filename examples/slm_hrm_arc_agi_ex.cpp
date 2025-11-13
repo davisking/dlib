@@ -818,9 +818,9 @@ int main(int argc, char** argv)
                         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - start_time).count();
 
                         cout << "epoch#: " << (epoch + 1) << "/" << max_epochs
-                            << " \t batches: " << batches_seen
-                            << " \t learning rate: " << trainer.get_learning_rate()
-                            << " \t average loss: " << trainer.get_average_loss()
+                            << " (batches: " << batches_seen << ")"
+                            << " \t loss: " << trainer.get_average_loss()
+                            << " \t patience: " << trainer.get_steps_without_progress()
                             << " \t time: " << elapsed << "s\n";
                         cout.flush();
                     }
