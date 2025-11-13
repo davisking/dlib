@@ -515,9 +515,8 @@ namespace dlib
         {
             // Deep copy of expert networks
             experts.reserve(other.experts.size());
-            for (const auto& expert : other.experts) {
+            for (const auto& expert : other.experts)
                 experts.push_back(expert);
-            }
         }
 
         moe_& operator=(const moe_& other)
@@ -533,9 +532,8 @@ namespace dlib
                 // Deep copy of expert networks
                 experts.clear();
                 experts.reserve(other.experts.size());
-                for (const auto& expert : other.experts) {
+                for (const auto& expert : other.experts)
                     experts.push_back(expert);
-                }
             }
             return *this;
         }
@@ -650,16 +648,14 @@ namespace dlib
 
                 // Normalize weights of selected experts
                 float sum_weights = 0.0f;
-                for (long i = 0; i < top_n; ++i) {
+                for (long i = 0; i < top_n; ++i)
                     sum_weights += std::max(0.0f, expert_scores[i].first);
-                }
 
                 // Handle edge case of zero total weight
                 if (sum_weights < 1e-8f) {
                     sum_weights = top_n;
-                    for (long i = 0; i < top_n; ++i) {
+                    for (long i = 0; i < top_n; ++i)
                         expert_scores[i].first = 1.0f;
-                    }
                 }
 
                 // Create zero-copy views
@@ -727,9 +723,8 @@ namespace dlib
 
             // Compute auxiliary load balancing loss factor
             float aux_loss_factor = 0.0f;
-            if (std::is_same<MODE, training_mode_tag>::value) {
+            if (std::is_same<MODE, training_mode_tag>::value)
                 aux_loss_factor = compute_auxiliary_loss();
-            }
 
             // Create alias_tensor for zero-copy slicing
             alias_tensor sample_alias(1, k, nr, nc);
@@ -742,9 +737,8 @@ namespace dlib
                 std::vector<std::pair<float, size_t>> expert_scores;
                 expert_scores.reserve(n_experts);
 
-                for (long e = 0; e < n_experts; ++e) {
+                for (long e = 0; e < n_experts; ++e)
                     expert_scores.emplace_back(sample_gates[e], e);
-                }
 
                 std::partial_sort(expert_scores.begin(),
                     expert_scores.begin() + top_n,
@@ -754,9 +748,8 @@ namespace dlib
                 });
 
                 float sum_weights = 0.0f;
-                for (size_t i = 0; i < top_n; ++i) {
+                for (size_t i = 0; i < top_n; ++i)
                     sum_weights += std::max(0.0f, expert_scores[i].first);
-                }
                 if (sum_weights < 1e-8f) sum_weights = top_n;
 
                 // Calculate offset
