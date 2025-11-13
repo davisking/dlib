@@ -392,12 +392,13 @@ int main(int argc, char** argv)
 
                     // Compose training corpus from multiple datasets
                     std::string delimiter = "@@";
-                    std::string tokenizer_corpus = get_dataset_as_text(dataset_id::BLACK_HOLE_ARTICLE) + delimiter
-                        + get_dataset_raw(dataset_id::PHYSICS_PARAGRAPHS) + delimiter
-                        + get_dataset_raw(dataset_id::BLACK_HOLE_QA_PARTA) + delimiter
-                        + get_dataset_raw(dataset_id::BLACK_HOLE_QA_PARTB) + delimiter
-                        + get_dataset_raw(dataset_id::BLACK_HOLE_QA_PARTC) + delimiter
-                        + get_dataset_raw(dataset_id::GENERAL_KNOWLEDGE);
+                    std::string tokenizer_corpus =
+                        get_dataset_as_text(dataset_id::BLACK_HOLE_ARTICLE) + delimiter
+                        + get_dataset_as_text(dataset_id::PHYSICS_PARAGRAPHS) + delimiter
+                        + get_dataset_as_text(dataset_id::BLACK_HOLE_QA_PARTA) + delimiter
+                        + get_dataset_as_text(dataset_id::BLACK_HOLE_QA_PARTB) + delimiter
+                        + get_dataset_as_text(dataset_id::BLACK_HOLE_QA_PARTC) + delimiter
+                        + get_dataset_as_text(dataset_id::GENERAL_KNOWLEDGE);
 
                     // Replace all "@@" delimiters with spaces                    
                     size_t pos = 0;
