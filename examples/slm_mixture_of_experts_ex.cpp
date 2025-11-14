@@ -74,7 +74,7 @@ namespace dlib
     template <template <typename> class ACT, template <typename> class DO,
         long seq_len, long d_model, long num_heads, typename MODE, typename SUBNET>
     using trans_moe_block =
-        moe_ffn<expert_net_type<DO, d_model>, 4, 0, MODE, DO,
+        moe_ffn<expert_net_type<DO, d_model>, 3, 0, MODE, DO,
         multihead_attention<ACT, DO, seq_len, d_model, num_heads, SUBNET>>;
 
     /*!

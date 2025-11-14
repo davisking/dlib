@@ -39,8 +39,8 @@
 using namespace std;
 using namespace dlib;
 
-// Window length: 128 for quick testing, 512-1024 for better performance, 4096 for maximum context
-constexpr long WINDOW_LEN = 256;
+// Window length: 256 for quick testing, 512-1024 for better performance, 4096 for maximum context
+constexpr long WINDOW_LEN = 2048;
 
 namespace densenet
 {
@@ -182,7 +182,7 @@ namespace dlib
         long num_h_layers = 4,                                     // H module depth
         long num_l_layers = 4,                                     // L module depth
         long num_heads = 8,                                        // Attention heads
-        long embedding_dim = 256,                                  // Embedding dimension
+        long embedding_dim = 512,                                  // Embedding dimension
         long window_len = WINDOW_LEN,                              // Context window
         long hrm_N = 2,                                            // High-level cycles
         long hrm_T = 2,                                            // Low-level steps
@@ -240,33 +240,35 @@ namespace dlib
         using signal_compressor_i = typename signal_compressor_impl<depth, affine, SUBNET>::type;
 
         // Network component definitions for training (with dropout)
+        static constexpr long compression_depth = 2; // Adjust based on input size
+        static constexpr long compression_ratio = (1 << compression_depth); // 2^depth
         using t_h_net_type = transformer_stack<NUM_H_LAYERS, activation_func, dropout_policy,
-            WINDOW_LEN, EMBEDDING_DIM, NUM_HEADS,
+            WINDOW_LEN / compression_ratio, EMBEDDING_DIM / compression_ratio, NUM_HEADS,
             input<matrix<float>>>;
         using t_l_net_type = transformer_stack<NUM_L_LAYERS, activation_func, dropout_policy,
-            WINDOW_LEN, EMBEDDING_DIM, NUM_HEADS,
+            WINDOW_LEN / compression_ratio, EMBEDDING_DIM / compression_ratio, NUM_HEADS,
             input<matrix<float>>>;
 
         // Network component definitions for inference (without dropout)
         using i_h_net_type = transformer_stack<NUM_H_LAYERS, activation_func, multiply,
-            WINDOW_LEN, EMBEDDING_DIM, NUM_HEADS,
+            WINDOW_LEN / compression_ratio, EMBEDDING_DIM / compression_ratio, NUM_HEADS,
             input<matrix<float>>>;
         using i_l_net_type = transformer_stack<NUM_L_LAYERS, activation_func, multiply,
-            WINDOW_LEN, EMBEDDING_DIM, NUM_HEADS,
+            WINDOW_LEN / compression_ratio, EMBEDDING_DIM / compression_ratio, NUM_HEADS,
             input<matrix<float>>>;
 
         // Complete network type selector
         template<bool is_training>
         using network_type = std::conditional_t<is_training,
             loss_multiclass_log<fc<VOCAB_SIZE, rms_norm<
-            display<densenet::def<relu, bn_con, 16>::backbone<8, 12, 6, 3, display<
+            //densenet::def<relu, bn_con, 16>::backbone<8, 12, 6, 3,
             tag10<hrm<t_h_net_type, t_l_net_type, HRM_N, HRM_T,
-            token_embeddings<VOCAB_SIZE, EMBEDDING_DIM,
-            input<matrix<long, 0, 1>>>>>>>>>>>,
+            signal_compressor_t<compression_depth, token_embeddings<VOCAB_SIZE, EMBEDDING_DIM,
+            input<matrix<long, 0, 1>>>>>>>>>,
             loss_multiclass_log<fc<VOCAB_SIZE, rms_norm<
-            densenet::def<relu, affine, 16>::backbone<8, 12, 6, 3,
+            //densenet::def<relu, affine, 16>::backbone<8, 12, 6, 3,
             tag10<hrm<i_h_net_type, i_l_net_type, HRM_N, HRM_T,
-            token_embeddings<VOCAB_SIZE, EMBEDDING_DIM,
+            signal_compressor_i<compression_depth, token_embeddings<VOCAB_SIZE, EMBEDDING_DIM,
             input<matrix<long, 0, 1>>>>>>>>>>;
 
         struct model_info {
@@ -693,7 +695,7 @@ int main(int argc, char** argv)
         parser.add_option("eval-path", "Path to evaluation JSON files", 1);
         parser.add_option("model-file", "Path for model file", 1);
         parser.add_option("learning-rate", "Learning rate (default: 1e-4)", 1);
-        parser.add_option("batch-size", "Mini-batch size (default: 4)", 1);
+        parser.add_option("batch-size", "Mini-batch size (default: 12)", 1);
         parser.add_option("max-epochs", "Maximum training epochs (default: 10000)", 1);
         parser.add_option("patience", "Early stopping patience (default: 5000)", 1);
         parser.add_option("task-id", "Specific task ID to evaluate/generate", 1);
@@ -716,7 +718,7 @@ int main(int argc, char** argv)
         const std::string eval_path = get_option(parser, "eval-path", "data/evaluation");
         const std::string model_file = get_option(parser, "model-file", "dlib_lm_arc_agi_model.dat");
         const double learning_rate = get_option(parser, "learning-rate", 1e-4);
-        const size_t batch_size = get_option(parser, "batch-size", 4);
+        const size_t batch_size = get_option(parser, "batch-size", 12);
         const size_t max_epochs = get_option(parser, "max-epochs", 10000);
         const long patience = get_option(parser, "patience", 5000);
         

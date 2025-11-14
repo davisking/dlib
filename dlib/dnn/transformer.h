@@ -748,7 +748,7 @@ namespace dlib
                 });
 
                 float sum_weights = 0.0f;
-                for (long i = 0; i < top_n; ++i)
+                for (size_t i = 0; i < top_n; ++i)
                     sum_weights += std::max(0.0f, expert_scores[i].first);
                 if (sum_weights < 1e-8f) sum_weights = top_n;
 
@@ -761,7 +761,7 @@ namespace dlib
                 auto sample_input_grad = sample_alias(expert_input_grad, sample_offset);
 
                 // Backprop through each activated expert
-                for (long i = 0; i < top_n; ++i) {
+                for (size_t i = 0; i < top_n; ++i) {
                     const size_t expert_idx = expert_scores[i].second;
                     float weight = expert_scores[i].first / sum_weights;
 
@@ -857,7 +857,7 @@ namespace dlib
             const bool is_training = std::is_same<MODE, training_mode_tag>::value;
             out << "moe"
                 << " (experts=" << item.n_experts
-                << ", top_k=" << item.top_n
+                << ", top_n=" << item.top_n
                 << ", mode=" << (is_training ? "train" : "infer") << ")";
             return out;
         }
@@ -867,7 +867,7 @@ namespace dlib
             const bool is_training = std::is_same<MODE, training_mode_tag>::value;
             out << "<moe>\n";
             out << "  <num_experts>" << item.n_experts << "</num_experts>\n";
-            out << "  <top_k>" << item.top_n << "</top_k>\n";
+            out << "  <top_n>" << item.top_n << "</top_n>\n";
             out << "  <balance_weight>" << item.balance_loss_weight << "</balance_weight>\n";
             out << "  <noise_scale>" << item.noise_scale << "</noise_scale>\n";
             out << "  <training>" << is_training << "</training>\n";
