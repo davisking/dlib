@@ -748,7 +748,7 @@ namespace dlib
                 });
 
                 float sum_weights = 0.0f;
-                for (size_t i = 0; i < top_n; ++i)
+                for (long i = 0; i < top_n; ++i)
                     sum_weights += std::max(0.0f, expert_scores[i].first);
                 if (sum_weights < 1e-8f) sum_weights = top_n;
 
@@ -761,7 +761,7 @@ namespace dlib
                 auto sample_input_grad = sample_alias(expert_input_grad, sample_offset);
 
                 // Backprop through each activated expert
-                for (size_t i = 0; i < top_n; ++i) {
+                for (long i = 0; i < top_n; ++i) {
                     const size_t expert_idx = expert_scores[i].second;
                     float weight = expert_scores[i].first / sum_weights;
 
