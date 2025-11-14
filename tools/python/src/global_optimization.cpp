@@ -59,8 +59,8 @@ size_t num_function_arguments(py::object f, size_t expected_num)
         
         // Check if function accepts *args (VAR_POSITIONAL)
         bool has_var_args = false;
-        for (auto item : params) {
-            auto param = item.second.cast<py::object>();
+        for (auto item : params.attr("values")()) {
+            auto param = item.cast<py::object>();
             auto kind = param.attr("kind");
             // inspect.Parameter.VAR_POSITIONAL == 2
             if (kind.cast<int>() == 2) {
