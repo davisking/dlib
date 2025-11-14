@@ -48,11 +48,42 @@ py::list mat_to_list (
 
 size_t num_function_arguments(py::object f, size_t expected_num)
 {
-    const auto code_object = f.attr(hasattr(f,"func_code") ? "func_code" : "__code__");
-    const auto num = code_object.attr("co_argcount").cast<std::size_t>();
-    if (num < expected_num && (code_object.attr("co_flags").cast<int>() & CO_VARARGS))
-        return expected_num;
-    return num;
+    // Use Python's inspect module to get signature, which works with all callable objects
+    // including functools.partial, lambdas, and regular functions
+    auto inspect = py::module_::import("inspect");
+    
+    try {
+        auto sig = inspect.attr("signature")(f);
+        auto params = sig.attr("parameters");
+        auto num = py::len(params);
+        
+        // Check if function accepts *args (VAR_POSITIONAL)
+        bool has_var_args = false;
+        for (auto item : params) {
+            auto param = item.second.cast<py::object>();
+            auto kind = param.attr("kind");
+            // inspect.Parameter.VAR_POSITIONAL == 2
+            if (kind.cast<int>() == 2) {
+                has_var_args = true;
+                break;
+            }
+        }
+        
+        if (num < expected_num && has_var_args)
+            return expected_num;
+        return num;
+    } catch (const py::error_already_set&) {
+        // Fallback to old method if inspect.signature fails
+        // This maintains backward compatibility
+        if (!hasattr(f, "__code__") && !hasattr(f, "func_code")) {
+            throw;
+        }
+        const auto code_object = f.attr(hasattr(f,"func_code") ? "func_code" : "__code__");
+        const auto num = code_object.attr("co_argcount").cast<std::size_t>();
+        if (num < expected_num && (code_object.attr("co_flags").cast<int>() & CO_VARARGS))
+            return expected_num;
+        return num;
+    }
 }
 
 double call_func(py::object f, const matrix<double,0,1>& args)
