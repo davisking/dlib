@@ -5740,8 +5740,7 @@ namespace dlib
             num_channels_(item.num_channels_),
             feature_dim_(item.feature_dim_),
             ponder_cost_(item.ponder_cost_),
-            avg_steps_(item.avg_steps_),
-            params(item.params),
+            avg_steps_(item.avg_steps_),            
             halting_probs_(item.halting_probs_),
             cumulative_halting_(item.cumulative_halting_),
             remainders_(item.remainders_),
@@ -5749,7 +5748,8 @@ namespace dlib
             logits_(item.logits_),
             grad_logits_(item.grad_logits_),
             input_cache_(item.input_cache_),
-            true_effective_weights_(item.true_effective_weights_)
+            true_effective_weights_(item.true_effective_weights_),
+            params(item.params)
         {
         }
 
@@ -5768,8 +5768,7 @@ namespace dlib
             num_channels_ = item.num_channels_;
             feature_dim_ = item.feature_dim_;
             ponder_cost_ = item.ponder_cost_;
-            avg_steps_ = item.avg_steps_;
-            params = item.params;
+            avg_steps_ = item.avg_steps_;            
             halting_probs_ = item.halting_probs_;
             cumulative_halting_ = item.cumulative_halting_;
             remainders_ = item.remainders_;
@@ -5778,6 +5777,7 @@ namespace dlib
             grad_logits_ = item.grad_logits_;
             input_cache_ = item.input_cache_;
             true_effective_weights_ = item.true_effective_weights_;
+            params = item.params;
 
             return *this;
         }

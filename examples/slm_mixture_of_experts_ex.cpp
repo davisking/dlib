@@ -343,7 +343,8 @@ int main(int argc, char** argv)
         cout << "Loading internal training datasets...\n";
         std::vector<dataset_id> datasets = {
             dataset_id::BLACK_HOLE_ARTICLE,
-            dataset_id::PHYSICS_PARAGRAPHS
+            dataset_id::PHYSICS_PARAGRAPHS,
+			dataset_id::GENERAL_KNOWLEDGE
         };
         auto training_segments = get_dataset_as_segments(datasets);
 
