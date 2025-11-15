@@ -6075,9 +6075,6 @@ namespace dlib
         long num_channels_;
         long feature_dim_;
 
-        // Learnable parameters
-        resizable_tensor params;
-
         // Working memory
         resizable_tensor halting_probs_;        // p_t^n: Halting probabilities
         resizable_tensor cumulative_halting_;   // h_t^n: Cumulative halting probabilities
@@ -6091,6 +6088,9 @@ namespace dlib
         // Statistics for monitoring
         float ponder_cost_;      // R(x): Current ponder cost
         float avg_steps_;        // Average number of computation steps
+
+        // Learnable parameters
+        resizable_tensor params;
     };
 
     template <long max_steps, typename SUBNET>
