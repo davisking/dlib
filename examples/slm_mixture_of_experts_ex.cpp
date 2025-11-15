@@ -10,28 +10,20 @@
 
     Key features:
     - Mixture-of-Experts architecture with dynamic expert selection
-    - Sparse activation pattern (only top-k experts active per input)
+    - Sparse activation pattern (only top-n experts active per input)
     - Automatic load balancing across experts through auxiliary loss
     - Multi-head self-attention with causal masking for autoregressive generation
     - BPE tokenization for efficient vocabulary management
-    - Complete training, generation, and verification pipeline
-    - Compile-time mode selection (training vs inference) using tag-based dispatch
+    - Complete training and generation pipeline using datasets
 
     Usage modes:
-    --train      Train model on internal dataset with MoE layers
+    --train      Train model on internal datasets with MoE layers
     --generate   Generate text from trained MoE-enhanced model
 
-    Configuration:
-    - Adjust template parameters in transformer_config for model architecture
-    - Modify training parameters via command-line for optimization
-    - Set sequence length and expert count according to hardware resources
-    - Balance exploration noise and load balancing weights for convergence
-
     Performance considerations:
-    - MoE layers increase model capacity without proportional compute cost
-    - Sparse activation reduces inference time compared to dense networks
-    - Expert specialization improves model quality on diverse data
-    - Memory usage scales with number of experts (4 experts by default)
+    - Sparse activation reduces inference compute (only top-n experts active)
+    - Training is more challenging than standard transformers
+    - Requires larger datasets for effective expert specialization
 !*/
 #include <iostream>
 #include <string>
