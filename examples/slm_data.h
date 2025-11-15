@@ -62,12 +62,11 @@ namespace detail
 
     // Splits a string by the "@@" delimiter into a vector of segments
     // Used for DELIMITED_TEXT and PAIRED_TEXT formats
-    inline std::vector<std::string> split_by_delimiter(const std::string& text)
+    inline std::vector<std::string> split_by_delimiter(const std::string& text, std::string delimiter = "@@")
     {
         std::vector<std::string> result;
         std::string::size_type start = 0;
         std::string::size_type end;
-        const std::string delimiter = "@@";
 
         while ((end = text.find(delimiter, start)) != std::string::npos)
         {
@@ -2236,18 +2235,28 @@ inline std::string get_dataset_as_text(dataset_id id)
 }
 
 /*!
-    Returns dataset as vector of text segments (DELIMITED_TEXT format).
-    Splits the decompressed text by "@@" delimiter.
+    Returns combined datasets as vector of text segments (DELIMITED_TEXT format).
+    For each dataset ID, splits the decompressed text by "@@" delimiter and
+    concatenates all segments into a single vector.
 
     Example:
-        auto paragraphs = get_dataset_as_segments(dataset_id::PHYSICS_PARAGRAPHS);
+        std::vector<dataset_id> datasets = {
+            dataset_id::BLACK_HOLE_ARTICLE,
+            dataset_id::PHYSICS_PARAGRAPHS
+        };
+        auto paragraphs = get_dataset_as_segments(datasets);
         for (const auto& para : paragraphs) {
-            // Process each paragraph independently
+            // Process each paragraph from all combined datasets
         }
-!*/
-inline std::vector<std::string> get_dataset_as_segments(dataset_id id)
+*/
+inline std::vector<std::string> get_dataset_as_segments(const std::vector<dataset_id>& ids)
 {
-    return detail::split_by_delimiter(get_dataset_raw(id));
+    std::vector<std::string> result;
+    for (const auto& id : ids) {
+        auto segments = detail::split_by_delimiter(get_dataset_raw(id));
+        result.insert(result.end(), segments.begin(), segments.end());
+    }
+    return result;
 }
 
 /*!

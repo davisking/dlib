@@ -20,7 +20,6 @@
     Usage modes:
     --train      Train model on internal dataset with MoE layers
     --generate   Generate text from trained MoE-enhanced model
-    --verify     Compare generated output with original dataset
 
     Configuration:
     - Adjust template parameters in transformer_config for model architecture
@@ -184,29 +183,6 @@ namespace {
 }
 
 // Utility functions
-std::string generate_tokens_filename(size_t max_bytes)
-{
-    if (max_bytes > 0) {
-        return "dlib_dataset_" + std::to_string(max_bytes) + "_tokens.bin";
-    }
-    return "dlib_dataset_tokens.bin";
-}
-
-bool save_tokens_to_file(const std::vector<int>& tokens, const std::string& filename)
-{
-    std::ofstream file(filename, std::ios::binary);
-    if (!file) return false;
-
-    uint64_t num_tokens = tokens.size();
-    file.write(reinterpret_cast<const char*>(&num_tokens), sizeof(num_tokens));
-
-    for (int token : tokens) {
-        uint32_t t = static_cast<uint32_t>(token);
-        file.write(reinterpret_cast<const char*>(&t), sizeof(t));
-    }
-
-    return file.good();
-}
 
 bool load_tokens_from_file(std::vector<int>& tokens, const std::string& filename)
 {
@@ -230,56 +206,6 @@ bool load_tokens_from_file(std::vector<int>& tokens, const std::string& filename
     return true;
 }
 
-std::string read_file_content(const std::string& filename, size_t max_bytes = 0)
-{
-    std::ifstream file(filename, std::ios::binary);
-    if (!file) {
-        throw std::runtime_error("Cannot open file: " + filename);
-    }
-
-    std::string content;
-    if (max_bytes > 0) {
-        content.resize(max_bytes);
-        file.read(&content[0], max_bytes);
-        content.resize(file.gcount());
-    }
-    else {
-        content.assign(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>());
-    }
-
-    return content;
-}
-
-bool verify_match(const std::string& original, const std::string& generated)
-{
-    if (original.size() != generated.size()) {
-        cout << "Size mismatch: original=" << original.size()
-            << ", generated=" << generated.size() << "\n";
-        return false;
-    }
-
-    size_t mismatch_count = 0;
-    for (size_t i = 0; i < original.size(); ++i) {
-        if (original[i] != generated[i]) {
-            if (mismatch_count < 10) {
-                cout << "Mismatch at byte " << i << ": expected='" << original[i]
-                    << "' (0x" << std::hex << (int)(unsigned char)original[i] << std::dec
-                    << "), got='" << generated[i]
-                    << "' (0x" << std::hex << (int)(unsigned char)generated[i] << std::dec << ")\n";
-            }
-            mismatch_count++;
-        }
-    }
-
-    if (mismatch_count > 0) {
-        cout << "Total mismatches: " << mismatch_count << "\n";
-        return false;
-    }
-
-    cout << "Files match perfectly. All " << original.size() << " bytes are identical.\n";
-    return true;
-}
-
 // ----------------------------------------------------------------------------------------
 
 // Structure to hold MoE parameter information with breakdown
@@ -292,7 +218,7 @@ struct moe_param_info
     size_t total_inference_params;  // Active parameters during inference
     long num_experts;               // Number of experts per MoE layer
     long num_moe_layers;            // Number of MoE layers in the network
-    long top_k;                     // Number of active experts during inference
+    long top_n;                     // Number of active experts during inference
     float efficiency_ratio;         // Ratio of inference/training params
 
     void print() const
@@ -301,7 +227,7 @@ struct moe_param_info
             << "Architecture:\n"
             << "  MoE layers: " << num_moe_layers << "\n"
             << "  Experts per layer: " << num_experts << "\n"
-            << "  Active experts (top-k): " << top_k << "\n\n"
+            << "  Active experts (top-n): " << top_n << "\n\n"
             << "Parameter breakdown per MoE layer:\n"
             << "  Single expert: " << expert_params << " params\n"
             << "Total network parameters:\n"
@@ -332,11 +258,11 @@ moe_param_info get_moe_param_info(const net_type& net, long num_layers)
         info.expert_params = count_parameters(moe_layer.get_expert(0));
 
         // Determine top_k (either fixed or auto-calculated as 20% of experts)
-        info.top_k = std::max(1L, static_cast<long>(std::floor(info.num_experts * 0.2f)));
+        info.top_n = std::max(1L, static_cast<long>(std::floor(info.num_experts * 0.2f)));
     }
     else {
         info.expert_params = 0;
-        info.top_k = 0;
+        info.top_n = 0;
     }
 
     // Count other parameters (embeddings, attention layers, output layer)
@@ -349,7 +275,7 @@ moe_param_info get_moe_param_info(const net_type& net, long num_layers)
 
     // Calculate active parameters during inference (only top-k experts)
     size_t moe_inference_params = info.num_moe_layers *
-        (info.top_k * info.expert_params);
+        (info.top_n * info.expert_params);
     info.total_inference_params = info.other_params + moe_inference_params;
 
     // Calculate efficiency ratio
@@ -372,9 +298,8 @@ int main(int argc, char** argv)
         setup_interrupt_handler();
 
         command_line_parser parser;
-        parser.add_option("train", "Train a transformer model on internal dataset");
+        parser.add_option("train", "Train a transformer model on internal datasets");
         parser.add_option("generate", "Generate text from a previously trained model");
-        parser.add_option("verify", "Verify generated output against original dataset");
         parser.add_option("learning-rate", "Set the learning rate (default: 2e-4)", 1);
         parser.add_option("batch-size", "Set the mini-batch size (default: 64)", 1);
         parser.add_option("patience", "Iterations without progress before early stopping (default: 7500)", 1);
@@ -385,14 +310,10 @@ int main(int argc, char** argv)
         parser.add_option("model-file", "Path for model (default: dlib_lm_moe_model.dat)", 1);
         parser.add_option("tokenizer-file", "Path for tokenizer (default: dlib_lm_tokenizer.vocab)", 1);
         parser.add_option("output-file", "Path for generated output (default: generated_text.txt)", 1);
-        parser.add_option("max-tokens", "Maximum number of tokens to process (default: all)", 1);
-        parser.add_option("max-bytes", "Maximum number of bytes to process (default: all)", 1);
-        parser.add_option("percent", "Percentage of bytes to process (0-100 - default: all)", 1);
         parser.parse(argc, argv);
 
         if (parser.number_of_arguments() == 0 &&
-            !parser.option("train") && !parser.option("generate") &&
-            !parser.option("verify"))
+            !parser.option("train") && !parser.option("generate"))
         {
             parser.print_options();
             return 0;
@@ -427,32 +348,15 @@ int main(int argc, char** argv)
         > ;
 
         // Load internal dataset
-        cout << "Loading internal training dataset...\n";
-        std::string training_text = get_dataset_as_text(dataset_id::BLACK_HOLE_ARTICLE);
-        size_t original_size = training_text.size();
-        cout << "Loaded " << original_size << " bytes from internal dataset\n";
+        cout << "Loading internal training datasets...\n";
+        std::vector<dataset_id> datasets = {
+            dataset_id::BLACK_HOLE_ARTICLE,
+            dataset_id::PHYSICS_PARAGRAPHS
+        };
+        auto training_segments = get_dataset_as_segments(datasets);
 
-        // Calculate max bytes to process
-        size_t max_bytes = 0, max_tokens_limit = 0;
-        if (parser.option("max-tokens"))
-            max_tokens_limit = std::stoul(parser.option("max-tokens").argument());
-        if (parser.option("max-bytes")) {
-            max_bytes = std::stoul(parser.option("max-bytes").argument());
-        }
-        else if (parser.option("percent")) {
-            double percent = std::stod(parser.option("percent").argument());
-            max_bytes = static_cast<size_t>(original_size * percent / 100.0);
-            cout << "Processing " << percent << "% of dataset = " << max_bytes << " bytes\n";
-        }
-
-        // Apply size limits to dataset
-        if (max_bytes > 0 && max_bytes < training_text.size()) {
-            training_text.resize(max_bytes);
-            cout << "Limited to " << training_text.size() << " bytes\n";
-        }
-
-        // Determine tokens filename
-        const std::string tokens_file = generate_tokens_filename(max_bytes);
+        // Tokens filename
+        const std::string tokens_file = "dlib_datasets_tokens.bin";
 
         // Tokenizer BPE
         bpe_tokenizer tokenizer;
@@ -471,30 +375,35 @@ int main(int argc, char** argv)
         // For GPU usage (if available)
         std::vector<int> gpus{ 0 };
 
-        // Variables to store tokens
-        std::vector<int> full_tokens;
+        // Variables to store tokens (one vector per segment)
+        std::vector<std::vector<int>> full_tokens;
 
         // Training mode
         if (parser.option("train"))
         {
-            cout << "=== TRAINING MODE ===\n";
-
-            bool tokens_loaded = false;
+            cout << "=== TRAINING MODE ===\n";            
 
             // Check if we should load pre-tokenized tokens
+            bool tokens_loaded = false;
             if (file_exists(tokens_file)) {
                 cout << "Found pre-tokenized tokens file: " << tokens_file << endl;
                 cout << "Loading tokens from file...\n";
-                if (load_tokens_from_file(full_tokens, tokens_file)) {
-                    cout << "Loaded " << full_tokens.size() << " tokens from file.\n";
-                    if (max_tokens_limit > 0 && max_tokens_limit < full_tokens.size()) {
-                        full_tokens.resize(max_tokens_limit);
-                        cout << "Limited to " << full_tokens.size() << " tokens for training.\n";
-                    }
+                try {
+                    dlib::deserialize(tokens_file) >> full_tokens;
+
+                    // Calculate total tokens across all segments
+                    size_t total_tokens = 0;
+                    for (const auto& segment_tokens : full_tokens)
+                        total_tokens += segment_tokens.size();
+
+                    cout << "Loaded " << full_tokens.size() << " segments ("
+                        << total_tokens << " total tokens) from file.\n";
                     tokens_loaded = true;
                 }
-                else {
-                    cerr << "Failed to load tokens from file. Will tokenize again.\n";
+                catch (const std::exception& e) {
+                    cerr << "Failed to load tokens from file: " << e.what()
+                        << "\nWill tokenize again.\n";
+                    full_tokens.clear();
                 }
             }
 
@@ -525,31 +434,42 @@ int main(int argc, char** argv)
                     cout << "Tokenizer saved to " << tokenizer_file << endl;
                 }
 
-                // Tokenize the full text
-                cout << "Tokenizing input text...\n";
+                // Tokenize all text segments
+                cout << "Tokenizing input text segments...\n";
                 int text_start_id = tokenizer.get_special_token_id("<text>"),
                     text_end_id = tokenizer.get_special_token_id("</text>");
                 if (text_start_id < 0 || text_end_id < 0)
                     cout << "Warning: Special tokens not found in tokenizer vocabulary.\n";
+
                 auto start_time = std::chrono::high_resolution_clock::now();
                 full_tokens.clear();
-                full_tokens.push_back(text_start_id);
-                auto encoded_tokens = tokenizer.encode(training_text);
-                full_tokens.insert(full_tokens.end(), encoded_tokens.begin(), encoded_tokens.end());
-                full_tokens.push_back(text_end_id);
+
+                // Process each segment independently with delimiters
+                size_t total_tokens = 0;
+                for (const auto& segment : training_segments) {
+                    std::vector<int> segment_tokens;
+                    segment_tokens.push_back(text_start_id);
+                    auto encoded_tokens = tokenizer.encode(segment);
+                    segment_tokens.insert(segment_tokens.end(), encoded_tokens.begin(), encoded_tokens.end());
+                    segment_tokens.push_back(text_end_id);
+
+                    total_tokens += segment_tokens.size();
+                    full_tokens.push_back(std::move(segment_tokens));
+                }
+
                 auto end_time = std::chrono::high_resolution_clock::now();
                 auto tokenize_time = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
+                cout << "Tokenization complete: " << total_tokens << " total tokens from "
+                    << training_segments.size() << " segments in " << tokenize_time << "s.\n";
 
-                cout << "Tokenization completed in " << tokenize_time << " seconds.\n";
-                cout << "Number of tokens: " << full_tokens.size() << endl;
-
-                // Save tokens for future use
+                // Save tokens for future use using Dlib serialization
                 cout << "Saving tokens to file: " << tokens_file << endl;
-                if (save_tokens_to_file(full_tokens, tokens_file)) {
+                try {
+                    serialize(tokens_file) << full_tokens;
                     cout << "Tokens successfully saved for future use.\n";
                 }
-                else {
-                    cerr << "Warning: Failed to save tokens for future use.\n";
+                catch (const std::exception& e) {
+                    cerr << "Warning: Failed to save tokens: " << e.what() << "\n";
                 }
             }
 
@@ -558,11 +478,13 @@ int main(int argc, char** argv)
             std::vector<matrix<int, 0, 1>> samples;
             std::vector<unsigned long> labels;
 
-            build_single_token_prediction_dataset({ full_tokens }, max_seq_len,
+            build_single_token_prediction_dataset(full_tokens, max_seq_len,
                 tokenizer.get_special_token_id("<pad>"), false,
                 samples, labels);
-            full_tokens.clear();
             cout << "Created " << samples.size() << " training samples\n";
+
+            // Release memory as we no longer need the tokens at this point
+            full_tokens.clear();            
 
             // Build and train the network
             using net_type = my_transformer::network_type<true>;
@@ -626,7 +548,8 @@ int main(int argc, char** argv)
                 epoch++;
             }
 
-            // Save model
+            // Save model and tokenizer
+			cout << "Training complete. Saving model...\n";
             net.clean();
             serialize(model_file) << net << tokenizer;
             cout << "Model saved to " << model_file << "\n";
@@ -681,72 +604,48 @@ int main(int argc, char** argv)
                 return 0;
             }
 
-            // Read beginning of the dataset for prompt
-            std::vector<int> prompt_tokens;
-
-            // Check if we have pre-tokenized tokens
-            if (file_exists(tokens_file)) {
-                cout << "Found pre-tokenized tokens file: " << tokens_file << endl;
-                cout << "Loading tokens for prompt...\n";
-
-                std::ifstream file(tokens_file, std::ios::binary);
-                if (!file) {
-                    cerr << "Failed to open tokens file: " << tokens_file << endl;
-                }
-                else {
-                    // Read total number of tokens
-                    uint64_t num_tokens_in_file;
-                    file.read(reinterpret_cast<char*>(&num_tokens_in_file), sizeof(num_tokens_in_file));
-
-                    // Read only the first max_seq_len tokens
-                    size_t tokens_to_read = std::min(static_cast<size_t>(max_seq_len),
-                        static_cast<size_t>(num_tokens_in_file));
-                    prompt_tokens.resize(tokens_to_read);
-
-                    for (size_t i = 0; i < tokens_to_read; ++i) {
-                        uint32_t t;
-                        file.read(reinterpret_cast<char*>(&t), sizeof(t));
-                        prompt_tokens[i] = static_cast<int>(t);
-                    }
-
-                    cout << "Loaded " << prompt_tokens.size() << " tokens for prompt from file.\n";
-                }
-            }
-
-            // If we couldn't load tokens, tokenize the prompt text
-            if (prompt_tokens.empty()) {
-                cout << "Tokenizing initial prompt from internal dataset...\n";
-
-                // Use beginning of internal dataset for prompt
-                std::string prompt_text = training_text.substr(0, std::min(training_text.size(),
-                    static_cast<size_t>(max_seq_len * 10)));
-
-                int text_start_id = tokenizer.get_special_token_id("<text>");
-                prompt_tokens.clear();
-                prompt_tokens.push_back(text_start_id);
-                auto encoded_tokens = tokenizer.encode(prompt_text);
-                prompt_tokens.insert(prompt_tokens.end(), encoded_tokens.begin(), encoded_tokens.end());
-            }
-
-            // Limit to requested number of tokens
-            if (prompt_tokens.size() > (size_t)max_seq_len) {
-                prompt_tokens.resize(max_seq_len);
-            }
-            else if (prompt_tokens.size() < (size_t)max_seq_len) {
-                cerr << "Warning: Not enough tokens in prompt. Got " << prompt_tokens.size()
-                    << ", needed " << max_seq_len << ".\n";
+            // Load tokenized segments
+            std::vector<std::vector<int>> tokenized_segments;
+            if (!file_exists(tokens_file)) {
+                cerr << "Error: Tokenized file not found. Please run --train first.\n";
                 return 0;
             }
-            cout << "Using " << prompt_tokens.size() << " tokens for initial prompt\n";
 
-            // Put prompt in input sequence
+            cout << "Loading tokenized segments from: " << tokens_file << endl;
+            try {
+                deserialize(tokens_file) >> tokenized_segments;
+                cout << "Loaded " << tokenized_segments.size() << " tokenized segments.\n";
+            }
+            catch (const std::exception& e) {
+                cerr << "Error loading tokens: " << e.what() << "\n";
+                return 0;
+            }
+
+            if (tokenized_segments.empty()) {
+                cerr << "Error: No segments found in tokens file.\n";
+                return 0;
+            }
+
+            // Select a segment for generation (use first segment by default)
+            size_t segment_idx = 0;
+            cout << "Using segment #" << segment_idx << " for generation.\n";
+            const auto& selected_segment = tokenized_segments[segment_idx];
+
+            if (selected_segment.size() < (size_t)max_seq_len) {
+                cerr << "Error: Selected segment has only " << selected_segment.size()
+                    << " tokens, need at least " << max_seq_len << ".\n";
+                return 0;
+            }
+
+            // Extract prompt tokens (first max_seq_len tokens of the segment)
+            std::vector<int> prompt_tokens(selected_segment.begin(),
+                selected_segment.begin() + max_seq_len);
+            cout << "Using " << prompt_tokens.size() << " tokens for initial prompt.\n";
+
+            // Setup inference context
             inference_context llm_context(max_seq_len, 4, tokenizer.get_special_token_id("<pad>"));
             llm_context.add_tokens(prompt_tokens);
             auto input_seq = llm_context.get_input_window();
-
-            // Determine text size to generate
-            size_t target_size = (max_bytes > 0) ? max_bytes : training_text.size();
-            cout << "Will generate approximately " << target_size << " bytes\n";
 
             // Open output file
             std::ofstream outfile(output_file, std::ios::binary);
@@ -758,60 +657,49 @@ int main(int argc, char** argv)
             // Write initial text (corresponding to prompt tokens)
             std::string initial_text = tokenizer.decode(prompt_tokens, false);
             outfile.write(initial_text.c_str(), initial_text.size());
+            outfile.flush();
 
-            // Generate the rest of the text autoregressively
             cout << "Starting autoregressive generation...\n";
 
-            // Buffer for accumulation before writing
-            std::vector<int> token_buffer;
-            const size_t buffer_size = 100;
+            // Generation parameters
+            const size_t tokens_to_generate = selected_segment.size() - max_seq_len;
+            std::vector<int> generated_tokens;
+            generated_tokens.reserve(tokens_to_generate);
 
-            // Save start time to measure execution time
             auto start_time = std::chrono::high_resolution_clock::now();
-            size_t total_bytes = initial_text.size();
-            size_t token_count = prompt_tokens.size();
+            int end_of_text_id = tokenizer.get_special_token_id("</text>");
 
-            // Generate until target size is reached
-            int end_of_text = tokenizer.get_special_token_id("</text>"), next_token = 0;
-            while (total_bytes < target_size && next_token != end_of_text && !g_terminate_flag.load()) {
+            // Generate tokens autoregressively
+            for (size_t i = 0; i < tokens_to_generate && !g_terminate_flag.load(); ++i) {
                 // Predict next token
-                next_token = net(input_seq);
-                token_buffer.push_back(next_token);
-                token_count++;
+                int next_token = net(input_seq);
 
-                // Shift the input window
+                // Stop if end-of-text token is generated
+                if (next_token == end_of_text_id)
+                    break;
+
+                generated_tokens.push_back(next_token);
+
+                // Update context window
                 llm_context.add_token(next_token);
                 input_seq = llm_context.get_input_window();
 
-                // If buffer is full, write to file
-                if (token_buffer.size() >= buffer_size) {
-                    std::string chunk = tokenizer.decode(token_buffer, false);
-                    outfile.write(chunk.c_str(), chunk.size());
-                    total_bytes += chunk.size();
-                    token_buffer.clear();
-
-                    // Display progress
+                // Progress reporting every 50 tokens
+                if ((i + 1) % 50 == 0) {
                     auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
                         std::chrono::high_resolution_clock::now() - start_time).count();
-                    double tokens_per_second = (token_count - input_seq.size()) / (elapsed > 0 ? elapsed : 1);
+                    double tokens_per_sec = (i + 1) / (elapsed > 0 ? elapsed : 1);
 
-                    cout << "Generated " << (token_count - input_seq.size()) << " tokens, "
-                        << total_bytes << " bytes ("
-                        << (total_bytes * 100.0 / target_size) << "%) - "
-                        << tokens_per_second << " tokens/sec - "
-                        << "Est. completion: "
-                        << (int)((target_size - total_bytes) / (tokens_per_second * (chunk.size() / (double)buffer_size)))
-                        << " seconds\r";
+                    cout << "Generated " << (i + 1) << "/" << tokens_to_generate
+                        << " tokens (" << ((i + 1) * 100.0 / tokens_to_generate) << "%) - "
+                        << tokens_per_sec << " tokens/sec\r";
+                    cout.flush();
                 }
-                if (max_tokens_limit > 0 && token_count >= max_tokens_limit) break;
             }
 
-            // Flush remaining buffer
-            if (!token_buffer.empty()) {
-                std::string chunk = tokenizer.decode(token_buffer, false);
-                outfile.write(chunk.c_str(), chunk.size());
-                total_bytes += chunk.size();
-            }
+            // Write generated text to file
+            std::string generated_text = tokenizer.decode(generated_tokens, false);
+            outfile.write(generated_text.c_str(), generated_text.size());
             outfile.flush();
             outfile.close();
 
@@ -819,37 +707,10 @@ int main(int argc, char** argv)
             auto total_time = std::chrono::duration_cast<std::chrono::seconds>(
                 end_time - start_time).count();
 
-            cout << "\nGeneration complete in " << total_time << " seconds! (100%)\n";
-            cout << "Generated " << (token_count - input_seq.size()) << " tokens after prompt, "
-                << total_bytes << " bytes total\n";
+            cout << "\nGeneration complete in " << total_time << " seconds!\n";
+            cout << "Generated " << generated_tokens.size() << " tokens\n";
+            cout << "Total output: " << (initial_text.size() + generated_text.size()) << " bytes\n";
             cout << "Output saved to " << output_file << "\n";
-        }
-
-        // Verification mode - Compare original and generated file
-        if (parser.option("verify"))
-        {
-            cout << "=== VERIFICATION MODE ===\n";
-
-            if (!file_exists(output_file)) {
-                cerr << "Error: Generated file not found at " << output_file << "\n";
-                return 0;
-            }
-
-            // Read generated file
-            cout << "Reading generated file...\n";
-            std::string generated = read_file_content(output_file);
-
-            // Read the same portion of original dataset
-            cout << "Reading original dataset (same size as generated)...\n";
-            std::string original = training_text.substr(0, std::min(training_text.size(), generated.size()));
-
-            cout << "Verifying byte-for-byte match...\n";
-            bool verify = verify_match(original, generated);
-
-            if (verify)
-                cout << "SUCCESS: The generated file matches the original text perfectly!\n";
-            else
-                cout << "FAILED: The generated file does not match the original text.\n";
         }
 
         return 0;
