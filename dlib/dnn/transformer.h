@@ -482,7 +482,7 @@ namespace dlib
 
     template<
         typename EXPERT_NET,                    // Expert network architecture
-        long top_k,                             // Number of experts to activate (0 = auto)
+        long top_e,                             // Number of experts to activate (0 = auto)
         typename MODE,                          // Tag-based mode selection
         template<typename> class TAG,           // Tag for gate input
         typename SUBNET                         // Input subnet type
@@ -500,7 +500,7 @@ namespace dlib
             n_experts(0),
             balance_loss_weight(0.01f),
             noise_scale(0.2f),
-            top_n(top_k),
+            top_n(top_e),
             usage_update_rate(0.05f)
         {
         }
@@ -542,7 +542,7 @@ namespace dlib
             SETUP
                 Initializes expert networks based on gate output dimensions.
                 The number of experts is automatically determined from gate_input.k().
-                If top_k == 0 (auto mode), activates 20% of experts by default.
+                If top_e == 0 (auto mode), activates 20% of experts by default.
         !*/
         template <typename SUBNET_TYPE>
         void setup(const SUBNET_TYPE& sub) {
@@ -561,13 +561,13 @@ namespace dlib
                 for (long i = 0; i < n_experts; ++i)
                     experts.emplace_back(EXPERT_NET{});
 
-                // Set top-k if auto mode (top_k == 0)
-                if (top_k == 0) {
+                // Set top-e if auto mode (top_e == 0)
+                if (top_e == 0) {
                     // Use 20% of experts by default
                     top_n = std::max(1L, static_cast<long>(std::floor(n_experts * 0.2f)));
                 }
                 else {
-                    top_n = std::min(top_k, n_experts);
+                    top_n = std::min(top_e, n_experts);
                 }
 
                 // Initialize expert networks with proper forward pass
@@ -952,23 +952,23 @@ namespace dlib
 
     template<
         typename EXPERT_NET,
-        long top_k,
+        long top_e,
         typename MODE,
         template<typename> class TAG,
         typename SUBNET
     >
-    using moe = add_layer<moe_<EXPERT_NET, top_k, MODE, TAG, SUBNET>, SUBNET>;
+    using moe = add_layer<moe_<EXPERT_NET, top_e, MODE, TAG, SUBNET>, SUBNET>;
 
     // This is a drop-in replacement for standard transformer feed-forward layers
     template<
         typename EXPERT_NET,
         long num_experts,
-        long top_k,
+        long top_e,
         typename MODE,
         template <typename> class DO,
         typename SUBNET
     >
-    using moe_ffn = add_prev8<moe<EXPERT_NET, top_k, MODE, tag9, rms_norm<skip8<
+    using moe_ffn = add_prev8<moe<EXPERT_NET, top_e, MODE, tag9, rms_norm<skip8<
         tag9<gate<num_experts, DO, tag8<SUBNET>>>>>>>;
 }
 
