@@ -300,7 +300,7 @@ int main(int argc, char** argv)
         parser.add_option("beta1", "Set Adam's first moment coefficient (default: 0.9)", 1);
         parser.add_option("beta2", "Set Adam's second moment coefficient (default: 0.999)", 1);
         parser.add_option("model-file", "Path for model (default: dlib_lm_moe_model.dat)", 1);
-        parser.add_option("tokenizer-file", "Path for tokenizer (default: dlib_lm_tokenizer.vocab)", 1);
+        parser.add_option("tokenizer-file", "Path for tokenizer (default: dlib_lm_tokenizer_3k.vocab)", 1);
         parser.add_option("output-file", "Path for generated output (default: generated_text.txt)", 1);
         parser.parse(argc, argv);
 
@@ -320,7 +320,7 @@ int main(int argc, char** argv)
         const double beta1 = get_option(parser, "beta1", 0.9);
         const double beta2 = get_option(parser, "beta2", 0.999);
         const std::string model_file = get_option(parser, "model-file", "dlib_lm_moe_model.dat");
-        const std::string tokenizer_file = get_option(parser, "tokenizer-file", "dlib_lm_tokenizer.vocab");
+        const std::string tokenizer_file = get_option(parser, "tokenizer-file", "dlib_lm_tokenizer_3k.vocab");
         const std::string output_file = get_option(parser, "output-file", "generated_text.txt");
 
         // Model architecture parameters
