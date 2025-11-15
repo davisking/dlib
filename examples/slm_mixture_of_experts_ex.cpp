@@ -134,7 +134,7 @@ namespace dlib
                     << "- Embedding dimension: " << EMBEDDING_DIM << "\n"
                     << "- Sequence length: " << MAX_SEQ_LEN << "\n"
                     << "- Architecture: Transformer with MoE feed-forward layers\n"
-                    << "- Experts per layer: 4 (auto top-k selection)";
+                    << "- Experts per layer: 4 (auto top-n selection)";
                 return ss.str();
             }
         };
@@ -225,7 +225,7 @@ struct moe_param_info
             << "Total network parameters:\n"
             << "  Other layers (attn, embed, etc.): " << other_params << " params\n"
             << "  Training (all experts): " << total_training_params << " params\n"
-            << "  Inference (top-k experts): " << total_inference_params << " params\n\n"
+            << "  Inference (top-n experts): " << total_inference_params << " params\n\n"
             << "Efficiency:\n"
             << "  Inference uses " << (efficiency_ratio * 100.0f) << "% of training params\n"
             << "  Savings: " << ((1.0f - efficiency_ratio) * 100.0f) << "% fewer active params\n\n";
@@ -265,7 +265,7 @@ moe_param_info get_moe_param_info(const net_type& net, long num_layers)
         (info.num_experts * info.expert_params);
     info.total_training_params = info.other_params + moe_training_params;
 
-    // Calculate active parameters during inference (only top-k experts)
+    // Calculate active parameters during inference (only top-n experts)
     size_t moe_inference_params = info.num_moe_layers *
         (info.top_n * info.expert_params);
     info.total_inference_params = info.other_params + moe_inference_params;
@@ -293,8 +293,8 @@ int main(int argc, char** argv)
         parser.add_option("train", "Train a transformer model on internal datasets");
         parser.add_option("generate", "Generate text from a previously trained model");
         parser.add_option("learning-rate", "Set the learning rate (default: 2e-4)", 1);
-        parser.add_option("batch-size", "Set the mini-batch size (default: 128)", 1);
-        parser.add_option("patience", "Iterations without progress before early stopping (default: 7500)", 1);
+        parser.add_option("batch-size", "Set the mini-batch size (default: 64)", 1);
+        parser.add_option("patience", "Iterations without progress before early stopping (default: 8000)", 1);
         parser.add_option("max-epochs", "Maximum number of training epochs (default: 800)", 1);
         parser.add_option("alpha", "Set the weight decay for Adam (default: 0.004)", 1);
         parser.add_option("beta1", "Set Adam's first moment coefficient (default: 0.9)", 1);
@@ -313,8 +313,8 @@ int main(int argc, char** argv)
 
         // Default values
         const double learning_rate = get_option(parser, "learning-rate", 2e-4);
-        const size_t batch_size = get_option(parser, "batch-size", 128);
-        const long patience = get_option(parser, "patience", 7500);
+        const size_t batch_size = get_option(parser, "batch-size", 64);
+        const long patience = get_option(parser, "patience", 8000);
         const size_t max_epochs = get_option(parser, "max-epochs", 800);
         const double alpha = get_option(parser, "alpha", 0.004);
         const double beta1 = get_option(parser, "beta1", 0.9);
@@ -324,11 +324,11 @@ int main(int argc, char** argv)
         const std::string output_file = get_option(parser, "output-file", "generated_text.txt");
 
         // Model architecture parameters
-        const long num_tokens = 2500;
+        const long num_tokens = 3000;
         const long num_layers = 4;
-        const long num_heads = 6;
-        const long embedding_dim = 228;
-        const long max_seq_len = 60;
+        const long num_heads = 8;
+        const long embedding_dim = 256;
+        const long max_seq_len = 128;
 
         // Define transformer configuration with MoE
         using my_transformer = transformer_config<
