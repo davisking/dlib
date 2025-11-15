@@ -939,9 +939,9 @@ namespace dlib
 
         // Core parameters
         long n_experts;                          // Number of expert networks (auto-detected from gate)
-        long top_n;                              // Number of experts to activate per sample
         float balance_loss_weight;               // Auxiliary loss weight for load balancing
         float noise_scale;                       // Exploration noise magnitude (training only)
+        long top_n;                              // Number of experts to activate per sample
         float usage_update_rate;                 // EMA smoothing factor for usage statistics
 
         // Expert networks and tracking
