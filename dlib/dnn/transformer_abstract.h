@@ -616,7 +616,7 @@ namespace dlib
 
     template
         typename EXPERT_NET,
-        long top_k,
+        long top_e,
         typename MODE,
         template<typename> class TAG,
         typename SUBNET
@@ -627,7 +627,7 @@ class moe_
             REQUIREMENTS ON TEMPLATE PARAMETERS
                 - EXPERT_NET must be a valid Dlib network type that can process tensors
                   through its forward() and back_propagate_error() methods
-                - top_k >= 0 (use 0 for automatic selection of 20% of available experts)
+                - top_e >= 0 (use 0 for automatic selection of 20% of available experts)
                 - MODE must be either training_mode_tag or inference_mode_tag
                 - TAG must be a valid layer tag template (e.g., tag9, tag8, etc.)
                 - SUBNET must be a valid Dlib network type
@@ -696,14 +696,14 @@ class moe_
 
             TEMPLATE PARAMETERS
                 - EXPERT_NET: network architecture for each expert (e.g., feed-forward block)
-                - top_k: number of experts to activate per sample (0 auto-select 20%)
+                - top_e: number of experts to activate per sample (0 auto-select 20%)
                 - MODE: compile-time mode tag (training_mode_tag or inference_mode_tag)
                 - TAG: layer tag for accessing gate network output
 
             HYPERPARAMETERS
                 The following hyperparameters control MoE behavior (set to sensible defaults):
-                - balance_loss_weight (0.01): weight for auxiliary load balancing loss
-                - noise_scale (0.2): standard deviation of exploration noise (training only)
+                - balance_loss_weight (0.001): weight for auxiliary load balancing loss
+                - noise_scale (0.05): standard deviation of exploration noise (training only)
                 - usage_update_rate (0.05): EMA smoothing factor for usage statistics
         !*/
 
@@ -712,10 +712,10 @@ class moe_
         /*!
             ensures
                 - #num_experts() == 0 (experts are created during setup() based on gate)
-                - #num_active_experts() == top_k (or will be auto-selected if top_k == 0)
+                - #num_active_experts() == top_e (or will be auto-selected if top_e == 0)
                 - Initializes hyperparameters with default values:
-                    * balance_loss_weight = 0.01
-                    * noise_scale = 0.2 (for training exploration)
+                    * balance_loss_weight = 0.001
+                    * noise_scale = 0.05 (for training exploration)
                     * usage_update_rate = 0.05 (for EMA tracking)
         !*/
 
@@ -742,8 +742,8 @@ class moe_
                 - Initializes the MoE layer based on gate network output:
                     * Creates E expert network instances (E = gate output dimension k)
                     * #num_experts() == E
-                    * If top_k == 0: #num_active_experts() == max(1, floor(E * 0.2))
-                    * If top_k > 0: #num_active_experts() == min(top_k, E)
+                    * If top_e == 0: #num_active_experts() == max(1, floor(E * 0.2))
+                    * If top_e > 0: #num_active_experts() == min(top_e, E)
         !*/
 
         template <typename SUBNET_TYPE>
@@ -863,17 +863,17 @@ class moe_
 
     template<
         typename EXPERT_NET,
-        long top_k,
+        long top_e,
         typename MODE,
         template<typename> class TAG,
         typename SUBNET
     >
-    using moe = add_layer<moe_<EXPERT_NET, top_k, MODE, TAG, SUBNET>, SUBNET>;
+    using moe = add_layer<moe_<EXPERT_NET, top_e, MODE, TAG, SUBNET>, SUBNET>;
 
     template<
         typename EXPERT_NET,
         long num_experts,
-        long top_k,
+        long top_e,
         typename MODE,
         template <typename> class DO,
         typename SUBNET
@@ -887,7 +887,7 @@ class moe_
         TEMPLATE PARAMETERS
             - EXPERT_NET: expert network architecture (typically feed-forward network)
             - num_experts: total number of experts in the mixture
-            - top_k: number of experts to activate per forward pass
+            - top_e: number of experts to activate per forward pass
             - MODE: training_mode_tag or inference_mode_tag
             - DO: dropout policy template
     !*/

@@ -50,7 +50,7 @@ namespace dlib
 {
     // Expert network architecture for MoE layer
     template <template <typename> class DO, long d_model>
-    using expert_net_type = swiglu<DO, d_model, input<matrix<float>>>;
+    using expert_net_type = swiglu<DO, d_model, input_tensor>;
 
     /*!
         Complete transformer block with MoE-based feed-forward layer.
@@ -326,9 +326,9 @@ int main(int argc, char** argv)
         // Model architecture parameters
         const long num_tokens = 3000;
         const long num_layers = 4;
-        const long num_heads = 8;
-        const long embedding_dim = 256;
-        const long max_seq_len = 128;
+        const long num_heads = 6;
+        const long embedding_dim = 228;
+        const long max_seq_len = 100;
 
         // Define transformer configuration with MoE
         using my_transformer = transformer_config<

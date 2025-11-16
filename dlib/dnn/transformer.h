@@ -474,44 +474,52 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+    // Gate network: produces raw logits for expert selection
     template <long num_experts, template <typename> class DO, typename SUBNET>
-    using gate = softmax<fc<num_experts, DO<leaky_relu<fc<num_experts * 6, SUBNET>>>>>;
+    using gate = fc<num_experts, DO<leaky_relu<fc<num_experts, SUBNET>>>>;
 
     struct training_mode_tag {};
     struct inference_mode_tag {};
 
     template<
         typename EXPERT_NET,                    // Expert network architecture
-        long top_e,                             // Number of experts to activate (0 = auto)
-        typename MODE,                          // Tag-based mode selection
-        template<typename> class TAG,           // Tag for gate input
+        long top_e,                             // Number of experts to activate (0 = auto: 20%)
+        typename MODE,                          // Tag-based mode selection (training/inference)
+        template<typename> class TAG,           // Tag for gate input location
         typename SUBNET                         // Input subnet type
     >
     class moe_
     {
     public:
         /*!
-            Initializes hyperparameters with sensible defaults:
-            - balance_loss_weight: controls strength of load balancing
-            - noise_scale: exploration noise during training
-            - usage_update_rate: exponential moving average rate for usage stats
+            Mixture of Experts layer with sample-wise expert routing.
+
+            Key features:
+            - Each sample independently selects top-k experts via gating network
+            - Gate produces logits, optional noise added before softmax (training only)
+            - Forward/backward consistency via cached expert selections
+            - Tracks expert usage statistics for monitoring
+
+            Hyperparameters:
+            - noise_scale: Gaussian noise std applied to gate logits (exploration)
+            - usage_update_rate: EMA smoothing for usage statistics
         !*/
         explicit moe_() :
             n_experts(0),
-            balance_loss_weight(0.01f),
-            noise_scale(0.2f),
+            noise_scale(0.0f),
             top_n(top_e),
-            usage_update_rate(0.05f)
+            usage_update_rate(0.05f),
+            cached_batch_size_(0)
         {
         }
 
         moe_(const moe_& other) :
             n_experts(other.n_experts),
-            balance_loss_weight(other.balance_loss_weight),
             noise_scale(other.noise_scale),
             top_n(other.top_n),
             usage_update_rate(other.usage_update_rate),
-            expert_usage(other.expert_usage)
+            expert_usage(other.expert_usage),
+            cached_batch_size_(0)
         {
             // Deep copy of expert networks
             experts.reserve(other.experts.size());
@@ -523,11 +531,11 @@ namespace dlib
         {
             if (this != &other) {
                 n_experts = other.n_experts;
-                balance_loss_weight = other.balance_loss_weight;
                 noise_scale = other.noise_scale;
                 top_n = other.top_n;
                 usage_update_rate = other.usage_update_rate;
                 expert_usage = other.expert_usage;
+                cached_batch_size_ = 0;
 
                 // Deep copy of expert networks
                 experts.clear();
@@ -541,14 +549,13 @@ namespace dlib
         /*!
             SETUP
                 Initializes expert networks based on gate output dimensions.
-                The number of experts is automatically determined from gate_input.k().
-                If top_e == 0 (auto mode), activates 20% of experts by default.
+                - Number of experts automatically determined from gate output channels
+                - If top_e == 0 (auto mode), activates 20% of experts (minimum 1)
         !*/
         template <typename SUBNET_TYPE>
         void setup(const SUBNET_TYPE& sub) {
-            // Get gate output to determine number of experts
-            const tensor& gate_input = layer<TAG>(sub).get_output();
-            long new_n_experts = gate_input.k();
+            const tensor& gate_output = layer<TAG>(sub).get_output();
+            long new_n_experts = gate_output.k();
 
             // Initialize experts if needed
             if (new_n_experts != n_experts) {
@@ -561,104 +568,136 @@ namespace dlib
                 for (long i = 0; i < n_experts; ++i)
                     experts.emplace_back(EXPERT_NET{});
 
-                // Set top-e if auto mode (top_e == 0)
+                // Determine top-k activation count
                 if (top_e == 0) {
-                    // Use 20% of experts by default
+                    // Auto mode: activate 20% of experts (minimum 1)
                     top_n = std::max(1L, static_cast<long>(std::floor(n_experts * 0.2f)));
                 }
                 else {
                     top_n = std::min(top_e, n_experts);
                 }
-
-                // Initialize expert networks with proper forward pass
-                initialize_experts(sub.get_output());
             }
         }
 
         /*!
             FORWARD PASS
-                Process:
-                1. Extract gate probabilities for each sample independently
-                2. For each sample:
-                   a. Add exploration noise during training
-                   b. Select top-k experts based on (possibly noisy) probabilities
-                   c. Normalize expert weights
-                   d. Route sample through selected experts
-                   e. Combine expert outputs with normalized weights
-                3. Update global expert usage statistics for load balancing
+                Sample-wise expert routing with optional exploration noise.
+
+                Process per sample:
+                1. Retrieve gate logits for this sample
+                2. Add Gaussian noise to logits (training only, if noise_scale > 0)
+                3. Apply softmax to obtain expert probabilities
+                4. Select top-k experts with highest probabilities
+                5. Renormalize top-k weights to sum to 1
+                6. Route sample through selected experts with weighted combination
+                7. Cache expert indices and weights for backward pass
+
+                The cache ensures forward/backward consistency: backward uses the
+                exact same experts and weights, even with stochastic noise.
         !*/
         template <typename SUBNET_TYPE>
         void forward(const SUBNET_TYPE& sub, resizable_tensor& output)
         {
             const tensor& expert_input = sub.get_output();
-            const tensor& gate_input = layer<TAG>(sub).get_output();
+            const tensor& gate_logits = layer<TAG>(sub).get_output();
 
-            DLIB_CASSERT(gate_input.k() == n_experts &&
-                gate_input.nr() == 1 && gate_input.nc() == 1,
+            DLIB_CASSERT(gate_logits.k() == n_experts &&
+                gate_logits.nr() == 1 && gate_logits.nc() == 1,
                 "\nExpected gate output shape [batch_size, " << n_experts << ", 1, 1]"
-                << "\nReceived shape [" << gate_input.num_samples() << ", "
-                << gate_input.k() << ", " << gate_input.nr() << ", "
-                << gate_input.nc() << "]");
+                << "\nReceived shape [" << gate_logits.num_samples() << ", "
+                << gate_logits.k() << ", " << gate_logits.nr() << ", "
+                << gate_logits.nc() << "]");
 
-            const long num_samples = gate_input.num_samples();
+            const long num_samples = gate_logits.num_samples();
             const long k = expert_input.k();
             const long nr = expert_input.nr();
             const long nc = expert_input.nc();
             const long sample_size = k * nr * nc;
-            const float* gate_probs = gate_input.host();
+            const float* logits_data = gate_logits.host();
 
             // Initialize output tensor
             output.copy_size(expert_input);
             output = 0;
 
-            // Track expert usage across batch for load balancing
+            // Prepare forward pass cache for backward consistency
+            if (std::is_same<MODE, training_mode_tag>::value) {
+                cached_batch_size_ = num_samples;
+                selected_expert_indices_.resize(num_samples);
+                selected_expert_weights_.resize(num_samples);
+            }
+
+            // Track expert usage for monitoring
             std::vector<float> batch_expert_usage(n_experts, 0.0f);
 
-            // Create alias_tensor for zero-copy sample extraction
             alias_tensor sample_alias(1, k, nr, nc);
 
             // Process each sample independently with its own expert routing
             for (long n = 0; n < num_samples; ++n) {
-                // Get gate probabilities for this specific sample
-                const float* sample_gates = gate_probs + n * n_experts;
+                const float* sample_logits = logits_data + n * n_experts;
 
-                // Build scored expert list
-                std::vector<std::pair<float, size_t>> expert_scores;
-                expert_scores.reserve(n_experts);
-
+                // Apply optional Gaussian noise to logits before softmax
+                std::vector<float> noisy_logits(n_experts);
                 for (long e = 0; e < n_experts; ++e) {
-                    float score = sample_gates[e];
+                    noisy_logits[e] = sample_logits[e];
 
-                    // Add exploration noise during training to encourage diversity
                     if (std::is_same<MODE, training_mode_tag>::value && noise_scale > 0) {
                         static thread_local dlib::rand rnd(std::time(0));
-                        score += noise_scale * (rnd.get_random_float() - 0.5f) * 2.0f;
+                        noisy_logits[e] += noise_scale * rnd.get_random_gaussian();
                     }
-
-                    expert_scores.emplace_back(score, e);
                 }
 
-                // Select top-k experts
+                // Softmax: numerically stable implementation
+                float max_logit = *std::max_element(noisy_logits.begin(), noisy_logits.end());
+
+                std::vector<float> exp_logits(n_experts);
+                float sum_exp = 0.0f;
+                for (long e = 0; e < n_experts; ++e) {
+                    exp_logits[e] = std::exp(noisy_logits[e] - max_logit);
+                    sum_exp += exp_logits[e];
+                }
+
+                std::vector<float> probs(n_experts);
+                for (long e = 0; e < n_experts; ++e)
+                    probs[e] = exp_logits[e] / sum_exp;
+
+                // Select top-k experts by probability
+                std::vector<std::pair<float, size_t>> expert_scores;
+                expert_scores.reserve(n_experts);
+                for (long e = 0; e < n_experts; ++e)
+                    expert_scores.emplace_back(probs[e], e);
+
                 std::partial_sort(expert_scores.begin(),
                     expert_scores.begin() + top_n,
                     expert_scores.end(),
-                    [](const auto& a, const auto& b) {
-                    return a.first > b.first;
-                });
+                    [](const auto& a, const auto& b) { return a.first > b.first; });
 
-                // Normalize weights of selected experts
+                // Renormalize top-k weights to sum to 1
                 float sum_weights = 0.0f;
                 for (long i = 0; i < top_n; ++i)
-                    sum_weights += std::max(0.0f, expert_scores[i].first);
+                    sum_weights += expert_scores[i].first;
 
-                // Handle edge case of zero total weight
+                // Safety: handle degenerate case (should be extremely rare with softmax)
                 if (sum_weights < 1e-8f) {
                     sum_weights = top_n;
                     for (long i = 0; i < top_n; ++i)
                         expert_scores[i].first = 1.0f;
                 }
 
-                // Create zero-copy views
+                for (long i = 0; i < top_n; ++i)
+                    expert_scores[i].first /= sum_weights;
+
+                // Cache selection for backward pass
+                if (std::is_same<MODE, training_mode_tag>::value) {
+                    selected_expert_indices_[n].resize(top_n);
+                    selected_expert_weights_[n].resize(top_n);
+
+                    for (long i = 0; i < top_n; ++i) {
+                        selected_expert_indices_[n][i] = expert_scores[i].second;
+                        selected_expert_weights_[n][i] = expert_scores[i].first;
+                    }
+                }
+
+                // Zero-copy views into input and output tensors
                 const long sample_offset = n * sample_size;
                 auto sample_input = sample_alias(expert_input, sample_offset);
                 auto sample_output = sample_alias(output, sample_offset);
@@ -666,21 +705,18 @@ namespace dlib
                 // Route through selected experts and accumulate weighted outputs
                 for (long i = 0; i < top_n; ++i) {
                     const size_t expert_idx = expert_scores[i].second;
-                    const float weight = expert_scores[i].first / sum_weights;
+                    const float weight = expert_scores[i].first;
 
-                    // Forward this sample through the selected expert
                     experts[expert_idx].forward(sample_input);
                     const auto& expert_out = experts[expert_idx].get_output();
 
-                    // Add weighted expert output to this sample's position
                     tt::add(1, sample_output, weight, expert_out);
 
-                    // Track usage for load balancing
                     batch_expert_usage[expert_idx] += weight;
                 }
             }
 
-            // Update exponential moving average of expert usage
+            // Update exponential moving average of expert usage (for monitoring)
             if (std::is_same<MODE, training_mode_tag>::value && usage_update_rate > 0) {
                 for (long e = 0; e < n_experts; ++e) {
                     float avg_usage = batch_expert_usage[e] / num_samples;
@@ -692,80 +728,52 @@ namespace dlib
 
         /*!
             BACKWARD PASS
-                Process:
-                1. For each sample:
-                   a. Reconstruct expert selection (same logic as forward)
-                   b. Scale incoming gradient by expert weights
-                   c. Optionally add auxiliary load balancing gradient
-                   d. Backpropagate through each activated expert
-                   e. Accumulate expert gradients to input
-                2. Gradients flow back to gate network automatically via Dlib's graph
+                Backpropagates gradients through cached expert selections.
 
-            LOAD BALANCING
-                Auxiliary loss encourages balanced expert usage by adding a small
-                gradient term proportional to usage variance. This gradient affects
-                both the expert outputs and (via backprop) the gate network.
+                Process per sample:
+                1. Retrieve cached expert indices and weights from forward pass
+                2. For each selected expert:
+                   a. Scale incoming gradient by expert's weight
+                   b. Backpropagate through expert network
+                   c. Accumulate expert's input gradient
+
+                Note: Gradients automatically flow back to gate network through
+                Dlib's computational graph without explicit implementation here.
         !*/
         template <typename SUBNET_TYPE>
         void backward(const tensor& gradient_input, SUBNET_TYPE& sub, tensor& params_grad)
         {
             tensor& expert_input_grad = sub.get_gradient_input();
-            expert_input_grad = 0;  // Initialize gradient accumulator
+            expert_input_grad = 0;
 
             const tensor& expert_input = sub.get_output();
-            const tensor& gate_input = layer<TAG>(sub).get_output();
-            const long num_samples = gate_input.num_samples();
+            const long num_samples = cached_batch_size_;
             const long k = gradient_input.k();
             const long nr = gradient_input.nr();
             const long nc = gradient_input.nc();
             const long sample_size = k * nr * nc;
-            const float* gate_probs = gate_input.host();
 
-            // Compute auxiliary load balancing loss factor
-            float aux_loss_factor = 0.0f;
-            if (std::is_same<MODE, training_mode_tag>::value)
-                aux_loss_factor = compute_auxiliary_loss();
+            DLIB_CASSERT(num_samples == (long)selected_expert_indices_.size(),
+                "Forward pass cache missing or invalid in backward pass");
 
-            // Create alias_tensor for zero-copy slicing
             alias_tensor sample_alias(1, k, nr, nc);
 
-            // Backpropagate through each sample independently
             for (long n = 0; n < num_samples; ++n) {
-                const float* sample_gates = gate_probs + n * n_experts;
-
-                // Reconstruct expert selection
-                std::vector<std::pair<float, size_t>> expert_scores;
-                expert_scores.reserve(n_experts);
-
-                for (long e = 0; e < n_experts; ++e)
-                    expert_scores.emplace_back(sample_gates[e], e);
-
-                std::partial_sort(expert_scores.begin(),
-                    expert_scores.begin() + top_n,
-                    expert_scores.end(),
-                    [](const auto& a, const auto& b) {
-                    return a.first > b.first;
-                });
-
-                float sum_weights = 0.0f;
-                for (long i = 0; i < top_n; ++i)
-                    sum_weights += std::max(0.0f, expert_scores[i].first);
-                if (sum_weights < 1e-8f) sum_weights = top_n;
-
-                // Calculate offset
                 const long sample_offset = n * sample_size;
 
-                // Create zero-copy views
                 auto sample_grad = sample_alias(gradient_input, sample_offset);
                 auto sample_input = sample_alias(expert_input, sample_offset);
                 auto sample_input_grad = sample_alias(expert_input_grad, sample_offset);
 
-                // Backprop through each activated expert
-                for (long i = 0; i < top_n; ++i) {
-                    const size_t expert_idx = expert_scores[i].second;
-                    float weight = expert_scores[i].first / sum_weights;
+                // Use cached expert routing from forward pass
+                const auto& expert_indices = selected_expert_indices_[n];
+                const auto& expert_weights = selected_expert_weights_[n];
 
-                    // Create weighted gradient: copy and scale in one pass
+                for (size_t i = 0; i < expert_indices.size(); ++i) {
+                    const size_t expert_idx = expert_indices[i];
+                    const float weight = expert_weights[i];
+
+                    // Scale gradient by expert weight
                     resizable_tensor weighted_grad;
                     weighted_grad.copy_size(sample_grad);
 
@@ -774,27 +782,16 @@ namespace dlib
                     std::transform(src_data, src_data + sample_size, dst_data,
                         [weight](float v) { return v * weight; });
 
-                    // Add auxiliary load balancing gradient if needed
-                    if (aux_loss_factor > 0) {
-                        const auto& expert_out = experts[expert_idx].get_output();
-                        tt::add(1, weighted_grad, aux_loss_factor, expert_out);
-                    }
-
-                    // Backpropagate through expert network
+                    // Backpropagate through expert
                     experts[expert_idx].back_propagate_error(sample_input, weighted_grad);
                     const auto& expert_grad = experts[expert_idx].get_gradient_input();
 
-                    // Accumulate expert gradient
+                    // Accumulate gradient
                     tt::add(1, sample_input_grad, 1, expert_grad);
                 }
             }
         }
 
-        /*!
-            Cleans up internal expert networks by calling their clean() methods
-            if available. This is typically called after training to prepare
-            the network for inference or serialization.
-        !*/
         void clean()
         {
             for (auto& expert : experts)
@@ -804,24 +801,21 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        /*!
-            Provides direct access to expert networks for inspection or modification.
-            Useful for debugging or implementing custom expert-specific operations.
-        !*/
+        // Direct access to expert networks (for inspection/debugging)
         EXPERT_NET& get_expert(size_t idx) {
             DLIB_CASSERT(idx < experts.size(), "Expert index out of bounds");
             return experts[idx];
-        }        
+        }
+
         const EXPERT_NET& get_expert(size_t idx) const {
             DLIB_CASSERT(idx < experts.size(), "Expert index out of bounds");
             return experts[idx];
         }
 
+        // Accessors
         long num_experts() const { return n_experts; }
         long num_active_experts() const { return top_n; }
         bool is_training_mode() const { return std::is_same<MODE, training_mode_tag>::value; }
-
-        // Access to usage statistics for monitoring
         const std::vector<float>& get_expert_usage() const { return expert_usage; }
 
         friend void serialize(const moe_& item, std::ostream& out)
@@ -829,7 +823,6 @@ namespace dlib
             serialize("moe_", out);
             serialize(item.n_experts, out);
             serialize(item.top_n, out);
-            serialize(item.balance_loss_weight, out);
             serialize(item.noise_scale, out);
             serialize(item.usage_update_rate, out);
             serialize(item.experts, out);
@@ -845,11 +838,12 @@ namespace dlib
 
             deserialize(item.n_experts, in);
             deserialize(item.top_n, in);
-            deserialize(item.balance_loss_weight, in);
             deserialize(item.noise_scale, in);
             deserialize(item.usage_update_rate, in);
             deserialize(item.experts, in);
             deserialize(item.expert_usage, in);
+
+            item.cached_batch_size_ = 0;
         }
 
         friend std::ostream& operator<<(std::ostream& out, const moe_& item)
@@ -857,8 +851,9 @@ namespace dlib
             const bool is_training = std::is_same<MODE, training_mode_tag>::value;
             out << "moe"
                 << " (experts=" << item.n_experts
-                << ", top_n=" << item.top_n
-                << ", mode=" << (is_training ? "train" : "infer") << ")";
+                << ", top_k=" << item.top_n
+                << ", mode=" << (is_training ? "train" : "infer")
+                << ", noise=" << item.noise_scale << ")";
             return out;
         }
 
@@ -867,64 +862,13 @@ namespace dlib
             const bool is_training = std::is_same<MODE, training_mode_tag>::value;
             out << "<moe>\n";
             out << "  <num_experts>" << item.n_experts << "</num_experts>\n";
-            out << "  <top_n>" << item.top_n << "</top_n>\n";
-            out << "  <balance_weight>" << item.balance_loss_weight << "</balance_weight>\n";
+            out << "  <top_k>" << item.top_n << "</top_k>\n";
             out << "  <noise_scale>" << item.noise_scale << "</noise_scale>\n";
-            out << "  <training>" << is_training << "</training>\n";
+            out << "  <mode>" << (is_training ? "training" : "inference") << "</mode>\n";
             out << "</moe>\n";
         }
 
     private:
-        /*!
-            Ensures all expert networks are properly set up with correct dimensions
-            before actual training begins.
-        !*/
-        void initialize_experts(const tensor& expert_input) {
-            const long nr = expert_input.nr();
-            const long nc = expert_input.nc();
-
-            // Create dummy input matching dimensions
-            matrix<float> input_data(nr, nc);
-            input_data = 0.0f;
-
-            resizable_tensor input_tensor(1, 1, nr, nc);
-            std::vector<matrix<float>> x(1, input_data);
-
-            // Forward through each expert to initialize
-            for (size_t i = 0; i < experts.size(); ++i)
-                experts[i].to_tensor(&x[0], &x[0] + 1, input_tensor);
-        }
-
-        /*!
-            Computes auxiliary load balancing loss as the coefficient of variation
-            (normalized standard deviation) of expert usage. High variance indicates
-            imbalanced usage, which the loss penalizes.
-
-            Returns a scaling factor to be applied to gradients for load balancing.
-        !*/
-        float compute_auxiliary_loss() const {
-            if (n_experts < 2 || balance_loss_weight <= 0.0f) return 0.0f;
-
-            // Compute mean usage across experts
-            float mean_usage = std::accumulate(expert_usage.begin(),
-                expert_usage.end(), 0.0f) / n_experts;
-
-            if (mean_usage < 1e-8f) return 0.0f;
-
-            // Compute variance of usage
-            float variance = 0.0f;
-            for (float usage : expert_usage) {
-                float diff = usage - mean_usage;
-                variance += diff * diff;
-            }
-            variance /= n_experts;
-
-            // Coefficient of variation: std / mean
-            float cv = std::sqrt(variance) / mean_usage;
-
-            return balance_loss_weight * cv;
-        }
-
         template<typename NET>
         auto clean_subnet(NET& net) -> decltype(net.clean(), void())
         {
@@ -937,17 +881,22 @@ namespace dlib
             // No-op if network doesn't have clean() method
         }
 
-        // Core parameters
-        long n_experts;                          // Number of expert networks (auto-detected from gate)
-        float balance_loss_weight;               // Auxiliary loss weight for load balancing
-        float noise_scale;                       // Exploration noise magnitude (training only)
-        long top_n;                              // Number of experts to activate per sample
-        float usage_update_rate;                 // EMA smoothing factor for usage statistics
+        // Configuration
+        long n_experts;                      // Number of expert networks
+        float noise_scale;                   // Gaussian noise std for exploration
+        long top_n;                          // Number of experts to activate per sample
+        float usage_update_rate;             // EMA smoothing rate for usage tracking
 
-        // Expert networks and tracking
-        std::vector<EXPERT_NET> experts;         // Expert network instances
-        std::vector<float> expert_usage;         // Exponential moving average of expert usage
-        resizable_tensor params;                 // Layer parameters (currently unused)
+        // Expert networks
+        std::vector<EXPERT_NET> experts;
+        std::vector<float> expert_usage;     // Usage statistics (for monitoring)
+
+        // Forward/backward cache (training mode only)
+        std::vector<std::vector<size_t>> selected_expert_indices_;  // [sample][top_k]
+        std::vector<std::vector<float>> selected_expert_weights_;   // [sample][top_k]
+        long cached_batch_size_;
+
+		resizable_tensor params; // Unused
     };
 
     template<
