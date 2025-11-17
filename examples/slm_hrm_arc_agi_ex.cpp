@@ -771,7 +771,8 @@ int main(int argc, char** argv)
                 }
             }
             size_t removed = filter_training_samples(all_X, all_Y);
-            cout << "\nTotal training samples: " << all_X.size() << endl;
+            cout << "\nTotal training samples: " << all_X.size() 
+                << "(removed samples: " << removed << ")" << endl;
 
             // Build network
             train_net_type net;
