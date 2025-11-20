@@ -800,10 +800,8 @@ int main(int argc, char** argv)
             size_t batches_count = 0;
             while (trainer.get_learning_rate() >= 1e-6 && epoch < max_epochs && !g_terminate_flag.load())
             {
-                // Shuffle indices
-                std::vector<size_t> indices(all_X.size());
-                std::iota(indices.begin(), indices.end(), 0);
-                std::shuffle(indices.begin(), indices.end(), std::default_random_engine());
+                // Shuffle the dataset
+                shuffle_training_dataset(all_X, all_Y);
 
                 // Train epoch
                 size_t batches_seen = 0;
@@ -811,12 +809,11 @@ int main(int argc, char** argv)
                 {
                     std::vector<arc_token_sequence_t> batch_X;
                     std::vector<unsigned long> batch_Y;
-
                     batch_X.reserve(batch_size);
                     batch_Y.reserve(batch_size);
 
                     for (size_t j = 0; j < batch_size && (i + j) < all_X.size(); ++j) {
-                        size_t idx = indices[i + j];
+                        size_t idx = i + j;
                         batch_X.push_back(all_X[idx]);
                         batch_Y.push_back(all_Y[idx]);
                     }                    

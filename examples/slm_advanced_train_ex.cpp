@@ -52,8 +52,7 @@ namespace dlib
 {
     // Classification head for next-token prediction
     template <long num_logits, long embedding_dim, typename SUBNET>
-	using classification_head = loss_cross_entropy_per_logit<linear<num_logits,
-        linear<embedding_dim / 2, rms_norm<SUBNET>>>>;
+	using classification_head = loss_cross_entropy_per_logit<linear<num_logits, rms_norm<SUBNET>>>;
 
     /**
      * @brief Transformer model configuration template
@@ -298,11 +297,11 @@ int main(int argc, char** argv)
         const std::string output_file = get_option(parser, "output-file", "generated_text.txt");
         
         // Model architecture parameters
-        const long num_tokens = 2500;
-        const long num_layers = 4;
-        const long num_heads = 6;        
-        const long embedding_dim = 228;
-        const long max_seq_len = 60;
+        const long num_tokens = 3500;
+        const long num_layers = 6;
+        const long num_heads = 8;        
+        const long embedding_dim = 256;
+        const long max_seq_len = 128;
 
         // Define transformer configuration
         using my_transformer = transformer_config<
@@ -481,6 +480,9 @@ int main(int argc, char** argv)
                 total_loss = 0.0;
                 batches_seen = samples_seen = 0;
                 epoch_start = std::chrono::high_resolution_clock::now();
+
+                // Shuffle the dataset
+                shuffle_training_dataset(samples, labels);
 
                 for (size_t i = 0; i < samples.size() && !g_terminate_flag.load(); i += batch_size)
                 {
@@ -748,14 +750,14 @@ int main(int argc, char** argv)
 /*
  * This program demonstrates advanced tokenization and training of a language model
  * on an internal dataset using a BPE-style tokenizer with 2500 vocabulary entries.
- * The training process produces a model file of approximately 13MB on disk.
+ * The training process produces a model file of approximately 12.5MB on disk.
  *
  * - Transformer model configuration:
- *    + vocabulary size: 2500
- *    + embedding dimension: 128
+ *    + vocabulary size: 3500
+ *    + embedding dimension: 256
  *    + layers: 6
  *    + attention heads: 8
- *    + max sequence length: 256
+ *    + max sequence length: 128
  * - Number of parameters: 2,814,323
  *
  * After training, the model achieves perfect memorization of the training data.
