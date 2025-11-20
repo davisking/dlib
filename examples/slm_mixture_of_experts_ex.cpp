@@ -484,6 +484,7 @@ int main(int argc, char** argv)
                 tokenizer.get_special_token_id("<pad>"),
                 0.15
             );
+            std::cout << "Augmented dataset size: " << samples.size() << std::endl;
 
             // Release memory as we no longer need the tokens at this point
             full_tokens.clear();            
