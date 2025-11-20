@@ -240,7 +240,7 @@ namespace dlib
         using signal_compressor_i = typename signal_compressor_impl<depth, affine, SUBNET>::type;
 
         // Network component definitions for training (with dropout)
-        static constexpr long compression_depth = 1; // Adjust based on input size
+        static constexpr long compression_depth = 0; // Adjust based on input size
         static constexpr long compression_ratio = (1 << compression_depth); // 2^depth
         using t_h_net_type = transformer_stack<NUM_H_LAYERS, activation_func, dropout_policy,
             WINDOW_LEN / compression_ratio, EMBEDDING_DIM / compression_ratio, NUM_HEADS,
@@ -695,9 +695,9 @@ int main(int argc, char** argv)
         parser.add_option("eval-path", "Path to evaluation JSON files", 1);
         parser.add_option("model-file", "Path for model file", 1);
         parser.add_option("learning-rate", "Learning rate (default: 1e-4)", 1);
-        parser.add_option("batch-size", "Mini-batch size (default: 12)", 1);
-        parser.add_option("max-epochs", "Maximum training epochs (default: 10000)", 1);
-        parser.add_option("patience", "Early stopping patience (default: 5000)", 1);
+        parser.add_option("batch-size", "Mini-batch size (default: 6)", 1);
+        parser.add_option("max-epochs", "Maximum training epochs (default: 300)", 1);
+        parser.add_option("patience", "Early stopping patience (default: 25000)", 1);
         parser.add_option("task-id", "Specific task ID to evaluate/generate", 1);
         parser.add_option("verbose", "Show detailed output during generation");
         parser.parse(argc, argv);
@@ -718,9 +718,9 @@ int main(int argc, char** argv)
         const std::string eval_path = get_option(parser, "eval-path", "data/evaluation");
         const std::string model_file = get_option(parser, "model-file", "dlib_lm_arc_agi_model.dat");
         const double learning_rate = get_option(parser, "learning-rate", 1e-4);
-        const size_t batch_size = get_option(parser, "batch-size", 12);
-        const size_t max_epochs = get_option(parser, "max-epochs", 10000);
-        const long patience = get_option(parser, "patience", 5000);
+        const size_t batch_size = get_option(parser, "batch-size", 6);
+        const size_t max_epochs = get_option(parser, "max-epochs", 300);
+        const long patience = get_option(parser, "patience", 25000);
         
         // Model configuration
         using arc_net_config = hrm_config<>;
