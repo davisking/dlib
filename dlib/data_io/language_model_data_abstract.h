@@ -219,6 +219,42 @@ namespace dlib
             - Uses Fisher-Yates shuffle algorithm for uniform random permutation
     !*/
 
+    template <typename sample_type, typename label_type>
+    void augment_training_dataset(
+        std::vector<sample_type>& samples,
+        std::vector<label_type>& labels,
+        int unk_token,
+        int padding_token,
+        double augmentation_ratio = 0.2,
+        long min_noise_tokens = 1,
+        long max_noise_tokens = 3,
+        unsigned long seed = 0
+    );
+    /*!
+        requires
+            - samples.size() == labels.size()
+            - 0.0 <= augmentation_ratio <= 2.0
+            - min_noise_tokens >= 0
+            - max_noise_tokens >= min_noise_tokens
+        ensures
+            - Augments the training dataset by adding noisy copies of existing samples
+            - Creates floor(samples.size() * augmentation_ratio) new augmented samples
+            - For each augmented sample:
+                * Randomly selects a source sample from the original dataset
+                * Creates a copy of the sample and its corresponding label
+                * Randomly replaces between min_noise_tokens and max_noise_tokens
+                  non-padding tokens with unk_token
+                * Only tokens != padding_token are eligible for noise injection
+                * Number of noise tokens is capped at 30% of non-padding tokens
+                  to maintain sample quality
+            - Corresponding labels are appended to labels vector (unchanged)
+            - Original samples and labels are preserved
+            - If seed == 0, uses random seed based on current time
+            - If seed != 0, uses provided seed for reproducible augmentation
+            - Default augmentation_ratio of 0.2 (20%) follows common practices
+              in language model training literature
+    !*/
+
 } // namespace dlib
 
 #endif // DLIB_LANGUAGE_MODEL_DATA_ABSTRACT_H_
