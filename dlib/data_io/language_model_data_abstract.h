@@ -201,6 +201,24 @@ namespace dlib
             - Y contains matrix<unsigned long,0,1> of shape (tgt_window_len, 1)
     !*/
 
+    template <typename sample_type, typename label_type>
+    void shuffle_training_dataset(
+        std::vector<sample_type>& samples,
+        std::vector<label_type>& labels,
+        unsigned long seed = 0
+    );
+    /*!
+        requires
+            - samples.size() == labels.size()
+        ensures
+            - Randomly shuffles the training dataset in-place
+            - Applies the same permutation to both samples and labels to maintain correspondence
+            - If seed == 0, uses a random seed based on current time
+            - If seed != 0, uses the provided seed for reproducible shuffling
+            - After shuffling, samples[i] still corresponds to labels[i]
+            - Uses Fisher-Yates shuffle algorithm for uniform random permutation
+    !*/
+
 } // namespace dlib
 
 #endif // DLIB_LANGUAGE_MODEL_DATA_ABSTRACT_H_

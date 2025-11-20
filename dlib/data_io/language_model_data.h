@@ -308,6 +308,35 @@ namespace dlib
             }
         }
     }
+
+    template <typename sample_type, typename label_type>
+    void shuffle_training_dataset(
+        std::vector<sample_type>& samples,
+        std::vector<label_type>& labels,
+        unsigned long seed = 0)
+    {
+        DLIB_CASSERT(samples.size() == labels.size(),
+            "samples and labels must have the same size");
+
+        const size_t dataset_size = samples.size();
+        if (dataset_size <= 1) return;
+
+        dlib::rand rng;
+        if (seed != 0) rng = dlib::rand(seed);
+
+        // Fisher-Yates shuffle algorithm
+        for (size_t i = dataset_size - 1; i > 0; --i)
+        {
+            size_t j = rng.get_random_32bit_number() % (i + 1);
+
+            // Swap samples[i] with samples[j]
+            std::swap(samples[i], samples[j]);
+
+            // Swap labels[i] with labels[j]
+            std::swap(labels[i], labels[j]);
+        }
+    }
+
 } // namespace dlib
 
 #endif // DLIB_LANGUAGE_MODEL_DATA_H_
