@@ -729,9 +729,11 @@ int main(int argc, char** argv)
 }
 
 /*
- * This program demonstrates advanced tokenization and training of a language model
- * on an internal dataset using a BPE-style tokenizer with 3500 vocabulary entries.
- * The training process produces a model file of approximately 21MB on disk.
+ * This program demonstrates production-grade language model training using Dlib's
+ * advanced utilities for dataset preparation: shuffle_training_dataset() for
+ * randomization and augment_training_dataset() for noise injection. These techniques
+ * improve model robustness and generalization, enabling effective training on large
+ * volumes of information.
  *
  * - Transformer model configuration:
  *    + vocabulary size: 3500
@@ -741,5 +743,5 @@ int main(int argc, char** argv)
  *    + max sequence length: 128
  * - Number of parameters: 4,614,137 (training) - 3,597,749 (inference)
  *
- * After training, the model achieves good memorization of all datasets.
+ * After training, the model achieves good memorization of all internal datasets.
  */
