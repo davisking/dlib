@@ -244,10 +244,10 @@ namespace dlib
         static constexpr long compression_ratio = (1 << compression_depth); // 2^depth
         using t_h_net_type = transformer_stack<NUM_H_LAYERS, activation_func, dropout_policy,
             WINDOW_LEN / compression_ratio, EMBEDDING_DIM / compression_ratio, NUM_HEADS,
-            input<matrix<float>>>;
+            input_tensor>;
         using t_l_net_type = transformer_stack<NUM_L_LAYERS, activation_func, dropout_policy,
             WINDOW_LEN / compression_ratio, EMBEDDING_DIM / compression_ratio, NUM_HEADS,
-            input<matrix<float>>>;
+            input_tensor>;
 
         // Network component definitions for inference (without dropout)
         using i_h_net_type = transformer_stack<NUM_H_LAYERS, activation_func, multiply,
