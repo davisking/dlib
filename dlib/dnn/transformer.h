@@ -216,9 +216,6 @@ namespace dlib
             seq_len = input.nr();
             hidden_dim = input.nc();
 
-            // Initialize internal networks with proper tensor shape
-            initialize_networks(input);
-
             // Initialize hidden states with truncated normal (std=1, trunc=2)
             init_hidden_states();
         }
@@ -385,29 +382,6 @@ namespace dlib
         }
 
     private:
-        void initialize_networks(const tensor& input_shape)
-        {
-            // Create dummy input data for network initialization
-            const long nr = input_shape.nr();
-            const long nc = input_shape.nc();
-
-            matrix<float> dummy_data(nr, nc);
-            dlib::rand rng(std::time(0));
-            for (long r = 0; r < nr; ++r)
-            {
-                for (long c = 0; c < nc; ++c)
-                {
-                    dummy_data(r, c) = static_cast<float>(rng.get_random_gaussian() * 0.1);
-                }
-            }
-            resizable_tensor init_tensor(1, 1, nr, nc);
-            std::vector<matrix<float>> x(1, dummy_data);
-
-            // Initialize both networks using to_tensor
-            h_net.to_tensor(&x[0], &x[0] + 1, init_tensor);
-            l_net.to_tensor(&x[0], &x[0] + 1, init_tensor);
-        }
-
         void init_hidden_states()
         {
             // Initialize single vector for H and L (will be broadcast to full tensor)
@@ -507,7 +481,7 @@ namespace dlib
         explicit moe_() :
             n_experts(0),
             noise_scale(0.0f),
-            top_n(top_e),
+            top_k(top_e),
             usage_update_rate(0.05f),
             cached_batch_size_(0)
         {
@@ -516,7 +490,7 @@ namespace dlib
         moe_(const moe_& other) :
             n_experts(other.n_experts),
             noise_scale(other.noise_scale),
-            top_n(other.top_n),
+            top_k(other.top_k),
             usage_update_rate(other.usage_update_rate),
             expert_usage(other.expert_usage),
             cached_batch_size_(0)
@@ -532,7 +506,7 @@ namespace dlib
             if (this != &other) {
                 n_experts = other.n_experts;
                 noise_scale = other.noise_scale;
-                top_n = other.top_n;
+                top_k = other.top_k;
                 usage_update_rate = other.usage_update_rate;
                 expert_usage = other.expert_usage;
                 cached_batch_size_ = 0;
@@ -571,10 +545,10 @@ namespace dlib
                 // Determine top-k activation count
                 if (top_e == 0) {
                     // Auto mode: activate 20% of experts (minimum 1)
-                    top_n = std::max(1L, static_cast<long>(std::floor(n_experts * 0.2f)));
+                    top_k = std::max(1L, static_cast<long>(std::floor(n_experts * 0.2f)));
                 }
                 else {
-                    top_n = std::min(top_e, n_experts);
+                    top_k = std::min(top_e, n_experts);
                 }
             }
         }
@@ -667,31 +641,31 @@ namespace dlib
                     expert_scores.emplace_back(probs[e], e);
 
                 std::partial_sort(expert_scores.begin(),
-                    expert_scores.begin() + top_n,
+                    expert_scores.begin() + top_k,
                     expert_scores.end(),
                     [](const auto& a, const auto& b) { return a.first > b.first; });
 
                 // Renormalize top-k weights to sum to 1
                 float sum_weights = 0.0f;
-                for (long i = 0; i < top_n; ++i)
+                for (long i = 0; i < top_k; ++i)
                     sum_weights += expert_scores[i].first;
 
                 // Safety: handle degenerate case (should be extremely rare with softmax)
                 if (sum_weights < 1e-8f) {
-                    sum_weights = top_n;
-                    for (long i = 0; i < top_n; ++i)
+                    sum_weights = top_k;
+                    for (long i = 0; i < top_k; ++i)
                         expert_scores[i].first = 1.0f;
                 }
 
-                for (long i = 0; i < top_n; ++i)
+                for (long i = 0; i < top_k; ++i)
                     expert_scores[i].first /= sum_weights;
 
                 // Cache selection for backward pass
                 if (std::is_same<MODE, training_mode_tag>::value) {
-                    selected_expert_indices_[n].resize(top_n);
-                    selected_expert_weights_[n].resize(top_n);
+                    selected_expert_indices_[n].resize(top_k);
+                    selected_expert_weights_[n].resize(top_k);
 
-                    for (long i = 0; i < top_n; ++i) {
+                    for (long i = 0; i < top_k; ++i) {
                         selected_expert_indices_[n][i] = expert_scores[i].second;
                         selected_expert_weights_[n][i] = expert_scores[i].first;
                     }
@@ -703,7 +677,7 @@ namespace dlib
                 auto sample_output = sample_alias(output, sample_offset);
 
                 // Route through selected experts and accumulate weighted outputs
-                for (long i = 0; i < top_n; ++i) {
+                for (long i = 0; i < top_k; ++i) {
                     const size_t expert_idx = expert_scores[i].second;
                     const float weight = expert_scores[i].first;
 
@@ -814,7 +788,7 @@ namespace dlib
 
         // Accessors
         long num_experts() const { return n_experts; }
-        long num_active_experts() const { return top_n; }
+        long num_active_experts() const { return top_k; }
         bool is_training_mode() const { return std::is_same<MODE, training_mode_tag>::value; }
         const std::vector<float>& get_expert_usage() const { return expert_usage; }
 
@@ -822,7 +796,7 @@ namespace dlib
         {
             serialize("moe_", out);
             serialize(item.n_experts, out);
-            serialize(item.top_n, out);
+            serialize(item.top_k, out);
             serialize(item.noise_scale, out);
             serialize(item.usage_update_rate, out);
             serialize(item.experts, out);
@@ -837,7 +811,7 @@ namespace dlib
                 throw serialization_error("Incorrect version '" + version + "' found while deserializing moe_.");
 
             deserialize(item.n_experts, in);
-            deserialize(item.top_n, in);
+            deserialize(item.top_k, in);
             deserialize(item.noise_scale, in);
             deserialize(item.usage_update_rate, in);
             deserialize(item.experts, in);
@@ -851,7 +825,7 @@ namespace dlib
             const bool is_training = std::is_same<MODE, training_mode_tag>::value;
             out << "moe"
                 << " (experts=" << item.n_experts
-                << ", top_k=" << item.top_n
+                << ", top_k=" << item.top_k
                 << ", mode=" << (is_training ? "train" : "infer")
                 << ", noise=" << item.noise_scale << ")";
             return out;
@@ -862,7 +836,7 @@ namespace dlib
             const bool is_training = std::is_same<MODE, training_mode_tag>::value;
             out << "<moe>\n";
             out << "  <num_experts>" << item.n_experts << "</num_experts>\n";
-            out << "  <top_k>" << item.top_n << "</top_k>\n";
+            out << "  <top_k>" << item.top_k << "</top_k>\n";
             out << "  <noise_scale>" << item.noise_scale << "</noise_scale>\n";
             out << "  <mode>" << (is_training ? "training" : "inference") << "</mode>\n";
             out << "</moe>\n";
@@ -884,7 +858,7 @@ namespace dlib
         // Configuration
         long n_experts;                      // Number of expert networks
         float noise_scale;                   // Gaussian noise std for exploration
-        long top_n;                          // Number of experts to activate per sample
+        long top_k;                          // Number of experts to activate per sample
         float usage_update_rate;             // EMA smoothing rate for usage tracking
 
         // Expert networks
