@@ -240,7 +240,7 @@ namespace dlib
         using signal_compressor_i = typename signal_compressor_impl<depth, affine, SUBNET>::type;
 
         // Network component definitions for training (with dropout)
-        static constexpr long compression_depth = 0; // Adjust based on input size
+        static constexpr long compression_depth = 2; // Adjust based on input size
         static constexpr long compression_ratio = (1 << compression_depth); // 2^depth
         using t_h_net_type = transformer_stack<NUM_H_LAYERS, activation_func, dropout_policy,
             WINDOW_LEN / compression_ratio, EMBEDDING_DIM / compression_ratio, NUM_HEADS,
@@ -263,13 +263,13 @@ namespace dlib
             loss_multiclass_log<fc<VOCAB_SIZE, rms_norm<
             //densenet::def<relu, bn_con, 16>::backbone<8, 12, 6, 3,
             tag10<hrm<t_h_net_type, t_l_net_type, HRM_N, HRM_T,
-            //signal_compressor_t<compression_depth, token_embeddings<VOCAB_SIZE, EMBEDDING_DIM,
-            input<matrix<long, 0, 1>>>>>>>,
+            signal_compressor_t<compression_depth, token_embeddings<VOCAB_SIZE, EMBEDDING_DIM,
+            input<matrix<long, 0, 1>>>>>>>>>,
             loss_multiclass_log<fc<VOCAB_SIZE, rms_norm<
             //densenet::def<relu, affine, 16>::backbone<8, 12, 6, 3,
             tag10<hrm<i_h_net_type, i_l_net_type, HRM_N, HRM_T,
-            //signal_compressor_i<compression_depth, token_embeddings<VOCAB_SIZE, EMBEDDING_DIM,
-            input<matrix<long, 0, 1>>>>>>>>;
+            signal_compressor_i<compression_depth, token_embeddings<VOCAB_SIZE, EMBEDDING_DIM,
+            input<matrix<long, 0, 1>>>>>>>>>>;
 
         struct model_info {
             static std::string describe() {

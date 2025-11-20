@@ -754,11 +754,11 @@ int main(int argc, char** argv)
  *
  * - Transformer model configuration:
  *    + vocabulary size: 3500
- *    + embedding dimension: 256
  *    + layers: 6
  *    + attention heads: 8
+ *    + embedding dimension: 256 
  *    + max sequence length: 128
- * - Number of parameters: 2,814,323
+ * - Number of parameters: 5,627,327
  *
  * After training, the model achieves perfect memorization of the training data.
  * The generation option produces text that matches the original dataset byte-for-byte

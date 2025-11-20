@@ -734,9 +734,9 @@ int main(int argc, char** argv)
  *
  * - Transformer model configuration:
  *    + vocabulary size: 3500
- *    + embedding dimension: 256
  *    + layers: 6
  *    + attention heads: 8
+ *    + embedding dimension: 256
  *    + max sequence length: 128
  * - Number of parameters: 2,814,323
  *
