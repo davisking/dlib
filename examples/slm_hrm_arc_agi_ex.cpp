@@ -240,7 +240,7 @@ namespace dlib
         using signal_compressor_i = typename signal_compressor_impl<depth, affine, SUBNET>::type;
 
         // Network component definitions for training (with dropout)
-        static constexpr long compression_depth = 2; // Adjust based on input size
+        static constexpr long compression_depth = 1; // Adjust based on input size
         static constexpr long compression_ratio = (1 << compression_depth); // 2^depth
         using t_h_net_type = transformer_stack<NUM_H_LAYERS, activation_func, dropout_policy,
             WINDOW_LEN / compression_ratio, EMBEDDING_DIM / compression_ratio, NUM_HEADS,

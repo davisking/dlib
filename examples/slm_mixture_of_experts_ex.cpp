@@ -476,13 +476,13 @@ int main(int argc, char** argv)
                 samples, labels);
             cout << "Created " << samples.size() << " training samples\n";
 
-            // Augment the dataset with 15% additional noisy samples
+            // Augment the dataset with 5% additional noisy samples
             augment_training_dataset(
                 samples,
                 labels,
                 tokenizer.get_special_token_id("<unk>"),
                 tokenizer.get_special_token_id("<pad>"),
-                0.15
+                0.05
             );
             std::cout << "Augmented dataset size: " << samples.size() << std::endl;
 
