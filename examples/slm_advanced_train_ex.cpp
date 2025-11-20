@@ -749,8 +749,8 @@ int main(int argc, char** argv)
 
 /*
  * This program demonstrates advanced tokenization and training of a language model
- * on an internal dataset using a BPE-style tokenizer with 2500 vocabulary entries.
- * The training process produces a model file of approximately 12.5MB on disk.
+ * on an internal dataset using a BPE-style tokenizer with 3500 vocabulary entries.
+ * The training process produces a model file of approximately 25MB on disk.
  *
  * - Transformer model configuration:
  *    + vocabulary size: 3500
