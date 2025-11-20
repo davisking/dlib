@@ -859,10 +859,6 @@ void decompress_file(const std::string& input_path, const std::string& output_pa
     cout << "Output file size: " << decompressed_data.size() << " bytes\n";
 }
 
-// ========================================================================================
-// Main function
-// ========================================================================================
-
 int main(int argc, char** argv)
 {
     try
