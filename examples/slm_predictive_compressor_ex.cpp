@@ -62,7 +62,7 @@ using namespace dlib;
 typedef dlib::compress_stream::kernel_1ec stream_compressor;
 
 // Constants
-const uint32_t MAGIC_NUMBER_DLIB = 0x444C4942; // "DLIB" in big-endian
+const uint32_t MAGIC_NUMBER = 0x444C4942;   // "DLIB" in big-endian
 
 const int WINDOW_SIZE = 16;                 // Prediction window size
 const long MAX_VOCAB_SIZE = 257;            // 256 byte values + 1 PAD token
@@ -569,7 +569,7 @@ void compress_file(const std::string& input_path, const std::string& output_path
         throw std::runtime_error("Cannot create output file");
 
     // Write header
-    output.write(reinterpret_cast<const char*>(&MAGIC_NUMBER_DLIB), sizeof(MAGIC_NUMBER_DLIB));
+    output.write(reinterpret_cast<const char*>(&MAGIC_NUMBER), sizeof(MAGIC_NUMBER));
 
     uint32_t vocab_size_u32 = use_full_vocab ? FULL_VOCAB_MARKER : vocab.size();
     output.write(reinterpret_cast<const char*>(&vocab_size_u32), sizeof(vocab_size_u32));
@@ -630,7 +630,7 @@ void decompress_file(const std::string& input_path, const std::string& output_pa
     // Read and verify magic number
     uint32_t magic;
     input.read(reinterpret_cast<char*>(&magic), sizeof(magic));
-    if (magic != MAGIC_NUMBER_DLIB)
+    if (magic != MAGIC_NUMBER)
         throw std::runtime_error("Invalid file format (bad magic number)");
 
     // Read vocabulary
