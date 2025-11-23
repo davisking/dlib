@@ -250,22 +250,13 @@ namespace dlib { namespace tt
             const size_t rhs_plane_size = rhs.nr() * rhs.nc();
             const size_t dest_plane_size = dest.nr() * dest.nc();
 
-            long num_samples, num_channels;
-            if (lhs_is_matrix && rhs_is_matrix && dest_is_matrix) {
-                // All are 2D matrices: single operation
+            long num_samples, num_channels = std::min({ lhs.k(), rhs.k(), dest.k() });
+            if (lhs_is_matrix && rhs_is_matrix && dest_is_matrix)
                 num_samples = 1;
-                num_channels = 1;
-            }
-            else if (!lhs_is_matrix && rhs_is_matrix) {
-                // Broadcast rhs matrix across all lhs planes
+            else if (!lhs_is_matrix && rhs_is_matrix)
                 num_samples = lhs.num_samples();
-                num_channels = lhs.k();
-            }
-            else {
-                // Standard case: dimensions must match
+            else
                 num_samples = std::min({ lhs.num_samples(), rhs.num_samples(), dest.num_samples() });
-                num_channels = std::min({ lhs.k(), rhs.k(), dest.k() });
-            }
 
             size_t lhs_rows = lhs.nr();
             size_t lhs_cols = lhs.nc();

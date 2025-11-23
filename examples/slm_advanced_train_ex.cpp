@@ -552,8 +552,7 @@ int main(int argc, char** argv)
             cout << "=== GENERATION MODE ===\n";
 
             // Load the model
-            using net_infer = my_transformer::network_type<false>;
-            net_infer net;
+            my_transformer::network_type<false> net;
             if (file_exists(model_file)) {
                 deserialize(model_file) >> net >> tokenizer;
                 cout << "Loaded model from " << model_file << "\n";
@@ -664,7 +663,9 @@ int main(int argc, char** argv)
             int end_of_text = tokenizer.get_special_token_id("</text>"), next_token = 0;
             while (total_bytes < target_size && next_token != end_of_text && !g_terminate_flag.load()) {
                 // Predict next token
-                next_token = net(input_seq);				
+                //auto predicted = net(std::vector<matrix<int, 0, 1>>{ input_seq, input_seq });
+                //next_token = static_cast<int>(predicted[0]);
+                next_token = net(input_seq);
                 token_buffer.push_back(next_token);
                 token_count++;
 
@@ -753,17 +754,17 @@ int main(int argc, char** argv)
 /*
  * This program demonstrates advanced tokenization and training of a language model
  * on an internal dataset using a BPE-style tokenizer with 3500 vocabulary entries.
- * The training process produces a model file of approximately 25MB on disk.
+ * The training process produces a model file of approximately 13.5MB on disk.
  *
  * - Transformer model configuration:
  *    + vocabulary size: 3500
- *    + layers: 6
- *    + attention heads: 8
- *    + embedding dimension: 256 
- *    + max sequence length: 128
- * - Number of parameters: 5,627,327
+ *    + layers: 4
+ *    + attention heads: 6
+ *    + embedding dimension: 228 
+ *    + max sequence length: 100
+ * - Number of parameters: 2,716,770
  *
- * After training, the model achieves perfect memorization of the training data.
+ * After a 2-step training, the model achieves perfect memorization of the dataset.
  * The generation option produces text that matches the original dataset byte-for-byte
  * with 100% accuracy.
  */
