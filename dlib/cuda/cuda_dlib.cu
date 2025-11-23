@@ -3078,6 +3078,97 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        __global__ void _cuda_compute_loss_cross_entropy_per_logit(
+            float* loss_out,
+            float* g,
+            const unsigned long* truth,
+            const float* out_data,
+            size_t batch_size,
+            size_t seq_len,
+            size_t vocab_size,
+            const float scale
+        )
+        {
+            float total_loss = 0;
+
+            for (auto sample_idx : grid_stride_range(0, batch_size))
+            {
+                const unsigned long target_class = truth[sample_idx];
+
+                const size_t last_pos = seq_len - 1;
+
+                float max_val = out_data[sample_idx * seq_len * vocab_size + last_pos * vocab_size + 0];
+                for (size_t c = 1; c < vocab_size; ++c)
+                {
+                    const size_t idx = sample_idx * seq_len * vocab_size + last_pos * vocab_size + c;
+                    max_val = ::max(max_val, out_data[idx]);
+                }
+
+                float sum_exp = 0.0f;
+                for (size_t c = 0; c < vocab_size; ++c)
+                {
+                    const size_t idx = sample_idx * seq_len * vocab_size + last_pos * vocab_size + c;
+                    const float exp_val = ::exp(out_data[idx] - max_val);
+                    g[idx] = exp_val;
+                    sum_exp += exp_val;
+                }
+
+                for (size_t c = 0; c < vocab_size; ++c)
+                {
+                    const size_t idx = sample_idx * seq_len * vocab_size + last_pos * vocab_size + c;
+                    const float softmax_val = g[idx] / sum_exp;
+
+                    if (c == target_class)
+                    {
+                        total_loss += -::log(::max(softmax_val, 1e-10f));
+                        g[idx] = scale * (softmax_val - 1.0f);
+                    }
+                    else
+                    {
+                        g[idx] = scale * softmax_val;
+                    }
+                }
+            }
+
+            warp_reduce_atomic_add(*loss_out, total_loss);
+        }
+
+        void compute_loss_cross_entropy_per_logit::
+            do_work(
+                cuda_data_ptr<float> loss_work_buffer,
+                cuda_data_ptr<const unsigned long> truth_buffer,
+                const tensor& subnetwork_output,
+                tensor& gradient,
+                double& loss
+            )
+        {
+            CHECK_CUDA(cudaMemset(gradient.device(), 0, gradient.size() * sizeof(float)));
+            CHECK_CUDA(cudaMemset(loss_work_buffer, 0, sizeof(float)));
+
+            const long batch_size = subnetwork_output.num_samples();
+            const long seq_len = subnetwork_output.nr();
+            const long vocab_size = subnetwork_output.nc();
+
+            const double scale = 1.0 / batch_size;
+
+            launch_kernel(_cuda_compute_loss_cross_entropy_per_logit, max_jobs(batch_size),
+                loss_work_buffer.data(),
+                gradient.device(),
+                truth_buffer.data(),
+                subnetwork_output.device(),
+                batch_size,
+                seq_len,
+                vocab_size,
+                scale
+            );
+
+            float floss;
+            dlib::cuda::memcpy(&floss, loss_work_buffer);
+            loss = scale * floss;
+        }
+
+    // ----------------------------------------------------------------------------------------
+
         __device__ float cuda_log1pexp(float x)
         {
             if (x <= -18)

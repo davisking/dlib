@@ -979,7 +979,7 @@ namespace dlib
 
             double loss = 0.0;
 #ifdef DLIB_USE_CUDA
-            cpu_compute(truth, output_tensor, grad, loss);
+            cuda_compute(truth, output_tensor, grad, loss);
 #else
             cpu_compute(truth, output_tensor, grad, loss);
 #endif
@@ -1013,7 +1013,7 @@ namespace dlib
 
         private:
 #ifdef DLIB_USE_CUDA
-            cpu::compute_loss_cross_entropy_per_logit cpu_compute;
+            cuda::compute_loss_cross_entropy_per_logit cuda_compute;
 #else
             cpu::compute_loss_cross_entropy_per_logit cpu_compute;
 #endif            
