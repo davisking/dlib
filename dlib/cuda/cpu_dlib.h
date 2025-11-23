@@ -770,6 +770,98 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
+    class compute_loss_cross_entropy_per_logit
+    {
+        /*! The point of this class is to compute the loss for loss_cross_entropy_per_logit_
+            on the cpu to provide an analogous implementation of the cuda version
+        !*/
+    public:
+        compute_loss_cross_entropy_per_logit()
+        {
+        }
+
+        template <typename const_label_iterator>
+        void operator()(
+            const_label_iterator truth,
+            const tensor& output_tensor,
+            tensor& grad,
+            double& loss
+        ) const
+        {
+            DLIB_CASSERT(output_tensor.k() == 1,
+                "output_tensor.k() = " << output_tensor.k());
+
+            const long batch_size = output_tensor.num_samples();
+            const long seq_len = output_tensor.nr();
+            const long vocab_size = output_tensor.nc();
+
+            // The loss we output is the average loss over the mini-batch
+            const double scale = 1.0 / batch_size;
+            loss = 0.0;
+
+            const float* out_data = output_tensor.host();
+            float* g = grad.host();
+
+            // Zero out all gradients first. Gradients will only be non-zero at the
+            // last position (seq_len-1) of each sequence where the loss is computed
+            std::fill(g, g + grad.size(), 0.0f);
+
+            // Compute loss and gradients only for the last position of each sequence.
+            // This implements the standard next token prediction objective used in
+            // autoregressive language models
+            for (long i = 0; i < batch_size; ++i)
+            {
+                const unsigned long target_class = *(truth + i);
+
+                // The network must produce a number of outputs that is equal to the number
+                // of labels when using this type of loss
+                DLIB_CASSERT(target_class < static_cast<unsigned long>(vocab_size),
+                    "target_class: " << target_class << ", vocab_size: " << vocab_size);
+
+                // Compute softmax for numerical stability using the log-sum-exp trick.
+                // First, find the maximum value for this position to prevent overflow
+                float max_val = out_data[tensor_index(output_tensor, i, 0, seq_len - 1, 0)];
+                for (long c = 1; c < vocab_size; ++c)
+                {
+                    const float val = out_data[tensor_index(output_tensor, i, 0, seq_len - 1, c)];
+                    max_val = std::max(max_val, val);
+                }
+
+                // Compute exp(x - max) and sum for the softmax denominator
+                float sum_exp = 0;
+                for (long c = 0; c < vocab_size; ++c)
+                {
+                    const unsigned long idx = tensor_index(output_tensor, i, 0, seq_len - 1, c);
+                    const float exp_val = std::exp(out_data[idx] - max_val);
+                    g[idx] = exp_val; // Temporarily store exp values
+                    sum_exp += exp_val;
+                }
+
+                // Normalize to get softmax probabilities, compute loss, and set gradients
+                for (long c = 0; c < vocab_size; ++c)
+                {
+                    const unsigned long idx = tensor_index(output_tensor, i, 0, seq_len - 1, c);
+                    const float softmax_val = g[idx] / sum_exp;
+
+                    if (static_cast<unsigned long>(c) == target_class)
+                    {
+                        // Cross-entropy loss: -log(p(target_class))
+                        loss += scale * (-std::log(std::max(softmax_val, 1e-10f)));
+                        // Gradient for the target class: scale * (p - 1)
+                        g[idx] = scale * (softmax_val - 1.0f);
+                    }
+                    else
+                    {
+                        // Gradient for non-target classes: scale * p
+                        g[idx] = scale * softmax_val;
+                    }
+                }
+            }
+        }
+    };
+
+    // -----------------------------------------------------------------------------------
+
     class compute_loss_binary_log_per_pixel
     {
 

@@ -52,7 +52,8 @@ namespace dlib
 {
     // Classification head for next-token prediction
     template <long num_logits, long embedding_dim, typename SUBNET>
-	using classification_head = loss_cross_entropy_per_logit<linear<num_logits, rms_norm<SUBNET>>>;
+	using classification_head = loss_cross_entropy_per_logit<linear<num_logits, 
+        linear<embedding_dim / 4, rms_norm<SUBNET>>>>;
 
     /**
      * @brief Transformer model configuration template
@@ -298,10 +299,10 @@ int main(int argc, char** argv)
         
         // Model architecture parameters
         const long num_tokens = 3500;
-        const long num_layers = 6;
-        const long num_heads = 8;        
-        const long embedding_dim = 256;
-        const long max_seq_len = 128;
+        const long num_layers = 4;
+        const long num_heads = 6;        
+        const long embedding_dim = 228;
+        const long max_seq_len = 100;
 
         // Define transformer configuration
         using my_transformer = transformer_config<
@@ -456,14 +457,17 @@ int main(int argc, char** argv)
             cout << my_transformer::model_info::describe() << endl;
 
             // Tokenizer stored with model for simplified inference
-            if (file_exists(model_file)) deserialize(model_file) >> net >> tokenizer;
+            if (file_exists(model_file) &&
+                !file_exists("chkpt-" + model_file)) deserialize(model_file) >> net >> tokenizer;
 
             // Create trainer
-            dnn_trainer<net_type, adam> trainer(net, adam(alpha, beta1, beta2), gpus);
+            //dnn_trainer<net_type, adam> trainer(net, adam(alpha, beta1, beta2), gpus);
+            dnn_trainer<net_type> trainer(net, sgd(alpha, beta1));
             trainer.set_learning_rate(learning_rate);
             trainer.set_min_learning_rate(1e-6);
             trainer.set_mini_batch_size(batch_size);
             trainer.set_iterations_without_progress_threshold(patience);
+            trainer.set_synchronization_file("chkpt-" + model_file, std::chrono::minutes(15));
             trainer.be_quiet();
 
             cout << "Number of model parameters: " << count_parameters(net) << endl;
@@ -525,8 +529,8 @@ int main(int argc, char** argv)
             {
                 if (!g_terminate_flag.load()) {
                     cout << "Evaluating model accuracy...\n";
-                    using net_infer = my_transformer::network_type<false>;
-                    net_infer g_infer = net;
+                    my_transformer::network_type<false> g_infer;
+                    deserialize(model_file) >> g_infer >> tokenizer;
                     auto predicted = g_infer(samples);
                     size_t correct = 0;
                     for (size_t i = 0; i < labels.size(); ++i)

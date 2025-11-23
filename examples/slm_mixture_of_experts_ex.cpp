@@ -495,7 +495,8 @@ int main(int argc, char** argv)
             cout << my_transformer::model_info::describe() << endl;
 
             // Tokenizer stored with model for simplified inference
-            if (file_exists(model_file)) deserialize(model_file) >> net >> tokenizer;
+            if (file_exists(model_file) &&
+                !file_exists("chkpt-" + model_file)) deserialize(model_file) >> net >> tokenizer;
             cout << net << endl << endl; // Show the model architecture
 
             // Create trainer
@@ -504,6 +505,7 @@ int main(int argc, char** argv)
             trainer.set_min_learning_rate(1e-6);
             trainer.set_mini_batch_size(batch_size);
             trainer.set_iterations_without_progress_threshold(patience);
+            trainer.set_synchronization_file("chkpt-" + model_file, std::chrono::minutes(15));
             trainer.be_quiet();
             cout << "Starting training...\n";
 
