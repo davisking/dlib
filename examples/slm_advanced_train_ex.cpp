@@ -461,8 +461,7 @@ int main(int argc, char** argv)
                 !file_exists("chkpt-" + model_file)) deserialize(model_file) >> net >> tokenizer;
 
             // Create trainer
-            //dnn_trainer<net_type, adam> trainer(net, adam(alpha, beta1, beta2), gpus);
-            dnn_trainer<net_type> trainer(net, sgd(alpha, beta1));
+            dnn_trainer<net_type, adam> trainer(net, adam(alpha, beta1, beta2), gpus);
             trainer.set_learning_rate(learning_rate);
             trainer.set_min_learning_rate(1e-6);
             trainer.set_mini_batch_size(batch_size);
