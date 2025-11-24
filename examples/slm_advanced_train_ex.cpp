@@ -52,8 +52,8 @@ namespace dlib
 {
     // Classification head for next-token prediction
     template <long num_logits, long embedding_dim, typename SUBNET>
-	using classification_head = loss_cross_entropy_per_logit<linear<num_logits, 
-        linear<embedding_dim / 4, rms_norm<SUBNET>>>>;
+    using classification_head = loss_multiclass_log<fc<num_logits,
+        fc<embedding_dim / 4, rms_norm<SUBNET>>>>;
 
     /**
      * @brief Transformer model configuration template
@@ -265,7 +265,7 @@ int main(int argc, char** argv)
         parser.add_option("learning-rate", "Set the learning rate (default: 2e-4)", 1);
         parser.add_option("batch-size", "Set the mini-batch size (default: 64)", 1);
         parser.add_option("patience", "Iterations without progress before early stopping (default: 8000)", 1);
-        parser.add_option("max-epochs", "Maximum number of training epochs (default: 500)", 1);
+        parser.add_option("max-epochs", "Maximum number of training epochs (default: 150)", 1);
         parser.add_option("alpha", "Set the weight decay for Adam (default: 0.004)", 1);
         parser.add_option("beta1", "Set Adam's first moment coefficient (default: 0.9)", 1);
         parser.add_option("beta2", "Set Adam's second moment coefficient (default: 0.999)", 1);
@@ -289,7 +289,7 @@ int main(int argc, char** argv)
         const double learning_rate = get_option(parser, "learning-rate", 2e-4);
         const size_t batch_size = get_option(parser, "batch-size", 64);
         const long patience = get_option(parser, "patience", 8000);
-        const size_t max_epochs = get_option(parser, "max-epochs", 500);
+        const size_t max_epochs = get_option(parser, "max-epochs", 150);
         const double alpha = get_option(parser, "alpha", 0.004);
         const double beta1 = get_option(parser, "beta1", 0.9);
         const double beta2 = get_option(parser, "beta2", 0.999);
@@ -663,9 +663,8 @@ int main(int argc, char** argv)
             int end_of_text = tokenizer.get_special_token_id("</text>"), next_token = 0;
             while (total_bytes < target_size && next_token != end_of_text && !g_terminate_flag.load()) {
                 // Predict next token
-                //auto predicted = net(std::vector<matrix<int, 0, 1>>{ input_seq, input_seq });
-                //next_token = static_cast<int>(predicted[0]);
-                next_token = net(input_seq);
+                auto predicted = net(std::vector<matrix<int, 0, 1>>{ input_seq, input_seq });
+                next_token = static_cast<int>(predicted[0]);
                 token_buffer.push_back(next_token);
                 token_count++;
 
@@ -764,7 +763,7 @@ int main(int argc, char** argv)
  *    + max sequence length: 100
  * - Number of parameters: 2,716,770
  *
- * After a 2-step training, the model achieves perfect memorization of the dataset.
+ * After a 1-step training, the model achieves perfect memorization of the dataset.
  * The generation option produces text that matches the original dataset byte-for-byte
  * with 100% accuracy.
  */

@@ -76,7 +76,8 @@ namespace dlib
         - Optimized for autoregressive language modeling
     !*/
     template <long num_logits, long embedding_dim, typename SUBNET>
-    using classification_head = loss_cross_entropy_per_logit<linear<num_logits, rms_norm<SUBNET>>>;
+    using classification_head = loss_cross_entropy_per_logit<linear<num_logits, 
+        linear<embedding_dim / 4, rms_norm<SUBNET>>>>;
 
     // Core model parameters
     template<
@@ -239,7 +240,7 @@ moe_param_info get_moe_param_info(const net_type& net, long num_layers)
     moe_param_info info;
 
     // Access first MoE layer
-    const auto& moe_layer = layer<4>(net).layer_details();
+    const auto& moe_layer = layer<5>(net).layer_details();
 
     // Get MoE configuration
     info.num_experts = moe_layer.num_experts();
@@ -566,8 +567,7 @@ int main(int argc, char** argv)
             {
                 if (!g_terminate_flag.load()) {
                     cout << "Evaluating model accuracy...\n";
-                    using net_infer = my_transformer::network_type<false>;
-                    net_infer g_infer;
+                    my_transformer::network_type<false> g_infer;
                     deserialize(model_file) >> g_infer >> tokenizer;
                     auto predicted = g_infer(samples);
                     size_t correct = 0;
@@ -680,7 +680,8 @@ int main(int argc, char** argv)
             // Generate tokens autoregressively
             for (size_t i = 0; i < tokens_to_generate && !g_terminate_flag.load(); ++i) {
                 // Predict next token
-                int next_token = net(input_seq);
+                auto predicted = net(std::vector<matrix<int, 0, 1>>{ input_seq, input_seq });
+                int next_token = static_cast<int>(predicted[0]);
 
                 // Stop if end-of-text token is generated
                 if (next_token == end_of_text_id)

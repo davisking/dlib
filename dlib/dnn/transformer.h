@@ -70,7 +70,6 @@ namespace dlib
         template <template <typename> class ACT, template <typename> class DO,
             long seq_len, long d_model, long num_heads, typename SUBNET>
         using transformer_block = 
-            //act<
             add_prev4<std_ffn<ACT, DO, d_model, rms_norm<tag4<
             multihead_attention<ACT, DO, seq_len, d_model, num_heads, SUBNET>>>>>;
 
@@ -134,7 +133,6 @@ namespace dlib
         template <template <typename> class ACT, template <typename> class DO,
             long seq_len, long d_model, long num_heads, typename SUBNET>
         using transformer_block = 
-            //act<
             add_prev5<std_ffn<ACT, DO, d_model, rms_norm<tag5<
             multihead_attention<ACT, DO, d_model, num_heads, SUBNET>>>>>;
 

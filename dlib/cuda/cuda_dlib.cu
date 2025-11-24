@@ -2422,7 +2422,7 @@ namespace dlib
             {
                 const auto ps = src + n * ks * num;
                 float sum_squares = 0.0f;
-                for (auto i : grid_stride_range(0, ks * num))
+                for (auto i : grid_stride_range(0, ks* num))
                 {
                     sum_squares += ps[i] * ps[i];
                 }
@@ -2443,7 +2443,7 @@ namespace dlib
             {
                 const auto ps = src + n * ks * num;
                 const auto pd = dest + n * ks * num;
-                for (auto i : grid_stride_range(0, ks * num))
+                for (auto i : grid_stride_range(0, ks* num))
                 {
                     pd[i] = ps[i] * scale[n] * gamma[i / num];
                 }
@@ -2457,7 +2457,7 @@ namespace dlib
             const tensor& src,
             const tensor& gamma
         )
-        {            
+        {
             DLIB_CASSERT(
                 gamma.k() == src.k() &&
                 gamma.nr() == 1 &&
@@ -2492,12 +2492,12 @@ namespace dlib
             const float* gradient_input,
             const float* scale,
             const float* gamma,
-            size_t ns, 
-            size_t ks,  
-            size_t num 
+            size_t ns,
+            size_t ks,
+            size_t num
         )
         {
-            for (auto nk : grid_stride_range_y(0, ns * ks))
+            for (auto nk : grid_stride_range_y(0, ns* ks))
             {
                 const auto n = nk / ks;
                 const auto k = nk % ks;
@@ -2524,7 +2524,7 @@ namespace dlib
                 const auto ps = src + n * ks * num;
                 const auto pgi = gradient_input + n * ks * num;
                 const auto psg = src_grad + n * ks * num;
-                for (auto i : grid_stride_range(0, ks * num))
+                for (auto i : grid_stride_range(0, ks* num))
                 {
                     const float dx = pgi[i] * gamma[i / num];
                     psg[i] += dx * scale[n] + dscale[n] * 2 * ps[i] * invnum;
@@ -2541,7 +2541,7 @@ namespace dlib
             tensor& gamma_grad,
             resizable_tensor& dscale
         )
-        {            
+        {
             DLIB_CASSERT(src.num_samples() == scale.size());
             DLIB_CASSERT(have_same_dimensions(gamma, gamma_grad));
             DLIB_CASSERT(gamma.k() == src.k());
@@ -2558,7 +2558,6 @@ namespace dlib
             dscale.copy_size(scale);
             dscale = 0;
 
-            // Lancement du kernel CUDA
             launch_kernel(_cuda_rms_normalize_gradient, max_jobs(ks * num, ns),
                 src_grad.device(), gamma_grad.device(), dscale.device(),
                 src.device(), gradient_input.device(), scale.device(), gamma.device(),

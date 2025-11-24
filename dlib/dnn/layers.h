@@ -2407,7 +2407,7 @@ namespace dlib
         {
             const auto& prev_output = sub.get_output();
             DLIB_CASSERT((long)num_inputs == prev_output.nc(),
-                "The size of the input tensor to this linear layer doesn't match the size the linear layer was trained with.");            
+                "The size of the input tensor to this linear layer doesn't match the size the linear layer was trained with.");
             output.set_size(prev_output.num_samples(), prev_output.k(), prev_output.nr(), num_outputs);
 
             auto o = alias_tensor(output.num_samples() * output.k() * output.nr(), num_outputs)(output, 0);
@@ -5378,6 +5378,7 @@ namespace dlib
             
             output.set_size(prev_output.num_samples(), prev_output.k(), sequence_dim, embedding_dim);
             tt::add(output, prev_output, pe);
+
         }
 
         template <typename SUBNET>
