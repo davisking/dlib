@@ -2501,8 +2501,7 @@ namespace dlib
 
    // ----------------------------------------------------------------------------------------
 
-        __global__ void _cuda_rms_normalize_gradient(
-            float* src_grad,
+        __global__ void _cuda_rms_normalize_gradient_accumulate(
             float* gamma_grad,
             float* dscale,
             const float* src,
@@ -2526,15 +2525,27 @@ namespace dlib
                 for (auto i : grid_stride_range(0, num))
                 {
                     const float x_hat = ps[i] * scale[n];
-                    const float dx = pgi[i] * gamma[i / num];
+                    const float dx = pgi[i] * gamma[k];
                     temp_gg += pgi[i] * x_hat;
                     temp_ds += dx * ps[i] * scale_pow;
                 }
                 warp_reduce_atomic_add(gamma_grad[k], temp_gg);
                 warp_reduce_atomic_add(dscale[n], temp_ds);
             }
-            __syncthreads();
+        }
 
+        __global__ void _cuda_rms_normalize_gradient_apply(
+            float* src_grad,
+            const float* dscale,
+            const float* src,
+            const float* gradient_input,
+            const float* scale,
+            const float* gamma,
+            size_t ns,
+            size_t ks,
+            size_t num
+        )
+        {
             const float invnum = 1.0f / (ks * num);
             for (auto n : grid_stride_range_y(0, ns))
             {
@@ -2575,8 +2586,13 @@ namespace dlib
             dscale.copy_size(scale);
             dscale = 0;
 
-            launch_kernel(_cuda_rms_normalize_gradient, max_jobs(ks * num, ns),
-                src_grad.device(), gamma_grad.device(), dscale.device(),
+            launch_kernel(_cuda_rms_normalize_gradient_accumulate, max_jobs(ks * num, ns * ks),
+                gamma_grad.device(), dscale.device(),
+                src.device(), gradient_input.device(), scale.device(), gamma.device(),
+                ns, ks, num);
+
+            launch_kernel(_cuda_rms_normalize_gradient_apply, max_jobs(ks * num, ns),
+                src_grad.device(), dscale.device(),
                 src.device(), gradient_input.device(), scale.device(), gamma.device(),
                 ns, ks, num);
         }
