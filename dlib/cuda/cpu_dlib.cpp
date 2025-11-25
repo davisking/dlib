@@ -1494,7 +1494,6 @@ namespace dlib
                 }
                 p_scale[n] = 1.0f / std::sqrt(p_scale[n] / (ks * num) + static_cast<float>(eps));
             }
-            scale.host();
 
             // Apply RMS normalization
             p_src = src.host();

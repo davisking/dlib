@@ -28,7 +28,7 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-    // CANONICAL TRANSFORMER ARCHITECTURE (separate projections)
+    // CANONICAL TRANSFORMER ARCHITECTURE
     namespace canonical_transformer
     {
 
@@ -46,16 +46,16 @@ namespace dlib
 
         template <template <typename> class ACT, template <typename> class DO,
             long seq_len, long d_model, long num_heads, typename SUBNET>
-        using multihead_attention = add_prev1<
+        using multihead_attention =
             DO<linear_no_bias<d_model, reshape_to<1, seq_len, d_model,
-            multm_prev2<softmaxm<tril_mask<
+            multm_prev3<softmaxm<tril_mask<
             scale_weights<d_model / num_heads,
-            multm_prev3<
-            rope<query<seq_len, d_model, num_heads, skip1<
-            tag3<transpose<
-            rope<key<seq_len, d_model, num_heads, skip1<
-            tag2<value<seq_len, d_model, num_heads,
-            rms_norm<tag1<SUBNET>>>>>>>>>>>>>>>>>>>>>;
+            multm_prev4<
+            rope<query<seq_len, d_model, num_heads, skip2<
+            tag4<transpose<
+            rope<key<seq_len, d_model, num_heads, skip2<
+            tag3<value<seq_len, d_model, num_heads,
+            tag2<SUBNET>>>>>>>>>>>>>>>>>>>;
 
         template <template <typename> class ACT, template <typename> class DO,
             long d_model, typename SUBNET>
@@ -64,14 +64,14 @@ namespace dlib
         // Standard SwiGLU FFN implementation
         // Reference: Noam Shazeer's "GLU Variants Improve Transformer" (https://arxiv.org/abs/2002.05202)
         template <template <typename> class DO, long d_model, typename SUBNET>
-        using swiglu = DO<linear<d_model, mult_prev6<linear<(d_model * 2) / 7, skip5<
-            tag6<silu<linear<(d_model * 2) / 7, tag5<SUBNET>>>>>>>>>;
+        using swiglu = DO<linear<d_model, mult_prev7<linear<(d_model * 2) / 7, skip6<
+            tag7<silu<linear<(d_model * 2) / 7, tag6<SUBNET>>>>>>>>>;
 
         template <template <typename> class ACT, template <typename> class DO,
             long seq_len, long d_model, long num_heads, typename SUBNET>
         using transformer_block = 
-            add_prev4<std_ffn<ACT, DO, d_model, rms_norm<tag4<
-            multihead_attention<ACT, DO, seq_len, d_model, num_heads, SUBNET>>>>>;
+            add_prev5<std_ffn<ACT, DO, d_model, rms_norm<tag5<
+            add_prev1<multihead_attention<ACT, DO, seq_len, d_model, num_heads, rms_norm<tag1<SUBNET>>>>>>>>;
 
         template<long remaining_layers, template <typename> class ACT, template <typename> class DO,
             long seq_len, long d_model, long num_heads, typename SUBNET, typename enabled = void>
@@ -85,7 +85,7 @@ namespace dlib
             long seq_len, long d_model, long num_heads, typename SUBNET>
         struct transformer_stack_impl<0, ACT, DO, seq_len, d_model, num_heads, SUBNET, void>
         {
-            using type = tag5<SUBNET>;
+            using type = tag10<SUBNET>;
         };
 
         template<long num_layers, template <typename> class ACT, template <typename> class DO,
@@ -94,7 +94,7 @@ namespace dlib
 
     } // namespace std_transformer
 
-    // FUSED TRANSFORMER ARCHITECTURE (separate projections)
+    // FUSED TRANSFORMER ARCHITECTURE
     namespace fused_transformer
     {
 
@@ -109,7 +109,7 @@ namespace dlib
 
         template <template <typename> class ACT, template <typename> class DO,
             long d_model, long num_heads, typename SUBNET>
-        using multihead_attention = add_prev1<
+        using multihead_attention =
             DO<extract<0, 1, 1, d_model, fc_no_bias<d_model,
             multm_prev3<softmaxm<tril_mask<
             scale_weights<d_model / num_heads,
@@ -118,7 +118,7 @@ namespace dlib
             tag4<key<num_heads, d_model, skip2<
             tag3<value<num_heads, d_model,
             tag2<fc_no_bias<d_model * 3,
-            rms_norm<tag1<SUBNET>>>>>>>>>>>>>>>>>>>>;
+            SUBNET>>>>>>>>>>>>>>>>>;
 
         template <template <typename> class ACT, template <typename> class DO,
             long d_model, typename SUBNET>
@@ -134,7 +134,7 @@ namespace dlib
             long seq_len, long d_model, long num_heads, typename SUBNET>
         using transformer_block = 
             add_prev5<std_ffn<ACT, DO, d_model, rms_norm<tag5<
-            multihead_attention<ACT, DO, d_model, num_heads, SUBNET>>>>>;
+            add_prev1<multihead_attention<ACT, DO, d_model, num_heads, rms_norm<tag1<SUBNET>>>>>>>>;
 
         template<long remaining_layers, template <typename> class ACT, template <typename> class DO,
             long seq_len, long d_model, long num_heads, typename SUBNET, typename enabled = void>
@@ -148,7 +148,7 @@ namespace dlib
             long seq_len, long d_model, long num_heads, typename SUBNET>
         struct transformer_stack_impl<0, ACT, DO, seq_len, d_model, num_heads, SUBNET, void>
         {
-            using type = tag6<SUBNET>;
+            using type = tag10<SUBNET>;
         };
 
         template<long num_layers, template <typename> class ACT, template <typename> class DO,

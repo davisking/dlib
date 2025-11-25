@@ -663,8 +663,9 @@ int main(int argc, char** argv)
             int end_of_text = tokenizer.get_special_token_id("</text>"), next_token = 0;
             while (total_bytes < target_size && next_token != end_of_text && !g_terminate_flag.load()) {
                 // Predict next token
-                auto predicted = net(std::vector<matrix<int, 0, 1>>{ input_seq, input_seq });
-                next_token = static_cast<int>(predicted[0]);
+                //auto predicted = net(std::vector<matrix<int, 0, 1>>{ input_seq, input_seq });
+                //next_token = static_cast<int>(predicted[0]);
+                next_token = net(input_seq);
                 token_buffer.push_back(next_token);
                 token_count++;
 

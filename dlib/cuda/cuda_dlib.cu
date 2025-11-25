@@ -2407,12 +2407,9 @@ namespace dlib
 
    // ----------------------------------------------------------------------------------------
 
-        __global__ void _cuda_rms_normalize(
-            float* dest,
+        __global__ void _cuda_rms_normalize_accumulate(
             float* scale,
             const float* src,
-            const float* gamma,
-            float eps,
             size_t ns,
             size_t ks,
             size_t num
@@ -2428,17 +2425,31 @@ namespace dlib
                 }
                 warp_reduce_atomic_add(scale[n], sum_squares / (ks * num));
             }
-            __syncthreads();
+        }
 
+        __global__ void _cuda_rms_normalize_invert(
+            float* scale,
+            float eps,
+            size_t ns
+        )
+        {
             for (auto n : grid_stride_range_y(0, ns))
             {
-                for (auto i : grid_stride_range(0, 1))
-                {
+                if (threadIdx.x == 0)
                     scale[n] = 1.0f / std::sqrt(scale[n] + eps);
-                }
             }
-            __syncthreads();
+        }
 
+        __global__ void _cuda_rms_normalize_apply(
+            float* dest,
+            const float* scale,
+            const float* src,
+            const float* gamma,
+            size_t ns,
+            size_t ks,
+            size_t num
+        )
+        {
             for (auto n : grid_stride_range_y(0, ns))
             {
                 const auto ps = src + n * ks * num;
@@ -2478,8 +2489,14 @@ namespace dlib
             scale.set_size(ns);
             scale = 0;
 
-            launch_kernel(_cuda_rms_normalize, max_jobs(ks * num, ns),
-                dest.device(), scale.device(), src.device(), gamma.device(), eps, ns, ks, num);
+            launch_kernel(_cuda_rms_normalize_accumulate, max_jobs(ks * num, ns),
+                scale.device(), src.device(), ns, ks, num);
+
+            launch_kernel(_cuda_rms_normalize_invert, max_jobs(1, ns),
+                scale.device(), eps, ns);
+
+            launch_kernel(_cuda_rms_normalize_apply, max_jobs(ks * num, ns),
+                dest.device(), scale.device(), src.device(), gamma.device(), ns, ks, num);
         }
 
    // ----------------------------------------------------------------------------------------

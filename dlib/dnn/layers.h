@@ -5378,7 +5378,6 @@ namespace dlib
             
             output.set_size(prev_output.num_samples(), prev_output.k(), sequence_dim, embedding_dim);
             tt::add(output, prev_output, pe);
-
         }
 
         template <typename SUBNET>
