@@ -480,7 +480,7 @@ namespace dlib
         !*/
         explicit moe_() :
             n_experts(0),
-            noise_scale(0.0f),
+            noise_scale(0.05f),
             top_k(top_e),
             usage_update_rate(0.05f),
             cached_batch_size_(0)
