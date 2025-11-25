@@ -66,7 +66,7 @@ namespace dlib
         long seq_len, long d_model, long num_heads, typename MODE, typename SUBNET>
     using trans_moe_block =
         moe_ffn<expert_net_type<DO, d_model>, 4, 0, MODE, DO,
-        multihead_attention<ACT, DO, seq_len, d_model, num_heads, SUBNET>>;
+        add_prev1<multihead_attention<ACT, DO, seq_len, d_model, num_heads, rms_norm<tag1<SUBNET>>>>>;
 
     /*!
         Classification head for next-token prediction.
@@ -75,9 +75,9 @@ namespace dlib
         - Computes loss only on the last sequence position
         - Optimized for autoregressive language modeling
     !*/
-    template <long num_logits, long embedding_dim, typename SUBNET>
-    using classification_head = loss_cross_entropy_per_logit<linear<num_logits, 
-        linear<embedding_dim / 4, rms_norm<SUBNET>>>>;
+    template <long num_logits, typename SUBNET>
+    using classification_head = loss_cross_entropy_per_logit<
+        linear<num_logits, rms_norm<SUBNET>>>;
 
     // Core model parameters
     template<
@@ -118,10 +118,10 @@ namespace dlib
         // Complete network type selector based on training/inference mode
         template<bool is_training>
         using network_type = std::conditional_t<is_training,
-            classification_head<VOCAB_SIZE, EMBEDDING_DIM,
+            classification_head<VOCAB_SIZE,
             repeat<NUM_LAYERS, t_transformer_block,
             token_embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>,
-            classification_head<VOCAB_SIZE, EMBEDDING_DIM,
+            classification_head<VOCAB_SIZE,
             repeat<NUM_LAYERS, i_transformer_block,
             token_embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>;
 
@@ -240,7 +240,7 @@ moe_param_info get_moe_param_info(const net_type& net, long num_layers)
     moe_param_info info;
 
     // Access first MoE layer
-    const auto& moe_layer = layer<5>(net).layer_details();
+    const auto& moe_layer = layer<4>(net).layer_details();
 
     // Get MoE configuration
     info.num_experts = moe_layer.num_experts();
@@ -326,10 +326,10 @@ int main(int argc, char** argv)
 
         // Model architecture parameters
         const long num_tokens = 3500;
-        const long num_layers = 6;
-        const long num_heads = 8;
-        const long embedding_dim = 256;
-        const long max_seq_len = 128;
+        const long num_layers = 4;
+        const long num_heads = 6;
+        const long embedding_dim = 228;
+        const long max_seq_len = 100;
 
         // Define transformer configuration with MoE
         using my_transformer = transformer_config<
@@ -680,8 +680,7 @@ int main(int argc, char** argv)
             // Generate tokens autoregressively
             for (size_t i = 0; i < tokens_to_generate && !g_terminate_flag.load(); ++i) {
                 // Predict next token
-                auto predicted = net(std::vector<matrix<int, 0, 1>>{ input_seq, input_seq });
-                int next_token = static_cast<int>(predicted[0]);
+                int next_token = net(input_seq);
 
                 // Stop if end-of-text token is generated
                 if (next_token == end_of_text_id)
