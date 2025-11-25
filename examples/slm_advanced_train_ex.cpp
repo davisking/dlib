@@ -663,8 +663,6 @@ int main(int argc, char** argv)
             int end_of_text = tokenizer.get_special_token_id("</text>"), next_token = 0;
             while (total_bytes < target_size && next_token != end_of_text && !g_terminate_flag.load()) {
                 // Predict next token
-                //auto predicted = net(std::vector<matrix<int, 0, 1>>{ input_seq, input_seq });
-                //next_token = static_cast<int>(predicted[0]);
                 next_token = net(input_seq);
                 token_buffer.push_back(next_token);
                 token_count++;
@@ -754,7 +752,7 @@ int main(int argc, char** argv)
 /*
  * This program demonstrates advanced tokenization and training of a language model
  * on an internal dataset using a BPE-style tokenizer with 3500 vocabulary entries.
- * The training process produces a model file of approximately 13.5MB on disk.
+ * The training process produces a model file of approximately 18.5MB on disk.
  *
  * - Transformer model configuration:
  *    + vocabulary size: 3500
@@ -762,9 +760,9 @@ int main(int argc, char** argv)
  *    + attention heads: 6
  *    + embedding dimension: 228 
  *    + max sequence length: 100
- * - Number of parameters: 2,716,770
+ * - Number of parameters: 4,002,458
  *
- * After a 1-step training, the model achieves perfect memorization of the dataset.
+ * After a 1-step full training, the model achieves perfect memorization of the dataset.
  * The generation option produces text that matches the original dataset byte-for-byte
  * with 100% accuracy.
  */
