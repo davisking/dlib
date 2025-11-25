@@ -376,11 +376,6 @@ namespace dlib
                 - DO: dropout policy
                 - d_model: model dimension
                 - num_heads: number of attention heads
-
-            PERFORMANCE NOTES
-                - Typically 10-20% faster than canonical version
-                - Better memory access patterns
-                - Reduced parameter initialization overhead
         !*/
 
         template <template <typename> class ACT, template <typename> class DO,
