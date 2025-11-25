@@ -199,7 +199,7 @@ int main(int argc, char** argv)
             trainer.set_min_learning_rate(1e-6);
             trainer.set_mini_batch_size(batch_size);
             trainer.set_iterations_without_progress_threshold(5000);
-            trainer.set_max_num_epochs(200);
+            trainer.set_max_num_epochs(150);
             trainer.be_verbose();
 
             // 4) Train
@@ -297,7 +297,7 @@ int main(int argc, char** argv)
  * The training can be performed using the following command line:
  * > ./slm_basic_train_ex --train --shuffle
  *
- * After this phase, the model achieves perfect prediction accuracy (i.e acc~99.98%).
+ * After this phase, the model achieves perfect prediction accuracy (i.e acc~99.99%).
  * The generation option produces text that is very similar or identical to the original
  * training data, as illustrated by the example below:
  * 
