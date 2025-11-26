@@ -11,6 +11,362 @@
 
 namespace dlib
 {
+
+    // ---------------------------------------------------------------------------------
+
+    enum class file_content_type
+    {
+        TEXT_PLAIN,      // Plain text file (including CSV, code, etc.)
+        TEXT_XML,        // XML or HTML markup
+        IMAGE,           // Image formats (PNG, JPEG, GIF, TIFF, BMP, etc.)
+        VIDEO,           // Video formats (MP4, AVI, MKV, etc.)
+        AUDIO,           // Audio formats (MP3, WAV, FLAC, etc.)
+        EXECUTABLE,      // Executable files (EXE, DLL, ELF, Mach-O)
+        COMPRESSED,      // Compressed archives (ZIP, GZIP, 7Z, RAR, etc.)
+        PDF,             // PDF documents
+        OFFICE,          // Office documents (DOCX, XLSX, PPTX, etc.)
+        UNKNOWN          // Unknown or undetermined file type
+    };
+
+    // ---------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        // Magic number signature structure
+        struct magic_signature
+        {
+            const unsigned char* bytes;
+            size_t length;
+            file_content_type type;
+            size_t offset;  // Byte offset where signature should appear
+        };
+
+        // Common magic number signatures (ordered by frequency/priority)
+        static const unsigned char sig_png[] = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+        static const unsigned char sig_jpg1[] = { 0xFF, 0xD8, 0xFF, 0xE0 };
+        static const unsigned char sig_jpg2[] = { 0xFF, 0xD8, 0xFF, 0xE1 };
+        static const unsigned char sig_jpg3[] = { 0xFF, 0xD8, 0xFF, 0xDB };
+        static const unsigned char sig_jpg4[] = { 0xFF, 0xD8, 0xFF, 0xEE };
+        static const unsigned char sig_gif87[] = { 0x47, 0x49, 0x46, 0x38, 0x37, 0x61 };  // GIF87a
+        static const unsigned char sig_gif89[] = { 0x47, 0x49, 0x46, 0x38, 0x39, 0x61 };  // GIF89a
+        static const unsigned char sig_tiff_le[] = { 0x49, 0x49, 0x2A, 0x00 };  // Little endian
+        static const unsigned char sig_tiff_be[] = { 0x4D, 0x4D, 0x00, 0x2A };  // Big endian
+        static const unsigned char sig_bmp[] = { 0x42, 0x4D };
+        static const unsigned char sig_webp[] = { 0x52, 0x49, 0x46, 0x46 };  // RIFF (check for WEBP at offset 8)
+
+        static const unsigned char sig_pdf[] = { 0x25, 0x50, 0x44, 0x46 };  // %PDF
+
+        static const unsigned char sig_zip[] = { 0x50, 0x4B, 0x03, 0x04 };
+        static const unsigned char sig_gzip[] = { 0x1F, 0x8B };
+        static const unsigned char sig_7z[] = { 0x37, 0x7A, 0xBC, 0xAF, 0x27, 0x1C };
+        static const unsigned char sig_rar[] = { 0x52, 0x61, 0x72, 0x21, 0x1A, 0x07 };
+
+        static const unsigned char sig_exe[] = { 0x4D, 0x5A };  // MZ (DOS/Windows executable)
+        static const unsigned char sig_elf[] = { 0x7F, 0x45, 0x4C, 0x46 };  // ELF (Unix/Linux executable)
+        static const unsigned char sig_macho_32[] = { 0xFE, 0xED, 0xFA, 0xCE };  // Mach-O 32-bit
+        static const unsigned char sig_macho_64[] = { 0xFE, 0xED, 0xFA, 0xCF };  // Mach-O 64-bit
+
+        static const unsigned char sig_mp3_id3[] = { 0x49, 0x44, 0x33 };  // ID3
+        static const unsigned char sig_mp3_ff[] = { 0xFF, 0xFB };
+        static const unsigned char sig_wav[] = { 0x52, 0x49, 0x46, 0x46 };  // RIFF (check for WAVE at offset 8)
+        static const unsigned char sig_flac[] = { 0x66, 0x4C, 0x61, 0x43 };  // fLaC
+        static const unsigned char sig_ogg[] = { 0x4F, 0x67, 0x67, 0x53 };  // OggS
+
+        static const unsigned char sig_mp4[] = { 0x66, 0x74, 0x79, 0x70 };  // ftyp (at offset 4)
+        static const unsigned char sig_avi[] = { 0x52, 0x49, 0x46, 0x46 };  // RIFF (check for AVI at offset 8)
+        static const unsigned char sig_mkv[] = { 0x1A, 0x45, 0xDF, 0xA3 };
+
+        static const magic_signature signatures[] = {
+            // Images
+            {sig_png, sizeof(sig_png), file_content_type::IMAGE, 0},
+            {sig_jpg1, sizeof(sig_jpg1), file_content_type::IMAGE, 0},
+            {sig_jpg2, sizeof(sig_jpg2), file_content_type::IMAGE, 0},
+            {sig_jpg3, sizeof(sig_jpg3), file_content_type::IMAGE, 0},
+            {sig_jpg4, sizeof(sig_jpg4), file_content_type::IMAGE, 0},
+            {sig_gif87, sizeof(sig_gif87), file_content_type::IMAGE, 0},
+            {sig_gif89, sizeof(sig_gif89), file_content_type::IMAGE, 0},
+            {sig_tiff_le, sizeof(sig_tiff_le), file_content_type::IMAGE, 0},
+            {sig_tiff_be, sizeof(sig_tiff_be), file_content_type::IMAGE, 0},
+            {sig_bmp, sizeof(sig_bmp), file_content_type::IMAGE, 0},
+
+            // PDF
+            {sig_pdf, sizeof(sig_pdf), file_content_type::PDF, 0},
+
+            // Compressed
+            {sig_zip, sizeof(sig_zip), file_content_type::COMPRESSED, 0},
+            {sig_gzip, sizeof(sig_gzip), file_content_type::COMPRESSED, 0},
+            {sig_7z, sizeof(sig_7z), file_content_type::COMPRESSED, 0},
+            {sig_rar, sizeof(sig_rar), file_content_type::COMPRESSED, 0},
+
+            // Executables
+            {sig_exe, sizeof(sig_exe), file_content_type::EXECUTABLE, 0},
+            {sig_elf, sizeof(sig_elf), file_content_type::EXECUTABLE, 0},
+            {sig_macho_32, sizeof(sig_macho_32), file_content_type::EXECUTABLE, 0},
+            {sig_macho_64, sizeof(sig_macho_64), file_content_type::EXECUTABLE, 0},
+
+            // Audio
+            {sig_mp3_id3, sizeof(sig_mp3_id3), file_content_type::AUDIO, 0},
+            {sig_mp3_ff, sizeof(sig_mp3_ff), file_content_type::AUDIO, 0},
+            {sig_flac, sizeof(sig_flac), file_content_type::AUDIO, 0},
+            {sig_ogg, sizeof(sig_ogg), file_content_type::AUDIO, 0},
+
+            // Video
+            {sig_mp4, sizeof(sig_mp4), file_content_type::VIDEO, 4},
+            {sig_mkv, sizeof(sig_mkv), file_content_type::VIDEO, 0}
+        };
+
+        // Portable case-insensitive string comparison (C++14 compatible)
+        inline bool iequals_n(const char* s1, const char* s2, size_t n)
+        {
+            for (size_t i = 0; i < n; ++i)
+            {
+                const char c1 = (s1[i] >= 'A' && s1[i] <= 'Z') ? s1[i] + 32 : s1[i];
+                const char c2 = (s2[i] >= 'A' && s2[i] <= 'Z') ? s2[i] + 32 : s2[i];
+                if (c1 != c2) return false;
+            }
+            return true;
+        }
+
+        // Case-insensitive check for file extension
+        inline bool has_extension(const std::string& filename, const char* ext)
+        {
+            const size_t ext_len = std::strlen(ext);
+            if (filename.length() < ext_len) return false;
+
+            const size_t start = filename.length() - ext_len;
+            for (size_t i = 0; i < ext_len; ++i)
+            {
+                const char fc = filename[start + i];
+                const char ec = ext[i];
+                const char fc_lower = (fc >= 'A' && fc <= 'Z') ? fc + 32 : fc;
+                const char ec_lower = (ec >= 'A' && ec <= 'Z') ? ec + 32 : ec;
+                if (fc_lower != ec_lower) return false;
+            }
+            return true;
+        }
+
+        // Calculate Shannon entropy for a buffer
+        inline double calculate_entropy(const unsigned char* buffer, size_t length)
+        {
+            if (length == 0) return 0.0;
+
+            // Count byte frequency
+            std::array<size_t, 256> counts = {};
+            for (size_t i = 0; i < length; ++i)
+                counts[buffer[i]]++;
+
+            // Calculate entropy using Shannon's formula: H = -sum(p * log2(p))
+            double entropy = 0.0;
+            const double length_d = static_cast<double>(length);
+
+            for (size_t i = 0; i < 256; ++i)
+            {
+                if (counts[i] > 0)
+                {
+                    const double probability = static_cast<double>(counts[i]) / length_d;
+                    entropy -= probability * std::log2(probability);
+                }
+            }
+
+            return entropy;
+        }
+
+        // Check if buffer contains mostly printable ASCII/UTF-8 text
+        inline bool is_text_content(const unsigned char* buffer, size_t length)
+        {
+            if (length == 0) return false;
+
+            size_t printable_count = 0;
+            size_t whitespace_count = 0;
+            size_t control_count = 0;
+
+            for (size_t i = 0; i < length; ++i)
+            {
+                const unsigned char ch = buffer[i];
+
+                // Common whitespace characters
+                if (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r')
+                {
+                    whitespace_count++;
+                    printable_count++;
+                }
+                // Printable ASCII range
+                else if (ch >= 32 && ch <= 126)
+                {
+                    printable_count++;
+                }
+                // UTF-8 continuation bytes (10xxxxxx)
+                else if ((ch & 0xC0) == 0x80)
+                {
+                    printable_count++;
+                }
+                // UTF-8 multi-byte sequence starts (110xxxxx, 1110xxxx, 11110xxx)
+                else if ((ch & 0xE0) == 0xC0 || (ch & 0xF0) == 0xE0 || (ch & 0xF8) == 0xF0)
+                {
+                    printable_count++;
+                }
+                // Control characters (excluding common whitespace)
+                else if (ch < 32)
+                {
+                    control_count++;
+                }
+            }
+
+            // Consider as text if >90% printable and <10% control chars
+            const double printable_ratio = static_cast<double>(printable_count) / length;
+            const double control_ratio = static_cast<double>(control_count) / length;
+
+            return printable_ratio > 0.90 && control_ratio < 0.10;
+        }
+
+        // Check for XML/HTML markers
+        inline bool is_xml_content(const unsigned char* buffer, size_t length)
+        {
+            if (length < 5) return false;
+
+            const char* str = reinterpret_cast<const char*>(buffer);
+
+            // Check for "<?xml" (case-insensitive)
+            if (length >= 5 && buffer[0] == '<' && buffer[1] == '?')
+            {
+                if (iequals_n(str + 2, "xml", 3))
+                    return true;
+            }
+
+            // Check for HTML doctype (case-insensitive)
+            if (length >= 9 && buffer[0] == '<' && buffer[1] == '!')
+            {
+                if (iequals_n(str + 2, "DOCTYPE", 7))
+                    return true;
+            }
+
+            // Check for HTML tags (case-insensitive)
+            if (length >= 6 && buffer[0] == '<')
+            {
+                if (iequals_n(str + 1, "html>", 5) || iequals_n(str + 1, "html ", 5))
+                    return true;
+            }
+
+            return false;
+        }
+
+        // Special check for RIFF-based formats (WAV, AVI, WEBP)
+        inline file_content_type check_riff_type(const unsigned char* buffer, size_t length)
+        {
+            if (length < 12) return file_content_type::UNKNOWN;
+
+            // RIFF format: "RIFF" + size (4 bytes) + format type (4 bytes)
+            if (std::memcmp(buffer + 8, "WAVE", 4) == 0)
+                return file_content_type::AUDIO;
+            else if (std::memcmp(buffer + 8, "AVI ", 4) == 0)
+                return file_content_type::VIDEO;
+            else if (std::memcmp(buffer + 8, "WEBP", 4) == 0)
+                return file_content_type::IMAGE;
+
+            return file_content_type::UNKNOWN;
+        }
+
+        // Check if ZIP is actually an Office document (DOCX, XLSX, PPTX)
+        inline file_content_type check_office_type(const std::string& filename)
+        {
+            if (has_extension(filename, ".docx") ||
+                has_extension(filename, ".xlsx") ||
+                has_extension(filename, ".pptx"))
+            {
+                return file_content_type::OFFICE;
+            }
+
+            return file_content_type::COMPRESSED;
+        }
+    }
+
+    // ---------------------------------------------------------------------------------
+
+    inline bool detect_file_type(
+        const std::string& filename,
+        file_content_type& detected_type
+    )
+    {
+        detected_type = file_content_type::UNKNOWN;
+
+        // Open file in binary mode
+        std::ifstream file(filename, std::ios::binary);
+        if (!file.is_open())
+            return false;
+
+        // Read initial bytes for analysis (8KB should be sufficient)
+        constexpr size_t BUFFER_SIZE = 8192;
+        std::array<unsigned char, BUFFER_SIZE> buffer;
+
+        file.read(reinterpret_cast<char*>(buffer.data()), BUFFER_SIZE);
+        const size_t bytes_read = static_cast<size_t>(file.gcount());
+        file.close();
+
+        if (bytes_read == 0)
+            return false;
+
+        // Step 1: Check for known magic number signatures
+        for (const auto& sig : impl::signatures)
+        {
+            if (bytes_read >= sig.offset + sig.length)
+            {
+                if (std::memcmp(buffer.data() + sig.offset, sig.bytes, sig.length) == 0)
+                {
+                    detected_type = sig.type;
+
+                    // Special handling for RIFF-based formats
+                    if (sig.bytes == impl::sig_webp || sig.bytes == impl::sig_wav ||
+                        sig.bytes == impl::sig_avi)
+                    {
+                        const auto riff_type = impl::check_riff_type(buffer.data(), bytes_read);
+                        if (riff_type != file_content_type::UNKNOWN)
+                            detected_type = riff_type;
+                    }
+
+                    // Special handling for ZIP (could be Office document)
+                    if (detected_type == file_content_type::COMPRESSED &&
+                        sig.bytes == impl::sig_zip)
+                    {
+                        detected_type = impl::check_office_type(filename);
+                    }
+
+                    // Binary types
+                    return false;
+                }
+            }
+        }
+
+        // Step 2: Check for XML/HTML content
+        if (impl::is_xml_content(buffer.data(), bytes_read))
+        {
+            detected_type = file_content_type::TEXT_XML;
+            return true;
+        }
+
+        // Step 3: Calculate entropy to distinguish text from binary
+        const double entropy = impl::calculate_entropy(buffer.data(), bytes_read);
+
+        // Step 4: Use heuristics to classify content
+        // Entropy thresholds:
+        //   < 5.0  : Likely plain text
+        //   5.0-6.8: Could be text or structured binary
+        //   > 6.8  : Likely compressed/encrypted/random binary
+
+        const bool is_text = impl::is_text_content(buffer.data(), bytes_read);
+
+        if (is_text && entropy < 6.5)
+        {
+            // High probability of plain text (< 5.5)
+            // Or could be text with some binary content (e.g., source code with special chars)
+            detected_type = file_content_type::TEXT_PLAIN;
+            return true;
+        }
+       
+        // Likely binary content (no recognized format)
+        detected_type = file_content_type::UNKNOWN;
+        return false;
+    }
+
     class inference_context
     {
     public:

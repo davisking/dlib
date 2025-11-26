@@ -75,9 +75,12 @@ namespace dlib
         - Computes loss only on the last sequence position
         - Optimized for autoregressive language modeling
     !*/
-    template <long num_logits, typename SUBNET>
+    /*template <long num_logits, typename SUBNET>
     using classification_head = loss_cross_entropy_per_logit<
-        linear<num_logits, rms_norm<SUBNET>>>;
+        linear<num_logits, rms_norm<SUBNET>>>;*/
+    template <long num_logits, long embedding_dim, typename SUBNET>
+    using classification_head = loss_multiclass_log<fc<num_logits,
+        fc<embedding_dim / 4, rms_norm<SUBNET>>>>;
 
     // Core model parameters
     template<
@@ -118,10 +121,10 @@ namespace dlib
         // Complete network type selector based on training/inference mode
         template<bool is_training>
         using network_type = std::conditional_t<is_training,
-            classification_head<VOCAB_SIZE,
+            classification_head<VOCAB_SIZE, EMBEDDING_DIM,
             repeat<NUM_LAYERS, t_transformer_block,
             token_embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>,
-            classification_head<VOCAB_SIZE,
+            classification_head<VOCAB_SIZE, EMBEDDING_DIM,
             repeat<NUM_LAYERS, i_transformer_block,
             token_embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>;
 
@@ -240,7 +243,7 @@ moe_param_info get_moe_param_info(const net_type& net, long num_layers)
     moe_param_info info;
 
     // Access first MoE layer
-    const auto& moe_layer = layer<4>(net).layer_details();
+    const auto& moe_layer = layer<5>(net).layer_details();
 
     // Get MoE configuration
     info.num_experts = moe_layer.num_experts();

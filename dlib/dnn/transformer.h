@@ -450,7 +450,7 @@ namespace dlib
 
     // Gate network: produces raw logits for expert selection
     template <long num_experts, template <typename> class DO, typename SUBNET>
-    using gate = fc<num_experts, DO<leaky_relu<fc<num_experts, SUBNET>>>>;
+    using gate = fc<num_experts, DO<leaky_relu<fc<num_experts * 8, SUBNET>>>>;
 
     struct training_mode_tag {};
     struct inference_mode_tag {};

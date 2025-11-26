@@ -11,6 +11,117 @@
 
 namespace dlib
 {
+    // ---------------------------------------------------------------------------------
+
+    enum class file_content_type
+    {
+        /*!
+            WHAT THIS ENUM REPRESENTS
+                Enumeration of recognized file content types for classification purposes.
+                Used by detect_file_type() to identify the nature of file contents.
+
+            VALUES
+                TEXT_PLAIN   - Plain text files (including CSV, source code, logs, etc.)
+                TEXT_XML     - XML or HTML markup documents
+                IMAGE        - Image formats (PNG, JPEG, GIF, TIFF, BMP, WEBP, etc.)
+                VIDEO        - Video formats (MP4, AVI, MKV, etc.)
+                AUDIO        - Audio formats (MP3, WAV, FLAC, OGG, etc.)
+                EXECUTABLE   - Executable binary files (EXE, DLL, ELF, Mach-O)
+                COMPRESSED   - Compressed archives (ZIP, GZIP, 7Z, RAR, etc.)
+                PDF          - PDF documents
+                OFFICE       - Office documents (DOCX, XLSX, PPTX)
+                UNKNOWN      - File type could not be determined or is not recognized
+
+            NOTES
+                - Detection is based on file content analysis, not file extensions
+                - Magic number signatures are checked first for binary formats
+                - Entropy analysis and heuristics are used for text vs binary classification
+        !*/
+    };
+
+    // ---------------------------------------------------------------------------------
+
+    inline bool detect_file_type(
+        const std::string& filename,
+        file_content_type& detected_type
+    );
+    /*!
+        ensures
+            - Efficiently detects the content type of a file by analyzing its internal
+              structure using magic number signatures and entropy-based heuristics
+            - Opens and reads the first 8KB of the file for analysis
+            - Returns true if file contains text-based content (TEXT_PLAIN or TEXT_XML)
+            - Returns false if file contains binary content or cannot be opened
+            - Sets detected_type to the most specific content type that could be identified
+            - If file cannot be opened, returns false and sets detected_type to UNKNOWN
+
+        FILE DETECTION METHODOLOGY
+            The function uses a multi-stage detection process:
+
+            Stage 1: magic number detection (Binary Formats)
+                - Checks for ~30 common file format signatures (magic numbers)
+                - Supported formats include:
+                  * Images: PNG, JPEG (4 variants), GIF (87a/89a), TIFF (LE/BE), BMP, WEBP
+                  * Documents: PDF
+                  * Compressed: ZIP, GZIP, 7Z, RAR
+                  * Executables: Windows PE (EXE/DLL), Unix ELF, macOS Mach-O (32/64-bit)
+                  * Audio: MP3 (ID3/FF), WAV, FLAC, OGG
+                  * Video: MP4, AVI, MKV
+                - Special handling for container formats:
+                  * RIFF containers (WAV/AVI/WEBP) are distinguished by format identifier
+                  * ZIP files are checked against filename to detect Office documents (DOCX/XLSX/PPTX)
+                - If magic number is found, returns false (binary) with appropriate type
+
+            Stage 2: XML/HTML detection
+                - Checks for XML declarations (<?xml) and HTML markers
+                - Case-insensitive matching for robustness
+                - Returns true with TEXT_XML if detected
+
+            Stage 3: entropy analysis
+                - Calculates Shannon entropy: H = -sum(p * log2(p))
+                - Entropy ranges from 0 (completely uniform) to 8 (maximum randomness)
+                - Used to distinguish text from compressed/encrypted content
+
+            Stage 4: text content heuristics
+                - Analyzes character distribution:
+                  * Counts printable ASCII/UTF-8 characters
+                  * Counts whitespace and control characters
+                  * Supports multi-byte UTF-8 sequences
+                - Text classification criteria:
+                  * >90% printable characters
+                  * <10% control characters
+                  * Entropy < 5.5 (high confidence text)
+                  * Entropy < 6.5 (text with special characters)
+                  * Entropy >= 6.8 (likely binary/compressed/encrypted)
+
+        TYPICAL USAGE
+            file_content_type type;
+
+            // Detect file type
+            bool is_text = detect_file_type("document.pdf", type);
+
+            if (type == file_content_type::PDF)
+                std::cout << "PDF document detected\n";
+            else if (type == file_content_type::IMAGE)
+                std::cout << "Image file detected\n";
+            else if (is_text)
+                std::cout << "Text file detected\n";
+            else
+                std::cout << "Binary file or unknown format\n";
+
+            // Filter text files for processing
+            std::vector<std::string> filenames = get_file_list();
+            for (const auto& fname : filenames)
+            {
+                file_content_type ftype;
+                if (detect_file_type(fname, ftype))
+                {
+                    // Process text file
+                    process_text_file(fname);
+                }
+            }
+    !*/
+
     class inference_context
     {
         /*!
