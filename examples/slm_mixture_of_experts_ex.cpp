@@ -75,9 +75,6 @@ namespace dlib
         - Computes loss only on the last sequence position
         - Optimized for autoregressive language modeling
     !*/
-    /*template <long num_logits, typename SUBNET>
-    using classification_head = loss_cross_entropy_per_logit<
-        linear<num_logits, rms_norm<SUBNET>>>;*/
     template <long num_logits, long embedding_dim, typename SUBNET>
     using classification_head = loss_multiclass_log<fc<num_logits,
         fc<embedding_dim / 4, rms_norm<SUBNET>>>>;
@@ -299,7 +296,7 @@ int main(int argc, char** argv)
         parser.add_option("learning-rate", "Set the learning rate (default: 2e-4)", 1);
         parser.add_option("batch-size", "Set the mini-batch size (default: 64)", 1);
         parser.add_option("patience", "Iterations without progress before early stopping (default: 15000)", 1);
-        parser.add_option("max-epochs", "Maximum number of training epochs (default: 500)", 1);
+        parser.add_option("max-epochs", "Maximum number of training epochs (default: 250)", 1);
         parser.add_option("alpha", "Set the weight decay for Adam (default: 0.004)", 1);
         parser.add_option("beta1", "Set Adam's first moment coefficient (default: 0.9)", 1);
         parser.add_option("beta2", "Set Adam's second moment coefficient (default: 0.999)", 1);
@@ -319,7 +316,7 @@ int main(int argc, char** argv)
         const double learning_rate = get_option(parser, "learning-rate", 2e-4);
         const size_t batch_size = get_option(parser, "batch-size", 64);
         const long patience = get_option(parser, "patience", 15000);
-        const size_t max_epochs = get_option(parser, "max-epochs", 500);
+        const size_t max_epochs = get_option(parser, "max-epochs", 250);
         const double alpha = get_option(parser, "alpha", 0.004);
         const double beta1 = get_option(parser, "beta1", 0.9);
         const double beta2 = get_option(parser, "beta2", 0.999);
@@ -638,8 +635,10 @@ int main(int argc, char** argv)
             }
 
             // Select a segment for generation (use first segment by default)
-            size_t segment_idx = 0;
-            cout << "Using segment #" << segment_idx << " for generation.\n";
+            dlib::rand rng(std::chrono::system_clock::now().time_since_epoch().count());
+            size_t segment_idx = rng.get_random_32bit_number() % 50;
+            cout << "Randomly selected segment #" << segment_idx << " (out of "
+                << tokenized_segments.size() << ") for generation\n";
             const auto& selected_segment = tokenized_segments[segment_idx];
 
             if (selected_segment.size() < (size_t)max_seq_len) {
@@ -742,11 +741,11 @@ int main(int argc, char** argv)
  *
  * - Transformer model configuration:
  *    + vocabulary size: 3500
- *    + layers: 6
- *    + attention heads: 8
- *    + embedding dimension: 256
- *    + max sequence length: 128
- * - Number of parameters: 4,614,137 (training) - 3,597,749 (inference)
+ *    + layers: 4
+ *    + attention heads: 6
+ *    + embedding dimension: 228
+ *    + max sequence length: 100
+ * - Number of parameters: 5,970,554 (training) - 5,432,738 (inference)
  *
- * After training, the model achieves good memorization of all internal datasets.
+ * After training, the model achieves excellent memorization of all internal datasets.
  */
