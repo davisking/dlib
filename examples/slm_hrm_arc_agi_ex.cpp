@@ -40,7 +40,7 @@ using namespace std;
 using namespace dlib;
 
 // Window length: 256 for quick testing, 512-1024 for better performance, 4096 for maximum context
-constexpr long WINDOW_LEN = 512;
+constexpr long WINDOW_LEN = 1024;
 
 namespace densenet
 {
@@ -66,9 +66,9 @@ namespace densenet
 
         template <size_t n4, size_t n3, size_t n2, size_t n1, typename INPUT>
         using backbone = ACT<BN<
-            repeat<n4, dense_layer, transition<k* (2 + n1 + 2 * n2 + 4 * n3) / 8,
-            repeat<n3, dense_layer, transition<k* (2 + n1 + 2 * n2) / 4,
-            repeat<n2, dense_layer, transition<k* (2 + n1) / 2,
+            repeat<n4, dense_layer, transition<k * (2 + n1 + 2 * n2 + 4 * n3) / 8,
+            repeat<n3, dense_layer, transition<k * (2 + n1 + 2 * n2) / 4,
+            repeat<n2, dense_layer, transition<k * (2 + n1) / 2,
             repeat<n1, dense_layer, stem<INPUT>>>>>>>>>>;
     };
 }
@@ -182,7 +182,7 @@ namespace dlib
         long num_h_layers = 4,                                     // H module depth
         long num_l_layers = 4,                                     // L module depth
         long num_heads = 8,                                        // Attention heads
-        long embedding_dim = 256,                                  // Embedding dimension
+        long embedding_dim = 1024,                                 // Embedding dimension
         long window_len = WINDOW_LEN,                              // Context window
         long hrm_N = 2,                                            // High-level cycles
         long hrm_T = 2,                                            // Low-level steps
@@ -260,16 +260,14 @@ namespace dlib
         // Complete network type selector
         template<bool is_training>
         using network_type = std::conditional_t<is_training,
-            loss_multiclass_log<fc<VOCAB_SIZE, rms_norm<
-            //densenet::def<relu, bn_con, 16>::backbone<8, 12, 6, 3,
+            loss_multiclass_log<fc<VOCAB_SIZE, fc<EMBEDDING_DIM / compression_ratio, rms_norm<
             tag10<hrm<t_h_net_type, t_l_net_type, HRM_N, HRM_T,
             signal_compressor_t<compression_depth, token_embeddings<VOCAB_SIZE, EMBEDDING_DIM,
-            input<matrix<long, 0, 1>>>>>>>>>,
-            loss_multiclass_log<fc<VOCAB_SIZE, rms_norm<
-            //densenet::def<relu, affine, 16>::backbone<8, 12, 6, 3,
+            input<matrix<long, 0, 1>>>>>>>>>>,
+            loss_multiclass_log<fc<VOCAB_SIZE, fc<EMBEDDING_DIM / compression_ratio, rms_norm<
             tag10<hrm<i_h_net_type, i_l_net_type, HRM_N, HRM_T,
             signal_compressor_i<compression_depth, token_embeddings<VOCAB_SIZE, EMBEDDING_DIM,
-            input<matrix<long, 0, 1>>>>>>>>>>;
+            input<matrix<long, 0, 1>>>>>>>>>>>;
 
         struct model_info {
             static std::string describe() {

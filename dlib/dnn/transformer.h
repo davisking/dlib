@@ -480,9 +480,10 @@ namespace dlib
         !*/
         explicit moe_() :
             n_experts(0),
-            noise_scale(0.05f),
+            noise_scale(0.1f),
             top_k(top_e),
             usage_update_rate(0.05f),
+            load_balance_weight(0.01f),
             cached_batch_size_(0)
         {
         }
@@ -492,6 +493,7 @@ namespace dlib
             noise_scale(other.noise_scale),
             top_k(other.top_k),
             usage_update_rate(other.usage_update_rate),
+            load_balance_weight(other.load_balance_weight),
             expert_usage(other.expert_usage),
             cached_batch_size_(0)
         {
@@ -508,6 +510,7 @@ namespace dlib
                 noise_scale = other.noise_scale;
                 top_k = other.top_k;
                 usage_update_rate = other.usage_update_rate;
+                load_balance_weight = other.load_balance_weight;
                 expert_usage = other.expert_usage;
                 cached_batch_size_ = 0;
 
@@ -598,10 +601,13 @@ namespace dlib
                 cached_batch_size_ = num_samples;
                 selected_expert_indices_.resize(num_samples);
                 selected_expert_weights_.resize(num_samples);
+                cached_gate_probs_.resize(num_samples);
             }
 
             // Track expert usage for monitoring
             std::vector<float> batch_expert_usage(n_experts, 0.0f);
+            std::vector<float> routing_fraction(n_experts, 0.0f);
+            std::vector<float> gate_prob_sum(n_experts, 0.0f);
 
             alias_tensor sample_alias(1, k, nr, nc);
 
@@ -631,8 +637,13 @@ namespace dlib
                 }
 
                 std::vector<float> probs(n_experts);
-                for (long e = 0; e < n_experts; ++e)
+                for (long e = 0; e < n_experts; ++e) {
                     probs[e] = exp_logits[e] / sum_exp;
+                    gate_prob_sum[e] += probs[e];
+                }
+                if (std::is_same<MODE, training_mode_tag>::value) {
+                    cached_gate_probs_[n] = probs;
+                }
 
                 // Select top-k experts by probability
                 std::vector<std::pair<float, size_t>> expert_scores;
@@ -650,7 +661,7 @@ namespace dlib
                 for (long i = 0; i < top_k; ++i)
                     sum_weights += expert_scores[i].first;
 
-                // Safety: handle degenerate case (should be extremely rare with softmax)
+                // Handle degenerate case (should be extremely rare with softmax)
                 if (sum_weights < 1e-8f) {
                     sum_weights = top_k;
                     for (long i = 0; i < top_k; ++i)
@@ -668,6 +679,7 @@ namespace dlib
                     for (long i = 0; i < top_k; ++i) {
                         selected_expert_indices_[n][i] = expert_scores[i].second;
                         selected_expert_weights_[n][i] = expert_scores[i].first;
+                        routing_fraction[expert_scores[i].second] += 1.0f;
                     }
                 }
 
@@ -691,11 +703,27 @@ namespace dlib
             }
 
             // Update exponential moving average of expert usage (for monitoring)
-            if (std::is_same<MODE, training_mode_tag>::value && usage_update_rate > 0) {
+            if (std::is_same<MODE, training_mode_tag>::value) {
                 for (long e = 0; e < n_experts; ++e) {
-                    float avg_usage = batch_expert_usage[e] / num_samples;
-                    expert_usage[e] = (1.0f - usage_update_rate) * expert_usage[e] +
-                        usage_update_rate * avg_usage;
+                    routing_fraction[e] /= num_samples;
+                    gate_prob_sum[e] /= num_samples;
+                }
+
+                load_balance_loss_ = 0.0f;
+                for (long e = 0; e < n_experts; ++e) {
+                    load_balance_loss_ += routing_fraction[e] * gate_prob_sum[e];
+                }
+                load_balance_loss_ *= n_experts * load_balance_weight;
+
+                cached_routing_fraction_ = routing_fraction;
+                cached_gate_prob_avg_ = gate_prob_sum;
+
+                if (usage_update_rate > 0) {
+                    for (long e = 0; e < n_experts; ++e) {
+                        float avg_usage = batch_expert_usage[e] / num_samples;
+                        expert_usage[e] = (1.0f - usage_update_rate) * expert_usage[e] +
+                            usage_update_rate * avg_usage;
+                    }
                 }
             }
         }
@@ -764,6 +792,39 @@ namespace dlib
                     tt::add(1, sample_input_grad, 1, expert_grad);
                 }
             }
+
+            if (std::is_same<MODE, training_mode_tag>::value && load_balance_weight > 0) {
+                tensor& gate_grad = layer<TAG>(sub).get_gradient_input();
+                float* gate_grad_data = gate_grad.host();
+
+                // Compute gradient of load balancing loss w.r.t. gate logits
+                // Loss: L_aux = alpha * N * sum_e (f_e * P_e)
+                // where f_e = routing fraction, P_e = gate probability average
+                //
+                // Gradient through softmax: dL/dz_j = P_j * (w_j - sum_e (w_e * P_e))
+                // where w_e = df_e + dP_e = routing_fraction[e] + gate_prob_avg[e]
+
+                for (long n = 0; n < num_samples; ++n) {
+                    const auto& gate_probs = cached_gate_probs_[n];
+
+                    // First pass: compute weighted sum for softmax normalization term
+                    float sum_weighted_probs = 0.0f;
+                    for (long e = 0; e < n_experts; ++e) {
+                        float w_e = (cached_routing_fraction_[e] + cached_gate_prob_avg_[e]) *
+                            n_experts * load_balance_weight / num_samples;
+                        sum_weighted_probs += w_e * gate_probs[e];
+                    }
+
+                    // Second pass: apply complete softmax gradient formula
+                    for (long e = 0; e < n_experts; ++e) {
+                        float w_e = (cached_routing_fraction_[e] + cached_gate_prob_avg_[e]) *
+                            n_experts * load_balance_weight / num_samples;
+
+                        // Gradient component: P_j * (w_j - sum_e (w_e * P_e))
+                        gate_grad_data[n * n_experts + e] += gate_probs[e] * (w_e - sum_weighted_probs);
+                    }
+                }
+            }
         }
 
         void clean()
@@ -791,6 +852,7 @@ namespace dlib
         long num_active_experts() const { return top_k; }
         bool is_training_mode() const { return std::is_same<MODE, training_mode_tag>::value; }
         const std::vector<float>& get_expert_usage() const { return expert_usage; }
+        float get_load_balance_loss() const { return load_balance_loss_; }
 
         friend void serialize(const moe_& item, std::ostream& out)
         {
@@ -799,6 +861,7 @@ namespace dlib
             serialize(item.top_k, out);
             serialize(item.noise_scale, out);
             serialize(item.usage_update_rate, out);
+            serialize(item.load_balance_weight, out);
             serialize(item.experts, out);
             serialize(item.expert_usage, out);
         }
@@ -814,6 +877,7 @@ namespace dlib
             deserialize(item.top_k, in);
             deserialize(item.noise_scale, in);
             deserialize(item.usage_update_rate, in);
+            deserialize(item.load_balance_weight, in);
             deserialize(item.experts, in);
             deserialize(item.expert_usage, in);
 
@@ -827,7 +891,8 @@ namespace dlib
                 << " (experts=" << item.n_experts
                 << ", top_k=" << item.top_k
                 << ", mode=" << (is_training ? "train" : "infer")
-                << ", noise=" << item.noise_scale << ")";
+                << ", noise=" << item.noise_scale << ")"
+                << ", lb=" << item.load_balance_weight << ")";
             return out;
         }
 
@@ -838,6 +903,7 @@ namespace dlib
             out << "  <num_experts>" << item.n_experts << "</num_experts>\n";
             out << "  <top_k>" << item.top_k << "</top_k>\n";
             out << "  <noise_scale>" << item.noise_scale << "</noise_scale>\n";
+            out << "  <load_balance_weight>" << item.load_balance_weight << "</load_balance_weight>\n";
             out << "  <mode>" << (is_training ? "training" : "inference") << "</mode>\n";
             out << "</moe>\n";
         }
@@ -856,10 +922,11 @@ namespace dlib
         }
 
         // Configuration
-        long n_experts;                      // Number of expert networks
-        float noise_scale;                   // Gaussian noise std for exploration
-        long top_k;                          // Number of experts to activate per sample
-        float usage_update_rate;             // EMA smoothing rate for usage tracking
+        long n_experts;                 // Number of expert networks
+        float noise_scale;              // Gaussian noise std for exploration
+        long top_k;                     // Number of experts to activate per sample
+        float usage_update_rate;        // EMA smoothing rate for usage tracking
+        float load_balance_weight;      // Auxiliary loss coefficient for expert load balancing
 
         // Expert networks
         std::vector<EXPERT_NET> experts;
@@ -868,7 +935,11 @@ namespace dlib
         // Forward/backward cache (training mode only)
         std::vector<std::vector<size_t>> selected_expert_indices_;  // [sample][top_k]
         std::vector<std::vector<float>> selected_expert_weights_;   // [sample][top_k]
+        std::vector<std::vector<float>> cached_gate_probs_;
+        std::vector<float> cached_routing_fraction_;
+        std::vector<float> cached_gate_prob_avg_;
         long cached_batch_size_;
+        float load_balance_loss_;
 
 		resizable_tensor params; // Unused
     };

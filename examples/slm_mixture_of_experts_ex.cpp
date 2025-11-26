@@ -70,10 +70,6 @@ namespace dlib
 
     /*!
         Classification head for next-token prediction.
-        Uses the new loss_cross_entropy_per_logit loss function which:
-        - Works directly with sequence outputs (no flattening needed)
-        - Computes loss only on the last sequence position
-        - Optimized for autoregressive language modeling
     !*/
     template <long num_logits, long embedding_dim, typename SUBNET>
     using classification_head = loss_multiclass_log<fc<num_logits,
@@ -479,8 +475,7 @@ int main(int argc, char** argv)
 
             // Augment the dataset with 5% additional noisy samples
             augment_training_dataset(
-                samples,
-                labels,
+                samples, labels,
                 tokenizer.get_special_token_id("<unk>"),
                 tokenizer.get_special_token_id("<pad>"),
                 0.05
@@ -497,8 +492,7 @@ int main(int argc, char** argv)
 
             // Tokenizer stored with model for simplified inference
             if (file_exists(model_file) &&
-                !file_exists("chkpt-" + model_file)) deserialize(model_file) >> net >> tokenizer;
-            cout << net << endl << endl; // Show the model architecture
+                !file_exists("chkpt-" + model_file)) deserialize(model_file) >> net >> tokenizer;            
 
             // Create trainer
             dnn_trainer<net_type, adam> trainer(net, adam(alpha, beta1, beta2), gpus);
@@ -508,6 +502,7 @@ int main(int argc, char** argv)
             trainer.set_iterations_without_progress_threshold(patience);
             trainer.set_synchronization_file("chkpt-" + model_file, std::chrono::minutes(10));
             trainer.be_quiet();
+            cout << net << endl << endl; // Show the model architecture
             cout << "Starting training...\n";
 
             size_t epoch = 0, steps = 0;            
@@ -576,7 +571,7 @@ int main(int argc, char** argv)
                     double accuracy = (double)correct / labels.size();
                     cout << "Training accuracy: " << (accuracy * 100.0) << "%\n";
 
-                    // We need perfect accuracy to reconstruct the internal dataset
+                    // We need perfect accuracy to reconstruct the internal datasets
                     if (accuracy < 0.999) {
                         cout << "WARNING: Model accuracy is less than 99.90%. The model may not "
                             << "perfectly reconstruct the input text.\n";
@@ -634,7 +629,7 @@ int main(int argc, char** argv)
                 return 0;
             }
 
-            // Select a segment for generation (use first segment by default)
+            // Select a segment for generation
             dlib::rand rng(std::chrono::system_clock::now().time_since_epoch().count());
             size_t segment_idx = rng.get_random_32bit_number() % 50;
             cout << "Randomly selected segment #" << segment_idx << " (out of "

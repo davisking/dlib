@@ -17,7 +17,7 @@
         Each dataset, when decompressed, contains text with specific structure:
 
         - RAW_TEXT: Plain text without special separators
-          Example: "First paragraph. Second paragraph. Third paragraph."
+          Example: "First paragraph.\nSecond paragraph.\nThird paragraph."
 
         - DELIMITED_TEXT: Text segments separated by "@@" delimiter
           Example: "Segment 1@@Segment 2@@Segment 3"
