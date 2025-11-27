@@ -220,7 +220,7 @@ namespace dlib
         template <int depth, template<typename> class NORM, typename SUBNET>
         struct signal_compressor_impl
         {
-            using type = relu<NORM<
+            using type = gelu<NORM<
                 con3d<typename signal_compressor_impl<depth - 1, NORM, SUBNET>::type>>>;
         };
 
