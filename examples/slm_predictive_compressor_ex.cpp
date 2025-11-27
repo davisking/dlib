@@ -20,10 +20,11 @@
     - Flexible embedding: model can be embedded in compressed file or stored separately
     - Universal compression: works with any file type (text, binary, executables, etc.)
     - Incremental improvement: each compression can improve the predictor for future use
+    - File type detection: automatically detects text vs binary for optimized processing
 
     Compression format:
-    - Header: magic number "DLIB", vocabulary size, vocabulary (if size < 256),
-      original size, CRC32, compressed model size (0 if not embedded)
+    - Header: magic number "DLIB", file type flag (text/binary), vocabulary size,
+      vocabulary (if size < 256), original size, CRC32, compressed model size (0 if not embedded)
     - Compressed serialized model (if embedded, using dlib compress_stream)
     - Initial window (16 bytes)
     - Compressed body size
@@ -63,6 +64,8 @@ typedef dlib::compress_stream::kernel_1ec stream_compressor;
 
 // Constants
 const uint32_t MAGIC_NUMBER = 0x444C4942;   // "DLIB" in big-endian
+const uint8_t FILE_TYPE_BINARY = 0x00;      // Binary file marker
+const uint8_t FILE_TYPE_TEXT = 0x01;        // Text file marker
 
 const int WINDOW_SIZE = 16;                 // Prediction window size
 const long MAX_VOCAB_SIZE = 257;            // 256 byte values + 1 PAD token
@@ -102,19 +105,65 @@ std::string format_duration(double seconds)
         oss << minutes << "m " << secs << "s";
     else
         oss << secs << "s";
+    return oss.str();
+}
+
+// Format throughput
+std::string format_throughput(double bytes_per_sec)
+{
+    if (bytes_per_sec >= 1048576)
+        return std::to_string(static_cast<int>(bytes_per_sec / 1048576)) + " MB/s";
+    else if (bytes_per_sec >= 1024)
+        return std::to_string(static_cast<int>(bytes_per_sec / 1024)) + " KB/s";
+    else
+        return std::to_string(static_cast<int>(bytes_per_sec)) + " B/s";
+}
+
+// Calculate throughput
+double calculate_throughput(size_t bytes, double seconds)
+{
+    if (seconds == 0.0)
+        return 0.0;
+    return static_cast<double>(bytes) / seconds;
+}
+
+// Format compression ratio with sign
+std::string format_compression_ratio(size_t compressed, size_t original)
+{
+    if (original == 0)
+        return "N/A";
+
+    double ratio = ((1.0 - static_cast<double>(compressed) / original) * 100.0);
+    std::ostringstream oss;
+    oss << std::fixed << std::setprecision(2);
+
+    if (ratio >= 0)
+        oss << "-" << ratio << "%";
+    else
+        oss << "+" << ratio << "%";
 
     return oss.str();
+}
+
+// Show progress
+void show_progress(size_t current, size_t total, const std::string& label)
+{
+    double percent = (static_cast<double>(current) / total) * 100.0;
+    std::cout << "\r" << label << ": " << current << "/" << total
+        << " (" << std::fixed << std::setprecision(1) << percent << "%)     " << std::flush;
+    if (current == total)
+        std::cout << "\n";
 }
 
 // Calculate max epochs for the trainer based on dataset size
 size_t calculate_max_epochs(size_t num_samples)
 {
-    const size_t MIN_TRAINING_TOKENS = 20000;
+    const size_t MIN_TRAINING_TOKENS = 5000;
     double S = static_cast<double>(std::max(num_samples, MIN_TRAINING_TOKENS));
     double S_min = static_cast<double>(MIN_TRAINING_TOKENS);
     double S_max = static_cast<double>(MAX_TRAINING_TOKENS);
     double V_min = 1.0;
-    double V_max = 50.0;
+    double V_max = 100.0;
 
     S = std::max(S_min, std::min(S, S_max));
 
@@ -126,113 +175,70 @@ size_t calculate_max_epochs(size_t num_samples)
     return static_cast<size_t>(std::ceil(V));
 }
 
-// Calculate throughput in bytes/s
-double calculate_throughput(size_t bytes, double seconds)
-{
-    return (bytes / (seconds + 1e-8));
-}
-
-// Format throughput for display
-std::string format_throughput(double bytes_per_sec)
-{
-    std::ostringstream oss;
-    if (bytes_per_sec >= 1048576.0)
-        oss << std::fixed << std::setprecision(2) << (bytes_per_sec / 1048576.0) << " MB/s";
-    else if (bytes_per_sec >= 1024.0)
-        oss << std::fixed << std::setprecision(2) << (bytes_per_sec / 1024.0) << " KB/s";
-    else
-        oss << std::fixed << std::setprecision(0) << bytes_per_sec << " B/s";
-    return oss.str();
-}
-
-// Display progress bar
-void show_progress(size_t current, size_t total, const std::string& prefix = "Progress")
-{
-    if (total == 0) return;
-
-    const int bar_width = 30;
-    float progress = static_cast<float>(current) / total;
-    int pos = static_cast<int>(bar_width * progress);
-
-    cout << "\r" << prefix << ": [";
-    for (int i = 0; i < bar_width; ++i)
-    {
-        if (i < pos) cout << "=";
-        else if (i == pos) cout << ">";
-        else cout << " ";
-    }
-    cout << "] " << std::fixed << std::setprecision(1) << (progress * 100.0) << "%" << std::flush;
-
-    if (current >= total)
-        cout << "\n";
-}
-
 // ========================================================================================
-// Bit stream writer/reader
+// Bit Stream Classes
 // ========================================================================================
 
 class bit_stream_writer
 {
-private:
-    std::vector<uint8_t>& buffer;
-    uint8_t current_byte;
-    int bit_position;
-
 public:
-    bit_stream_writer(std::vector<uint8_t>& buf)
-        : buffer(buf), current_byte(0), bit_position(0) {
+    bit_stream_writer(std::vector<uint8_t>& output) : output_(output), current_byte_(0), bit_pos_(0)
+    {
     }
 
     void write_bit(bool bit)
     {
         if (bit)
-            current_byte |= (1 << bit_position);
-
-        bit_position++;
-        if (bit_position == 8)
+            current_byte_ |= (1 << (7 - bit_pos_));
+        bit_pos_++;
+        if (bit_pos_ == 8)
         {
-            buffer.push_back(current_byte);
-            current_byte = 0;
-            bit_position = 0;
+            output_.push_back(current_byte_);
+            current_byte_ = 0;
+            bit_pos_ = 0;
         }
     }
 
     void write_bits(uint8_t value, int num_bits)
     {
-        for (int i = 0; i < num_bits; ++i)
+        for (int i = num_bits - 1; i >= 0; --i)
             write_bit((value >> i) & 1);
     }
 
     void flush()
     {
-        if (bit_position > 0)
-            buffer.push_back(current_byte);
+        if (bit_pos_ > 0)
+        {
+            output_.push_back(current_byte_);
+            current_byte_ = 0;
+            bit_pos_ = 0;
+        }
     }
+
+private:
+    std::vector<uint8_t>& output_;
+    uint8_t current_byte_;
+    int bit_pos_;
 };
 
 class bit_stream_reader
 {
-private:
-    const std::vector<uint8_t>& buffer;
-    size_t byte_position;
-    int bit_position;
-
 public:
-    bit_stream_reader(const std::vector<uint8_t>& buf)
-        : buffer(buf), byte_position(0), bit_position(0) {
+    bit_stream_reader(const std::vector<uint8_t>& data) : data_(data), byte_pos_(0), bit_pos_(0)
+    {
     }
 
     bool read_bit()
     {
-        if (byte_position >= buffer.size())
-            throw std::runtime_error("End of bit stream reached");
+        if (byte_pos_ >= data_.size())
+            throw std::runtime_error("Unexpected end of bit stream");
 
-        bool bit = (buffer[byte_position] >> bit_position) & 1;
-        bit_position++;
-        if (bit_position == 8)
+        bool bit = (data_[byte_pos_] >> (7 - bit_pos_)) & 1;
+        bit_pos_++;
+        if (bit_pos_ == 8)
         {
-            bit_position = 0;
-            byte_position++;
+            bit_pos_ = 0;
+            byte_pos_++;
         }
         return bit;
     }
@@ -241,102 +247,86 @@ public:
     {
         uint8_t value = 0;
         for (int i = 0; i < num_bits; ++i)
-            if (read_bit())
-                value |= (1 << i);
+            value = (value << 1) | (read_bit() ? 1 : 0);
         return value;
     }
+
+private:
+    const std::vector<uint8_t>& data_;
+    size_t byte_pos_;
+    int bit_pos_;
 };
 
 // ========================================================================================
-// Vocabulary (for optimal encoding of unpredicted bytes only)
+// Vocabulary Management
 // ========================================================================================
 
 class vocabulary
 {
-private:
-    std::vector<uint8_t> index_to_byte;
-    std::map<uint8_t, int> byte_to_index;
-
 public:
-    // Build vocabulary from binary data
-    void build_from_data(const std::string& data)
+    vocabulary() = default;
+
+    void build(const std::vector<uint8_t>& data)
     {
-        std::set<uint8_t> unique_bytes;
-        for (size_t i = 0; i < data.size(); ++i)
-            unique_bytes.insert(static_cast<uint8_t>(data[i]));
+        std::set<uint8_t> unique_bytes(data.begin(), data.end());
+        sorted_bytes_.assign(unique_bytes.begin(), unique_bytes.end());
+        std::sort(sorted_bytes_.begin(), sorted_bytes_.end());
 
-        index_to_byte.assign(unique_bytes.begin(), unique_bytes.end());
-        std::sort(index_to_byte.begin(), index_to_byte.end());
-
-        byte_to_index.clear();
-        for (size_t i = 0; i < index_to_byte.size(); ++i)
-            byte_to_index[index_to_byte[i]] = static_cast<int>(i);
+        byte_to_index_.clear();
+        for (size_t i = 0; i < sorted_bytes_.size(); ++i)
+            byte_to_index_[sorted_bytes_[i]] = i;
     }
 
-    int size() const { return static_cast<int>(index_to_byte.size()); }
-
-    int byte_to_compact_index(uint8_t byte_val) const
+    int byte_to_compact_index(uint8_t byte) const
     {
-        auto it = byte_to_index.find(byte_val);
-        return (it != byte_to_index.end()) ? it->second : 0;
+        auto it = byte_to_index_.find(byte);
+        if (it == byte_to_index_.end())
+            throw std::runtime_error("Byte not in vocabulary");
+        return it->second;
     }
 
     uint8_t compact_index_to_byte(int index) const
     {
-        return (index >= 0 && index < size()) ? index_to_byte[index] : 0;
+        if (index < 0 || index >= static_cast<int>(sorted_bytes_.size()))
+            throw std::runtime_error("Index out of range");
+        return sorted_bytes_[index];
     }
+
+    size_t size() const { return sorted_bytes_.size(); }
 
     std::string serialize() const
     {
-        std::string result;
-        result.reserve(index_to_byte.size());
-        for (uint8_t b : index_to_byte)
-            result.push_back(static_cast<char>(b));
-        return result;
+        return std::string(sorted_bytes_.begin(), sorted_bytes_.end());
     }
 
     void deserialize(const std::string& data)
     {
-        index_to_byte.clear();
-        byte_to_index.clear();
-        index_to_byte.reserve(data.size());
-
-        for (size_t i = 0; i < data.size(); ++i)
-            index_to_byte.push_back(static_cast<uint8_t>(data[i]));
-
-        for (size_t i = 0; i < index_to_byte.size(); ++i)
-            byte_to_index[index_to_byte[i]] = static_cast<int>(i);
+        sorted_bytes_.assign(data.begin(), data.end());
+        byte_to_index_.clear();
+        for (size_t i = 0; i < sorted_bytes_.size(); ++i)
+            byte_to_index_[sorted_bytes_[i]] = i;
     }
+
+private:
+    std::vector<uint8_t> sorted_bytes_;
+    std::map<uint8_t, int> byte_to_index_;
 };
 
 // ========================================================================================
-// Tokenization
-// ========================================================================================
-
-std::vector<int> tokenize(const std::string& data)
-{
-    std::vector<int> tokens;
-    tokens.reserve(data.size());
-    for (size_t i = 0; i < data.size(); ++i)
-        tokens.push_back(static_cast<int>(static_cast<uint8_t>(data[i])));
-    return tokens;
-}
-
-// ========================================================================================
-// Predictor network
+// Neural Network Architecture
 // ========================================================================================
 
 template<int vocab_size>
 using train_predictor =
-loss_multiclass_log<fc<vocab_size, rms_norm<
+loss_multiclass_log<fc<vocab_size, fc<EMBEDDING_DIM, rms_norm<
     fused_transformer::transformer_stack<NUM_LAYERS, gelu, dropout_10, WINDOW_SIZE, EMBEDDING_DIM, NUM_HEADS,
-    token_embeddings<vocab_size, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>>;
+    token_embeddings<vocab_size, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>>>;
 
 template<int vocab_size>
 using infer_predictor =
-loss_multiclass_log<fc<vocab_size, rms_norm<
+loss_multiclass_log<fc<vocab_size, fc<EMBEDDING_DIM, rms_norm<
     fused_transformer::transformer_stack<NUM_LAYERS, gelu, multiply, WINDOW_SIZE, EMBEDDING_DIM, NUM_HEADS,
-    token_embeddings<vocab_size, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>>;
+    token_embeddings<vocab_size, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>>>;
 
 // ========================================================================================
 // Compression function
@@ -348,54 +338,110 @@ void compress_file(const std::string& input_path, const std::string& output_path
     cout << "=== COMPRESSION MODE ===\n";
     cout << "Input file: " << input_path << "\n";
     cout << "Output file: " << output_path << "\n";
-    cout << "Training: " << (train_model ? "enabled" : "disabled") << "\n";
-    cout << "Model embedding: " << (embed_model ? "enabled" : "disabled") << "\n\n";
+    cout << "Training: " << (train_model ? "Yes" : "No") << "\n";
+    cout << "Embed model: " << (embed_model ? "Yes" : "No") << "\n\n";
 
-    // Read input file in binary mode
-    std::ifstream input(input_path, std::ios::binary);
-    if (!input)
+    // Detect file type
+    cout << "Detecting file type...\n";
+    file_content_type detected_type;
+    bool is_text = detect_file_type(input_path, detected_type);
+
+    cout << "File type detected: ";
+    if (is_text)
+    {
+        cout << "TEXT";
+        if (detected_type == file_content_type::TEXT_XML)
+            cout << " (XML/HTML)";
+    }
+    else
+    {
+        cout << "BINARY";
+        switch (detected_type)
+        {
+        case file_content_type::IMAGE: cout << " (Image)"; break;
+        case file_content_type::VIDEO: cout << " (Video)"; break;
+        case file_content_type::AUDIO: cout << " (Audio)"; break;
+        case file_content_type::EXECUTABLE: cout << " (Executable)"; break;
+        case file_content_type::COMPRESSED: cout << " (Compressed Archive)"; break;
+        case file_content_type::PDF: cout << " (PDF)"; break;
+        case file_content_type::OFFICE: cout << " (Office Document)"; break;
+        case file_content_type::UNKNOWN: cout << " (Unknown Format)"; break;
+        default: break;
+        }
+    }
+    cout << "\n\n";
+
+    uint8_t file_type_flag = is_text ? FILE_TYPE_TEXT : FILE_TYPE_BINARY;
+
+    // Load input file
+    cout << "Loading input file...\n";
+    std::ifstream input_file(input_path, std::ios::binary);
+    if (!input_file)
         throw std::runtime_error("Cannot open input file");
 
-    std::string file_data;
-    input.seekg(0, std::ios::end);
-    size_t file_size = input.tellg();
-    input.seekg(0, std::ios::beg);
-    file_data.resize(file_size);
-    input.read(&file_data[0], file_size);
-    input.close();
+    std::vector<uint8_t> file_data((std::istreambuf_iterator<char>(input_file)),
+        std::istreambuf_iterator<char>());
+    input_file.close();
 
-    cout << "Original file size: " << file_data.size() << " bytes\n";
-    if (file_data.size() == 0) {
-        cout << "Input file is empty\n";
-        return;
+    cout << "Input file size: " << file_data.size() << " bytes\n";
+
+    if (file_data.empty())
+        throw std::runtime_error("Input file is empty");
+
+    const size_t original_size = file_data.size();
+
+    // Apply text-specific preprocessing if needed
+    std::vector<uint8_t> preprocessed_data;
+    if (is_text)
+    {
+        cout << "Applying text-specific preprocessing...\n";
+        // TODO: Implement text-specific preprocessing here
+        // For now, just copy the data
+        preprocessed_data = file_data;
+    }
+    else
+    {
+        preprocessed_data = file_data;
     }
 
     // Build vocabulary
     vocabulary vocab;
-    vocab.build_from_data(file_data);
+    vocab.build(preprocessed_data);
+    cout << "Unique byte values: " << vocab.size() << "\n";
 
-    int bits_per_byte = calculate_bits_per_byte(vocab.size());
-    bool use_full_vocab = (bits_per_byte >= 8);
+    bool use_full_vocab = (vocab.size() == 256);
+    int bits_per_byte = use_full_vocab ? 8 : calculate_bits_per_byte(vocab.size());
 
-    cout << "Vocabulary size: " << vocab.size() << " unique byte values\n";
-    if (use_full_vocab)
-        cout << "Using direct 8-bit encoding (vocabulary not stored)\n";
+    if (!use_full_vocab)
+        cout << "Using optimized vocabulary (" << bits_per_byte << " bits per unpredicted byte)\n";
     else
-        cout << "Bits per unpredicted byte: " << bits_per_byte << "\n";
+        cout << "Using direct 8-bit encoding (full vocabulary)\n";
 
-    // Tokenize
-    std::vector<int> tokens = tokenize(file_data);
+    // Convert to tokens
+    std::vector<int> tokens;
+    tokens.reserve(preprocessed_data.size());
+    for (uint8_t byte : preprocessed_data)
+        tokens.push_back(static_cast<int>(byte));
 
-    // Prepare training data if needed
+    // Train or load model
     train_predictor<MAX_VOCAB_SIZE> net;
     bool model_exists = file_exists(MODEL_SAVE_FILE);
 
-    if (train_model || !model_exists)
+    if (train_model)
     {
         std::vector<int> tokens_for_training;
         if (tokens.size() > MAX_TRAINING_TOKENS) {
-            tokens_for_training.assign(tokens.begin(), tokens.begin() + MAX_TRAINING_TOKENS);
-            cout << "Limiting training to first " << MAX_TRAINING_TOKENS << " bytes\n";
+            cout << "\nFile is large (" << tokens.size() << " tokens).\n";
+            cout << "Using random " << MAX_TRAINING_TOKENS << " tokens for training.\n";
+
+            dlib::rand rng(std::time(0));
+            std::set<size_t> selected_indices;
+            while (selected_indices.size() < MAX_TRAINING_TOKENS)
+                selected_indices.insert(rng.get_random_32bit_number() % tokens.size());
+
+            tokens_for_training.reserve(selected_indices.size());
+            for (size_t idx : selected_indices)
+                tokens_for_training.push_back(tokens[idx]);
         }
         else {
             tokens_for_training = tokens;
@@ -463,6 +509,8 @@ void compress_file(const std::string& input_path, const std::string& output_path
 
     // Prepare model data for embedding if requested
     std::string compressed_model;
+    size_t model_overhead = 0;
+
     if (embed_model)
     {
         cout << "\nSerializing model for embedding...\n";
@@ -479,9 +527,9 @@ void compress_file(const std::string& input_path, const std::string& output_path
         model_comp.compress(model_input, model_compressed);
 
         compressed_model = model_compressed.str();
-        cout << "Compressed model size: " << compressed_model.size() << " bytes";
-        double model_compression_ratio = (1.0 - static_cast<double>(compressed_model.size()) / serialized_model.size()) * 100.0;
-        cout << " (saved " << std::fixed << std::setprecision(1) << model_compression_ratio << "%)\n";
+        model_overhead = compressed_model.size();
+        cout << "Compressed model size: " << model_overhead << " bytes "
+            << format_compression_ratio(model_overhead, serialized_model.size()) << "\n";
     }
     else
     {
@@ -543,8 +591,9 @@ void compress_file(const std::string& input_path, const std::string& output_path
 
     cout << "Prediction success ratio: " << std::fixed << std::setprecision(2)
         << (predictions_correct * 100.0 / predictions_total) << "%\n";
-    cout << "Uncompressed body size: " << compressed_data.size() << " bytes\n";
-    cout << "Compression time: " << format_duration(compression_duration.count())
+    cout << "Encoded body size: " << compressed_data.size() << " bytes "
+        << format_compression_ratio(compressed_data.size(), original_size) << "\n";
+    cout << "Encoding time: " << format_duration(compression_duration.count())
         << " (" << format_throughput(throughput) << ")\n";
 
     // Apply final compression
@@ -557,11 +606,17 @@ void compress_file(const std::string& input_path, const std::string& output_path
     body_comp.compress(body_input, body_compressed);
 
     std::string final_compressed_body = body_compressed.str();
-    cout << "Final compressed body size: " << final_compressed_body.size() << " bytes";
-    double body_compression_ratio = (1.0 - static_cast<double>(final_compressed_body.size()) / compressed_data.size()) * 100.0;
-    cout << " (saved " << std::fixed << std::setprecision(1) << body_compression_ratio << "%)\n";
+    cout << "Final compressed body: " << final_compressed_body.size() << " bytes "
+        << format_compression_ratio(final_compressed_body.size(), compressed_data.size()) << "\n";
 
-    uint32_t checksum = dlib::crc32(file_data);
+    uint32_t checksum = dlib::crc32(std::string(file_data.begin(), file_data.end()));
+
+    // Calculate header overhead
+    size_t header_size = sizeof(MAGIC_NUMBER) + sizeof(file_type_flag) + sizeof(uint32_t);
+    if (!use_full_vocab)
+        header_size += vocab.size();
+    header_size += sizeof(uint64_t) + sizeof(uint32_t) + sizeof(uint64_t);
+    header_size += WINDOW_SIZE + sizeof(uint64_t);
 
     // Write output file
     std::ofstream output(output_path, std::ios::binary);
@@ -570,6 +625,9 @@ void compress_file(const std::string& input_path, const std::string& output_path
 
     // Write header
     output.write(reinterpret_cast<const char*>(&MAGIC_NUMBER), sizeof(MAGIC_NUMBER));
+
+    // Write file type flag
+    output.write(reinterpret_cast<const char*>(&file_type_flag), sizeof(file_type_flag));
 
     uint32_t vocab_size_u32 = use_full_vocab ? FULL_VOCAB_MARKER : vocab.size();
     output.write(reinterpret_cast<const char*>(&vocab_size_u32), sizeof(vocab_size_u32));
@@ -580,8 +638,8 @@ void compress_file(const std::string& input_path, const std::string& output_path
         output.write(vocab_data.data(), vocab_data.size());
     }
 
-    uint64_t original_size = file_data.size();
-    output.write(reinterpret_cast<const char*>(&original_size), sizeof(original_size));
+    uint64_t original_size_u64 = file_data.size();
+    output.write(reinterpret_cast<const char*>(&original_size_u64), sizeof(original_size_u64));
 
     output.write(reinterpret_cast<const char*>(&checksum), sizeof(checksum));
 
@@ -607,9 +665,14 @@ void compress_file(const std::string& input_path, const std::string& output_path
     std::streampos final_size = output.tellp();
     output.close();
 
-    cout << "\nFinal compressed file size: " << final_size << " bytes\n";
-    cout << "Overall compression ratio: " << std::fixed << std::setprecision(2)
-        << ((1.0 - static_cast<double>(final_size) / file_data.size()) * 100.0) << "%\n";
+    cout << "\n=== COMPRESSION SUMMARY ===\n";
+    cout << "Original size:       " << original_size << " bytes\n";
+    cout << "Compressed size:     " << final_size << " bytes\n";
+    cout << "  Header + metadata: " << header_size << " bytes\n";
+    if (embed_model)
+        cout << "  Embedded model:    " << model_overhead << " bytes\n";
+    cout << "  Compressed data:   " << final_compressed_body.size() << " bytes\n";
+    cout << "Overall compression: " << format_compression_ratio(static_cast<size_t>(final_size), original_size) << "\n";
     cout << "Compression complete!\n";
 }
 
@@ -632,6 +695,13 @@ void decompress_file(const std::string& input_path, const std::string& output_pa
     input.read(reinterpret_cast<char*>(&magic), sizeof(magic));
     if (magic != MAGIC_NUMBER)
         throw std::runtime_error("Invalid file format (bad magic number)");
+
+    // Read file type flag
+    uint8_t file_type_flag;
+    input.read(reinterpret_cast<char*>(&file_type_flag), sizeof(file_type_flag));
+
+    bool is_text = (file_type_flag == FILE_TYPE_TEXT);
+    cout << "File type: " << (is_text ? "TEXT" : "BINARY") << "\n";
 
     // Read vocabulary
     uint32_t vocab_size_u32;
@@ -748,11 +818,8 @@ void decompress_file(const std::string& input_path, const std::string& output_pa
     input.read(compressed_body_buffer.data(), compressed_body_size);
     input.close();
 
-    if (!input.good())
-        throw std::runtime_error("Failed to read compressed body");
-
     // Decompress body
-    cout << "Decompressing body...\n";
+    cout << "\nDecompressing body...\n";
     std::string compressed_body(compressed_body_buffer.begin(), compressed_body_buffer.end());
     std::istringstream body_compressed_input(compressed_body);
     std::ostringstream body_decompressed_output;
@@ -760,162 +827,174 @@ void decompress_file(const std::string& input_path, const std::string& output_pa
     stream_compressor body_decomp;
     body_decomp.decompress(body_compressed_input, body_decompressed_output);
 
-    std::string decompressed_body = body_decompressed_output.str();
+    std::string decompressed_body_str = body_decompressed_output.str();
+    std::vector<uint8_t> decompressed_body(decompressed_body_str.begin(), decompressed_body_str.end());
+
     cout << "Decompressed body size: " << decompressed_body.size() << " bytes\n";
 
-    std::vector<uint8_t> compressed_data(decompressed_body.begin(), decompressed_body.end());
-
-    // Decompress data
-    inference_context ctx(WINDOW_SIZE, 1, PAD_TOKEN);
-    for (int token : initial_tokens)
-        ctx.add_token(token);
-
+    // Decode data
     auto decompression_start = std::chrono::high_resolution_clock::now();
 
-    cout << "\nDecompressing data...\n";
-    std::string decompressed_data;
-    decompressed_data.reserve(original_size);
+    cout << "\nDecoding data...\n";
+    bit_stream_reader reader(decompressed_body);
+    inference_context ctx(WINDOW_SIZE, 1, PAD_TOKEN);
+
+    std::vector<uint8_t> output_data;
+    output_data.reserve(original_size);
 
     for (int token : initial_tokens)
-        decompressed_data.push_back(static_cast<char>(token));
-
-    if (compressed_data.size() > 0)
     {
-        bit_stream_reader reader(compressed_data);
+        output_data.push_back(static_cast<uint8_t>(token));
+        ctx.add_token(token);
+    }
 
-        try
+    size_t tokens_to_decode = original_size - window_size;
+
+    try {
+        for (size_t i = 0; i < tokens_to_decode; ++i)
         {
-            size_t bytes_to_decompress = original_size - window_size;
-            while (decompressed_data.size() < original_size)
+            if (i % 1000 == 0 || i == tokens_to_decode - 1)
+                show_progress(i + 1, tokens_to_decode, "Decoding");
+
+            bool prediction_correct = reader.read_bit();
+            unsigned long token;
+
+            if (prediction_correct)
             {
-                size_t current_pos = decompressed_data.size() - window_size;
-                if (current_pos % 1000 == 0 || decompressed_data.size() == original_size - 1)
-                    show_progress(current_pos + 1, bytes_to_decompress, "Decompressing");
-
-                bool prediction_success = reader.read_bit();
-
-                int next_token;
-                if (prediction_success)
+                auto input_seq = ctx.get_input_window();
+                token = infer_net(input_seq);
+            }
+            else
+            {
+                if (use_full_vocab)
                 {
-                    auto input_seq = ctx.get_input_window();
-                    next_token = infer_net(input_seq);
+                    token = reader.read_bits(8);
                 }
                 else
                 {
-                    if (use_full_vocab)
-                        next_token = reader.read_bits(8);
-                    else
-                    {
-                        int compact_index = reader.read_bits(bits_per_byte);
-                        next_token = static_cast<int>(vocab.compact_index_to_byte(compact_index));
-                    }
+                    int compact_index = reader.read_bits(bits_per_byte);
+                    token = vocab.compact_index_to_byte(compact_index);
                 }
-
-                decompressed_data.push_back(static_cast<char>(next_token));
-                ctx.add_token(next_token);
             }
+
+            output_data.push_back(static_cast<uint8_t>(token));
+            ctx.add_token(token);
         }
-        catch (const std::exception& e)
-        {
-            throw std::runtime_error(std::string("Decompression error: ") + e.what());
-        }
+    }
+    catch (const std::exception& e) {
+        throw std::runtime_error(std::string("Decoding error: ") + e.what());
     }
 
     auto decompression_end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> decompression_duration = decompression_end - decompression_start;
-    double throughput = calculate_throughput(decompressed_data.size(), decompression_duration.count());
+    double throughput = calculate_throughput(original_size, decompression_duration.count());
 
     cout << "Decompression time: " << format_duration(decompression_duration.count())
         << " (" << format_throughput(throughput) << ")\n";
 
-    // Verify
-    if (decompressed_data.size() != original_size)
+    // Apply text-specific postprocessing if needed
+    std::vector<uint8_t> final_output_data;
+    if (is_text)
     {
-        cerr << "Warning: Decompressed size (" << decompressed_data.size()
-            << ") differs from expected (" << original_size << ")\n";
-    }
-
-    uint32_t computed_crc = dlib::crc32(decompressed_data);
-    if (computed_crc != stored_crc)
-    {
-        cerr << "Warning: CRC mismatch! File may be corrupted.\n";
-        cerr << "Expected: 0x" << std::hex << stored_crc << "\n";
-        cerr << "Computed: 0x" << std::hex << computed_crc << "\n";
+        cout << "Applying text-specific postprocessing...\n";
+        // TODO: Implement text-specific postprocessing here
+        // For now, just copy the data
+        final_output_data = output_data;
     }
     else
     {
-        cout << "CRC verification: OK\n";
+        final_output_data = output_data;
     }
 
-    // Write output
-    std::ofstream output(output_path, std::ios::binary);
-    if (!output)
+    // Verify checksum
+    uint32_t computed_crc = dlib::crc32(std::string(final_output_data.begin(), final_output_data.end()));
+    if (computed_crc != stored_crc)
+    {
+        cerr << "WARNING: CRC mismatch! Data may be corrupted.\n";
+        cerr << "Expected CRC: " << std::hex << stored_crc << "\n";
+        cerr << "Computed CRC: " << std::hex << computed_crc << "\n";
+    }
+    else
+    {
+        cout << "CRC32 verification: OK\n";
+    }
+
+    // Write output file
+    std::ofstream output_file(output_path, std::ios::binary);
+    if (!output_file)
         throw std::runtime_error("Cannot create output file");
 
-    output.write(decompressed_data.data(), decompressed_data.size());
-    output.close();
+    output_file.write(reinterpret_cast<const char*>(final_output_data.data()), final_output_data.size());
+    output_file.close();
 
     cout << "\nDecompression complete!\n";
-    cout << "Output file size: " << decompressed_data.size() << " bytes\n";
+    cout << "Output file: " << output_path << " (" << final_output_data.size() << " bytes)\n";
 }
+
+// ========================================================================================
+// Main
+// ========================================================================================
 
 int main(int argc, char** argv)
 {
     try
     {
         command_line_parser parser;
-        parser.add_option("compress", "Compress any file using AI predictive encoding");
-        parser.add_option("decompress", "Decompress a compressed file");
+        parser.add_option("compress", "Compress a file");
+        parser.add_option("decompress", "Decompress a file");
         parser.add_option("input", "Input file path", 1);
         parser.add_option("output", "Output file path", 1);
-        parser.add_option("no-train", "Skip model training/fine-tuning (use existing model as-is)");
-        parser.add_option("no-embed-model", "Don't embed model in compressed file (requires external model file for decompression)");
+        parser.add_option("no-train", "Skip training (use existing model)");
+        parser.add_option("no-embed-model", "Don't embed model in compressed file");
+
         parser.parse(argc, argv);
 
-        if (parser.number_of_arguments() == 0 && !parser.option("compress") && !parser.option("decompress"))
+        if (parser.number_of_arguments() == 0 &&
+            !parser.option("compress") && !parser.option("decompress"))
         {
-            cout << "This example demonstrates how AI generative models can be applied to\n";
-            cout << "practical optimization problems beyond traditional chatbot applications.\n";
-            cout << "It uses a small Transformer model to predict and compress data.\n\n";
+            cout << "Dlib Predictive Compressor Example\n\n";
             parser.print_options();
-            cout << "\nExample usage:\n";
-            cout << "  Compress with training:   " << argv[0] << " --compress --input file.bin --output file.dlib\n";
-            cout << "  Compress without training:" << argv[0] << " --compress --input file.bin --output file.dlib --no-train\n";
-            cout << "  Compress without embed:   " << argv[0] << " --compress --input file.bin --output file.dlib --no-embed-model\n";
-            cout << "  Decompress:               " << argv[0] << " --decompress --input file.dlib --output file.bin\n";
-            cout << "\nNotes:\n";
-            cout << "  - Model uses direct byte values (0-255) as embeddings, reusable across files\n";
-            cout << "  - Model saved to '" << MODEL_SAVE_FILE << "' for continuous improvement\n";
-            cout << "  - Use --no-train to compress faster with existing model\n";
-            cout << "  - Use --no-embed-model for smaller compressed files (requires model file separately)\n";
+            cout << "\nExamples:\n";
+            cout << "  Compress with training:\n";
+            cout << "    " << argv[0] << " --compress --input data.txt --output data.dpc\n\n";
+            cout << "  Compress without training:\n";
+            cout << "    " << argv[0] << " --compress --input data.txt --output data.dpc --no-train\n\n";
+            cout << "  Decompress:\n";
+            cout << "    " << argv[0] << " --decompress --input data.dpc --output data_restored.txt\n";
             return 0;
         }
 
-        const std::string input_file = get_option(parser, "input", "");
-        const std::string output_file = get_option(parser, "output", "");
+        if (parser.option("compress") && parser.option("decompress"))
+            throw std::runtime_error("Cannot specify both --compress and --decompress");
 
-        if (input_file.empty() || output_file.empty())
-        {
-            cerr << "Error: Both --input and --output options are required\n";
-            return 1;
-        }
+        if (!parser.option("compress") && !parser.option("decompress"))
+            throw std::runtime_error("Must specify either --compress or --decompress");
+
+        if (!parser.option("input"))
+            throw std::runtime_error("Missing --input parameter");
+
+        if (!parser.option("output"))
+            throw std::runtime_error("Missing --output parameter");
+
+        std::string input_path = parser.option("input").argument();
+        std::string output_path = parser.option("output").argument();
 
         if (parser.option("compress"))
         {
             bool train_model = !parser.option("no-train");
             bool embed_model = !parser.option("no-embed-model");
-            compress_file(input_file, output_file, train_model, embed_model);
+            compress_file(input_path, output_path, train_model, embed_model);
         }
-        else if (parser.option("decompress"))
+        else
         {
-            decompress_file(input_file, output_file);
+            decompress_file(input_path, output_path);
         }
 
         return 0;
     }
-    catch (std::exception& e)
+    catch (const std::exception& e)
     {
-        cerr << "Error: " << e.what() << endl;
+        cerr << "\nERROR: " << e.what() << "\n";
         return 1;
     }
 }

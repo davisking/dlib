@@ -678,11 +678,6 @@ int main(int argc, char** argv)
             for (size_t i = 0; i < tokens_to_generate && !g_terminate_flag.load(); ++i) {
                 // Predict next token
                 int next_token = net(input_seq);
-
-                // Stop if end-of-text token is generated
-                if (next_token == end_of_text_id)
-                    break;
-
                 generated_tokens.push_back(next_token);
 
                 // Update context window
@@ -700,6 +695,9 @@ int main(int argc, char** argv)
                         << tokens_per_sec << " tokens/sec\r";
                     cout.flush();
                 }
+
+                // Stop if end-of-text token is generated
+                if (next_token == end_of_text_id) break;
             }
 
             // Write generated text to file
@@ -716,6 +714,51 @@ int main(int argc, char** argv)
             cout << "Generated " << generated_tokens.size() << " tokens\n";
             cout << "Total output: " << (initial_text.size() + generated_text.size()) << " bytes\n";
             cout << "Output saved to " << output_file << "\n";
+
+            // Compare generated text with original segment for validation
+            cout << "\n=== Validation: comparing generated vs. original segment ===\n";
+
+            // Extract reference tokens (the part we tried to regenerate)
+            std::vector<int> reference_tokens(selected_segment.begin() + max_seq_len,
+                selected_segment.end());
+
+            // Limit comparison to the length of generated tokens
+            size_t compare_length = std::min(reference_tokens.size(), generated_tokens.size());
+            std::vector<int> reference_subset(reference_tokens.begin(),
+                reference_tokens.begin() + compare_length);
+            std::vector<int> generated_subset(generated_tokens.begin(),
+                generated_tokens.begin() + compare_length);
+
+            cout << "Comparing " << compare_length << " tokens\n";
+            cout << "Reference length: " << reference_tokens.size() << " tokens\n";
+            cout << "Generated length: " << generated_tokens.size() << " tokens\n\n";
+
+            // Compute and display similarity metrics
+            auto similarity = compute_text_similarity(reference_subset, generated_subset);
+            similarity.print();
+
+            // Display sample of differences if similarity is not perfect
+            if (similarity.edit_similarity < 0.95) {
+                cout << "Sample comparison (first 100 tokens):\n";
+                size_t sample_len = std::min(size_t(100), compare_length);
+
+                size_t diff_count = 0;
+                for (size_t i = 0; i < sample_len; ++i) {
+                    if (reference_subset[i] != generated_subset[i]) {
+                        if (diff_count < 10) {  // Show first 10 differences
+                            std::string ref_word = tokenizer.decode({ reference_subset[i] }, false);
+                            std::string gen_word = tokenizer.decode({ generated_subset[i] }, false);
+                            cout << "  Position " << i << ": '"
+                                << ref_word << "' -> '" << gen_word << "'\n";
+                        }
+                        diff_count++;
+                    }
+                }
+                cout << "Total differences in sample: " << diff_count << "/" << sample_len << "\n";
+            }
+            else {
+                cout << "Excellent match! Generated text closely follows the original.\n";
+            }
         }
 
         return 0;

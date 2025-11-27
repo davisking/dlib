@@ -122,6 +122,191 @@ namespace dlib
             }
     !*/
 
+    // ---------------------------------------------------------------------------------
+
+    inline size_t edit_distance(
+        const std::vector<int>& tokens1,
+        const std::vector<int>& tokens2
+    );
+    /*!
+        ensures
+            - Computes the Levenshtein (edit) distance between two token sequences
+            - Returns the minimum number of single-token edits (insertions, deletions,
+              or substitutions) required to transform tokens1 into tokens2
+            - Uses dynamic programming with O(n*m) time complexity and O(n*m) space
+            - Returns tokens2.size() if tokens1 is empty
+            - Returns tokens1.size() if tokens2 is empty
+            - Returns 0 if both sequences are identical
+    !*/
+
+    inline double normalized_edit_similarity(
+        const std::vector<int>& tokens1,
+        const std::vector<int>& tokens2
+    );
+    /*!
+        ensures
+            - Computes a normalized similarity score based on edit distance
+            - Returns a value in the range [0.0, 1.0] where:
+              * 1.0 indicates identical sequences
+              * 0.0 indicates completely different sequences
+            - Formula: 1.0 - (edit_distance / max_length)
+            - If both sequences are empty, returns 1.0 (considered identical)
+            - This metric is order-sensitive: [1,2,3] vs [3,2,1] will have low similarity
+    !*/
+
+    // ---------------------------------------------------------------------------------
+
+    struct token_overlap_metrics
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                Stores token-level evaluation metrics that treat sequences as
+                bags of tokens (order-independent). Useful for assessing vocabulary
+                overlap between reference and generated text.
+
+            FIELDS
+                precision   - Fraction of generated tokens that appear in the reference
+                            Range: [0.0, 1.0]
+                            Formula: matching_tokens / total_generated_tokens
+
+                recall      - Fraction of reference tokens that appear in the generated text
+                            Range: [0.0, 1.0]
+                            Formula: matching_tokens / total_reference_tokens
+
+                f1_score    - Harmonic mean of precision and recall
+                            Range: [0.0, 1.0]
+                            Formula: 2 * (precision * recall) / (precision + recall)
+
+            INTERPRETATION
+                - High precision: generated text uses vocabulary from reference
+                - High recall: generated text covers reference vocabulary
+                - High F1: good balance between precision and recall
+                - Unlike edit distance, this metric ignores token order
+        !*/
+
+        double precision;
+        double recall;
+        double f1_score;
+
+        void print() const;
+        /*!
+            ensures
+                - Prints formatted metrics to standard output
+                - Format: "Precision: XX.XX%\n  Recall: XX.XX%\n  F1-score: XX.XX%"
+        !*/
+    };
+
+    inline token_overlap_metrics compute_token_overlap(
+        const std::vector<int>& reference,
+        const std::vector<int>& generated
+    );
+    /*!
+        ensures
+            - Computes token-level precision, recall, and F1-score between reference
+              and generated token sequences
+            - Treats sequences as multisets (bags) of tokens, ignoring order
+            - Handles duplicate tokens correctly by matching each token at most once
+            - Returns metrics with all values set to 0.0 if either sequence is empty
+            - Precision = fraction of generated tokens found in reference
+            - Recall = fraction of reference tokens found in generated
+            - F1 = harmonic mean of precision and recall
+    !*/
+
+    // ---------------------------------------------------------------------------------
+
+    inline double compute_ngram_overlap(
+        const std::vector<int>& reference,
+        const std::vector<int>& generated,
+        int max_n = 4
+    );
+    /*!
+        requires
+            - max_n >= 1
+        ensures
+            - Computes n-gram overlap score similar to BLEU metric
+            - Evaluates matching n-grams for n = 1, 2, 3, ..., max_n
+            - Returns average n-gram precision across all n values
+            - Score range: [0.0, 1.0] where 1.0 is perfect overlap
+            - Returns 0.0 if either sequence is empty
+            - Stops computing for n-values where n > sequence length
+
+        COMPARISON TO BLEU
+            - Similar to BLEU but simplified (no brevity penalty, no geometric mean)
+            - Uses arithmetic mean instead of geometric mean for simplicity
+            - Suitable for quick similarity assessment in language model evaluation
+    !*/
+
+    // ---------------------------------------------------------------------------------
+
+    struct text_similarity_report
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                Comprehensive similarity report combining multiple metrics to evaluate
+                how closely generated text matches reference text. Provides both
+                order-sensitive and order-insensitive measures.
+
+            FIELDS
+                edit_similarity  - Normalized Levenshtein distance (order-sensitive)
+                                 Range: [0.0, 1.0]
+                                 Measures token-by-token match considering order
+
+                overlap          - Token-level precision/recall/F1 metrics
+                                 Order-insensitive bag-of-tokens comparison
+                                 Useful for vocabulary coverage assessment
+
+                ngram_score      - BLEU-like n-gram overlap score (order-aware locally)
+                                 Range: [0.0, 1.0]
+                                 Captures phrase-level similarity
+
+            INTERPRETATION GUIDE
+                Use edit_similarity when:
+                    - Exact token order matters
+                    - Evaluating sequence prediction tasks
+                    - Need strict alignment measure
+
+                Use overlap metrics when:
+                    - Vocabulary coverage is important
+                    - Order is less critical
+                    - Want to know what fraction of tokens are correct
+
+                Use ngram_score when:
+                    - Local phrase structure matters
+                    - Evaluating fluency and coherence
+                    - Need metric between strict order and pure bag-of-words
+        !*/
+
+        double edit_similarity;
+        token_overlap_metrics overlap;
+        double ngram_score;
+
+        void print() const;
+        /*!
+            ensures
+                - Prints comprehensive formatted report to standard output
+                - Displays all three metric categories with clear labels
+                - Format optimized for readability with percentages and section headers
+        !*/
+    };
+
+    inline text_similarity_report compute_text_similarity(
+        const std::vector<int>& reference,
+        const std::vector<int>& generated
+    );
+    /*!
+        ensures
+            - Computes comprehensive similarity metrics between reference and generated
+              token sequences
+            - Returns text_similarity_report containing:
+              * edit_similarity: normalized Levenshtein distance
+              * overlap: token-level precision/recall/F1 scores
+              * ngram_score: BLEU-like n-gram overlap (up to 4-grams)
+            - This is the primary function for evaluating text generation quality
+            - Provides multiple complementary views of similarity
+    !*/
+
+    // ---------------------------------------------------------------------------------
+
     class inference_context
     {
         /*!

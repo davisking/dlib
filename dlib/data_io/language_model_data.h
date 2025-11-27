@@ -367,6 +367,192 @@ namespace dlib
         return false;
     }
 
+    // ---------------------------------------------------------------------------------   
+
+    // Compute Levenshtein (edit) distance between two token sequences
+    inline size_t edit_distance(const std::vector<int>& tokens1, const std::vector<int>& tokens2)
+    {
+        const size_t len1 = tokens1.size();
+        const size_t len2 = tokens2.size();
+
+        if (len1 == 0) return len2;
+        if (len2 == 0) return len1;
+
+        // DP table: dp[i][j] = edit distance between tokens1[0..i-1] and tokens2[0..j-1]
+        std::vector<std::vector<size_t>> dp(len1 + 1, std::vector<size_t>(len2 + 1));
+
+        // Initialize base cases
+        for (size_t i = 0; i <= len1; ++i)
+            dp[i][0] = i;
+        for (size_t j = 0; j <= len2; ++j)
+            dp[0][j] = j;
+
+        // Fill DP table
+        for (size_t i = 1; i <= len1; ++i) {
+            for (size_t j = 1; j <= len2; ++j) {
+                if (tokens1[i - 1] == tokens2[j - 1]) {
+                    dp[i][j] = dp[i - 1][j - 1];  // No edit needed
+                }
+                else {
+                    dp[i][j] = 1 + std::min({ dp[i - 1][j],     // Deletion
+                                             dp[i][j - 1],      // Insertion
+                                             dp[i - 1][j - 1]   // Substitution
+                        });
+                }
+            }
+        }
+
+        return dp[len1][len2];
+    }
+    
+    // Compute normalized edit distance as a similarity score between 0 and 1
+    inline double normalized_edit_similarity(const std::vector<int>& tokens1, const std::vector<int>& tokens2)
+    {
+        if (tokens1.empty() && tokens2.empty())
+            return 1.0;
+
+        const size_t max_len = std::max(tokens1.size(), tokens2.size());
+        if (max_len == 0)
+            return 1.0;
+
+        const size_t dist = edit_distance(tokens1, tokens2);
+        return 1.0 - (static_cast<double>(dist) / max_len);
+    }
+
+    // Compute token-level precision, recall, and F1-score
+    struct token_overlap_metrics
+    {
+        double precision;  // What fraction of generated tokens appear in reference
+        double recall;     // What fraction of reference tokens appear in generated
+        double f1_score;   // Harmonic mean of precision and recall
+
+        void print() const
+        {
+            std::cout << "Token overlap metrics:\n"
+                << "  Precision: " << std::fixed << std::setprecision(4) << (precision * 100.0) << "%\n"
+                << "  Recall:    " << std::fixed << std::setprecision(4) << (recall * 100.0) << "%\n"
+                << "  F1-score:  " << std::fixed << std::setprecision(4) << (f1_score * 100.0) << "%\n";
+        }
+    };
+
+    inline token_overlap_metrics compute_token_overlap(
+        const std::vector<int>& reference,
+        const std::vector<int>& generated)
+    {
+        token_overlap_metrics metrics{ 0.0, 0.0, 0.0 };
+
+        if (reference.empty() || generated.empty())
+            return metrics;
+
+        // Count matching tokens
+        std::multiset<int> ref_tokens(reference.begin(), reference.end());
+        std::multiset<int> gen_tokens(generated.begin(), generated.end());
+
+        size_t matches = 0;
+        for (int token : gen_tokens) {
+            auto it = ref_tokens.find(token);
+            if (it != ref_tokens.end()) {
+                ++matches;
+                ref_tokens.erase(it);  // Remove to handle duplicates correctly
+            }
+        }
+
+        // Calculate precision and recall
+        metrics.precision = static_cast<double>(matches) / generated.size();
+        metrics.recall = static_cast<double>(matches) / reference.size();
+
+        // Calculate F1-score
+        if (metrics.precision + metrics.recall > 0.0) {
+            metrics.f1_score = 2.0 * (metrics.precision * metrics.recall) /
+                (metrics.precision + metrics.recall);
+        }
+
+        return metrics;
+    }
+
+    // Compute BLEU-like n-gram overlap score
+    inline double compute_ngram_overlap(
+        const std::vector<int>& reference,
+        const std::vector<int>& generated,
+        int max_n = 4)
+    {
+        if (reference.empty() || generated.empty())
+            return 0.0;
+
+        double total_score = 0.0;
+        int valid_n_count = 0;
+
+        // Compute overlap for n-grams of size 1 to max_n
+        for (int n = 1; n <= max_n; ++n) {
+            if (static_cast<size_t>(n) > reference.size() ||
+                static_cast<size_t>(n) > generated.size())
+                break;
+
+            // Extract n-grams from reference
+            std::map<std::vector<int>, size_t> ref_ngrams;
+            for (size_t i = 0; i <= reference.size() - n; ++i) {
+                std::vector<int> ngram(reference.begin() + i, reference.begin() + i + n);
+                ref_ngrams[ngram]++;
+            }
+
+            // Count matching n-grams in generated
+            size_t matches = 0;
+            size_t total_gen_ngrams = 0;
+            for (size_t i = 0; i <= generated.size() - n; ++i) {
+                std::vector<int> ngram(generated.begin() + i, generated.begin() + i + n);
+                total_gen_ngrams++;
+
+                auto it = ref_ngrams.find(ngram);
+                if (it != ref_ngrams.end() && it->second > 0) {
+                    matches++;
+                    it->second--;  // Decrement to handle multiple occurrences
+                }
+            }
+
+            if (total_gen_ngrams > 0) {
+                total_score += static_cast<double>(matches) / total_gen_ngrams;
+                valid_n_count++;
+            }
+        }
+
+        // Return average n-gram precision
+        return valid_n_count > 0 ? total_score / valid_n_count : 0.0;
+    }
+
+    // Text similarity report
+    struct text_similarity_report
+    {
+        double edit_similarity;         // Normalized Levenshtein distance
+        token_overlap_metrics overlap;  // Token-level precision/recall/F1
+        double ngram_score;             // N-gram overlap (BLEU-like)
+
+        void print() const
+        {
+            std::cout << "\n=== Text similarity report ===\n";
+            std::cout << "Edit similarity (order-sensitive): "
+                << std::fixed << std::setprecision(4) << (edit_similarity * 100.0) << "%\n\n";
+
+            overlap.print();
+
+            std::cout << "\nN-gram overlap (BLEU-like): "
+                << std::fixed << std::setprecision(4) << (ngram_score * 100.0) << "%\n";
+            std::cout << "==============================\n\n";
+        }
+    };
+
+    inline text_similarity_report compute_text_similarity(
+        const std::vector<int>& reference,
+        const std::vector<int>& generated)
+    {
+        text_similarity_report report;
+
+        report.edit_similarity = normalized_edit_similarity(reference, generated);
+        report.overlap = compute_token_overlap(reference, generated);
+        report.ngram_score = compute_ngram_overlap(reference, generated, 4);
+
+        return report;
+    }
+
     class inference_context
     {
     public:
