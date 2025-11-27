@@ -209,6 +209,7 @@ struct moe_param_info
     long num_moe_layers;            // Number of MoE layers in the network
     long top_n;                     // Number of active experts during inference
     float efficiency_ratio;         // Ratio of inference/training params
+    std::vector<float> expert_usage; // Usage statistics per expert
 
     void print() const
     {
@@ -226,10 +227,84 @@ struct moe_param_info
             << "Efficiency:\n"
             << "  Inference uses " << (efficiency_ratio * 100.0f) << "% of training params\n"
             << "  Savings: " << ((1.0f - efficiency_ratio) * 100.0f) << "% fewer active params\n\n";
+
+        // Display expert usage statistics
+        if (!expert_usage.empty()) {
+            std::cout << "Expert usage statistics (EMA):\n";
+
+            // Calculate statistics
+            float total_usage = 0.0f;
+            float min_usage = expert_usage[0];
+            float max_usage = expert_usage[0];
+
+            for (float u : expert_usage) {
+                total_usage += u;
+                min_usage = std::min(min_usage, u);
+                max_usage = std::max(max_usage, u);
+            }
+
+            float mean_usage = total_usage / num_experts;
+            float ideal_usage = 1.0f / num_experts;
+
+            // Calculate variance for coefficient of variation
+            float variance = 0.0f;
+            for (float u : expert_usage) {
+                float diff = u - mean_usage;
+                variance += diff * diff;
+            }
+            variance /= num_experts;
+            float std_dev = std::sqrt(variance);
+            float cv = (mean_usage > 1e-8f) ? (std_dev / mean_usage) : 0.0f;
+
+            std::cout << "  Mean usage: " << std::fixed << std::setprecision(4)
+                << mean_usage << " (ideal: " << ideal_usage << ")\n";
+            std::cout << "  Range: [" << min_usage << ", " << max_usage << "]\n";
+            std::cout << "  Std dev: " << std_dev << "\n";
+            std::cout << "  Coefficient of variation: " << cv << "\n";
+
+            // Balance quality assessment
+            std::cout << "  Balance quality: ";
+            if (cv < 0.3f)
+                std::cout << "excellent (CV < 0.3)\n";
+            else if (cv < 0.5f)
+                std::cout << "good (CV < 0.5)\n";
+            else if (cv < 0.8f)
+                std::cout << "fair (CV < 0.8)\n";
+            else
+                std::cout << "poor (CV >= 0.8) - possible expert collapse\n";
+
+            std::cout << "\n  Per-expert usage:\n";
+            for (long e = 0; e < num_experts; ++e) {
+                std::cout << "    expert " << e << ": "
+                    << std::fixed << std::setprecision(4) << expert_usage[e];
+
+                // Visual bar indicator
+                int bar_length = static_cast<int>(expert_usage[e] * 50.0f / max_usage);
+                std::cout << " [";
+                for (int i = 0; i < bar_length; ++i)
+                    std::cout << "=";
+                for (int i = bar_length; i < 20; ++i)
+                    std::cout << " ";
+                std::cout << "]";
+
+                // Flag over/under utilized experts
+                float usage_ratio = expert_usage[e] / ideal_usage;
+                if (usage_ratio < 0.5f)
+                    std::cout << " (underutilized)";
+                else if (usage_ratio > 2.0f)
+                    std::cout << " (overutilized)";
+
+                std::cout << "\n";
+            }
+        }
+        else {
+            std::cout << "Expert usage statistics: Not available (inference mode or no training yet)\n";
+        }
+
+        std::cout << "\n";
     }
 };
 
-// Computes detailed parameter counts for MoE-enhanced networks
 template <typename net_type>
 moe_param_info get_moe_param_info(const net_type& net, long num_layers)
 {
@@ -275,6 +350,9 @@ moe_param_info get_moe_param_info(const net_type& net, long num_layers)
     else {
         info.efficiency_ratio = 1.0f;
     }
+
+    // Retrieve expert usage statistics
+    info.expert_usage = moe_layer.get_expert_usage();
 
     return info;
 }
