@@ -2407,12 +2407,9 @@ namespace dlib
 
    // ----------------------------------------------------------------------------------------
 
-        __global__ void _cuda_rms_normalize(
-            float* dest,
+        __global__ void _cuda_rms_normalize_accumulate(
             float* scale,
             const float* src,
-            const float* gamma,
-            float eps,
             size_t ns,
             size_t ks,
             size_t num
@@ -2422,28 +2419,42 @@ namespace dlib
             {
                 const auto ps = src + n * ks * num;
                 float sum_squares = 0.0f;
-                for (auto i : grid_stride_range(0, ks * num))
+                for (auto i : grid_stride_range(0, ks* num))
                 {
                     sum_squares += ps[i] * ps[i];
                 }
                 warp_reduce_atomic_add(scale[n], sum_squares / (ks * num));
             }
-            __syncthreads();
+        }
 
+        __global__ void _cuda_rms_normalize_invert(
+            float* scale,
+            float eps,
+            size_t ns
+        )
+        {
             for (auto n : grid_stride_range_y(0, ns))
             {
-                for (auto i : grid_stride_range(0, 1))
-                {
+                if (threadIdx.x == 0)
                     scale[n] = 1.0f / std::sqrt(scale[n] + eps);
-                }
             }
-            __syncthreads();
+        }
 
+        __global__ void _cuda_rms_normalize_apply(
+            float* dest,
+            const float* scale,
+            const float* src,
+            const float* gamma,
+            size_t ns,
+            size_t ks,
+            size_t num
+        )
+        {
             for (auto n : grid_stride_range_y(0, ns))
             {
                 const auto ps = src + n * ks * num;
                 const auto pd = dest + n * ks * num;
-                for (auto i : grid_stride_range(0, ks * num))
+                for (auto i : grid_stride_range(0, ks* num))
                 {
                     pd[i] = ps[i] * scale[n] * gamma[i / num];
                 }
@@ -2457,7 +2468,7 @@ namespace dlib
             const tensor& src,
             const tensor& gamma
         )
-        {            
+        {
             DLIB_CASSERT(
                 gamma.k() == src.k() &&
                 gamma.nr() == 1 &&
@@ -2478,26 +2489,31 @@ namespace dlib
             scale.set_size(ns);
             scale = 0;
 
-            launch_kernel(_cuda_rms_normalize, max_jobs(ks * num, ns),
-                dest.device(), scale.device(), src.device(), gamma.device(), eps, ns, ks, num);
+            launch_kernel(_cuda_rms_normalize_accumulate, max_jobs(ks * num, ns),
+                scale.device(), src.device(), ns, ks, num);
+
+            launch_kernel(_cuda_rms_normalize_invert, max_jobs(1, ns),
+                scale.device(), eps, ns);
+
+            launch_kernel(_cuda_rms_normalize_apply, max_jobs(ks * num, ns),
+                dest.device(), scale.device(), src.device(), gamma.device(), ns, ks, num);
         }
 
    // ----------------------------------------------------------------------------------------
 
-        __global__ void _cuda_rms_normalize_gradient(
-            float* src_grad,
+        __global__ void _cuda_rms_normalize_gradient_accumulate(
             float* gamma_grad,
             float* dscale,
             const float* src,
             const float* gradient_input,
             const float* scale,
             const float* gamma,
-            size_t ns, 
-            size_t ks,  
-            size_t num 
+            size_t ns,
+            size_t ks,
+            size_t num
         )
         {
-            for (auto nk : grid_stride_range_y(0, ns * ks))
+            for (auto nk : grid_stride_range_y(0, ns* ks))
             {
                 const auto n = nk / ks;
                 const auto k = nk % ks;
@@ -2509,22 +2525,34 @@ namespace dlib
                 for (auto i : grid_stride_range(0, num))
                 {
                     const float x_hat = ps[i] * scale[n];
-                    const float dx = pgi[i] * gamma[i / num];
+                    const float dx = pgi[i] * gamma[k];
                     temp_gg += pgi[i] * x_hat;
                     temp_ds += dx * ps[i] * scale_pow;
                 }
                 warp_reduce_atomic_add(gamma_grad[k], temp_gg);
                 warp_reduce_atomic_add(dscale[n], temp_ds);
             }
-            __syncthreads();
+        }
 
+        __global__ void _cuda_rms_normalize_gradient_apply(
+            float* src_grad,
+            const float* dscale,
+            const float* src,
+            const float* gradient_input,
+            const float* scale,
+            const float* gamma,
+            size_t ns,
+            size_t ks,
+            size_t num
+        )
+        {
             const float invnum = 1.0f / (ks * num);
             for (auto n : grid_stride_range_y(0, ns))
             {
                 const auto ps = src + n * ks * num;
                 const auto pgi = gradient_input + n * ks * num;
                 const auto psg = src_grad + n * ks * num;
-                for (auto i : grid_stride_range(0, ks * num))
+                for (auto i : grid_stride_range(0, ks* num))
                 {
                     const float dx = pgi[i] * gamma[i / num];
                     psg[i] += dx * scale[n] + dscale[n] * 2 * ps[i] * invnum;
@@ -2541,7 +2569,7 @@ namespace dlib
             tensor& gamma_grad,
             resizable_tensor& dscale
         )
-        {            
+        {
             DLIB_CASSERT(src.num_samples() == scale.size());
             DLIB_CASSERT(have_same_dimensions(gamma, gamma_grad));
             DLIB_CASSERT(gamma.k() == src.k());
@@ -2558,9 +2586,13 @@ namespace dlib
             dscale.copy_size(scale);
             dscale = 0;
 
-            // Lancement du kernel CUDA
-            launch_kernel(_cuda_rms_normalize_gradient, max_jobs(ks * num, ns),
-                src_grad.device(), gamma_grad.device(), dscale.device(),
+            launch_kernel(_cuda_rms_normalize_gradient_accumulate, max_jobs(ks * num, ns * ks),
+                gamma_grad.device(), dscale.device(),
+                src.device(), gradient_input.device(), scale.device(), gamma.device(),
+                ns, ks, num);
+
+            launch_kernel(_cuda_rms_normalize_gradient_apply, max_jobs(ks * num, ns),
+                src_grad.device(), dscale.device(),
                 src.device(), gradient_input.device(), scale.device(), gamma.device(),
                 ns, ks, num);
         }
@@ -2993,6 +3025,181 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        __global__ void apply_rope_kernel(
+            float* __restrict__ data,
+            const float* __restrict__ cos_cache,
+            const float* __restrict__ sin_cache,
+            const size_t total_pairs,
+            const long num_heads,
+            const long seq_len,
+            const long d_head,
+            const long half_d,
+            const long rot_dim,
+            const bool is_backward)
+        {
+            for (auto pair_id : grid_stride_range(0, total_pairs))
+            {
+                const long pair_idx = pair_id % half_d;
+                const long pos = (pair_id / half_d) % seq_len;
+                const long head = (pair_id / (half_d * seq_len)) % num_heads;
+                const long batch = pair_id / (half_d * seq_len * num_heads);
+        
+                const long dim_i = pair_idx * 2;
+                if (dim_i >= rot_dim) continue;
+        
+                const long base_offset = ((batch * num_heads + head) * seq_len + pos) * d_head;
+                const long data_offset = base_offset + dim_i;
+                const long trig_offset = pos * half_d + pair_idx;
+        
+                const float c = cos_cache[trig_offset];
+                const float s = sin_cache[trig_offset];
+                const float x0 = data[data_offset];
+                const float x1 = data[data_offset + 1];
+        
+                if (!is_backward)
+                {
+                    // Forward: rotation standard
+                    data[data_offset]     = x0 * c - x1 * s;
+                    data[data_offset + 1] = x0 * s + x1 * c;
+                }
+                else
+                {
+                    // Backward: rotation inverse
+                    data[data_offset]     = x0 * c + x1 * s;
+                    data[data_offset + 1] = -x0 * s + x1 * c;
+                }
+            }
+        }
+
+        void apply_rotary_positional_embedding(
+            bool is_backward,
+            tensor& data,
+            const tensor& cos_cache,
+            const tensor& sin_cache)
+        {
+            const long batch_size = data.num_samples();
+            const long num_heads = data.k();
+            const long seq_len = data.nr();
+            const long d_head = data.nc();
+            const long half_d = d_head / 2;
+
+            DLIB_CASSERT(cos_cache.nr() == seq_len, "cos_cache.nr() must match seq_len");
+            DLIB_CASSERT(cos_cache.nc() == half_d, "cos_cache.nc() must be d_head/2");
+            DLIB_CASSERT(sin_cache.nr() == seq_len, "sin_cache.nr() must match seq_len");
+            DLIB_CASSERT(sin_cache.nc() == half_d, "sin_cache.nc() must be d_head/2");
+
+            const bool is_odd = (d_head % 2 != 0);
+            const long rot_dim = is_odd ? d_head - 1 : d_head;
+
+            const size_t total_elements = batch_size * num_heads * seq_len * half_d;
+            if (total_elements == 0) return;
+
+            launch_kernel(apply_rope_kernel, max_jobs(total_elements),
+                data.device(),
+                cos_cache.device(),
+                sin_cache.device(),
+                total_elements,
+                num_heads,
+                seq_len,
+                d_head,
+                half_d,
+                rot_dim,
+                is_backward
+            );
+        }
+
+    // ----------------------------------------------------------------------------------------
+
+        __global__ void _cuda_compute_loss_cross_entropy_per_logit(
+            float* loss_out,
+            float* g,
+            const unsigned long* truth,
+            const float* out_data,
+            size_t batch_size,
+            size_t seq_len,
+            size_t vocab_size,
+            const float scale
+        )
+        {
+            float total_loss = 0;
+
+            for (auto sample_idx : grid_stride_range(0, batch_size))
+            {
+                const unsigned long target_class = truth[sample_idx];
+
+                const size_t last_pos = seq_len - 1;
+
+                float max_val = out_data[sample_idx * seq_len * vocab_size + last_pos * vocab_size + 0];
+                for (size_t c = 1; c < vocab_size; ++c)
+                {
+                    const size_t idx = sample_idx * seq_len * vocab_size + last_pos * vocab_size + c;
+                    max_val = ::max(max_val, out_data[idx]);
+                }
+
+                float sum_exp = 0.0f;
+                for (size_t c = 0; c < vocab_size; ++c)
+                {
+                    const size_t idx = sample_idx * seq_len * vocab_size + last_pos * vocab_size + c;
+                    const float exp_val = ::exp(out_data[idx] - max_val);
+                    g[idx] = exp_val;
+                    sum_exp += exp_val;
+                }
+
+                for (size_t c = 0; c < vocab_size; ++c)
+                {
+                    const size_t idx = sample_idx * seq_len * vocab_size + last_pos * vocab_size + c;
+                    const float softmax_val = g[idx] / sum_exp;
+
+                    if (c == target_class)
+                    {
+                        total_loss += -::log(::max(softmax_val, 1e-10f));
+                        g[idx] = scale * (softmax_val - 1.0f);
+                    }
+                    else
+                    {
+                        g[idx] = scale * softmax_val;
+                    }
+                }
+            }
+
+            warp_reduce_atomic_add(*loss_out, total_loss);
+        }
+
+        void compute_loss_cross_entropy_per_logit::
+            do_work(
+                cuda_data_ptr<float> loss_work_buffer,
+                cuda_data_ptr<const unsigned long> truth_buffer,
+                const tensor& subnetwork_output,
+                tensor& gradient,
+                double& loss
+            )
+        {
+            CHECK_CUDA(cudaMemset(gradient.device(), 0, gradient.size() * sizeof(float)));
+            CHECK_CUDA(cudaMemset(loss_work_buffer, 0, sizeof(float)));
+
+            const long batch_size = subnetwork_output.num_samples();
+            const long seq_len = subnetwork_output.nr();
+            const long vocab_size = subnetwork_output.nc();
+
+            const double scale = 1.0 / batch_size;
+
+            launch_kernel(_cuda_compute_loss_cross_entropy_per_logit, max_jobs(batch_size),
+                loss_work_buffer.data(),
+                gradient.device(),
+                truth_buffer.data(),
+                subnetwork_output.device(),
+                batch_size,
+                seq_len,
+                vocab_size,
+                scale
+            );
+
+            float floss;
+            dlib::cuda::memcpy(&floss, loss_work_buffer);
+            loss = scale * floss;
+        }
+
+    // ----------------------------------------------------------------------------------------
 
         __device__ float cuda_log1pexp(float x)
         {

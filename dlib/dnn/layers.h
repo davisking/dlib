@@ -2407,7 +2407,7 @@ namespace dlib
         {
             const auto& prev_output = sub.get_output();
             DLIB_CASSERT((long)num_inputs == prev_output.nc(),
-                "The size of the input tensor to this linear layer doesn't match the size the linear layer was trained with.");            
+                "The size of the input tensor to this linear layer doesn't match the size the linear layer was trained with.");
             output.set_size(prev_output.num_samples(), prev_output.k(), prev_output.nr(), num_outputs);
 
             auto o = alias_tensor(output.num_samples() * output.k() * output.nr(), num_outputs)(output, 0);
@@ -2441,8 +2441,6 @@ namespace dlib
                 }
             }
             
-            //prev_gradient is not const, so that sgi isn't const
-            //since sgi is used as a destination for tt::gemm
             auto& prev_gradient = sub.get_gradient_input();
             alias_tensor_instance sgi = alias_tensor(prev_gradient.num_samples() * prev_gradient.k() * prev_gradient.nr(), num_inputs)(prev_gradient, 0);
             auto w = weights(params, 0);
@@ -5742,8 +5740,7 @@ namespace dlib
             num_channels_(item.num_channels_),
             feature_dim_(item.feature_dim_),
             ponder_cost_(item.ponder_cost_),
-            avg_steps_(item.avg_steps_),
-            params(item.params),
+            avg_steps_(item.avg_steps_),            
             halting_probs_(item.halting_probs_),
             cumulative_halting_(item.cumulative_halting_),
             remainders_(item.remainders_),
@@ -5751,7 +5748,8 @@ namespace dlib
             logits_(item.logits_),
             grad_logits_(item.grad_logits_),
             input_cache_(item.input_cache_),
-            true_effective_weights_(item.true_effective_weights_)
+            true_effective_weights_(item.true_effective_weights_),
+            params(item.params)
         {
         }
 
@@ -5770,8 +5768,7 @@ namespace dlib
             num_channels_ = item.num_channels_;
             feature_dim_ = item.feature_dim_;
             ponder_cost_ = item.ponder_cost_;
-            avg_steps_ = item.avg_steps_;
-            params = item.params;
+            avg_steps_ = item.avg_steps_;            
             halting_probs_ = item.halting_probs_;
             cumulative_halting_ = item.cumulative_halting_;
             remainders_ = item.remainders_;
@@ -5780,6 +5777,7 @@ namespace dlib
             grad_logits_ = item.grad_logits_;
             input_cache_ = item.input_cache_;
             true_effective_weights_ = item.true_effective_weights_;
+            params = item.params;
 
             return *this;
         }
@@ -6077,9 +6075,6 @@ namespace dlib
         long num_channels_;
         long feature_dim_;
 
-        // Learnable parameters
-        resizable_tensor params;
-
         // Working memory
         resizable_tensor halting_probs_;        // p_t^n: Halting probabilities
         resizable_tensor cumulative_halting_;   // h_t^n: Cumulative halting probabilities
@@ -6093,6 +6088,9 @@ namespace dlib
         // Statistics for monitoring
         float ponder_cost_;      // R(x): Current ponder cost
         float avg_steps_;        // Average number of computation steps
+
+        // Learnable parameters
+        resizable_tensor params;
     };
 
     template <long max_steps, typename SUBNET>
@@ -6106,6 +6104,197 @@ namespace dlib
 
     template <typename SUBNET>
     using act16 = add_layer<adaptive_computation_time_<16>, SUBNET>;    // Deep version
+
+// ----------------------------------------------------------------------------------------
+
+    class rotary_positional_embedding_
+    {
+    public:
+        explicit rotary_positional_embedding_() :
+            seq_len(0),
+            d_head(0),
+			theta_base(10000.0f)
+        {
+		}
+
+        rotary_positional_embedding_(const rotary_positional_embedding_& other) :
+            seq_len(other.seq_len),
+            d_head(other.d_head),
+            theta_base(other.theta_base),
+            cos_cache(other.cos_cache),
+            sin_cache(other.sin_cache)
+        {
+        }
+
+        rotary_positional_embedding_& operator=(const rotary_positional_embedding_& other)
+        {
+            if (this != &other) {
+                seq_len = other.seq_len;
+                d_head = other.d_head;
+                theta_base = other.theta_base;
+                cos_cache = other.cos_cache;
+                sin_cache = other.sin_cache;
+            }
+            return *this;
+        }
+
+        void set_theta_base(float base)
+        {
+            DLIB_CASSERT(base > 0, "Theta base must be positive");
+            theta_base = base;
+        }
+
+        float get_theta_base() const { return theta_base; }
+        long get_seq_len() const { return seq_len; }
+        long get_d_head() const { return d_head; }
+
+        template <typename SUBNET>
+        void setup(const SUBNET& sub)
+        {
+            const tensor& input = sub.get_output();
+
+            // Expected input shape: (batch, num_heads, seq_len, d_head)
+            seq_len = input.nr();
+            d_head = input.nc();
+
+            DLIB_CASSERT(d_head >= 2, "d_head must be at least 2 for rotation");
+            DLIB_CASSERT(seq_len > 0, "seq_len must be positive");
+
+            // Precompute rotation angles and trigonometric values
+            compute_and_cache_trig_values();
+        }
+
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            const tensor& input = sub.get_output();
+            output.copy_size(input);
+
+            // Copy input to output
+            tt::copy_tensor(false, output, 0, input, 0, input.k());
+
+            // Apply rotary embedding in-place
+            tt::apply_rotary_positional_embedding(
+                false,  // forward pass
+                output,
+                cos_cache,
+                sin_cache
+            );
+        }
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
+        {
+            tensor& prev_grad = sub.get_gradient_input();
+
+            // Apply inverse rotation to gradients
+            resizable_tensor grad_output;
+            grad_output.copy_size(gradient_input);
+            tt::copy_tensor(false, grad_output, 0, gradient_input, 0, gradient_input.k());
+
+            tt::apply_rotary_positional_embedding(
+                true,   // backward pass (inverse rotation)
+                grad_output,
+                cos_cache,
+                sin_cache
+            );
+
+            // Accumulate gradients
+            tt::copy_tensor(true, prev_grad, 0, grad_output, 0, grad_output.k());
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const rotary_positional_embedding_& item, std::ostream& out)
+        {
+            serialize("rotary_positional_embedding_", out);
+            serialize(item.seq_len, out);
+            serialize(item.d_head, out);
+            serialize(item.theta_base, out);
+            serialize(item.cos_cache, out);
+            serialize(item.sin_cache, out);
+        }
+
+        friend void deserialize(rotary_positional_embedding_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "rotary_positional_embedding_")
+                throw serialization_error("Unexpected version '" + version +
+                    "' while deserializing rotary_positional_embedding_");
+
+            deserialize(item.seq_len, in);
+            deserialize(item.d_head, in);
+            deserialize(item.theta_base, in);
+            deserialize(item.cos_cache, in);
+            deserialize(item.sin_cache, in);
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const rotary_positional_embedding_& item)
+        {
+            out << "rotary_positional_embedding (seq_len=" << item.seq_len
+                << ", d_head=" << item.d_head
+                << ", theta_base=" << item.theta_base << ")";
+            return out;
+        }
+
+        friend void to_xml(const rotary_positional_embedding_& item, std::ostream& out)
+        {
+            out << "<rotary_positional_embedding"
+                << " seq_len='" << item.seq_len << "'"
+                << " d_head='" << item.d_head << "'"
+                << " theta_base='" << item.theta_base << "'"
+                << "/>\n";
+        }
+
+        inline dpoint map_input_to_output(const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input(const dpoint& p) const { return p; }
+
+    private:
+        void compute_and_cache_trig_values()
+        {
+            const long half_dim = d_head / 2;
+
+            // Allocate cache tensors: shape (1, 1, seq_len, half_dim)
+            cos_cache.set_size(1, 1, seq_len, half_dim);
+            sin_cache.set_size(1, 1, seq_len, half_dim);
+
+            // Compute on host side
+            float* cos_ptr = cos_cache.host();
+            float* sin_ptr = sin_cache.host();
+
+            // Compute θ_i = base^(-2i/d) for each dimension i
+            // Then θ_{pos,i} = pos * θ_i for each position
+            for (long pos = 0; pos < seq_len; ++pos) {
+                for (long i = 0; i < half_dim; ++i) {
+                    // inv_freq = base^(-2i/d_head)
+                    const float inv_freq = std::pow(theta_base, -2.0f * i / static_cast<float>(d_head));
+                    const float angle = pos * inv_freq;
+
+                    const long idx = pos * half_dim + i;
+                    cos_ptr[idx] = std::cos(angle);
+                    sin_ptr[idx] = std::sin(angle);
+                }
+            }
+        }
+
+        // Configuration
+        long seq_len;
+        long d_head;
+        float theta_base;
+
+        // Precomputed trigonometric values
+        // Shape: (1, 1, seq_len, d_head/2)
+        resizable_tensor cos_cache;
+        resizable_tensor sin_cache;
+
+        // No trainable parameters
+        resizable_tensor params;
+    };
+
+    template <typename SUBNET>
+    using rope = add_layer<rotary_positional_embedding_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
