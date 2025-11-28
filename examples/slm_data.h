@@ -2249,6 +2249,15 @@ inline std::string get_dataset_as_text(dataset_id id)
             // Process each paragraph from all combined datasets
         }
 */
+inline std::vector<std::string> get_dataset_as_segments(const std::vector<std::string>& docs)
+{
+    std::vector<std::string> result;
+    for (const auto& d : docs) {
+        auto segments = detail::split_by_delimiter(d);
+        result.insert(result.end(), segments.begin(), segments.end());
+    }
+    return result;
+}
 inline std::vector<std::string> get_dataset_as_segments(const std::vector<dataset_id>& ids)
 {
     std::vector<std::string> result;
@@ -2266,10 +2275,20 @@ inline std::vector<std::string> get_dataset_as_segments(const std::vector<datase
 
     Example:
         auto qa_pairs = get_dataset_as_pairs(dataset_id::BLACK_HOLE_QA_PARTA);
-        for (const auto& [question, answer] : qa_pairs) {
-            // Process question-answer pairs
+        for (const auto& qa_pair : qa_pairs) {
+            auto q_tokens = tokenizer.encode(qa_pair.first);   // question
+            auto a_tokens = tokenizer.encode(qa_pair.second);  // answer
         }
 !*/
+inline std::vector<std::pair<std::string, std::string>> get_dataset_as_pairs(const std::vector<dataset_id>& ids)
+{
+    std::vector<std::pair<std::string, std::string>> result;
+    for (const auto& id : ids) {
+        auto pairs = detail::parse_pairs(get_dataset_raw(id));
+        result.insert(result.end(), pairs.begin(), pairs.end());
+    }
+    return result;
+}
 inline std::vector<std::pair<std::string, std::string>>
     get_dataset_as_pairs(dataset_id id)
 {
