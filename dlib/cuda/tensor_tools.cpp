@@ -49,11 +49,13 @@ namespace dlib { namespace tt
         const double eps
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::inverse_norms(invnorms, data, eps);
-#else
-        invnorms = reciprocal(sqrt(sum_cols(squared(mat(data))) + eps));
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::inverse_norms(invnorms, data, eps);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            invnorms = reciprocal(sqrt(sum_cols(squared(mat(data))) + eps));
+        )
     }
 
     void dot_prods (
@@ -62,11 +64,13 @@ namespace dlib { namespace tt
         const tensor& rhs
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::dot_prods(out, lhs, rhs);
-#else
-        out = sum_cols(pointwise_multiply(mat(lhs), mat(rhs))); 
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::dot_prods(out, lhs, rhs);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            out = sum_cols(pointwise_multiply(mat(lhs), mat(rhs))); 
+        )
     }
 
     void dot_prods (
@@ -76,14 +80,16 @@ namespace dlib { namespace tt
         const tensor& rhs
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::dot_prods(add_to, out, lhs, rhs);
-#else
-        if (add_to)
-            out += sum_cols(pointwise_multiply(mat(lhs), mat(rhs))); 
-        else
-            out = sum_cols(pointwise_multiply(mat(lhs), mat(rhs))); 
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::dot_prods(add_to, out, lhs, rhs);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            if (add_to)
+                out += sum_cols(pointwise_multiply(mat(lhs), mat(rhs))); 
+            else
+                out = sum_cols(pointwise_multiply(mat(lhs), mat(rhs))); 
+        )
     }
 
     void scale_columns (
@@ -99,11 +105,13 @@ namespace dlib { namespace tt
         DLIB_CASSERT(m.size() != 0);
         DLIB_CASSERT(m.size()/m.num_samples() == v.size());
 
-#ifdef DLIB_USE_CUDA
-        cuda::scale_columns(out, m, v);
-#else
-        out = scale_columns(mat(m), mat(v));
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::scale_columns(out, m, v);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            out = scale_columns(mat(m), mat(v));
+        )
     }
 
     void scale_rows (
@@ -119,11 +127,13 @@ namespace dlib { namespace tt
         DLIB_CASSERT(m.size() != 0);
         DLIB_CASSERT(m.num_samples() == static_cast<long long>(v.size()));
 
-#ifdef DLIB_USE_CUDA
-        cuda::scale_rows(out, m, v);
-#else
-        out = scale_rows(mat(m), mat(v));
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::scale_rows(out, m, v);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            out = scale_rows(mat(m), mat(v));
+        )
     }
 
     void scale_rows2 (
@@ -141,14 +151,16 @@ namespace dlib { namespace tt
         DLIB_CASSERT(is_vector(mat(v1))); 
         DLIB_CASSERT(static_cast<long long>(v1.size()) == m1.num_samples());
 
-#ifdef DLIB_USE_CUDA
-        cuda::scale_rows2(beta, out, m1, m2, v1, v2);
-#else
-        if (beta == 0)
-            out = scale_rows(mat(m1) - scale_rows(mat(m2),mat(v1)), mat(v2));
-        else
-            out = beta*mat(out) + scale_rows(mat(m1) - scale_rows(mat(m2),mat(v1)), mat(v2));
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::scale_rows2(beta, out, m1, m2, v1, v2);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            if (beta == 0)
+                out = scale_rows(mat(m1) - scale_rows(mat(m2),mat(v1)), mat(v2));
+            else
+                out = beta*mat(out) + scale_rows(mat(m1) - scale_rows(mat(m2),mat(v1)), mat(v2));
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -160,11 +172,13 @@ namespace dlib { namespace tt
     {
         DLIB_CASSERT(dest.size() == src.size());
 
-#ifdef DLIB_USE_CUDA
-        cuda::exp(dest,src);
-#else
-        dest = exp(mat(src));
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::exp(dest,src);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            dest = exp(mat(src));
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -176,11 +190,13 @@ namespace dlib { namespace tt
     {
         DLIB_CASSERT(dest.size() == src.size());
 
-#ifdef DLIB_USE_CUDA
-        cuda::log(dest,src);
-#else
-        dest = log(mat(src));
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::log(dest,src);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            dest = log(mat(src));
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -192,11 +208,13 @@ namespace dlib { namespace tt
     {
         DLIB_CASSERT(dest.size() == src.size());
 
-#ifdef DLIB_USE_CUDA
-        cuda::log10(dest,src);
-#else
-        dest = log10(mat(src));
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::log10(dest,src);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            dest = log10(mat(src));
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -212,97 +230,99 @@ namespace dlib { namespace tt
         operation_mode mode
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::gemm(beta, dest, alpha, lhs, trans_lhs, rhs, trans_rhs, mode);
-#else
-        if (mode == operation_mode::CHANNEL_WISE)
-        {
-            if (beta != 0)
+        IF_DLIB_USE_CUDA(
+            cuda::gemm(beta, dest, alpha, lhs, trans_lhs, rhs, trans_rhs, mode);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            if (mode == operation_mode::CHANNEL_WISE)
             {
-                if (trans_lhs && trans_rhs)
-                    dest = alpha * trans(mat(lhs)) * trans(mat(rhs)) + beta * mat(dest);
-                else if (!trans_lhs && trans_rhs)
-                    dest = alpha * mat(lhs) * trans(mat(rhs)) + beta * mat(dest);
-                else if (trans_lhs && !trans_rhs)
-                    dest = alpha * trans(mat(lhs)) * mat(rhs) + beta * mat(dest);
-                else
-                    dest = alpha * mat(lhs) * mat(rhs) + beta * mat(dest);
-            }
-            else
-            {
-                if (trans_lhs && trans_rhs)
-                    dest = alpha * trans(mat(lhs)) * trans(mat(rhs));
-                else if (!trans_lhs && trans_rhs)
-                    dest = alpha * mat(lhs) * trans(mat(rhs));
-                else if (trans_lhs && !trans_rhs)
-                    dest = alpha * trans(mat(lhs)) * mat(rhs);
-                else
-                    dest = alpha * mat(lhs) * mat(rhs);
-            }
-        }
-        else if (mode == operation_mode::PLANE_WISE)
-        {
-            auto is_matrix = [](const auto& tensor) {
-                return ((tensor.num_samples() * tensor.k() == 1 && tensor.nr() * tensor.nc() > 1) ||
-                    (tensor.num_samples() * tensor.k() > 1 && tensor.nr() * tensor.nc() == 1));
-                };
-
-            long num_samples = std::min({ lhs.num_samples(), rhs.num_samples(), dest.num_samples() });
-            long num_channels = std::min({ lhs.k(), rhs.k(), dest.k() });
-            const bool lhs_is_matrix = is_matrix(lhs), rhs_is_matrix = is_matrix(rhs), dest_is_matrix = is_matrix(dest);
-
-            if (lhs_is_matrix && rhs_is_matrix && dest_is_matrix) {
-                num_samples = num_channels = 1;
-            }
-
-            long lhs_rows = (lhs_is_matrix && lhs.num_samples() > 1) ? lhs.num_samples() : lhs.nr();
-            long lhs_cols = (lhs_is_matrix && lhs.k() > 1) ? lhs.k() : lhs.nc();
-            long rhs_rows = (rhs_is_matrix && rhs.num_samples() > 1) ? rhs.num_samples() : rhs.nr();
-            long rhs_cols = (rhs_is_matrix && rhs.k() > 1) ? rhs.k() : rhs.nc();
-            long dest_rows = (dest_is_matrix && dest.num_samples() > 1) ? dest.num_samples() : dest.nr();
-            long dest_cols = (dest_is_matrix && dest.k() > 1) ? dest.k() : dest.nc();
-
-            const size_t lhs_plane_size = lhs_rows * lhs_cols;
-            const size_t rhs_plane_size = rhs_rows * rhs_cols;
-            const size_t dest_plane_size = dest_rows * dest_cols;
-
-            for (long b = 0; b < num_samples; ++b)
-            {
-                for (long c = 0; c < num_channels; ++c)
+                if (beta != 0)
                 {
-                    auto lhs_slice = lhs_is_matrix ? alias_tensor(lhs_rows, lhs_cols)(lhs, 0) :
-                        alias_tensor(lhs_rows, lhs_cols)(lhs, (b * num_channels + c) * lhs_plane_size);
-                    auto rhs_slice = rhs_is_matrix ? alias_tensor(rhs_rows, rhs_cols)(rhs, 0) :
-                        alias_tensor(rhs_rows, rhs_cols)(rhs, (b * num_channels + c) * rhs_plane_size);
-                    auto dest_slice = dest_is_matrix ? alias_tensor(dest_rows, dest_cols)(dest, 0) :
-                        alias_tensor(dest_rows, dest_cols)(dest, (b * num_channels + c) * dest_plane_size);
-
-                    if (beta != 0)
-                    {
-                        if (trans_lhs && trans_rhs)
-                            dest_slice = alpha * trans(mat(lhs_slice)) * trans(mat(rhs_slice)) + beta * mat(dest_slice);
-                        else if (!trans_lhs && trans_rhs)
-                            dest_slice = alpha * mat(lhs_slice) * trans(mat(rhs_slice)) + beta * mat(dest_slice);
-                        else if (trans_lhs && !trans_rhs)
-                            dest_slice = alpha * trans(mat(lhs_slice)) * mat(rhs_slice) + beta * mat(dest_slice);
-                        else
-                            dest_slice = alpha * mat(lhs_slice) * mat(rhs_slice) + beta * mat(dest_slice);
-                    }
+                    if (trans_lhs && trans_rhs)
+                        dest = alpha * trans(mat(lhs)) * trans(mat(rhs)) + beta * mat(dest);
+                    else if (!trans_lhs && trans_rhs)
+                        dest = alpha * mat(lhs) * trans(mat(rhs)) + beta * mat(dest);
+                    else if (trans_lhs && !trans_rhs)
+                        dest = alpha * trans(mat(lhs)) * mat(rhs) + beta * mat(dest);
                     else
+                        dest = alpha * mat(lhs) * mat(rhs) + beta * mat(dest);
+                }
+                else
+                {
+                    if (trans_lhs && trans_rhs)
+                        dest = alpha * trans(mat(lhs)) * trans(mat(rhs));
+                    else if (!trans_lhs && trans_rhs)
+                        dest = alpha * mat(lhs) * trans(mat(rhs));
+                    else if (trans_lhs && !trans_rhs)
+                        dest = alpha * trans(mat(lhs)) * mat(rhs);
+                    else
+                        dest = alpha * mat(lhs) * mat(rhs);
+                }
+            }
+            else if (mode == operation_mode::PLANE_WISE)
+            {
+                auto is_matrix = [](const auto& tensor) {
+                    return ((tensor.num_samples() * tensor.k() == 1 && tensor.nr() * tensor.nc() > 1) ||
+                        (tensor.num_samples() * tensor.k() > 1 && tensor.nr() * tensor.nc() == 1));
+                    };
+
+                long num_samples = std::min({ lhs.num_samples(), rhs.num_samples(), dest.num_samples() });
+                long num_channels = std::min({ lhs.k(), rhs.k(), dest.k() });
+                const bool lhs_is_matrix = is_matrix(lhs), rhs_is_matrix = is_matrix(rhs), dest_is_matrix = is_matrix(dest);
+
+                if (lhs_is_matrix && rhs_is_matrix && dest_is_matrix) {
+                    num_samples = num_channels = 1;
+                }
+
+                long lhs_rows = (lhs_is_matrix && lhs.num_samples() > 1) ? lhs.num_samples() : lhs.nr();
+                long lhs_cols = (lhs_is_matrix && lhs.k() > 1) ? lhs.k() : lhs.nc();
+                long rhs_rows = (rhs_is_matrix && rhs.num_samples() > 1) ? rhs.num_samples() : rhs.nr();
+                long rhs_cols = (rhs_is_matrix && rhs.k() > 1) ? rhs.k() : rhs.nc();
+                long dest_rows = (dest_is_matrix && dest.num_samples() > 1) ? dest.num_samples() : dest.nr();
+                long dest_cols = (dest_is_matrix && dest.k() > 1) ? dest.k() : dest.nc();
+
+                const size_t lhs_plane_size = lhs_rows * lhs_cols;
+                const size_t rhs_plane_size = rhs_rows * rhs_cols;
+                const size_t dest_plane_size = dest_rows * dest_cols;
+
+                for (long b = 0; b < num_samples; ++b)
+                {
+                    for (long c = 0; c < num_channels; ++c)
                     {
-                        if (trans_lhs && trans_rhs)
-                            dest_slice = alpha * trans(mat(lhs_slice)) * trans(mat(rhs_slice));
-                        else if (!trans_lhs && trans_rhs)
-                            dest_slice = alpha * mat(lhs_slice) * trans(mat(rhs_slice));
-                        else if (trans_lhs && !trans_rhs)
-                            dest_slice = alpha * trans(mat(lhs_slice)) * mat(rhs_slice);
+                        auto lhs_slice = lhs_is_matrix ? alias_tensor(lhs_rows, lhs_cols)(lhs, 0) :
+                            alias_tensor(lhs_rows, lhs_cols)(lhs, (b * num_channels + c) * lhs_plane_size);
+                        auto rhs_slice = rhs_is_matrix ? alias_tensor(rhs_rows, rhs_cols)(rhs, 0) :
+                            alias_tensor(rhs_rows, rhs_cols)(rhs, (b * num_channels + c) * rhs_plane_size);
+                        auto dest_slice = dest_is_matrix ? alias_tensor(dest_rows, dest_cols)(dest, 0) :
+                            alias_tensor(dest_rows, dest_cols)(dest, (b * num_channels + c) * dest_plane_size);
+
+                        if (beta != 0)
+                        {
+                            if (trans_lhs && trans_rhs)
+                                dest_slice = alpha * trans(mat(lhs_slice)) * trans(mat(rhs_slice)) + beta * mat(dest_slice);
+                            else if (!trans_lhs && trans_rhs)
+                                dest_slice = alpha * mat(lhs_slice) * trans(mat(rhs_slice)) + beta * mat(dest_slice);
+                            else if (trans_lhs && !trans_rhs)
+                                dest_slice = alpha * trans(mat(lhs_slice)) * mat(rhs_slice) + beta * mat(dest_slice);
+                            else
+                                dest_slice = alpha * mat(lhs_slice) * mat(rhs_slice) + beta * mat(dest_slice);
+                        }
                         else
-                            dest_slice = alpha * mat(lhs_slice) * mat(rhs_slice);
+                        {
+                            if (trans_lhs && trans_rhs)
+                                dest_slice = alpha * trans(mat(lhs_slice)) * trans(mat(rhs_slice));
+                            else if (!trans_lhs && trans_rhs)
+                                dest_slice = alpha * mat(lhs_slice) * trans(mat(rhs_slice));
+                            else if (trans_lhs && !trans_rhs)
+                                dest_slice = alpha * trans(mat(lhs_slice)) * mat(rhs_slice);
+                            else
+                                dest_slice = alpha * mat(lhs_slice) * mat(rhs_slice);
+                        }
                     }
                 }
             }
-        }
-#endif
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -313,10 +333,9 @@ namespace dlib { namespace tt
         unsigned long long seed
     ) 
 #ifdef DLIB_USE_CUDA
-    :rnd(seed){}
-#else
-    {rnd.set_seed(cast_to_string(seed)); }
+    :cuda_impl(seed)
 #endif
+    {cpu_impl.set_seed(cast_to_string(seed)); }
 
     void tensor_rand::
     fill_gaussian (
@@ -326,12 +345,15 @@ namespace dlib { namespace tt
     )
     {
         DLIB_CASSERT(data.size()%2 == 0);
-#ifdef DLIB_USE_CUDA
-        rnd.fill_gaussian(data, mean, stddev);
-#else
-        for (auto& x : data) 
-            x = rnd.get_random_gaussian()*stddev + mean;
-#endif
+
+        IF_DLIB_USE_CUDA(
+            cuda_impl.fill_gaussian(data, mean, stddev);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            for (auto& x : data) 
+                x = cpu_impl.get_random_gaussian()*stddev + mean;
+        )
     }
 
     void tensor_rand::
@@ -339,12 +361,14 @@ namespace dlib { namespace tt
         tensor& data
     )
     {
-#ifdef DLIB_USE_CUDA
-        rnd.fill_uniform(data);
-#else
-        for (auto& x : data) 
-            x = rnd.get_random_float();
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda_impl.fill_uniform(data);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            for (auto& x : data) 
+                x = cpu_impl.get_random_float();
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -364,11 +388,14 @@ namespace dlib { namespace tt
         DLIB_CASSERT((dest.num_samples()==1 || dest.num_samples()==MD) &&
                     (src1.num_samples()==1 || src1.num_samples()==MD) &&
                     (src2.num_samples()==1 || src2.num_samples()==MD) );
-#ifdef DLIB_USE_CUDA
-        cuda::multiply(add_to, dest, src1, src2);
-#else
-        cpu::multiply(add_to, dest, src1, src2);
-#endif
+
+        IF_DLIB_USE_CUDA(
+            cuda::multiply(add_to, dest, src1, src2);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::multiply(add_to, dest, src1, src2);
+        )
 
     }
 
@@ -379,11 +406,13 @@ namespace dlib { namespace tt
         const tensor& scales
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::scale_channels(add_to, dest, src, scales);
-#else
-        cpu::scale_channels(add_to, dest, src, scales);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::scale_channels(add_to, dest, src, scales);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::scale_channels(add_to, dest, src, scales);
+        )
     }
 
     void multiply_conv (
@@ -393,11 +422,13 @@ namespace dlib { namespace tt
         const tensor& src2
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::multiply_conv(add_to, dest, src1, src2);
-#else
-        cpu::multiply_conv(add_to, dest, src1, src2);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::multiply_conv(add_to, dest, src1, src2);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::multiply_conv(add_to, dest, src1, src2);
+        )
     }
 
     void multiply_zero_padded (
@@ -407,11 +438,13 @@ namespace dlib { namespace tt
         const tensor& src2
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::multiply_zero_padded(add_to, dest, src1, src2);
-#else
-        cpu::multiply_zero_padded(add_to, dest, src1, src2);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::multiply_zero_padded(add_to, dest, src1, src2);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::multiply_zero_padded(add_to, dest, src1, src2);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -423,11 +456,13 @@ namespace dlib { namespace tt
         const float B
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::affine_transform(dest,src,A,B);
-#else
-        cpu::affine_transform(dest,src,A,B);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::affine_transform(dest,src,A,B);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::affine_transform(dest,src,A,B);
+        )
     }
 
     void affine_transform(
@@ -436,11 +471,13 @@ namespace dlib { namespace tt
         const float A
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::affine_transform(dest,src,A);
-#else
-        cpu::affine_transform(dest,src,A,0);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::affine_transform(dest,src,A);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::affine_transform(dest,src,A,0);
+        )
     }
 
     void affine_transform(
@@ -452,11 +489,13 @@ namespace dlib { namespace tt
         const float C
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::affine_transform(dest,src1,src2,A,B,C);
-#else
-        cpu::affine_transform(dest,src1,src2,A,B,C);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::affine_transform(dest,src1,src2,A,B,C);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::affine_transform(dest,src1,src2,A,B,C);
+        )
     }
 
     void affine_transform(
@@ -467,11 +506,13 @@ namespace dlib { namespace tt
         const float B
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::affine_transform(dest,src1,src2,A,B);
-#else
-        cpu::affine_transform(dest,src1,src2,A,B,0);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::affine_transform(dest,src1,src2,A,B);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::affine_transform(dest,src1,src2,A,B,0);
+        )
     }
 
     void affine_transform(
@@ -485,11 +526,13 @@ namespace dlib { namespace tt
         const float D
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::affine_transform(dest,src1,src2,src3,A,B,C,D);
-#else
-        cpu::affine_transform(dest,src1,src2,src3,A,B,C,D);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::affine_transform(dest,src1,src2,src3,A,B,C,D);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::affine_transform(dest,src1,src2,src3,A,B,C,D);
+        )
     }
 
     void affine_transform_range(
@@ -504,11 +547,13 @@ namespace dlib { namespace tt
         const float C
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::affine_transform_range(begin, end, dest,src1,src2,src3,A,B,C);
-#else
-        cpu::affine_transform_range(begin, end, dest,src1,src2,src3,A,B,C);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::affine_transform_range(begin, end, dest,src1,src2,src3,A,B,C);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::affine_transform_range(begin, end, dest,src1,src2,src3,A,B,C);
+        )
     }
 
     void affine_transform(
@@ -522,11 +567,13 @@ namespace dlib { namespace tt
         float C
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::affine_transform(rect, dest,src1,src2,src3,A,B,C);
-#else
-        cpu::affine_transform(rect, dest,src1,src2,src3,A,B,C);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::affine_transform(rect, dest,src1,src2,src3,A,B,C);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::affine_transform(rect, dest,src1,src2,src3,A,B,C);
+        )
     }
 
     void affine_transform(
@@ -539,11 +586,13 @@ namespace dlib { namespace tt
         const float C
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::affine_transform_range(0,dest.size(),dest,src1,src2,src3,A,B,C);
-#else
-        cpu::affine_transform_range(0,dest.size(),dest,src1,src2,src3,A,B,C);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::affine_transform_range(0,dest.size(),dest,src1,src2,src3,A,B,C);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::affine_transform_range(0,dest.size(),dest,src1,src2,src3,A,B,C);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -555,11 +604,13 @@ namespace dlib { namespace tt
         const tensor& B
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::affine_transform(dest,src,A,B);
-#else
-        cpu::affine_transform(dest,src,A,B);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::affine_transform(dest,src,A,B);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::affine_transform(dest,src,A,B);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -571,11 +622,13 @@ namespace dlib { namespace tt
         const tensor& B
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::affine_transform_conv(dest,src,A,B);
-#else
-        cpu::affine_transform_conv(dest,src,A,B);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::affine_transform_conv(dest,src,A,B);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::affine_transform_conv(dest,src,A,B);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -595,13 +648,15 @@ namespace dlib { namespace tt
         const tensor& params_grad
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::compute_adam_update(begin, end, s, m, v, t, learning_rate, weight_decay, momentum1,
-            momentum2, params, params_grad);
-#else
-        cpu::compute_adam_update(begin, end, s, m, v, t, learning_rate, weight_decay, momentum1,
-            momentum2, params, params_grad);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::compute_adam_update(begin, end, s, m, v, t, learning_rate, weight_decay, momentum1,
+                momentum2, params, params_grad);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::compute_adam_update(begin, end, s, m, v, t, learning_rate, weight_decay, momentum1,
+                momentum2, params, params_grad);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -616,11 +671,13 @@ namespace dlib { namespace tt
         const tensor& running_variances
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::batch_normalize_inference(eps,dest,src,gamma,beta,running_means,running_variances);
-#else
-        cpu::batch_normalize_inference(eps,dest,src,gamma,beta,running_means,running_variances);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::batch_normalize_inference(eps,dest,src,gamma,beta,running_means,running_variances);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::batch_normalize_inference(eps,dest,src,gamma,beta,running_means,running_variances);
+        )
     }
 
     void batch_normalize (
@@ -636,11 +693,13 @@ namespace dlib { namespace tt
         const tensor& beta 
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::batch_normalize(eps,dest,means,vars,averaging_factor,running_means,running_variances,src,gamma,beta);
-#else
-        cpu::batch_normalize(eps,dest,means,vars,averaging_factor,running_means,running_variances,src,gamma,beta);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::batch_normalize(eps,dest,means,vars,averaging_factor,running_means,running_variances,src,gamma,beta);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::batch_normalize(eps,dest,means,vars,averaging_factor,running_means,running_variances,src,gamma,beta);
+        )
     }
 
     void batch_normalize_gradient (
@@ -656,11 +715,13 @@ namespace dlib { namespace tt
     )
     {
              
-#ifdef DLIB_USE_CUDA
-        cuda::batch_normalize_gradient(eps,gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
-#else
-        cpu::batch_normalize_gradient(eps,gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::batch_normalize_gradient(eps,gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::batch_normalize_gradient(eps,gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -675,11 +736,13 @@ namespace dlib { namespace tt
         const tensor& running_variances
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::batch_normalize_conv_inference(eps,dest,src,gamma,beta,running_means,running_variances);
-#else
-        cpu::batch_normalize_conv_inference(eps,dest,src,gamma,beta,running_means,running_variances);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::batch_normalize_conv_inference(eps,dest,src,gamma,beta,running_means,running_variances);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::batch_normalize_conv_inference(eps,dest,src,gamma,beta,running_means,running_variances);
+        )
     }
 
     void batch_normalize_conv (
@@ -695,11 +758,13 @@ namespace dlib { namespace tt
         const tensor& beta 
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::batch_normalize_conv(eps,dest,means,vars,averaging_factor,running_means,running_variances,src,gamma,beta);
-#else
-        cpu::batch_normalize_conv(eps,dest,means,vars,averaging_factor,running_means,running_variances,src,gamma,beta);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::batch_normalize_conv(eps,dest,means,vars,averaging_factor,running_means,running_variances,src,gamma,beta);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::batch_normalize_conv(eps,dest,means,vars,averaging_factor,running_means,running_variances,src,gamma,beta);
+        )
     }
 
     void batch_normalize_conv_gradient (
@@ -715,11 +780,13 @@ namespace dlib { namespace tt
     )
     {
              
-#ifdef DLIB_USE_CUDA
-        cuda::batch_normalize_conv_gradient(eps,gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
-#else
-        cpu::batch_normalize_conv_gradient(eps,gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::batch_normalize_conv_gradient(eps,gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::batch_normalize_conv_gradient(eps,gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -734,11 +801,13 @@ namespace dlib { namespace tt
         const tensor& beta
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::layer_normalize(eps, dest, means, vars, src, gamma, beta);
-#else
-        cpu::layer_normalize(eps, dest, means, vars, src, gamma, beta);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::layer_normalize(eps, dest, means, vars, src, gamma, beta);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::layer_normalize(eps, dest, means, vars, src, gamma, beta);
+        )
     }
 
     void layer_normalize_gradient (
@@ -755,11 +824,13 @@ namespace dlib { namespace tt
             resizable_tensor& dvars
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::layer_normalize_gradient(eps, gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad, dmeans, dvars);
-#else
-        cpu::layer_normalize_gradient(eps, gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad, dmeans, dvars);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::layer_normalize_gradient(eps, gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad, dmeans, dvars);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::layer_normalize_gradient(eps, gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad, dmeans, dvars);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -772,11 +843,13 @@ namespace dlib { namespace tt
         const tensor& gamma
     )
     {            
-#ifdef DLIB_USE_CUDA
-        cuda::rms_normalize(eps, dest, scale, src, gamma);
-#else
-        cpu::rms_normalize(eps, dest, scale, src, gamma);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::rms_normalize(eps, dest, scale, src, gamma);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::rms_normalize(eps, dest, scale, src, gamma);
+        )
     }
 
     void rms_normalize_gradient(
@@ -789,11 +862,13 @@ namespace dlib { namespace tt
         resizable_tensor& dscale
     )
     {            
-#ifdef DLIB_USE_CUDA
-        cuda::rms_normalize_gradient(gradient_input, scale, src, gamma, src_grad, gamma_grad, dscale);
-#else
-        cpu::rms_normalize_gradient(gradient_input, scale, src, gamma, src_grad, gamma_grad, dscale);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::rms_normalize_gradient(gradient_input, scale, src, gamma, src_grad, gamma_grad, dscale);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::rms_normalize_gradient(gradient_input, scale, src, gamma, src_grad, gamma_grad, dscale);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -803,11 +878,13 @@ namespace dlib { namespace tt
         float thresh
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::threshold(data,thresh);
-#else
-        cpu::threshold(data,thresh);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::threshold(data,thresh);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::threshold(data,thresh);
+        )
     }
 
     void dot (
@@ -817,11 +894,13 @@ namespace dlib { namespace tt
         size_t idx
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::dot(a,b,result,idx);
-#else
-        cpu::dot(a,b,result,idx);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::dot(a,b,result,idx);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::dot(a,b,result,idx);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -833,11 +912,13 @@ namespace dlib { namespace tt
         const tensor& src
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::add(beta,dest,alpha,src);
-#else
-        cpu::add(beta,dest,alpha,src);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::add(beta,dest,alpha,src);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::add(beta,dest,alpha,src);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -848,11 +929,13 @@ namespace dlib { namespace tt
         const tensor& src2
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::add(dest, src1, src2);
-#else
-        cpu::add(dest, src1, src2);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::add(dest, src1, src2);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::add(dest, src1, src2);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -862,11 +945,13 @@ namespace dlib { namespace tt
         const tensor& gradient_input
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::assign_conv_bias_gradient(grad,gradient_input);
-#else
-        cpu::assign_conv_bias_gradient(grad,gradient_input);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::assign_conv_bias_gradient(grad,gradient_input);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::assign_conv_bias_gradient(grad,gradient_input);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -876,11 +961,13 @@ namespace dlib { namespace tt
         const tensor& gradient_input
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::assign_bias_gradient(grad,gradient_input);
-#else
-        cpu::assign_bias_gradient(grad,gradient_input);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::assign_bias_gradient(grad,gradient_input);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::assign_bias_gradient(grad,gradient_input);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -891,11 +978,13 @@ namespace dlib { namespace tt
         operation_mode mode
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::softmax(dest, src, mode);
-#else
-        cpu::softmax(dest, src, mode);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::softmax(dest, src, mode);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::softmax(dest, src, mode);
+        )
     }
 
     void softmax_gradient(
@@ -905,11 +994,13 @@ namespace dlib { namespace tt
         operation_mode mode
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::softmax_gradient(grad, dest, gradient_input, mode);
-#else
-        cpu::softmax_gradient(grad, dest, gradient_input, mode);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::softmax_gradient(grad, dest, gradient_input, mode);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::softmax_gradient(grad, dest, gradient_input, mode);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -919,11 +1010,13 @@ namespace dlib { namespace tt
         const tensor& src
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::softmax_all(dest,src);
-#else
-        cpu::softmax_all(dest,src);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::softmax_all(dest,src);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::softmax_all(dest,src);
+        )
     }
 
     void softmax_all_gradient (
@@ -932,11 +1025,13 @@ namespace dlib { namespace tt
         const tensor& gradient_input
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::softmax_all_gradient(grad, dest, gradient_input);
-#else
-        cpu::softmax_all_gradient(grad, dest, gradient_input);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::softmax_all_gradient(grad, dest, gradient_input);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::softmax_all_gradient(grad, dest, gradient_input);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -946,11 +1041,13 @@ namespace dlib { namespace tt
         const tensor& src
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::sigmoid(dest,src);
-#else
-        cpu::sigmoid(dest,src);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::sigmoid(dest,src);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::sigmoid(dest,src);
+        )
     }
 
     void sigmoid_gradient (
@@ -959,11 +1056,13 @@ namespace dlib { namespace tt
         const tensor& gradient_input
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::sigmoid_gradient(grad, dest, gradient_input);
-#else
-        cpu::sigmoid_gradient(grad, dest, gradient_input);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::sigmoid_gradient(grad, dest, gradient_input);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::sigmoid_gradient(grad, dest, gradient_input);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -973,11 +1072,13 @@ namespace dlib { namespace tt
         const tensor& src
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::mish(dest,src);
-#else
-        cpu::mish(dest,src);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::mish(dest,src);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::mish(dest,src);
+        )
     }
 
     void mish_gradient (
@@ -986,11 +1087,13 @@ namespace dlib { namespace tt
         const tensor& gradient_input
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::mish_gradient(grad, src, gradient_input);
-#else
-        cpu::mish_gradient(grad, src, gradient_input);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::mish_gradient(grad, src, gradient_input);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::mish_gradient(grad, src, gradient_input);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1000,11 +1103,13 @@ namespace dlib { namespace tt
         const tensor& src
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::relu(dest,src);
-#else
-        cpu::relu(dest,src);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::relu(dest,src);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::relu(dest,src);
+        )
     }
 
     void relu_gradient (
@@ -1013,11 +1118,13 @@ namespace dlib { namespace tt
         const tensor& gradient_input
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::relu_gradient(grad, dest, gradient_input);
-#else
-        cpu::relu_gradient(grad, dest, gradient_input);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::relu_gradient(grad, dest, gradient_input);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::relu_gradient(grad, dest, gradient_input);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1028,11 +1135,13 @@ namespace dlib { namespace tt
         const tensor& param
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::prelu(dest, src, param);
-#else
-        cpu::prelu(dest, src, param);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::prelu(dest, src, param);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::prelu(dest, src, param);
+        )
     }
 
     void prelu_gradient (
@@ -1043,11 +1152,13 @@ namespace dlib { namespace tt
         tensor& params_grad 
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::prelu_gradient(grad, src, gradient_input, param, params_grad);
-#else
-        cpu::prelu_gradient(grad, src, gradient_input, param, params_grad);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::prelu_gradient(grad, src, gradient_input, param, params_grad);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::prelu_gradient(grad, src, gradient_input, param, params_grad);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1058,11 +1169,13 @@ namespace dlib { namespace tt
         const float alpha
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::leaky_relu(dest, src, alpha);
-#else
-        cpu::leaky_relu(dest, src, alpha);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::leaky_relu(dest, src, alpha);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::leaky_relu(dest, src, alpha);
+        )
     }
 
     void leaky_relu_gradient (
@@ -1072,11 +1185,13 @@ namespace dlib { namespace tt
         const float alpha
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::leaky_relu_gradient(grad, dest, gradient_input, alpha);
-#else
-        cpu::leaky_relu_gradient(grad, dest, gradient_input, alpha);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::leaky_relu_gradient(grad, dest, gradient_input, alpha);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::leaky_relu_gradient(grad, dest, gradient_input, alpha);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1086,11 +1201,13 @@ namespace dlib { namespace tt
         const tensor& src
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::tanh(dest,src);
-#else
-        cpu::tanh(dest,src);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::tanh(dest,src);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::tanh(dest,src);
+        )
     }
 
     void tanh_gradient (
@@ -1099,11 +1216,13 @@ namespace dlib { namespace tt
         const tensor& gradient_input
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::tanh_gradient(grad, dest, gradient_input);
-#else
-        cpu::tanh_gradient(grad, dest, gradient_input);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::tanh_gradient(grad, dest, gradient_input);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::tanh_gradient(grad, dest, gradient_input);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1114,11 +1233,13 @@ namespace dlib { namespace tt
         const float ceiling
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::clipped_relu(dest, src, ceiling);
-#else
-        cpu::clipped_relu(dest, src, ceiling);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::clipped_relu(dest, src, ceiling);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::clipped_relu(dest, src, ceiling);
+        )
     }
 
     void clipped_relu_gradient (
@@ -1128,11 +1249,13 @@ namespace dlib { namespace tt
         const float ceiling
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::clipped_relu_gradient(grad, dest, gradient_input, ceiling);
-#else
-        cpu::clipped_relu_gradient(grad, dest, gradient_input, ceiling);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::clipped_relu_gradient(grad, dest, gradient_input, ceiling);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::clipped_relu_gradient(grad, dest, gradient_input, ceiling);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1143,11 +1266,13 @@ namespace dlib { namespace tt
         const float alpha
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::elu(dest, src, alpha);
-#else
-        cpu::elu(dest, src, alpha);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::elu(dest, src, alpha);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::elu(dest, src, alpha);
+        )
     }
 
     void elu_gradient (
@@ -1157,11 +1282,13 @@ namespace dlib { namespace tt
         const float alpha
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::elu_gradient(grad, dest, gradient_input, alpha);
-#else
-        cpu::elu_gradient(grad, dest, gradient_input, alpha);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::elu_gradient(grad, dest, gradient_input, alpha);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::elu_gradient(grad, dest, gradient_input, alpha);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1171,11 +1298,13 @@ namespace dlib { namespace tt
         const tensor& src
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::gelu(dest,src);
-#else
-        cpu::gelu(dest,src);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::gelu(dest,src);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::gelu(dest,src);
+        )
     }
 
     void gelu_gradient (
@@ -1184,11 +1313,13 @@ namespace dlib { namespace tt
         const tensor& gradient_input
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::gelu_gradient(grad, src, gradient_input);
-#else
-        cpu::gelu_gradient(grad, src, gradient_input);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::gelu_gradient(grad, src, gradient_input);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::gelu_gradient(grad, src, gradient_input);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1200,11 +1331,14 @@ namespace dlib { namespace tt
     )
     {
         DLIB_CASSERT(beta > 0);
-#ifdef DLIB_USE_CUDA
-        cuda::smelu(dest, src, beta);
-#else
-        cpu::smelu(dest, src, beta);
-#endif
+
+        IF_DLIB_USE_CUDA(
+            cuda::smelu(dest, src, beta);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::smelu(dest, src, beta);
+        )
     }
 
     void smelu_gradient (
@@ -1215,11 +1349,14 @@ namespace dlib { namespace tt
     )
     {
         DLIB_CASSERT(beta > 0);
-#ifdef DLIB_USE_CUDA
-        cuda::smelu_gradient(grad, dest, gradient_input, beta);
-#else
-        cpu::smelu_gradient(grad, dest, gradient_input, beta);
-#endif
+
+        IF_DLIB_USE_CUDA(
+            cuda::smelu_gradient(grad, dest, gradient_input, beta);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::smelu_gradient(grad, dest, gradient_input, beta);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1229,11 +1366,13 @@ namespace dlib { namespace tt
         const tensor& src
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::silu(dest,src);
-#else
-        cpu::silu(dest,src);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::silu(dest,src);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::silu(dest,src);
+        )
     }
 
     void silu_gradient (
@@ -1242,11 +1381,13 @@ namespace dlib { namespace tt
         const tensor& gradient_input
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::silu_gradient(grad, src, gradient_input);
-#else
-        cpu::silu_gradient(grad, src, gradient_input);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::silu_gradient(grad, src, gradient_input);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::silu_gradient(grad, src, gradient_input);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1260,11 +1401,13 @@ namespace dlib { namespace tt
         long src_channel_stride
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::resize_bilinear(dest,dest_row_stride,dest_channel_stride, src,src_row_stride,src_channel_stride);
-#else
-        cpu::resize_bilinear(dest,dest_row_stride,dest_channel_stride, src,src_row_stride,src_channel_stride);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::resize_bilinear(dest,dest_row_stride,dest_channel_stride, src,src_row_stride,src_channel_stride);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::resize_bilinear(dest,dest_row_stride,dest_channel_stride, src,src_row_stride,src_channel_stride);
+        )
     }
 
     void resize_bilinear_gradient (
@@ -1276,11 +1419,13 @@ namespace dlib { namespace tt
         long gradient_input_channel_stride
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::resize_bilinear_gradient(grad,grad_row_stride,grad_channel_stride,  gradient_input,gradient_input_row_stride,gradient_input_channel_stride);
-#else
-        cpu::resize_bilinear_gradient(grad,grad_row_stride,grad_channel_stride,  gradient_input,gradient_input_row_stride,gradient_input_channel_stride);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::resize_bilinear_gradient(grad,grad_row_stride,grad_channel_stride,  gradient_input,gradient_input_row_stride,gradient_input_channel_stride);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::resize_bilinear_gradient(grad,grad_row_stride,grad_channel_stride,  gradient_input,gradient_input_row_stride,gradient_input_channel_stride);
+        )
     }
 
 // ------------------------------------------------------------------------------------
@@ -1293,11 +1438,13 @@ namespace dlib { namespace tt
         const tensor& src
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::reorg(add_to, dest, row_stride, col_stride, src);
-#else
-        cpu::reorg(add_to, dest, row_stride, col_stride, src);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::reorg(add_to, dest, row_stride, col_stride, src);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::reorg(add_to, dest, row_stride, col_stride, src);
+        )
     }
 
     void reorg_gradient (
@@ -1308,11 +1455,13 @@ namespace dlib { namespace tt
         const tensor& gradient_input
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::reorg_gradient(add_to, grad, row_stride, col_stride, gradient_input);
-#else
-        cpu::reorg_gradient(add_to, grad, row_stride, col_stride, gradient_input);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::reorg_gradient(add_to, grad, row_stride, col_stride, gradient_input);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::reorg_gradient(add_to, grad, row_stride, col_stride, gradient_input);
+        )
     }
 
 // ------------------------------------------------------------------------------------
@@ -1326,11 +1475,13 @@ namespace dlib { namespace tt
             size_t count_k
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::copy_tensor(add_to, dest, dest_k_offset, src, src_k_offset, count_k);
-#else
-        cpu::copy_tensor(add_to, dest, dest_k_offset, src, src_k_offset, count_k);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::copy_tensor(add_to, dest, dest_k_offset, src, src_k_offset, count_k);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::copy_tensor(add_to, dest, dest_k_offset, src, src_k_offset, count_k);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1344,11 +1495,13 @@ namespace dlib { namespace tt
         size_t k, size_t nr, size_t nc
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::copy_tensor(add_to, dest, dk, dnr, dnc , src, sk, snr, snc, k, nr, nc);
-#else
-        cpu::copy_tensor(add_to, dest, dk, dnr, dnc, src, sk, snr, snc, k, nr, nc);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::copy_tensor(add_to, dest, dk, dnr, dnc , src, sk, snr, snc, k, nr, nc);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::copy_tensor(add_to, dest, dk, dnr, dnc, src, sk, snr, snc, k, nr, nc);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1359,11 +1512,13 @@ namespace dlib { namespace tt
         resizable_tensor& out
     )
     {
-#ifdef DLIB_USE_CUDA
-        finv(m,out);
-#else
-        out = dlib::inv(mat(m));
-#endif
+        IF_DLIB_USE_CUDA(
+            finv(m,out);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            out = dlib::inv(mat(m));
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1374,11 +1529,13 @@ namespace dlib { namespace tt
         const tensor& src
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::transpose(add_to, dest, src);
-#else
-        cpu::transpose(add_to, dest, src);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::transpose(add_to, dest, src);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::transpose(add_to, dest, src);
+        )
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1389,11 +1546,13 @@ namespace dlib { namespace tt
         const tensor& embs
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::embeddings(dest, src, embs);
-#else
-        cpu::embeddings(dest, src, embs);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::embeddings(dest, src, embs);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::embeddings(dest, src, embs);
+        )
     }
 
     void embeddings_gradient(
@@ -1405,11 +1564,13 @@ namespace dlib { namespace tt
         bool scale
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::embeddings_gradient(prev, gradient_input, grads, freqs, learning_rate, scale);
-#else
-        cpu::embeddings_gradient(prev, gradient_input, grads, freqs, learning_rate, scale);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::embeddings_gradient(prev, gradient_input, grads, freqs, learning_rate, scale);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::embeddings_gradient(prev, gradient_input, grads, freqs, learning_rate, scale);
+        )
     }
 
 // ----------------------------------------------------------------------------------------

@@ -14,6 +14,14 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace cuda
+    {
+        bool use_cuda(
+        );
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class gpu_data 
     {
         /*!
@@ -93,14 +101,16 @@ namespace dlib
         float* host() 
         {
             copy_to_host();
-            device_current = false;
+            if (device_id() >= 0)
+                device_current = false;
             return data_host.get(); 
         }
 
         float* host_write_only() 
         {
             host_current = true;
-            device_current = false;
+            if (device_id() >= 0)
+                device_current = false;
             return data_host.get(); 
         }
 
@@ -109,6 +119,7 @@ namespace dlib
 #ifndef DLIB_USE_CUDA
             DLIB_CASSERT(false, "CUDA NOT ENABLED");
 #endif
+            DLIB_CASSERT(device_id() >= 0, "This data is host only");
             copy_to_device();
             device_in_use = true;
             return data_device.get(); 
@@ -119,6 +130,7 @@ namespace dlib
 #ifndef DLIB_USE_CUDA
             DLIB_CASSERT(false, "CUDA NOT ENABLED");
 #endif
+            DLIB_CASSERT(device_id() >= 0, "This data is host only");
             copy_to_device();
             host_current = false;
             device_in_use = true;
@@ -130,6 +142,7 @@ namespace dlib
 #ifndef DLIB_USE_CUDA
             DLIB_CASSERT(false, "CUDA NOT ENABLED");
 #endif
+            DLIB_CASSERT(device_id() >= 0, "This data is host only");
             wait_for_transfer_to_finish();
             host_current = false;
             device_current = true;
@@ -141,7 +154,7 @@ namespace dlib
         ) const { return host_current; }
 
         bool device_ready (
-        ) const { return device_current && !have_active_transfer; }
+        ) const { return device_current && !have_active_transfer && device_id() >= 0; }
 
         size_t size() const { return data_size; }
 
