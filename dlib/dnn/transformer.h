@@ -51,7 +51,7 @@ namespace dlib
             multm_prev3<softmaxm<tril_mask<
             scale_weights<d_model / num_heads,
             multm_prev4<
-            rope<query<seq_len, d_model, num_heads, skip2<
+            rope<query<seq_len, d_model, num_heads, skip1<
             tag4<transpose<
             rope<key<seq_len, d_model, num_heads, skip2<
             tag3<value<seq_len, d_model, num_heads,
@@ -114,7 +114,7 @@ namespace dlib
             multm_prev3<softmaxm<tril_mask<
             scale_weights<d_model / num_heads,
             multm_prev4<
-            query<num_heads, d_model, skip2<
+            query<num_heads, d_model, skip1<
             tag4<key<num_heads, d_model, skip2<
             tag3<value<num_heads, d_model,
             tag2<fc_no_bias<d_model * 3,
