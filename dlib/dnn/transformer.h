@@ -23,7 +23,7 @@ namespace dlib
     // ----------------------------------------------------------------------------------------
 
     template <long num_embeddings, long embedding_length, typename SUBNET>
-    using token_embeddings = positional_encodings<
+    using positional_embeddings = positional_encodings<
         embeddings<num_embeddings, embedding_length, SUBNET>>;
 
     // ----------------------------------------------------------------------------------------
@@ -131,29 +131,29 @@ namespace dlib
             tag7<silu<fc<(d_model * 2) / 7, tag6<SUBNET>>>>>>>>>>;
 
         template <template <typename> class ACT, template <typename> class DO,
-            long seq_len, long d_model, long num_heads, typename SUBNET>
+            long d_model, long num_heads, typename SUBNET>
         using transformer_block = 
             add_prev5<std_ffn<ACT, DO, d_model, rms_norm<tag5<
             add_prev1<multihead_attention<ACT, DO, d_model, num_heads, rms_norm<tag1<SUBNET>>>>>>>>;
 
         template<long remaining_layers, template <typename> class ACT, template <typename> class DO,
-            long seq_len, long d_model, long num_heads, typename SUBNET, typename enabled = void>
+            long d_model, long num_heads, typename SUBNET, typename enabled = void>
         struct transformer_stack_impl
         {
-            using type = transformer_block<ACT, DO, seq_len, d_model, num_heads,
-                typename transformer_stack_impl<remaining_layers - 1, ACT, DO, seq_len, d_model, num_heads, SUBNET>::type>;
+            using type = transformer_block<ACT, DO, d_model, num_heads,
+                typename transformer_stack_impl<remaining_layers - 1, ACT, DO, d_model, num_heads, SUBNET>::type>;
         };
 
         template<template <typename> class ACT, template <typename> class DO,
-            long seq_len, long d_model, long num_heads, typename SUBNET>
-        struct transformer_stack_impl<0, ACT, DO, seq_len, d_model, num_heads, SUBNET, void>
+            long d_model, long num_heads, typename SUBNET>
+        struct transformer_stack_impl<0, ACT, DO, d_model, num_heads, SUBNET, void>
         {
             using type = tag10<SUBNET>;
         };
 
         template<long num_layers, template <typename> class ACT, template <typename> class DO,
-            long seq_len, long d_model, long num_heads, typename SUBNET>
-        using transformer_stack = typename transformer_stack_impl<num_layers, ACT, DO, seq_len, d_model, num_heads, SUBNET>::type;
+            long d_model, long num_heads, typename SUBNET>
+        using transformer_stack = typename transformer_stack_impl<num_layers, ACT, DO, d_model, num_heads, SUBNET>::type;
 
     } // namespace fused_transformer
 
