@@ -927,22 +927,21 @@ namespace dlib
         {
             const tensor& output_tensor = sub.get_output();
             DLIB_CASSERT(sub.sample_expansion_factor() == 1);
-            DLIB_CASSERT(output_tensor.k() == 1,
-                "output_tensor.k() = " << output_tensor.k());
+            DLIB_CASSERT(output_tensor.k() == 1);
             DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
 
             const long batch_size = output_tensor.num_samples();
             const long seq_len = output_tensor.nr();
             const long vocab_size = output_tensor.nc();
 
-            // Note that output_tensor.nc() should match the vocabulary size.
+            // Note that output_tensor.nc() should match the vocabulary size
             const float* out_data = output_tensor.host();
 
             for (long i = 0; i < batch_size; ++i, ++iter)
             {
                 // For each sample, find the class with the maximum logit at the last
                 // position of the sequence (position seq_len-1). This is the predicted
-                // next token for autoregressive generation.
+                // next token for autoregressive generation
                 long max_idx = 0;
                 float max_val = out_data[tensor_index(output_tensor, i, 0, seq_len - 1, 0)];
                 for (long c = 1; c < vocab_size; ++c)
@@ -970,7 +969,6 @@ namespace dlib
 
             DLIB_CASSERT(sub.sample_expansion_factor() == 1);
             DLIB_CASSERT(input_tensor.num_samples() != 0);
-            DLIB_CASSERT(input_tensor.num_samples() % sub.sample_expansion_factor() == 0);
             DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
             DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
             DLIB_CASSERT(output_tensor.nr() == grad.nr() &&
@@ -979,11 +977,10 @@ namespace dlib
 
             double loss = 0.0;
 #ifdef DLIB_USE_CUDA
-            cuda_compute(truth, output_tensor, grad, loss);
+            cuda_compute(truth, input_tensor, output_tensor, grad, loss);
 #else
-            cpu_compute(truth, output_tensor, grad, loss);
+            cpu_compute(truth, input_tensor, output_tensor, grad, loss);
 #endif
-
             return loss;
         }
 

@@ -72,8 +72,7 @@ namespace dlib
         Classification head for next-token prediction.
     !*/
     template <long num_logits, long embedding_dim, typename SUBNET>
-    using classification_head = loss_multiclass_log<fc<num_logits,
-        fc<embedding_dim / 4, rms_norm<SUBNET>>>>;
+    using classification_head = loss_cross_entropy_per_logit<linear<num_logits, rms_norm<SUBNET>>>;
 
     // Core model parameters
     template<
@@ -311,7 +310,7 @@ moe_param_info get_moe_param_info(const net_type& net, long num_layers)
     moe_param_info info;
 
     // Access first MoE layer
-    const auto& moe_layer = layer<5>(net).layer_details();
+    const auto& moe_layer = layer<4>(net).layer_details();
 
     // Get MoE configuration
     info.num_experts = moe_layer.num_experts();
@@ -416,12 +415,18 @@ int main(int argc, char** argv)
 
         // Load internal dataset
         cout << "Loading internal training datasets...\n";
-        std::vector<dataset_id> datasets = {
+        std::vector<dataset_id> text_datasets = {
             dataset_id::BLACK_HOLE_ARTICLE,
             dataset_id::PHYSICS_PARAGRAPHS,
 			dataset_id::GENERAL_KNOWLEDGE
         };
-        auto training_segments = get_dataset_as_segments(datasets);
+        auto text_segments = get_dataset_as_segments(text_datasets);
+        std::vector<dataset_id> qa_datasets = {
+            dataset_id::BLACK_HOLE_QA_PARTA,
+            dataset_id::BLACK_HOLE_QA_PARTB,
+            dataset_id::BLACK_HOLE_QA_PARTC
+        };
+        auto qa_pairs = get_dataset_as_pairs(qa_datasets);
 
         // Tokens filename
         const std::string tokens_file = "dlib_datasets_tokens.bin";
@@ -465,7 +470,7 @@ int main(int argc, char** argv)
                         total_tokens += segment_tokens.size();
 
                     cout << "Loaded " << full_tokens.size() << " segments ("
-                        << total_tokens << " total tokens) from file.\n";
+                        << total_tokens << " tokens) from file.\n";
                     tokens_loaded = true;
                 }
                 catch (const std::exception& e) {
@@ -505,17 +510,24 @@ int main(int argc, char** argv)
                 // Tokenize all text segments
                 cout << "Tokenizing input text segments...\n";
                 int text_start_id = tokenizer.get_special_token_id("<text>"),
-                    text_end_id = tokenizer.get_special_token_id("</text>");
-                if (text_start_id < 0 || text_end_id < 0)
-                    cout << "Warning: Special tokens not found in tokenizer vocabulary.\n";
+                    text_end_id = tokenizer.get_special_token_id("</text>"),
+                    question_id = tokenizer.get_special_token_id("<question>"),
+                    answer_id = tokenizer.get_special_token_id("<answer>");
+                if (text_start_id < 0 || text_end_id < 0 ||
+                    question_id < 0 || answer_id < 0) {
+                    cerr << "ERROR: Required special tokens not found in tokenizer vocabulary!\n";
+                    cerr << "The tokenizer must include: <text>, </text>, <question>, <answer>\n";
+                    return 1;
+                }
 
                 auto start_time = std::chrono::high_resolution_clock::now();
                 full_tokens.clear();
 
-                // Process each segment independently with delimiters
+                // Format : <answer><text>content</text>
                 size_t total_tokens = 0;
-                for (const auto& segment : training_segments) {
+                for (const auto& segment : text_segments) {
                     std::vector<int> segment_tokens;
+                    segment_tokens.push_back(answer_id);
                     segment_tokens.push_back(text_start_id);
                     auto encoded_tokens = tokenizer.encode(segment);
                     segment_tokens.insert(segment_tokens.end(), encoded_tokens.begin(), encoded_tokens.end());
@@ -524,11 +536,31 @@ int main(int argc, char** argv)
                     total_tokens += segment_tokens.size();
                     full_tokens.push_back(std::move(segment_tokens));
                 }
+                // Format : <question><text>Q</text><answer><text>A</text>
+                for (const auto& qa_pair : qa_pairs) {
+                    std::vector<int> pair_tokens;
+
+                    pair_tokens.push_back(question_id);
+                    pair_tokens.push_back(text_start_id);
+                    auto q_tokens = tokenizer.encode(qa_pair.first);
+                    pair_tokens.insert(pair_tokens.end(), q_tokens.begin(), q_tokens.end());
+                    pair_tokens.push_back(text_end_id);
+
+                    pair_tokens.push_back(answer_id);
+                    pair_tokens.push_back(text_start_id);
+                    auto a_tokens = tokenizer.encode(qa_pair.second);
+                    pair_tokens.insert(pair_tokens.end(), a_tokens.begin(), a_tokens.end());
+                    pair_tokens.push_back(text_end_id);
+
+                    total_tokens += pair_tokens.size();
+                    full_tokens.push_back(std::move(pair_tokens));
+                }
 
                 auto end_time = std::chrono::high_resolution_clock::now();
                 auto tokenize_time = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
-                cout << "Tokenization complete: " << total_tokens << " total tokens from "
-                    << training_segments.size() << " segments in " << tokenize_time << "s.\n";
+                cout << "Tokenization complete: " << total_tokens << " tokens in " << tokenize_time << "s.\n";
+                text_segments.clear();
+                qa_pairs.clear();
 
                 // Save tokens for future use using Dlib serialization
                 cout << "Saving tokens to file: " << tokens_file << endl;

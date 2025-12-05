@@ -836,6 +836,12 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
+        void set_learning_rate_multiplier(double val)
+        {
+            for (auto& expert : experts)
+                set_all_learning_rate_multipliers(expert, val);
+        }
+
         // Direct access to expert networks (for inspection/debugging)
         EXPERT_NET& get_expert(size_t idx) {
             DLIB_CASSERT(idx < experts.size(), "Expert index out of bounds");
