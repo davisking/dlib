@@ -484,6 +484,7 @@ namespace dlib
             top_k(top_e),
             usage_update_rate(0.05f),
             load_balance_weight(0.01f),
+            learning_rate_multiplier(1.0),
             cached_batch_size_(0)
         {
         }
@@ -494,6 +495,7 @@ namespace dlib
             top_k(other.top_k),
             usage_update_rate(other.usage_update_rate),
             load_balance_weight(other.load_balance_weight),
+            learning_rate_multiplier(other.learning_rate_multiplier),
             expert_usage(other.expert_usage),
             cached_batch_size_(0)
         {
@@ -511,6 +513,7 @@ namespace dlib
                 top_k = other.top_k;
                 usage_update_rate = other.usage_update_rate;
                 load_balance_weight = other.load_balance_weight;
+                learning_rate_multiplier = other.learning_rate_multiplier;
                 expert_usage = other.expert_usage;
                 cached_batch_size_ = 0;
 
@@ -793,7 +796,8 @@ namespace dlib
                 }
             }
 
-            if (std::is_same<MODE, training_mode_tag>::value && load_balance_weight > 0) {
+            if (std::is_same<MODE, training_mode_tag>::value && load_balance_weight > 0
+                && learning_rate_multiplier > 0) {
                 tensor& gate_grad = layer<TAG>(sub).get_gradient_input();
                 float* gate_grad_data = gate_grad.host();
 
@@ -838,6 +842,7 @@ namespace dlib
 
         void set_learning_rate_multiplier(double val)
         {
+            learning_rate_multiplier = val;
             for (auto& expert : experts)
                 set_all_learning_rate_multipliers(expert, val);
         }
@@ -868,6 +873,7 @@ namespace dlib
             serialize(item.noise_scale, out);
             serialize(item.usage_update_rate, out);
             serialize(item.load_balance_weight, out);
+            serialize(item.learning_rate_multiplier, out);
             serialize(item.experts, out);
             serialize(item.expert_usage, out);
         }
@@ -884,6 +890,7 @@ namespace dlib
             deserialize(item.noise_scale, in);
             deserialize(item.usage_update_rate, in);
             deserialize(item.load_balance_weight, in);
+            deserialize(item.learning_rate_multiplier, in);
             deserialize(item.experts, in);
             deserialize(item.expert_usage, in);
 
@@ -928,11 +935,12 @@ namespace dlib
         }
 
         // Configuration
-        long n_experts;                 // Number of expert networks
-        float noise_scale;              // Gaussian noise std for exploration
-        long top_k;                     // Number of experts to activate per sample
-        float usage_update_rate;        // EMA smoothing rate for usage tracking
-        float load_balance_weight;      // Auxiliary loss coefficient for expert load balancing
+        long n_experts;                     // Number of expert networks
+        float noise_scale;                  // Gaussian noise std for exploration
+        long top_k;                         // Number of experts to activate per sample
+        float usage_update_rate;            // EMA smoothing rate for usage tracking
+        float load_balance_weight;          // Auxiliary loss coefficient for expert load balancing
+        double learning_rate_multiplier;
 
         // Expert networks
         std::vector<EXPERT_NET> experts;
