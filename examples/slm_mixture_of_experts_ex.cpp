@@ -741,7 +741,7 @@ int main(int argc, char** argv)
 
             // Select a segment for generation
             dlib::rand rng(std::chrono::system_clock::now().time_since_epoch().count());
-            size_t segment_idx = rng.get_random_32bit_number() % 50;
+            size_t segment_idx = rng.get_random_32bit_number() % 100;
             cout << "Randomly selected segment #" << segment_idx << " (out of "
                 << tokenized_segments.size() << ") for generation\n";
             const auto& selected_segment = tokenized_segments[segment_idx];
