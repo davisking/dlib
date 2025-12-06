@@ -361,6 +361,18 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline bool is_2d_matrix(
+        const tensor& t
+    );
+    /*!
+        ensures
+            - returns true if and only if one of the following is true:
+                - t.size() == t.num_samples() * t.k()
+                - t.size() == t.nr() * t.nc()
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp mat (
         const tensor& t,
         long long nr,

@@ -715,8 +715,8 @@ namespace dlib
             sequence.push_back(TOKEN_GEN_START);
 
             // Convert to dlib column vector
-            arc_token_sequence_t result(static_cast<long>(sequence.size()));
-            for (long i = 0; i < static_cast<long>(sequence.size()); ++i)
+            arc_token_sequence_t result(sequence.size());
+            for (size_t i = 0; i < sequence.size(); ++i)
                 result(i) = sequence[i];
             return result;
         }
@@ -736,8 +736,8 @@ namespace dlib
             append_flat_grid(sequence, test_pair.output);
             sequence.push_back(TOKEN_END_OF_OUTPUT);
 
-            arc_token_sequence_t result(static_cast<long>(sequence.size()));
-            for (long i = 0; i < static_cast<long>(sequence.size()); ++i)
+            arc_token_sequence_t result(sequence.size());
+            for (size_t i = 0; i < sequence.size(); ++i)
                 result(i) = sequence[i];
             return result;
         }

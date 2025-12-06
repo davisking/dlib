@@ -2407,7 +2407,7 @@ namespace dlib
         {
             const auto& prev_output = sub.get_output();
             DLIB_CASSERT((long)num_inputs == prev_output.nc(),
-                "The size of the input tensor to this linear layer doesn't match the size the linear layer was trained with.");            
+                "The size of the input tensor to this linear layer doesn't match the size the linear layer was trained with.");
             output.set_size(prev_output.num_samples(), prev_output.k(), prev_output.nr(), num_outputs);
 
             auto o = alias_tensor(output.num_samples() * output.k() * output.nr(), num_outputs)(output, 0);
@@ -2441,8 +2441,6 @@ namespace dlib
                 }
             }
             
-            //prev_gradient is not const, so that sgi isn't const
-            //since sgi is used as a destination for tt::gemm
             auto& prev_gradient = sub.get_gradient_input();
             alias_tensor_instance sgi = alias_tensor(prev_gradient.num_samples() * prev_gradient.k() * prev_gradient.nr(), num_inputs)(prev_gradient, 0);
             auto w = weights(params, 0);
@@ -5742,8 +5740,7 @@ namespace dlib
             num_channels_(item.num_channels_),
             feature_dim_(item.feature_dim_),
             ponder_cost_(item.ponder_cost_),
-            avg_steps_(item.avg_steps_),
-            params(item.params),
+            avg_steps_(item.avg_steps_),            
             halting_probs_(item.halting_probs_),
             cumulative_halting_(item.cumulative_halting_),
             remainders_(item.remainders_),
@@ -5751,7 +5748,8 @@ namespace dlib
             logits_(item.logits_),
             grad_logits_(item.grad_logits_),
             input_cache_(item.input_cache_),
-            true_effective_weights_(item.true_effective_weights_)
+            true_effective_weights_(item.true_effective_weights_),
+            params(item.params)
         {
         }
 
@@ -5770,8 +5768,7 @@ namespace dlib
             num_channels_ = item.num_channels_;
             feature_dim_ = item.feature_dim_;
             ponder_cost_ = item.ponder_cost_;
-            avg_steps_ = item.avg_steps_;
-            params = item.params;
+            avg_steps_ = item.avg_steps_;            
             halting_probs_ = item.halting_probs_;
             cumulative_halting_ = item.cumulative_halting_;
             remainders_ = item.remainders_;
@@ -5780,6 +5777,7 @@ namespace dlib
             grad_logits_ = item.grad_logits_;
             input_cache_ = item.input_cache_;
             true_effective_weights_ = item.true_effective_weights_;
+            params = item.params;
 
             return *this;
         }
@@ -6077,9 +6075,6 @@ namespace dlib
         long num_channels_;
         long feature_dim_;
 
-        // Learnable parameters
-        resizable_tensor params;
-
         // Working memory
         resizable_tensor halting_probs_;        // p_t^n: Halting probabilities
         resizable_tensor cumulative_halting_;   // h_t^n: Cumulative halting probabilities
@@ -6093,6 +6088,9 @@ namespace dlib
         // Statistics for monitoring
         float ponder_cost_;      // R(x): Current ponder cost
         float avg_steps_;        // Average number of computation steps
+
+        // Learnable parameters
+        resizable_tensor params;
     };
 
     template <long max_steps, typename SUBNET>
@@ -6106,6 +6104,311 @@ namespace dlib
 
     template <typename SUBNET>
     using act16 = add_layer<adaptive_computation_time_<16>, SUBNET>;    // Deep version
+
+// ----------------------------------------------------------------------------------------
+
+    // YaRN configuration structure
+    struct yarn_config
+    {
+        // Alpha controls overall intensity of scaling (typical ~1.0)
+        float alpha = 1.0f;
+
+        // Beta controls curvature of scaling across head dimensions (typical 0.25..0.5)
+        float beta = 0.5f;
+
+        // original_len is the context length used at training time
+        // If 0, it will be set to the first seq_len observed (common pattern)
+        long original_len = 0;
+
+        // Enable/disable YaRN; if false, behavior is identical to classical RoPE
+        bool enabled = true;
+    };
+
+    class rotary_positional_embedding_
+    {
+    public:
+        explicit rotary_positional_embedding_() :
+            seq_len(0),
+            d_head(0),
+			theta_base(10000.0f)
+        {
+		}
+
+        rotary_positional_embedding_(const rotary_positional_embedding_& other) :
+            seq_len(other.seq_len),
+            d_head(other.d_head),
+            theta_base(other.theta_base),
+            cos_cache(other.cos_cache),
+            sin_cache(other.sin_cache),
+            yarn(other.yarn)
+        {
+        }
+
+        rotary_positional_embedding_& operator=(const rotary_positional_embedding_& other)
+        {
+            if (this != &other) {
+                seq_len = other.seq_len;
+                d_head = other.d_head;
+                theta_base = other.theta_base;
+                cos_cache = other.cos_cache;
+                sin_cache = other.sin_cache;
+                yarn = other.yarn;
+            }
+            return *this;
+        }
+
+        // Set base used to compute inverse frequencies (theta base > 0)
+        void set_theta_base(float base)
+        {
+            DLIB_CASSERT(base > 0, "Theta base must be positive");
+            theta_base = base;
+        }
+
+        float get_theta_base() const { return theta_base; }
+        long get_seq_len() const { return seq_len; }
+        long get_d_head() const { return d_head; }
+
+        // Configure YaRN hyperparameters
+        void set_yarn_params(float alpha, float beta, long original_len = 0, bool enabled = true)
+        {
+            DLIB_CASSERT(alpha >= 0, "alpha must be non-negative");
+            DLIB_CASSERT(beta >= 0, "beta must be non-negative");
+            yarn.alpha = alpha;
+            yarn.beta = beta;
+            yarn.original_len = original_len;
+            yarn.enabled = enabled;
+        }
+        const yarn_config& get_yarn_config() const { return yarn; }
+
+        template <typename SUBNET>
+        void setup(const SUBNET& sub)
+        {
+            const tensor& input = sub.get_output();
+
+            // Expected input shape: (batch, num_heads, seq_len, d_head)
+            seq_len = input.nr();
+            d_head = input.nc();
+
+            DLIB_CASSERT(d_head >= 2, "d_head must be at least 2 for rotation");
+            DLIB_CASSERT(seq_len > 0, "seq_len must be positive");
+
+            // If original_len not set, treat the setup seq_len as the model's training length
+            if (yarn.original_len == 0) yarn.original_len = seq_len;
+
+            // Precompute rotation angles and trigonometric values
+            compute_and_cache_trig_values(seq_len);
+        }
+
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            const tensor& input = sub.get_output();
+
+            // Validate shape; we expect shape (batch, num_heads, seq_len, d_head)
+            const long in_seq_len = input.nr();
+            const long in_d_head = input.nc();
+
+            DLIB_CASSERT(in_d_head >= 2, "d_head must be at least 2 for rotation");
+            DLIB_CASSERT(in_seq_len > 0, "seq_len must be positive");
+
+            // If setup() was not called or the incoming sequence length changed from
+            // the cached seq_len (e.g. inference with a different context window),
+            // recompute trig caches for the current seq_len.
+            if (seq_len != in_seq_len || d_head != in_d_head
+                || cos_cache.size() == 0 || sin_cache.size() == 0)
+            {
+                // If we don't have a recorded original_len yet, set it here (first observed seq_len)
+                if (yarn.original_len == 0) yarn.original_len = in_seq_len;
+
+                // Update internal dimensions and recompute caches targeted to in_seq_len
+                seq_len = in_seq_len;
+                d_head = in_d_head;
+                compute_and_cache_trig_values(seq_len);
+            }
+
+            output.copy_size(input);
+
+            // Copy input to output
+            tt::copy_tensor(false, output, 0, input, 0, input.k());
+
+            // Apply rotary embedding in-place
+            tt::apply_rotary_positional_embedding(
+                false,  // forward pass
+                output,
+                cos_cache,
+                sin_cache
+            );
+        }
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
+        {
+            tensor& prev_grad = sub.get_gradient_input();
+
+            // Apply inverse rotation to gradients
+            resizable_tensor grad_output;
+            grad_output.copy_size(gradient_input);
+            tt::copy_tensor(false, grad_output, 0, gradient_input, 0, gradient_input.k());
+
+            tt::apply_rotary_positional_embedding(
+                true,   // backward pass (inverse rotation)
+                grad_output,
+                cos_cache,
+                sin_cache
+            );
+
+            // Accumulate gradients
+            tt::copy_tensor(true, prev_grad, 0, grad_output, 0, grad_output.k());
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const rotary_positional_embedding_& item, std::ostream& out)
+        {
+            serialize("rope_", out);
+            serialize(item.seq_len, out);
+            serialize(item.d_head, out);
+            serialize(item.theta_base, out);
+            serialize(item.cos_cache, out);
+            serialize(item.sin_cache, out);
+
+            // yarn config
+            serialize(item.yarn.alpha, out);
+            serialize(item.yarn.beta, out);
+            serialize(item.yarn.original_len, out);
+            serialize(item.yarn.enabled, out);
+        }
+
+        friend void deserialize(rotary_positional_embedding_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "rope_")
+                throw serialization_error("Unexpected version '" + version +
+                    "' while deserializing rope_");
+
+            deserialize(item.seq_len, in);
+            deserialize(item.d_head, in);
+            deserialize(item.theta_base, in);
+            deserialize(item.cos_cache, in);
+            deserialize(item.sin_cache, in);
+
+            // yarn config
+            deserialize(item.yarn.alpha, in);
+            deserialize(item.yarn.beta, in);
+            deserialize(item.yarn.original_len, in);
+            deserialize(item.yarn.enabled, in);
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const rotary_positional_embedding_& item)
+        {
+            out << "rope (seq_len=" << item.seq_len
+                << ", d_head=" << item.d_head
+                << ", theta_base=" << item.theta_base
+                << ", yarn.alpha=" << item.yarn.alpha
+                << ", yarn.beta=" << item.yarn.beta
+                << ", yarn.original_len=" << item.yarn.original_len
+                << ", yarn.enabled=" << (item.yarn.enabled ? "true" : "false")
+                << ")";
+            return out;
+        }
+
+        friend void to_xml(const rotary_positional_embedding_& item, std::ostream& out)
+        {
+            out << "<rope"
+                << " seq_len='" << item.seq_len << "'"
+                << " d_head='" << item.d_head << "'"
+                << " theta_base='" << item.theta_base << "'"
+                << " yarn_alpha='" << item.yarn.alpha << "'"
+                << " yarn_beta='" << item.yarn.beta << "'"
+                << " yarn_original_len='" << item.yarn.original_len << "'"
+                << " yarn_enabled='" << (item.yarn.enabled ? "true" : "false") << "'"
+                << "/>\n";
+        }
+
+        inline dpoint map_input_to_output(const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input(const dpoint& p) const { return p; }
+
+    private:
+        // Compute and cache cosine/sine tables for target_seq_len
+        // This function uses YaRN scaling when yarn.enabled is true
+        void compute_and_cache_trig_values(long target_seq_len)
+        {
+            // Half the head dimension (we rotate pairs)
+            const long half_dim = d_head / 2;
+
+            // Allocate cache tensors: shape (1, 1, seq_len, half_dim)
+            cos_cache.set_size(1, 1, seq_len, half_dim);
+            sin_cache.set_size(1, 1, seq_len, half_dim);
+
+            // Compute on host side
+            float* cos_ptr = cos_cache.host();
+            float* sin_ptr = sin_cache.host();
+
+            // Precompute inv_freq constant per dimension (independent of position)
+            // inv_freq_i = theta_base^(-2i/d_head)
+            std::vector<float> inv_freq(half_dim);
+            for (long i = 0; i < half_dim; ++i)
+                inv_freq[i] = std::pow(theta_base, -2.0f * i / static_cast<float>(d_head));
+
+            // Determine the training length to use for YaRN scaling
+            const long train_len = (yarn.original_len > 0) ? yarn.original_len : target_seq_len;
+
+            // Compute cos/sin for each position and frequency index, using YaRN if enabled
+            for (long pos = 0; pos < target_seq_len; ++pos)
+            {
+                for (long i = 0; i < half_dim; ++i)
+                {
+                    // Base angle: pos * inv_freq[i]
+                    float pos_scaled = static_cast<float>(pos);
+
+                    if (yarn.enabled)
+                    {
+                        // Compute dimension-normalized index in [0,1]
+                        const float dim_norm = static_cast<float>(i) / static_cast<float>(half_dim);
+
+                        // exponent = alpha * dim_norm^beta
+                        // Note: we use half_dim for normalization so higher-frequency dims get smaller exponent
+                        const float exponent = yarn.alpha * std::pow(dim_norm, yarn.beta);
+
+                        // scale = (target_len / train_len)^exponent
+                        // This allows small-dim (low freq) to scale less than high-dim if desired
+                        const float ratio = static_cast<float>(target_seq_len) / static_cast<float>(train_len);
+                        const float scale = std::pow(ratio, exponent);
+
+                        // Scaled position used to compute the angle
+                        pos_scaled = static_cast<float>(pos) * scale;
+                    }
+
+                    const float angle = pos_scaled * inv_freq[i];
+
+                    const long idx = pos * half_dim + i;
+                    cos_ptr[idx] = std::cos(angle);
+                    sin_ptr[idx] = std::sin(angle);
+                }
+            }
+        }
+
+        // Configuration
+        long seq_len;
+        long d_head;
+        float theta_base;
+
+        // Precomputed trigonometric values
+        // Shape: (1, 1, seq_len, d_head/2)
+        resizable_tensor cos_cache;
+        resizable_tensor sin_cache;
+
+        // YaRN configuration
+        yarn_config yarn;
+
+        // No trainable parameters
+        resizable_tensor params;
+    };
+
+    template <typename SUBNET>
+    using rope = add_layer<rotary_positional_embedding_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

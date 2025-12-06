@@ -911,6 +911,114 @@ namespace dlib
     using loss_multibinary_log = add_loss_layer<loss_multibinary_log_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
+
+    class loss_cross_entropy_per_logit_
+    {
+    public:
+        typedef unsigned long training_label_type;
+        typedef unsigned long output_label_type;
+
+        template <typename SUB_TYPE, typename label_iterator>
+        void to_label(
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const
+        {
+            const tensor& output_tensor = sub.get_output();
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+            DLIB_CASSERT(output_tensor.k() == 1);
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+
+            const long batch_size = output_tensor.num_samples();
+            const long seq_len = output_tensor.nr();
+            const long vocab_size = output_tensor.nc();
+
+            // Note that output_tensor.nc() should match the vocabulary size
+            const float* out_data = output_tensor.host();
+
+            for (long i = 0; i < batch_size; ++i, ++iter)
+            {
+                // For each sample, find the class with the maximum logit at the last
+                // position of the sequence (position seq_len-1). This is the predicted
+                // next token for autoregressive generation
+                long max_idx = 0;
+                float max_val = out_data[tensor_index(output_tensor, i, 0, seq_len - 1, 0)];
+                for (long c = 1; c < vocab_size; ++c)
+                {
+                    const float val = out_data[tensor_index(output_tensor, i, 0, seq_len - 1, c)];
+                    if (val > max_val)
+                    {
+                        max_val = val;
+                        max_idx = c;
+                    }
+                }
+                *iter = static_cast<unsigned long>(max_idx);
+            }
+        }
+
+        template <typename const_label_iterator, typename SUBNET>
+        double compute_loss_value_and_gradient(
+            const tensor& input_tensor,
+            const_label_iterator truth,
+            SUBNET& sub
+        ) const
+        {
+            const tensor& output_tensor = sub.get_output();
+            tensor& grad = sub.get_gradient_input();
+
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+            DLIB_CASSERT(input_tensor.num_samples() != 0);
+            DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+            DLIB_CASSERT(output_tensor.nr() == grad.nr() &&
+                output_tensor.nc() == grad.nc() &&
+                output_tensor.k() == grad.k());
+
+            double loss = 0.0;
+#ifdef DLIB_USE_CUDA
+            cuda_compute(truth, input_tensor, output_tensor, grad, loss);
+#else
+            cpu_compute(truth, input_tensor, output_tensor, grad, loss);
+#endif
+            return loss;
+        }
+
+        friend void serialize(const loss_cross_entropy_per_logit_&, std::ostream& out)
+        {
+            serialize("loss_cross_entropy_per_logit_", out);
+        }
+
+        friend void deserialize(loss_cross_entropy_per_logit_&, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "loss_cross_entropy_per_logit_")
+                throw serialization_error("Unexpected version found while deserializing dlib::loss_cross_entropy_per_logit_.");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const loss_cross_entropy_per_logit_&)
+        {
+            out << "loss_cross_entropy_per_logit";
+            return out;
+        }
+
+        friend void to_xml(const loss_cross_entropy_per_logit_& /*item*/, std::ostream& out)
+        {
+            out << "<loss_cross_entropy_per_logit/>\n";
+        }
+
+        private:
+#ifdef DLIB_USE_CUDA
+            cuda::compute_loss_cross_entropy_per_logit cuda_compute;
+#else
+            cpu::compute_loss_cross_entropy_per_logit cpu_compute;
+#endif            
+    };
+
+    template <typename SUBNET>
+    using loss_cross_entropy_per_logit = add_loss_layer<loss_cross_entropy_per_logit_, SUBNET>;
+
 // ----------------------------------------------------------------------------------------
 
     enum class use_image_pyramid : uint8_t
