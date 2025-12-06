@@ -180,7 +180,8 @@ namespace dlib
 
         explicit hrm_() :
             seq_len(0),
-            hidden_dim(0)
+            hidden_dim(0),
+            learning_rate_multiplier(1.0)
         {
         }
 
@@ -190,7 +191,8 @@ namespace dlib
             z_h_init(other.z_h_init),
             z_l_init(other.z_l_init),
             seq_len(other.seq_len),
-            hidden_dim(other.hidden_dim)
+            hidden_dim(other.hidden_dim),
+            learning_rate_multiplier(other.learning_rate_multiplier)
         {
         }
 
@@ -203,6 +205,7 @@ namespace dlib
                 z_l_init = other.z_l_init;
                 seq_len = other.seq_len;
                 hidden_dim = other.hidden_dim;
+                learning_rate_multiplier = other.learning_rate_multiplier;
             }
             return *this;
         }
@@ -321,6 +324,15 @@ namespace dlib
             tt::add(1.0f, prev_grad, 1.0f, grad_l);
         }
 
+        void set_learning_rate_multiplier(double val)
+        {
+            learning_rate_multiplier = val;            
+            set_all_learning_rate_multipliers(h_net, val);
+            set_all_learning_rate_multipliers(l_net, val);
+        }
+        double get_learning_rate_multiplier() const { return learning_rate_multiplier; }
+
+
         // Cleans up the internal state of H and L networks
         void clean()
         {
@@ -346,6 +358,7 @@ namespace dlib
             serialize(item.z_l_init, out);
             serialize(item.seq_len, out);
             serialize(item.hidden_dim, out);
+            serialize(item.learning_rate_multiplier, out);
         }
 
         friend void deserialize(hrm_& item, std::istream& in)
@@ -361,17 +374,26 @@ namespace dlib
             deserialize(item.z_l_init, in);
             deserialize(item.seq_len, in);
             deserialize(item.hidden_dim, in);
+            deserialize(item.learning_rate_multiplier, in);
         }
 
         friend std::ostream& operator<<(std::ostream& out, const hrm_& item)
         {
-            out << "hrm (N=" << N << ", T=" << T << ")";
+            out << "hrm\t ("
+                << "N=" << N
+                << ", T=" << T
+                << ")";
+            out << " learning_rate_mult=" << item.learning_rate_multiplier;
             return out;
         }
 
         friend void to_xml(const hrm_& item, std::ostream& out)
         {
-            out << "<hrm N='" << N << "' T='" << T << "'>\n";
+            out << "<hrm"
+                << " N='" << N << "'"
+                << " T='" << T << "'"
+                << " learning_rate_mult='" << item.learning_rate_multiplier << "'"
+                << ">\n";
             out << "  <h_module>\n";
             to_xml(item.h_net, out);
             out << "  </h_module>\n";
@@ -426,9 +448,10 @@ namespace dlib
         resizable_tensor z_h_init;
         resizable_tensor z_l_init;
 
-        // Dimensions
+        // Dimensions and learning rate
         long seq_len;
         long hidden_dim;
+        double learning_rate_multiplier;
 
         // Temporary computation tensors
         resizable_tensor z_h_current;
@@ -846,6 +869,7 @@ namespace dlib
             for (auto& expert : experts)
                 set_all_learning_rate_multipliers(expert, val);
         }
+        double get_learning_rate_multiplier() const { return learning_rate_multiplier; }
 
         // Direct access to expert networks (for inspection/debugging)
         EXPERT_NET& get_expert(size_t idx) {
@@ -900,24 +924,42 @@ namespace dlib
         friend std::ostream& operator<<(std::ostream& out, const moe_& item)
         {
             const bool is_training = std::is_same<MODE, training_mode_tag>::value;
-            out << "moe"
-                << " (experts=" << item.n_experts
+            out << "moe\t ("
+                << "experts=" << item.n_experts
                 << ", top_k=" << item.top_k
                 << ", mode=" << (is_training ? "train" : "infer")
-                << ", noise=" << item.noise_scale << ")"
-                << ", lb=" << item.load_balance_weight << ")";
+                << ", noise=" << item.noise_scale
+                << ", lb=" << item.load_balance_weight
+                << ")";
+            out << " learning_rate_mult=" << item.learning_rate_multiplier;
             return out;
         }
 
         friend void to_xml(const moe_& item, std::ostream& out)
         {
             const bool is_training = std::is_same<MODE, training_mode_tag>::value;
-            out << "<moe>\n";
-            out << "  <num_experts>" << item.n_experts << "</num_experts>\n";
-            out << "  <top_k>" << item.top_k << "</top_k>\n";
-            out << "  <noise_scale>" << item.noise_scale << "</noise_scale>\n";
-            out << "  <load_balance_weight>" << item.load_balance_weight << "</load_balance_weight>\n";
-            out << "  <mode>" << (is_training ? "training" : "inference") << "</mode>\n";
+            out << "<moe"
+                << " num_experts='" << item.n_experts << "'"
+                << " top_k='" << item.top_k << "'"
+                << " noise_scale='" << item.noise_scale << "'"
+                << " usage_update_rate='" << item.usage_update_rate << "'"
+                << " load_balance_weight='" << item.load_balance_weight << "'"
+                << " learning_rate_mult='" << item.learning_rate_multiplier << "'"
+                << " mode='" << (is_training ? "training" : "inference") << "'"
+                << ">\n";
+            for (size_t i = 0; i < item.experts.size(); ++i)
+            {
+                out << "<expert index='" << i << "'>\n";
+                to_xml(item.experts[i], out);
+                out << "</expert>\n";
+            }
+            out << "<expert_usage>";
+            for (size_t i = 0; i < item.expert_usage.size(); ++i)
+            {
+                if (i > 0) out << " ";
+                out << item.expert_usage[i];
+            }
+            out << "</expert_usage>\n";
             out << "</moe>\n";
         }
 
