@@ -621,7 +621,6 @@ int main(int argc, char** argv)
         std::string external_corpus_for_tokenizer;
         if (parser.option("external-data")) {
             std::string external_path = parser.option("external-data").argument();
-            cout << "Externa source: " << external_path << "\n";
 
             std::string external_text = load_external_data(external_path, true);
             if (!external_text.empty()) {
@@ -691,7 +690,7 @@ int main(int argc, char** argv)
                         total_tokens += segment_tokens.size();
 
                     cout << "Loaded " << full_tokens.size() << " segments ("
-                        << total_tokens << " tokens) from file.\n";
+                        << total_tokens << " tokens) from file\n";
                     tokens_loaded = true;
                 }
                 catch (const std::exception& e) {
