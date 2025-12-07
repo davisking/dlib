@@ -257,16 +257,27 @@ int main(int argc, char** argv)
             cout << "=== FINE-TUNING MODE ===\n";
             cout << "Objective: specialize model for conversational Q&A with proper formatting\n\n";
 
-            // Load tokenizer & last checkpoint from the global training
+            // Setup trainer for fine-tuning
             std::string finetuned_model = model_file.substr(0, model_file.find_last_of('.'))
                 + "_finetuned.dat";
+            train_net net;
+            dnn_trainer<train_net, adam> trainer(net, adam(weight_decay, beta1, beta2), gpus);
+            trainer.set_learning_rate(learning_rate);
+            trainer.set_min_learning_rate(1e-7);
+            trainer.set_mini_batch_size(batch_size);
+            trainer.set_max_num_epochs(max_epochs);
+            trainer.set_iterations_without_progress_threshold(patience);
+            trainer.set_synchronization_file("chkpt-" + finetuned_model, std::chrono::minutes(5));
+            trainer.be_quiet();
 
+            // Load tokenizer & model
             bpe_tokenizer tokenizer;
-            if (file_exists(tokenizer_file)) {
-                cout << "Loading pre-trained tokenizer from: " << tokenizer_file << endl;
-                deserialize(tokenizer_file) >> tokenizer;
-                cout << "Tokenizer loaded successfully with vocabulary size: " << tokenizer.get_vocab_size() << endl;
-            }
+            if (file_exists(model_file) &&
+                !file_exists("chkpt-" + finetuned_model)) deserialize(model_file) >> net >> tokenizer;
+            else if (file_exists(finetuned_model) &&
+                !file_exists("chkpt-" + finetuned_model)) deserialize(finetuned_model) >> net >> tokenizer;
+            else if (file_exists(tokenizer_file)) {
+                deserialize(tokenizer_file) >> tokenizer;            }
             else {
                 cout << "Pre-trained tokenizer not found at: " << tokenizer_file << endl;
                 return 1;
@@ -336,22 +347,6 @@ int main(int argc, char** argv)
             // Release memory
             qa_tokens.clear();
 
-            // Setup trainer for fine-tuning
-            train_net net;
-            if (!file_exists("chkpt-" + model_file)) {
-                cerr << "Error: last checkpoint not found: " << (string("chkpt-") + model_file) << "\n";
-                cerr << "Please run --train first to create base model using <slm_mixture_of_experts_ex>.\n";
-                return 1;
-            }
-            dnn_trainer<train_net, adam> trainer(net, adam(weight_decay, beta1, beta2), gpus);
-            trainer.set_learning_rate(learning_rate);
-            trainer.set_min_learning_rate(1e-7);
-            trainer.set_mini_batch_size(batch_size);
-            trainer.set_max_num_epochs(max_epochs);
-            trainer.set_iterations_without_progress_threshold(patience);
-            trainer.set_synchronization_file("chkpt-" + model_file, std::chrono::minutes(10));
-            trainer.be_quiet();
-
             cout << "Applying freezing strategy...\n";
             set_all_learning_rate_multipliers(net, 0.1);
             layer<1>(net).layer_details().set_learning_rate_multiplier(1.0);    // linear
@@ -392,7 +387,7 @@ int main(int argc, char** argv)
                     steps += batch_samples.size();
 
                     // Progress reporting
-                    if (batches_count++ % 50 == 0) {
+                    if (batches_count++ % 100 == 0) {
                         double avg_loss = total_loss / batches_seen;
                         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
                             std::chrono::high_resolution_clock::now() - epoch_start).count();
