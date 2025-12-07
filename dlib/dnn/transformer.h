@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2015  Davis E. King (davis@dlib.net)
+﻿// Copyright (C) 2025  Cydral Technology (cydraltechnology@gmail.com)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_DNN_TRANSFORMER_H_
 #define DLIB_DNN_TRANSFORMER_H_
@@ -21,7 +21,7 @@ namespace dlib
     using scale_weights = add_layer<scale_weights_<d_k>, SUBNET>;
 
     // ----------------------------------------------------------------------------------------
-
+    
     template <long num_embeddings, long embedding_length, typename SUBNET>
     using positional_embeddings = positional_encodings<
         embeddings<num_embeddings, embedding_length, SUBNET>>;
