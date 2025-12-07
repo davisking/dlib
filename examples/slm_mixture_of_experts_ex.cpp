@@ -366,11 +366,11 @@ int main(int argc, char** argv)
         command_line_parser parser;
         parser.add_option("train", "Train a transformer model on internal datasets");
         parser.add_option("generate", "Generate text from a previously trained model");
-        parser.add_option("learning-rate", "Set the learning rate (default: 2e-4)", 1);
+        parser.add_option("learning-rate", "Set the learning rate (default: 3e-4)", 1);
         parser.add_option("batch-size", "Set the mini-batch size (default: 64)", 1);
-        parser.add_option("patience", "Iterations without progress before early stopping (default: 15000)", 1);
-        parser.add_option("max-epochs", "Maximum number of training epochs (default: 100)", 1);
-        parser.add_option("alpha", "Set the weight decay for Adam (default: 0.004)", 1);
+        parser.add_option("patience", "Iterations without progress before early stopping (default: 8000)", 1);
+        parser.add_option("max-epochs", "Maximum number of training epochs (default: 150)", 1);
+        parser.add_option("weight-decay", "Set the weight decay for Adam (default: 0.01)", 1);
         parser.add_option("beta1", "Set Adam's first moment coefficient (default: 0.9)", 1);
         parser.add_option("beta2", "Set Adam's second moment coefficient (default: 0.999)", 1);
         parser.add_option("model-file", "Path for model (default: dlib_lm_moe_model.dat)", 1);
@@ -386,11 +386,11 @@ int main(int argc, char** argv)
         }
 
         // Default values
-        const double learning_rate = get_option(parser, "learning-rate", 2e-4);
+        const double learning_rate = get_option(parser, "learning-rate", 3e-4);
         const size_t batch_size = get_option(parser, "batch-size", 64);
-        const long patience = get_option(parser, "patience", 15000);
-        const size_t max_epochs = get_option(parser, "max-epochs", 100);
-        const double alpha = get_option(parser, "alpha", 0.004);
+        const long patience = get_option(parser, "patience", 8000);
+        const size_t max_epochs = get_option(parser, "max-epochs", 150);
+        const double weight_decay = get_option(parser, "weight-decay", 0.01);
         const double beta1 = get_option(parser, "beta1", 0.9);
         const double beta2 = get_option(parser, "beta2", 0.999);
         const std::string model_file = get_option(parser, "model-file", "dlib_lm_moe_model.dat");
@@ -421,12 +421,6 @@ int main(int argc, char** argv)
 			dataset_id::GENERAL_KNOWLEDGE
         };
         auto text_segments = get_dataset_as_segments(text_datasets);
-        std::vector<dataset_id> qa_datasets = {
-            dataset_id::BLACK_HOLE_QA_PARTA,
-            dataset_id::BLACK_HOLE_QA_PARTB,
-            dataset_id::BLACK_HOLE_QA_PARTC
-        };
-        auto qa_pairs = get_dataset_as_pairs(qa_datasets);
 
         // Tokens filename
         const std::string tokens_file = "dlib_datasets_tokens.bin";
@@ -510,24 +504,20 @@ int main(int argc, char** argv)
                 // Tokenize all text segments
                 cout << "Tokenizing input text segments...\n";
                 int text_start_id = tokenizer.get_special_token_id("<text>"),
-                    text_end_id = tokenizer.get_special_token_id("</text>"),
-                    question_id = tokenizer.get_special_token_id("<question>"),
-                    answer_id = tokenizer.get_special_token_id("<answer>");
-                if (text_start_id < 0 || text_end_id < 0 ||
-                    question_id < 0 || answer_id < 0) {
+                    text_end_id = tokenizer.get_special_token_id("</text>");
+                if (text_start_id < 0 || text_end_id < 0) {
                     cerr << "ERROR: Required special tokens not found in tokenizer vocabulary!\n";
-                    cerr << "The tokenizer must include: <text>, </text>, <question>, <answer>\n";
+                    cerr << "The tokenizer must include: <text>, </text>\n";
                     return 1;
                 }
 
                 auto start_time = std::chrono::high_resolution_clock::now();
                 full_tokens.clear();
 
-                // Format : <answer><text>content</text>
+                // Format : <text>content</text>
                 size_t total_tokens = 0;
                 for (const auto& segment : text_segments) {
                     std::vector<int> segment_tokens;
-                    segment_tokens.push_back(answer_id);
                     segment_tokens.push_back(text_start_id);
                     auto encoded_tokens = tokenizer.encode(segment);
                     segment_tokens.insert(segment_tokens.end(), encoded_tokens.begin(), encoded_tokens.end());
@@ -536,31 +526,11 @@ int main(int argc, char** argv)
                     total_tokens += segment_tokens.size();
                     full_tokens.push_back(std::move(segment_tokens));
                 }
-                // Format : <question><text>Q</text><answer><text>A</text>
-                for (const auto& qa_pair : qa_pairs) {
-                    std::vector<int> pair_tokens;
-
-                    pair_tokens.push_back(question_id);
-                    pair_tokens.push_back(text_start_id);
-                    auto q_tokens = tokenizer.encode(qa_pair.first);
-                    pair_tokens.insert(pair_tokens.end(), q_tokens.begin(), q_tokens.end());
-                    pair_tokens.push_back(text_end_id);
-
-                    pair_tokens.push_back(answer_id);
-                    pair_tokens.push_back(text_start_id);
-                    auto a_tokens = tokenizer.encode(qa_pair.second);
-                    pair_tokens.insert(pair_tokens.end(), a_tokens.begin(), a_tokens.end());
-                    pair_tokens.push_back(text_end_id);
-
-                    total_tokens += pair_tokens.size();
-                    full_tokens.push_back(std::move(pair_tokens));
-                }
 
                 auto end_time = std::chrono::high_resolution_clock::now();
                 auto tokenize_time = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
                 cout << "Tokenization complete: " << total_tokens << " tokens in " << tokenize_time << "s.\n";
                 text_segments.clear();
-                qa_pairs.clear();
 
                 // Save tokens for future use using Dlib serialization
                 cout << "Saving tokens to file: " << tokens_file << endl;
@@ -605,7 +575,7 @@ int main(int argc, char** argv)
                 !file_exists("chkpt-" + model_file)) deserialize(model_file) >> net >> tokenizer;            
 
             // Create trainer
-            dnn_trainer<net_type, adam> trainer(net, adam(alpha, beta1, beta2), gpus);
+            dnn_trainer<net_type, adam> trainer(net, adam(weight_decay, beta1, beta2), gpus);
             trainer.set_learning_rate(learning_rate);
             trainer.set_min_learning_rate(1e-6);
             trainer.set_mini_batch_size(batch_size);
@@ -621,7 +591,8 @@ int main(int argc, char** argv)
             auto epoch_start = std::chrono::high_resolution_clock::now();
 
             // Training loop
-            while (trainer.get_learning_rate() >= 1e-6 && epoch < max_epochs && !g_terminate_flag.load())
+            while (trainer.get_learning_rate() >= trainer.get_min_learning_rate() 
+                && epoch < max_epochs && !g_terminate_flag.load())
             {
                 total_loss = 0.0;
                 batches_seen = 0, samples_seen = 0;
@@ -670,22 +641,20 @@ int main(int argc, char** argv)
 
             // Evaluate on training set
             {
-                if (!g_terminate_flag.load()) {
-                    cout << "Evaluating model accuracy...\n";
-                    my_transformer::network_type<false> g_infer;
-                    deserialize(model_file) >> g_infer >> tokenizer;
-                    auto predicted = g_infer(samples);
-                    size_t correct = 0;
-                    for (size_t i = 0; i < labels.size(); ++i)
-                        if (predicted[i] == labels[i]) correct++;
-                    double accuracy = (double)correct / labels.size();
-                    cout << "Training accuracy: " << (accuracy * 100.0) << "%\n";
+                cout << "Evaluating model accuracy...\n";
+                my_transformer::network_type<false> g_infer;
+                deserialize(model_file) >> g_infer >> tokenizer;
+                auto predicted = g_infer(samples);
+                size_t correct = 0;
+                for (size_t i = 0; i < labels.size(); ++i)
+                    if (predicted[i] == labels[i]) correct++;
+                double accuracy = (double)correct / labels.size();
+                cout << "Training accuracy: " << (accuracy * 100.0) << "%\n";
 
-                    // We need perfect accuracy to reconstruct the internal datasets
-                    if (accuracy < 0.999) {
-                        cout << "WARNING: Model accuracy is less than 99.90%. The model may not "
-                            << "perfectly reconstruct the input text.\n";
-                    }
+                // We need perfect accuracy to reconstruct the internal datasets
+                if (accuracy < 0.999) {
+                    cout << "WARNING: Model accuracy is less than 99.90%. The model may not "
+                        << "perfectly reconstruct the input text.\n";
                 }
             }
         }

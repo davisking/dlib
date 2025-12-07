@@ -1,0 +1,652 @@
+﻿/*!
+    @file slm_chatbot_ex.cpp
+    @brief Transformer-based chatbot with staged fine-tuning
+
+    This program demonstrates how to build a specialized chatbot using transformer
+    architecture with Mixture-of-Experts layers. The fine-tuning process is used to
+    specialize the model for conversational Q&A tasks using formatted prompt-response
+    pairs with special tags
+
+    The chatbot is designed to answer questions about black holes and
+    related astrophysics topics, demonstrating how proper data formatting and
+    tagging can specialize a language model for specific domains.
+
+    Usage modes:
+    --fine-tune          Fine-tune on Q&A pairs for chatbot specialization
+    --prompt             Interactive prompting mode
+
+    Data format for fine-tuning:
+    <question><text>What is a black hole?</text>
+    <answer><text>A black hole is a region of spacetime...</text>
+
+    The special tags help the model learn the conversational structure and
+    role-based response patterns.
+!*/
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <cmath>
+#include <random>
+#include <fstream>
+#include <chrono>
+#include <csignal>
+#include <sstream>
+
+#include <dlib/dnn.h>
+#include <dlib/data_io.h>
+#include <dlib/cmd_line_parser.h>
+#include <dlib/tokenizer/bpe_tokenizer.h>
+#include <dlib/misc_api.h>
+
+// Include internal dataset
+#include "slm_data.h"
+
+using namespace std;
+using namespace dlib;
+
+namespace dlib
+{
+    // Expert network architecture for MoE layer
+    template <template <typename> class DO, long d_model>
+    using expert_net_type = swiglu<DO, d_model, input_tensor>;
+
+    // Complete transformer block with MoE-based feed-forward layer
+    template <template <typename> class ACT, template <typename> class DO,
+        long seq_len, long d_model, long num_heads, typename MODE, typename SUBNET>
+    using trans_moe_block =
+        moe_ffn<expert_net_type<DO, d_model>, 4, 0, MODE, DO,
+        add_prev1<multihead_attention<ACT, DO, seq_len, d_model, num_heads, rms_norm<tag1<SUBNET>>>>>;
+
+    // Classification head for next-token prediction in conversational context
+    template <long num_logits, long embedding_dim, typename SUBNET>
+    using classification_head = loss_cross_entropy_per_logit<linear<num_logits, rms_norm<SUBNET>>>;
+
+    // Chatbot model configuration
+    template<
+        long vocab_size = 3500,
+        long max_seq_len = 100,
+        long num_layers = 4,
+        long num_heads = 6,
+        long embedding_dim = 228,
+        template <typename> class activation_func = gelu,
+        template <typename> class dropout_policy = dropout_10
+    >
+    struct chatbot_config {
+        static constexpr long VOCAB_SIZE = vocab_size;
+        static constexpr long MAX_SEQ_LEN = max_seq_len;
+        static constexpr long NUM_LAYERS = num_layers;
+        static constexpr long NUM_HEADS = num_heads;
+        static constexpr long EMBEDDING_DIM = embedding_dim;
+
+        struct validation {
+            static_assert(VOCAB_SIZE > 0, "Vocabulary size must be positive");
+            static_assert(NUM_LAYERS > 0, "Number of layers must be positive");
+            static_assert(NUM_HEADS > 0, "Number of attention heads must be positive");
+            static_assert(EMBEDDING_DIM% NUM_HEADS == 0, "Embedding dimension must be divisible by number of heads");
+        };
+
+        // Network component definitions for training (with dropout)
+        template <typename SUBNET>
+        using t_transformer_block =
+            trans_moe_block<activation_func, dropout_policy, MAX_SEQ_LEN, EMBEDDING_DIM, NUM_HEADS,
+            training_mode_tag, SUBNET>;
+
+        // Network component definitions for inference (using multiply)
+        template <typename SUBNET>
+        using i_transformer_block =
+            trans_moe_block<activation_func, multiply, MAX_SEQ_LEN, EMBEDDING_DIM, NUM_HEADS,
+            inference_mode_tag, SUBNET>;
+
+        // Complete network type selector based on training/inference mode
+        template<bool is_training>
+        using network_type = std::conditional_t<is_training,
+            classification_head<VOCAB_SIZE, EMBEDDING_DIM,
+            repeat<NUM_LAYERS, t_transformer_block,
+            embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>,
+            classification_head<VOCAB_SIZE, EMBEDDING_DIM,
+            repeat<NUM_LAYERS, i_transformer_block,
+            embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>;
+
+        struct model_info {
+            static std::string describe() {
+                std::stringstream ss;
+                ss << "Chatbot configuration:\n"
+                    << "- Vocabulary: " << VOCAB_SIZE << " tokens\n"
+                    << "- Layers: " << NUM_LAYERS << " transformer layers with MoE\n"
+                    << "- Attention heads: " << NUM_HEADS << "\n"
+                    << "- Embedding dimension: " << EMBEDDING_DIM << "\n"
+                    << "- Context window: " << MAX_SEQ_LEN << " tokens\n"
+                    << "- Experts per layer: 4 (auto top-n selection)";
+                return ss.str();
+            }
+        };
+    };
+}
+
+// Signal handling for clean termination
+namespace {
+    std::atomic<bool> g_terminate_flag(false);
+
+#ifdef _WIN32
+    BOOL WINAPI console_ctrl_handler(DWORD ctrl_type) {
+        if (ctrl_type == CTRL_C_EVENT) {
+            g_terminate_flag.store(true);
+            cout << "\nCtrl+C detected, cleaning up..." << endl;
+            return TRUE;
+        }
+        return FALSE;
+    }
+
+    void setup_interrupt_handler() {
+        SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
+    }
+#else
+    void signal_handler(int signal) {
+        if (signal == SIGINT) {
+            g_terminate_flag.store(true);
+            cout << "\nCtrl+C detected, cleaning up..." << endl;
+        }
+    }
+
+    void setup_interrupt_handler() {
+        std::signal(SIGINT, signal_handler);
+    }
+#endif
+}
+
+// ----------------------------------------------------------------------------------------
+
+void display_random_qa_samples(size_t num_samples = 3)
+{
+    try {
+        // Load Q&A dataset
+        auto qa_pairs = get_dataset_as_pairs({ dataset_id::BLACK_HOLE_QA_PARTA });
+        if (qa_pairs.empty()) {
+            cout << "Warning: No Q&A pairs found in dataset\n";
+            return;
+        }
+
+        cout << "=== SAMPLE QUESTIONS FROM TRAINING DATA ===\n";
+        cout << "Total Q&A pairs in dataset <part.a>: " << qa_pairs.size() << "\n\n";
+
+        // Generate random indices
+        dlib::rand rng(std::time(0));
+        std::vector<size_t> indices;
+        for (size_t i = 0; i < qa_pairs.size(); ++i)
+            indices.push_back(i);
+
+        // Shuffle indices
+        for (size_t i = indices.size() - 1; i > 0; --i) {
+            size_t j = rng.get_random_32bit_number() % (i + 1);
+            std::swap(indices[i], indices[j]);
+        }
+
+        // Display random samples (questions only)
+        num_samples = std::min(num_samples, qa_pairs.size());
+        for (size_t i = 0; i < num_samples; ++i) {
+            size_t idx = indices[i];
+            cout << "Example " << (i + 1) << " - ";
+            cout << "Q: " << qa_pairs[idx].first << "\n";
+        }
+
+        cout << "=========================================\n\n";
+    }
+    catch (const std::exception& e) {
+        cerr << "Error loading Q&A samples: " << e.what() << "\n";
+    }
+}
+
+int main(int argc, char** argv)
+{
+    try
+    {
+        setup_interrupt_handler();
+
+        command_line_parser parser;
+        parser.add_option("fine-tune", "Fine-tune model on Q&A pairs for chatbot specialization");
+        parser.add_option("prompt", "Enter interactive prompting mode");
+        parser.add_option("learning-rate", "Set the learning rate (default: 1e-5)", 1);
+        parser.add_option("batch-size", "Set mini-batch size (default: 16)", 1);
+        parser.add_option("max-epochs", "Set maximum training epochs (default: 15)", 1);
+        parser.add_option("patience", "Set iterations without progress threshold (default: 500)", 1);
+        parser.add_option("model-file", "Path for model (default: dlib_lm_moe_model.dat)", 1);
+        parser.add_option("tokenizer-file", "Path for tokenizer (default: dlib_lm_tokenizer.vocab)", 1);
+        parser.add_option("temperature", "Set sampling temperature, higher = more creative (default: 0.8)", 1);
+        parser.add_option("top-k", "Set top-k filtering, max tokens to consider (default: 50)", 1);
+        parser.add_option("top-p", "Set nucleus sampling threshold (default: 0.9)", 1);
+        parser.add_option("repeat-penalty", "Set repetition penalty (default: 1.2)", 1);
+        parser.add_option("min-p", "Set relative minimum probability threshold (default: 0.05)", 1);
+        parser.add_option("deterministic", "Force deterministic generation mode (Argmax)");
+        parser.parse(argc, argv);
+
+        if (!parser.option("fine-tune") && !parser.option("prompt")) {
+            cout << "Transformer-based chatbot with staged fine-tuning\n\n";
+            parser.print_options();
+            return 0;
+        }
+
+        // Training hyperparameters
+        const double learning_rate = get_option(parser, "learning-rate", 1e-5);
+        const long batch_size = get_option(parser, "batch-size", 16);
+        const long max_epochs = get_option(parser, "max-epochs", 15);
+        const long patience = get_option(parser, "patience", 500);
+        const double weight_decay = 0.01;
+        const double beta1 = 0.9;
+        const double beta2 = 0.999;
+
+        // File paths
+        const std::string model_file = get_option(parser, "model-file", std::string("dlib_lm_moe_model.dat"));
+        const std::string tokenizer_file = get_option(parser, "tokenizer-file", std::string("dlib_lm_tokenizer.vocab"));
+
+        // Configuration parameters
+        const long vocab_size = 3500;
+        const long max_seq_len = 100;
+        using config = chatbot_config<vocab_size, max_seq_len>;
+        using train_net = config::network_type<true>;
+        using infer_net = config::network_type<false>;
+        cout << config::model_info::describe() << "\n\n";
+
+        // GPU configuration
+        std::vector<int> gpus{ 0 };
+
+        // FINE-TUNING MODE
+        if (parser.option("fine-tune"))
+        {
+            cout << "=== FINE-TUNING MODE ===\n";
+            cout << "Objective: specialize model for conversational Q&A with proper formatting\n\n";
+
+            // Load tokenizer & last checkpoint from the global training
+            std::string finetuned_model = model_file.substr(0, model_file.find_last_of('.'))
+                + "_finetuned.dat";
+
+            bpe_tokenizer tokenizer;
+            if (file_exists(tokenizer_file)) {
+                cout << "Loading pre-trained tokenizer from: " << tokenizer_file << endl;
+                deserialize(tokenizer_file) >> tokenizer;
+                cout << "Tokenizer loaded successfully with vocabulary size: " << tokenizer.get_vocab_size() << endl;
+            }
+            else {
+                cout << "Pre-trained tokenizer not found at: " << tokenizer_file << endl;
+                return 1;
+            }
+
+            // Load Q&A datasets for fine-tuning
+            cout << "Loading Q&A training datasets...\n";
+            std::vector<dataset_id> qa_datasets = {
+                dataset_id::BLACK_HOLE_QA_PARTA,
+                dataset_id::BLACK_HOLE_QA_PARTB,
+                dataset_id::BLACK_HOLE_QA_PARTC
+            };
+            auto all_qa_pairs = get_dataset_as_pairs(qa_datasets);
+
+            cout << "Loaded " << all_qa_pairs.size() << " Q&A pairs\n";
+            cout << "Format: uses special tags for role-based learning\n\n";
+
+            // Tokenize Q&A segments with markers
+            cout << "Tokenizing Q&A segments...\n";
+            int text_start_id = tokenizer.get_special_token_id("<text>"),
+                text_end_id = tokenizer.get_special_token_id("</text>"),
+                question_id = tokenizer.get_special_token_id("<question>"),
+                answer_id = tokenizer.get_special_token_id("<answer>");
+
+            std::vector<std::vector<int>> qa_tokens;
+            size_t total_tokens = 0;
+            for (const auto& qa_pair : all_qa_pairs) {
+                std::vector<int> pair_tokens;
+
+                // Format: <question><text>question_text</text>
+                pair_tokens.push_back(question_id);
+                pair_tokens.push_back(text_start_id);
+                auto q_tokens = tokenizer.encode(qa_pair.first);
+                pair_tokens.insert(pair_tokens.end(), q_tokens.begin(), q_tokens.end());
+                pair_tokens.push_back(text_end_id);
+
+                // Format: <answer><text>answer_text</text>
+                pair_tokens.push_back(answer_id);
+                pair_tokens.push_back(text_start_id);
+                auto a_tokens = tokenizer.encode(qa_pair.second);
+                pair_tokens.insert(pair_tokens.end(), a_tokens.begin(), a_tokens.end());
+                pair_tokens.push_back(text_end_id);
+
+                total_tokens += pair_tokens.size();
+                qa_tokens.push_back(std::move(pair_tokens));
+            }
+            cout << "Tokenization complete: " << total_tokens << " total Q&A tokens\n\n";
+
+            // Prepare fine-tuning dataset
+            cout << "Building fine-tuning dataset...\n";
+            std::vector<matrix<int, 0, 1>> samples;
+            std::vector<unsigned long> labels;
+            build_single_token_prediction_dataset(
+                qa_tokens,
+                max_seq_len,
+                tokenizer.get_special_token_id("<pad>"),
+                true,
+                samples,
+                labels
+            );
+            cout << "Fine-tuning samples: " << samples.size() << "\n";
+            if (samples.empty()) {
+                cerr << "Error: No fine-tuning samples generated\n";
+                return 1;
+            }
+
+            // Release memory
+            qa_tokens.clear();
+
+            // Setup trainer for fine-tuning
+            train_net net;
+            if (!file_exists("chkpt-" + model_file)) {
+                cerr << "Error: last checkpoint not found: " << (string("chkpt-") + model_file) << "\n";
+                cerr << "Please run --train first to create base model using <slm_mixture_of_experts_ex>.\n";
+                return 1;
+            }
+            dnn_trainer<train_net, adam> trainer(net, adam(weight_decay, beta1, beta2), gpus);
+            trainer.set_learning_rate(learning_rate);
+            trainer.set_min_learning_rate(1e-7);
+            trainer.set_mini_batch_size(batch_size);
+            trainer.set_max_num_epochs(max_epochs);
+            trainer.set_iterations_without_progress_threshold(patience);
+            trainer.set_synchronization_file("chkpt-" + model_file, std::chrono::minutes(10));
+            trainer.be_quiet();
+
+            cout << "Applying freezing strategy...\n";
+            set_all_learning_rate_multipliers(net, 0.1);
+            layer<1>(net).layer_details().set_learning_rate_multiplier(1.0);    // linear
+            layer<2>(net).layer_details().set_learning_rate_multiplier(0.5);    // rms_norm
+            layer<143>(net).layer_details().set_learning_rate_multiplier(0.5);  // embeddings
+            cout << "Fine-tuning learning rate strategy applied.\n\n";
+            cout << net << endl;
+
+            size_t epoch = 0, steps = 0;
+            size_t batches_count = 0, batches_seen = 0, samples_seen = 0;
+            double total_loss = 0.0;
+            auto epoch_start = std::chrono::high_resolution_clock::now();
+
+            // Training loop
+            cout << "Starting standard training...\n";
+            while (trainer.get_learning_rate() >= trainer.get_min_learning_rate()
+                && epoch < max_epochs && !g_terminate_flag.load())
+            {
+                total_loss = 0.0;
+                batches_seen = 0, samples_seen = 0;
+                epoch_start = std::chrono::high_resolution_clock::now();
+
+                // Shuffle the dataset
+                shuffle_training_dataset(samples, labels);
+
+                for (size_t i = 0; i < samples.size() && !g_terminate_flag.load(); i += batch_size)
+                {
+                    size_t batch_end = std::min(i + batch_size, samples.size());
+                    std::vector<matrix<int, 0, 1>> batch_samples(
+                        samples.begin() + i, samples.begin() + batch_end);
+                    std::vector<unsigned long> batch_labels(
+                        labels.begin() + i, labels.begin() + batch_end);
+
+                    trainer.train_one_step(batch_samples, batch_labels);
+                    total_loss += trainer.get_average_loss();
+                    batches_seen++;
+                    samples_seen += batch_samples.size();
+                    steps += batch_samples.size();
+
+                    // Progress reporting
+                    if (batches_count++ % 50 == 0) {
+                        double avg_loss = total_loss / batches_seen;
+                        auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
+                            std::chrono::high_resolution_clock::now() - epoch_start).count();
+                        double samples_per_sec = samples_seen / (elapsed > 0 ? elapsed : 1);
+
+                        cout << "epoch#: " << (epoch + 1) << "/" << max_epochs
+                            << " (ksteps: " << (steps / 1000) << ")"
+                            << " \t loss: " << avg_loss
+                            << " \t patience: " << trainer.get_steps_without_progress()
+                            << " \t speed: " << samples_per_sec << " samples/sec\n";
+                        cout.flush();
+                    }
+                }
+                epoch++;
+            }
+
+            // Save fine-tuned model
+            set_all_learning_rate_multipliers(net, 1.0);
+            cout << "\nFine-tuning complete, saving specialized model...\n";
+            net.clean();
+
+            serialize(finetuned_model) << net << tokenizer;
+            cout << "Fine-tuned model saved to " << finetuned_model << "\n";
+
+            cout << "\nFine-tuning completed successfully\n";
+            cout << "The model is now specialized for chatbot Q&A interactions\n";
+            cout << "Next step: use --prompt to interact with the Chatbot\n";
+        }
+
+        // PROMPTING MODE
+        else if (parser.option("prompt"))
+        {
+            cout << "=== INTERACTIVE PROMPTING MODE ===\n";
+            cout << "Chat specialized in astrophysics and black holes\n\n";
+
+            // Display 3 random sample questions from training data
+            display_random_qa_samples(5);
+            cout << "Type 'quit' to exit\n\n";
+
+            // Sampling parameters for text generation
+            size_t top_k = get_option(parser, "top-k", 50);
+            float top_p = get_option(parser, "top-p", 0.9f);
+            float repeat_penalty = get_option(parser, "repeat-penalty", 1.2f);
+            float min_p = get_option(parser, "min-p", 0.05f);
+            bool deterministic_mode = parser.option("deterministic");
+            float temperature = deterministic_mode ? 1.0f : get_option(parser, "temperature", 0.8f);
+            dlib::rand rng(std::time(0));
+
+            // Load fine-tuned model
+            bpe_tokenizer tokenizer;
+            softmaxm<multiply<infer_net::subnet_type>> generator(multiply_(1.0 / temperature));
+            {
+                infer_net net;
+                std::string finetuned_model = model_file.substr(0, model_file.find_last_of('.'))
+                    + "_finetuned.dat";
+                if (!file_exists(finetuned_model)) {
+                    cerr << "Error: fine-tuned model not found: " << finetuned_model << "\n";
+                    cerr << "Please run --fine-tune first.\n";
+                    return 1;
+                }
+                deserialize(finetuned_model) >> net >> tokenizer;
+                cout << "Fine-tuned model loaded from " << finetuned_model << "\n\n";
+                generator.subnet().subnet() = net.subnet();
+            }            
+
+            // Get special token IDs
+            int text_start_id = tokenizer.get_special_token_id("<text>");
+            int text_end_id = tokenizer.get_special_token_id("</text>");
+            int question_id = tokenizer.get_special_token_id("<question>");
+            int answer_id = tokenizer.get_special_token_id("<answer>");
+
+            // Setup inference context
+            inference_context ctx(max_seq_len, 3, tokenizer.get_special_token_id("<pad>"));
+
+            // Interactive loop
+            while (!g_terminate_flag.load())
+            {
+                // Get user input
+                cout << "You: ";
+                cout.flush();
+
+                std::string user_input;
+                if (!std::getline(std::cin, user_input)) break;
+
+                // Trim whitespace
+                user_input.erase(0, user_input.find_first_not_of(" \t\n\r"));
+                user_input.erase(user_input.find_last_not_of(" \t\n\r") + 1);
+                if (user_input.empty()) continue;
+
+                // Check for quit command
+                if (user_input == "quit" || user_input == "exit") {
+                    cout << "Goodbye!\n";
+                    break;
+                }
+
+                // Tokenize user input with proper formatting
+                // Format: <question><text>user_input</text>
+                std::vector<int> input_tokens;
+                input_tokens.push_back(question_id);
+                input_tokens.push_back(text_start_id);
+                auto q_tokens = tokenizer.encode(user_input);
+                input_tokens.insert(input_tokens.end(), q_tokens.begin(), q_tokens.end());
+                input_tokens.push_back(text_end_id);
+
+                // Add to context
+                ctx.add_tokens(input_tokens);
+
+                // Prepare for bot response
+                // Format: <answer><text>
+                ctx.add_token(answer_id);
+                ctx.add_token(text_start_id);
+
+                // Generate response token by token
+                cout << "CHATBOT: ";
+                cout.flush();
+
+                // Top-k/top-p (nucleus) sampling for non-deterministic text generation.
+                // This function applies temperature scaling, repetition penalty, min-p filtering, 
+                // top-k filtering, and nucleus sampling to select the next token.
+                auto top_k_p_sample = [&rng, &ctx, &text_end_id](
+                    const float* probs, size_t N, size_t k,
+                    float p, float repeat_penalty, float min_p) -> size_t
+                    {
+                        // Copy probabilities
+                        std::vector<float> p_copy(probs, probs + N);
+
+                        // Step 1: Apply repetition penalty ONCE
+                        if (repeat_penalty > 1.0f) {
+                            const auto& context_tokens = ctx.get_full_context();
+
+                            // Penalize only recent tokens (last 20%)
+                            size_t recent_size = std::max(size_t(1),
+                                static_cast<size_t>(context_tokens.size() * 0.2));
+                            size_t start_idx = (context_tokens.size() > recent_size)
+                                ? context_tokens.size() - recent_size : 0;
+
+                            for (size_t i = start_idx; i < context_tokens.size(); ++i) {
+                                int token_id = context_tokens[i];
+                                if (token_id >= 0 && static_cast<size_t>(token_id) < N) {
+                                    p_copy[token_id] /= repeat_penalty;
+                                }
+                            }
+                        }
+
+                        // Step 2: Renormalize after penalty
+                        float sum_after_penalty = 0.0f;
+                        for (size_t i = 0; i < N; ++i) {
+                            sum_after_penalty += p_copy[i];
+                        }
+                        if (sum_after_penalty > 1e-8f) {
+                            for (size_t i = 0; i < N; ++i) {
+                                p_copy[i] /= sum_after_penalty;
+                            }
+                        }
+
+                        // Step 3: Find max probability for min-p filtering
+                        float max_prob = *std::max_element(p_copy.begin(), p_copy.end());
+                        float min_p_threshold = max_prob * min_p;
+
+                        // Step 4: Build candidate list with min-p filter
+                        std::vector<std::pair<size_t, float>> candidates;
+                        candidates.reserve(N);
+
+                        for (size_t i = 0; i < N; ++i) {
+                            if (p_copy[i] >= min_p_threshold) {
+                                candidates.push_back({ i, p_copy[i] });
+                            }
+                        }
+
+                        if (candidates.empty()) {
+                            return text_end_id;  // Fallback
+                        }
+
+                        // Step 5: Sort and apply top-k
+                        k = std::min(k, candidates.size());
+                        std::partial_sort(candidates.begin(), candidates.begin() + k, candidates.end(),
+                            [](const auto& a, const auto& b) { return a.second > b.second; });
+
+                        // Step 6: Apply top-p (nucleus sampling)
+                        float cumsum = 0.0f;
+                        size_t cutoff = 0;
+                        for (size_t i = 0; i < k; ++i) {
+                            cumsum += candidates[i].second;
+                            cutoff = i;
+                            if (cumsum >= p) break;
+                        }
+
+                        // Step 7: Renormalize filtered distribution
+                        float final_sum = 0.0f;
+                        for (size_t i = 0; i <= cutoff; ++i) {
+                            final_sum += candidates[i].second;
+                        }
+
+                        if (final_sum < 1e-8f) {
+                            return candidates[0].first;  // Return most probable
+                        }
+
+                        // Step 8: Sample from normalized distribution
+                        float r = rng.get_random_float() * final_sum;
+                        float cs = 0.0f;
+                        for (size_t i = 0; i <= cutoff; ++i) {
+                            cs += candidates[i].second;
+                            if (r <= cs) {
+                                return candidates[i].first;
+                            }
+                        }
+
+                        return candidates[0].first;  // Fallback
+                    };
+
+                int next_token, max_response_tokens = 3 * max_seq_len;
+                for (int i = 0; i < max_response_tokens && !g_terminate_flag.load(); ++i)
+                {
+                    // Get current context window and predict next token
+                    auto& probs_tensor = generator(ctx.get_input_window());
+
+                    // Extract dimensions
+                    const long seq_len = probs_tensor.nr();
+                    const long vocab_size = probs_tensor.nc();
+                    const long last_pos = seq_len - 1;
+
+                    // Get pointer to probabilities at last position
+                    const long offset = tensor_index(probs_tensor, 0, 0, last_pos, 0);
+                    const float* probs = probs_tensor.host() + offset;
+
+                    if (deterministic_mode) {
+                        // Argmax: select most probable token
+                        const float* max_ptr = std::max_element(probs, probs + vocab_size);
+                        next_token = static_cast<int>(std::distance(probs, max_ptr));
+                    }
+                    else {
+                        // Stochastic sampling
+                        next_token = top_k_p_sample(probs, vocab_size, top_k, top_p, repeat_penalty, min_p);
+                    }
+
+                    ctx.add_token(next_token);
+
+                    // Decode and display token
+                    std::string token_text = tokenizer.decode(next_token, false);
+                    cout << token_text;
+                    cout.flush();
+
+                    // Stop if end token is found
+                    if (next_token == text_end_id) break;
+                }
+                cout << "\n\n";
+            }
+        }
+
+        return 0;
+    }
+    catch (exception& e)
+    {
+        cerr << "Exception thrown: " << e.what() << endl;
+        return 1;
+    }
+}
