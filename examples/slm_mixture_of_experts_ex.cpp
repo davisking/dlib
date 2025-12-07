@@ -356,6 +356,200 @@ moe_param_info get_moe_param_info(const net_type& net, long num_layers)
     return info;
 }
 
+// Reads entire file content into a string.
+std::string read_file_content(const std::string& filepath)
+{
+    std::ifstream file(filepath, std::ios::binary);
+    if (!file) {
+        cerr << "Warning: Cannot open file: " << filepath << "\n";
+        return "";
+    }
+
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    return buffer.str();
+}
+
+// Replaces all occurrences of double newlines ("\n\n") with "@@" delimiter.
+std::string normalize_paragraph_delimiters(const std::string& text)
+{
+    std::string result;
+    result.reserve(text.size());
+
+    size_t i = 0;
+    while (i < text.size()) {
+        // Check for double (or more) newlines
+        if (i + 1 < text.size() && text[i] == '\n' && text[i + 1] == '\n') {
+            result += "@@";
+            i += 2;
+
+            // Skip any additional consecutive newlines
+            while (i < text.size() && text[i] == '\n') ++i;
+        }
+        else {
+            result += text[i];
+            ++i;
+        }
+    }
+
+    return result;
+}
+
+// Recursively collects all text files from a directory using Dlib's directory class.
+void collect_text_files_recursive(
+    const directory& dir,
+    std::vector<std::string>& text_files,
+    size_t max_files = 0
+)
+{
+    // Process files in current directory
+    for (const auto& file : dir.get_files()) {
+        if (max_files > 0 && text_files.size() >= max_files) return;
+
+        // Check if it's a text file using file type detection
+        file_content_type content_type;
+        if (detect_file_type(file.full_name(), content_type)) {
+            text_files.push_back(file.full_name());
+            cout << "  Found text file: " << file.name() << "\n";
+        }
+    }
+
+    // Recursively process subdirectories
+    for (const auto& subdir : dir.get_dirs()) {
+        if (max_files > 0 && text_files.size() >= max_files) {
+            return;
+        }
+        collect_text_files_recursive(subdir, text_files, max_files);
+    }
+}
+
+// Loads external text data from a file or directory
+std::string load_external_data(
+    const std::string& path,
+    bool normalize_delimiters = true
+)
+{
+    std::string combined_text;
+
+    try {
+        // Try as directory first
+        directory dir(path);
+
+        cout << "Scanning directory recursively: " << path << "\n";
+
+        std::vector<std::string> text_files;
+        collect_text_files_recursive(dir, text_files);
+
+        cout << "Found " << text_files.size() << " text file(s)\n";
+
+        if (text_files.empty()) {
+            cerr << "Warning: No text files found in directory\n";
+            return "";
+        }
+
+        // Sort files for consistent ordering
+        std::sort(text_files.begin(), text_files.end());
+
+        // Concatenate all files with delimiter
+        size_t total_bytes = 0;
+        for (const auto& filepath : text_files) {
+            std::string content = read_file_content(filepath);
+            if (!content.empty()) {
+                combined_text += content;
+
+                // Ensure content ends with delimiter for next file
+                if (!combined_text.empty() &&
+                    combined_text.size() >= 2 &&
+                    combined_text.substr(combined_text.size() - 2) != "@@") {
+                    combined_text += "@@";
+                }
+
+                total_bytes += content.size();
+            }
+        }
+
+        cout << "Total loaded: " << total_bytes << " bytes from "
+            << text_files.size() << " file(s)\n";
+    }
+    catch (const directory::dir_not_found&) {
+        // Not a directory, try as single file
+        cout << "Loading single text file: " << path << "\n";
+
+        // Verify it's a text file
+        file_content_type content_type;
+        if (!detect_file_type(path, content_type)) {
+            cerr << "Error: File does not appear to be text: " << path << "\n";
+            cerr << "Only plain text files are supported for training.\n";
+            return "";
+        }
+
+        combined_text = read_file_content(path);
+
+        if (combined_text.empty()) {
+            cerr << "Warning: File is empty or could not be read\n";
+            return "";
+        }
+
+        cout << "Loaded " << combined_text.size() << " bytes from file\n";
+    }
+    catch (const std::exception& e) {
+        cerr << "Error loading external data: " << e.what() << "\n";
+        return "";
+    }
+
+    // Normalize paragraph delimiters if requested
+    if (normalize_delimiters && !combined_text.empty()) {
+        size_t original_size = combined_text.size();
+        combined_text = normalize_paragraph_delimiters(combined_text);
+    }
+
+    return combined_text;
+}
+
+// Parses text with @@ delimiters into individual segments.
+std::vector<std::string> parse_delimited_segments(const std::string& text)
+{
+    std::vector<std::string> segments;
+    std::string delimiter = "@@";
+
+    size_t start = 0;
+    size_t end = text.find(delimiter);
+
+    while (end != std::string::npos) {
+        std::string segment = text.substr(start, end - start);
+
+        // Trim whitespace
+        size_t first = segment.find_first_not_of(" \t\n\r");
+        if (first != std::string::npos) {
+            size_t last = segment.find_last_not_of(" \t\n\r");
+            segment = segment.substr(first, last - first + 1);
+
+            // Add non-empty segments
+            if (!segment.empty()) {
+                segments.push_back(segment);
+            }
+        }
+
+        start = end + delimiter.length();
+        end = text.find(delimiter, start);
+    }
+
+    // Handle last segment
+    if (start < text.size()) {
+        std::string segment = text.substr(start);
+        size_t first = segment.find_first_not_of(" \t\n\r");
+        if (first != std::string::npos) {
+            size_t last = segment.find_last_not_of(" \t\n\r");
+            segment = segment.substr(first, last - first + 1);
+            if (!segment.empty()) {
+                segments.push_back(segment);
+            }
+        }
+    }
+
+    return segments;
+}
+
 int main(int argc, char** argv)
 {
     try
@@ -376,6 +570,7 @@ int main(int argc, char** argv)
         parser.add_option("model-file", "Path for model (default: dlib_lm_moe_model.dat)", 1);
         parser.add_option("tokenizer-file", "Path for tokenizer (default: dlib_lm_tokenizer.vocab)", 1);
         parser.add_option("output-file", "Path for generated output (default: generated_text.txt)", 1);
+        parser.add_option("external-data", "Path to external text data", 1);
         parser.parse(argc, argv);
 
         if (parser.number_of_arguments() == 0 &&
@@ -421,6 +616,38 @@ int main(int argc, char** argv)
 			dataset_id::GENERAL_KNOWLEDGE
         };
         auto text_segments = get_dataset_as_segments(text_datasets);
+
+        // Load external data if provided
+        std::string external_corpus_for_tokenizer;
+        if (parser.option("external-data")) {
+            std::string external_path = parser.option("external-data").argument();
+            cout << "Externa source: " << external_path << "\n";
+
+            std::string external_text = load_external_data(external_path, true);
+            if (!external_text.empty()) {
+                // Store raw text for tokenizer training (if needed later)
+                external_corpus_for_tokenizer = external_text;
+
+                // Parse into segments for training
+                cout << "Parsing external data into segments...\n";
+                auto external_segments = parse_delimited_segments(external_text);
+                cout << "Parsed " << external_segments.size() << " external segments\n";
+
+                if (!external_segments.empty()) {
+                    // Add to training data
+                    size_t original_count = text_segments.size();
+                    text_segments.insert(text_segments.end(),
+                        external_segments.begin(), external_segments.end());
+
+                    cout << "Training segments: " << original_count
+                        << " (internal) + " << external_segments.size()
+                        << " (external) = " << text_segments.size() << " (total)\n";
+                }
+            }
+            else {
+                cerr << "Warning: no valid external data loaded, continuing with internal datasets only\n";
+            }
+        }
 
         // Tokens filename
         const std::string tokens_file = "dlib_datasets_tokens.bin";
@@ -488,6 +715,9 @@ int main(int argc, char** argv)
                         + get_dataset_as_text(dataset_id::BLACK_HOLE_QA_PARTB) + delimiter
                         + get_dataset_as_text(dataset_id::BLACK_HOLE_QA_PARTC) + delimiter
                         + get_dataset_as_text(dataset_id::GENERAL_KNOWLEDGE);
+
+                    if (!external_corpus_for_tokenizer.empty())
+                        tokenizer_corpus += delimiter + external_corpus_for_tokenizer;
 
                     // Replace all "@@" delimiters with spaces
                     size_t pos = 0;
