@@ -276,8 +276,8 @@ int main(int argc, char** argv)
                 !file_exists("chkpt-" + finetuned_model)) deserialize(model_file) >> net >> tokenizer;
             else if (file_exists(finetuned_model) &&
                 !file_exists("chkpt-" + finetuned_model)) deserialize(finetuned_model) >> net >> tokenizer;
-            else if (file_exists(tokenizer_file)) {
-                deserialize(tokenizer_file) >> tokenizer;            }
+            else if (file_exists(tokenizer_file))
+                deserialize(tokenizer_file) >> tokenizer;
             else {
                 cout << "Pre-trained tokenizer not found at: " << tokenizer_file << endl;
                 return 1;
