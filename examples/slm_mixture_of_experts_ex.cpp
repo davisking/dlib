@@ -498,10 +498,8 @@ std::string load_external_data(
     }
 
     // Normalize paragraph delimiters if requested
-    if (normalize_delimiters && !combined_text.empty()) {
-        size_t original_size = combined_text.size();
+    if (normalize_delimiters && !combined_text.empty())
         combined_text = normalize_paragraph_delimiters(combined_text);
-    }
 
     return combined_text;
 }
