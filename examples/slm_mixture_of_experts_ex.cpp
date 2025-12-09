@@ -715,6 +715,7 @@ int main(int argc, char** argv)
 
                     if (!external_corpus_for_tokenizer.empty())
                         tokenizer_corpus += delimiter + external_corpus_for_tokenizer;
+                    cout << "Tokenizer corpus: " << tokenizer_corpus.size() << " characters\n";
 
                     // Replace all "@@" delimiters with spaces
                     size_t pos = 0;
