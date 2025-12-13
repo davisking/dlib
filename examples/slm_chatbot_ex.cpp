@@ -60,16 +60,16 @@ namespace dlib
         add_prev1<multihead_attention<ACT, DO, seq_len, d_model, num_heads, rms_norm<tag1<SUBNET>>>>>;
 
     // Classification head for next-token prediction in conversational context
-    template <long num_logits, long embedding_dim, typename SUBNET>
+    template <long num_logits, typename SUBNET>
     using classification_head = loss_cross_entropy_per_logit<linear<num_logits, rms_norm<SUBNET>>>;
 
     // Chatbot model configuration
     template<
-        long vocab_size = 3500,
-        long max_seq_len = 100,
-        long num_layers = 4,
+        long vocab_size = 2000,
+        long max_seq_len = 128,
+        long num_layers = 3,
         long num_heads = 6,
-        long embedding_dim = 228,
+        long embedding_dim = 192,
         template <typename> class activation_func = gelu,
         template <typename> class dropout_policy = dropout_10
     >
@@ -102,10 +102,10 @@ namespace dlib
         // Complete network type selector based on training/inference mode
         template<bool is_training>
         using network_type = std::conditional_t<is_training,
-            classification_head<VOCAB_SIZE, EMBEDDING_DIM,
+            classification_head<VOCAB_SIZE,
             repeat<NUM_LAYERS, t_transformer_block,
             embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>,
-            classification_head<VOCAB_SIZE, EMBEDDING_DIM,
+            classification_head<VOCAB_SIZE,
             repeat<NUM_LAYERS, i_transformer_block,
             embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>;
 
@@ -210,7 +210,10 @@ int main(int argc, char** argv)
         parser.add_option("learning-rate", "Set the learning rate (default: 1e-5)", 1);
         parser.add_option("batch-size", "Set mini-batch size (default: 16)", 1);
         parser.add_option("max-epochs", "Set maximum training epochs (default: 15)", 1);
-        parser.add_option("patience", "Set iterations without progress threshold (default: 500)", 1);
+        parser.add_option("weight-decay", "Set the weight decay for Adam (default: 0.01)", 1);
+        parser.add_option("beta1", "Set Adam's beta1 coefficient (default: 0.9)", 1);
+        parser.add_option("beta2", "Set Adam's beta2 coefficient (default: 0.999)", 1);
+        parser.add_option("patience", "Set iterations without progress threshold (default: 2500)", 1);
         parser.add_option("model-file", "Path for model (default: dlib_lm_moe_model.dat)", 1);
         parser.add_option("tokenizer-file", "Path for tokenizer (default: dlib_lm_tokenizer.vocab)", 1);
         parser.add_option("temperature", "Set sampling temperature, higher = more creative (default: 0.8)", 1);
@@ -231,10 +234,10 @@ int main(int argc, char** argv)
         const double learning_rate = get_option(parser, "learning-rate", 1e-5);
         const long batch_size = get_option(parser, "batch-size", 16);
         const long max_epochs = get_option(parser, "max-epochs", 15);
-        const long patience = get_option(parser, "patience", 500);
-        const double weight_decay = 0.01;
-        const double beta1 = 0.9;
-        const double beta2 = 0.999;
+        const long patience = get_option(parser, "patience", 2500);
+        const double weight_decay = get_option(parser, "weight-decay", 0.01);
+        const double beta1 = get_option(parser, "beta1", 0.9);
+        const double beta2 = get_option(parser, "beta2", 0.999);
 
         // File paths
         const std::string model_file = get_option(parser, "model-file", std::string("dlib_lm_moe_model.dat"));
@@ -242,7 +245,7 @@ int main(int argc, char** argv)
 
         // Configuration parameters
         const long vocab_size = 3500;
-        const long max_seq_len = 100;
+        const long max_seq_len = 128;
         using config = chatbot_config<vocab_size, max_seq_len>;
         using train_net = config::network_type<true>;
         using infer_net = config::network_type<false>;
@@ -351,7 +354,7 @@ int main(int argc, char** argv)
             set_all_learning_rate_multipliers(net, 0.1);
             layer<1>(net).layer_details().set_learning_rate_multiplier(1.0);    // linear
             layer<2>(net).layer_details().set_learning_rate_multiplier(0.5);    // rms_norm
-            layer<143>(net).layer_details().set_learning_rate_multiplier(0.5);  // embeddings
+            layer<108>(net).layer_details().set_learning_rate_multiplier(0.5);  // embeddings
             cout << "Fine-tuning learning rate strategy applied.\n\n";
             cout << net << endl;
 

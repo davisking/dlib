@@ -71,7 +71,7 @@ namespace dlib
     /*!
         Classification head for next-token prediction.
     !*/
-    template <long num_logits, long embedding_dim, typename SUBNET>
+    template <long num_logits, typename SUBNET>
     using classification_head = loss_cross_entropy_per_logit<linear<num_logits, rms_norm<SUBNET>>>;
 
     // Core model parameters
@@ -113,10 +113,10 @@ namespace dlib
         // Complete network type selector based on training/inference mode
         template<bool is_training>
         using network_type = std::conditional_t<is_training,
-            classification_head<VOCAB_SIZE, EMBEDDING_DIM,
+            classification_head<VOCAB_SIZE,
             repeat<NUM_LAYERS, t_transformer_block,
             embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>,
-            classification_head<VOCAB_SIZE, EMBEDDING_DIM,
+            classification_head<VOCAB_SIZE,
             repeat<NUM_LAYERS, i_transformer_block,
             embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>;
 
@@ -559,12 +559,12 @@ int main(int argc, char** argv)
         parser.add_option("train", "Train a transformer model on internal datasets");
         parser.add_option("generate", "Generate text from a previously trained model");
         parser.add_option("learning-rate", "Set the learning rate (default: 3e-4)", 1);
-        parser.add_option("batch-size", "Set the mini-batch size (default: 64)", 1);
+        parser.add_option("batch-size", "Set the mini-batch size (default: 96)", 1);
         parser.add_option("patience", "Iterations without progress before early stopping (default: 8000)", 1);
-        parser.add_option("max-epochs", "Maximum number of training epochs (default: 150)", 1);
+        parser.add_option("max-epochs", "Maximum number of training epochs (default: 500)", 1);
         parser.add_option("weight-decay", "Set the weight decay for Adam (default: 0.01)", 1);
-        parser.add_option("beta1", "Set Adam's first moment coefficient (default: 0.9)", 1);
-        parser.add_option("beta2", "Set Adam's second moment coefficient (default: 0.999)", 1);
+        parser.add_option("beta1", "Set Adam's beta1 coefficient (default: 0.9)", 1);
+        parser.add_option("beta2", "Set Adam's beta2 coefficient (default: 0.999)", 1);
         parser.add_option("model-file", "Path for model (default: dlib_lm_moe_model.dat)", 1);
         parser.add_option("tokenizer-file", "Path for tokenizer (default: dlib_lm_tokenizer.vocab)", 1);
         parser.add_option("output-file", "Path for generated output (default: generated_text.txt)", 1);
@@ -580,9 +580,9 @@ int main(int argc, char** argv)
 
         // Default values
         const double learning_rate = get_option(parser, "learning-rate", 3e-4);
-        const size_t batch_size = get_option(parser, "batch-size", 64);
+        const size_t batch_size = get_option(parser, "batch-size", 96);
         const long patience = get_option(parser, "patience", 8000);
-        const size_t max_epochs = get_option(parser, "max-epochs", 150);
+        const size_t max_epochs = get_option(parser, "max-epochs", 500);
         const double weight_decay = get_option(parser, "weight-decay", 0.01);
         const double beta1 = get_option(parser, "beta1", 0.9);
         const double beta2 = get_option(parser, "beta2", 0.999);
@@ -591,11 +591,11 @@ int main(int argc, char** argv)
         const std::string output_file = get_option(parser, "output-file", "generated_text.txt");
 
         // Model architecture parameters
-        const long num_tokens = 3500;
-        const long num_layers = 4;
+        const long num_tokens = 2000;
+        const long num_layers = 3;
         const long num_heads = 6;
-        const long embedding_dim = 228;
-        const long max_seq_len = 100;
+        const long embedding_dim = 192;
+        const long max_seq_len = 128;
 
         // Define transformer configuration with MoE
         using my_transformer = transformer_config<
@@ -805,7 +805,8 @@ int main(int argc, char** argv)
             // Create trainer
             dnn_trainer<net_type, adam> trainer(net, adam(weight_decay, beta1, beta2), gpus);
             trainer.set_learning_rate(learning_rate);
-            trainer.set_min_learning_rate(1e-6);
+            trainer.set_min_learning_rate(5e-5);
+            trainer.set_learning_rate_shrink_factor(0.1);
             trainer.set_mini_batch_size(batch_size);
             trainer.set_iterations_without_progress_threshold(patience);
             trainer.set_synchronization_file("chkpt-" + model_file, std::chrono::minutes(5));
