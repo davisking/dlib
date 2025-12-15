@@ -208,12 +208,12 @@ int main(int argc, char** argv)
         parser.add_option("fine-tune", "Fine-tune model on Q&A pairs for chatbot specialization");
         parser.add_option("prompt", "Enter interactive prompting mode");
         parser.add_option("learning-rate", "Set the learning rate (default: 1e-5)", 1);
-        parser.add_option("batch-size", "Set mini-batch size (default: 16)", 1);
-        parser.add_option("max-epochs", "Set maximum training epochs (default: 15)", 1);
+        parser.add_option("batch-size", "Set mini-batch size (default: 32)", 1);
+        parser.add_option("max-epochs", "Set maximum training epochs (default: 150)", 1);
         parser.add_option("weight-decay", "Set the weight decay for Adam (default: 0.01)", 1);
         parser.add_option("beta1", "Set Adam's beta1 coefficient (default: 0.9)", 1);
         parser.add_option("beta2", "Set Adam's beta2 coefficient (default: 0.999)", 1);
-        parser.add_option("patience", "Set iterations without progress threshold (default: 2500)", 1);
+        parser.add_option("patience", "Set iterations without progress threshold (default: 15000)", 1);
         parser.add_option("model-file", "Path for model (default: dlib_lm_moe_model.dat)", 1);
         parser.add_option("tokenizer-file", "Path for tokenizer (default: dlib_lm_tokenizer.vocab)", 1);
         parser.add_option("temperature", "Set sampling temperature, higher = more creative (default: 0.8)", 1);
@@ -232,9 +232,9 @@ int main(int argc, char** argv)
 
         // Training hyperparameters
         const double learning_rate = get_option(parser, "learning-rate", 1e-5);
-        const long batch_size = get_option(parser, "batch-size", 16);
-        const long max_epochs = get_option(parser, "max-epochs", 15);
-        const long patience = get_option(parser, "patience", 2500);
+        const long batch_size = get_option(parser, "batch-size", 32);
+        const long max_epochs = get_option(parser, "max-epochs", 150);
+        const long patience = get_option(parser, "patience", 15000);
         const double weight_decay = get_option(parser, "weight-decay", 0.01);
         const double beta1 = get_option(parser, "beta1", 0.9);
         const double beta2 = get_option(parser, "beta2", 0.999);

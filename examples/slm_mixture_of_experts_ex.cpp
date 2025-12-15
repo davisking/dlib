@@ -560,7 +560,7 @@ int main(int argc, char** argv)
         parser.add_option("generate", "Generate text from a previously trained model");
         parser.add_option("learning-rate", "Set the learning rate (default: 3e-4)", 1);
         parser.add_option("batch-size", "Set the mini-batch size (default: 96)", 1);
-        parser.add_option("patience", "Iterations without progress before early stopping (default: 8000)", 1);
+        parser.add_option("patience", "Iterations without progress before early stopping (default: 25000)", 1);
         parser.add_option("max-epochs", "Maximum number of training epochs (default: 500)", 1);
         parser.add_option("weight-decay", "Set the weight decay for Adam (default: 0.01)", 1);
         parser.add_option("beta1", "Set Adam's beta1 coefficient (default: 0.9)", 1);
@@ -581,7 +581,7 @@ int main(int argc, char** argv)
         // Default values
         const double learning_rate = get_option(parser, "learning-rate", 3e-4);
         const size_t batch_size = get_option(parser, "batch-size", 96);
-        const long patience = get_option(parser, "patience", 8000);
+        const long patience = get_option(parser, "patience", 25000);
         const size_t max_epochs = get_option(parser, "max-epochs", 500);
         const double weight_decay = get_option(parser, "weight-decay", 0.01);
         const double beta1 = get_option(parser, "beta1", 0.9);
@@ -879,12 +879,6 @@ int main(int argc, char** argv)
                     if (predicted[i] == labels[i]) correct++;
                 double accuracy = (double)correct / labels.size();
                 cout << "Training accuracy: " << (accuracy * 100.0) << "%\n";
-
-                // We need perfect accuracy to reconstruct the internal datasets
-                if (accuracy < 0.999) {
-                    cout << "WARNING: Model accuracy is less than 99.90%. The model may not "
-                        << "perfectly reconstruct the input text.\n";
-                }
             }
         }
 
