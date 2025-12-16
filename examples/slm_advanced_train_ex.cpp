@@ -751,16 +751,16 @@ int main(int argc, char** argv)
 
 /*
  * This program demonstrates advanced tokenization and training of a language model
- * on an internal dataset using a BPE-style tokenizer with 3500 vocabulary entries.
+ * on an internal dataset using a BPE-style tokenizer with 2000 vocabulary entries.
  * The training process produces a model file of approximately 18.5MB on disk.
  *
  * - Transformer model configuration:
- *    + vocabulary size: 3500
+ *    + vocabulary size: 2000
  *    + layers: 4
  *    + attention heads: 6
  *    + embedding dimension: 228 
  *    + max sequence length: 100
- * - Number of parameters: 4,002,458
+ * - Number of parameters: 3,915,458
  *
  * After a 1-step full training, the model achieves perfect memorization of the dataset.
  * The generation option produces text that matches the original dataset byte-for-byte
