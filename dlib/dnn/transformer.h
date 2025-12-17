@@ -32,29 +32,29 @@ namespace dlib
     namespace canonical_transformer
     {
 
-        template <long seq_len, long d_model, long num_heads, typename SUBNET>
-        using query = reshape_to<num_heads, seq_len, d_model / num_heads,
+        template <long d_model, long num_heads, typename SUBNET>
+        using query = reshape_to<num_heads, -1, d_model / num_heads,
             linear_no_bias<d_model, SUBNET>>;
 
-        template <long seq_len, long d_model, long num_heads, typename SUBNET>
-        using key = reshape_to<num_heads, seq_len, d_model / num_heads,
+        template <long d_model, long num_heads, typename SUBNET>
+        using key = reshape_to<num_heads, -1, d_model / num_heads,
             linear_no_bias<d_model, SUBNET>>;
 
-        template <long seq_len, long d_model, long num_heads, typename SUBNET>
-        using value = reshape_to<num_heads, seq_len, d_model / num_heads,
+        template <long d_model, long num_heads, typename SUBNET>
+        using value = reshape_to<num_heads, -1, d_model / num_heads,
             linear_no_bias<d_model, SUBNET>>;
 
         template <template <typename> class ACT, template <typename> class DO,
-            long seq_len, long d_model, long num_heads, typename SUBNET>
+            long d_model, long num_heads, typename SUBNET>
         using multihead_attention =
-            DO<linear_no_bias<d_model, reshape_to<1, seq_len, d_model,
+            DO<linear_no_bias<d_model, reshape_to<1, -1, d_model,
             multm_prev3<softmaxm<tril_mask<
             scale_weights<d_model / num_heads,
             multm_prev4<
-            rope<query<seq_len, d_model, num_heads, skip1<
+            rope<query<d_model, num_heads, skip1<
             tag4<transpose<
-            rope<key<seq_len, d_model, num_heads, skip2<
-            tag3<value<seq_len, d_model, num_heads,
+            rope<key<d_model, num_heads, skip2<
+            tag3<value<d_model, num_heads,
             tag2<SUBNET>>>>>>>>>>>>>>>>>>>;
 
         template <template <typename> class ACT, template <typename> class DO,
@@ -68,29 +68,29 @@ namespace dlib
             tag7<silu<linear<(d_model * 2) / 7, tag6<SUBNET>>>>>>>>>;
 
         template <template <typename> class ACT, template <typename> class DO,
-            long seq_len, long d_model, long num_heads, typename SUBNET>
+            long d_model, long num_heads, typename SUBNET>
         using transformer_block = 
             add_prev5<std_ffn<ACT, DO, d_model, rms_norm<tag5<
-            add_prev1<multihead_attention<ACT, DO, seq_len, d_model, num_heads, rms_norm<tag1<SUBNET>>>>>>>>;
+            add_prev1<multihead_attention<ACT, DO, d_model, num_heads, rms_norm<tag1<SUBNET>>>>>>>>;
 
         template<long remaining_layers, template <typename> class ACT, template <typename> class DO,
-            long seq_len, long d_model, long num_heads, typename SUBNET, typename enabled = void>
+            long d_model, long num_heads, typename SUBNET, typename enabled = void>
         struct transformer_stack_impl
         {
-            using type = transformer_block<ACT, DO, seq_len, d_model, num_heads,
-                typename transformer_stack_impl<remaining_layers - 1, ACT, DO, seq_len, d_model, num_heads, SUBNET>::type>;
+            using type = transformer_block<ACT, DO, d_model, num_heads,
+                typename transformer_stack_impl<remaining_layers - 1, ACT, DO, d_model, num_heads, SUBNET>::type>;
         };
 
         template<template <typename> class ACT, template <typename> class DO,
-            long seq_len, long d_model, long num_heads, typename SUBNET>
-        struct transformer_stack_impl<0, ACT, DO, seq_len, d_model, num_heads, SUBNET, void>
+            long d_model, long num_heads, typename SUBNET>
+        struct transformer_stack_impl<0, ACT, DO, d_model, num_heads, SUBNET, void>
         {
             using type = tag10<SUBNET>;
         };
 
         template<long num_layers, template <typename> class ACT, template <typename> class DO,
-            long seq_len, long d_model, long num_heads, typename SUBNET>
-        using transformer_stack = typename transformer_stack_impl<num_layers, ACT, DO, seq_len, d_model, num_heads, SUBNET>::type;
+            long d_model, long num_heads, typename SUBNET>
+        using transformer_stack = typename transformer_stack_impl<num_layers, ACT, DO, d_model, num_heads, SUBNET>::type;
 
     } // namespace std_transformer
 
@@ -179,7 +179,6 @@ namespace dlib
         using l_net_type = L_NET;
 
         explicit hrm_() :
-            seq_len(0),
             hidden_dim(0),
             learning_rate_multiplier(1.0)
         {
@@ -190,7 +189,6 @@ namespace dlib
             l_net(other.l_net),
             z_h_init(other.z_h_init),
             z_l_init(other.z_l_init),
-            seq_len(other.seq_len),
             hidden_dim(other.hidden_dim),
             learning_rate_multiplier(other.learning_rate_multiplier)
         {
@@ -203,7 +201,6 @@ namespace dlib
                 l_net = other.l_net;
                 z_h_init = other.z_h_init;
                 z_l_init = other.z_l_init;
-                seq_len = other.seq_len;
                 hidden_dim = other.hidden_dim;
                 learning_rate_multiplier = other.learning_rate_multiplier;
             }
@@ -215,8 +212,7 @@ namespace dlib
         {
             const tensor& input = sub.get_output();
 
-            // Store dimensions for initialization
-            seq_len = input.nr();
+            // Store dimension for initialization
             hidden_dim = input.nc();
 
             // Initialize hidden states with truncated normal (std=1, trunc=2)
@@ -229,6 +225,7 @@ namespace dlib
             const tensor& x = sub.get_output();
             const long batch_size = x.num_samples();
             const long k = x.k();
+            const long seq_len = x.nr();
 
             // Allocate working tensors with proper batch size
             z_h_current.copy_size(x);
@@ -356,7 +353,6 @@ namespace dlib
             serialize(item.l_net, out);
             serialize(item.z_h_init, out);
             serialize(item.z_l_init, out);
-            serialize(item.seq_len, out);
             serialize(item.hidden_dim, out);
             serialize(item.learning_rate_multiplier, out);
         }
@@ -372,7 +368,6 @@ namespace dlib
             deserialize(item.l_net, in);
             deserialize(item.z_h_init, in);
             deserialize(item.z_l_init, in);
-            deserialize(item.seq_len, in);
             deserialize(item.hidden_dim, in);
             deserialize(item.learning_rate_multiplier, in);
         }
@@ -449,7 +444,6 @@ namespace dlib
         resizable_tensor z_l_init;
 
         // Dimensions and learning rate
-        long seq_len;
         long hidden_dim;
         double learning_rate_multiplier;
 
@@ -473,7 +467,7 @@ namespace dlib
 
     // Gate network: produces raw logits for expert selection
     template <long num_experts, template <typename> class DO, typename SUBNET>
-    using gate = fc<num_experts, DO<leaky_relu<fc<num_experts * 8, SUBNET>>>>;
+    using gate = fc<num_experts, DO<leaky_relu<fc<num_experts * 8, avg_pool_everything<SUBNET>>>>>;
 
     struct training_mode_tag {};
     struct inference_mode_tag {};

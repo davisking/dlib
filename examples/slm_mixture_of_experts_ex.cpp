@@ -57,16 +57,16 @@ namespace dlib
         Architecture:
         1. Multi-head self-attention (from canonical_transformer)
         2. MoE feed-forward layer with multiple expert networks
-
+        f
         This replaces the standard transformer feed-forward layer with a
         mixture-of-experts that can specialize different experts for different
         types of patterns in the input.
     !*/
     template <template <typename> class ACT, template <typename> class DO,
-        long seq_len, long d_model, long num_heads, typename MODE, typename SUBNET>
+        long d_model, long num_heads, typename MODE, typename SUBNET>
     using trans_moe_block =
         moe_ffn<expert_net_type<DO, d_model>, 4, 0, MODE, DO,
-        add_prev1<multihead_attention<ACT, DO, seq_len, d_model, num_heads, rms_norm<tag1<SUBNET>>>>>;
+        add_prev1<multihead_attention<ACT, DO, d_model, num_heads, rms_norm<tag1<SUBNET>>>>>;
 
     /*!
         Classification head for next-token prediction.
@@ -80,7 +80,6 @@ namespace dlib
         long num_layers = 6,
         long num_heads = 8,
         long embedding_dim = 512,
-        long max_seq_len = 300,
         template <typename> class activation_func = gelu,
         template <typename> class dropout_policy = dropout_10
     >
@@ -89,7 +88,6 @@ namespace dlib
         static constexpr long NUM_LAYERS = num_layers;
         static constexpr long NUM_HEADS = num_heads;
         static constexpr long EMBEDDING_DIM = embedding_dim;
-        static constexpr long MAX_SEQ_LEN = max_seq_len;
 
         struct validation {
             static_assert(VOCAB_SIZE > 0, "Vocabulary size must be positive");
@@ -101,13 +99,13 @@ namespace dlib
         // Network component definitions for training (with dropout)
         template <typename SUBNET>
         using t_transformer_block =
-            trans_moe_block<activation_func, dropout_policy, MAX_SEQ_LEN, EMBEDDING_DIM, NUM_HEADS,
+            trans_moe_block<activation_func, dropout_policy, EMBEDDING_DIM, NUM_HEADS,
             training_mode_tag, SUBNET>;
 
         // Network component definitions for inference (using multiply)
         template <typename SUBNET>
         using i_transformer_block =
-            trans_moe_block<activation_func, multiply, MAX_SEQ_LEN, EMBEDDING_DIM, NUM_HEADS,
+            trans_moe_block<activation_func, multiply, EMBEDDING_DIM, NUM_HEADS,
             inference_mode_tag, SUBNET>;
 
         // Complete network type selector based on training/inference mode
@@ -128,7 +126,6 @@ namespace dlib
                     << "- Layers: " << NUM_LAYERS << "\n"
                     << "- Attention heads: " << NUM_HEADS << "\n"
                     << "- Embedding dimension: " << EMBEDDING_DIM << "\n"
-                    << "- Sequence length: " << MAX_SEQ_LEN << "\n"
                     << "- Architecture: Transformer with MoE feed-forward layers\n"
                     << "- Experts per layer: 4 (auto top-n selection)";
                 return ss.str();
@@ -602,8 +599,7 @@ int main(int argc, char** argv)
             num_tokens,     // vocab_size
             num_layers,     // number of layers
             num_heads,      // number of attention heads
-            embedding_dim,  // embedding dimension
-            max_seq_len     // maximum sequence length
+            embedding_dim   // embedding dimension
         > ;
 
         // Load internal dataset
@@ -938,19 +934,20 @@ int main(int argc, char** argv)
                 << tokenized_segments.size() << ") for generation\n";
             const auto& selected_segment = tokenized_segments[segment_idx];
 
+            long prompt_seq_len = max_seq_len;
             if (selected_segment.size() < (size_t)max_seq_len) {
-                cerr << "Error: Selected segment has only " << selected_segment.size()
+                cerr << "Warning: Selected segment has only " << selected_segment.size()
                     << " tokens, need at least " << max_seq_len << ".\n";
-                return 0;
+                prompt_seq_len = (selected_segment.size() * 2) / 3;
             }
 
-            // Extract prompt tokens (first max_seq_len tokens of the segment)
+            // Extract prompt tokens (first prompt_seq_len tokens of the segment)
             std::vector<int> prompt_tokens(selected_segment.begin(),
-                selected_segment.begin() + max_seq_len);
+                selected_segment.begin() + prompt_seq_len);
             cout << "Using " << prompt_tokens.size() << " tokens for initial prompt.\n";
 
             // Setup inference context
-            inference_context llm_context(max_seq_len, 4, tokenizer.get_special_token_id("<pad>"));
+            inference_context llm_context(max_seq_len*2, 4, tokenizer.get_special_token_id("<pad>"));
             llm_context.add_tokens(prompt_tokens);
             auto input_seq = llm_context.get_input_window();
 
@@ -969,7 +966,7 @@ int main(int argc, char** argv)
             cout << "Starting autoregressive generation...\n";
 
             // Generation parameters
-            const size_t tokens_to_generate = selected_segment.size() - max_seq_len;
+            const size_t tokens_to_generate = selected_segment.size() - prompt_seq_len;
             std::vector<int> generated_tokens;
             generated_tokens.reserve(tokens_to_generate);
 
@@ -1021,7 +1018,7 @@ int main(int argc, char** argv)
             cout << "\n=== Validation: comparing generated vs. original segment ===\n";
 
             // Extract reference tokens (the part we tried to regenerate)
-            std::vector<int> reference_tokens(selected_segment.begin() + max_seq_len,
+            std::vector<int> reference_tokens(selected_segment.begin() + prompt_seq_len,
                 selected_segment.end());
 
             // Limit comparison to the length of generated tokens

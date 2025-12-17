@@ -54,10 +54,10 @@ namespace dlib
 
     // Complete transformer block with MoE-based feed-forward layer
     template <template <typename> class ACT, template <typename> class DO,
-        long seq_len, long d_model, long num_heads, typename MODE, typename SUBNET>
+        long d_model, long num_heads, typename MODE, typename SUBNET>
     using trans_moe_block =
         moe_ffn<expert_net_type<DO, d_model>, 4, 0, MODE, DO,
-        add_prev1<multihead_attention<ACT, DO, seq_len, d_model, num_heads, rms_norm<tag1<SUBNET>>>>>;
+        add_prev1<multihead_attention<ACT, DO, d_model, num_heads, rms_norm<tag1<SUBNET>>>>>;
 
     // Classification head for next-token prediction in conversational context
     template <long num_logits, typename SUBNET>
@@ -66,7 +66,6 @@ namespace dlib
     // Chatbot model configuration
     template<
         long vocab_size = 2000,
-        long max_seq_len = 128,
         long num_layers = 3,
         long num_heads = 6,
         long embedding_dim = 192,
@@ -75,7 +74,6 @@ namespace dlib
     >
     struct chatbot_config {
         static constexpr long VOCAB_SIZE = vocab_size;
-        static constexpr long MAX_SEQ_LEN = max_seq_len;
         static constexpr long NUM_LAYERS = num_layers;
         static constexpr long NUM_HEADS = num_heads;
         static constexpr long EMBEDDING_DIM = embedding_dim;
@@ -90,13 +88,13 @@ namespace dlib
         // Network component definitions for training (with dropout)
         template <typename SUBNET>
         using t_transformer_block =
-            trans_moe_block<activation_func, dropout_policy, MAX_SEQ_LEN, EMBEDDING_DIM, NUM_HEADS,
+            trans_moe_block<activation_func, dropout_policy, EMBEDDING_DIM, NUM_HEADS,
             training_mode_tag, SUBNET>;
 
         // Network component definitions for inference (using multiply)
         template <typename SUBNET>
         using i_transformer_block =
-            trans_moe_block<activation_func, multiply, MAX_SEQ_LEN, EMBEDDING_DIM, NUM_HEADS,
+            trans_moe_block<activation_func, multiply, EMBEDDING_DIM, NUM_HEADS,
             inference_mode_tag, SUBNET>;
 
         // Complete network type selector based on training/inference mode
@@ -117,7 +115,6 @@ namespace dlib
                     << "- Layers: " << NUM_LAYERS << " transformer layers with MoE\n"
                     << "- Attention heads: " << NUM_HEADS << "\n"
                     << "- Embedding dimension: " << EMBEDDING_DIM << "\n"
-                    << "- Context window: " << MAX_SEQ_LEN << " tokens\n"
                     << "- Experts per layer: 4 (auto top-n selection)";
                 return ss.str();
             }
@@ -246,7 +243,7 @@ int main(int argc, char** argv)
         // Configuration parameters
         const long vocab_size = 3500;
         const long max_seq_len = 128;
-        using config = chatbot_config<vocab_size, max_seq_len>;
+        using config = chatbot_config<vocab_size>;
         using train_net = config::network_type<true>;
         using infer_net = config::network_type<false>;
         cout << config::model_info::describe() << "\n\n";

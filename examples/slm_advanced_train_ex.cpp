@@ -66,7 +66,6 @@ namespace dlib
      * @param num_layers Number of transformer layers
      * @param num_heads Number of attention heads
      * @param embedding_dim Dimension of token embeddings
-     * @param max_seq_len Maximum sequence length
      * @param activation_func Activation function type
      * @param dropout_policy Dropout regularization policy
      */
@@ -75,7 +74,6 @@ namespace dlib
         long num_layers = 6,
         long num_heads = 8,
         long embedding_dim = 512,
-        long max_seq_len = 300,
         template <typename> class activation_func = gelu,
         template <typename> class dropout_policy = dropout_10
     >
@@ -85,7 +83,6 @@ namespace dlib
         static constexpr long NUM_LAYERS = num_layers;
         static constexpr long NUM_HEADS = num_heads;
         static constexpr long EMBEDDING_DIM = embedding_dim;
-        static constexpr long MAX_SEQ_LEN = max_seq_len;
 
         // Compile-time validation of model configuration
         struct validation {
@@ -98,10 +95,10 @@ namespace dlib
         template<bool is_training>
         using network_type = std::conditional_t<is_training,
             classification_head<VOCAB_SIZE, EMBEDDING_DIM,
-            transformer_stack<NUM_LAYERS, activation_func, dropout_policy, MAX_SEQ_LEN, EMBEDDING_DIM, NUM_HEADS,
+            transformer_stack<NUM_LAYERS, activation_func, dropout_policy, EMBEDDING_DIM, NUM_HEADS,
             embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>,
             classification_head<VOCAB_SIZE, EMBEDDING_DIM,
-            transformer_stack<NUM_LAYERS, activation_func, multiply, MAX_SEQ_LEN, EMBEDDING_DIM, NUM_HEADS,
+            transformer_stack<NUM_LAYERS, activation_func, multiply, EMBEDDING_DIM, NUM_HEADS,
             embeddings<VOCAB_SIZE, EMBEDDING_DIM, input<matrix<int, 0, 1>>>>>>;
 
         struct model_info {
@@ -111,8 +108,7 @@ namespace dlib
                     << "- vocabulary size: " << VOCAB_SIZE << "\n"
                     << "- layers: " << NUM_LAYERS << "\n"
                     << "- attention heads: " << NUM_HEADS << "\n"
-                    << "- embedding dimension: " << EMBEDDING_DIM << "\n"
-                    << "- sequence length: " << MAX_SEQ_LEN;
+                    << "- embedding dimension: " << EMBEDDING_DIM;
                 return ss.str();
             }
         };
@@ -309,8 +305,7 @@ int main(int argc, char** argv)
             num_tokens,     // vocab_size
             num_layers,     // number of layers
             num_heads,      // number of attention heads
-            embedding_dim,  // embedding dimension
-            max_seq_len     // maximum sequence length
+            embedding_dim   // embedding dimension
         >;
 
         // Load internal dataset
