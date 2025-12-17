@@ -562,9 +562,9 @@ int main(int argc, char** argv)
         parser.add_option("batch-size", "Set the mini-batch size (default: 96)", 1);
         parser.add_option("patience", "Iterations without progress before early stopping (default: 25000)", 1);
         parser.add_option("max-epochs", "Maximum number of training epochs (default: 500)", 1);
-        parser.add_option("weight-decay", "Set the weight decay for Adam (default: 0.01)", 1);
-        parser.add_option("beta1", "Set Adam's beta1 coefficient (default: 0.9)", 1);
-        parser.add_option("beta2", "Set Adam's beta2 coefficient (default: 0.999)", 1);
+        parser.add_option("weight-decay", "Set the weight decay for AdamW (default: 0.01)", 1);
+        parser.add_option("beta1", "Set AdamW's beta1 coefficient (default: 0.9)", 1);
+        parser.add_option("beta2", "Set AdamW's beta2 coefficient (default: 0.999)", 1);
         parser.add_option("model-file", "Path for model (default: dlib_lm_moe_model.dat)", 1);
         parser.add_option("tokenizer-file", "Path for tokenizer (default: dlib_lm_tokenizer.vocab)", 1);
         parser.add_option("output-file", "Path for generated output (default: generated_text.txt)", 1);
@@ -803,7 +803,7 @@ int main(int argc, char** argv)
                 !file_exists("chkpt-" + model_file)) deserialize(model_file) >> net >> tokenizer;            
 
             // Create trainer
-            dnn_trainer<net_type, adam> trainer(net, adam(weight_decay, beta1, beta2), gpus);
+            dnn_trainer<net_type, adamw> trainer(net, adamw(weight_decay, beta1, beta2), gpus);
             trainer.set_learning_rate(learning_rate);
             trainer.set_min_learning_rate(5e-5);
             trainer.set_learning_rate_shrink_factor(0.1);
