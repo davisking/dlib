@@ -592,7 +592,7 @@ int main(int argc, char** argv)
         const long num_layers = 3;
         const long num_heads = 6;
         const long embedding_dim = 192;
-        const long max_seq_len = 128;
+        long max_seq_len = 128;
 
         // Define transformer configuration with MoE
         using my_transformer = transformer_config<
@@ -933,21 +933,20 @@ int main(int argc, char** argv)
             cout << "Randomly selected segment #" << segment_idx << " (out of "
                 << tokenized_segments.size() << ") for generation\n";
             const auto& selected_segment = tokenized_segments[segment_idx];
-
-            long prompt_seq_len = max_seq_len;
             if (selected_segment.size() < (size_t)max_seq_len) {
-                cerr << "Warning: Selected segment has only " << selected_segment.size()
+                cerr << "Error: Selected segment has only " << selected_segment.size()
                     << " tokens, need at least " << max_seq_len << ".\n";
-                prompt_seq_len = (selected_segment.size() * 2) / 3;
+                //return 1;
+                max_seq_len = (selected_segment.size() * 2) / 3;
             }
 
-            // Extract prompt tokens (first prompt_seq_len tokens of the segment)
+            // Extract prompt tokens (first max_seq_len tokens of the segment)
             std::vector<int> prompt_tokens(selected_segment.begin(),
-                selected_segment.begin() + prompt_seq_len);
+                selected_segment.begin() + max_seq_len);
             cout << "Using " << prompt_tokens.size() << " tokens for initial prompt.\n";
 
             // Setup inference context
-            inference_context llm_context(max_seq_len*2, 4, tokenizer.get_special_token_id("<pad>"));
+            inference_context llm_context(max_seq_len, 4, tokenizer.get_special_token_id("<pad>"));
             llm_context.add_tokens(prompt_tokens);
             auto input_seq = llm_context.get_input_window();
 
@@ -966,7 +965,7 @@ int main(int argc, char** argv)
             cout << "Starting autoregressive generation...\n";
 
             // Generation parameters
-            const size_t tokens_to_generate = selected_segment.size() - prompt_seq_len;
+            const size_t tokens_to_generate = selected_segment.size() - max_seq_len;
             std::vector<int> generated_tokens;
             generated_tokens.reserve(tokens_to_generate);
 
@@ -1018,7 +1017,7 @@ int main(int argc, char** argv)
             cout << "\n=== Validation: comparing generated vs. original segment ===\n";
 
             // Extract reference tokens (the part we tried to regenerate)
-            std::vector<int> reference_tokens(selected_segment.begin() + prompt_seq_len,
+            std::vector<int> reference_tokens(selected_segment.begin() + max_seq_len,
                 selected_segment.end());
 
             // Limit comparison to the length of generated tokens
@@ -1075,14 +1074,6 @@ int main(int argc, char** argv)
  * randomization and augment_training_dataset() for noise injection. These techniques
  * improve model robustness and generalization, enabling effective training on large
  * volumes of information.
- *
- * - Transformer model configuration:
- *    + vocabulary size: 3500
- *    + layers: 4
- *    + attention heads: 6
- *    + embedding dimension: 228
- *    + max sequence length: 100
- * - Number of parameters: 5,970,554 (training) - 5,432,738 (inference)
- *
- * After training, the model achieves excellent memorization of all internal datasets.
+ * After a complete training, the model achieves excellent memorization of all
+ * internal datasets.
  */

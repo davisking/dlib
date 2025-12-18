@@ -1017,19 +1017,10 @@ namespace dlib
         void setup(const SUBNET& sub)
         {
             const auto& input = sub.get_output();
-            input_k = input.k();
-            input_nr = input.nr();
-            input_nc = input.nc();
+            update_dimensions_from_input(input);
 
-            // Calculate output dimensions using input dims where target is -1
-            if (k_ == -1) output_k = input_k;
-            if (nr_ == -1) output_nr = input_nr;
-            if (nc_ == -1) output_nc = input_nc;
-
-            // Check if this is well a pure reshape
             long input_elements = input_k * input_nr * input_nc;
             long output_elements = output_k * output_nr * output_nc;
-            if (input_elements != output_elements && input_k == output_k) needs_rescale = true;
             DLIB_CASSERT(input_elements == output_elements || needs_rescale,
                 "Cannot reshape tensor of " << input_elements <<
                 " elements into shape with " << output_elements << " elements. " <<
@@ -1039,8 +1030,14 @@ namespace dlib
         template <typename SUBNET>
         void forward(const SUBNET& sub, resizable_tensor& output)
         {
-            // Set the output size (always preserving batch dimension)
             const tensor& input = sub.get_output();
+
+            // Check if dimensions changed (after deserialization or fine-tuning)
+            // This ensures dimensions are always synchronized with current input
+            if (input_k != input.k() || input_nr != input.nr() || input_nc != input.nc())
+                update_dimensions_from_input(input);
+
+            // Set the output size (always preserving batch dimension)
             output.set_size(input.num_samples(), output_k, output_nr, output_nc);
 
             if (!needs_rescale)
@@ -1142,7 +1139,25 @@ namespace dlib
                 << "/>\n";
         }
 
-    private:        
+    private:
+        void update_dimensions_from_input(const tensor& input)
+        {
+            // Update input dimensions
+            input_k = input.k();
+            input_nr = input.nr();
+            input_nc = input.nc();
+
+            // Recalculate output dimensions for dynamic axes (-1)
+            if (k_ == -1) output_k = input_k;
+            if (nr_ == -1) output_nr = input_nr;
+            if (nc_ == -1) output_nc = input_nc;
+
+            // Check if rescaling is needed
+            long input_elements = input_k * input_nr * input_nc;
+            long output_elements = output_k * output_nr * output_nc;
+            needs_rescale = (input_elements != output_elements && input_k == output_k);
+        }
+
         long input_k, input_nr, input_nc;       // Input dimensions        
 		long output_k, output_nr, output_nc;    // Output dimensions        
         bool needs_rescale;        
