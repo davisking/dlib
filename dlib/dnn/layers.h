@@ -6267,8 +6267,6 @@ namespace dlib
         friend void serialize(const rotary_positional_embedding_& item, std::ostream& out)
         {
             serialize("rope_", out);
-            serialize(item.seq_len, out);
-            serialize(item.d_head, out);
             serialize(item.theta_base, out);
             serialize(item.cos_cache, out);
             serialize(item.sin_cache, out);
@@ -6288,8 +6286,6 @@ namespace dlib
                 throw serialization_error("Unexpected version '" + version +
                     "' while deserializing rope_");
 
-            deserialize(item.seq_len, in);
-            deserialize(item.d_head, in);
             deserialize(item.theta_base, in);
             deserialize(item.cos_cache, in);
             deserialize(item.sin_cache, in);
@@ -6303,9 +6299,7 @@ namespace dlib
 
         friend std::ostream& operator<<(std::ostream& out, const rotary_positional_embedding_& item)
         {
-            out << "rope (seq_len=" << item.seq_len
-                << ", d_head=" << item.d_head
-                << ", theta_base=" << item.theta_base
+            out << "rope (theta_base=" << item.theta_base
                 << ", yarn.alpha=" << item.yarn.alpha
                 << ", yarn.beta=" << item.yarn.beta
                 << ", yarn.original_len=" << item.yarn.original_len
@@ -6317,8 +6311,6 @@ namespace dlib
         friend void to_xml(const rotary_positional_embedding_& item, std::ostream& out)
         {
             out << "<rope"
-                << " seq_len='" << item.seq_len << "'"
-                << " d_head='" << item.d_head << "'"
                 << " theta_base='" << item.theta_base << "'"
                 << " yarn_alpha='" << item.yarn.alpha << "'"
                 << " yarn_beta='" << item.yarn.beta << "'"
@@ -6335,6 +6327,8 @@ namespace dlib
         // This function uses YaRN scaling when yarn.enabled is true
         void compute_and_cache_trig_values(long target_seq_len)
         {
+            if (seq_len == 0 || d_head == 0) return;
+
             // Half the head dimension (we rotate pairs)
             const long half_dim = d_head / 2;
 

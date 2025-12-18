@@ -351,7 +351,7 @@ int main(int argc, char** argv)
             set_all_learning_rate_multipliers(net, 0.1);
             layer<1>(net).layer_details().set_learning_rate_multiplier(1.0);    // linear
             layer<2>(net).layer_details().set_learning_rate_multiplier(0.5);    // rms_norm
-            layer<108>(net).layer_details().set_learning_rate_multiplier(0.5);  // embeddings
+            layer<111>(net).layer_details().set_learning_rate_multiplier(0.5);  // embeddings
             cout << "Fine-tuning learning rate strategy applied.\n\n";
             cout << net << endl;
 

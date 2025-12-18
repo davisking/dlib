@@ -4838,7 +4838,20 @@ namespace dlib
                         [x'_i  ]   [cos(θ)  -sin(θ)] [x_i  ]
                         [x'_i+1] = [sin(θ)   cos(θ)] [x_i+1]
 
-                where θ(pos, i) = pos * base^(-2i/d_head) and base is typically 10000.
+                    where θ(pos, i) = pos * base^(-2i/d_head) and base is typically 10000.
+
+                DYNAMIC SEQUENCE LENGTH SUPPORT:
+                    This layer automatically adapts to different sequence lengths during
+                    inference. When a sequence of different length is processed, the rotation
+                    angles are recomputed on-the-fly. This allows models trained on shorter
+                    sequences to handle longer contexts at inference time.
+
+                YARN EXTENSION (OPTIONAL):
+                    Optionally supports YaRN (Yet another RoPE extensioN) scaling for
+                    improved extrapolation to longer sequences than seen during training.
+                    YaRN applies frequency-dependent scaling that preserves low-frequency
+                    information while adapting high-frequency components. Enable via
+                    set_yarn_params().
 
                 This layer has no trainable parameters. All rotation angles are precomputed
                 during setup based on the sequence length and head dimension.
@@ -4901,8 +4914,10 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - Returns the sequence length that this layer was configured for
-                - Returns 0 if setup() has not been called yet
+                - Returns the most recent sequence length processed by this layer
+                - Returns 0 if forward() has not been called yet
+                - Note: this value may change between forward() calls if sequences
+                  of different lengths are processed
         !*/
 
         long get_d_head(
@@ -4910,7 +4925,36 @@ namespace dlib
         /*!
             ensures
                 - Returns the head dimension that this layer was configured for
-                - Returns 0 if setup() has not been called yet
+                - Returns 0 if forward() has not been called yet
+                - This value remains constant once set (determined by network architecture)
+        !*/
+
+        void set_yarn_params(
+            float alpha,
+            float beta,
+            long original_len = 0,
+            bool enabled = true
+        );
+        /*!
+            requires
+                - alpha >= 0
+                - beta >= 0
+            ensures
+                - Configures YaRN (Yet another RoPE extensioN) scaling parameters
+                - alpha controls the overall intensity of scaling (typical: 1.0)
+                - beta controls the curvature of scaling across frequency dimensions (typical: 0.25 to 0.5)
+                - original_len is the sequence length used during training
+                  If 0, it will be set to the first sequence length observed in forward()
+                - enabled determines whether YaRN scaling is active
+                - YaRN allows better extrapolation to sequence lengths longer than training
+                - Should be called before forward() to take effect
+        !*/
+
+        const yarn_config& get_yarn_config(
+        ) const;
+        /*!
+            ensures
+                - Returns the current YaRN configuration
         !*/
 
         template <typename SUBNET>
@@ -4930,6 +4974,8 @@ namespace dlib
                 - The cos_cache and sin_cache tensors are allocated with shape:
                   (1, 1, seq_len, d_head/2)
                 - If d_head is odd, only (d_head-1) dimensions will be rotated
+                - If YaRN is enabled and original_len is 0, the observed sequence
+                  length is recorded as the training length for YaRN scaling
         !*/
 
         template <typename SUBNET>
@@ -4939,12 +4985,14 @@ namespace dlib
         );
         /*!
             requires
-                - setup(sub) has been called
-                - sub.get_output().nr() == get_seq_len()
-                - sub.get_output().nc() == get_d_head()
+                - sub.get_output().nc() >= 2
+                - sub.get_output().nr() > 0
             ensures
                 - Applies rotary positional embeddings to the input
                 - #output has the same dimensions as sub.get_output()
+                - If the input sequence length differs from get_seq_len(), or if
+                  this is the first forward pass after deserialization, the rotation
+                  angles are automatically recomputed for the current sequence length.
                 - For each position pos and dimension pair (i, i+1):
                     output[pos,i]   = input[pos,i] * cos(θ_pos,i/2) - input[pos,i+1] * sin(θ_pos,i/2)
                     output[pos,i+1] = input[pos,i] * sin(θ_pos,i/2) + input[pos,i+1] * cos(θ_pos,i/2)
@@ -4952,6 +5000,7 @@ namespace dlib
                   relative positional information
                 - If d_head is odd, the last dimension is copied without rotation
                 - Expected input shape: (batch_size, num_heads, seq_len, d_head)
+                - YaRN scaling is applied if enabled via set_yarn_params()
         !*/
 
         template <typename SUBNET>
