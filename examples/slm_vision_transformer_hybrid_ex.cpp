@@ -79,7 +79,7 @@ namespace dlib
         This demonstrates a modern, clean ViT implementation using:
         - patch_embeddings: splits image into patches + learned projection
         - canonical_transformer: Dlib's transformer with RoPE positioning
-        - Standard Dlib layers: fc, dropout, avg_pool_everything, ...
+        - Standard Dlib layers: fc, dropout, ...
         
         Architecture summary:
         Input (32x32 RGB) => Patches (4x4) => Embeddings (192-dim)
@@ -100,21 +100,21 @@ namespace dlib
         static constexpr long EMBEDDING_DIM = embedding_dim;
         static constexpr long PATCH_SIZE = 4;     // 32/4 = 8x8 = 64 patches
         static constexpr long NUM_PATCHES = 64;   // (32/4)^2
+        static constexpr long DONT_USE_ClASS_TOKEN = 0;
+        static constexpr long DONT_USE_POSITION_EMBEDDINGS = 0;
 
         // Backbone: patch embeddings => transformer => pooling
         // Returns: (batch, embedding_dim) feature vectors
         template <template <typename> class DO, typename INPUT>
-        using backbone_training = 
-            avg_pool_everything<
+        using backbone_training = rms_norm<
             canonical_transformer::transformer_stack<NUM_LAYERS, gelu, DO, EMBEDDING_DIM, NUM_HEADS,
-            patch_embeddings<PATCH_SIZE, EMBEDDING_DIM, 1, 0,  // cls=1, no pos_emb (use RoPE)
+            patch_embeddings<PATCH_SIZE, EMBEDDING_DIM, DONT_USE_ClASS_TOKEN, DONT_USE_POSITION_EMBEDDINGS,
             INPUT>>>;
 
         template <typename INPUT>
-        using backbone_inference = 
-            avg_pool_everything<
+        using backbone_inference = rms_norm<
             canonical_transformer::transformer_stack<NUM_LAYERS, gelu, multiply, EMBEDDING_DIM, NUM_HEADS,
-            patch_embeddings<PATCH_SIZE, EMBEDDING_DIM, 1, 0,
+            patch_embeddings<PATCH_SIZE, EMBEDDING_DIM, DONT_USE_ClASS_TOKEN, DONT_USE_POSITION_EMBEDDINGS,
             INPUT>>>;
 
         static std::string describe() {
@@ -244,7 +244,7 @@ void train_ssl(
     cout << "Training without labels - Learning representations from augmentations\n" << endl;
 
     model::ssl_train net((loss_barlow_twins_(lambda)));
-    dnn_trainer<model::ssl_train, adamw> trainer(net, adamw(0.04, 0.9, 0.999));
+    dnn_trainer<model::ssl_train, adamw> trainer(net, adamw(0.01, 0.9, 0.999));
     trainer.set_learning_rate(learning_rate);
     trainer.set_min_learning_rate(min_learning_rate);
     trainer.set_mini_batch_size(batch_size);
@@ -305,7 +305,7 @@ void train_supervised(
 
     model::supervised_train net;
     model::supervised_inference inference_net;
-    dnn_trainer<model::supervised_train, adamw> trainer(net, adamw(0.04, 0.9, 0.999));
+    dnn_trainer<model::supervised_train, adamw> trainer(net, adamw(0.01, 0.9, 0.999));
     trainer.set_learning_rate(learning_rate);
     trainer.set_min_learning_rate(min_learning_rate);
     trainer.set_mini_batch_size(batch_size);
