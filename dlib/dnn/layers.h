@@ -6420,6 +6420,510 @@ namespace dlib
     using rope = add_layer<rotary_positional_embedding_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
+    
+    template <
+        long patch_size_,
+        long embedding_dim_,
+        long use_class_token_,
+        long use_position_embeddings_
+    >
+    class patch_embeddings_
+    {
+        static_assert(patch_size_ > 0, "Patch size must be positive");
+        static_assert(embedding_dim_ > 0, "Embedding dimension must be positive");
+        static_assert(use_class_token_ == 0 || use_class_token_ == 1,
+            "use_class_token must be 0 or 1");
+        static_assert(use_position_embeddings_ == 0 || use_position_embeddings_ == 1,
+            "use_position_embeddings must be 0 or 1");
+
+    public:
+
+        patch_embeddings_() :
+            in_channels(0),
+            num_patches_h(0),
+            num_patches_w(0),
+            cached_input_h(0),
+            cached_input_w(0),
+            cached_input_k(0),
+            learning_rate_multiplier(1.0)
+        {
+        }
+
+        patch_embeddings_(const patch_embeddings_& other) :
+            in_channels(other.in_channels),
+            num_patches_h(other.num_patches_h),
+            num_patches_w(other.num_patches_w),
+            cached_input_h(other.cached_input_h),
+            cached_input_w(other.cached_input_w),
+            cached_input_k(other.cached_input_k),
+            learning_rate_multiplier(other.learning_rate_multiplier),
+            params(other.params),
+            filters_alias(other.filters_alias),
+            biases_alias(other.biases_alias),
+            pos_embed_alias(other.pos_embed_alias),
+            cls_token_alias(other.cls_token_alias)
+        {
+        }
+
+        patch_embeddings_& operator=(const patch_embeddings_& other)
+        {
+            if (this != &other) {
+                in_channels = other.in_channels;
+                num_patches_h = other.num_patches_h;
+                num_patches_w = other.num_patches_w;
+                cached_input_h = other.cached_input_h;
+                cached_input_w = other.cached_input_w;
+                cached_input_k = other.cached_input_k;
+                learning_rate_multiplier = other.learning_rate_multiplier;
+                params = other.params;
+                filters_alias = other.filters_alias;
+                biases_alias = other.biases_alias;
+                pos_embed_alias = other.pos_embed_alias;
+                cls_token_alias = other.cls_token_alias;
+                // Note: conv_op is non-copyable and stateless, will be re-setup on forward()
+            }
+            return *this;
+        }
+
+        long get_patch_size() const { return patch_size_; }
+        long get_embedding_dim() const { return embedding_dim_; }
+        long uses_class_token() const { return use_class_token_; }
+        long uses_position_embeddings() const { return use_position_embeddings_; }
+        long get_num_patches() const { return num_patches_h * num_patches_w; }
+
+        double get_learning_rate_multiplier() const { return learning_rate_multiplier; }
+        void set_learning_rate_multiplier(double val) { learning_rate_multiplier = val; }
+
+        template <typename SUBNET>
+        void setup(const SUBNET& sub)
+        {
+            const tensor& input = sub.get_output();
+            in_channels = input.k();
+
+            DLIB_CASSERT(input.nr() % patch_size_ == 0,
+                "Image height must be divisible by patch size. Got height=" << input.nr()
+                << ", patch_size=" << patch_size_);
+            DLIB_CASSERT(input.nc() % patch_size_ == 0,
+                "Image width must be divisible by patch size. Got width=" << input.nc()
+                << ", patch_size=" << patch_size_);
+
+            num_patches_h = input.nr() / patch_size_;
+            num_patches_w = input.nc() / patch_size_;
+            const long num_patches = num_patches_h * num_patches_w;
+            const long sequence_length = num_patches + use_class_token_;
+
+            // Calculate total parameter size:
+            // - projection_filters: embedding_dim * in_channels * patch_size * patch_size
+            // - projection_biases: embedding_dim
+            // - position_embeddings (optional): sequence_length * embedding_dim
+            // - class_token (optional): embedding_dim
+            const long filter_size = embedding_dim_ * in_channels * patch_size_ * patch_size_;
+            const long bias_size = embedding_dim_;
+            const long pos_embed_size = use_position_embeddings_ ? sequence_length * embedding_dim_ : 0;
+            const long cls_token_size = use_class_token_ ? embedding_dim_ : 0;
+            const long total_params = filter_size + bias_size + pos_embed_size + cls_token_size;
+
+            // Allocate all parameters in a single contiguous tensor
+            params.set_size(total_params);
+
+            // Setup alias tensors for accessing parameter regions
+            filters_alias = alias_tensor(embedding_dim_, in_channels, patch_size_, patch_size_);
+            biases_alias = alias_tensor(1, embedding_dim_, 1, 1);
+
+            if (use_position_embeddings_) {
+                pos_embed_alias = alias_tensor(1, 1, sequence_length, embedding_dim_);
+            }
+            if (use_class_token_) {
+                cls_token_alias = alias_tensor(1, 1, 1, embedding_dim_);
+            }
+
+            // Initialize parameters with Xavier/Glorot for filters
+            tt::tensor_rand rnd;
+            const float fan_in = static_cast<float>(in_channels * patch_size_ * patch_size_);
+            const float fan_out = static_cast<float>(embedding_dim_);
+            const float xavier_stddev = std::sqrt(2.0f / (fan_in + fan_out));
+
+            // Initialize filter weights
+            auto filt = filters_alias(params, 0);
+            rnd.fill_gaussian(filt, 0.0f, xavier_stddev);
+
+            // Initialize biases to zero
+            auto bias = biases_alias(params, filters_alias.size());
+            bias = 0;
+
+            // Initialize position embeddings if enabled
+            if (use_position_embeddings_) {
+                auto pos = pos_embed_alias(params, filters_alias.size() + biases_alias.size());
+                rnd.fill_gaussian(pos, 0.0f, 0.02f);
+            }
+
+            // Initialize class token if enabled
+            if (use_class_token_) {
+                long cls_offset = filters_alias.size() + biases_alias.size();
+                if (use_position_embeddings_) cls_offset += pos_embed_alias.size();
+                auto cls = cls_token_alias(params, cls_offset);
+                rnd.fill_gaussian(cls, 0.0f, 0.02f);
+            }
+
+            // Cache input dimensions and setup convolution
+            cached_input_h = input.nr();
+            cached_input_w = input.nc();
+            cached_input_k = input.k();
+            conv_op.setup(input, filt, patch_size_, patch_size_, 0, 0);
+        }
+
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            const tensor& input = sub.get_output();
+            const long batch_size = input.num_samples();
+
+            // Re-setup convolution if input spatial dimensions changed
+            if (input.nr() != cached_input_h ||
+                input.nc() != cached_input_w ||
+                input.k() != cached_input_k ||
+                params.size() == 0)
+            {
+                DLIB_CASSERT(input.nr() % patch_size_ == 0,
+                    "Image height must be divisible by patch size. Got height=" << input.nr()
+                    << ", patch_size=" << patch_size_);
+                DLIB_CASSERT(input.nc() % patch_size_ == 0,
+                    "Image width must be divisible by patch size. Got width=" << input.nc()
+                    << ", patch_size=" << patch_size_);
+
+                cached_input_h = input.nr();
+                cached_input_w = input.nc();
+                cached_input_k = input.k();
+                num_patches_h = input.nr() / patch_size_;
+                num_patches_w = input.nc() / patch_size_;
+            }
+
+            const long num_patches = num_patches_h * num_patches_w;
+            const long sequence_length = num_patches + use_class_token_;
+
+            // Get parameter aliases
+            auto filt = filters_alias(params, 0);
+            auto bias = biases_alias(params, filters_alias.size());
+            conv_op.setup(input, filt, patch_size_, patch_size_, 0, 0);
+
+            // Step 1: apply convolution (patch extraction + projection)
+            conv_output.set_size(batch_size, embedding_dim_, num_patches_h, num_patches_w);
+            conv_op(false, conv_output, input, filt);
+
+            // Add bias using broadcasting
+            tt::add(1.0f, conv_output, 1.0f, bias);
+
+            // Step 2: reshape from (batch, embed, H/P, W/P) to (batch, 1, num_patches, embed)
+            patch_sequence.set_size(batch_size, 1, num_patches, embedding_dim_);
+            reshape_conv_to_sequence(conv_output, patch_sequence);
+
+            // Step 3: prepend class token if enabled
+            if (use_class_token_) {
+                long cls_offset = filters_alias.size() + biases_alias.size();
+                if (use_position_embeddings_) cls_offset += pos_embed_alias.size();
+                auto cls = cls_token_alias(params, cls_offset);
+
+                output.set_size(batch_size, 1, sequence_length, embedding_dim_);
+                prepend_class_token(patch_sequence, cls, output);
+            }
+            else {
+                output.copy_size(patch_sequence);
+                tt::copy_tensor(false, output, 0, patch_sequence, 0, patch_sequence.k());
+            }
+
+            // Step 4: add position embeddings if enabled
+            if (use_position_embeddings_) {
+                auto pos = pos_embed_alias(params, filters_alias.size() + biases_alias.size());
+                tt::add(1.0f, output, 1.0f, pos);
+            }
+        }
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
+        {
+            const long batch_size = gradient_input.num_samples();
+            const long sequence_length = gradient_input.nr();
+            const long num_patches = num_patches_h * num_patches_w;
+
+            // Get parameter aliases from params
+            auto filt = filters_alias(params, 0);
+
+            // Get gradient aliases from params_grad
+            auto filt_grad = filters_alias(params_grad, 0);
+            auto bias_grad = biases_alias(params_grad, filters_alias.size());
+
+            // Step 1: gradient for position embeddings (if enabled)
+            if (use_position_embeddings_) {
+                auto pos_grad = pos_embed_alias(params_grad, filters_alias.size() + biases_alias.size());
+                // Zero out and accumulate across batch
+                pos_grad = 0;
+                sum_across_batch_to_alias(gradient_input, pos_grad);
+                tt::affine_transform(pos_grad, pos_grad, static_cast<float>(learning_rate_multiplier));
+            }
+
+            // Step 2: split gradient between class token and patches
+            grad_patch_sequence.set_size(batch_size, 1, num_patches, embedding_dim_);
+
+            if (use_class_token_) {
+                long cls_offset = filters_alias.size() + biases_alias.size();
+                if (use_position_embeddings_) cls_offset += pos_embed_alias.size();
+                auto cls_grad = cls_token_alias(params_grad, cls_offset);
+
+                cls_grad = 0;
+                split_class_token_gradient_to_alias(gradient_input, cls_grad, grad_patch_sequence);
+                tt::affine_transform(cls_grad, cls_grad, static_cast<float>(learning_rate_multiplier));
+            }
+            else {
+                tt::copy_tensor(false, grad_patch_sequence, 0, gradient_input, 0, gradient_input.k());
+            }
+
+            // Step 3: reshape gradient from sequence back to spatial format
+            grad_conv_output.set_size(batch_size, embedding_dim_, num_patches_h, num_patches_w);
+            reshape_sequence_to_conv(grad_patch_sequence, grad_conv_output);
+
+            // Step 4: gradient for projection bias
+            bias_grad = 0;
+            tt::assign_conv_bias_gradient(bias_grad, grad_conv_output);
+            tt::affine_transform(bias_grad, bias_grad, static_cast<float>(learning_rate_multiplier));
+
+            // Step 5: gradient for convolution filters
+            const tensor& input = sub.get_output();
+            filt_grad = 0;
+            conv_op.get_gradient_for_filters(false, grad_conv_output, input, filt_grad);
+            tt::affine_transform(filt_grad, filt_grad, static_cast<float>(learning_rate_multiplier));
+
+            // Step 6: gradient for input (accumulate)
+            tensor& grad_input = sub.get_gradient_input();
+            conv_op.get_gradient_for_data(true, grad_conv_output, filt, grad_input);
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const patch_embeddings_& item, std::ostream& out)
+        {
+            serialize("patch_embeddings_", out);
+            serialize(item.in_channels, out);
+            serialize(item.num_patches_h, out);
+            serialize(item.num_patches_w, out);
+            serialize(item.cached_input_h, out);
+            serialize(item.cached_input_w, out);
+            serialize(item.cached_input_k, out);
+            serialize(item.learning_rate_multiplier, out);
+            serialize(item.params, out);
+            serialize(item.filters_alias, out);
+            serialize(item.biases_alias, out);
+            if (use_position_embeddings_)
+                serialize(item.pos_embed_alias, out);
+            if (use_class_token_)
+                serialize(item.cls_token_alias, out);
+        }
+
+        friend void deserialize(patch_embeddings_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "patch_embeddings_")
+                throw serialization_error("Unexpected version '" + version +
+                    "' found while deserializing patch_embeddings_.");
+
+            deserialize(item.in_channels, in);
+            deserialize(item.num_patches_h, in);
+            deserialize(item.num_patches_w, in);
+            deserialize(item.cached_input_h, in);
+            deserialize(item.cached_input_w, in);
+            deserialize(item.cached_input_k, in);
+            deserialize(item.learning_rate_multiplier, in);
+            deserialize(item.params, in);
+            deserialize(item.filters_alias, in);
+            deserialize(item.biases_alias, in);
+            if (use_position_embeddings_)
+                deserialize(item.pos_embed_alias, in);
+            if (use_class_token_)
+                deserialize(item.cls_token_alias, in);            
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const patch_embeddings_& item)
+        {
+            out << "patch_embeddings (patch_size=" << patch_size_
+                << ", embedding_dim=" << embedding_dim_
+                << ", num_patches=" << item.get_num_patches()
+                << ", use_class_token=" << use_class_token_
+                << ", use_position_embeddings=" << use_position_embeddings_
+                << ") learning_rate_mult=" << item.learning_rate_multiplier;
+            return out;
+        }
+
+        friend void to_xml(const patch_embeddings_& item, std::ostream& out)
+        {
+            out << "<patch_embeddings"
+                << " patch_size='" << patch_size_ << "'"
+                << " embedding_dim='" << embedding_dim_ << "'"
+                << " num_patches='" << item.get_num_patches() << "'"
+                << " use_class_token='" << use_class_token_ << "'"
+                << " use_position_embeddings='" << use_position_embeddings_ << "'"
+                << " learning_rate_mult='" << item.learning_rate_multiplier << "'"
+                << "/>\n";
+        }
+
+    private:
+
+        // Reshape conv output (batch, embed, H/P, W/P) to sequence (batch, 1, num_patches, embed)
+        void reshape_conv_to_sequence(const tensor& src, tensor& dest)
+        {
+            const long batch_size = src.num_samples();
+            const long embed_dim = src.k();
+            const long h = src.nr();
+            const long w = src.nc();
+            const long num_patches = h * w;
+
+            const float* src_ptr = src.host();
+            float* dest_ptr = dest.host_write_only();
+
+            // src[n, d, i, j] -> dest[n, 0, i*w + j, d]
+            for (long n = 0; n < batch_size; ++n) {
+                for (long i = 0; i < h; ++i) {
+                    for (long j = 0; j < w; ++j) {
+                        const long patch_idx = i * w + j;
+                        for (long d = 0; d < embed_dim; ++d) {
+                            const long src_idx = ((n * embed_dim + d) * h + i) * w + j;
+                            const long dest_idx = (n * num_patches + patch_idx) * embed_dim + d;
+                            dest_ptr[dest_idx] = src_ptr[src_idx];
+                        }
+                    }
+                }
+            }
+        }
+
+        // Reshape sequence (batch, 1, num_patches, embed) to conv format (batch, embed, H/P, W/P)
+        void reshape_sequence_to_conv(const tensor& src, tensor& dest)
+        {
+            const long batch_size = src.num_samples();
+            const long num_patches = src.nr();
+            const long embed_dim = src.nc();
+            const long h = dest.nr();
+            const long w = dest.nc();
+
+            const float* src_ptr = src.host();
+            float* dest_ptr = dest.host_write_only();
+
+            // src[n, 0, i*w + j, d] -> dest[n, d, i, j]
+            for (long n = 0; n < batch_size; ++n) {
+                for (long i = 0; i < h; ++i) {
+                    for (long j = 0; j < w; ++j) {
+                        const long patch_idx = i * w + j;
+                        for (long d = 0; d < embed_dim; ++d) {
+                            const long src_idx = (n * num_patches + patch_idx) * embed_dim + d;
+                            const long dest_idx = ((n * embed_dim + d) * h + i) * w + j;
+                            dest_ptr[dest_idx] = src_ptr[src_idx];
+                        }
+                    }
+                }
+            }
+        }
+
+        // Prepend class token to patch sequence
+        void prepend_class_token(const tensor& patches, const tensor& cls_token, tensor& output)
+        {
+            const long batch_size = patches.num_samples();
+            const long num_patches = patches.nr();
+            const long embed_dim = patches.nc();
+            const long seq_len = num_patches + 1;
+
+            const float* patches_ptr = patches.host();
+            const float* cls_ptr = cls_token.host();
+            float* out_ptr = output.host_write_only();
+
+            for (long n = 0; n < batch_size; ++n) {
+                // Copy class token to position 0
+                for (long d = 0; d < embed_dim; ++d) {
+                    out_ptr[n * seq_len * embed_dim + d] = cls_ptr[d];
+                }
+                // Copy patch embeddings to positions 1..seq_len-1
+                for (long s = 0; s < num_patches; ++s) {
+                    for (long d = 0; d < embed_dim; ++d) {
+                        out_ptr[(n * seq_len + s + 1) * embed_dim + d] =
+                            patches_ptr[(n * num_patches + s) * embed_dim + d];
+                    }
+                }
+            }
+        }
+
+        // Split gradient between class token and patches (writes to alias)
+        void split_class_token_gradient_to_alias(const tensor& grad_in, tensor& grad_cls, tensor& grad_patches)
+        {
+            const long batch_size = grad_in.num_samples();
+            const long seq_len = grad_in.nr();
+            const long embed_dim = grad_in.nc();
+            const long num_patches = seq_len - 1;
+
+            const float* grad_in_ptr = grad_in.host();
+            float* grad_cls_ptr = grad_cls.host();
+            float* grad_patches_ptr = grad_patches.host_write_only();
+
+            for (long n = 0; n < batch_size; ++n) {
+                // Accumulate gradient for class token across batch
+                for (long d = 0; d < embed_dim; ++d) {
+                    grad_cls_ptr[d] += grad_in_ptr[n * seq_len * embed_dim + d];
+                }
+                // Copy gradient for patches
+                for (long s = 0; s < num_patches; ++s) {
+                    for (long d = 0; d < embed_dim; ++d) {
+                        grad_patches_ptr[(n * num_patches + s) * embed_dim + d] =
+                            grad_in_ptr[(n * seq_len + s + 1) * embed_dim + d];
+                    }
+                }
+            }
+        }
+
+        // Sum tensor across batch dimension (writes to alias)
+        void sum_across_batch_to_alias(const tensor& src, tensor& dest)
+        {
+            const long batch_size = src.num_samples();
+            const long seq_len = src.nr();
+            const long embed_dim = src.nc();
+
+            const float* src_ptr = src.host();
+            float* dest_ptr = dest.host();
+
+            for (long n = 0; n < batch_size; ++n) {
+                for (long s = 0; s < seq_len; ++s) {
+                    for (long d = 0; d < embed_dim; ++d) {
+                        dest_ptr[s * embed_dim + d] += src_ptr[(n * seq_len + s) * embed_dim + d];
+                    }
+                }
+            }
+        }
+
+        // Configuration
+        long in_channels;
+        long num_patches_h, num_patches_w;
+        long cached_input_h, cached_input_w, cached_input_k;
+        double learning_rate_multiplier;
+
+        // All learnable parameters stored in a single tensor
+        resizable_tensor params;
+
+        // Alias tensors for accessing parameter regions
+        alias_tensor filters_alias;     // (embedding_dim, in_channels, patch_size, patch_size)
+        alias_tensor biases_alias;      // (1, embedding_dim, 1, 1)
+        alias_tensor pos_embed_alias;   // (1, 1, sequence_length, embedding_dim) if enabled
+        alias_tensor cls_token_alias;   // (1, 1, 1, embedding_dim) if enabled
+
+        // Intermediate tensors for forward/backward
+        resizable_tensor conv_output;
+        resizable_tensor patch_sequence;
+        resizable_tensor grad_conv_output;
+        resizable_tensor grad_patch_sequence;
+
+        // Convolution operation
+        tt::tensor_conv conv_op;
+    };
+
+    template <long patch_size, long embedding_dim, long use_cls, long use_pos, typename SUBNET>
+    using patch_embeddings = add_layer<patch_embeddings_<patch_size, embedding_dim, use_cls, use_pos>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
 
 }
 

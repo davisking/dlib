@@ -5043,6 +5043,120 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        long patch_size,
+        long embedding_dim,
+        long use_class_token,
+        long use_position_embeddings
+    >
+    class patch_embeddings_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This layer implements patch embeddings for Vision Transformers (ViT), as described
+                in "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale"
+                (Dosovitskiy et al., 2021).
+
+                The layer performs the following operations:
+                1. Convolves the input image with filters of size (patch_size x patch_size)
+                   and stride (patch_size) to create a set of projected patches
+                2. Reshapes the resulting spatial feature maps into a sequence of vectors
+                3. If use_class_token == 1, prepends a learnable 'class token' to the sequence
+                4. If use_position_embeddings == 1, adds learnable position embeddings to
+                   the entire sequence
+
+                The input to this layer is a 4D tensor of shape:
+                    (batch_size, in_channels, height, width)
+
+                The output is a 4D tensor representing a sequence:
+                    (batch_size, 1, sequence_length, embedding_dim)
+                where sequence_length is (height/patch_size * width/patch_size) + use_class_token
+
+            TEMPLATE PARAMETERS
+                - patch_size: the side length of the square patches (e.g., 16)
+                - embedding_dim: the dimensionality of the resulting embeddings (e.g., 768)
+                - use_class_token: set to 1 to prepend a learnable CLS token, 0 otherwise
+                - use_position_embeddings: set to 1 to add learnable absolute position
+                  embeddings to the sequence, 0 otherwise
+        !*/
+
+    public:
+
+        patch_embeddings_(
+        );
+        /*!
+            ensures
+                - #get_patch_size() == patch_size
+                - #get_embedding_dim() == embedding_dim
+                - #uses_class_token() == use_class_token
+                - #uses_position_embeddings() == use_position_embeddings
+                - #get_learning_rate_multiplier() == 1
+        !*/
+
+        long get_patch_size() const;
+        long get_embedding_dim() const;
+        long uses_class_token() const;
+        long uses_position_embeddings() const;
+
+        double get_learning_rate_multiplier() const;
+        void set_learning_rate_multiplier(double val);
+        /*!
+            ensures
+                - #get_learning_rate_multiplier() == val
+        !*/
+
+        template <typename SUBNET>
+        void setup(
+            const SUBNET& sub
+        );
+        /*!
+            requires
+                - sub.get_output().nr() % patch_size == 0
+                - sub.get_output().nc() % patch_size == 0
+            ensures
+                - Initialized the learned parameters:
+                    - projection filters: (embedding_dim, in_channels, patch_size, patch_size)
+                    - projection biases: (embedding_dim)
+                    - (optional) class token and position embeddings.
+                - Parameters are initialized using Xavier/Glorot initialization for filters
+                  and zero/truncated normal for other components.
+        !*/
+
+        template <typename SUBNET>
+        void forward(
+            const SUBNET& sub,
+            resizable_tensor& output
+        );
+        /*!
+            requires
+                - setup(sub) has been called.
+            ensures
+                - #output.num_samples() == sub.get_output().num_samples()
+                - #output.k() == 1
+                - #output.nr() == (sub.get_output().nr()/patch_size * sub.get_output().nc()/patch_size) + use_class_token
+                - #output.nc() == embedding_dim
+        !*/
+
+        template <typename SUBNET>
+        void backward(
+            const tensor& gradient_input,
+            SUBNET& sub,
+            tensor& params_grad
+        );
+        /*!
+            requires
+                - gradient_input has the same dimensions as the output of forward()
+            ensures
+                - Computes the gradient of the loss with respect to the input of this
+                  layer and adds it to #sub.get_gradient_input()
+        !*/
+    };
+
+    template <long patch_size, long embedding_dim, long use_cls, long use_pos, typename SUBNET>
+    using patch_embeddings = add_layer<patch_embeddings_<patch_size, embedding_dim, use_cls, use_pos>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_LAYERS_ABSTRACT_H_

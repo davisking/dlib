@@ -592,7 +592,7 @@ int main(int argc, char** argv)
         const long num_layers = 3;
         const long num_heads = 6;
         const long embedding_dim = 192;
-        long max_seq_len = 128;
+        const long max_seq_len = 128;
 
         // Define transformer configuration with MoE
         using my_transformer = transformer_config<
@@ -936,8 +936,7 @@ int main(int argc, char** argv)
             if (selected_segment.size() < (size_t)max_seq_len) {
                 cerr << "Error: Selected segment has only " << selected_segment.size()
                     << " tokens, need at least " << max_seq_len << ".\n";
-                //return 1;
-                max_seq_len = (selected_segment.size() * 2) / 3;
+                return 1;
             }
 
             // Extract prompt tokens (first max_seq_len tokens of the segment)
