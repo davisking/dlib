@@ -5614,7 +5614,7 @@ namespace dlib
     class tril_
     {
     public:
-        tril_(): diag(diag_), diag_value(compute_diag_value()) {}
+        tril_(): diag(diag_), prefix_size(0), diag_value(compute_diag_value()) {}
         
         template <typename SUBNET>
         void setup(const SUBNET& /*sub*/)
@@ -5643,6 +5643,17 @@ namespace dlib
 
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
+
+        void set_prefix_size(long n_prefix_size)
+        {
+            if (prefix_size != n_prefix_size) {
+                prefix_size = n_prefix_size;
+                binary_mask.set_size(0, 0, 0, 0);
+                output_mask.set_size(0, 0, 0, 0);
+            }
+
+        }
+        long get_prefix_size() const { return prefix_size; }
         
         friend void serialize(const tril_& item, std::ostream& out)
         {
@@ -5695,7 +5706,7 @@ namespace dlib
                     {
                         for (long r = 0; r < output_mask.nr(); ++r)
                         {
-                            for (long c = std::max(r + diag + 1, 0L); c < output_mask.nc(); ++c)
+                            for (long c = std::max(r + diag + 1, prefix_size); c < output_mask.nc(); ++c)
                             {
                                 if (diag_value != 0.0f) output_mask.host()[tensor_index(output_mask, s, k, r, c)] = diag_value;
                                 binary_mask.host()[tensor_index(binary_mask, s, k, r, c)] = 0;
@@ -5712,6 +5723,7 @@ namespace dlib
         resizable_tensor params; // unused
         resizable_tensor binary_mask, output_mask;
         long diag;
+        long prefix_size;
         float diag_value;
     };
 
