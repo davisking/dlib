@@ -5696,7 +5696,9 @@ namespace dlib
             if (!have_same_dimensions(binary_mask, t)) {
                 binary_mask.copy_size(t);
                 binary_mask = 1;
-                if (diag_value != 0.0f) {
+
+                const bool use_output_mask = (diag_value != 0.0f);
+                if (use_output_mask) {
                     output_mask.copy_size(t);
                     output_mask = 0;
                 }                                
@@ -5708,7 +5710,7 @@ namespace dlib
                         {
                             for (long c = std::max(r + diag + 1, prefix_size); c < output_mask.nc(); ++c)
                             {
-                                if (diag_value != 0.0f) output_mask.host()[tensor_index(output_mask, s, k, r, c)] = diag_value;
+                                if (use_output_mask) output_mask.host()[tensor_index(output_mask, s, k, r, c)] = diag_value;
                                 binary_mask.host()[tensor_index(binary_mask, s, k, r, c)] = 0;
                             }
                         }
