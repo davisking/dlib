@@ -2768,12 +2768,23 @@ namespace dlib
     // ----------------------------------------------------------------------------------------
 
         // CUDA Kernels for ACT operations
-        __global__ void _cuda_compute_act_halt_probabilities(
-            float* halt_probs,
+
+        // Kernel 1: initialize logits with bias
+        __global__ void _cuda_act_init_logits(
+            float* logits,
+            float b_halt,
+            size_t total_positions
+        )
+        {
+            for (auto pos : grid_stride_range(0, total_positions))
+                logits[pos] = b_halt;
+        }
+
+        // Kernel 2: compute dot product and accumulate into logits
+        __global__ void _cuda_act_accumulate_logits(
             float* logits,
             const float* input_data,
             const float* W_halt,
-            float b_halt,
             size_t batch_size,
             size_t seq_len,
             size_t d_model,
@@ -2782,11 +2793,6 @@ namespace dlib
         )
         {
             const long total_positions = batch_size * seq_len;
-
-            for (auto pos : grid_stride_range_y(0, total_positions))
-                for (auto i : grid_stride_range(0, 1))
-                    logits[pos] = b_halt;
-            __syncthreads();
 
             for (auto pos : grid_stride_range_y(0, total_positions))
             {
@@ -2805,12 +2811,17 @@ namespace dlib
 
                 warp_reduce_atomic_add(logits[pos], temp);
             }
-            __syncthreads();
+        }
 
+        // Kernel 3: apply sigmoid to compute halt probabilities
+        __global__ void _cuda_act_apply_sigmoid(
+            float* halt_probs,
+            const float* logits,
+            size_t total_positions
+        )
+        {
             for (auto pos : grid_stride_range(0, total_positions))
-            {
                 halt_probs[pos] = 1.0f / (1.0f + expf(-logits[pos]));
-            }
         }
 
         void compute_act_halt_probabilities(
@@ -2830,18 +2841,36 @@ namespace dlib
             halt_probs.set_size(total_positions, 1, 1, 1);
             logits.set_size(total_positions, 1, 1, 1);
 
-            launch_kernel(_cuda_compute_act_halt_probabilities,
+            // Extract bias from halt_params (last element)
+            const float b_halt = halt_params.host()[feature_dim];
+
+            // Phase 1: initialize logits with bias
+            launch_kernel(_cuda_act_init_logits,
+                max_jobs(total_positions),
+                logits.device(),
+                b_halt,
+                total_positions);
+
+            // Phase 2: accumulate dot product into logits
+            // Note: sequential kernel launch provides implicit synchronization
+            launch_kernel(_cuda_act_accumulate_logits,
                 max_jobs(feature_dim, total_positions),
-                halt_probs.device(),
                 logits.device(),
                 input_data.device(),
                 halt_params.device(),
-                halt_params.host()[feature_dim],
                 batch_size,
                 seq_len,
                 d_model,
                 num_channels,
                 feature_dim);
+
+            // Phase 3: apply sigmoid
+            // Note: sequential kernel launch provides implicit synchronization
+            launch_kernel(_cuda_act_apply_sigmoid,
+                max_jobs(total_positions),
+                halt_probs.device(),
+                logits.device(),
+                total_positions);
         }
 
         __global__ void _cuda_update_act_state(
