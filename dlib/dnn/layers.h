@@ -5454,7 +5454,8 @@ namespace dlib
         embeddings_() : num_embeddings(num_embeddings_),
             embedding_dim(embedding_dim_),
             learning_rate_multiplier(1.0f),
-            scale_by_freq(true)
+            scale_by_freq(true),
+            output_scale(std::sqrt(static_cast<float>(embedding_dim_)))
         {
         }
 
@@ -5486,12 +5487,17 @@ namespace dlib
             }
         }
 
+        float get_output_scale() const { return output_scale; }
+
         template <typename SUBNET>
         void setup(const SUBNET& /*sub*/)
         {
             embs.set_size(num_embeddings, embedding_dim);
             tt::tensor_rand rnd(std::rand());
             rnd.fill_gaussian(embs);
+
+            const float init_scale = 1.0f / std::sqrt(static_cast<float>(embedding_dim));
+            tt::affine_transform(embs, embs, init_scale);
         }
 
         template <typename SUBNET>
@@ -5501,6 +5507,7 @@ namespace dlib
             output.set_size(prev.num_samples(), prev.k(), prev.nr(), embedding_dim);
 
             tt::embeddings(output, prev, embs);
+            tt::affine_transform(output, output, output_scale);
         }
 
         template <typename SUBNET>
@@ -5515,7 +5522,8 @@ namespace dlib
                 auto& prev_src = sub.get_output();
                 
                 calc_token_freqs(prev_src, gradient_input);
-                tt::embeddings_gradient(prev_src, gradient_input, embs, freqs, learning_rate_multiplier, scale_by_freq);
+                const float scaled_lr = learning_rate_multiplier * output_scale;
+                tt::embeddings_gradient(prev_src, gradient_input, embs, freqs, scaled_lr, scale_by_freq);
             }
         }
 
@@ -5533,6 +5541,7 @@ namespace dlib
             serialize(item.embedding_dim, out);
             serialize(item.learning_rate_multiplier, out);
             serialize(item.scale_by_freq, out);
+            serialize(item.output_scale, out);
         }
         friend void deserialize(embeddings_& item, std::istream& in)
         {
@@ -5545,12 +5554,14 @@ namespace dlib
             deserialize(item.embedding_dim, in);
             deserialize(item.learning_rate_multiplier, in);
             deserialize(item.scale_by_freq, in);
+            deserialize(item.output_scale, in);
         }
 
         friend std::ostream& operator<<(std::ostream& out, const embeddings_& item)
         {
             out << "embeddings (num_embeddings=" << item.num_embeddings
                 << ", embedding_dim=" << item.embedding_dim
+                << ", scale=" << item.output_scale
                 << ") learning_rate_mult=" << item.learning_rate_multiplier;
             return out;
         }
@@ -5558,6 +5569,7 @@ namespace dlib
         {
             out << "<embeddings num_embeddings='" << item.num_embeddings
                 << "' embedding_dim='" << item.embedding_dim
+                << "' output_scale='" << item.output_scale
                 << "' learning_rate_mult='"
                 << item.learning_rate_multiplier << "'>\n";
             out << mat(item.embs);
@@ -5589,6 +5601,7 @@ namespace dlib
         unsigned long num_embeddings, embedding_dim;
         double learning_rate_multiplier;
         bool scale_by_freq;
+        float output_scale;
     };
 
     template <
