@@ -4545,6 +4545,86 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class tril_padding_context
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This class provides a shared context for communicating padding information
+                to tril_ layers during forward passes. It solves the problem of nested
+                architectures where tril_ layers cannot directly access the input sequence.
+
+                The context stores per-sample padding lengths that are computed once
+                before each forward pass and consulted by all tril_ layers.
+
+            TYPICAL USAGE
+                // Before forward pass:
+                tril_padding_context::set(input_tensor, padding_token);
+
+                // Or from pre-computed lengths:
+                tril_padding_context::set_from_lengths(padding_lengths);
+        !*/
+
+    public:
+        static void set(const tensor& input_tokens, long padding_token);
+        /*!
+            ensures
+                - Computes and stores padding lengths by scanning input_tokens
+                - For each sample, counts leading tokens equal to padding_token
+                - #is_set() == true (if padding_token >= 0)
+                - If padding_token < 0, clears the context instead
+        !*/
+
+        static void set_from_lengths(const std::vector<long>& lengths);
+        /*!
+            ensures
+                - Stores the provided padding lengths directly
+                - #is_set() == true
+                - #get_padding_length(i) == lengths[i] for all valid i
+        !*/
+
+        static void set_uniform(long padding_length, long batch_size);
+        /*!
+            ensures
+                - Sets uniform padding length for all samples
+                - #is_set() == true
+                - #get_padding_length(i) == padding_length for i in [0, batch_size)
+        !*/
+
+        static void clear();
+        /*!
+            ensures
+                - #is_set() == false
+                - Releases stored padding lengths
+        !*/
+
+        static long get_padding_length(long sample_idx);
+        /*!
+            ensures
+                - If is_set() and sample_idx is valid: returns padding length for that sample
+                - Otherwise: returns 0
+        !*/
+
+        static std::vector<long> get_all_lengths();
+        /*!
+            ensures
+                - Returns a copy of all stored padding lengths
+                - Returns empty vector if !is_set()
+        !*/
+
+        static bool is_set();
+        /*!
+            ensures
+                - Returns true if padding context has been initialized
+        !*/
+
+    private:
+        static std::mutex mutex_;
+        static std::vector<long> padding_lengths_;
+        static bool is_set_;
+    };
+
+// ----------------------------------------------------------------------------------------
+
     struct neg_infinity_tag {};
     struct zero_tag {};
 
@@ -4664,6 +4744,25 @@ namespace dlib
             ensures
                 - Returns the parameters of this layer.
         !*/
+
+        void set_prefix_size(long n_prefix_size);
+        /*!
+            ensures
+                - #get_prefix_size() == n_prefix_size
+                - Invalidates cached mask if value changed
+        !*/
+        long get_prefix_size() const;
+
+        void set_padding_token(long token_id);
+        /*!
+            ensures
+                - #get_padding_token() == token_id
+                - If token_id >= 0: enables automatic padding context usage
+                - If token_id < 0: disables padding masking
+        !*/
+        long get_padding_token() const;
+
+        bool uses_padding_context() const;
 
         friend void serialize(const tril_& item, std::ostream& out);
         /*!

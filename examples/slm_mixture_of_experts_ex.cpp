@@ -792,7 +792,8 @@ int main(int argc, char** argv)
             // Build and train the network
             using net_type = my_transformer::network_type<true>;
             net_type net;
-            layer<0>(net).loss_details().set_ignore_index(tokenizer.get_special_token_id("<pad>"));
+            const int pad_token = tokenizer.get_special_token_id("<pad>");
+            layer<0>(net).loss_details().set_ignore_index(pad_token);
             cout << my_transformer::model_info::describe() << endl;
 
             // Tokenizer stored with model for simplified inference
@@ -835,6 +836,11 @@ int main(int argc, char** argv)
                     std::vector<unsigned long> batch_labels(
                         labels.begin() + i, labels.begin() + batch_end);
 
+                    std::vector<long> pad_lengths(batch_samples.size());
+                    for (size_t j = 0; j < batch_samples.size(); ++j)
+                        pad_lengths[j] = count_leading_padding(batch_samples[j], pad_token);
+                    tril_padding_context::set_from_lengths(pad_lengths);
+
                     trainer.train_one_step(batch_samples, batch_labels);
                     total_loss += trainer.get_average_loss();
                     batches_seen++;
@@ -858,6 +864,7 @@ int main(int argc, char** argv)
                 }
                 epoch++;
             }
+            tril_padding_context::clear();
 
             // Save model and tokenizer
 			cout << "Training complete. Saving model...\n";
@@ -946,7 +953,8 @@ int main(int argc, char** argv)
             cout << "Using " << prompt_tokens.size() << " tokens for initial prompt.\n";
 
             // Setup inference context
-            inference_context llm_context(max_seq_len, 4, tokenizer.get_special_token_id("<pad>"));
+            const int pad_token = tokenizer.get_special_token_id("<pad>");
+            inference_context llm_context(max_seq_len, 4, pad_token);
             llm_context.add_tokens(prompt_tokens);
             auto input_seq = llm_context.get_input_window();
 
@@ -975,6 +983,8 @@ int main(int argc, char** argv)
             // Generate tokens autoregressively
             for (size_t i = 0; i < tokens_to_generate && !g_terminate_flag.load(); ++i) {
                 // Predict next token
+                long pad_len = count_leading_padding(input_seq, pad_token);
+                tril_padding_context::set_uniform(pad_len, 1);
                 int next_token = net(input_seq);
                 generated_tokens.push_back(next_token);
 
@@ -997,6 +1007,7 @@ int main(int argc, char** argv)
                 // Stop if end-of-text token is generated
                 if (next_token == end_of_text_id) break;
             }
+            tril_padding_context::clear();
 
             // Write generated text to file
             std::string generated_text = tokenizer.decode(generated_tokens, false);

@@ -250,8 +250,6 @@ int main(int argc, char** argv)
 
         // GPU configuration
         std::vector<int> gpus{ 0 };
-
-        // FINE-TUNING MODE
         if (parser.option("fine-tune"))
         {
             cout << "=== FINE-TUNING MODE ===\n";
@@ -282,7 +280,8 @@ int main(int argc, char** argv)
                 cout << "Pre-trained tokenizer not found at: " << tokenizer_file << endl;
                 return 1;
             }
-            layer<0>(net).loss_details().set_ignore_index(tokenizer.get_special_token_id("<pad>"));
+            const int pad_token = tokenizer.get_special_token_id("<pad>");
+            layer<0>(net).loss_details().set_ignore_index(pad_token);
 
             // Load Q&A datasets for fine-tuning
             cout << "Loading Q&A training datasets...\n";
@@ -349,10 +348,10 @@ int main(int argc, char** argv)
             qa_tokens.clear();
 
             cout << "Applying freezing strategy...\n";
-            //set_all_learning_rate_multipliers(net, 0.1);
-            //layer<1>(net).layer_details().set_learning_rate_multiplier(1.0);    // linear
-            //layer<2>(net).layer_details().set_learning_rate_multiplier(0.5);    // rms_norm
-            //layer<111>(net).layer_details().set_learning_rate_multiplier(0.5);  // embeddings
+            set_all_learning_rate_multipliers(net, 0.1);
+            layer<1>(net).layer_details().set_learning_rate_multiplier(1.0);    // linear
+            layer<2>(net).layer_details().set_learning_rate_multiplier(0.5);    // rms_norm
+            layer<111>(net).layer_details().set_learning_rate_multiplier(0.5);  // embeddings
             cout << "Fine-tuning learning rate strategy applied.\n\n";
             cout << net << endl;
 
@@ -381,6 +380,11 @@ int main(int argc, char** argv)
                     std::vector<unsigned long> batch_labels(
                         labels.begin() + i, labels.begin() + batch_end);
 
+                    std::vector<long> pad_lengths(batch_samples.size());
+                    for (size_t j = 0; j < batch_samples.size(); ++j)
+                        pad_lengths[j] = count_leading_padding(batch_samples[j], pad_token);
+                    tril_padding_context::set_from_lengths(pad_lengths);
+
                     trainer.train_one_step(batch_samples, batch_labels);
                     total_loss += trainer.get_average_loss();
                     batches_seen++;
@@ -404,6 +408,7 @@ int main(int argc, char** argv)
                 }
                 epoch++;
             }
+            tril_padding_context::clear();
 
             // Save fine-tuned model
             set_all_learning_rate_multipliers(net, 1.0);
@@ -461,7 +466,8 @@ int main(int argc, char** argv)
             int answer_id = tokenizer.get_special_token_id("<answer>");
 
             // Setup inference context
-            inference_context ctx(max_seq_len, 3, tokenizer.get_special_token_id("<pad>"));
+            const int pad_token = tokenizer.get_special_token_id("<pad>");
+            inference_context ctx(max_seq_len, 3, pad_token);
 
             // Interactive loop
             while (!g_terminate_flag.load())
@@ -603,7 +609,10 @@ int main(int argc, char** argv)
                 for (int i = 0; i < max_response_tokens && !g_terminate_flag.load(); ++i)
                 {
                     // Get current context window and predict next token
-                    auto& probs_tensor = generator(ctx.get_input_window());
+                    auto input_window = ctx.get_input_window();
+                    long pad_len = count_leading_padding(input_window, pad_token);
+                    tril_padding_context::set_uniform(pad_len, 1);
+                    auto& probs_tensor = generator(input_window);
 
                     // Extract dimensions
                     const long seq_len = probs_tensor.nr();
@@ -636,6 +645,7 @@ int main(int argc, char** argv)
                 }
                 cout << "\n\n";
             }
+            tril_padding_context::clear();
         }
 
         return 0;

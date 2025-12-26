@@ -5613,6 +5613,112 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
   
+    class tril_padding_context
+    {
+    public:
+        static void set(const tensor& input_tokens, long padding_token)
+        {
+            if (padding_token < 0) {
+                clear();
+                return;
+            }
+
+            std::lock_guard<std::mutex> lock(mutex_);
+
+            const long batch_size = input_tokens.num_samples();
+            const long seq_len = input_tokens.nr();
+            const float* data = input_tokens.host();
+
+            padding_lengths_.resize(batch_size);
+
+            for (long s = 0; s < batch_size; ++s)
+            {
+                long count = 0;
+                for (long t = 0; t < seq_len; ++t)
+                {
+                    const long idx = s * seq_len + t;
+                    const long token = static_cast<long>(data[idx]);
+
+                    if (token == padding_token)
+                        count++;
+                    else
+                        break;
+                }
+                padding_lengths_[s] = count;
+            }
+
+            is_set_ = true;
+        }
+
+        static void set_from_lengths(const std::vector<long>& lengths)
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            padding_lengths_ = lengths;
+            is_set_ = true;
+        }
+
+        static void set_uniform(long padding_length,long batch_size)
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            padding_lengths_.assign(batch_size, padding_length);
+            is_set_ = true;
+        }
+
+        static void clear()
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            padding_lengths_.clear();
+            is_set_ = false;
+        }
+
+        static long get_padding_length(long sample_idx)
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+
+            if (!is_set_ || sample_idx < 0 ||
+                sample_idx >= static_cast<long>(padding_lengths_.size()))
+                return 0;
+
+            return padding_lengths_[sample_idx];
+        }
+
+        static std::vector<long> get_all_lengths()
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            return padding_lengths_;
+        }
+
+        static bool is_set()
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            return is_set_;
+        }
+
+    private:
+        static std::mutex mutex_;
+        static std::vector<long> padding_lengths_;
+        static bool is_set_;
+    };
+
+    // Static member definitions for tril_padding_context
+    std::mutex tril_padding_context::mutex_;
+    std::vector<long> tril_padding_context::padding_lengths_;
+    bool tril_padding_context::is_set_ = false;
+
+    template <typename T>
+    long count_leading_padding(const matrix<T, 0, 1>& seq, T padding_token)
+    {
+        long count = 0;
+        for (long i = 0; i < seq.size(); ++i)
+        {
+            if (seq(i) == padding_token) count++;
+            else break;
+        }
+        return count;
+    }
+
+// ----------------------------------------------------------------------------------------
+
     struct neg_infinity_tag {};
     struct zero_tag {};
 
@@ -5640,10 +5746,28 @@ namespace dlib
             auto& prev = sub.get_output();
             output.set_size(prev.num_samples(), prev.k(), prev.nr(), prev.nc());
 
+            // Check padding context and update cached lengths if needed
+            if (tril_padding_context::is_set())
+            {
+                auto new_lengths = tril_padding_context::get_all_lengths();
+                if (new_lengths != cached_padding_lengths_)
+                {
+                    cached_padding_lengths_ = new_lengths;
+                    invalidate_mask();
+                }
+            }
+            else if (!cached_padding_lengths_.empty())
+            {
+                // Context was cleared, reset padding
+                cached_padding_lengths_.clear();
+                invalidate_mask();
+            }
+
             check_mask(prev);
             tt::multiply(false, output, prev, binary_mask);
             if (diag_value != 0.0f) tt::add(1, output, 1, output_mask);
         }
+
         template <typename SUBNET>
         void backward(const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
         {
@@ -5661,10 +5785,8 @@ namespace dlib
         {
             if (prefix_size != n_prefix_size) {
                 prefix_size = n_prefix_size;
-                binary_mask.set_size(0, 0, 0, 0);
-                output_mask.set_size(0, 0, 0, 0);
+                invalidate_mask();
             }
-
         }
         long get_prefix_size() const { return prefix_size; }
         
@@ -5704,9 +5826,16 @@ namespace dlib
                 return static_cast<float>(num_) / static_cast<float>(den_);
         }
 
+        void invalidate_mask()
+        {
+            binary_mask.set_size(0, 0, 0, 0);
+            output_mask.set_size(0, 0, 0, 0);
+        }
+
         void check_mask(const tensor& t)
         {
-            if (!have_same_dimensions(binary_mask, t)) {
+            if (!have_same_dimensions(binary_mask, t))
+            {
                 binary_mask.copy_size(t);
                 binary_mask = 1;
 
@@ -5714,17 +5843,49 @@ namespace dlib
                 if (use_output_mask) {
                     output_mask.copy_size(t);
                     output_mask = 0;
-                }                                
-                for (long s = 0; s < output_mask.num_samples(); ++s)
+                }
+
+                const bool has_padding = !cached_padding_lengths_.empty();
+
+                for (long s = 0; s < t.num_samples(); ++s)
                 {
-                    for (long k = 0; k < output_mask.k(); ++k)
+                    const long pad_len = has_padding &&
+                        s < static_cast<long>(cached_padding_lengths_.size())
+                        ? cached_padding_lengths_[s] : 0;
+
+                    for (long k = 0; k < t.k(); ++k)
                     {
-                        for (long r = 0; r < output_mask.nr(); ++r)
+                        for (long r = 0; r < t.nr(); ++r)
                         {
-                            for (long c = std::max(r + diag + 1, prefix_size); c < output_mask.nc(); ++c)
+                            // Mask padding columns
+                            for (long c = 0; c < pad_len; ++c)
                             {
-                                if (use_output_mask) output_mask.host()[tensor_index(output_mask, s, k, r, c)] = diag_value;
-                                binary_mask.host()[tensor_index(binary_mask, s, k, r, c)] = 0;
+                                const long idx = tensor_index(t, s, k, r, c);
+                                binary_mask.host()[idx] = 0;
+                                if (use_output_mask)
+                                    output_mask.host()[idx] = diag_value;
+                            }
+
+                            // Mask future positions (causal)
+                            const long causal_start = std::max({ r + diag + 1, prefix_size, pad_len });
+                            for (long c = causal_start; c < t.nc(); ++c)
+                            {
+                                const long idx = tensor_index(t, s, k, r, c);
+                                binary_mask.host()[idx] = 0;
+                                if (use_output_mask)
+                                    output_mask.host()[idx] = diag_value;
+                            }
+
+                            // Mask padding rows
+                            if (r < pad_len)
+                            {
+                                for (long c = 0; c < t.nc(); ++c)
+                                {
+                                    const long idx = tensor_index(t, s, k, r, c);
+                                    binary_mask.host()[idx] = 0;
+                                    if (use_output_mask)
+                                        output_mask.host()[idx] = diag_value;
+                                }
                             }
                         }
                     }
@@ -5740,6 +5901,7 @@ namespace dlib
         long diag;
         long prefix_size;
         float diag_value;
+        std::vector<long> cached_padding_lengths_;
     };
 
     template <typename SUBNET>
