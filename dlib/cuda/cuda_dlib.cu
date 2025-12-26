@@ -3139,6 +3139,39 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        __global__ void _cuda_count_valid_tokens(
+            float* valid_count,
+            const unsigned long* truth,
+            const float* input_data,
+            size_t batch_size,
+            size_t seq_len,
+            long ignore_index
+        )
+        {
+            float count = 0.0f;
+
+            for (auto sample_idx : grid_stride_range(0, batch_size))
+            {
+                for (size_t t = 0; t < seq_len; ++t)
+                {
+                    unsigned long target_class;
+                    if (t < seq_len - 1) {
+                        const size_t input_idx = sample_idx * seq_len + (t + 1);
+                        target_class = static_cast<unsigned long>(input_data[input_idx]);
+                    }
+                    else {
+                        target_class = truth[sample_idx];
+                    }
+
+                    if (ignore_index < 0 || static_cast<long>(target_class) != ignore_index) {
+                        count += 1.0f;
+                    }
+                }
+            }
+
+            warp_reduce_atomic_add(*valid_count, count);
+        }
+
         __global__ void _cuda_compute_loss_cross_entropy_per_logit(
             float* loss_out,
             float* g,
@@ -3148,7 +3181,8 @@ namespace dlib
             size_t batch_size,
             size_t seq_len,
             size_t vocab_size,
-            const float scale
+            float scale,
+            long ignore_index
         )
         {
             float total_loss = 0;
@@ -3158,7 +3192,6 @@ namespace dlib
                 for (size_t t = 0; t < seq_len; ++t)
                 {
                     unsigned long target_class;
-
                     if (t < seq_len - 1) {
                         const size_t input_idx = sample_idx * seq_len + (t + 1);
                         target_class = static_cast<unsigned long>(input_data[input_idx]);
@@ -3168,7 +3201,15 @@ namespace dlib
                     }
 
                     const size_t base_idx = sample_idx * seq_len * vocab_size + t * vocab_size;
-                    float max_val = out_data[base_idx + 0];
+
+                    if (ignore_index >= 0 && static_cast<long>(target_class) == ignore_index) {
+                        for (size_t c = 0; c < vocab_size; ++c) {
+                            g[base_idx + c] = 0.0f;
+                        }
+                        continue;
+                    }
+
+                    float max_val = out_data[base_idx];
                     for (size_t c = 1; c < vocab_size; ++c)
                     {
                         max_val = ::max(max_val, out_data[base_idx + c]);
@@ -3210,7 +3251,8 @@ namespace dlib
             const tensor& input_tensor,
             const tensor& subnetwork_output,
             tensor& gradient,
-            double& loss
+            double& loss,
+            long ignore_index
         )
         {
             CHECK_CUDA(cudaMemset(gradient.device(), 0, gradient.size() * sizeof(float)));
@@ -3220,7 +3262,35 @@ namespace dlib
             const long seq_len = subnetwork_output.nr();
             const long vocab_size = subnetwork_output.nc();
 
-            const double scale = 1.0 / (batch_size * seq_len);
+            double scale;
+            if (ignore_index < 0)
+            {
+                scale = 1.0 / (batch_size * seq_len);
+            }
+            else {
+                cuda_data_void_ptr count_buf = device_global_buffer(sizeof(float));
+                auto valid_count_ptr = static_pointer_cast<float>(count_buf, 1);
+                CHECK_CUDA(cudaMemset(valid_count_ptr, 0, sizeof(float)));
+
+                launch_kernel(_cuda_count_valid_tokens, max_jobs(batch_size),
+                    valid_count_ptr.data(),
+                    truth_buffer.data(),
+                    input_tensor.device(),
+                    batch_size,
+                    seq_len,
+                    ignore_index
+                );
+
+                float valid_count;
+                dlib::cuda::memcpy(&valid_count, valid_count_ptr);
+
+                if (valid_count == 0) {
+                    loss = 0.0;
+                    return;
+                }
+
+                scale = 1.0 / valid_count;
+            }
 
             launch_kernel(_cuda_compute_loss_cross_entropy_per_logit, max_jobs(batch_size),
                 loss_work_buffer.data(),
@@ -3231,7 +3301,8 @@ namespace dlib
                 batch_size,
                 seq_len,
                 vocab_size,
-                scale
+                static_cast<float>(scale),
+                ignore_index
             );
 
             float floss;

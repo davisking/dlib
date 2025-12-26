@@ -267,7 +267,7 @@ int main(int argc, char** argv)
             trainer.set_mini_batch_size(batch_size);
             trainer.set_max_num_epochs(max_epochs);
             trainer.set_iterations_without_progress_threshold(patience);
-            trainer.set_synchronization_file("chkpt-" + finetuned_model, std::chrono::minutes(5));
+            trainer.set_synchronization_file("chkpt-" + finetuned_model, std::chrono::minutes(25));
             trainer.be_quiet();
 
             // Load tokenizer & model
@@ -282,6 +282,7 @@ int main(int argc, char** argv)
                 cout << "Pre-trained tokenizer not found at: " << tokenizer_file << endl;
                 return 1;
             }
+            layer<0>(net).loss_details().set_ignore_index(tokenizer.get_special_token_id("<pad>"));
 
             // Load Q&A datasets for fine-tuning
             cout << "Loading Q&A training datasets...\n";
@@ -348,10 +349,10 @@ int main(int argc, char** argv)
             qa_tokens.clear();
 
             cout << "Applying freezing strategy...\n";
-            set_all_learning_rate_multipliers(net, 0.1);
-            layer<1>(net).layer_details().set_learning_rate_multiplier(1.0);    // linear
-            layer<2>(net).layer_details().set_learning_rate_multiplier(0.5);    // rms_norm
-            layer<111>(net).layer_details().set_learning_rate_multiplier(0.5);  // embeddings
+            //set_all_learning_rate_multipliers(net, 0.1);
+            //layer<1>(net).layer_details().set_learning_rate_multiplier(1.0);    // linear
+            //layer<2>(net).layer_details().set_learning_rate_multiplier(0.5);    // rms_norm
+            //layer<111>(net).layer_details().set_learning_rate_multiplier(0.5);  // embeddings
             cout << "Fine-tuning learning rate strategy applied.\n\n";
             cout << net << endl;
 

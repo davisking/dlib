@@ -1,3 +1,4 @@
+
 /*!
     @file slm_vision_transformer_hybrid_ex.cpp
     @brief Vision Transformer with Dlib loss hybridization demonstration
@@ -82,13 +83,13 @@ namespace dlib
         - Standard Dlib layers: fc, dropout, ...
         
         Architecture summary:
-        Input (32x32 RGB) => Patches (4x4) => Embeddings (192-dim)
-            => Transformer (3 layers, 6 heads) => Pooling => Output
+        Input (32x32 RGB) => Patches (4x4) => Embeddings (216-dim)
+            => Transformer (4 layers, 6 heads) => Output
     !*/
     template<
-        long num_layers = 3,
+        long num_layers = 4,
         long num_heads = 6,
-        long embedding_dim = 192
+        long embedding_dim = 216
     >
     struct vit_cifar10_config
     {
@@ -106,16 +107,16 @@ namespace dlib
         // Backbone: patch embeddings => transformer => pooling
         // Returns: (batch, embedding_dim) feature vectors
         template <template <typename> class DO, typename INPUT>
-        using backbone_training = rms_norm<
+        using backbone_training = 
             canonical_transformer::transformer_stack<NUM_LAYERS, gelu, DO, EMBEDDING_DIM, NUM_HEADS,
             patch_embeddings<PATCH_SIZE, EMBEDDING_DIM, DONT_USE_ClASS_TOKEN, DONT_USE_POSITION_EMBEDDINGS,
-            INPUT>>>;
+            INPUT>>;
 
         template <typename INPUT>
-        using backbone_inference = rms_norm<
+        using backbone_inference = 
             canonical_transformer::transformer_stack<NUM_LAYERS, gelu, multiply, EMBEDDING_DIM, NUM_HEADS,
             patch_embeddings<PATCH_SIZE, EMBEDDING_DIM, DONT_USE_ClASS_TOKEN, DONT_USE_POSITION_EMBEDDINGS,
-            INPUT>>>;
+            INPUT>>;
 
         static std::string describe() {
             std::stringstream ss;
@@ -148,8 +149,8 @@ namespace model
     template <typename SUBNET> 
     using projector = fc<128, relu<bn_fc<fc<256, SUBNET>>>>;
 
-    using ssl_train = loss_barlow_twins<
-        projector<my_vit::backbone_training<dropout, input_rgb_image_pair>>>;
+    using ssl_train = loss_barlow_twins<projector<rms_norm<
+        my_vit::backbone_training<dropout, input_rgb_image_pair>>>>;
     
     using ssl_inference = loss_metric<
         my_vit::backbone_inference<input_rgb_image>>;
@@ -162,10 +163,12 @@ namespace model
     // Output: class predictions (10 classes for CIFAR-10)
 
     using supervised_train = loss_multiclass_log<
-        fc<10, my_vit::backbone_training<dropout, input<matrix<rgb_pixel>>>>>;
+        fc<10, rms_norm<
+        my_vit::backbone_training<dropout, input<matrix<rgb_pixel>>>>>>;
     
     using supervised_inference = loss_multiclass_log<
-        fc<10, my_vit::backbone_inference<input<matrix<rgb_pixel>>>>>;
+        fc<10, rms_norm<
+        my_vit::backbone_inference<input<matrix<rgb_pixel>>>>>>;
 }
 
 // Data augmentation
@@ -248,7 +251,8 @@ void train_ssl(
     trainer.set_learning_rate(learning_rate);
     trainer.set_min_learning_rate(min_learning_rate);
     trainer.set_mini_batch_size(batch_size);
-    trainer.set_iterations_without_progress_threshold(15000);
+    trainer.set_iterations_without_progress_threshold(25000);
+    trainer.set_synchronization_file("chkpt-" + model_file, std::chrono::minutes(25));
     trainer.be_verbose();
     set_all_bn_running_stats_window_sizes(net, 100);    
     
@@ -309,7 +313,8 @@ void train_supervised(
     trainer.set_learning_rate(learning_rate);
     trainer.set_min_learning_rate(min_learning_rate);
     trainer.set_mini_batch_size(batch_size);
-    trainer.set_iterations_without_progress_threshold(15000);
+    trainer.set_iterations_without_progress_threshold(25000);
+    trainer.set_synchronization_file("chkpt-" + model_file, std::chrono::minutes(25));
     trainer.be_verbose();    
     
     if (file_exists(model_file)) {

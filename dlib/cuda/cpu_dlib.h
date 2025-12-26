@@ -786,7 +786,8 @@ namespace dlib
             const tensor& input_tensor,
             const tensor& output_tensor,
             tensor& grad,
-            double& loss
+            double& loss,
+            long ignore_index
         ) const
         {
             DLIB_CASSERT(output_tensor.k() == 1);
@@ -796,16 +797,46 @@ namespace dlib
             const long batch_size = output_tensor.num_samples();
             const long seq_len = output_tensor.nr();
             const long vocab_size = output_tensor.nc();
-        
-            // Normalization over all positions
-            const double scale = 1.0 / (batch_size * seq_len);
-        
-            loss = 0.0;
+                
             const float* out_data = output_tensor.host();
             const float* in_data = input_tensor.host();
-            float* g = grad.host();
+            float* g = grad.host();            
         
             std::fill(g, g + grad.size(), 0.0f);
+
+            long valid_tokens = 0;
+
+            if (ignore_index < 0)
+            {
+                valid_tokens = batch_size * seq_len;
+            }
+            else {
+                for (long i = 0; i < batch_size; ++i)
+                {
+                    for (long t = 0; t < seq_len; ++t)
+                    {
+                        unsigned long target_class;
+                        if (t < seq_len - 1) {
+                            target_class = static_cast<unsigned long>(
+                                in_data[tensor_index(input_tensor, i, 0, t + 1, 0)]
+                                );
+                        }
+                        else
+                            target_class = *(truth + i);
+
+                        if (static_cast<long>(target_class) != ignore_index)
+                            valid_tokens++;
+                    }
+                }
+            }
+            if (valid_tokens == 0)
+            {
+                loss = 0.0;
+                return;
+            }
+
+            const double scale = 1.0 / valid_tokens;
+            loss = 0.0;
         
             for (long i = 0; i < batch_size; ++i)
             {
@@ -825,6 +856,9 @@ namespace dlib
                         target_class = *(truth + i);
                     }
                 
+                    if (ignore_index >= 0 && static_cast<long>(target_class) == ignore_index)
+                        continue;
+
                     DLIB_CASSERT(target_class < static_cast<unsigned long>(vocab_size));
                 
                     // Find max logit for numerical stability

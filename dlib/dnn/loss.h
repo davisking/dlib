@@ -918,6 +918,11 @@ namespace dlib
         typedef unsigned long training_label_type;
         typedef unsigned long output_label_type;
 
+        loss_cross_entropy_per_logit_() : ignore_index_(-1) {}
+
+        void set_ignore_index(long idx) { ignore_index_ = idx; }
+        long get_ignore_index() const { return ignore_index_; }
+
         template <typename SUB_TYPE, typename label_iterator>
         void to_label(
             const tensor& input_tensor,
@@ -977,38 +982,43 @@ namespace dlib
 
             double loss = 0.0;
 #ifdef DLIB_USE_CUDA
-            cuda_compute(truth, input_tensor, output_tensor, grad, loss);
+            cuda_compute(truth, input_tensor, output_tensor, grad, loss, ignore_index_);
 #else
-            cpu_compute(truth, input_tensor, output_tensor, grad, loss);
+            cpu_compute(truth, input_tensor, output_tensor, grad, loss, ignore_index_);
 #endif
             return loss;
         }
 
-        friend void serialize(const loss_cross_entropy_per_logit_&, std::ostream& out)
+        friend void serialize(const loss_cross_entropy_per_logit_& item, std::ostream& out)
         {
             serialize("loss_cross_entropy_per_logit_", out);
+            serialize(item.ignore_index_, out);
         }
 
-        friend void deserialize(loss_cross_entropy_per_logit_&, std::istream& in)
+        friend void deserialize(loss_cross_entropy_per_logit_& item, std::istream& in)
         {
             std::string version;
             deserialize(version, in);
             if (version != "loss_cross_entropy_per_logit_")
                 throw serialization_error("Unexpected version found while deserializing dlib::loss_cross_entropy_per_logit_.");
+            deserialize(item.ignore_index_, in);
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const loss_cross_entropy_per_logit_&)
+        friend std::ostream& operator<<(std::ostream& out, const loss_cross_entropy_per_logit_& item)
         {
             out << "loss_cross_entropy_per_logit";
+            out << " (ignore_index=" << item.ignore_index_ << ")";
             return out;
         }
 
-        friend void to_xml(const loss_cross_entropy_per_logit_& /*item*/, std::ostream& out)
+        friend void to_xml(const loss_cross_entropy_per_logit_& item, std::ostream& out)
         {
-            out << "<loss_cross_entropy_per_logit/>\n";
+            out << "<loss_cross_entropy_per_logit ignore_index='" << item.ignore_index_ << "'/>\n";
         }
 
         private:
+            long ignore_index_;
+
 #ifdef DLIB_USE_CUDA
             cuda::compute_loss_cross_entropy_per_logit cuda_compute;
 #else

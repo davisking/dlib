@@ -792,6 +792,7 @@ int main(int argc, char** argv)
             // Build and train the network
             using net_type = my_transformer::network_type<true>;
             net_type net;
+            layer<0>(net).loss_details().set_ignore_index(tokenizer.get_special_token_id("<pad>"));
             cout << my_transformer::model_info::describe() << endl;
 
             // Tokenizer stored with model for simplified inference
@@ -805,7 +806,7 @@ int main(int argc, char** argv)
             trainer.set_learning_rate_shrink_factor(0.1);
             trainer.set_mini_batch_size(batch_size);
             trainer.set_iterations_without_progress_threshold(patience);
-            trainer.set_synchronization_file("chkpt-" + model_file, std::chrono::minutes(5));
+            trainer.set_synchronization_file("chkpt-" + model_file, std::chrono::minutes(25));
             trainer.be_quiet();
             cout << net << endl << endl; // Show the model architecture
             cout << "Starting training...\n";

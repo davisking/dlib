@@ -449,6 +449,7 @@ int main(int argc, char** argv)
             // Build and train the network
             using net_type = my_transformer::network_type<true>;
             net_type net;
+            layer<0>(net).loss_details().set_ignore_index(tokenizer.get_special_token_id("<pad>"));
             cout << my_transformer::model_info::describe() << endl;
 
             // Tokenizer stored with model for simplified inference

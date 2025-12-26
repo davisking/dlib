@@ -682,7 +682,8 @@ namespace dlib
                 const tensor& input_tensor,        // Source tokens
                 const tensor& subnetwork_output,   // Logits
                 tensor& gradient,
-                double& loss
+                double& loss,
+                long ignore_index
                 ) const
             {
                 const size_t bytes_per_sample = sizeof(unsigned long);
@@ -697,7 +698,7 @@ namespace dlib
                 }
 
                 auto truth_buf = static_pointer_cast<const unsigned long>(buf, subnetwork_output.num_samples());
-                do_work(loss_buf, truth_buf, input_tensor, subnetwork_output, gradient, loss);
+                do_work(loss_buf, truth_buf, input_tensor, subnetwork_output, gradient, loss, ignore_index);
             }
 
         private:
@@ -707,7 +708,8 @@ namespace dlib
                 const tensor& input_tensor,
                 const tensor& subnetwork_output,
                 tensor& gradient,
-                double& loss
+                double& loss,
+                long ignore_index
             );
 
             mutable cuda_data_void_ptr buf;
