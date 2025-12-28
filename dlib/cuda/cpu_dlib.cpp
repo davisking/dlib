@@ -3267,6 +3267,7 @@ namespace dlib
             resizable_tensor& cumulative_halting,
             resizable_tensor& remainders,
             resizable_tensor& n_steps,
+            resizable_tensor& effective_weights,
             long batch_size,
             long seq_len,
             long d_model,
@@ -3281,6 +3282,7 @@ namespace dlib
             float* cum_halt = cumulative_halting.host();
             float* remain = remainders.host();
             float* steps = n_steps.host();
+            float* eff_weights = effective_weights.host();
 
             for (long pos = 0; pos < batch_size * seq_len; ++pos) {
                 if (cum_halt[pos] < halt_threshold) {
@@ -3294,6 +3296,7 @@ namespace dlib
                     cum_halt[pos] += effective;
                     remain[pos] -= effective;
                     steps[pos] = static_cast<float>(current_step + 1);
+                    eff_weights[pos] += effective;
 
                     for (long c = 0; c < num_channels; ++c) {
                         for (long d = 0; d < d_model; ++d) {
@@ -3309,6 +3312,7 @@ namespace dlib
             resizable_tensor& output,
             const tensor& input_data,
             const tensor& remainders,
+            resizable_tensor& effective_weights,
             long batch_size,
             long seq_len,
             long d_model,
@@ -3318,12 +3322,15 @@ namespace dlib
             const float* in_ptr = input_data.host();
             const float* remain = remainders.host();
             float* out_ptr = output.host();
+            float* eff_weights = effective_weights.host();
 
             for (long pos = 0; pos < batch_size * seq_len; ++pos) {
                 float r = remain[pos];
                 if (r > 1e-6f) {
                     const long n = pos / seq_len;
                     const long s = pos % seq_len;
+
+                    eff_weights[pos] += r;
 
                     for (long c = 0; c < num_channels; ++c) {
                         for (long d = 0; d < d_model; ++d) {
