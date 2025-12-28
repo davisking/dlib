@@ -796,28 +796,54 @@ int main(int argc, char** argv)
             layer<0>(net).loss_details().set_ignore_index(pad_token);
             cout << my_transformer::model_info::describe() << endl;
 
-            // Tokenizer stored with model for simplified inference
-            if (file_exists(model_file) &&
-                !file_exists("chkpt-" + model_file)) deserialize(model_file) >> net >> tokenizer;            
-
             // Create trainer
             dnn_trainer<net_type, adamw> trainer(net, adamw(weight_decay, beta1, beta2), gpus);
             trainer.set_learning_rate(learning_rate);
-            trainer.set_min_learning_rate(5e-5);
+            trainer.set_min_learning_rate(1e-7);
             trainer.set_learning_rate_shrink_factor(0.1);
             trainer.set_mini_batch_size(batch_size);
             trainer.set_iterations_without_progress_threshold(patience);
-            trainer.set_synchronization_file("chkpt-" + model_file, std::chrono::minutes(25));
+            trainer.set_synchronization_file("chkpt-" + model_file, std::chrono::minutes(15));
             trainer.be_quiet();
-            cout << net << endl << endl; // Show the model architecture
-            cout << "Starting training...\n";
+            cout << net << endl << endl; // Show the model architecture            
 
-            size_t epoch = 0, steps = 0;            
+            // Estimate total training steps
+            size_t steps_per_epoch = (samples.size() + batch_size - 1) / batch_size;
+            size_t total_steps = steps_per_epoch * max_epochs;
+
+            // Create learning rate scheduler with warmup
+            lr_scheduler scheduler(
+                trainer.get_learning_rate(),                // peak_lr
+                std::min(size_t(2000), total_steps / 10),   // warmup_steps (2000 or 10% of total)
+                total_steps,                                // total_steps
+                trainer.get_min_learning_rate(),            // min_lr
+                lr_decay_type::COSINE                       // decay_type
+            );
+
+            // Tokenizer stored with model for simplified inference
+            if (file_exists(model_file) &&
+                !file_exists("chkpt-" + model_file)) {
+                lr_scheduler loaded_scheduler;
+                deserialize(model_file) >> net >> tokenizer >> loaded_scheduler;
+                scheduler = loaded_scheduler;
+                cout << "Resumed from step " << scheduler.get_current_step()
+                    << ", LR: " << scheduler.get_learning_rate() << "\n";
+            }
+
+            size_t epoch = 0;            
             size_t batches_count = 0, batches_seen = 0, samples_seen = 0;
             double total_loss = 0.0;
             auto epoch_start = std::chrono::high_resolution_clock::now();
 
-            // Training loop
+            // Training loop           
+            cout << "Learning rate schedule:\n"
+                << "  Peak LR: " << scheduler.get_peak_lr() << "\n"
+                << "  Min LR: " << scheduler.get_min_lr() << "\n"
+                << "  Warmup steps: " << scheduler.get_warmup_steps() << "\n"
+                << "  Total steps: " << scheduler.get_total_steps() << "\n"
+                << "  Decay type: COSINE\n\n";
+            cout << "Starting training...\n";
+            trainer.set_learning_rate(scheduler.get_learning_rate());
             while (trainer.get_learning_rate() >= trainer.get_min_learning_rate() 
                 && epoch < max_epochs && !g_terminate_flag.load())
             {
@@ -836,16 +862,19 @@ int main(int argc, char** argv)
                     std::vector<unsigned long> batch_labels(
                         labels.begin() + i, labels.begin() + batch_end);
 
+                    double current_lr = scheduler.get_learning_rate();
+                    trainer.set_learning_rate(current_lr);
+
                     std::vector<long> pad_lengths(batch_samples.size());
                     for (size_t j = 0; j < batch_samples.size(); ++j)
                         pad_lengths[j] = count_leading_padding(batch_samples[j], pad_token);
                     tril_padding_context::set_from_lengths(pad_lengths);
 
                     trainer.train_one_step(batch_samples, batch_labels);
+                    scheduler.step();
                     total_loss += trainer.get_average_loss();
                     batches_seen++;
                     samples_seen += batch_samples.size();
-                    steps += batch_samples.size();
 
                     // Progress reporting
                     if (batches_count++ % 50 == 0) {
@@ -855,10 +884,11 @@ int main(int argc, char** argv)
                         double samples_per_sec = samples_seen / (elapsed > 0 ? elapsed : 1);
 
                         cout << "epoch#: " << (epoch + 1) << "/" << max_epochs
-                            << " (ksteps: " << (steps / 1000) << ")"
-                            << " \t loss: " << avg_loss
-                            << " \t patience: " << trainer.get_steps_without_progress()
-                            << " \t speed: " << samples_per_sec << " samples/sec\n";
+                            << " \t loss: " << std::setprecision(3) << avg_loss
+                            << " \t lr: " << current_lr
+                            << " \t phase: " << scheduler.get_phase_name()
+                            << " \t speed: " << std::fixed << std::setprecision(1)
+                            << samples_per_sec << " samples/sec\n";
                         cout.flush();
                     }
                 }
@@ -869,8 +899,10 @@ int main(int argc, char** argv)
             // Save model and tokenizer
 			cout << "Training complete. Saving model...\n";
             net.clean();
-            serialize(model_file) << net << tokenizer;
+            serialize(model_file) << net << tokenizer << scheduler;
             cout << "Model saved to " << model_file << "\n";
+            cout << "Final step: " << scheduler.get_current_step()
+                << ", Final LR: " << scheduler.get_learning_rate() << "\n";
 
             // Evaluate on training set
             {
