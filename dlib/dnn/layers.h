@@ -5857,29 +5857,11 @@ namespace dlib
                     halting_probs_, logits_, input, params,
                     batch_size_, seq_len_, feature_dim_);
 
-                // Capture effective weights before state update
-                const float* p_halt = halting_probs_.host();
-                const float* cum_halt = cum_halt_ptr;
-                const float* remainders = remainders_ptr;
-                float* true_weights = true_effective_weights_.host();
-
-                for (long pos = 0; pos < total_positions; ++pos) {
-                    if (cum_halt[pos] < halt_threshold_) {
-                        float p = p_halt[pos];
-                        float r = remainders[pos];
-
-                        // Compute effective weight: alpha_t^n = min(p * rho, theta - h_t^(n-1))
-                        float effective = std::min(p * r, halt_threshold_ - cum_halt[pos]);
-
-                        // Store for backward pass
-                        true_weights[pos] += effective;
-                    }
-                }
-
                 // Update ACT state and accumulate weighted outputs
                 tt::update_act_state(
                     output, input, halting_probs_,
                     cumulative_halting_, remainders_, n_steps_,
+                    true_effective_weights_,
                     batch_size_, seq_len_, d_model_, num_channels_,
                     halt_threshold_, step
                 );
@@ -5891,16 +5873,8 @@ namespace dlib
             // Finalize with remainder contributions
             tt::finalize_act_output(
                 output, input, remainders_,
+                true_effective_weights_,
                 batch_size_, seq_len_, d_model_, num_channels_);
-
-            // Add remainder weights for gradient computation
-            const float* final_remainders = remainders_.host();
-            float* true_weights = true_effective_weights_.host();
-            for (long pos = 0; pos < total_positions; ++pos) {
-                if (final_remainders[pos] > 1e-6f) {
-                    true_weights[pos] += final_remainders[pos];
-                }
-            }
 
             // Compute statistics for monitoring and regularization
             compute_ponder_stats();
