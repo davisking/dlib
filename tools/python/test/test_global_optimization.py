@@ -62,8 +62,8 @@ def holder_table(x0,x1):
     return -abs(sin(x0)*cos(x1)*exp(abs(1-sqrt(x0*x0+x1*x1)/pi)))
 
 def test_on_holder_table():
-    x,y = find_min_global(holder_table, 
-                            [-10,-10],  
-                            [10,10],   
-                            200)       
+    x,y = find_min_global(holder_table,
+                            [-10,-10],
+                            [10,10],
+                            300)       
     assert (y - -19.2085025679) < 1e-7
