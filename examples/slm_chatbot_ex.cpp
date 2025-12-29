@@ -263,8 +263,8 @@ int main(int argc, char** argv)
 
         // Training hyperparameters
         const double learning_rate = get_option(parser, "learning-rate", 1e-5);
-        const long batch_size = get_option(parser, "batch-size", 32);
-        const long max_epochs = get_option(parser, "max-epochs", 150);
+        const size_t batch_size = get_option(parser, "batch-size", 32);
+        const size_t max_epochs = get_option(parser, "max-epochs", 150);
         const long patience = get_option(parser, "patience", 15000);
         const double weight_decay = get_option(parser, "weight-decay", 0.01);
         const double beta1 = get_option(parser, "beta1", 0.9);
