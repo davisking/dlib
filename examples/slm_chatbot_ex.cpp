@@ -195,6 +195,34 @@ void display_random_qa_samples(size_t num_samples = 3)
     }
 }
 
+// Visitor for setting learning rate multiplier on computational layers
+struct lr_mult_visitor
+{
+    double mult;
+
+    lr_mult_visitor(double m) : mult(m) {}
+
+    template <typename layer_type>
+    void operator()(size_t, layer_type& l) const
+    {
+        set_learning_rate_multiplier_impl(l, mult);
+    }
+
+private:
+    template <typename T>
+    static auto set_learning_rate_multiplier_impl(T& layer, double m)
+        -> decltype(layer.layer_details().set_learning_rate_multiplier(m), void())
+    {
+        layer.layer_details().set_learning_rate_multiplier(m);
+    }
+
+    template <typename T>
+    static void set_learning_rate_multiplier_impl(T&, ...)
+    {
+        // No-op for layers without this method
+    }
+};
+
 int main(int argc, char** argv)
 {
     try
@@ -241,7 +269,7 @@ int main(int argc, char** argv)
         const std::string tokenizer_file = get_option(parser, "tokenizer-file", std::string("dlib_lm_tokenizer.vocab"));
 
         // Configuration parameters
-        const long vocab_size = 3500;
+        const long vocab_size = 2000;
         const long max_seq_len = 128;
         using config = chatbot_config<vocab_size>;
         using train_net = config::network_type<true>;
@@ -347,12 +375,24 @@ int main(int argc, char** argv)
             // Release memory
             qa_tokens.clear();
 
-            cout << "Applying freezing strategy...\n";
-            set_all_learning_rate_multipliers(net, 0.1);
-            layer<1>(net).layer_details().set_learning_rate_multiplier(1.0);    // linear
-            layer<2>(net).layer_details().set_learning_rate_multiplier(0.5);    // rms_norm
-            layer<111>(net).layer_details().set_learning_rate_multiplier(0.5);  // embeddings
-            cout << "Fine-tuning learning rate strategy applied.\n\n";
+            // Strategy: Freeze embeddings and lower transformer layers, fine-tune upper layers
+            // - Embeddings: frozen (preserve learned token representations)
+            // - Lower transformer blocks: frozen or very slow (preserve general language understanding)
+            // - Upper transformer blocks: slow learning (adapt to domain)
+            // - Classification head: normal learning (specialize for task)
+            cout << "Applying freezing strategy for fine-tuning\n";
+            // Step 1: freeze everything first (multiplier = 0)
+            set_all_learning_rate_multipliers(net, 0.0);
+            // Step 2: unfreeze classification head (layers 1-2: linear + rms_norm)
+            layer<1>(net).layer_details().set_learning_rate_multiplier(1.0);  // linear (classification)
+            layer<2>(net).layer_details().set_learning_rate_multiplier(1.0);  // rms_norm
+            // Step 3: partially unfreeze upper transformer layers with gradual unfreezing
+            // For a 3-layer transformer, unfreeze the last 1-2 blocks with reduced LR
+            // Layer indices depend on architecture - adjust based on `net` output
+            // Top transformer block: moderate learning
+            visit_layers_range<3, 40>(net, lr_mult_visitor(0.3));
+            // Middle transformer block: slower learning  
+            visit_layers_range<40, 75>(net, lr_mult_visitor(0.1));
             cout << net << endl;
 
             size_t epoch = 0, steps = 0;
@@ -360,13 +400,32 @@ int main(int argc, char** argv)
             double total_loss = 0.0;
             auto epoch_start = std::chrono::high_resolution_clock::now();
 
+            // Setup learning rate scheduler with warmup
+            const size_t steps_per_epoch = (samples.size() + batch_size - 1) / batch_size;
+            const size_t total_steps = steps_per_epoch * max_epochs;
+            const size_t warmup_steps = std::min(size_t(500), total_steps / 10);  // 10% or 500 steps max
+
+            lr_scheduler scheduler(
+                learning_rate,          // peak_lr
+                warmup_steps,           // warmup_steps
+                total_steps,            // total_steps
+                1e-7,                   // min_lr
+                lr_decay_type::COSINE   // decay_type
+            );
+            cout << "Learning rate schedule:\n"
+                << "  - peak learning rate: " << learning_rate << "\n"
+                << "  - warmup steps: " << warmup_steps << "\n"
+                << "  - total steps: " << total_steps << "\n"
+                << "  - decay: cosine\n\n";
+            cout << "Starting fine-tuning with warmup...\n";
+
             // Training loop
-            cout << "Starting standard training...\n";
-            while (trainer.get_learning_rate() >= trainer.get_min_learning_rate()
+            while (!scheduler.is_training_complete()
                 && epoch < max_epochs && !g_terminate_flag.load())
             {
                 total_loss = 0.0;
-                batches_seen = 0, samples_seen = 0;
+                batches_seen = 0;
+                samples_seen = 0;
                 epoch_start = std::chrono::high_resolution_clock::now();
 
                 // Shuffle the dataset
@@ -380,16 +439,24 @@ int main(int argc, char** argv)
                     std::vector<unsigned long> batch_labels(
                         labels.begin() + i, labels.begin() + batch_end);
 
+                    // Update learning rate from scheduler
+                    double current_lr = scheduler.get_learning_rate();
+                    trainer.set_learning_rate(current_lr);
+
                     std::vector<long> pad_lengths(batch_samples.size());
                     for (size_t j = 0; j < batch_samples.size(); ++j)
                         pad_lengths[j] = count_leading_padding(batch_samples[j], pad_token);
                     tril_padding_context::set_from_lengths(pad_lengths);
 
+                    // Train
                     trainer.train_one_step(batch_samples, batch_labels);
+
+                    // Advance scheduler
+                    scheduler.step();
+
                     total_loss += trainer.get_average_loss();
                     batches_seen++;
                     samples_seen += batch_samples.size();
-                    steps += batch_samples.size();
 
                     // Progress reporting
                     if (batches_count++ % 100 == 0) {
@@ -398,21 +465,34 @@ int main(int argc, char** argv)
                             std::chrono::high_resolution_clock::now() - epoch_start).count();
                         double samples_per_sec = samples_seen / (elapsed > 0 ? elapsed : 1);
 
+                        std::ios_base::fmtflags old_flags = cout.flags();
+                        std::streamsize old_precision = cout.precision();
+
                         cout << "epoch#: " << (epoch + 1) << "/" << max_epochs
-                            << " (ksteps: " << (steps / 1000) << ")"
-                            << " \t loss: " << avg_loss
-                            << " \t patience: " << trainer.get_steps_without_progress()
+                            << " \t loss: " << std::fixed << std::setprecision(3) << avg_loss
+                            << " \t lr: " << std::scientific << std::setprecision(2) << current_lr
+                            << " \t phase: " << scheduler.get_phase_name()
+                            << " \t progress: " << std::fixed << std::setprecision(1)
+                            << (scheduler.get_total_progress() * 100) << "%"
                             << " \t speed: " << samples_per_sec << " samples/sec\n";
                         cout.flush();
+
+                        cout.flags(old_flags);
+                        cout.precision(old_precision);
                     }
+
+                    // Check if scheduler indicates training is complete
+                    if (scheduler.is_training_complete()) break;
                 }
                 epoch++;
             }
             tril_padding_context::clear();
 
             // Save fine-tuned model
-            set_all_learning_rate_multipliers(net, 1.0);
+            set_all_learning_rate_multipliers(net, 1.0);  // Reset multipliers before saving
             cout << "\nFine-tuning complete, saving specialized model...\n";
+            cout << "Final step: " << scheduler.get_current_step()
+                << ", final learning rate: " << scheduler.get_learning_rate() << "\n";
             net.clean();
 
             serialize(finetuned_model) << net << tokenizer;
