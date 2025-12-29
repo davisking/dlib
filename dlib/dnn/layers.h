@@ -5622,15 +5622,11 @@ namespace dlib
                 clear();
                 return;
             }
-
-            std::lock_guard<std::mutex> lock(mutex_);
-
+            std::lock_guard<std::mutex> lock(get_mutex_());
             const long batch_size = input_tokens.num_samples();
             const long seq_len = input_tokens.nr();
             const float* data = input_tokens.host();
-
-            padding_lengths_.resize(batch_size);
-
+            get_padding_lengths_().resize(batch_size);
             for (long s = 0; s < batch_size; ++s)
             {
                 long count = 0;
@@ -5638,72 +5634,77 @@ namespace dlib
                 {
                     const long idx = s * seq_len + t;
                     const long token = static_cast<long>(data[idx]);
-
                     if (token == padding_token)
                         count++;
                     else
                         break;
                 }
-                padding_lengths_[s] = count;
+                get_padding_lengths_()[s] = count;
             }
-
-            is_set_ = true;
+            get_is_set_() = true;
         }
 
         static void set_from_lengths(const std::vector<long>& lengths)
         {
-            std::lock_guard<std::mutex> lock(mutex_);
-            padding_lengths_ = lengths;
-            is_set_ = true;
+            std::lock_guard<std::mutex> lock(get_mutex_());
+            get_padding_lengths_() = lengths;
+            get_is_set_() = true;
         }
 
-        static void set_uniform(long padding_length,long batch_size)
+        static void set_uniform(long padding_length, long batch_size)
         {
-            std::lock_guard<std::mutex> lock(mutex_);
-            padding_lengths_.assign(batch_size, padding_length);
-            is_set_ = true;
+            std::lock_guard<std::mutex> lock(get_mutex_());
+            get_padding_lengths_().assign(batch_size, padding_length);
+            get_is_set_() = true;
         }
 
         static void clear()
         {
-            std::lock_guard<std::mutex> lock(mutex_);
-            padding_lengths_.clear();
-            is_set_ = false;
+            std::lock_guard<std::mutex> lock(get_mutex_());
+            get_padding_lengths_().clear();
+            get_is_set_() = false;
         }
 
         static long get_padding_length(long sample_idx)
         {
-            std::lock_guard<std::mutex> lock(mutex_);
-
-            if (!is_set_ || sample_idx < 0 ||
-                sample_idx >= static_cast<long>(padding_lengths_.size()))
+            std::lock_guard<std::mutex> lock(get_mutex_());
+            if (!get_is_set_() || sample_idx < 0 ||
+                sample_idx >= static_cast<long>(get_padding_lengths_().size()))
                 return 0;
-
-            return padding_lengths_[sample_idx];
+            return get_padding_lengths_()[sample_idx];
         }
 
         static std::vector<long> get_all_lengths()
         {
-            std::lock_guard<std::mutex> lock(mutex_);
-            return padding_lengths_;
+            std::lock_guard<std::mutex> lock(get_mutex_());
+            return get_padding_lengths_();
         }
 
         static bool is_set()
         {
-            std::lock_guard<std::mutex> lock(mutex_);
-            return is_set_;
+            std::lock_guard<std::mutex> lock(get_mutex_());
+            return get_is_set_();
         }
 
     private:
-        static std::mutex mutex_;
-        static std::vector<long> padding_lengths_;
-        static bool is_set_;
-    };
+        static std::mutex& get_mutex_()
+        {
+            static std::mutex m;
+            return m;
+        }
 
-    // Static member definitions for tril_padding_context
-    std::mutex tril_padding_context::mutex_;
-    std::vector<long> tril_padding_context::padding_lengths_;
-    bool tril_padding_context::is_set_ = false;
+        static std::vector<long>& get_padding_lengths_()
+        {
+            static std::vector<long> lengths;
+            return lengths;
+        }
+
+        static bool& get_is_set_()
+        {
+            static bool is_set = false;
+            return is_set;
+        }
+    };
 
     template <typename T>
     long count_leading_padding(const matrix<T, 0, 1>& seq, T padding_token)

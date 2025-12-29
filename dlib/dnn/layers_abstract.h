@@ -4552,18 +4552,18 @@ namespace dlib
                 This class provides a shared context for communicating padding information
                 to tril_ layers during forward passes. It solves the problem of nested
                 architectures where tril_ layers cannot directly access the input sequence.
-
                 The context stores per-sample padding lengths that are computed once
                 before each forward pass and consulted by all tril_ layers.
+
+            THREAD SAFETY
+                All methods are thread-safe through internal mutex protection.
 
             TYPICAL USAGE
                 // Before forward pass:
                 tril_padding_context::set(input_tensor, padding_token);
-
                 // Or from pre-computed lengths:
                 tril_padding_context::set_from_lengths(padding_lengths);
         !*/
-
     public:
         static void set(const tensor& input_tokens, long padding_token);
         /*!
@@ -4616,11 +4616,6 @@ namespace dlib
             ensures
                 - Returns true if padding context has been initialized
         !*/
-
-    private:
-        static std::mutex mutex_;
-        static std::vector<long> padding_lengths_;
-        static bool is_set_;
     };
 
 // ----------------------------------------------------------------------------------------
