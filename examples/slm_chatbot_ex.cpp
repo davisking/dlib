@@ -5,7 +5,14 @@
     This program demonstrates how to build a specialized chatbot using transformer
     architecture with Mixture-of-Experts layers. The fine-tuning process is used to
     specialize the model for conversational Q&A tasks using formatted prompt-response
-    pairs with special tags
+    pairs with special tags.
+
+    Key features:
+    - Layer-wise learning rate multipliers for selective fine-tuning
+    - Learning rate scheduler with warmup and cosine decay
+    - Padding-aware causal attention via tril_padding_context
+    - Stochastic text generation with temperature, top-k, nucleus sampling
+    - Repetition penalty and min-p filtering for improved generation quality
 
     The chatbot is designed to answer questions about black holes and
     related astrophysics topics, demonstrating how proper data formatting and
@@ -22,7 +29,6 @@
     The special tags help the model learn the conversational structure and
     role-based response patterns.
 !*/
-
 #include <iostream>
 #include <string>
 #include <vector>
@@ -111,11 +117,11 @@ namespace dlib
             static std::string describe() {
                 std::stringstream ss;
                 ss << "Chatbot configuration:\n"
-                    << "- Vocabulary: " << VOCAB_SIZE << " tokens\n"
-                    << "- Layers: " << NUM_LAYERS << " transformer layers with MoE\n"
-                    << "- Attention heads: " << NUM_HEADS << "\n"
-                    << "- Embedding dimension: " << EMBEDDING_DIM << "\n"
-                    << "- Experts per layer: 4 (auto top-n selection)";
+                    << "- vocabulary: " << VOCAB_SIZE << " tokens\n"
+                    << "- layers: " << NUM_LAYERS << " transformer layers with MoE\n"
+                    << "- attention heads: " << NUM_HEADS << "\n"
+                    << "- embedding dimension: " << EMBEDDING_DIM << "\n"
+                    << "- experts per layer: 4 (auto top-n selection)";
                 return ss.str();
             }
         };
@@ -395,7 +401,7 @@ int main(int argc, char** argv)
             visit_layers_range<40, 75>(net, lr_mult_visitor(0.1));
             cout << net << endl;
 
-            size_t epoch = 0, steps = 0;
+            size_t epoch = 0;
             size_t batches_count = 0, batches_seen = 0, samples_seen = 0;
             double total_loss = 0.0;
             auto epoch_start = std::chrono::high_resolution_clock::now();
@@ -412,14 +418,27 @@ int main(int argc, char** argv)
                 1e-7,                   // min_lr
                 lr_decay_type::COSINE   // decay_type
             );
+
+            // Restore scheduler state if exists
+            const std::string scheduler_state_file = "scheduler-" + finetuned_model;
+            if (file_exists(scheduler_state_file)) {
+                deserialize(scheduler_state_file) >> scheduler;
+                cout << "Scheduler resumed: step " << scheduler.get_current_step()
+                    << ", phase: " << scheduler.get_phase_name()
+                    << ", learning rate: " << scheduler.get_learning_rate() << "\n";
+            }
+
             cout << "Learning rate schedule:\n"
-                << "  - peak learning rate: " << learning_rate << "\n"
-                << "  - warmup steps: " << warmup_steps << "\n"
-                << "  - total steps: " << total_steps << "\n"
-                << "  - decay: cosine\n\n";
-            cout << "Starting fine-tuning with warmup...\n";
+                << "  peak learning rate: " << scheduler.get_peak_lr() << "\n"
+                << "  min learning rate: " << scheduler.get_min_lr() << "\n"
+                << "  warmup steps: " << scheduler.get_warmup_steps() << "\n"
+                << "  total steps: " << scheduler.get_total_steps() << "\n"
+                << "  current step: " << scheduler.get_current_step() << "\n"
+                << "  current phase: " << scheduler.get_phase_name() << "\n"
+                << "  decay type: COSINE\n\n";
 
             // Training loop
+            cout << "Starting fine-tuning...\n";
             while (!scheduler.is_training_complete()
                 && epoch < max_epochs && !g_terminate_flag.load())
             {
@@ -479,6 +498,9 @@ int main(int argc, char** argv)
 
                         cout.flags(old_flags);
                         cout.precision(old_precision);
+
+                        // Save scheduler checkpoint periodically
+                        serialize(scheduler_state_file) << scheduler;
                     }
 
                     // Check if scheduler indicates training is complete
