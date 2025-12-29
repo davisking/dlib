@@ -4,8 +4,8 @@
 
     This program demonstrates how to build a transformer-based language model enhanced
     with Mixture-of-Experts (MoE) layers using Dlib's advanced deep learning capabilities.
-    The example shows how to integrate the new moe_ffn layer that replaces
-    standard feed-forward networks with dynamic expert routing for improved model capacity
+    The example shows how to integrate the moe_ffn layer that replaces standard
+    feed-forward networks with dynamic expert routing for improved model capacity
     and specialization.
 
     Key features:
@@ -13,17 +13,21 @@
     - Sparse activation pattern (only top-n experts active per input)
     - Automatic load balancing across experts through auxiliary loss
     - Multi-head self-attention with causal masking for autoregressive generation
+    - Padding-aware attention masks via tril_padding_context for variable-length sequences
+    - Learning rate scheduler with warmup and cosine decay for stable convergence
     - BPE tokenization for efficient vocabulary management
-    - Complete training and generation pipeline using datasets
+    - Checkpoint support for both trainer state and scheduler state
+    - Complete training and generation pipeline using internal and external datasets
 
     Usage modes:
     --train      Train model on internal datasets with MoE layers
     --generate   Generate text from trained MoE-enhanced model
 
-    Performance considerations:
-    - Sparse activation reduces inference compute (only top-n experts active)
-    - Training is more challenging than standard transformers
-    - Requires larger datasets for effective expert specialization
+    Training considerations:
+    - Warmup phase prevents early gradient instability (default: 2000 steps or 10%)
+    - Cosine decay provides smooth learning rate annealing to minimum LR
+    - Scheduler state is saved separately for proper training resumption
+    - Padding context enables efficient batching of variable-length sequences
 !*/
 #include <iostream>
 #include <string>
@@ -122,12 +126,12 @@ namespace dlib
             static std::string describe() {
                 std::stringstream ss;
                 ss << "Transformer-MoE model configuration:\n"
-                    << "- Vocabulary size: " << VOCAB_SIZE << "\n"
-                    << "- Layers: " << NUM_LAYERS << "\n"
-                    << "- Attention heads: " << NUM_HEADS << "\n"
-                    << "- Embedding dimension: " << EMBEDDING_DIM << "\n"
-                    << "- Architecture: Transformer with MoE feed-forward layers\n"
-                    << "- Experts per layer: 4 (auto top-n selection)";
+                    << "- vocabulary size: " << VOCAB_SIZE << "\n"
+                    << "- layers: " << NUM_LAYERS << "\n"
+                    << "- attention heads: " << NUM_HEADS << "\n"
+                    << "- embedding dimension: " << EMBEDDING_DIM << "\n"
+                    << "- architecture: Transformer with MoE feed-forward layers\n"
+                    << "- experts per layer: 4 (auto top-n selection)";
                 return ss.str();
             }
         };
@@ -807,6 +811,11 @@ int main(int argc, char** argv)
             trainer.be_quiet();
             cout << net << endl << endl; // Show the model architecture            
 
+            size_t epoch = 0;
+            size_t batches_count = 0, batches_seen = 0, samples_seen = 0;
+            double total_loss = 0.0;
+            auto epoch_start = std::chrono::high_resolution_clock::now();
+
             // Estimate total training steps
             size_t steps_per_epoch = (samples.size() + batch_size - 1) / batch_size;
             size_t total_steps = steps_per_epoch * max_epochs;
@@ -818,33 +827,32 @@ int main(int argc, char** argv)
                 total_steps,                                // total_steps
                 trainer.get_min_learning_rate(),            // min_lr
                 lr_decay_type::COSINE                       // decay_type
-            );
+            );            
 
-            // Tokenizer stored with model for simplified inference
-            if (file_exists(model_file) &&
-                !file_exists("chkpt-" + model_file)) {
-                lr_scheduler loaded_scheduler;
-                deserialize(model_file) >> net >> tokenizer >> loaded_scheduler;
-                scheduler = loaded_scheduler;
-                cout << "Resumed from step " << scheduler.get_current_step()
-                    << ", LR: " << scheduler.get_learning_rate() << "\n";
+            // Restore scheduler state if exists
+            const std::string scheduler_state_file = "scheduler-" + model_file;
+            if (file_exists(scheduler_state_file)) {
+                deserialize(scheduler_state_file) >> scheduler;
+                cout << "Scheduler resumed: step " << scheduler.get_current_step()
+                    << ", phase: " << scheduler.get_phase_name()
+                    << ", learning rate: " << scheduler.get_learning_rate() << "\n";
             }
+            cout << "Learning rate schedule:\n"
+                << "  peak learning rate: " << scheduler.get_peak_lr() << "\n"
+                << "  min learning rate: " << scheduler.get_min_lr() << "\n"
+                << "  warmup steps: " << scheduler.get_warmup_steps() << "\n"
+                << "  total steps: " << scheduler.get_total_steps() << "\n"
+                << "  current step: " << scheduler.get_current_step() << "\n"
+                << "  current phase: " << scheduler.get_phase_name() << "\n"
+                << "  decay type: COSINE\n\n";
 
-            size_t epoch = 0;            
-            size_t batches_count = 0, batches_seen = 0, samples_seen = 0;
-            double total_loss = 0.0;
-            auto epoch_start = std::chrono::high_resolution_clock::now();
+            // Restore from final model file if no checkpoint but model exists
+            if (file_exists(model_file) && !file_exists("chkpt-" + model_file))
+                deserialize(model_file) >> net >> tokenizer;
 
             // Training loop           
-            cout << "Learning rate schedule:\n"
-                << "  Peak LR: " << scheduler.get_peak_lr() << "\n"
-                << "  Min LR: " << scheduler.get_min_lr() << "\n"
-                << "  Warmup steps: " << scheduler.get_warmup_steps() << "\n"
-                << "  Total steps: " << scheduler.get_total_steps() << "\n"
-                << "  Decay type: COSINE\n\n";
             cout << "Starting training...\n";
-            trainer.set_learning_rate(scheduler.get_learning_rate());
-            while (trainer.get_learning_rate() >= trainer.get_min_learning_rate() 
+            while (!scheduler.is_training_complete()
                 && epoch < max_epochs && !g_terminate_flag.load())
             {
                 total_loss = 0.0;
@@ -862,6 +870,7 @@ int main(int argc, char** argv)
                     std::vector<unsigned long> batch_labels(
                         labels.begin() + i, labels.begin() + batch_end);
 
+                    // Update learning rate from scheduler
                     double current_lr = scheduler.get_learning_rate();
                     trainer.set_learning_rate(current_lr);
 
@@ -870,8 +879,12 @@ int main(int argc, char** argv)
                         pad_lengths[j] = count_leading_padding(batch_samples[j], pad_token);
                     tril_padding_context::set_from_lengths(pad_lengths);
 
+                    // Train
                     trainer.train_one_step(batch_samples, batch_labels);
+
+                    // Advance scheduler
                     scheduler.step();
+
                     total_loss += trainer.get_average_loss();
                     batches_seen++;
                     samples_seen += batch_samples.size();
@@ -883,13 +896,22 @@ int main(int argc, char** argv)
                             std::chrono::high_resolution_clock::now() - epoch_start).count();
                         double samples_per_sec = samples_seen / (elapsed > 0 ? elapsed : 1);
 
+                        std::ios_base::fmtflags old_flags = cout.flags();
+                        std::streamsize old_precision = cout.precision();
+
                         cout << "epoch#: " << (epoch + 1) << "/" << max_epochs
-                            << " \t loss: " << std::setprecision(3) << avg_loss
-                            << " \t lr: " << current_lr
+                            << " \t loss: " << std::fixed << std::setprecision(3) << avg_loss
+                            << " \t learning-rate: " << std::scientific << std::setprecision(2) << current_lr
                             << " \t phase: " << scheduler.get_phase_name()
                             << " \t speed: " << std::fixed << std::setprecision(1)
                             << samples_per_sec << " samples/sec\n";
                         cout.flush();
+
+                        cout.flags(old_flags);
+                        cout.precision(old_precision);
+
+                        // Save scheduler checkpoint periodically
+                        serialize(scheduler_state_file) << scheduler;
                     }
                 }
                 epoch++;
@@ -897,22 +919,43 @@ int main(int argc, char** argv)
             tril_padding_context::clear();
 
             // Save model and tokenizer
-			cout << "Training complete. Saving model...\n";
+            cout << "Training complete. Saving model...\n";
             net.clean();
-            serialize(model_file) << net << tokenizer << scheduler;
+            serialize(model_file) << net << tokenizer;
             cout << "Model saved to " << model_file << "\n";
             cout << "Final step: " << scheduler.get_current_step()
-                << ", Final LR: " << scheduler.get_learning_rate() << "\n";
+                << ", final learning rate: " << scheduler.get_learning_rate() << "\n";
 
             // Evaluate on training set
             {
                 cout << "Evaluating model accuracy...\n";
                 my_transformer::network_type<false> g_infer;
                 deserialize(model_file) >> g_infer >> tokenizer;
-                auto predicted = g_infer(samples);
+
                 size_t correct = 0;
-                for (size_t i = 0; i < labels.size(); ++i)
-                    if (predicted[i] == labels[i]) correct++;
+                const size_t eval_batch_size = batch_size;
+
+                for (size_t i = 0; i < samples.size(); i += eval_batch_size)
+                {
+                    size_t batch_end = std::min(i + eval_batch_size, samples.size());
+                    std::vector<matrix<int, 0, 1>> batch_samples(
+                        samples.begin() + i, samples.begin() + batch_end);
+
+                    // Configure padding context for this batch
+                    std::vector<long> pad_lengths(batch_samples.size());
+                    for (size_t j = 0; j < batch_samples.size(); ++j)
+                        pad_lengths[j] = count_leading_padding(batch_samples[j], pad_token);
+                    tril_padding_context::set_from_lengths(pad_lengths);
+
+                    // Predict
+                    auto predicted = g_infer(batch_samples);
+
+                    // Count correct predictions
+                    for (size_t j = 0; j < predicted.size(); ++j)
+                        if (predicted[j] == labels[i + j]) correct++;
+                }
+                tril_padding_context::clear();
+
                 double accuracy = (double)correct / labels.size();
                 cout << "Training accuracy: " << (accuracy * 100.0) << "%\n";
             }
