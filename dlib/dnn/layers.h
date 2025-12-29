@@ -6832,7 +6832,6 @@ namespace dlib
         void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
         {
             const long batch_size = gradient_input.num_samples();
-            const long sequence_length = gradient_input.nr();
             const long num_patches = num_patches_h * num_patches_w;
 
             // Get parameter aliases from params
