@@ -101,7 +101,7 @@ namespace dlib
         static constexpr long EMBEDDING_DIM = embedding_dim;
         static constexpr long PATCH_SIZE = 4;     // 32/4 = 8x8 = 64 patches
         static constexpr long NUM_PATCHES = 64;   // (32/4)^2
-        static constexpr long DONT_USE_ClASS_TOKEN = 0;
+        static constexpr long DONT_USE_CLASS_TOKEN = 0;
         static constexpr long DONT_USE_POSITION_EMBEDDINGS = 0;
 
         // Backbone: patch embeddings => transformer => pooling
@@ -109,13 +109,13 @@ namespace dlib
         template <template <typename> class DO, typename INPUT>
         using backbone_training = 
             canonical_transformer::transformer_stack<NUM_LAYERS, gelu, DO, EMBEDDING_DIM, NUM_HEADS,
-            patch_embeddings<PATCH_SIZE, EMBEDDING_DIM, DONT_USE_ClASS_TOKEN, DONT_USE_POSITION_EMBEDDINGS,
+            patch_embeddings<PATCH_SIZE, EMBEDDING_DIM, DONT_USE_CLASS_TOKEN, DONT_USE_POSITION_EMBEDDINGS,
             INPUT>>;
 
         template <typename INPUT>
         using backbone_inference = 
             canonical_transformer::transformer_stack<NUM_LAYERS, gelu, multiply, EMBEDDING_DIM, NUM_HEADS,
-            patch_embeddings<PATCH_SIZE, EMBEDDING_DIM, DONT_USE_ClASS_TOKEN, DONT_USE_POSITION_EMBEDDINGS,
+            patch_embeddings<PATCH_SIZE, EMBEDDING_DIM, DONT_USE_CLASS_TOKEN, DONT_USE_POSITION_EMBEDDINGS,
             INPUT>>;
 
         static std::string describe() {
