@@ -31,6 +31,7 @@
 #include <dlib/dnn.h>
 #include <dlib/data_io.h>
 #include <dlib/cmd_line_parser.h>
+#include <dlib/misc_api.h>
 #include <iostream>
 #include <chrono>
 #include <csignal>
@@ -39,37 +40,6 @@
 
 using namespace std;
 using namespace dlib;
-
-// Signal handling for clean termination
-namespace {
-    std::atomic<bool> g_terminate_flag(false);
-
-#ifdef _WIN32
-    BOOL WINAPI console_ctrl_handler(DWORD ctrl_type) {
-        if (ctrl_type == CTRL_C_EVENT) {
-            g_terminate_flag.store(true);
-            cout << "\nCtrl+C detected, cleaning up..." << endl;
-            return TRUE;
-        }
-        return FALSE;
-    }
-
-    void setup_interrupt_handler() {
-        SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
-    }
-#else
-    void signal_handler(int signal) {
-        if (signal == SIGINT) {
-            g_terminate_flag.store(true);
-            cout << "\nCtrl+C detected, cleaning up..." << endl;
-        }
-    }
-
-    void setup_interrupt_handler() {
-        std::signal(SIGINT, signal_handler);
-    }
-#endif
-}
 
 // Vision Transformer Architecture
 namespace dlib
@@ -268,13 +238,9 @@ void train_ssl(
     cout << "Starting self-supervised training...\n";
     cout << "Press Ctrl+C to stop and save the model\n" << endl;
 
-    while (trainer.get_learning_rate() >= trainer.get_min_learning_rate())
+    while (trainer.get_learning_rate() >= trainer.get_min_learning_rate()
+        && !signal_handler::is_triggered())
     {
-        if (g_terminate_flag.load()) {
-            cout << "\nInterrupted by user. Saving model..." << endl;
-            break;
-        }
-
         // Create pairs of augmented views
         std::vector<std::pair<matrix<rgb_pixel>, matrix<rgb_pixel>>> batch_pairs;
         while (batch_pairs.size() < batch_size) {
@@ -331,12 +297,9 @@ void train_supervised(
     cout << "Press Ctrl+C to stop and save the model\n" << endl;
 
     size_t epoch = 0;
-    while (trainer.get_learning_rate() >= trainer.get_min_learning_rate())
+    while (trainer.get_learning_rate() >= trainer.get_min_learning_rate()
+        && !signal_handler::is_triggered())
     {
-        if (g_terminate_flag.load()) {
-            cout << "\nInterrupted by user. Saving model..." << endl;
-            break;
-        }
         ++epoch;
 
         // Shuffle training data
@@ -345,7 +308,7 @@ void train_supervised(
         std::shuffle(indices.begin(), indices.end(), std::default_random_engine{});
 
         // Train for one epoch
-        for (size_t i = 0; i < training_images.size() && !g_terminate_flag.load(); ++i)
+        for (size_t i = 0; i < training_images.size() && !signal_handler::is_triggered(); ++i)
         {
             const auto idx = indices[i];
             batch_images.push_back(augment_image(training_images[idx], rnd, false));
@@ -409,7 +372,7 @@ void train_supervised(
 int main(const int argc, const char** argv)
 try
 {
-    setup_interrupt_handler();
+    signal_handler::setup();
 
     command_line_parser parser;
     parser.add_option("ssl", "Use self-supervised learning (Barlow Twins)");

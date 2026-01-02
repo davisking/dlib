@@ -43,6 +43,7 @@
 #include <dlib/data_io.h>
 #include <dlib/cmd_line_parser.h>
 #include <dlib/tokenizer/bpe_tokenizer.h>
+#include <dlib/misc_api.h>
 
 // Include internal dataset
 #include "slm_data.h"
@@ -136,39 +137,6 @@ namespace dlib
             }
         };
     };
-}
-
-// Signal handling for clean termination
-namespace {
-    std::atomic<bool> g_terminate_flag(false);
-
-#ifdef _WIN32
-    // Windows-specific handler
-    BOOL WINAPI console_ctrl_handler(DWORD ctrl_type) {
-        if (ctrl_type == CTRL_C_EVENT) {
-            g_terminate_flag.store(true);
-            cout << "\nCtrl+C detected, cleaning up and closing the program..." << endl;
-            return TRUE;
-        }
-        return FALSE;
-    }
-
-    void setup_interrupt_handler() {
-        SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
-    }
-#else
-    // Unix/Linux-specific handler
-    void signal_handler(int signal) {
-        if (signal == SIGINT) {
-            g_terminate_flag.store(true);
-            cout << "\nCtrl+C detected, cleaning up and closing the program..." << endl;
-        }
-    }
-
-    void setup_interrupt_handler() {
-        std::signal(SIGINT, signal_handler);
-    }
-#endif
 }
 
 // Utility functions
@@ -554,7 +522,7 @@ int main(int argc, char** argv)
     try
     {
         // Setup interrupt handling for clean termination
-        setup_interrupt_handler();
+        signal_handler::setup();
 
         command_line_parser parser;
         parser.add_option("train", "Train a transformer model on internal datasets");
@@ -731,7 +699,7 @@ int main(int argc, char** argv)
 
                 // Tokenize all text segments
                 cout << "Tokenizing input text segments...\n";
-                int text_start_id = tokenizer.get_special_token_id("<text>"),
+                long text_start_id = tokenizer.get_special_token_id("<text>"),
                     text_end_id = tokenizer.get_special_token_id("</text>");
                 if (text_start_id < 0 || text_end_id < 0) {
                     cerr << "ERROR: Required special tokens not found in tokenizer vocabulary!\n";
@@ -796,7 +764,7 @@ int main(int argc, char** argv)
             // Build and train the network
             using net_type = my_transformer::network_type<true>;
             net_type net;
-            const int pad_token = tokenizer.get_special_token_id("<pad>");
+            const long pad_token = tokenizer.get_special_token_id("<pad>");
             layer<0>(net).loss_details().set_ignore_index(pad_token);
             cout << my_transformer::model_info::describe() << endl;
 
@@ -853,7 +821,7 @@ int main(int argc, char** argv)
             // Training loop           
             cout << "Starting training...\n";
             while (!scheduler.is_training_complete()
-                && epoch < max_epochs && !g_terminate_flag.load())
+                && epoch < max_epochs && !signal_handler::is_triggered())
             {
                 total_loss = 0.0;
                 batches_seen = 0, samples_seen = 0;
@@ -862,7 +830,7 @@ int main(int argc, char** argv)
                 // Shuffle the dataset
                 shuffle_training_dataset(samples, labels);
 
-                for (size_t i = 0; i < samples.size() && !g_terminate_flag.load(); i += batch_size)
+                for (size_t i = 0; i < samples.size() && !signal_handler::is_triggered(); i += batch_size)
                 {
                     size_t batch_end = std::min(i + batch_size, samples.size());
                     std::vector<matrix<int, 0, 1>> batch_samples(
@@ -876,7 +844,7 @@ int main(int argc, char** argv)
 
                     std::vector<long> pad_lengths(batch_samples.size());
                     for (size_t j = 0; j < batch_samples.size(); ++j)
-                        pad_lengths[j] = count_leading_padding(batch_samples[j], pad_token);
+                        pad_lengths[j] = count_leading_padding(batch_samples[j], static_cast<int>(pad_token));
                     tril_padding_context::set_from_lengths(pad_lengths);
 
                     // Train
@@ -944,7 +912,7 @@ int main(int argc, char** argv)
                     // Configure padding context for this batch
                     std::vector<long> pad_lengths(batch_samples.size());
                     for (size_t j = 0; j < batch_samples.size(); ++j)
-                        pad_lengths[j] = count_leading_padding(batch_samples[j], pad_token);
+                        pad_lengths[j] = count_leading_padding(batch_samples[j], static_cast<int>(pad_token));
                     tril_padding_context::set_from_lengths(pad_lengths);
 
                     // Predict
@@ -1028,7 +996,7 @@ int main(int argc, char** argv)
             cout << "Using " << prompt_tokens.size() << " tokens for initial prompt.\n";
 
             // Setup inference context
-            const int pad_token = tokenizer.get_special_token_id("<pad>");
+            const long pad_token = tokenizer.get_special_token_id("<pad>");
             inference_context llm_context(max_seq_len, 4, pad_token);
             llm_context.add_tokens(prompt_tokens);
             auto input_seq = llm_context.get_input_window();
@@ -1053,12 +1021,12 @@ int main(int argc, char** argv)
             generated_tokens.reserve(tokens_to_generate);
 
             auto start_time = std::chrono::high_resolution_clock::now();
-            int end_of_text_id = tokenizer.get_special_token_id("</text>");
+            long end_of_text_id = tokenizer.get_special_token_id("</text>");
 
             // Generate tokens autoregressively
-            for (size_t i = 0; i < tokens_to_generate && !g_terminate_flag.load(); ++i) {
+            for (size_t i = 0; i < tokens_to_generate && !signal_handler::is_triggered(); ++i) {
                 // Predict next token
-                long pad_len = count_leading_padding(input_seq, pad_token);
+                long pad_len = count_leading_padding(input_seq, static_cast<int>(pad_token));
                 tril_padding_context::set_uniform(pad_len, 1);
                 int next_token = net(input_seq);
                 generated_tokens.push_back(next_token);

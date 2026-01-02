@@ -71,6 +71,55 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct signal_handler
+    {
+        /*!
+            ensures
+                - registers a signal handler for SIGINT (Linux/macOS) or CTRL_C_EVENT (Windows)
+                - when triggered, #is_triggered() will return true
+        !*/
+        static void setup();
+
+        /*!
+            ensures
+                - returns true if the user has pressed Ctrl+C since setup() was called or since
+                  the last reset()
+        !*/
+        static bool is_triggered()
+        {
+            return get_flag().load();
+        }
+
+        /*!
+            ensures
+                - resets the internal triggered flag to false
+        !*/
+        static void reset()
+        {
+            get_flag().store(false);
+        }
+
+        /*!
+            ensures
+                - sets the internal triggered flag to true
+                - this function is typically called by the underlying OS-specific signal handler
+        !*/
+        static void trigger_interrupt()
+        {
+            get_flag().store(true);
+        }
+
+    private:
+        // Helper to access the singleton atomic flag safely
+        static std::atomic<bool>& get_flag()
+        {
+            static std::atomic<bool> flag(false);
+            return flag;
+        }
+    };
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #ifdef NO_MAKEFILE

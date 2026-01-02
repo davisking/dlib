@@ -41,6 +41,7 @@
 #include <dlib/data_io.h>
 #include <dlib/cmd_line_parser.h>
 #include <dlib/tokenizer/bpe_tokenizer.h>
+#include <dlib/misc_api.h>
 
 // Include internal dataset
 #include "slm_data.h"
@@ -113,39 +114,6 @@ namespace dlib
             }
         };
     };
-}
-
-// Signal handling for clean termination
-namespace {
-    std::atomic<bool> g_terminate_flag(false);
-
-#ifdef _WIN32
-    // Windows-specific handler
-    BOOL WINAPI console_ctrl_handler(DWORD ctrl_type) {
-        if (ctrl_type == CTRL_C_EVENT) {
-            g_terminate_flag.store(true);
-            cout << "\nCtrl+C detected, cleaning up and closing the program..." << endl;
-            return TRUE;
-        }
-        return FALSE;
-    }
-
-    void setup_interrupt_handler() {
-        SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
-    }
-#else
-    // Unix/Linux-specific handler
-    void signal_handler(int signal) {
-        if (signal == SIGINT) {
-            g_terminate_flag.store(true);
-            cout << "\nCtrl+C detected, cleaning up and closing the program..." << endl;
-        }
-    }
-
-    void setup_interrupt_handler() {
-        std::signal(SIGINT, signal_handler);
-    }
-#endif
 }
 
 // Utility functions
@@ -252,7 +220,7 @@ int main(int argc, char** argv)
     try
     {
         // Setup interrupt handling for clean termination
-        setup_interrupt_handler();
+        signal_handler::setup();
 
         command_line_parser parser;
         parser.add_option("train", "Train a transformer model on internal dataset");
@@ -450,7 +418,6 @@ int main(int argc, char** argv)
             using net_type = my_transformer::network_type<true>;
             net_type net;
             const int pad_token = tokenizer.get_special_token_id("<pad>");
-            layer<0>(net).loss_details().set_ignore_index(pad_token);
             cout << my_transformer::model_info::describe() << endl;
 
             // Tokenizer stored with model for simplified inference
@@ -475,7 +442,8 @@ int main(int argc, char** argv)
             auto epoch_start = std::chrono::high_resolution_clock::now();
 
             // Training loop
-            while (trainer.get_learning_rate() >= 1e-6 && epoch < max_epochs && !g_terminate_flag.load())
+            while (trainer.get_learning_rate() >= 1e-6 && epoch < max_epochs
+                && !signal_handler::is_triggered())
             {
                 total_loss = 0.0;
                 batches_seen = samples_seen = 0;
@@ -484,7 +452,7 @@ int main(int argc, char** argv)
                 // Shuffle the dataset
                 shuffle_training_dataset(samples, labels);
 
-                for (size_t i = 0; i < samples.size() && !g_terminate_flag.load(); i += batch_size)
+                for (size_t i = 0; i < samples.size() && !signal_handler::is_triggered(); i += batch_size)
                 {
                     size_t batch_end = std::min(i + batch_size, samples.size());
                     std::vector<matrix<int, 0, 1>> batch_samples(
@@ -529,7 +497,7 @@ int main(int argc, char** argv)
 
             // Evaluate on training set
             {
-                if (!g_terminate_flag.load()) {
+                if (!signal_handler::is_triggered()) {
                     cout << "Evaluating model accuracy...\n";
                     my_transformer::network_type<false> g_infer;
                     deserialize(model_file) >> g_infer >> tokenizer;
@@ -665,7 +633,8 @@ int main(int argc, char** argv)
 
             // Generate until target size is reached
             int end_of_text = tokenizer.get_special_token_id("</text>"), next_token = 0;
-            while (total_bytes < target_size && next_token != end_of_text && !g_terminate_flag.load()) {
+            while (total_bytes < target_size && next_token != end_of_text
+                && !signal_handler::is_triggered()) {
                 // Predict next token
                 long pad_len = count_leading_padding(input_seq, pad_token);
                 tril_padding_context::set_uniform(pad_len, 1);

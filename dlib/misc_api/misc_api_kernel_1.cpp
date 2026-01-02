@@ -141,6 +141,23 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
     
+    BOOL WINAPI console_ctrl_handler(DWORD ctrl_type)
+    {
+        if (ctrl_type == CTRL_C_EVENT)
+        {
+            signal_handler::trigger_interrupt();
+            return TRUE;
+        }
+        return FALSE;
+    }
+
+    void signal_handler::setup()
+    {
+        SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
+    }
+
+// ----------------------------------------------------------------------------------------
+    
 }
 
 #endif // WIN32

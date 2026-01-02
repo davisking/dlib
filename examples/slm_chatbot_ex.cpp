@@ -128,37 +128,6 @@ namespace dlib
     };
 }
 
-// Signal handling for clean termination
-namespace {
-    std::atomic<bool> g_terminate_flag(false);
-
-#ifdef _WIN32
-    BOOL WINAPI console_ctrl_handler(DWORD ctrl_type) {
-        if (ctrl_type == CTRL_C_EVENT) {
-            g_terminate_flag.store(true);
-            cout << "\nCtrl+C detected, cleaning up..." << endl;
-            return TRUE;
-        }
-        return FALSE;
-    }
-
-    void setup_interrupt_handler() {
-        SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
-    }
-#else
-    void signal_handler(int signal) {
-        if (signal == SIGINT) {
-            g_terminate_flag.store(true);
-            cout << "\nCtrl+C detected, cleaning up..." << endl;
-        }
-    }
-
-    void setup_interrupt_handler() {
-        std::signal(SIGINT, signal_handler);
-    }
-#endif
-}
-
 // ----------------------------------------------------------------------------------------
 
 void display_random_qa_samples(size_t num_samples = 3)
@@ -233,7 +202,8 @@ int main(int argc, char** argv)
 {
     try
     {
-        setup_interrupt_handler();
+        // Setup interrupt handling for clean termination
+        signal_handler::setup();
 
         command_line_parser parser;
         parser.add_option("fine-tune", "Fine-tune model on Q&A pairs for chatbot specialization");
@@ -314,7 +284,7 @@ int main(int argc, char** argv)
                 cout << "Pre-trained tokenizer not found at: " << tokenizer_file << endl;
                 return 1;
             }
-            const int pad_token = tokenizer.get_special_token_id("<pad>");
+            const long pad_token = tokenizer.get_special_token_id("<pad>");
             layer<0>(net).loss_details().set_ignore_index(pad_token);
 
             // Load Q&A datasets for fine-tuning
@@ -331,7 +301,7 @@ int main(int argc, char** argv)
 
             // Tokenize Q&A segments with markers
             cout << "Tokenizing Q&A segments...\n";
-            int text_start_id = tokenizer.get_special_token_id("<text>"),
+            long text_start_id = tokenizer.get_special_token_id("<text>"),
                 text_end_id = tokenizer.get_special_token_id("</text>"),
                 question_id = tokenizer.get_special_token_id("<question>"),
                 answer_id = tokenizer.get_special_token_id("<answer>");
@@ -439,8 +409,8 @@ int main(int argc, char** argv)
 
             // Training loop
             cout << "Starting fine-tuning...\n";
-            while (!scheduler.is_training_complete()
-                && epoch < max_epochs && !g_terminate_flag.load())
+            while (!scheduler.is_training_complete() && epoch < max_epochs
+                && !signal_handler::is_triggered())
             {
                 total_loss = 0.0;
                 batches_seen = 0;
@@ -450,7 +420,7 @@ int main(int argc, char** argv)
                 // Shuffle the dataset
                 shuffle_training_dataset(samples, labels);
 
-                for (size_t i = 0; i < samples.size() && !g_terminate_flag.load(); i += batch_size)
+                for (size_t i = 0; i < samples.size() && !signal_handler::is_triggered(); i += batch_size)
                 {
                     size_t batch_end = std::min(i + batch_size, samples.size());
                     std::vector<matrix<int, 0, 1>> batch_samples(
@@ -464,7 +434,7 @@ int main(int argc, char** argv)
 
                     std::vector<long> pad_lengths(batch_samples.size());
                     for (size_t j = 0; j < batch_samples.size(); ++j)
-                        pad_lengths[j] = count_leading_padding(batch_samples[j], pad_token);
+                        pad_lengths[j] = count_leading_padding(batch_samples[j], static_cast<int>(pad_token));
                     tril_padding_context::set_from_lengths(pad_lengths);
 
                     // Train
@@ -562,17 +532,17 @@ int main(int argc, char** argv)
             }            
 
             // Get special token IDs
-            int text_start_id = tokenizer.get_special_token_id("<text>");
-            int text_end_id = tokenizer.get_special_token_id("</text>");
-            int question_id = tokenizer.get_special_token_id("<question>");
-            int answer_id = tokenizer.get_special_token_id("<answer>");
+            long text_start_id = tokenizer.get_special_token_id("<text>");
+            long text_end_id = tokenizer.get_special_token_id("</text>");
+            long question_id = tokenizer.get_special_token_id("<question>");
+            long answer_id = tokenizer.get_special_token_id("<answer>");
 
             // Setup inference context
-            const int pad_token = tokenizer.get_special_token_id("<pad>");
+            const long pad_token = tokenizer.get_special_token_id("<pad>");
             inference_context ctx(max_seq_len, 3, pad_token);
 
             // Interactive loop
-            while (!g_terminate_flag.load())
+            while (!signal_handler::is_triggered())
             {
                 // Get user input
                 cout << "You: ";
@@ -708,11 +678,11 @@ int main(int argc, char** argv)
                     };
 
                 int next_token, max_response_tokens = 3 * max_seq_len;
-                for (int i = 0; i < max_response_tokens && !g_terminate_flag.load(); ++i)
+                for (int i = 0; i < max_response_tokens && !signal_handler::is_triggered(); ++i)
                 {
                     // Get current context window and predict next token
                     auto input_window = ctx.get_input_window();
-                    long pad_len = count_leading_padding(input_window, pad_token);
+                    long pad_len = count_leading_padding(input_window, static_cast<int>(pad_token));
                     tril_padding_context::set_uniform(pad_len, 1);
                     auto& probs_tensor = generator(input_window);
 
