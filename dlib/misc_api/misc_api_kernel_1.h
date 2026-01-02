@@ -11,6 +11,7 @@
 #include "misc_api_kernel_abstract.h"
 #include "../algs.h"
 #include <string>
+#include <atomic>
 #include "../uintn.h"
 
 namespace dlib
