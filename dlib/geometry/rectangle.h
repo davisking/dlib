@@ -771,8 +771,7 @@ namespace dlib
             return centered_rect(rect, scale, scale);
         }
         else
-        {
-            // Le compilateur sait maintenant que rect_area != 0
+        {            
             const double scale = std::sqrt(area / static_cast<double>(rect_area));
             return centered_rect(rect, std::lround(rect.width() * scale),
                 std::lround(rect.height() * scale));
