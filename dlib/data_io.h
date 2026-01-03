@@ -8,6 +8,7 @@
 #include "data_io/mnist.h"
 #include "data_io/cifar.h"
 #include "data_io/arc_agi.h"
+#include "data_io/language_model_data.h"
 
 #ifndef DLIB_ISO_CPP_ONLY
 #include "data_io/load_image_dataset.h"

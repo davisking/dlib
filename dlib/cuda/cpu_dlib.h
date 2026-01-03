@@ -588,6 +588,15 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
+        void apply_rotary_positional_embedding(
+            bool is_backward,
+            resizable_tensor& data,
+            const resizable_tensor& cos_cache,
+            const resizable_tensor& sin_cache
+        );
+
+    // -----------------------------------------------------------------------------------
+
         class pooling
         {
         public:
@@ -760,6 +769,138 @@ namespace dlib
             tensor& dest,
             const tensor& src
         );
+
+    // -----------------------------------------------------------------------------------
+
+    class compute_loss_cross_entropy_per_logit
+    {
+        /*!
+            Computes cross-entropy loss for causal language modeling
+            Uses all sequence positions (except last) for training
+            Each position t predicts the token at position t+1
+        !*/
+    public:
+        compute_loss_cross_entropy_per_logit() {}
+    
+        template <typename const_label_iterator>
+        void operator()(
+            const_label_iterator truth,
+            const tensor& input_tensor,
+            const tensor& output_tensor,
+            tensor& grad,
+            double& loss,
+            long ignore_index
+        ) const
+        {
+            DLIB_CASSERT(output_tensor.k() == 1);
+            DLIB_CASSERT(input_tensor.k() == 1);
+            DLIB_CASSERT(input_tensor.nc() == 1);
+        
+            const long batch_size = output_tensor.num_samples();
+            const long seq_len = output_tensor.nr();
+            const long vocab_size = output_tensor.nc();
+                
+            const float* out_data = output_tensor.host();
+            const float* in_data = input_tensor.host();
+            float* g = grad.host();            
+        
+            std::fill(g, g + grad.size(), 0.0f);
+
+            long valid_tokens = 0;
+
+            if (ignore_index < 0)
+            {
+                valid_tokens = batch_size * seq_len;
+            }
+            else {
+                for (long i = 0; i < batch_size; ++i)
+                {
+                    for (long t = 0; t < seq_len; ++t)
+                    {
+                        unsigned long target_class;
+                        if (t < seq_len - 1) {
+                            target_class = static_cast<unsigned long>(
+                                in_data[tensor_index(input_tensor, i, 0, t + 1, 0)]
+                                );
+                        }
+                        else
+                            target_class = *(truth + i);
+
+                        if (static_cast<long>(target_class) != ignore_index)
+                            valid_tokens++;
+                    }
+                }
+            }
+            if (valid_tokens == 0)
+            {
+                loss = 0.0;
+                return;
+            }
+
+            const double scale = 1.0 / valid_tokens;
+            loss = 0.0;
+        
+            for (long i = 0; i < batch_size; ++i)
+            {
+                // Loop over all positions (0 to seq_len-1)
+                for (long t = 0; t < seq_len; ++t)
+                {
+                    unsigned long target_class;
+                
+                    // Extract target token
+                    if (t < seq_len - 1) {
+                        // For positions 0 to seq_len-2: target from input_tensor[t+1]
+                        target_class = static_cast<unsigned long>(
+                            in_data[tensor_index(input_tensor, i, 0, t + 1, 0)]
+                        );
+                    } else {
+                        // For last position (seq_len-1): target from truth
+                        target_class = *(truth + i);
+                    }
+                
+                    if (ignore_index >= 0 && static_cast<long>(target_class) == ignore_index)
+                        continue;
+
+                    DLIB_CASSERT(target_class < static_cast<unsigned long>(vocab_size));
+                
+                    // Find max logit for numerical stability
+                    float max_val = out_data[tensor_index(output_tensor, i, 0, t, 0)];
+                    for (long c = 1; c < vocab_size; ++c)
+                    {
+                        const float val = out_data[tensor_index(output_tensor, i, 0, t, c)];
+                        max_val = std::max(max_val, val);
+                    }
+                
+                    // Compute softmax denominator
+                    float sum_exp = 0.0f;
+                    for (long c = 0; c < vocab_size; ++c)
+                    {
+                        const unsigned long idx = tensor_index(output_tensor, i, 0, t, c);
+                        const float exp_val = std::exp(out_data[idx] - max_val);
+                        g[idx] = exp_val;
+                        sum_exp += exp_val;
+                    }
+                
+                    // Compute loss and gradients
+                    for (long c = 0; c < vocab_size; ++c)
+                    {
+                        const unsigned long idx = tensor_index(output_tensor, i, 0, t, c);
+                        const float softmax_val = g[idx] / sum_exp;
+                    
+                        if (static_cast<unsigned long>(c) == target_class)
+                        {
+                            loss += scale * (-std::log(std::max(softmax_val, 1e-10f)));
+                            g[idx] = scale * (softmax_val - 1.0f);
+                        }
+                        else
+                        {
+                            g[idx] = scale * softmax_val;
+                        }
+                    }
+                }
+            }
+        }
+    };
 
     // -----------------------------------------------------------------------------------
 

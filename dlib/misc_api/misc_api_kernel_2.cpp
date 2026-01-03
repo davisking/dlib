@@ -11,6 +11,7 @@
 #include <sys/time.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <csignal>
 #include <errno.h>
 
 namespace dlib
@@ -115,6 +116,22 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+    
+    void posix_signal_handler(int signal)
+    {
+        if (signal == SIGINT)
+        {
+            signal_handler::trigger_interrupt();
+        }
+    }
+
+    void signal_handler::setup()
+    {
+        std::signal(SIGINT, posix_signal_handler);
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_POSIX

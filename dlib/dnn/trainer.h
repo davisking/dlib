@@ -11,6 +11,7 @@
 #include <fstream>
 #include <sstream>
 #include "../serialize.h"
+#include "lr_scheduler.h"
 
 #include "../pipe.h"
 #include "../threads.h"

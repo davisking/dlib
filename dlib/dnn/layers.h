@@ -1017,19 +1017,10 @@ namespace dlib
         void setup(const SUBNET& sub)
         {
             const auto& input = sub.get_output();
-            input_k = input.k();
-            input_nr = input.nr();
-            input_nc = input.nc();
+            update_dimensions_from_input(input);
 
-            // Calculate output dimensions using input dims where target is -1
-            if (k_ == -1) output_k = input_k;
-            if (nr_ == -1) output_nr = input_nr;
-            if (nc_ == -1) output_nc = input_nc;
-
-            // Check if this is well a pure reshape
             long input_elements = input_k * input_nr * input_nc;
             long output_elements = output_k * output_nr * output_nc;
-            if (input_elements != output_elements && input_k == output_k) needs_rescale = true;
             DLIB_CASSERT(input_elements == output_elements || needs_rescale,
                 "Cannot reshape tensor of " << input_elements <<
                 " elements into shape with " << output_elements << " elements. " <<
@@ -1039,8 +1030,14 @@ namespace dlib
         template <typename SUBNET>
         void forward(const SUBNET& sub, resizable_tensor& output)
         {
-            // Set the output size (always preserving batch dimension)
             const tensor& input = sub.get_output();
+
+            // Check if dimensions changed (after deserialization or fine-tuning)
+            // This ensures dimensions are always synchronized with current input
+            if (input_k != input.k() || input_nr != input.nr() || input_nc != input.nc())
+                update_dimensions_from_input(input);
+
+            // Set the output size (always preserving batch dimension)
             output.set_size(input.num_samples(), output_k, output_nr, output_nc);
 
             if (!needs_rescale)
@@ -1142,7 +1139,25 @@ namespace dlib
                 << "/>\n";
         }
 
-    private:        
+    private:
+        void update_dimensions_from_input(const tensor& input)
+        {
+            // Update input dimensions
+            input_k = input.k();
+            input_nr = input.nr();
+            input_nc = input.nc();
+
+            // Recalculate output dimensions for dynamic axes (-1)
+            if (k_ == -1) output_k = input_k;
+            if (nr_ == -1) output_nr = input_nr;
+            if (nc_ == -1) output_nc = input_nc;
+
+            // Check if rescaling is needed
+            long input_elements = input_k * input_nr * input_nc;
+            long output_elements = output_k * output_nr * output_nc;
+            needs_rescale = (input_elements != output_elements && input_k == output_k);
+        }
+
         long input_k, input_nr, input_nc;       // Input dimensions        
 		long output_k, output_nr, output_nc;    // Output dimensions        
         bool needs_rescale;        
@@ -2407,7 +2422,7 @@ namespace dlib
         {
             const auto& prev_output = sub.get_output();
             DLIB_CASSERT((long)num_inputs == prev_output.nc(),
-                "The size of the input tensor to this linear layer doesn't match the size the linear layer was trained with.");            
+                "The size of the input tensor to this linear layer doesn't match the size the linear layer was trained with.");
             output.set_size(prev_output.num_samples(), prev_output.k(), prev_output.nr(), num_outputs);
 
             auto o = alias_tensor(output.num_samples() * output.k() * output.nr(), num_outputs)(output, 0);
@@ -2441,8 +2456,6 @@ namespace dlib
                 }
             }
             
-            //prev_gradient is not const, so that sgi isn't const
-            //since sgi is used as a destination for tt::gemm
             auto& prev_gradient = sub.get_gradient_input();
             alias_tensor_instance sgi = alias_tensor(prev_gradient.num_samples() * prev_gradient.k() * prev_gradient.nr(), num_inputs)(prev_gradient, 0);
             auto w = weights(params, 0);
@@ -5441,7 +5454,8 @@ namespace dlib
         embeddings_() : num_embeddings(num_embeddings_),
             embedding_dim(embedding_dim_),
             learning_rate_multiplier(1.0f),
-            scale_by_freq(true)
+            scale_by_freq(true),
+            output_scale(std::sqrt(static_cast<float>(embedding_dim_)))
         {
         }
 
@@ -5473,12 +5487,17 @@ namespace dlib
             }
         }
 
+        float get_output_scale() const { return output_scale; }
+
         template <typename SUBNET>
         void setup(const SUBNET& /*sub*/)
         {
             embs.set_size(num_embeddings, embedding_dim);
             tt::tensor_rand rnd(std::rand());
             rnd.fill_gaussian(embs);
+
+            const float init_scale = 1.0f / std::sqrt(static_cast<float>(embedding_dim));
+            tt::affine_transform(embs, embs, init_scale);
         }
 
         template <typename SUBNET>
@@ -5488,6 +5507,7 @@ namespace dlib
             output.set_size(prev.num_samples(), prev.k(), prev.nr(), embedding_dim);
 
             tt::embeddings(output, prev, embs);
+            tt::affine_transform(output, output, output_scale);
         }
 
         template <typename SUBNET>
@@ -5502,7 +5522,8 @@ namespace dlib
                 auto& prev_src = sub.get_output();
                 
                 calc_token_freqs(prev_src, gradient_input);
-                tt::embeddings_gradient(prev_src, gradient_input, embs, freqs, learning_rate_multiplier, scale_by_freq);
+                const float scaled_lr = learning_rate_multiplier * output_scale;
+                tt::embeddings_gradient(prev_src, gradient_input, embs, freqs, scaled_lr, scale_by_freq);
             }
         }
 
@@ -5520,6 +5541,7 @@ namespace dlib
             serialize(item.embedding_dim, out);
             serialize(item.learning_rate_multiplier, out);
             serialize(item.scale_by_freq, out);
+            serialize(item.output_scale, out);
         }
         friend void deserialize(embeddings_& item, std::istream& in)
         {
@@ -5532,12 +5554,14 @@ namespace dlib
             deserialize(item.embedding_dim, in);
             deserialize(item.learning_rate_multiplier, in);
             deserialize(item.scale_by_freq, in);
+            deserialize(item.output_scale, in);
         }
 
         friend std::ostream& operator<<(std::ostream& out, const embeddings_& item)
         {
             out << "embeddings (num_embeddings=" << item.num_embeddings
                 << ", embedding_dim=" << item.embedding_dim
+                << ", scale=" << item.output_scale
                 << ") learning_rate_mult=" << item.learning_rate_multiplier;
             return out;
         }
@@ -5545,6 +5569,7 @@ namespace dlib
         {
             out << "<embeddings num_embeddings='" << item.num_embeddings
                 << "' embedding_dim='" << item.embedding_dim
+                << "' output_scale='" << item.output_scale
                 << "' learning_rate_mult='"
                 << item.learning_rate_multiplier << "'>\n";
             out << mat(item.embs);
@@ -5576,6 +5601,7 @@ namespace dlib
         unsigned long num_embeddings, embedding_dim;
         double learning_rate_multiplier;
         bool scale_by_freq;
+        float output_scale;
     };
 
     template <
@@ -5587,6 +5613,113 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
   
+    class tril_padding_context
+    {
+    public:
+        static void set(const tensor& input_tokens, long padding_token)
+        {
+            if (padding_token < 0) {
+                clear();
+                return;
+            }
+            std::lock_guard<std::mutex> lock(get_mutex_());
+            const long batch_size = input_tokens.num_samples();
+            const long seq_len = input_tokens.nr();
+            const float* data = input_tokens.host();
+            get_padding_lengths_().resize(batch_size);
+            for (long s = 0; s < batch_size; ++s)
+            {
+                long count = 0;
+                for (long t = 0; t < seq_len; ++t)
+                {
+                    const long idx = s * seq_len + t;
+                    const long token = static_cast<long>(data[idx]);
+                    if (token == padding_token)
+                        count++;
+                    else
+                        break;
+                }
+                get_padding_lengths_()[s] = count;
+            }
+            get_is_set_() = true;
+        }
+
+        static void set_from_lengths(const std::vector<long>& lengths)
+        {
+            std::lock_guard<std::mutex> lock(get_mutex_());
+            get_padding_lengths_() = lengths;
+            get_is_set_() = true;
+        }
+
+        static void set_uniform(long padding_length, long batch_size)
+        {
+            std::lock_guard<std::mutex> lock(get_mutex_());
+            get_padding_lengths_().assign(batch_size, padding_length);
+            get_is_set_() = true;
+        }
+
+        static void clear()
+        {
+            std::lock_guard<std::mutex> lock(get_mutex_());
+            get_padding_lengths_().clear();
+            get_is_set_() = false;
+        }
+
+        static long get_padding_length(long sample_idx)
+        {
+            std::lock_guard<std::mutex> lock(get_mutex_());
+            if (!get_is_set_() || sample_idx < 0 ||
+                sample_idx >= static_cast<long>(get_padding_lengths_().size()))
+                return 0;
+            return get_padding_lengths_()[sample_idx];
+        }
+
+        static std::vector<long> get_all_lengths()
+        {
+            std::lock_guard<std::mutex> lock(get_mutex_());
+            return get_padding_lengths_();
+        }
+
+        static bool is_set()
+        {
+            std::lock_guard<std::mutex> lock(get_mutex_());
+            return get_is_set_();
+        }
+
+    private:
+        static std::mutex& get_mutex_()
+        {
+            static std::mutex m;
+            return m;
+        }
+
+        static std::vector<long>& get_padding_lengths_()
+        {
+            static std::vector<long> lengths;
+            return lengths;
+        }
+
+        static bool& get_is_set_()
+        {
+            static bool is_set = false;
+            return is_set;
+        }
+    };
+
+    template <typename T>
+    long count_leading_padding(const matrix<T, 0, 1>& seq, T padding_token)
+    {
+        long count = 0;
+        for (long i = 0; i < seq.size(); ++i)
+        {
+            if (seq(i) == padding_token) count++;
+            else break;
+        }
+        return count;
+    }
+
+// ----------------------------------------------------------------------------------------
+
     struct neg_infinity_tag {};
     struct zero_tag {};
 
@@ -5601,7 +5734,7 @@ namespace dlib
     class tril_
     {
     public:
-        tril_(): diag(diag_), diag_value(compute_diag_value()) {}
+        tril_(): diag(diag_), prefix_size(0), diag_value(compute_diag_value()) {}
         
         template <typename SUBNET>
         void setup(const SUBNET& /*sub*/)
@@ -5614,10 +5747,28 @@ namespace dlib
             auto& prev = sub.get_output();
             output.set_size(prev.num_samples(), prev.k(), prev.nr(), prev.nc());
 
+            // Check padding context and update cached lengths if needed
+            if (tril_padding_context::is_set())
+            {
+                auto new_lengths = tril_padding_context::get_all_lengths();
+                if (new_lengths != cached_padding_lengths_)
+                {
+                    cached_padding_lengths_ = new_lengths;
+                    invalidate_mask();
+                }
+            }
+            else if (!cached_padding_lengths_.empty())
+            {
+                // Context was cleared, reset padding
+                cached_padding_lengths_.clear();
+                invalidate_mask();
+            }
+
             check_mask(prev);
             tt::multiply(false, output, prev, binary_mask);
             if (diag_value != 0.0f) tt::add(1, output, 1, output_mask);
         }
+
         template <typename SUBNET>
         void backward(const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
         {
@@ -5630,6 +5781,15 @@ namespace dlib
 
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
+
+        void set_prefix_size(long n_prefix_size)
+        {
+            if (prefix_size != n_prefix_size) {
+                prefix_size = n_prefix_size;
+                invalidate_mask();
+            }
+        }
+        long get_prefix_size() const { return prefix_size; }
         
         friend void serialize(const tril_& item, std::ostream& out)
         {
@@ -5667,25 +5827,66 @@ namespace dlib
                 return static_cast<float>(num_) / static_cast<float>(den_);
         }
 
+        void invalidate_mask()
+        {
+            binary_mask.set_size(0, 0, 0, 0);
+            output_mask.set_size(0, 0, 0, 0);
+        }
+
         void check_mask(const tensor& t)
         {
-            if (!have_same_dimensions(binary_mask, t)) {
+            if (!have_same_dimensions(binary_mask, t))
+            {
                 binary_mask.copy_size(t);
                 binary_mask = 1;
-                if (diag_value != 0.0f) {
+
+                const bool use_output_mask = (diag_value != 0.0f);
+                if (use_output_mask) {
                     output_mask.copy_size(t);
                     output_mask = 0;
-                }                                
-                for (long s = 0; s < output_mask.num_samples(); ++s)
+                }
+
+                const bool has_padding = !cached_padding_lengths_.empty();
+
+                for (long s = 0; s < t.num_samples(); ++s)
                 {
-                    for (long k = 0; k < output_mask.k(); ++k)
+                    const long pad_len = has_padding &&
+                        s < static_cast<long>(cached_padding_lengths_.size())
+                        ? cached_padding_lengths_[s] : 0;
+
+                    for (long k = 0; k < t.k(); ++k)
                     {
-                        for (long r = 0; r < output_mask.nr(); ++r)
+                        for (long r = 0; r < t.nr(); ++r)
                         {
-                            for (long c = std::max(r + diag + 1, 0L); c < output_mask.nc(); ++c)
+                            // Mask padding columns
+                            for (long c = 0; c < pad_len; ++c)
                             {
-                                if (diag_value != 0.0f) output_mask.host()[tensor_index(output_mask, s, k, r, c)] = diag_value;
-                                binary_mask.host()[tensor_index(binary_mask, s, k, r, c)] = 0;
+                                const long idx = tensor_index(t, s, k, r, c);
+                                binary_mask.host()[idx] = 0;
+                                if (use_output_mask)
+                                    output_mask.host()[idx] = diag_value;
+                            }
+
+                            // Mask future positions (causal)
+                            const long causal_start = std::max({ r + diag + 1, prefix_size, pad_len });
+                            for (long c = causal_start; c < t.nc(); ++c)
+                            {
+                                const long idx = tensor_index(t, s, k, r, c);
+                                binary_mask.host()[idx] = 0;
+                                if (use_output_mask)
+                                    output_mask.host()[idx] = diag_value;
+                            }
+
+                            // Mask padding rows
+                            if (r < pad_len)
+                            {
+                                for (long c = 0; c < t.nc(); ++c)
+                                {
+                                    const long idx = tensor_index(t, s, k, r, c);
+                                    binary_mask.host()[idx] = 0;
+                                    if (use_output_mask)
+                                        output_mask.host()[idx] = diag_value;
+                                }
                             }
                         }
                     }
@@ -5699,7 +5900,9 @@ namespace dlib
         resizable_tensor params; // unused
         resizable_tensor binary_mask, output_mask;
         long diag;
+        long prefix_size;
         float diag_value;
+        std::vector<long> cached_padding_lengths_;
     };
 
     template <typename SUBNET>
@@ -5742,8 +5945,7 @@ namespace dlib
             num_channels_(item.num_channels_),
             feature_dim_(item.feature_dim_),
             ponder_cost_(item.ponder_cost_),
-            avg_steps_(item.avg_steps_),
-            params(item.params),
+            avg_steps_(item.avg_steps_),            
             halting_probs_(item.halting_probs_),
             cumulative_halting_(item.cumulative_halting_),
             remainders_(item.remainders_),
@@ -5751,7 +5953,8 @@ namespace dlib
             logits_(item.logits_),
             grad_logits_(item.grad_logits_),
             input_cache_(item.input_cache_),
-            true_effective_weights_(item.true_effective_weights_)
+            true_effective_weights_(item.true_effective_weights_),
+            params(item.params)
         {
         }
 
@@ -5770,8 +5973,7 @@ namespace dlib
             num_channels_ = item.num_channels_;
             feature_dim_ = item.feature_dim_;
             ponder_cost_ = item.ponder_cost_;
-            avg_steps_ = item.avg_steps_;
-            params = item.params;
+            avg_steps_ = item.avg_steps_;            
             halting_probs_ = item.halting_probs_;
             cumulative_halting_ = item.cumulative_halting_;
             remainders_ = item.remainders_;
@@ -5780,6 +5982,7 @@ namespace dlib
             grad_logits_ = item.grad_logits_;
             input_cache_ = item.input_cache_;
             true_effective_weights_ = item.true_effective_weights_;
+            params = item.params;
 
             return *this;
         }
@@ -6051,9 +6254,6 @@ namespace dlib
         long num_channels_;
         long feature_dim_;
 
-        // Learnable parameters
-        resizable_tensor params;
-
         // Working memory
         resizable_tensor halting_probs_;        // p_t^n: Halting probabilities
         resizable_tensor cumulative_halting_;   // h_t^n: Cumulative halting probabilities
@@ -6067,6 +6267,9 @@ namespace dlib
         // Statistics for monitoring
         float ponder_cost_;      // R(x): Current ponder cost
         float avg_steps_;        // Average number of computation steps
+
+        // Learnable parameters
+        resizable_tensor params;
     };
 
     template <long max_steps, typename SUBNET>
@@ -6080,6 +6283,808 @@ namespace dlib
 
     template <typename SUBNET>
     using act16 = add_layer<adaptive_computation_time_<16>, SUBNET>;    // Deep version
+
+// ----------------------------------------------------------------------------------------
+
+    // YaRN configuration structure
+    struct yarn_config
+    {
+        // Alpha controls overall intensity of scaling (typical ~1.0)
+        float alpha = 1.0f;
+
+        // Beta controls curvature of scaling across head dimensions (typical 0.25..0.5)
+        float beta = 0.5f;
+
+        // original_len is the context length used at training time
+        // If 0, it will be set to the first seq_len observed (common pattern)
+        long original_len = 0;
+
+        // Enable/disable YaRN; if false, behavior is identical to classical RoPE
+        bool enabled = true;
+    };
+
+    class rotary_positional_embedding_
+    {
+    public:
+        explicit rotary_positional_embedding_() :
+            seq_len(0),
+            d_head(0),
+			theta_base(10000.0f)
+        {
+		}
+
+        rotary_positional_embedding_(const rotary_positional_embedding_& other) :
+            seq_len(other.seq_len),
+            d_head(other.d_head),
+            theta_base(other.theta_base),
+            cos_cache(other.cos_cache),
+            sin_cache(other.sin_cache),
+            yarn(other.yarn)
+        {
+        }
+
+        rotary_positional_embedding_& operator=(const rotary_positional_embedding_& other)
+        {
+            if (this != &other) {
+                seq_len = other.seq_len;
+                d_head = other.d_head;
+                theta_base = other.theta_base;
+                cos_cache = other.cos_cache;
+                sin_cache = other.sin_cache;
+                yarn = other.yarn;
+            }
+            return *this;
+        }
+
+        // Set base used to compute inverse frequencies (theta base > 0)
+        void set_theta_base(float base)
+        {
+            DLIB_CASSERT(base > 0, "Theta base must be positive");
+            theta_base = base;
+        }
+
+        float get_theta_base() const { return theta_base; }
+        long get_seq_len() const { return seq_len; }
+        long get_d_head() const { return d_head; }
+
+        // Configure YaRN hyperparameters
+        void set_yarn_params(float alpha, float beta, long original_len = 0, bool enabled = true)
+        {
+            DLIB_CASSERT(alpha >= 0, "alpha must be non-negative");
+            DLIB_CASSERT(beta >= 0, "beta must be non-negative");
+            yarn.alpha = alpha;
+            yarn.beta = beta;
+            yarn.original_len = original_len;
+            yarn.enabled = enabled;
+        }
+        const yarn_config& get_yarn_config() const { return yarn; }
+
+        template <typename SUBNET>
+        void setup(const SUBNET& sub)
+        {
+            const tensor& input = sub.get_output();
+
+            // Expected input shape: (batch, num_heads, seq_len, d_head)
+            seq_len = input.nr();
+            d_head = input.nc();
+
+            DLIB_CASSERT(d_head >= 2, "d_head must be at least 2 for rotation");
+            DLIB_CASSERT(seq_len > 0, "seq_len must be positive");
+
+            // If original_len not set, treat the setup seq_len as the model's training length
+            if (yarn.original_len == 0) yarn.original_len = seq_len;
+
+            // Precompute rotation angles and trigonometric values
+            compute_and_cache_trig_values(seq_len);
+        }
+
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            const tensor& input = sub.get_output();
+
+            // Validate shape; we expect shape (batch, num_heads, seq_len, d_head)
+            const long in_seq_len = input.nr();
+            const long in_d_head = input.nc();
+
+            DLIB_CASSERT(in_d_head >= 2, "d_head must be at least 2 for rotation");
+            DLIB_CASSERT(in_seq_len > 0, "seq_len must be positive");
+
+            // If setup() was not called or the incoming sequence length changed from
+            // the cached seq_len (e.g. inference with a different context window),
+            // recompute trig caches for the current seq_len.
+            if (seq_len != in_seq_len || d_head != in_d_head
+                || cos_cache.size() == 0 || sin_cache.size() == 0)
+            {
+                // If we don't have a recorded original_len yet, set it here (first observed seq_len)
+                if (yarn.original_len == 0) yarn.original_len = in_seq_len;
+
+                // Update internal dimensions and recompute caches targeted to in_seq_len
+                seq_len = in_seq_len;
+                d_head = in_d_head;
+                compute_and_cache_trig_values(seq_len);
+            }
+
+            output.copy_size(input);
+
+            // Copy input to output
+            tt::copy_tensor(false, output, 0, input, 0, input.k());
+
+            // Apply rotary embedding in-place
+            tt::apply_rotary_positional_embedding(
+                false,  // forward pass
+                output,
+                cos_cache,
+                sin_cache
+            );
+        }
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
+        {
+            tensor& prev_grad = sub.get_gradient_input();
+
+            // Apply inverse rotation to gradients
+            resizable_tensor grad_output;
+            grad_output.copy_size(gradient_input);
+            tt::copy_tensor(false, grad_output, 0, gradient_input, 0, gradient_input.k());
+
+            tt::apply_rotary_positional_embedding(
+                true,   // backward pass (inverse rotation)
+                grad_output,
+                cos_cache,
+                sin_cache
+            );
+
+            // Accumulate gradients
+            tt::copy_tensor(true, prev_grad, 0, grad_output, 0, grad_output.k());
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const rotary_positional_embedding_& item, std::ostream& out)
+        {
+            serialize("rope_", out);
+            serialize(item.theta_base, out);
+            serialize(item.cos_cache, out);
+            serialize(item.sin_cache, out);
+
+            // yarn config
+            serialize(item.yarn.alpha, out);
+            serialize(item.yarn.beta, out);
+            serialize(item.yarn.original_len, out);
+            serialize(item.yarn.enabled, out);
+        }
+
+        friend void deserialize(rotary_positional_embedding_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "rope_")
+                throw serialization_error("Unexpected version '" + version +
+                    "' while deserializing rope_");
+
+            deserialize(item.theta_base, in);
+            deserialize(item.cos_cache, in);
+            deserialize(item.sin_cache, in);
+
+            // yarn config
+            deserialize(item.yarn.alpha, in);
+            deserialize(item.yarn.beta, in);
+            deserialize(item.yarn.original_len, in);
+            deserialize(item.yarn.enabled, in);
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const rotary_positional_embedding_& item)
+        {
+            out << "rope (theta_base=" << item.theta_base
+                << ", yarn.alpha=" << item.yarn.alpha
+                << ", yarn.beta=" << item.yarn.beta
+                << ", yarn.original_len=" << item.yarn.original_len
+                << ", yarn.enabled=" << (item.yarn.enabled ? "true" : "false")
+                << ")";
+            return out;
+        }
+
+        friend void to_xml(const rotary_positional_embedding_& item, std::ostream& out)
+        {
+            out << "<rope"
+                << " theta_base='" << item.theta_base << "'"
+                << " yarn_alpha='" << item.yarn.alpha << "'"
+                << " yarn_beta='" << item.yarn.beta << "'"
+                << " yarn_original_len='" << item.yarn.original_len << "'"
+                << " yarn_enabled='" << (item.yarn.enabled ? "true" : "false") << "'"
+                << "/>\n";
+        }
+
+        inline dpoint map_input_to_output(const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input(const dpoint& p) const { return p; }
+
+    private:
+        // Compute and cache cosine/sine tables for target_seq_len
+        // This function uses YaRN scaling when yarn.enabled is true
+        void compute_and_cache_trig_values(long target_seq_len)
+        {
+            if (seq_len == 0 || d_head == 0) return;
+
+            // Half the head dimension (we rotate pairs)
+            const long half_dim = d_head / 2;
+
+            // Allocate cache tensors: shape (1, 1, seq_len, half_dim)
+            cos_cache.set_size(1, 1, seq_len, half_dim);
+            sin_cache.set_size(1, 1, seq_len, half_dim);
+
+            // Compute on host side
+            float* cos_ptr = cos_cache.host();
+            float* sin_ptr = sin_cache.host();
+
+            // Precompute inv_freq constant per dimension (independent of position)
+            // inv_freq_i = theta_base^(-2i/d_head)
+            std::vector<float> inv_freq(half_dim);
+            for (long i = 0; i < half_dim; ++i)
+                inv_freq[i] = std::pow(theta_base, -2.0f * i / static_cast<float>(d_head));
+
+            // Determine the training length to use for YaRN scaling
+            const long train_len = (yarn.original_len > 0) ? yarn.original_len : target_seq_len;
+
+            // Compute cos/sin for each position and frequency index, using YaRN if enabled
+            for (long pos = 0; pos < target_seq_len; ++pos)
+            {
+                for (long i = 0; i < half_dim; ++i)
+                {
+                    // Base angle: pos * inv_freq[i]
+                    float pos_scaled = static_cast<float>(pos);
+
+                    if (yarn.enabled)
+                    {
+                        // Compute dimension-normalized index in [0,1]
+                        const float dim_norm = static_cast<float>(i) / static_cast<float>(half_dim);
+
+                        // exponent = alpha * dim_norm^beta
+                        // Note: we use half_dim for normalization so higher-frequency dims get smaller exponent
+                        const float exponent = yarn.alpha * std::pow(dim_norm, yarn.beta);
+
+                        // scale = (target_len / train_len)^exponent
+                        // This allows small-dim (low freq) to scale less than high-dim if desired
+                        const float ratio = static_cast<float>(target_seq_len) / static_cast<float>(train_len);
+                        const float scale = std::pow(ratio, exponent);
+
+                        // Scaled position used to compute the angle
+                        pos_scaled = static_cast<float>(pos) * scale;
+                    }
+
+                    const float angle = pos_scaled * inv_freq[i];
+
+                    const long idx = pos * half_dim + i;
+                    cos_ptr[idx] = std::cos(angle);
+                    sin_ptr[idx] = std::sin(angle);
+                }
+            }
+        }
+
+        // Configuration
+        long seq_len;
+        long d_head;
+        float theta_base;
+
+        // Precomputed trigonometric values
+        // Shape: (1, 1, seq_len, d_head/2)
+        resizable_tensor cos_cache;
+        resizable_tensor sin_cache;
+
+        // YaRN configuration
+        yarn_config yarn;
+
+        // No trainable parameters
+        resizable_tensor params;
+    };
+
+    template <typename SUBNET>
+    using rope = add_layer<rotary_positional_embedding_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+    
+    template <
+        long patch_size_,
+        long embedding_dim_,
+        long use_class_token_,
+        long use_position_embeddings_
+    >
+    class patch_embeddings_
+    {
+        static_assert(patch_size_ > 0, "Patch size must be positive");
+        static_assert(embedding_dim_ > 0, "Embedding dimension must be positive");
+        static_assert(use_class_token_ == 0 || use_class_token_ == 1,
+            "use_class_token must be 0 or 1");
+        static_assert(use_position_embeddings_ == 0 || use_position_embeddings_ == 1,
+            "use_position_embeddings must be 0 or 1");
+
+    public:
+
+        patch_embeddings_() :
+            in_channels(0),
+            num_patches_h(0),
+            num_patches_w(0),
+            cached_input_h(0),
+            cached_input_w(0),
+            cached_input_k(0),
+            learning_rate_multiplier(1.0)
+        {
+        }
+
+        patch_embeddings_(const patch_embeddings_& other) :
+            in_channels(other.in_channels),
+            num_patches_h(other.num_patches_h),
+            num_patches_w(other.num_patches_w),
+            cached_input_h(other.cached_input_h),
+            cached_input_w(other.cached_input_w),
+            cached_input_k(other.cached_input_k),
+            learning_rate_multiplier(other.learning_rate_multiplier),
+            params(other.params),
+            filters_alias(other.filters_alias),
+            biases_alias(other.biases_alias),
+            pos_embed_alias(other.pos_embed_alias),
+            cls_token_alias(other.cls_token_alias)
+        {
+        }
+
+        patch_embeddings_& operator=(const patch_embeddings_& other)
+        {
+            if (this != &other) {
+                in_channels = other.in_channels;
+                num_patches_h = other.num_patches_h;
+                num_patches_w = other.num_patches_w;
+                cached_input_h = other.cached_input_h;
+                cached_input_w = other.cached_input_w;
+                cached_input_k = other.cached_input_k;
+                learning_rate_multiplier = other.learning_rate_multiplier;
+                params = other.params;
+                filters_alias = other.filters_alias;
+                biases_alias = other.biases_alias;
+                pos_embed_alias = other.pos_embed_alias;
+                cls_token_alias = other.cls_token_alias;
+                // Note: conv_op is non-copyable and stateless, will be re-setup on forward()
+            }
+            return *this;
+        }
+
+        long get_patch_size() const { return patch_size_; }
+        long get_embedding_dim() const { return embedding_dim_; }
+        long uses_class_token() const { return use_class_token_; }
+        long uses_position_embeddings() const { return use_position_embeddings_; }
+        long get_num_patches() const { return num_patches_h * num_patches_w; }
+
+        double get_learning_rate_multiplier() const { return learning_rate_multiplier; }
+        void set_learning_rate_multiplier(double val) { learning_rate_multiplier = val; }
+
+        template <typename SUBNET>
+        void setup(const SUBNET& sub)
+        {
+            const tensor& input = sub.get_output();
+            in_channels = input.k();
+
+            DLIB_CASSERT(input.nr() % patch_size_ == 0,
+                "Image height must be divisible by patch size. Got height=" << input.nr()
+                << ", patch_size=" << patch_size_);
+            DLIB_CASSERT(input.nc() % patch_size_ == 0,
+                "Image width must be divisible by patch size. Got width=" << input.nc()
+                << ", patch_size=" << patch_size_);
+
+            num_patches_h = input.nr() / patch_size_;
+            num_patches_w = input.nc() / patch_size_;
+            const long num_patches = num_patches_h * num_patches_w;
+            const long sequence_length = num_patches + use_class_token_;
+
+            // Calculate total parameter size:
+            // - projection_filters: embedding_dim * in_channels * patch_size * patch_size
+            // - projection_biases: embedding_dim
+            // - position_embeddings (optional): sequence_length * embedding_dim
+            // - class_token (optional): embedding_dim
+            const long filter_size = embedding_dim_ * in_channels * patch_size_ * patch_size_;
+            const long bias_size = embedding_dim_;
+            const long pos_embed_size = use_position_embeddings_ ? sequence_length * embedding_dim_ : 0;
+            const long cls_token_size = use_class_token_ ? embedding_dim_ : 0;
+            const long total_params = filter_size + bias_size + pos_embed_size + cls_token_size;
+
+            // Allocate all parameters in a single contiguous tensor
+            params.set_size(total_params);
+
+            // Setup alias tensors for accessing parameter regions
+            filters_alias = alias_tensor(embedding_dim_, in_channels, patch_size_, patch_size_);
+            biases_alias = alias_tensor(1, embedding_dim_, 1, 1);
+
+            if (use_position_embeddings_) {
+                pos_embed_alias = alias_tensor(1, 1, sequence_length, embedding_dim_);
+            }
+            if (use_class_token_) {
+                cls_token_alias = alias_tensor(1, 1, 1, embedding_dim_);
+            }
+
+            // Initialize parameters with Xavier/Glorot for filters
+            tt::tensor_rand rnd;
+            const float fan_in = static_cast<float>(in_channels * patch_size_ * patch_size_);
+            const float fan_out = static_cast<float>(embedding_dim_);
+            const float xavier_stddev = std::sqrt(2.0f / (fan_in + fan_out));
+
+            // Initialize filter weights
+            auto filt = filters_alias(params, 0);
+            rnd.fill_gaussian(filt, 0.0f, xavier_stddev);
+
+            // Initialize biases to zero
+            auto bias = biases_alias(params, filters_alias.size());
+            bias = 0;
+
+            // Initialize position embeddings if enabled
+            if (use_position_embeddings_) {
+                auto pos = pos_embed_alias(params, filters_alias.size() + biases_alias.size());
+                rnd.fill_gaussian(pos, 0.0f, 0.02f);
+            }
+
+            // Initialize class token if enabled
+            if (use_class_token_) {
+                long cls_offset = filters_alias.size() + biases_alias.size();
+                if (use_position_embeddings_) cls_offset += pos_embed_alias.size();
+                auto cls = cls_token_alias(params, cls_offset);
+                rnd.fill_gaussian(cls, 0.0f, 0.02f);
+            }
+
+            // Cache input dimensions and setup convolution
+            cached_input_h = input.nr();
+            cached_input_w = input.nc();
+            cached_input_k = input.k();
+            conv_op.setup(input, filt, patch_size_, patch_size_, 0, 0);
+        }
+
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            const tensor& input = sub.get_output();
+            const long batch_size = input.num_samples();
+
+            // Re-setup convolution if input spatial dimensions changed
+            if (input.nr() != cached_input_h ||
+                input.nc() != cached_input_w ||
+                input.k() != cached_input_k ||
+                params.size() == 0)
+            {
+                DLIB_CASSERT(input.nr() % patch_size_ == 0,
+                    "Image height must be divisible by patch size. Got height=" << input.nr()
+                    << ", patch_size=" << patch_size_);
+                DLIB_CASSERT(input.nc() % patch_size_ == 0,
+                    "Image width must be divisible by patch size. Got width=" << input.nc()
+                    << ", patch_size=" << patch_size_);
+
+                cached_input_h = input.nr();
+                cached_input_w = input.nc();
+                cached_input_k = input.k();
+                num_patches_h = input.nr() / patch_size_;
+                num_patches_w = input.nc() / patch_size_;
+            }
+
+            const long num_patches = num_patches_h * num_patches_w;
+            const long sequence_length = num_patches + use_class_token_;
+
+            // Get parameter aliases
+            auto filt = filters_alias(params, 0);
+            auto bias = biases_alias(params, filters_alias.size());
+            conv_op.setup(input, filt, patch_size_, patch_size_, 0, 0);
+
+            // Step 1: apply convolution (patch extraction + projection)
+            conv_output.set_size(batch_size, embedding_dim_, num_patches_h, num_patches_w);
+            conv_op(false, conv_output, input, filt);
+
+            // Add bias using broadcasting
+            tt::add(1.0f, conv_output, 1.0f, bias);
+
+            // Step 2: reshape from (batch, embed, H/P, W/P) to (batch, 1, num_patches, embed)
+            patch_sequence.set_size(batch_size, 1, num_patches, embedding_dim_);
+            reshape_conv_to_sequence(conv_output, patch_sequence);
+
+            // Step 3: prepend class token if enabled
+            if (use_class_token_) {
+                long cls_offset = filters_alias.size() + biases_alias.size();
+                if (use_position_embeddings_) cls_offset += pos_embed_alias.size();
+                auto cls = cls_token_alias(params, cls_offset);
+
+                output.set_size(batch_size, 1, sequence_length, embedding_dim_);
+                prepend_class_token(patch_sequence, cls, output);
+            }
+            else {
+                output.copy_size(patch_sequence);
+                tt::copy_tensor(false, output, 0, patch_sequence, 0, patch_sequence.k());
+            }
+
+            // Step 4: add position embeddings if enabled
+            if (use_position_embeddings_) {
+                auto pos = pos_embed_alias(params, filters_alias.size() + biases_alias.size());
+                tt::add(1.0f, output, 1.0f, pos);
+            }
+        }
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
+        {
+            const long batch_size = gradient_input.num_samples();
+            const long num_patches = num_patches_h * num_patches_w;
+
+            // Get parameter aliases from params
+            auto filt = filters_alias(params, 0);
+
+            // Get gradient aliases from params_grad
+            auto filt_grad = filters_alias(params_grad, 0);
+            auto bias_grad = biases_alias(params_grad, filters_alias.size());
+
+            // Step 1: gradient for position embeddings (if enabled)
+            if (use_position_embeddings_) {
+                auto pos_grad = pos_embed_alias(params_grad, filters_alias.size() + biases_alias.size());
+                // Zero out and accumulate across batch
+                pos_grad = 0;
+                sum_across_batch_to_alias(gradient_input, pos_grad);
+                tt::affine_transform(pos_grad, pos_grad, static_cast<float>(learning_rate_multiplier));
+            }
+
+            // Step 2: split gradient between class token and patches
+            grad_patch_sequence.set_size(batch_size, 1, num_patches, embedding_dim_);
+
+            if (use_class_token_) {
+                long cls_offset = filters_alias.size() + biases_alias.size();
+                if (use_position_embeddings_) cls_offset += pos_embed_alias.size();
+                auto cls_grad = cls_token_alias(params_grad, cls_offset);
+
+                cls_grad = 0;
+                split_class_token_gradient_to_alias(gradient_input, cls_grad, grad_patch_sequence);
+                tt::affine_transform(cls_grad, cls_grad, static_cast<float>(learning_rate_multiplier));
+            }
+            else {
+                tt::copy_tensor(false, grad_patch_sequence, 0, gradient_input, 0, gradient_input.k());
+            }
+
+            // Step 3: reshape gradient from sequence back to spatial format
+            grad_conv_output.set_size(batch_size, embedding_dim_, num_patches_h, num_patches_w);
+            reshape_sequence_to_conv(grad_patch_sequence, grad_conv_output);
+
+            // Step 4: gradient for projection bias
+            bias_grad = 0;
+            tt::assign_conv_bias_gradient(bias_grad, grad_conv_output);
+            tt::affine_transform(bias_grad, bias_grad, static_cast<float>(learning_rate_multiplier));
+
+            // Step 5: gradient for convolution filters
+            const tensor& input = sub.get_output();
+            filt_grad = 0;
+            conv_op.get_gradient_for_filters(false, grad_conv_output, input, filt_grad);
+            tt::affine_transform(filt_grad, filt_grad, static_cast<float>(learning_rate_multiplier));
+
+            // Step 6: gradient for input (accumulate)
+            tensor& grad_input = sub.get_gradient_input();
+            conv_op.get_gradient_for_data(true, grad_conv_output, filt, grad_input);
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const patch_embeddings_& item, std::ostream& out)
+        {
+            serialize("patch_embeddings_", out);
+            serialize(item.in_channels, out);
+            serialize(item.num_patches_h, out);
+            serialize(item.num_patches_w, out);
+            serialize(item.cached_input_h, out);
+            serialize(item.cached_input_w, out);
+            serialize(item.cached_input_k, out);
+            serialize(item.learning_rate_multiplier, out);
+            serialize(item.params, out);
+            serialize(item.filters_alias, out);
+            serialize(item.biases_alias, out);
+            if (use_position_embeddings_)
+                serialize(item.pos_embed_alias, out);
+            if (use_class_token_)
+                serialize(item.cls_token_alias, out);
+        }
+
+        friend void deserialize(patch_embeddings_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "patch_embeddings_")
+                throw serialization_error("Unexpected version '" + version +
+                    "' found while deserializing patch_embeddings_.");
+
+            deserialize(item.in_channels, in);
+            deserialize(item.num_patches_h, in);
+            deserialize(item.num_patches_w, in);
+            deserialize(item.cached_input_h, in);
+            deserialize(item.cached_input_w, in);
+            deserialize(item.cached_input_k, in);
+            deserialize(item.learning_rate_multiplier, in);
+            deserialize(item.params, in);
+            deserialize(item.filters_alias, in);
+            deserialize(item.biases_alias, in);
+            if (use_position_embeddings_)
+                deserialize(item.pos_embed_alias, in);
+            if (use_class_token_)
+                deserialize(item.cls_token_alias, in);            
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const patch_embeddings_& item)
+        {
+            out << "patch_embeddings (patch_size=" << patch_size_
+                << ", embedding_dim=" << embedding_dim_
+                << ", num_patches=" << item.get_num_patches()
+                << ", use_class_token=" << use_class_token_
+                << ", use_position_embeddings=" << use_position_embeddings_
+                << ") learning_rate_mult=" << item.learning_rate_multiplier;
+            return out;
+        }
+
+        friend void to_xml(const patch_embeddings_& item, std::ostream& out)
+        {
+            out << "<patch_embeddings"
+                << " patch_size='" << patch_size_ << "'"
+                << " embedding_dim='" << embedding_dim_ << "'"
+                << " num_patches='" << item.get_num_patches() << "'"
+                << " use_class_token='" << use_class_token_ << "'"
+                << " use_position_embeddings='" << use_position_embeddings_ << "'"
+                << " learning_rate_mult='" << item.learning_rate_multiplier << "'"
+                << "/>\n";
+        }
+
+    private:
+
+        // Reshape conv output (batch, embed, H/P, W/P) to sequence (batch, 1, num_patches, embed)
+        void reshape_conv_to_sequence(const tensor& src, tensor& dest)
+        {
+            const long batch_size = src.num_samples();
+            const long embed_dim = src.k();
+            const long h = src.nr();
+            const long w = src.nc();
+            const long num_patches = h * w;
+
+            const float* src_ptr = src.host();
+            float* dest_ptr = dest.host_write_only();
+
+            // src[n, d, i, j] -> dest[n, 0, i*w + j, d]
+            for (long n = 0; n < batch_size; ++n) {
+                for (long i = 0; i < h; ++i) {
+                    for (long j = 0; j < w; ++j) {
+                        const long patch_idx = i * w + j;
+                        for (long d = 0; d < embed_dim; ++d) {
+                            const long src_idx = ((n * embed_dim + d) * h + i) * w + j;
+                            const long dest_idx = (n * num_patches + patch_idx) * embed_dim + d;
+                            dest_ptr[dest_idx] = src_ptr[src_idx];
+                        }
+                    }
+                }
+            }
+        }
+
+        // Reshape sequence (batch, 1, num_patches, embed) to conv format (batch, embed, H/P, W/P)
+        void reshape_sequence_to_conv(const tensor& src, tensor& dest)
+        {
+            const long batch_size = src.num_samples();
+            const long num_patches = src.nr();
+            const long embed_dim = src.nc();
+            const long h = dest.nr();
+            const long w = dest.nc();
+
+            const float* src_ptr = src.host();
+            float* dest_ptr = dest.host_write_only();
+
+            // src[n, 0, i*w + j, d] -> dest[n, d, i, j]
+            for (long n = 0; n < batch_size; ++n) {
+                for (long i = 0; i < h; ++i) {
+                    for (long j = 0; j < w; ++j) {
+                        const long patch_idx = i * w + j;
+                        for (long d = 0; d < embed_dim; ++d) {
+                            const long src_idx = (n * num_patches + patch_idx) * embed_dim + d;
+                            const long dest_idx = ((n * embed_dim + d) * h + i) * w + j;
+                            dest_ptr[dest_idx] = src_ptr[src_idx];
+                        }
+                    }
+                }
+            }
+        }
+
+        // Prepend class token to patch sequence
+        void prepend_class_token(const tensor& patches, const tensor& cls_token, tensor& output)
+        {
+            const long batch_size = patches.num_samples();
+            const long num_patches = patches.nr();
+            const long embed_dim = patches.nc();
+            const long seq_len = num_patches + 1;
+
+            const float* patches_ptr = patches.host();
+            const float* cls_ptr = cls_token.host();
+            float* out_ptr = output.host_write_only();
+
+            for (long n = 0; n < batch_size; ++n) {
+                // Copy class token to position 0
+                for (long d = 0; d < embed_dim; ++d) {
+                    out_ptr[n * seq_len * embed_dim + d] = cls_ptr[d];
+                }
+                // Copy patch embeddings to positions 1..seq_len-1
+                for (long s = 0; s < num_patches; ++s) {
+                    for (long d = 0; d < embed_dim; ++d) {
+                        out_ptr[(n * seq_len + s + 1) * embed_dim + d] =
+                            patches_ptr[(n * num_patches + s) * embed_dim + d];
+                    }
+                }
+            }
+        }
+
+        // Split gradient between class token and patches (writes to alias)
+        void split_class_token_gradient_to_alias(const tensor& grad_in, tensor& grad_cls, tensor& grad_patches)
+        {
+            const long batch_size = grad_in.num_samples();
+            const long seq_len = grad_in.nr();
+            const long embed_dim = grad_in.nc();
+            const long num_patches = seq_len - 1;
+
+            const float* grad_in_ptr = grad_in.host();
+            float* grad_cls_ptr = grad_cls.host();
+            float* grad_patches_ptr = grad_patches.host_write_only();
+
+            for (long n = 0; n < batch_size; ++n) {
+                // Accumulate gradient for class token across batch
+                for (long d = 0; d < embed_dim; ++d) {
+                    grad_cls_ptr[d] += grad_in_ptr[n * seq_len * embed_dim + d];
+                }
+                // Copy gradient for patches
+                for (long s = 0; s < num_patches; ++s) {
+                    for (long d = 0; d < embed_dim; ++d) {
+                        grad_patches_ptr[(n * num_patches + s) * embed_dim + d] =
+                            grad_in_ptr[(n * seq_len + s + 1) * embed_dim + d];
+                    }
+                }
+            }
+        }
+
+        // Sum tensor across batch dimension (writes to alias)
+        void sum_across_batch_to_alias(const tensor& src, tensor& dest)
+        {
+            const long batch_size = src.num_samples();
+            const long seq_len = src.nr();
+            const long embed_dim = src.nc();
+
+            const float* src_ptr = src.host();
+            float* dest_ptr = dest.host();
+
+            for (long n = 0; n < batch_size; ++n) {
+                for (long s = 0; s < seq_len; ++s) {
+                    for (long d = 0; d < embed_dim; ++d) {
+                        dest_ptr[s * embed_dim + d] += src_ptr[(n * seq_len + s) * embed_dim + d];
+                    }
+                }
+            }
+        }
+
+        // Configuration
+        long in_channels;
+        long num_patches_h, num_patches_w;
+        long cached_input_h, cached_input_w, cached_input_k;
+        double learning_rate_multiplier;
+
+        // All learnable parameters stored in a single tensor
+        resizable_tensor params;
+
+        // Alias tensors for accessing parameter regions
+        alias_tensor filters_alias;     // (embedding_dim, in_channels, patch_size, patch_size)
+        alias_tensor biases_alias;      // (1, embedding_dim, 1, 1)
+        alias_tensor pos_embed_alias;   // (1, 1, sequence_length, embedding_dim) if enabled
+        alias_tensor cls_token_alias;   // (1, 1, 1, embedding_dim) if enabled
+
+        // Intermediate tensors for forward/backward
+        resizable_tensor conv_output;
+        resizable_tensor patch_sequence;
+        resizable_tensor grad_conv_output;
+        resizable_tensor grad_patch_sequence;
+
+        // Convolution operation
+        tt::tensor_conv conv_op;
+    };
+
+    template <long patch_size, long embedding_dim, long use_cls, long use_pos, typename SUBNET>
+    using patch_embeddings = add_layer<patch_embeddings_<patch_size, embedding_dim, use_cls, use_pos>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

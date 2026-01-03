@@ -4545,6 +4545,81 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class tril_padding_context
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This class provides a shared context for communicating padding information
+                to tril_ layers during forward passes. It solves the problem of nested
+                architectures where tril_ layers cannot directly access the input sequence.
+                The context stores per-sample padding lengths that are computed once
+                before each forward pass and consulted by all tril_ layers.
+
+            THREAD SAFETY
+                All methods are thread-safe through internal mutex protection.
+
+            TYPICAL USAGE
+                // Before forward pass:
+                tril_padding_context::set(input_tensor, padding_token);
+                // Or from pre-computed lengths:
+                tril_padding_context::set_from_lengths(padding_lengths);
+        !*/
+    public:
+        static void set(const tensor& input_tokens, long padding_token);
+        /*!
+            ensures
+                - Computes and stores padding lengths by scanning input_tokens
+                - For each sample, counts leading tokens equal to padding_token
+                - #is_set() == true (if padding_token >= 0)
+                - If padding_token < 0, clears the context instead
+        !*/
+
+        static void set_from_lengths(const std::vector<long>& lengths);
+        /*!
+            ensures
+                - Stores the provided padding lengths directly
+                - #is_set() == true
+                - #get_padding_length(i) == lengths[i] for all valid i
+        !*/
+
+        static void set_uniform(long padding_length, long batch_size);
+        /*!
+            ensures
+                - Sets uniform padding length for all samples
+                - #is_set() == true
+                - #get_padding_length(i) == padding_length for i in [0, batch_size)
+        !*/
+
+        static void clear();
+        /*!
+            ensures
+                - #is_set() == false
+                - Releases stored padding lengths
+        !*/
+
+        static long get_padding_length(long sample_idx);
+        /*!
+            ensures
+                - If is_set() and sample_idx is valid: returns padding length for that sample
+                - Otherwise: returns 0
+        !*/
+
+        static std::vector<long> get_all_lengths();
+        /*!
+            ensures
+                - Returns a copy of all stored padding lengths
+                - Returns empty vector if !is_set()
+        !*/
+
+        static bool is_set();
+        /*!
+            ensures
+                - Returns true if padding context has been initialized
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
     struct neg_infinity_tag {};
     struct zero_tag {};
 
@@ -4664,6 +4739,25 @@ namespace dlib
             ensures
                 - Returns the parameters of this layer.
         !*/
+
+        void set_prefix_size(long n_prefix_size);
+        /*!
+            ensures
+                - #get_prefix_size() == n_prefix_size
+                - Invalidates cached mask if value changed
+        !*/
+        long get_prefix_size() const;
+
+        void set_padding_token(long token_id);
+        /*!
+            ensures
+                - #get_padding_token() == token_id
+                - If token_id >= 0: enables automatic padding context usage
+                - If token_id < 0: disables padding masking
+        !*/
+        long get_padding_token() const;
+
+        bool uses_padding_context() const;
 
         friend void serialize(const tril_& item, std::ostream& out);
         /*!
@@ -4817,6 +4911,343 @@ namespace dlib
 
     template <typename SUBNET>
     using act16 = add_layer<adaptive_computation_time_<16>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class rotary_positional_embedding_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object implements a rotary positional embedding (RoPE) layer for neural
+                networks, as described in "RoFormer: Enhanced Transformer with Rotary Position
+                Embedding" by Su et al.
+
+                Rotary positional embeddings encode positional information by rotating pairs
+                of feature dimensions according to their position in the sequence. This method
+                provides better relative position encoding compared to traditional learned
+                positional embeddings, particularly for sequence-to-sequence tasks.
+
+                The transformation is applied as a rotation matrix in 2D subspaces:
+                    For each pair of dimensions (i, i+1) at position pos:
+                        [x'_i  ]   [cos(θ)  -sin(θ)] [x_i  ]
+                        [x'_i+1] = [sin(θ)   cos(θ)] [x_i+1]
+
+                    where θ(pos, i) = pos * base^(-2i/d_head) and base is typically 10000.
+
+                DYNAMIC SEQUENCE LENGTH SUPPORT:
+                    This layer automatically adapts to different sequence lengths during
+                    inference. When a sequence of different length is processed, the rotation
+                    angles are recomputed on-the-fly. This allows models trained on shorter
+                    sequences to handle longer contexts at inference time.
+
+                YARN EXTENSION (OPTIONAL):
+                    Optionally supports YaRN (Yet another RoPE extensioN) scaling for
+                    improved extrapolation to longer sequences than seen during training.
+                    YaRN applies frequency-dependent scaling that preserves low-frequency
+                    information while adapting high-frequency components. Enable via
+                    set_yarn_params().
+
+                This layer has no trainable parameters. All rotation angles are precomputed
+                during setup based on the sequence length and head dimension.
+        !*/
+
+    public:
+
+        rotary_positional_embedding_(
+        );
+        /*!
+            ensures
+                - #get_theta_base() == 10000.0
+                - #get_seq_len() == 0
+                - #get_d_head() == 0
+        !*/
+
+        rotary_positional_embedding_(
+            const rotary_positional_embedding_& item
+        );
+        /*!
+            ensures
+                - Creates a copy of item
+                - #get_theta_base() == item.get_theta_base()
+                - #get_seq_len() == item.get_seq_len()
+                - #get_d_head() == item.get_d_head()
+                - All precomputed trigonometric caches are copied
+        !*/
+
+        rotary_positional_embedding_& operator=(
+            const rotary_positional_embedding_& item
+            );
+        /*!
+            ensures
+                - Assigns item to *this
+                - returns #*this
+        !*/
+
+        void set_theta_base(
+            float base
+        );
+        /*!
+            requires
+                - base > 0
+            ensures
+                - #get_theta_base() == base
+                - Sets the base frequency for computing rotation angles
+                - Higher values result in slower rotation with increasing position
+                - Common values: 10000 (default), 500000 (for longer sequences)
+                - This should be called before setup() to take effect
+        !*/
+
+        float get_theta_base(
+        ) const;
+        /*!
+            ensures
+                - Returns the base frequency used for rotation angle computation
+        !*/
+
+        long get_seq_len(
+        ) const;
+        /*!
+            ensures
+                - Returns the most recent sequence length processed by this layer
+                - Returns 0 if forward() has not been called yet
+                - Note: this value may change between forward() calls if sequences
+                  of different lengths are processed
+        !*/
+
+        long get_d_head(
+        ) const;
+        /*!
+            ensures
+                - Returns the head dimension that this layer was configured for
+                - Returns 0 if forward() has not been called yet
+                - This value remains constant once set (determined by network architecture)
+        !*/
+
+        void set_yarn_params(
+            float alpha,
+            float beta,
+            long original_len = 0,
+            bool enabled = true
+        );
+        /*!
+            requires
+                - alpha >= 0
+                - beta >= 0
+            ensures
+                - Configures YaRN (Yet another RoPE extensioN) scaling parameters
+                - alpha controls the overall intensity of scaling (typical: 1.0)
+                - beta controls the curvature of scaling across frequency dimensions (typical: 0.25 to 0.5)
+                - original_len is the sequence length used during training
+                  If 0, it will be set to the first sequence length observed in forward()
+                - enabled determines whether YaRN scaling is active
+                - YaRN allows better extrapolation to sequence lengths longer than training
+                - Should be called before forward() to take effect
+        !*/
+
+        const yarn_config& get_yarn_config(
+        ) const;
+        /*!
+            ensures
+                - Returns the current YaRN configuration
+        !*/
+
+        template <typename SUBNET>
+        void setup(
+            const SUBNET& sub
+        );
+        /*!
+            requires
+                - sub.get_output().nr() > 0
+                - sub.get_output().nc() >= 2
+            ensures
+                - Initializes this layer based on the input dimensions
+                - #get_seq_len() == sub.get_output().nr()
+                - #get_d_head() == sub.get_output().nc()
+                - Precomputes and caches all cosine and sine values for the rotation
+                  angles based on the sequence length and head dimension
+                - The cos_cache and sin_cache tensors are allocated with shape:
+                  (1, 1, seq_len, d_head/2)
+                - If d_head is odd, only (d_head-1) dimensions will be rotated
+                - If YaRN is enabled and original_len is 0, the observed sequence
+                  length is recorded as the training length for YaRN scaling
+        !*/
+
+        template <typename SUBNET>
+        void forward(
+            const SUBNET& sub,
+            resizable_tensor& output
+        );
+        /*!
+            requires
+                - sub.get_output().nc() >= 2
+                - sub.get_output().nr() > 0
+            ensures
+                - Applies rotary positional embeddings to the input
+                - #output has the same dimensions as sub.get_output()
+                - If the input sequence length differs from get_seq_len(), or if
+                  this is the first forward pass after deserialization, the rotation
+                  angles are automatically recomputed for the current sequence length.
+                - For each position pos and dimension pair (i, i+1):
+                    output[pos,i]   = input[pos,i] * cos(θ_pos,i/2) - input[pos,i+1] * sin(θ_pos,i/2)
+                    output[pos,i+1] = input[pos,i] * sin(θ_pos,i/2) + input[pos,i+1] * cos(θ_pos,i/2)
+                - The rotation preserves the magnitude of feature vectors while encoding
+                  relative positional information
+                - If d_head is odd, the last dimension is copied without rotation
+                - Expected input shape: (batch_size, num_heads, seq_len, d_head)
+                - YaRN scaling is applied if enabled via set_yarn_params()
+        !*/
+
+        template <typename SUBNET>
+        void backward(
+            const tensor& gradient_input,
+            SUBNET& sub,
+            tensor& params_grad
+        );
+        /*!
+            requires
+                - setup() has been called
+                - gradient_input has the same dimensions as the output from forward()
+            ensures
+                - Computes gradients with respect to the input
+                - Applies the inverse rotation to gradient_input
+                - The inverse rotation is:
+                    grad_input[pos,i]   = grad_out[pos,i] * cos(θ) + grad_out[pos,i+1] * sin(θ)
+                    grad_input[pos,i+1] = -grad_out[pos,i] * sin(θ) + grad_out[pos,i+1] * cos(θ)
+                - Accumulated gradients are added to sub.get_gradient_input()
+                - params_grad is not used (this layer has no trainable parameters)
+        !*/
+
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
+        inline dpoint map_input_to_output(const dpoint& p) const;
+        inline dpoint map_output_to_input(const dpoint& p) const;
+
+        friend void serialize(const rotary_positional_embedding_& item, std::ostream& out);
+        friend void deserialize(rotary_positional_embedding_& item, std::istream& in);
+        friend std::ostream& operator<<(std::ostream& out, const rotary_positional_embedding_& item);
+        friend void to_xml(const rotary_positional_embedding_& item, std::ostream& out);
+        /*!
+            provides serialization support and output operators
+        !*/
+
+    };
+
+    template <typename SUBNET>
+    using rope = add_layer<rotary_positional_embedding_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        long patch_size,
+        long embedding_dim,
+        long use_class_token,
+        long use_position_embeddings
+    >
+    class patch_embeddings_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This layer implements patch embeddings for Vision Transformers (ViT), as described
+                in "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale"
+                (Dosovitskiy et al., 2021).
+
+                The layer performs the following operations:
+                1. Convolves the input image with filters of size (patch_size x patch_size)
+                   and stride (patch_size) to create a set of projected patches
+                2. Reshapes the resulting spatial feature maps into a sequence of vectors
+                3. If use_class_token == 1, prepends a learnable 'class token' to the sequence
+                4. If use_position_embeddings == 1, adds learnable position embeddings to
+                   the entire sequence
+
+                The input to this layer is a 4D tensor of shape:
+                    (batch_size, in_channels, height, width)
+
+                The output is a 4D tensor representing a sequence:
+                    (batch_size, 1, sequence_length, embedding_dim)
+                where sequence_length is (height/patch_size * width/patch_size) + use_class_token
+
+            TEMPLATE PARAMETERS
+                - patch_size: the side length of the square patches (e.g., 16)
+                - embedding_dim: the dimensionality of the resulting embeddings (e.g., 768)
+                - use_class_token: set to 1 to prepend a learnable CLS token, 0 otherwise
+                - use_position_embeddings: set to 1 to add learnable absolute position
+                  embeddings to the sequence, 0 otherwise
+        !*/
+
+    public:
+
+        patch_embeddings_(
+        );
+        /*!
+            ensures
+                - #get_patch_size() == patch_size
+                - #get_embedding_dim() == embedding_dim
+                - #uses_class_token() == use_class_token
+                - #uses_position_embeddings() == use_position_embeddings
+                - #get_learning_rate_multiplier() == 1
+        !*/
+
+        long get_patch_size() const;
+        long get_embedding_dim() const;
+        long uses_class_token() const;
+        long uses_position_embeddings() const;
+
+        double get_learning_rate_multiplier() const;
+        void set_learning_rate_multiplier(double val);
+        /*!
+            ensures
+                - #get_learning_rate_multiplier() == val
+        !*/
+
+        template <typename SUBNET>
+        void setup(
+            const SUBNET& sub
+        );
+        /*!
+            requires
+                - sub.get_output().nr() % patch_size == 0
+                - sub.get_output().nc() % patch_size == 0
+            ensures
+                - Initialized the learned parameters:
+                    - projection filters: (embedding_dim, in_channels, patch_size, patch_size)
+                    - projection biases: (embedding_dim)
+                    - (optional) class token and position embeddings.
+                - Parameters are initialized using Xavier/Glorot initialization for filters
+                  and zero/truncated normal for other components.
+        !*/
+
+        template <typename SUBNET>
+        void forward(
+            const SUBNET& sub,
+            resizable_tensor& output
+        );
+        /*!
+            requires
+                - setup(sub) has been called.
+            ensures
+                - #output.num_samples() == sub.get_output().num_samples()
+                - #output.k() == 1
+                - #output.nr() == (sub.get_output().nr()/patch_size * sub.get_output().nc()/patch_size) + use_class_token
+                - #output.nc() == embedding_dim
+        !*/
+
+        template <typename SUBNET>
+        void backward(
+            const tensor& gradient_input,
+            SUBNET& sub,
+            tensor& params_grad
+        );
+        /*!
+            requires
+                - gradient_input has the same dimensions as the output of forward()
+            ensures
+                - Computes the gradient of the loss with respect to the input of this
+                  layer and adds it to #sub.get_gradient_input()
+        !*/
+    };
+
+    template <long patch_size, long embedding_dim, long use_cls, long use_pos, typename SUBNET>
+    using patch_embeddings = add_layer<patch_embeddings_<patch_size, embedding_dim, use_cls, use_pos>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

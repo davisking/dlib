@@ -242,39 +242,54 @@ namespace dlib { namespace tt
         }
         else if (mode == operation_mode::PLANE_WISE)
         {
-            auto is_matrix = [](const auto& tensor) {
-                return ((tensor.num_samples() * tensor.k() == 1 && tensor.nr() * tensor.nc() > 1) ||
-                    (tensor.num_samples() * tensor.k() > 1 && tensor.nr() * tensor.nc() == 1));
-                };
+            const bool lhs_is_matrix = is_2d_matrix(lhs);
+            const bool rhs_is_matrix = is_2d_matrix(rhs);
+            const bool dest_is_matrix = is_2d_matrix(dest);
 
-            long num_samples = std::min({ lhs.num_samples(), rhs.num_samples(), dest.num_samples() });
-            long num_channels = std::min({ lhs.k(), rhs.k(), dest.k() });
-            const bool lhs_is_matrix = is_matrix(lhs), rhs_is_matrix = is_matrix(rhs), dest_is_matrix = is_matrix(dest);
+            const size_t lhs_plane_size = lhs.nr() * lhs.nc();
+            const size_t rhs_plane_size = rhs.nr() * rhs.nc();
+            const size_t dest_plane_size = dest.nr() * dest.nc();
 
-            if (lhs_is_matrix && rhs_is_matrix && dest_is_matrix) {
-                num_samples = num_channels = 1;
+            long num_samples, num_channels = std::min({ lhs.k(), rhs.k(), dest.k() });
+            if (lhs_is_matrix && rhs_is_matrix && dest_is_matrix)
+                num_samples = 1;
+            else if (!lhs_is_matrix && rhs_is_matrix)
+                num_samples = lhs.num_samples();
+            else
+                num_samples = std::min({ lhs.num_samples(), rhs.num_samples(), dest.num_samples() });
+
+            size_t lhs_rows = lhs.nr();
+            size_t lhs_cols = lhs.nc();
+            if (lhs_is_matrix && (lhs.num_samples() > 1 || lhs.k() > 1)) {
+                lhs_rows = lhs.num_samples();
+                lhs_cols = lhs.k();
+            }
+            size_t rhs_rows = rhs.nr();
+            size_t rhs_cols = rhs.nc();
+            if (rhs_is_matrix && (rhs.num_samples() > 1 || rhs.k() > 1)) {
+                rhs_rows = rhs.num_samples();
+                rhs_cols = rhs.k();
+            }
+            size_t dest_rows = dest.nr();
+            size_t dest_cols = dest.nc();
+            if (dest_is_matrix && (dest.num_samples() > 1 || dest.k() > 1)) {
+                dest_rows = dest.num_samples();
+                dest_cols = dest.k();
             }
 
-            long lhs_rows = (lhs_is_matrix && lhs.num_samples() > 1) ? lhs.num_samples() : lhs.nr();
-            long lhs_cols = (lhs_is_matrix && lhs.k() > 1) ? lhs.k() : lhs.nc();
-            long rhs_rows = (rhs_is_matrix && rhs.num_samples() > 1) ? rhs.num_samples() : rhs.nr();
-            long rhs_cols = (rhs_is_matrix && rhs.k() > 1) ? rhs.k() : rhs.nc();
-            long dest_rows = (dest_is_matrix && dest.num_samples() > 1) ? dest.num_samples() : dest.nr();
-            long dest_cols = (dest_is_matrix && dest.k() > 1) ? dest.k() : dest.nc();
-
-            const size_t lhs_plane_size = lhs_rows * lhs_cols;
-            const size_t rhs_plane_size = rhs_rows * rhs_cols;
-            const size_t dest_plane_size = dest_rows * dest_cols;
-
+            // Process each plane
             for (long b = 0; b < num_samples; ++b)
             {
                 for (long c = 0; c < num_channels; ++c)
                 {
-                    auto lhs_slice = lhs_is_matrix ? alias_tensor(lhs_rows, lhs_cols)(lhs, 0) :
+                    auto lhs_slice = lhs_is_matrix ?
+                        alias_tensor(lhs_rows, lhs_cols)(lhs, 0) :
                         alias_tensor(lhs_rows, lhs_cols)(lhs, (b * num_channels + c) * lhs_plane_size);
-                    auto rhs_slice = rhs_is_matrix ? alias_tensor(rhs_rows, rhs_cols)(rhs, 0) :
+                    auto rhs_slice = rhs_is_matrix ?
+                        alias_tensor(rhs_rows, rhs_cols)(rhs, 0) :
                         alias_tensor(rhs_rows, rhs_cols)(rhs, (b * num_channels + c) * rhs_plane_size);
-                    auto dest_slice = dest_is_matrix ? alias_tensor(dest_rows, dest_cols)(dest, 0) :
+                    auto dest_slice = dest_is_matrix ?
+                        alias_tensor(dest_rows, dest_cols)(dest, 0) :
                         alias_tensor(dest_rows, dest_cols)(dest, (b * num_channels + c) * dest_plane_size);
 
                     if (beta != 0)
@@ -1498,6 +1513,22 @@ namespace dlib { namespace tt
 #endif
     }
     
+// ----------------------------------------------------------------------------------------
+
+    void apply_rotary_positional_embedding(
+        bool is_backward,
+        resizable_tensor& data,
+        const resizable_tensor& cos_cache,
+        const resizable_tensor& sin_cache
+    )
+    {
+#ifdef DLIB_USE_CUDA
+		cuda::apply_rotary_positional_embedding(is_backward, data, cos_cache, sin_cache);
+#else
+        cpu::apply_rotary_positional_embedding(is_backward, data, cos_cache, sin_cache);
+#endif
+    }
+
 // ----------------------------------------------------------------------------------------
 
 }}

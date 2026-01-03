@@ -1095,6 +1095,23 @@ namespace dlib
                 end_node();
                 update(i);
             }
+
+            template <long max_steps, typename U, typename E>
+            void operator()(size_t i, const add_layer<adaptive_computation_time_<max_steps>, U, E>&)
+            {
+                start_node(i, "adaptive_computation_time");
+                out << " | {max_steps|{" << max_steps << "}}";
+                end_node();
+                update(i);
+            }
+
+            template <typename U, typename E>
+            void operator()(size_t i, const add_layer<rotary_positional_embedding_, U, E>&)
+            {
+                start_node(i, "rotary_positional_embedding");
+                end_node();
+                update(i);
+            }
             
             template <typename T, typename U, typename E>
             void operator()(size_t i, const add_layer<T, U, E>&)

@@ -10,8 +10,6 @@ namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
 
     class EXAMPLE_SOLVER 
     {
@@ -69,8 +67,6 @@ namespace dlib
         Prints the solver's name and parameters to out.
     !*/
 
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     class sgd
@@ -192,6 +188,82 @@ namespace dlib
     !*/
 
     std::ostream& operator<< (std::ostream& out, const adam& item);
+    /*!
+        Prints the solver's name and parameters to out.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    class adamw
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object implements the EXAMPLE_SOLVER interface defined above. In
+                particular, it implements the AdamW parameter update method with decoupled
+                weight decay regularization as described in the paper:
+                    Loshchilov, Ilya, and Frank Hutter. "Decoupled weight decay
+                    regularization." International Conference on Learning Representations. 2019.
+
+                The key difference from standard Adam is that weight decay is decoupled from
+                the gradient-based optimization step. This leads to better generalization
+                performance and makes the optimal weight decay factor more independent of the
+                learning rate setting. AdamW has become the standard optimizer for training
+                large language models and transformer architectures.
+
+                The update is computed as:
+                    m_t = momentum1*m_{t-1} + (1-momentum1)*params_grad
+                    v_t = momentum2*v_{t-1} + (1-momentum2)*(params_grad^2)
+                    V = -learning_rate * (m_hat_t/sqrt(v_hat_t) + weight_decay*l.get_layer_params())
+                where m_hat_t and v_hat_t are bias-corrected moment estimates.
+
+                Note that the actual learning rate and weight decay used by the solver are
+                multiplied by the per layer multipliers. That is, the solver will call
+                get_learning_rate_multiplier(l) and get_weight_decay_multiplier(l) and
+                multiply these values with the nominal learning rate and weight decay,
+                respectively, to determine the values it will use during each step. It is
+                also overloaded to allow additional learning rate multipliers to be applied
+                to fc_ and con_ bias parameters.
+        !*/
+
+    public:
+
+        adamw(
+        );
+        /*!
+            ensures
+                - #get_weight_decay()  == 0.01
+                - #get_momentum1()     == 0.9
+                - #get_momentum2()     == 0.999
+        !*/
+
+        explicit adamw(
+            float weight_decay,
+            float momentum1 = 0.9,
+            float momentum2 = 0.999
+        );
+        /*!
+            requires
+                - weight_decay >= 0
+                - 0 <= momentum1 < 1
+                - 0 <= momentum2 < 1
+            ensures
+                - #get_weight_decay()  == weight_decay
+                - #get_momentum1()     == momentum1
+                - #get_momentum2()     == momentum2
+        !*/
+
+        float get_weight_decay() const;
+        float get_momentum1() const;
+        float get_momentum2() const;
+    };
+
+    void serialize(const adamw& item, std::ostream& out);
+    void deserialize(adamw& item, std::istream& in);
+    /*!
+        provides serialization support
+    !*/
+
+    std::ostream& operator<< (std::ostream& out, const adamw& item);
     /*!
         Prints the solver's name and parameters to out.
     !*/
