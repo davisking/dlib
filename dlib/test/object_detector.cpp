@@ -296,7 +296,7 @@ namespace
         std::vector<full_object_detection> temp;
 
         rectangle rect = centered_rect(point(100,100), 70,71);
-        std::vector<point> movable_parts;
+        std::vector<dpoint> movable_parts;
         movable_parts.push_back(shrink_rect(rect,shrink).tl_corner());
         movable_parts.push_back(shrink_rect(rect,shrink).tr_corner());
         movable_parts.push_back(shrink_rect(rect,shrink).bl_corner());

@@ -301,6 +301,10 @@
                   <link>slm_basic_train_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Deep learning Language Modeling Advanced</name>
+                  <link>slm_advanced_train_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Self-supervised deep feature learning</name>
                   <link>dnn_self_supervised_learning_ex.cpp.html</link>
                </item>

@@ -48,11 +48,45 @@ py::list mat_to_list (
 
 size_t num_function_arguments(py::object f, size_t expected_num)
 {
-    const auto code_object = f.attr(hasattr(f,"func_code") ? "func_code" : "__code__");
-    const auto num = code_object.attr("co_argcount").cast<std::size_t>();
-    if (num < expected_num && (code_object.attr("co_flags").cast<int>() & CO_VARARGS))
-        return expected_num;
-    return num;
+    // Use Python's inspect module to get signature, which works with all callable objects
+    // including functools.partial, lambdas, and regular functions
+    auto inspect = py::module_::import("inspect");
+    
+    try {
+        auto sig = inspect.attr("signature")(f);
+        auto params = sig.attr("parameters");
+        
+        // Count only regular parameters, excluding VAR_POSITIONAL (*args) and VAR_KEYWORD (**kwargs)
+        size_t num_regular_params = 0;
+        bool has_var_args = false;
+        
+        for (auto item : params.attr("values")()) {
+            auto param = item.cast<py::object>();
+            auto kind = param.attr("kind").cast<int>();
+            // inspect.Parameter.VAR_POSITIONAL == 2, VAR_KEYWORD == 4
+            if (kind == 2) {
+                has_var_args = true;
+            } else if (kind != 4) {
+                // Count all parameters except VAR_POSITIONAL and VAR_KEYWORD
+                num_regular_params++;
+            }
+        }
+        
+        if (num_regular_params < expected_num && has_var_args)
+            return expected_num;
+        return num_regular_params;
+    } catch (const py::error_already_set&) {
+        // Fallback to old method if inspect.signature fails
+        // This maintains backward compatibility
+        if (!hasattr(f, "__code__") && !hasattr(f, "func_code")) {
+            throw;
+        }
+        const auto code_object = f.attr(hasattr(f,"func_code") ? "func_code" : "__code__");
+        const auto num = code_object.attr("co_argcount").cast<std::size_t>();
+        if (num < expected_num && (code_object.attr("co_flags").cast<int>() & CO_VARARGS))
+            return expected_num;
+        return num;
+    }
 }
 
 double call_func(py::object f, const matrix<double,0,1>& args)

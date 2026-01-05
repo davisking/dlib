@@ -27,13 +27,6 @@ if (POLICY CMP0042)
 endif()
 
 
-# To avoid dll hell, always link everything statically when compiling in
-# visual studio.  This way, the resulting library won't depend on a bunch
-# of other dll files and can be safely copied to someone else's computer
-# and expected to run.
-if (MSVC)
-    include(${CMAKE_CURRENT_LIST_DIR}/../../dlib/cmake_utils/tell_visual_studio_to_use_static_runtime.cmake)
-endif()
 
 add_subdirectory(../../dlib/external/pybind11 pybind11_build)
 add_subdirectory(../../dlib dlib_build)

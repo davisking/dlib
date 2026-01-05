@@ -40,16 +40,10 @@ namespace dlib
         long nc()                   const;
 
         template<class image_type>
-        void get_image( image_type& img) const 
+        void get_image(image_type& img) const 
         {
 #ifndef DLIB_PNG_SUPPORT
-            /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                You are getting this error because you are trying to use the png_loader
-                object but you haven't defined DLIB_PNG_SUPPORT.  You must do so to use
-                this object.   You must also make sure you set your build environment
-                to link against the libpng library.
-            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-            COMPILE_TIME_ASSERT(sizeof(T) == 0);
+            static_assert(sizeof(image_type) == 0, "You are getting this error because you are trying to use the png_loader object but you haven't defined DLIB_PNG_SUPPORT.  You must do so to use this object.   You must also make sure you set your build environment to link against the libpng library.");
 #else
             using pixel_type = pixel_type_t<image_type>;
             auto t = make_image_view(img);

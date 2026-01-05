@@ -96,20 +96,37 @@ namespace dlib
 
     const std::wstring convert_mbstring_to_wstring(const std::string &src)
     {
-        std::vector<wchar_t> wstr(src.length()+5);
-        std::mbstowcs(&wstr[0], src.c_str(), src.length()+1);
-        return std::wstring(&wstr[0]);
+        // Compute dst length
+        std::mbstate_t st{};
+        const char* p = src.c_str();
+        size_t n = std::mbsrtowcs(nullptr, &p, 0, &st);
+        if (n == static_cast<size_t>(-1)) throw std::runtime_error("Invalid multibyte sequence / wrong locale");
+
+        // Convert
+        std::wstring out(n, L'\0');
+        st = std::mbstate_t{};
+        n  = std::mbsrtowcs(&out[0], &p, out.size(), &st);
+        if (n == static_cast<size_t>(-1)) throw std::runtime_error("Conversion failed");
+        return out;
     }
 
 // ----------------------------------------------------------------------------------------
 
     const std::string convert_wstring_to_mbstring(const std::wstring &src)
     {
-        using namespace std;
-        std::string str;
-        str.resize((src.length() + 1) * MB_CUR_MAX);
-        wcstombs(&str[0], src.c_str(), str.size());
-        return std::string(&str[0]);
+        std::mbstate_t st{};
+        const wchar_t* p = src.c_str();
+
+        // Compute length
+        size_t n = std::wcsrtombs(nullptr, &p, 0, &st);
+        if (n == static_cast<std::size_t>(-1)) throw std::runtime_error("Invalid wide sequence / locale mismatch");
+
+        // Convert
+        std::string out(n, '\0');
+        st = std::mbstate_t{};
+        n  = std::wcsrtombs(&out[0], &p, out.size(), &st);
+        if (n == static_cast<std::size_t>(-1)) throw std::runtime_error("Conversion failed");
+        return out;
     }
 
 // ----------------------------------------------------------------------------------------

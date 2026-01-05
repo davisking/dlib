@@ -35,6 +35,7 @@
 #include "../dir_nav/dir_nav_kernel_1.cpp"
 #include "../dir_nav/dir_nav_kernel_2.cpp"
 #include "../dir_nav/dir_nav_extensions.cpp"
+#include "../fft/fft.cpp"
 #include "../linker/linker_kernel_1.cpp"
 #include "../logger/extra_logger_headers.cpp"
 #include "../logger/logger_kernel_1.cpp"
@@ -68,8 +69,9 @@
 #include "../image_saver/save_jpeg.cpp"
 #endif
 
-#ifndef DLIB_NO_GUI_SUPPORT
 #include "../gui_widgets/fonts.cpp"
+
+#ifndef DLIB_NO_GUI_SUPPORT
 #include "../gui_widgets/widgets.cpp"
 #include "../gui_widgets/drawable.cpp"
 #include "../gui_widgets/canvas_drawing.cpp"

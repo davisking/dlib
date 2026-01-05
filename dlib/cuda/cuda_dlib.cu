@@ -1,4 +1,4 @@
-// Copyright (C) 2015  Davis E. King (davis@dlib.net)
+﻿// Copyright (C) 2015  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 #include "cuda_utils.h"
@@ -2765,6 +2765,273 @@ namespace dlib
             launch_kernel(_cuda_transpose, max_jobs(dest.size()), dest.size(),
                 dest.k(), dest.nr(), dest.nc(), dest.device(),
                 src.k(), src.nr(), src.nc(), src.device(), add_to);
+        }
+
+    // ----------------------------------------------------------------------------------------
+
+        // CUDA Kernels for ACT operations
+        __global__ void _cuda_compute_act_halt_probabilities(
+            float* halt_probs,
+            float* logits,
+            const float* input_data,
+            const float* W_halt,
+            float b_halt,
+            size_t batch_size,
+            size_t seq_len,
+            size_t d_model,
+            size_t num_channels,
+            size_t feature_dim
+        )
+        {
+            const long total_positions = batch_size * seq_len;
+
+            for (auto pos : grid_stride_range_y(0, total_positions))
+                for (auto i : grid_stride_range(0, 1))
+                    logits[pos] = b_halt;
+            __syncthreads();
+
+            for (auto pos : grid_stride_range_y(0, total_positions))
+            {
+                const long n = pos / seq_len;
+                const long s = pos % seq_len;
+
+                float temp = 0;
+                for (auto feat_idx : grid_stride_range(0, feature_dim))
+                {
+                    const long c = feat_idx / d_model;
+                    const long d = feat_idx % d_model;
+
+                    const long in_idx = ((n * num_channels + c) * seq_len + s) * d_model + d;
+                    temp += input_data[in_idx] * W_halt[feat_idx];
+                }
+
+                warp_reduce_atomic_add(logits[pos], temp);
+            }
+            __syncthreads();
+
+            for (auto pos : grid_stride_range(0, total_positions))
+            {
+                halt_probs[pos] = 1.0f / (1.0f + expf(-logits[pos]));
+            }
+        }
+
+        void compute_act_halt_probabilities(
+            resizable_tensor& halt_probs,
+            resizable_tensor& logits,
+            const tensor& input_data,
+            const tensor& halt_params,
+            long batch_size,
+            long seq_len,
+            long feature_dim
+        )
+        {
+            const long total_positions = batch_size * seq_len;
+            const long d_model = feature_dim / input_data.k();
+            const long num_channels = input_data.k();
+
+            halt_probs.set_size(total_positions, 1, 1, 1);
+            logits.set_size(total_positions, 1, 1, 1);
+
+            launch_kernel(_cuda_compute_act_halt_probabilities,
+                max_jobs(feature_dim, total_positions),
+                halt_probs.device(),
+                logits.device(),
+                input_data.device(),
+                halt_params.device(),
+                halt_params.host()[feature_dim],
+                batch_size,
+                seq_len,
+                d_model,
+                num_channels,
+                feature_dim);
+        }
+
+        __global__ void _cuda_update_act_state(
+            float* output,
+            const float* input_data,
+            const float* halt_probs,
+            float* cumulative_halting,
+            float* remainders,
+            float* n_steps,
+            float* effective_weights,
+            size_t batch_size,
+            size_t seq_len,
+            size_t d_model,
+            size_t num_channels,
+            float halt_threshold,
+            long current_step
+        )
+        {
+            for (auto pos : grid_stride_range(0, batch_size * seq_len))
+            {
+                if (cumulative_halting[pos] < halt_threshold)
+                {
+                    const size_t n = pos / seq_len;
+                    const size_t s = pos % seq_len;
+
+                    float p = halt_probs[pos];
+                    float r = remainders[pos];
+                    float effective = fminf(p * r, halt_threshold - cumulative_halting[pos]);
+
+                    cumulative_halting[pos] += effective;
+                    remainders[pos] -= effective;
+                    n_steps[pos] = static_cast<float>(current_step + 1);
+                    effective_weights[pos] += effective;
+
+                    for (size_t c = 0; c < num_channels; ++c) {
+                        for (size_t d = 0; d < d_model; ++d) {
+                            const size_t idx = ((n * num_channels + c) * seq_len + s) * d_model + d;
+                            output[idx] += effective * input_data[idx];
+                        }
+                    }
+                }
+            }
+        }
+
+        void update_act_state(
+            resizable_tensor& output,
+            const tensor& input_data,
+            const tensor& halt_probs,
+            resizable_tensor& cumulative_halting,
+            resizable_tensor& remainders,
+            resizable_tensor& n_steps,
+            resizable_tensor& effective_weights,
+            long batch_size,
+            long seq_len,
+            long d_model,
+            long num_channels,
+            float halt_threshold,
+            long current_step
+        )
+        {
+            const long total_positions = batch_size * seq_len;
+
+            launch_kernel(_cuda_update_act_state,
+                max_jobs(total_positions),
+                output.device(),
+                input_data.device(),
+                halt_probs.device(),
+                cumulative_halting.device(),
+                remainders.device(),
+                n_steps.device(),
+                effective_weights.device(),
+                batch_size,
+                seq_len,
+                d_model,
+                num_channels,
+                halt_threshold,
+                current_step);
+        }
+
+        __global__ void _cuda_finalize_act_output(
+            float* output,
+            const float* input_data,
+            const float* remainders,
+            float* effective_weights,
+            size_t batch_size,
+            size_t seq_len,
+            size_t d_model,
+            size_t num_channels
+        )
+        {
+            for (auto pos : grid_stride_range(0, batch_size * seq_len))
+            {
+                float r = remainders[pos];
+                if (r > 1e-6f) {
+                    const size_t n = pos / seq_len;
+                    const size_t s = pos % seq_len;
+
+                    effective_weights[pos] += r;
+
+                    for (size_t c = 0; c < num_channels; ++c) {
+                        for (size_t d = 0; d < d_model; ++d) {
+                            const size_t idx = ((n * num_channels + c) * seq_len + s) * d_model + d;
+                            output[idx] += r * input_data[idx];
+                        }
+                    }
+                }
+            }
+        }
+
+        void finalize_act_output(
+            resizable_tensor& output,
+            const tensor& input_data,
+            const tensor& remainders,
+            resizable_tensor& effective_weights,
+            long batch_size,
+            long seq_len,
+            long d_model,
+            long num_channels
+        )
+        {
+            const long total_positions = batch_size * seq_len;
+
+            launch_kernel(_cuda_finalize_act_output,
+                max_jobs(total_positions),
+                output.device(),
+                input_data.device(),
+                remainders.device(),
+                effective_weights.device(),
+                batch_size,
+                seq_len,
+                d_model,
+                num_channels);
+        }
+
+        __global__ void _cuda_apply_act_depth_scaling(
+            float* gradients,
+            const float* n_steps,
+            size_t batch_size,
+            size_t seq_len,
+            size_t d_model,
+            size_t num_channels,
+            float max_steps,
+            float scale_factor
+        )
+        {
+            const long total_positions = batch_size * seq_len;
+            const long feature_dim = num_channels * d_model;
+
+            for (auto pos : grid_stride_range_y(0, total_positions))
+            {
+                const long n = pos / seq_len;
+                const long s = pos % seq_len;
+                const float scale = 1.0f + scale_factor * (n_steps[pos] / max_steps);
+
+                for (auto feat_idx : grid_stride_range(0, feature_dim))
+                {
+                    const long c = feat_idx / d_model;
+                    const long d = feat_idx % d_model;
+                    const long idx = ((n * num_channels + c) * seq_len + s) * d_model + d;
+                    gradients[idx] *= scale;
+                }
+            }
+        }
+
+        void apply_act_depth_scaling(
+            tensor& gradients,
+            const tensor& n_steps,
+            long batch_size,
+            long seq_len,
+            long d_model,
+            long num_channels,
+            float max_steps,
+            float scale_factor
+        )
+        {
+            const long total_positions = batch_size * seq_len;
+            const long feature_dim = num_channels * d_model;
+
+            launch_kernel(_cuda_apply_act_depth_scaling,
+                max_jobs(feature_dim, total_positions),
+                gradients.device(),
+                n_steps.device(),
+                batch_size,
+                seq_len,
+                d_model,
+                num_channels,
+                max_steps,
+                scale_factor);
         }
 
     // ----------------------------------------------------------------------------------------

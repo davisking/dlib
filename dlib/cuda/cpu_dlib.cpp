@@ -816,37 +816,38 @@ namespace dlib
             dest.copy_size(src);
             means.set_size(1, src.k(), src.nr(), src.nc());
             invstds.set_size(1, src.k(), src.nr(), src.nc());
+            running_means.set_size(1, src.k(), src.nr(), src.nc());
+            running_variances.set_size(1, src.k(), src.nr(), src.nc());
 
             // first compute means and invstds
-            means = 0;
-            invstds = 0;
             const auto p_invstds = invstds.host();
             const auto p_means = means.host();
             auto p_src = src.host();
+            const auto rvar = running_variances.host();
             const long num = src.k()*src.nr()*src.nc();
-            // compute means, and sum of squares
+
+            // This scale makes the running variances unbiased.
+            const double scale = (src.num_samples())/(src.num_samples()-1.0);
+
+            // Apply Welford's algorithm to improve numerical stability
             for (long i = 0; i < num; ++i)
             {
+                double mean = 0.0;
+                double M2 = 0.0;
+
                 for (long n = 0; n < src.num_samples(); ++n)
                 {
                     float val = p_src[n*num+i];
-                    p_means[i] += val;
-                    p_invstds[i] += val*val;
+                    const double delta1 = val - mean;
+                    mean += delta1 / (n + 1);
+                    const double delta2 = val - mean;
+                    M2 += delta1 * delta2;
                 }
-            }
-            means /= src.num_samples();
-            invstds /= src.num_samples();
-            // copy data back to host
-            invstds.host(); means.host();
 
-            // compute variances 
-            running_variances.copy_size(invstds);
-            auto rvar = running_variances.host();
-            // This scale makes the running variances unbiased.
-            const double scale = (src.num_samples())/(src.num_samples()-1.0);
-            for (long i = 0; i < num; ++i)
-            {
-                auto actual_var = p_invstds[i] - p_means[i]*p_means[i];
+                p_means[i] = mean;
+
+                const auto actual_var = (src.num_samples() > 1) ? (M2 / src.num_samples()) : 0.0;
+
                 if (averaging_factor == 1)
                     rvar[i] = scale*actual_var;
                 else
@@ -855,7 +856,6 @@ namespace dlib
                 p_invstds[i] = 1.0f/std::sqrt(actual_var + eps);
             }
 
-            p_src = src.host();
             auto p_dest = dest.host();
             const auto p_gamma = gamma.host();   
             const auto p_beta = beta.host();   
@@ -871,7 +871,6 @@ namespace dlib
             }
 
             // now keep track of the running means 
-            running_means.copy_size(means);
             if (averaging_factor != 1)
                 running_means = (1-averaging_factor)*mat(running_means) + averaging_factor*mat(means);
             else
@@ -1083,52 +1082,56 @@ namespace dlib
             dest.copy_size(src);
             means.set_size(1, src.k());
             invstds.set_size(1, src.k());
+            running_means.set_size(1, src.k());
+            running_variances.set_size(1, src.k());
 
             // first compute means and invstds
-            means = 0;
-            invstds = 0;
             const auto p_invstds = invstds.host();
             const auto p_means = means.host();
             const auto p_gamma = gamma.host();   
             const auto p_beta = beta.host();   
             auto p_src = src.host();
-            const long num = src.nr()*src.nc();
-            // compute means, and sum of squares
-            for (long n = 0; n < src.num_samples(); ++n)
-            {
-                for (long k = 0; k < src.k(); ++k)
-                {
-                    for (long i = 0; i < num; ++i)
-                    {
-                        p_means[k] += *p_src;
-                        p_invstds[k] += (*p_src)*(*p_src);
-                        ++p_src;
-                    }
-                }
-            }
-            means /= src.num_samples()*num;
-            invstds /= src.num_samples()*num;
-            // copy data back to host
-            invstds.host(); means.host();
-
-            p_src = src.host();
-            // compute variances 
-            running_variances.copy_size(invstds);
             auto rvar = running_variances.host();
+            const long num = src.nr()*src.nc();
+
             // This scale makes the running variances unbiased.
             const double scale = (src.num_samples()*num)/(src.num_samples()*num-1.0);
+
+            // Apply Welford's algorithm to improve numerical stability
             for (long k = 0; k < src.k(); ++k)
             {
-                float actual_var = p_invstds[k] - p_means[k]*p_means[k];
+                double mean = 0.0;
+                double M2 = 0.0;
+                long count = 0;
+
+                for (long n = 0; n < src.num_samples(); ++n)
+                {
+                    long start_index = tensor_index(src, n, k, 0, 0);
+                    auto p = p_src + start_index;
+
+                    for (long i = 0; i < num; ++i)
+                    {
+                        const float val = *p;
+                        const double delta1 = val - mean;
+                        mean += delta1 / (count + 1);
+                        const double delta2 = val - mean;
+                        M2 += delta1 * delta2;
+                        ++count;
+                        ++p;
+                    }
+                }
+
+                const auto actual_var = (count > 1) ? (M2 / count) : 0.0;
+
                 if (averaging_factor == 1)
                     rvar[k] = scale*actual_var;
                 else
                     rvar[k] = (1-averaging_factor)*rvar[k] + scale*averaging_factor*actual_var;
 
+                p_means[k] = mean;
                 p_invstds[k] = 1.0f/std::sqrt(actual_var + eps);
             }
 
-            p_src = src.host();
             auto p_dest = dest.host();
             for (long n = 0; n < src.num_samples(); ++n)
             {
@@ -1145,7 +1148,6 @@ namespace dlib
             }
 
             // now keep track of the running means 
-            running_means.copy_size(means);
             if (averaging_factor != 1)
                 running_means = (1-averaging_factor)*mat(running_means) + averaging_factor*mat(means);
             else
@@ -3219,6 +3221,160 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        void compute_act_halt_probabilities(
+            resizable_tensor& halt_probs,
+            resizable_tensor& logits,
+            const tensor& input_data,
+            const tensor& halt_params,
+            long batch_size,
+            long seq_len,
+            long feature_dim
+        )
+        {
+            const float* in_ptr = input_data.host();
+            const float* W_halt = halt_params.host();
+            const float b_halt = halt_params.host()[feature_dim];
+            float* logits_ptr = logits.host();
+            float* halt_probs_ptr = halt_probs.host();
+
+            const long d_model = feature_dim / input_data.k();
+            const long num_channels = input_data.k();
+
+            for (long pos = 0; pos < batch_size * seq_len; ++pos) {
+                const long n = pos / seq_len;
+                const long s = pos % seq_len;
+
+                float logit = b_halt;
+
+                for (long c = 0; c < num_channels; ++c) {
+                    for (long d = 0; d < d_model; ++d) {
+                        const long in_idx = ((n * num_channels + c) * seq_len + s) * d_model + d;
+                        const long weight_idx = c * d_model + d;
+                        logit += in_ptr[in_idx] * W_halt[weight_idx];
+                    }
+                }
+
+                logits_ptr[pos] = logit;
+
+                halt_probs_ptr[pos] = 1.0f / (1.0f + std::exp(-logit));
+            }
+        }
+
+        void update_act_state(
+            resizable_tensor& output,
+            const tensor& input_data,
+            const tensor& halt_probs,
+            resizable_tensor& cumulative_halting,
+            resizable_tensor& remainders,
+            resizable_tensor& n_steps,
+            resizable_tensor& effective_weights,
+            long batch_size,
+            long seq_len,
+            long d_model,
+            long num_channels,
+            float halt_threshold,
+            long current_step
+        )
+        {
+            const float* in_ptr = input_data.host();
+            const float* p_halt = halt_probs.host();
+            float* out_ptr = output.host();
+            float* cum_halt = cumulative_halting.host();
+            float* remain = remainders.host();
+            float* steps = n_steps.host();
+            float* eff_weights = effective_weights.host();
+
+            for (long pos = 0; pos < batch_size * seq_len; ++pos) {
+                if (cum_halt[pos] < halt_threshold) {
+                    const long n = pos / seq_len;
+                    const long s = pos % seq_len;
+
+                    float p = p_halt[pos];
+                    float r = remain[pos];
+                    float effective = std::min(p * r, halt_threshold - cum_halt[pos]);
+
+                    cum_halt[pos] += effective;
+                    remain[pos] -= effective;
+                    steps[pos] = static_cast<float>(current_step + 1);
+                    eff_weights[pos] += effective;
+
+                    for (long c = 0; c < num_channels; ++c) {
+                        for (long d = 0; d < d_model; ++d) {
+                            const long idx = ((n * num_channels + c) * seq_len + s) * d_model + d;
+                            out_ptr[idx] += effective * in_ptr[idx];
+                        }
+                    }
+                }
+            }
+        }
+
+        void finalize_act_output(
+            resizable_tensor& output,
+            const tensor& input_data,
+            const tensor& remainders,
+            resizable_tensor& effective_weights,
+            long batch_size,
+            long seq_len,
+            long d_model,
+            long num_channels
+        )
+        {
+            const float* in_ptr = input_data.host();
+            const float* remain = remainders.host();
+            float* out_ptr = output.host();
+            float* eff_weights = effective_weights.host();
+
+            for (long pos = 0; pos < batch_size * seq_len; ++pos) {
+                float r = remain[pos];
+                if (r > 1e-6f) {
+                    const long n = pos / seq_len;
+                    const long s = pos % seq_len;
+
+                    eff_weights[pos] += r;
+
+                    for (long c = 0; c < num_channels; ++c) {
+                        for (long d = 0; d < d_model; ++d) {
+                            const long idx = ((n * num_channels + c) * seq_len + s) * d_model + d;
+                            out_ptr[idx] += r * in_ptr[idx];
+                        }
+                    }
+                }
+            }
+        }
+
+        void apply_act_depth_scaling(
+            tensor& gradients,
+            const tensor& n_steps,
+            long batch_size,
+            long seq_len,
+            long d_model,
+            long num_channels,
+            float max_steps,
+            float scale_factor
+        )
+        {
+            const float* steps = n_steps.host();
+            float* grad_ptr = gradients.host();
+
+            for (long pos = 0; pos < batch_size * seq_len; ++pos)
+            {
+                const float scale = 1.0f + scale_factor * (steps[pos] / max_steps);
+                const long n = pos / seq_len;
+                const long s = pos % seq_len;
+
+                for (long c = 0; c < num_channels; ++c)
+                {
+                    for (long d = 0; d < d_model; ++d)
+                    {
+                        const long idx = ((n * num_channels + c) * seq_len + s) * d_model + d;
+                        grad_ptr[idx] *= scale;
+                    }
+                }
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+    
     } 
 }
 

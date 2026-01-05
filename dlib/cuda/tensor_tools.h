@@ -1,4 +1,4 @@
-// Copyright (C) 2015  Davis E. King (davis@dlib.net)
+﻿// Copyright (C) 2015  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_TeNSOR_TOOLS_H_
 #define DLIB_TeNSOR_TOOLS_H_
@@ -2512,6 +2512,133 @@ namespace dlib { namespace tt
                 - The result is added to the existing contents of dest.
                 - For all valid n, k, r, c:
                     - #dest(n,k,c,r) == dest(n,k,c,r) + src(n,k,r,c)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    // ACT (Adaptive Computation Time) operations
+
+    void compute_act_halt_probabilities(
+        resizable_tensor& halt_probs,
+        resizable_tensor& logits,
+        const tensor& input_data,
+        const tensor& halt_params,
+        long batch_size,
+        long seq_len,
+        long feature_dim
+    );
+    /*!
+        requires
+            - halt_params.size() == feature_dim + 1 (weights + bias)
+            - input_data.num_samples() == batch_size
+            - input_data.k() == num_channels where feature_dim = num_channels * d_model
+            - input_data.nr() == seq_len
+            - input_data.nc() == d_model
+        ensures
+            - Computes halting probabilities for Adaptive Computation Time:
+                - halt_probs contains sigmoid(W_halt^T * input + b_halt) for each position
+                - logits contains the pre-sigmoid values
+            - batch_size: number of samples in the batch
+            - seq_len: sequence length (number of positions to process)
+            - feature_dim: total feature dimension (num_channels × d_model)
+    !*/
+
+    void update_act_state(
+        resizable_tensor& output,
+        const tensor& input_data,
+        const tensor& halt_probs,
+        resizable_tensor& cumulative_halting,
+        resizable_tensor& remainders,
+        resizable_tensor& n_steps,
+        resizable_tensor& effective_weights,
+        long batch_size,
+        long seq_len,
+        long d_model,
+        long num_channels,
+        float halt_threshold,
+        long current_step
+    );
+    /*!
+        requires
+            - 0 < halt_threshold <= 1.0
+            - current_step >= 0
+            - input_data.num_samples() == batch_size
+            - input_data.k() == num_channels
+            - input_data.nr() == seq_len
+            - input_data.nc() == d_model
+            - output has the same dimensions as input_data
+            - halt_probs.size() == batch_size * seq_len
+            - cumulative_halting.size() == remainders.size() == n_steps.size() == effective_weights.size() == batch_size * seq_len
+        ensures
+            - Core ACT update step that accumulates weighted outputs:
+                - Updates ACT state for all positions
+                - Accumulates weighted outputs: output += α_t^n * input_data
+                - Updates cumulative_halting, remainders, n_steps, and effective_weights
+            - batch_size: number of samples in the batch
+            - seq_len: sequence length (number of positions to process)
+            - d_model: model dimension per channel
+            - num_channels: number of feature channels
+            - halt_threshold: halting threshold (typically 0.99)
+            - current_step: current computation step index (0-based)
+    !*/
+
+    void finalize_act_output(
+        resizable_tensor& output,
+        const tensor& input_data,
+        const tensor& remainders,
+        resizable_tensor& effective_weights,
+        long batch_size,
+        long seq_len,
+        long d_model,
+        long num_channels
+    );
+    /*!
+        requires
+            - input_data.num_samples() == batch_size
+            - input_data.k() == num_channels
+            - input_data.nr() == seq_len
+            - input_data.nc() == d_model
+            - output has the same dimensions as input_data
+            - remainders.size() == effective_weights.size() == batch_size * seq_len
+        ensures
+            - Finalizes ACT output by adding remainder contributions:
+                - Adds final remainder contributions: output += ρ_t * input_data
+                - Updates effective_weights with remainder values
+                - Applied only to positions with significant remainder (> 1e-6)
+            - batch_size: number of samples in the batch
+            - seq_len: sequence length (number of positions to process)
+            - d_model: model dimension per channel
+            - num_channels: number of feature channels
+    !*/
+
+    void apply_act_depth_scaling(
+        tensor& gradients,
+        const tensor& n_steps,
+        long batch_size,
+        long seq_len,
+        long d_model,
+        long num_channels,
+        float max_steps,
+        float scale_factor
+    );
+    /*!
+        requires
+            - scale_factor >= 0
+            - max_steps > 0
+            - gradients.num_samples() == batch_size
+            - gradients.k() == num_channels
+            - gradients.nr() == seq_len
+            - gradients.nc() == d_model
+            - n_steps.size() == batch_size * seq_len
+        ensures
+            - Applies gradient scaling based on computation depth:
+                - Applies depth-dependent gradient scaling
+                - scale = 1 + scale_factor * (n_steps[pos] / max_steps)
+            - seq_len: sequence length (number of positions to process)
+            - d_model: model dimension per channel
+            - num_channels: number of feature channels
+            - max_steps: maximum allowed computation steps
+            - scale_factor: scaling strength (0 = no scaling)
     !*/
 
 // ----------------------------------------------------------------------------------------

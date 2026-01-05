@@ -1575,6 +1575,92 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void compute_act_halt_probabilities(
+        resizable_tensor& halt_probs,
+        resizable_tensor& logits,
+        const tensor& input_data,
+        const tensor& halt_params,
+        long batch_size,
+        long seq_len,
+        long feature_dim
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::compute_act_halt_probabilities(halt_probs, logits, input_data, halt_params,
+            batch_size, seq_len, feature_dim);
+#else
+        cpu::compute_act_halt_probabilities(halt_probs, logits, input_data, halt_params,
+            batch_size, seq_len, feature_dim);
+#endif
+    }
+
+    void update_act_state(
+        resizable_tensor& output,
+        const tensor& input_data,
+        const tensor& halt_probs,
+        resizable_tensor& cumulative_halting,
+        resizable_tensor& remainders,
+        resizable_tensor& n_steps,
+        resizable_tensor& effective_weights,
+        long batch_size,
+        long seq_len,
+        long d_model,
+        long num_channels,
+        float halt_threshold,
+        long current_step
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::update_act_state(output, input_data, halt_probs, cumulative_halting, remainders,
+            n_steps, effective_weights, batch_size, seq_len, d_model, num_channels, halt_threshold, current_step);
+#else
+        cpu::update_act_state(output, input_data, halt_probs, cumulative_halting, remainders,
+            n_steps, effective_weights, batch_size, seq_len, d_model, num_channels, halt_threshold, current_step);
+#endif
+    }
+
+    void finalize_act_output(
+        resizable_tensor& output,
+        const tensor& input_data,
+        const tensor& remainders,
+        resizable_tensor& effective_weights,
+        long batch_size,
+        long seq_len,
+        long d_model,
+        long num_channels
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::finalize_act_output(output, input_data, remainders, effective_weights,
+            batch_size, seq_len, d_model, num_channels);
+#else
+        cpu::finalize_act_output(output, input_data, remainders, effective_weights,
+            batch_size, seq_len, d_model, num_channels);
+#endif
+    }
+
+    void apply_act_depth_scaling(
+        tensor& gradients,
+        const tensor& n_steps,
+        long batch_size,
+        long seq_len,
+        long d_model,
+        long num_channels,
+        float max_steps,
+        float scale_factor
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::apply_act_depth_scaling(gradients, n_steps, batch_size, seq_len,
+            d_model, num_channels, max_steps, scale_factor);
+#else
+        cpu::apply_act_depth_scaling(gradients, n_steps, batch_size, seq_len,
+            d_model, num_channels, max_steps, scale_factor);
+#endif
+    }
+    
+// ----------------------------------------------------------------------------------------
+
 }}
 
 #endif // DLIB_TeNSOR_TOOLS_CPP_

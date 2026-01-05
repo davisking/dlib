@@ -35,6 +35,10 @@ set(dlib_LIBRARIES dlib::dlib)
 set(dlib_LIBS      dlib::dlib)
 set(dlib_INCLUDE_DIRS "@CMAKE_INSTALL_FULL_INCLUDEDIR@" "@dlib_needed_includes@")
 
+if (@DLIB_USE_CUDA@)
+   find_package(CUDAToolkit)
+endif()
+
 mark_as_advanced(dlib_LIBRARIES)
 mark_as_advanced(dlib_LIBS)
 mark_as_advanced(dlib_INCLUDE_DIRS)
