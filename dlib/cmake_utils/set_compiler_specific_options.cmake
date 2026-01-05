@@ -108,7 +108,7 @@ if (MSVC)
    # Build dlib with all cores.  Don't propagate the setting to client programs
    # though since they might compile large translation units that use too much
    # RAM.
-   list(APPEND active_compile_opts_private "/MP")
+   list(APPEND active_compile_opts "/MP")
 
    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 3.3) 
       # Clang can compile all Dlib's code at Windows platform. Tested with Clang 5
