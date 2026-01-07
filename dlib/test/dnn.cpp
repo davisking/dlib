@@ -1578,17 +1578,21 @@ namespace
             conv2.setup(data,filters,stride_y,stride_x,padding_y,padding_x);
             conv2(false, output2, data, filters);
             dlog << LINFO << "forward error: "<< max(abs(mat(output1)-mat(output2)));
-            DLIB_TEST_MSG(max(abs(mat(output1)-mat(output2))) < 1e-3, max(abs(mat(output1)-mat(output2)))
+            double eps = 1e-3 * max(abs(mat(output1)));
+            DLIB_TEST_MSG(max(abs(mat(output1)-mat(output2))) < eps, max(abs(mat(output1)-mat(output2)))
                  <<"\n\t padding_y: "<< padding_y 
                  <<"\n\t padding_x: "<< padding_x 
+                 <<"\n\t eps: "<< eps 
                  );
 
             conv1(true, output1, data, filters);
             conv2(true, output2, data, filters);
             dlog << LINFO << "forward error: "<< max(abs(mat(output1)-mat(output2)));
-            DLIB_TEST_MSG(max(abs(mat(output1)-mat(output2))) < 1e-3, max(abs(mat(output1)-mat(output2)))
+            eps = 1e-3 * max(abs(mat(output1)));
+            DLIB_TEST_MSG(max(abs(mat(output1)-mat(output2))) < eps, max(abs(mat(output1)-mat(output2)))
                  <<"\n\t padding_y: "<< padding_y 
                  <<"\n\t padding_x: "<< padding_x 
+                 <<"\n\t eps: "<< eps 
                  );
 
 

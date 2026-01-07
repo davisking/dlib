@@ -2880,6 +2880,7 @@ namespace dlib
             float* cumulative_halting,
             float* remainders,
             float* n_steps,
+            float* effective_weights,
             size_t batch_size,
             size_t seq_len,
             size_t d_model,
@@ -2902,6 +2903,7 @@ namespace dlib
                     cumulative_halting[pos] += effective;
                     remainders[pos] -= effective;
                     n_steps[pos] = static_cast<float>(current_step + 1);
+                    effective_weights[pos] += effective;
 
                     for (size_t c = 0; c < num_channels; ++c) {
                         for (size_t d = 0; d < d_model; ++d) {
@@ -2920,6 +2922,7 @@ namespace dlib
             resizable_tensor& cumulative_halting,
             resizable_tensor& remainders,
             resizable_tensor& n_steps,
+            resizable_tensor& effective_weights,
             long batch_size,
             long seq_len,
             long d_model,
@@ -2938,6 +2941,7 @@ namespace dlib
                 cumulative_halting.device(),
                 remainders.device(),
                 n_steps.device(),
+                effective_weights.device(),
                 batch_size,
                 seq_len,
                 d_model,
@@ -2950,6 +2954,7 @@ namespace dlib
             float* output,
             const float* input_data,
             const float* remainders,
+            float* effective_weights,
             size_t batch_size,
             size_t seq_len,
             size_t d_model,
@@ -2962,6 +2967,8 @@ namespace dlib
                 if (r > 1e-6f) {
                     const size_t n = pos / seq_len;
                     const size_t s = pos % seq_len;
+
+                    effective_weights[pos] += r;
 
                     for (size_t c = 0; c < num_channels; ++c) {
                         for (size_t d = 0; d < d_model; ++d) {
@@ -2977,6 +2984,7 @@ namespace dlib
             resizable_tensor& output,
             const tensor& input_data,
             const tensor& remainders,
+            resizable_tensor& effective_weights,
             long batch_size,
             long seq_len,
             long d_model,
@@ -2990,6 +2998,7 @@ namespace dlib
                 output.device(),
                 input_data.device(),
                 remainders.device(),
+                effective_weights.device(),
                 batch_size,
                 seq_len,
                 d_model,

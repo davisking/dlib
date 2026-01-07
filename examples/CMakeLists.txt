@@ -112,6 +112,16 @@ macro(add_example name)
    # required though.
        target_link_options(${name} PRIVATE $<$<CONFIG:RELEASE>:-s>)
    endif()
+
+   if (MSVC)
+      # For DNN builds on Visual C++, increase the stack size from the default 1 MB -
+      # because otherwise there may easily be a stack overflow error (0xC00000FD) when
+      # calling cudnnFindConvolutionBackwardDataAlgorithm (and/or friends) on Blackwell
+      # (where calling these "Find" functions may result in a deep recursive search).
+      if (${name} MATCHES "dnn_.*_ex")
+         set_target_properties(${name} PROPERTIES LINK_FLAGS "/STACK:16777216")
+      endif()
+   endif()
 endmacro()
 
 # if an example requires GUI, call this macro to check DLIB_NO_GUI_SUPPORT to include or exclude

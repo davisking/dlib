@@ -1455,6 +1455,7 @@ namespace dlib { namespace tt
         resizable_tensor& cumulative_halting,
         resizable_tensor& remainders,
         resizable_tensor& n_steps,
+        resizable_tensor& effective_weights,
         long batch_size,
         long seq_len,
         long d_model,
@@ -1465,10 +1466,10 @@ namespace dlib { namespace tt
     {
 #ifdef DLIB_USE_CUDA
         cuda::update_act_state(output, input_data, halt_probs, cumulative_halting, remainders,
-            n_steps, batch_size, seq_len, d_model, num_channels, halt_threshold, current_step);
+            n_steps, effective_weights, batch_size, seq_len, d_model, num_channels, halt_threshold, current_step);
 #else
         cpu::update_act_state(output, input_data, halt_probs, cumulative_halting, remainders,
-            n_steps, batch_size, seq_len, d_model, num_channels, halt_threshold, current_step);
+            n_steps, effective_weights, batch_size, seq_len, d_model, num_channels, halt_threshold, current_step);
 #endif
     }
 
@@ -1476,6 +1477,7 @@ namespace dlib { namespace tt
         resizable_tensor& output,
         const tensor& input_data,
         const tensor& remainders,
+        resizable_tensor& effective_weights,
         long batch_size,
         long seq_len,
         long d_model,
@@ -1483,10 +1485,10 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::finalize_act_output(output, input_data, remainders,
+        cuda::finalize_act_output(output, input_data, remainders, effective_weights,
             batch_size, seq_len, d_model, num_channels);
 #else
-        cpu::finalize_act_output(output, input_data, remainders,
+        cpu::finalize_act_output(output, input_data, remainders, effective_weights,
             batch_size, seq_len, d_model, num_channels);
 #endif
     }

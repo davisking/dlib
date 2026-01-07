@@ -1044,6 +1044,15 @@ namespace dlib
                         CUDNN_CROSS_CORRELATION)); // could also be CUDNN_CONVOLUTION
 #endif
 
+#if CUDNN_MAJOR >= 8
+                // On Ampere and later GPUs, CUDNN_DEFAULT_MATH permits TF32 Tensor Core
+                // operations which have reduced precision. Use CUDNN_FMA_MATH to force
+                // true FP32 computation for consistent numerical results.
+                CHECK_CUDNN(cudnnSetConvolutionMathType(
+                        (cudnnConvolutionDescriptor_t)conv_handle,
+                        CUDNN_FMA_MATH));
+#endif
+
                 CHECK_CUDNN(cudnnGetConvolution2dForwardOutputDim(
                         (const cudnnConvolutionDescriptor_t)conv_handle,
                         descriptor(data),

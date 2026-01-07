@@ -2428,6 +2428,7 @@ namespace dlib { namespace tt
         resizable_tensor& cumulative_halting,
         resizable_tensor& remainders,
         resizable_tensor& n_steps,
+        resizable_tensor& effective_weights,
         long batch_size,
         long seq_len,
         long d_model,
@@ -2445,12 +2446,12 @@ namespace dlib { namespace tt
             - input_data.nc() == d_model
             - output has the same dimensions as input_data
             - halt_probs.size() == batch_size * seq_len
-            - cumulative_halting.size() == remainders.size() == n_steps.size() == batch_size * seq_len
+            - cumulative_halting.size() == remainders.size() == n_steps.size() == effective_weights.size() == batch_size * seq_len
         ensures
             - Core ACT update step that accumulates weighted outputs:
                 - Updates ACT state for all positions
                 - Accumulates weighted outputs: output += α_t^n * input_data
-                - Updates cumulative_halting, remainders, and n_steps
+                - Updates cumulative_halting, remainders, n_steps, and effective_weights
             - batch_size: number of samples in the batch
             - seq_len: sequence length (number of positions to process)
             - d_model: model dimension per channel
@@ -2463,6 +2464,7 @@ namespace dlib { namespace tt
         resizable_tensor& output,
         const tensor& input_data,
         const tensor& remainders,
+        resizable_tensor& effective_weights,
         long batch_size,
         long seq_len,
         long d_model,
@@ -2475,10 +2477,11 @@ namespace dlib { namespace tt
             - input_data.nr() == seq_len
             - input_data.nc() == d_model
             - output has the same dimensions as input_data
-            - remainders.size() == batch_size * seq_len
+            - remainders.size() == effective_weights.size() == batch_size * seq_len
         ensures
             - Finalizes ACT output by adding remainder contributions:
                 - Adds final remainder contributions: output += ρ_t * input_data
+                - Updates effective_weights with remainder values
                 - Applied only to positions with significant remainder (> 1e-6)
             - batch_size: number of samples in the batch
             - seq_len: sequence length (number of positions to process)
