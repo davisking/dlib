@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2015  Davis E. King (davis@dlib.net)
+// Copyright (C) 2015  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 #include "cuda_utils.h"
@@ -109,64 +109,68 @@ namespace dlib
         }
 
     // -----------------------------------------------------------------------------------
-    // -----------------------------------------------------------------------------------
-    // -----------------------------------------------------------------------------------
 
-        __global__ void _cuda_inverse_norms(float* invnorms, const float* data, size_t nr, size_t nc, const float eps)
+        __global__ void _cuda_inverse_norms_accumulate(
+            float* invnorms,
+            const float* data,
+            size_t nr,
+            size_t nc
+        )
         {
-            // initialize invnorms before we begin.
-            for (auto i : grid_stride_range_y(0, nr))
-                for (auto j : grid_stride_range(0, 1))
-                    invnorms[i] = eps;
-            __syncthreads();
-
             for (auto i : grid_stride_range_y(0, nr))
             {
-                auto p = data + i*nc;
+                auto p = data + i * nc;
                 float temp = 0;
                 for (auto j : grid_stride_range(0, nc))
-                    temp += p[j]*p[j];
+                    temp += p[j] * p[j];
 
-                // and store the sum into invnorms[i]
                 warp_reduce_atomic_add(invnorms[i], temp);
             }
-            __syncthreads();
-
-            for (auto i : grid_stride_range_y(0, nr))
-                for (auto j : grid_stride_range(0, 1))
-                    invnorms[i] = 1.0/std::sqrt(invnorms[i]);
         }
 
-        void inverse_norms (
+        __global__ void _cuda_inverse_norms_invert(
+            float* invnorms,
+            size_t nr
+        )
+        {
+            for (auto i : grid_stride_range_y(0, nr))
+            {
+                if (threadIdx.x == 0)
+                    invnorms[i] = 1.0f / std::sqrt(invnorms[i]);
+            }
+        }
+
+        void inverse_norms(
             resizable_tensor& invnorms,
             const tensor& data,
             const double eps
         )
         {
-            invnorms.set_size(data.num_samples());
-            launch_kernel(_cuda_inverse_norms, max_jobs(data.size()/data.num_samples(), data.num_samples()),
-                invnorms.device(), data.device(), data.num_samples(), data.size()/data.num_samples(), eps);
+            const auto nr = data.num_samples();
+            const auto nc = data.size() / data.num_samples();
+
+            invnorms.set_size(nr);
+            invnorms = eps;
+
+            launch_kernel(_cuda_inverse_norms_accumulate, max_jobs(nc, nr),
+                invnorms.device(), data.device(), nr, nc);
+
+            launch_kernel(_cuda_inverse_norms_invert, max_jobs(1, nr),
+                invnorms.device(), nr);
         }
 
     // ----------------------------------------------------------------------------------------
 
         __global__ void _cuda_dot_prods(float* out, const float* lhs, const float* rhs, size_t nr, size_t nc)
         {
-            // initialize out before we begin.
-            for (auto i : grid_stride_range_y(0, nr))
-                for (auto j : grid_stride_range(0, 1))
-                    out[i] = 0;
-            __syncthreads();
-
             for (auto i : grid_stride_range_y(0, nr))
             {
-                auto l = lhs + i*nc;
-                auto r = rhs + i*nc;
+                auto l = lhs + i * nc;
+                auto r = rhs + i * nc;
                 float temp = 0;
                 for (auto j : grid_stride_range(0, nc))
-                    temp += l[j]*r[j];
+                    temp += l[j] * r[j];
 
-                // and store the sum into out[i]
                 warp_reduce_atomic_add(out[i], temp);
             }
         }
@@ -175,53 +179,61 @@ namespace dlib
         {
             for (auto i : grid_stride_range_y(0, nr))
             {
-                auto l = lhs + i*nc;
-                auto r = rhs + i*nc;
+                auto l = lhs + i * nc;
+                auto r = rhs + i * nc;
                 float temp = 0;
                 for (auto j : grid_stride_range(0, nc))
-                    temp += l[j]*r[j];
+                    temp += l[j] * r[j];
 
-                // and store the sum into out[i]
                 warp_reduce_atomic_add(out[i], temp);
             }
         }
 
-        void dot_prods (
+        void dot_prods(
             resizable_tensor& out,
             const tensor& lhs,
             const tensor& rhs
         )
         {
-            DLIB_CASSERT(have_same_dimensions(lhs,rhs));
+            DLIB_CASSERT(have_same_dimensions(lhs, rhs));
 
             out.set_size(lhs.num_samples());
             if (out.size() == 0)
                 return;
 
             const auto nr = lhs.num_samples();
-            const auto nc = lhs.size()/lhs.num_samples();
+            const auto nc = lhs.size() / lhs.num_samples();
 
-            launch_kernel(_cuda_dot_prods, max_jobs(nc,nr), out.device_write_only(), lhs.device(), rhs.device(), nr, nc);
+            out = 0;
+            launch_kernel(_cuda_dot_prods, max_jobs(nc, nr),
+                out.device(), lhs.device(), rhs.device(), nr, nc);
         }
 
-        void dot_prods (
+        void dot_prods(
             bool add_to,
             tensor& out,
             const tensor& lhs,
             const tensor& rhs
         )
         {
-            DLIB_CASSERT(have_same_dimensions(lhs,rhs));
+            DLIB_CASSERT(have_same_dimensions(lhs, rhs));
             DLIB_CASSERT(out.k() == 1 && out.nr() == 1 && out.nc() == 1);
-            DLIB_CASSERT(out.size() == lhs.num_samples());
+            DLIB_CASSERT(out.num_samples() == lhs.num_samples());
 
             const auto nr = lhs.num_samples();
-            const auto nc = lhs.size()/lhs.num_samples();
+            const auto nc = lhs.size() / lhs.num_samples();
 
             if (add_to)
-                launch_kernel(_cuda_dot_prods_add_to, max_jobs(nc,nr), out.device(), lhs.device(), rhs.device(), nr, nc);
+            {
+                launch_kernel(_cuda_dot_prods_add_to, max_jobs(nc, nr),
+                    out.device(), lhs.device(), rhs.device(), nr, nc);
+            }
             else
-                launch_kernel(_cuda_dot_prods, max_jobs(nc,nr), out.device_write_only(), lhs.device(), rhs.device(), nr, nc);
+            {
+                out = 0;
+                launch_kernel(_cuda_dot_prods, max_jobs(nc, nr),
+                    out.device(), lhs.device(), rhs.device(), nr, nc);
+            }
         }
 
     // ----------------------------------------------------------------------------------------
@@ -465,27 +477,21 @@ namespace dlib
         {
             for (auto i : grid_stride_range(0, n))
             {
-                auto k = (i/bs)%ks;
-                d[i] = s1[i]*s2[k];
+                auto k = (i / bs) % ks;
+                d[i] = s1[i] * s2[k];
             }
         }
 
         __global__ void _cuda_multiply_conv2(float* d, const float* s1, size_t n, const float* s2, size_t bs, size_t ks)
         {
-            // zero initialize d before we begin.
-            for (auto i : grid_stride_range_y(0, ks))
-                for (auto j : grid_stride_range(0, 1))
-                    d[i] = 0;
-            __syncthreads();
-
             // loop over all the image planes
             for (auto i : grid_stride_range_y(0, n))
             {
                 // sum all the elements in the i-th image plane
                 float temp = 0;
-                for (auto j : grid_stride_range(i*bs, (i+1)*bs))
-                    temp += s1[j]*s2[j];
-                auto k = i%ks;
+                for (auto j : grid_stride_range(i* bs, (i + 1)* bs))
+                    temp += s1[j] * s2[j];
+                auto k = i % ks;
                 // and store the sum into d[k]
                 warp_reduce_atomic_add(d[k], temp);
             }
@@ -495,8 +501,8 @@ namespace dlib
         {
             for (auto i : grid_stride_range(0, n))
             {
-                auto k = (i/bs)%ks;
-                d[i] += s1[i]*s2[k];
+                auto k = (i / bs) % ks;
+                d[i] += s1[i] * s2[k];
             }
         }
 
@@ -507,53 +513,56 @@ namespace dlib
             {
                 // sum all the elements in the i-th image plane
                 float temp = 0;
-                for (auto j : grid_stride_range(i*bs, (i+1)*bs))
-                    temp += s1[j]*s2[j];
-                auto k = i%ks;
+                for (auto j : grid_stride_range(i* bs, (i + 1)* bs))
+                    temp += s1[j] * s2[j];
+                auto k = i % ks;
                 // and store the sum into d[k]
                 warp_reduce_atomic_add(d[k], temp);
             }
         }
 
-
-        void multiply_conv (
+        void multiply_conv(
             bool add_to,
             tensor& dest,
             const tensor& src1,
             const tensor& src2
         )
         {
-            if (have_same_dimensions(dest,src1))
+            if (have_same_dimensions(dest, src1))
             {
                 DLIB_CASSERT(src2.num_samples() == 1 && src2.nr() == 1 && src2.nc() == 1 && src2.k() == src1.k());
-                if (dest.size() == 0)
-                    return;
-
                 if (add_to)
-                    launch_kernel(_cuda_multiply_conv_add_to,max_jobs(dest.size()),
-                        dest.device(), src1.device(), src1.size(), src2.device(), src1.nr()*src1.nc(), src1.k());
+                {
+                    launch_kernel(_cuda_multiply_conv_add_to, max_jobs(dest.size()),
+                        dest.device(), src1.device(), src1.size(), src2.device(), src1.nr() * src1.nc(), src1.k());
+                }
                 else
-                    launch_kernel(_cuda_multiply_conv,max_jobs(dest.size()),
-                        dest.device(), src1.device(), src1.size(), src2.device(), src1.nr()*src1.nc(), src1.k());
+                {
+                    launch_kernel(_cuda_multiply_conv, max_jobs(dest.size()),
+                        dest.device(), src1.device(), src1.size(), src2.device(), src1.nr() * src1.nc(), src1.k());
+                }
             }
             else
             {
-                DLIB_CASSERT(have_same_dimensions(src1,src2));
+                DLIB_CASSERT(src1.num_samples() == src2.num_samples() && src1.k() == src2.k() &&
+                    src1.nr() == src2.nr() && src1.nc() == src2.nc());
                 DLIB_CASSERT(dest.num_samples() == 1 && dest.nr() == 1 && dest.nc() == 1 && dest.k() == src1.k());
-                if (dest.size() == 0)
-                    return;
 
+                const auto bs = src1.nr() * src1.nc();
+                const auto n = src1.num_samples() * src1.k();
 
-                const auto bs = src1.nr()*src1.nc();
-                const auto n = src1.num_samples()*src1.k();
                 if (add_to)
-                    launch_kernel(_cuda_multiply_conv2_add_to, max_jobs(bs,n),
+                {
+                    launch_kernel(_cuda_multiply_conv2_add_to, max_jobs(bs, n),
                         dest.device(), src1.device(), n, src2.device(), bs, src1.k());
+                }
                 else
-                    launch_kernel(_cuda_multiply_conv2, max_jobs(bs,n),
+                {
+                    dest = 0;
+                    launch_kernel(_cuda_multiply_conv2, max_jobs(bs, n),
                         dest.device(), src1.device(), n, src2.device(), bs, src1.k());
+                }
             }
-
         }
 
     // ------------------------------------------------------------------------------------
@@ -2210,26 +2219,21 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-        __global__ void _cuda_layer_normalize(
-            float* out,
-            const float* s,
+        __global__ void _cuda_layer_normalize_accumulate(
             float* m,
             float* v,
-            const float* g,
-            const float* b,
-            float eps,
+            const float* s,
             size_t ns,
             size_t k,
             size_t num
         )
         {
-           // compute means and sum of squares
             for (auto n : grid_stride_range_y(0, ns))
             {
                 const auto ps = s + n * k * num;
                 float means = 0;
                 float invstds = 0;
-                for (auto i : grid_stride_range(0, k * num))
+                for (auto i : grid_stride_range(0, k* num))
                 {
                     means += ps[i];
                     invstds += ps[i] * ps[i];
@@ -2237,23 +2241,39 @@ namespace dlib
                 warp_reduce_atomic_add(m[n], means / (k * num));
                 warp_reduce_atomic_add(v[n], invstds / (k * num));
             }
-            __syncthreads();
+        }
 
-            // compute variances
+        __global__ void _cuda_layer_normalize_invert(
+            float* m,
+            float* v,
+            float eps,
+            size_t ns
+        )
+        {
             for (auto n : grid_stride_range_y(0, ns))
             {
-                for (auto i : grid_stride_range(0, 1))
-                {
+                if (threadIdx.x == 0)
                     v[n] = 1.0f / std::sqrt(v[n] - m[n] * m[n] + eps);
-                }
             }
-            __syncthreads();
+        }
 
+        __global__ void _cuda_layer_normalize_apply(
+            float* out,
+            const float* s,
+            const float* m,
+            const float* v,
+            const float* g,
+            const float* b,
+            size_t ns,
+            size_t k,
+            size_t num
+        )
+        {
             for (auto n : grid_stride_range_y(0, ns))
             {
                 const auto ps = s + n * k * num;
                 const auto pout = out + n * k * num;
-                for (auto i : grid_stride_range(0, k * num))
+                for (auto i : grid_stride_range(0, k* num))
                 {
                     pout[i] = (ps[i] - m[n]) * v[n];
                     pout[i] = pout[i] * g[i / num] + b[i / num];
@@ -2261,7 +2281,7 @@ namespace dlib
             }
         }
 
-        void layer_normalize (
+        void layer_normalize(
             const double eps,
             resizable_tensor& dest,
             resizable_tensor& means,
@@ -2288,47 +2308,56 @@ namespace dlib
                 "\neps:  " << eps
             );
 
+            const long ns = src.num_samples();
+            const long ks = src.k();
+
             dest.copy_size(src);
-            means.set_size(src.num_samples());
-            invstds.set_size(src.num_samples());
+            means.set_size(ns);
+            invstds.set_size(ns);
             means = 0;
             invstds = 0;
-            launch_kernel(_cuda_layer_normalize, max_jobs(src.k() * num, src.num_samples()), dest.device(), src.device(),
-                          means.device(), invstds.device(), gamma.device(), beta.device(), eps, src.num_samples(), src.k(), num);
+
+            launch_kernel(_cuda_layer_normalize_accumulate, max_jobs(ks * num, ns),
+                means.device(), invstds.device(), src.device(), ns, ks, num);
+
+            launch_kernel(_cuda_layer_normalize_invert, max_jobs(1, ns),
+                means.device(), invstds.device(), eps, ns);
+
+            launch_kernel(_cuda_layer_normalize_apply, max_jobs(ks * num, ns),
+                dest.device(), src.device(), means.device(), invstds.device(),
+                gamma.device(), beta.device(), ns, ks, num);
         }
 
     // ----------------------------------------------------------------------------------------
 
-        __global__ void _cuda_layer_normalize_gradient(
-            float* out,
-            float* gg,
+        __global__ void _cuda_layer_normalize_gradient_accumulate(
             float* bg,
+            float* gg,
+            float* dv,
             const float* s,
             const float* gi,
             const float* m,
             const float* v,
             const float* g,
-            float* dm,
-            float* dv,
-            float eps,
             size_t ns,
             size_t ks,
-            size_t num)
+            size_t num
+        )
         {
-            for (auto nk : grid_stride_range_y(0, ns * ks))
+            for (auto nk : grid_stride_range_y(0, ns* ks))
             {
                 const auto n = nk / ks;
                 const auto k = nk % ks;
                 const auto ps = s + (n * ks + k) * num;
                 const auto pgi = gi + (n * ks + k) * num;
-                const float invstd_pow = -0.5 * std::pow(v[n], 3.0f);
+                const float invstd_pow = -0.5f * std::pow(v[n], 3.0f);
                 float temp_bg = 0;
                 float temp_gg = 0;
                 float temp_dv = 0;
                 for (auto i : grid_stride_range(0, num))
                 {
                     const float x_hat = (ps[i] - m[n]) * v[n];
-                    const float dx = pgi[i] * g[i / num];
+                    const float dx = pgi[i] * g[k];
                     temp_bg += pgi[i];
                     temp_gg += pgi[i] * x_hat;
                     temp_dv += dx * (ps[i] - m[n]) * invstd_pow;
@@ -2337,29 +2366,57 @@ namespace dlib
                 warp_reduce_atomic_add(gg[k], temp_gg);
                 warp_reduce_atomic_add(dv[n], temp_dv);
             }
-            __syncthreads();
+        }
 
+        __global__ void _cuda_layer_normalize_gradient_compute_dm(
+            float* dm,
+            const float* dv,
+            const float* s,
+            const float* gi,
+            const float* m,
+            const float* v,
+            const float* g,
+            size_t ns,
+            size_t ks,
+            size_t num
+        )
+        {
             const float invnum = 1.0f / (ks * num);
             for (auto n : grid_stride_range_y(0, ns))
             {
                 const auto ps = s + n * ks * num;
                 const auto pgi = gi + n * ks * num;
                 float temp_dm = 0;
-                for (auto i : grid_stride_range(0, ks * num))
+                for (auto i : grid_stride_range(0, ks* num))
                 {
                     const float dx = pgi[i] * g[i / num];
                     temp_dm += -dx * v[n] + dv[n] * -2 * (ps[i] - m[n]) * invnum;
                 }
                 warp_reduce_atomic_add(dm[n], temp_dm);
             }
-            __syncthreads();
+        }
 
+        __global__ void _cuda_layer_normalize_gradient_apply(
+            float* out,
+            const float* dm,
+            const float* dv,
+            const float* s,
+            const float* gi,
+            const float* m,
+            const float* v,
+            const float* g,
+            size_t ns,
+            size_t ks,
+            size_t num
+        )
+        {
+            const float invnum = 1.0f / (ks * num);
             for (auto n : grid_stride_range_y(0, ns))
             {
                 const auto ps = s + n * ks * num;
                 const auto pgi = gi + n * ks * num;
                 const auto pout = out + n * ks * num;
-                for (auto i : grid_stride_range(0, ks * num))
+                for (auto i : grid_stride_range(0, ks* num))
                 {
                     const float dx = pgi[i] * g[i / num];
                     pout[i] += dx * v[n] + dv[n] * 2 * (ps[i] - m[n]) * invnum + dm[n] * invnum;
@@ -2367,7 +2424,7 @@ namespace dlib
             }
         }
 
-        void layer_normalize_gradient (
+        void layer_normalize_gradient(
             const double eps,
             const tensor& gradient_input,
             const tensor& means,
@@ -2393,16 +2450,30 @@ namespace dlib
             DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad));
             DLIB_CASSERT(eps > 0);
 
+            const long ns = src.num_samples();
+            const long ks = src.k();
+
             beta_grad = 0;
             gamma_grad = 0;
             dvars.copy_size(invstds);
             dmeans.copy_size(means);
             dvars = 0;
             dmeans = 0;
-            launch_kernel(_cuda_layer_normalize_gradient, max_jobs(src.k() * num, src.num_samples()),
-                          src_grad.device(), gamma_grad.device(), beta_grad.device(), src.device(),
-                          gradient_input.device(), means.device(), invstds.device(), gamma.device(),
-                          dmeans.device(), dvars.device(), eps, src.num_samples(), src.k(), num);
+
+            launch_kernel(_cuda_layer_normalize_gradient_accumulate, max_jobs(ks * num, ns * ks),
+                beta_grad.device(), gamma_grad.device(), dvars.device(),
+                src.device(), gradient_input.device(), means.device(), invstds.device(),
+                gamma.device(), ns, ks, num);
+
+            launch_kernel(_cuda_layer_normalize_gradient_compute_dm, max_jobs(ks * num, ns),
+                dmeans.device(), dvars.device(),
+                src.device(), gradient_input.device(), means.device(), invstds.device(),
+                gamma.device(), ns, ks, num);
+
+            launch_kernel(_cuda_layer_normalize_gradient_apply, max_jobs(ks * num, ns),
+                src_grad.device(), dmeans.device(), dvars.device(),
+                src.device(), gradient_input.device(), means.device(), invstds.device(),
+                gamma.device(), ns, ks, num);
         }
 
    // ----------------------------------------------------------------------------------------
@@ -3063,263 +3134,6 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-        __global__ void apply_rope_kernel(
-            float* __restrict__ data,
-            const float* __restrict__ cos_cache,
-            const float* __restrict__ sin_cache,
-            const size_t total_pairs,
-            const long num_heads,
-            const long seq_len,
-            const long d_head,
-            const long half_d,
-            const long rot_dim,
-            const bool is_backward)
-        {
-            for (auto pair_id : grid_stride_range(0, total_pairs))
-            {
-                const long pair_idx = pair_id % half_d;
-                const long pos = (pair_id / half_d) % seq_len;
-                const long head = (pair_id / (half_d * seq_len)) % num_heads;
-                const long batch = pair_id / (half_d * seq_len * num_heads);
-        
-                const long dim_i = pair_idx * 2;
-                if (dim_i >= rot_dim) continue;
-        
-                const long base_offset = ((batch * num_heads + head) * seq_len + pos) * d_head;
-                const long data_offset = base_offset + dim_i;
-                const long trig_offset = pos * half_d + pair_idx;
-        
-                const float c = cos_cache[trig_offset];
-                const float s = sin_cache[trig_offset];
-                const float x0 = data[data_offset];
-                const float x1 = data[data_offset + 1];
-        
-                if (!is_backward)
-                {
-                    // Forward: rotation standard
-                    data[data_offset]     = x0 * c - x1 * s;
-                    data[data_offset + 1] = x0 * s + x1 * c;
-                }
-                else
-                {
-                    // Backward: rotation inverse
-                    data[data_offset]     = x0 * c + x1 * s;
-                    data[data_offset + 1] = -x0 * s + x1 * c;
-                }
-            }
-        }
-
-        void apply_rotary_positional_embedding(
-            bool is_backward,
-            tensor& data,
-            const tensor& cos_cache,
-            const tensor& sin_cache)
-        {
-            const long batch_size = data.num_samples();
-            const long num_heads = data.k();
-            const long seq_len = data.nr();
-            const long d_head = data.nc();
-            const long half_d = d_head / 2;
-
-            DLIB_CASSERT(cos_cache.nr() == seq_len, "cos_cache.nr() must match seq_len");
-            DLIB_CASSERT(cos_cache.nc() == half_d, "cos_cache.nc() must be d_head/2");
-            DLIB_CASSERT(sin_cache.nr() == seq_len, "sin_cache.nr() must match seq_len");
-            DLIB_CASSERT(sin_cache.nc() == half_d, "sin_cache.nc() must be d_head/2");
-
-            const bool is_odd = (d_head % 2 != 0);
-            const long rot_dim = is_odd ? d_head - 1 : d_head;
-
-            const size_t total_elements = batch_size * num_heads * seq_len * half_d;
-            if (total_elements == 0) return;
-
-            launch_kernel(apply_rope_kernel, max_jobs(total_elements),
-                data.device(),
-                cos_cache.device(),
-                sin_cache.device(),
-                total_elements,
-                num_heads,
-                seq_len,
-                d_head,
-                half_d,
-                rot_dim,
-                is_backward
-            );
-        }
-
-    // ----------------------------------------------------------------------------------------
-
-        __global__ void _cuda_count_valid_tokens(
-            float* valid_count,
-            const unsigned long* truth,
-            const float* input_data,
-            size_t batch_size,
-            size_t seq_len,
-            long ignore_index
-        )
-        {
-            float count = 0.0f;
-
-            for (auto sample_idx : grid_stride_range(0, batch_size))
-            {
-                for (size_t t = 0; t < seq_len; ++t)
-                {
-                    unsigned long target_class;
-                    if (t < seq_len - 1) {
-                        const size_t input_idx = sample_idx * seq_len + (t + 1);
-                        target_class = static_cast<unsigned long>(input_data[input_idx]);
-                    }
-                    else {
-                        target_class = truth[sample_idx];
-                    }
-
-                    if (ignore_index < 0 || static_cast<long>(target_class) != ignore_index) {
-                        count += 1.0f;
-                    }
-                }
-            }
-
-            warp_reduce_atomic_add(*valid_count, count);
-        }
-
-        __global__ void _cuda_compute_loss_cross_entropy_per_logit(
-            float* loss_out,
-            float* g,
-            const unsigned long* truth,
-            const float* input_data,
-            const float* out_data,
-            size_t batch_size,
-            size_t seq_len,
-            size_t vocab_size,
-            float scale,
-            long ignore_index
-        )
-        {
-            float total_loss = 0;
-
-            for (auto sample_idx : grid_stride_range(0, batch_size))
-            {
-                for (size_t t = 0; t < seq_len; ++t)
-                {
-                    unsigned long target_class;
-                    if (t < seq_len - 1) {
-                        const size_t input_idx = sample_idx * seq_len + (t + 1);
-                        target_class = static_cast<unsigned long>(input_data[input_idx]);
-                    }
-                    else {
-                        target_class = truth[sample_idx];
-                    }
-
-                    const size_t base_idx = sample_idx * seq_len * vocab_size + t * vocab_size;
-
-                    if (ignore_index >= 0 && static_cast<long>(target_class) == ignore_index) {
-                        for (size_t c = 0; c < vocab_size; ++c) {
-                            g[base_idx + c] = 0.0f;
-                        }
-                        continue;
-                    }
-
-                    float max_val = out_data[base_idx];
-                    for (size_t c = 1; c < vocab_size; ++c)
-                    {
-                        max_val = ::max(max_val, out_data[base_idx + c]);
-                    }
-
-                    float sum_exp = 0.0f;
-                    for (size_t c = 0; c < vocab_size; ++c)
-                    {
-                        const size_t idx = base_idx + c;
-                        const float exp_val = ::exp(out_data[idx] - max_val);
-                        g[idx] = exp_val;
-                        sum_exp += exp_val;
-                    }
-
-                    for (size_t c = 0; c < vocab_size; ++c)
-                    {
-                        const size_t idx = base_idx + c;
-                        const float softmax_val = g[idx] / sum_exp;
-
-                        if (c == target_class)
-                        {
-                            total_loss += -::log(::max(softmax_val, 1e-10f));
-                            g[idx] = scale * (softmax_val - 1.0f);
-                        }
-                        else
-                        {
-                            g[idx] = scale * softmax_val;
-                        }
-                    }
-                }
-            }
-
-            warp_reduce_atomic_add(*loss_out, total_loss);
-        }
-
-        void compute_loss_cross_entropy_per_logit::do_work(
-            cuda_data_ptr<float> loss_work_buffer,
-            cuda_data_ptr<const unsigned long> truth_buffer,
-            const tensor& input_tensor,
-            const tensor& subnetwork_output,
-            tensor& gradient,
-            double& loss,
-            long ignore_index
-        )
-        {
-            CHECK_CUDA(cudaMemset(gradient.device(), 0, gradient.size() * sizeof(float)));
-            CHECK_CUDA(cudaMemset(loss_work_buffer, 0, sizeof(float)));
-
-            const long batch_size = subnetwork_output.num_samples();
-            const long seq_len = subnetwork_output.nr();
-            const long vocab_size = subnetwork_output.nc();
-
-            double scale;
-            if (ignore_index < 0)
-            {
-                scale = 1.0 / (batch_size * seq_len);
-            }
-            else {
-                cuda_data_void_ptr count_buf = device_global_buffer(sizeof(float));
-                auto valid_count_ptr = static_pointer_cast<float>(count_buf, 1);
-                CHECK_CUDA(cudaMemset(valid_count_ptr, 0, sizeof(float)));
-
-                launch_kernel(_cuda_count_valid_tokens, max_jobs(batch_size),
-                    valid_count_ptr.data(),
-                    truth_buffer.data(),
-                    input_tensor.device(),
-                    batch_size,
-                    seq_len,
-                    ignore_index
-                );
-
-                float valid_count;
-                dlib::cuda::memcpy(&valid_count, valid_count_ptr);
-
-                if (valid_count == 0) {
-                    loss = 0.0;
-                    return;
-                }
-
-                scale = 1.0 / valid_count;
-            }
-
-            launch_kernel(_cuda_compute_loss_cross_entropy_per_logit, max_jobs(batch_size),
-                loss_work_buffer.data(),
-                gradient.device(),
-                truth_buffer.data(),
-                input_tensor.device(),
-                subnetwork_output.device(),
-                batch_size,
-                seq_len,
-                vocab_size,
-                static_cast<float>(scale),
-                ignore_index
-            );
-
-            float floss;
-            dlib::cuda::memcpy(&floss, loss_work_buffer);
-            loss = scale * floss;
-        }
-
-    // ----------------------------------------------------------------------------------------
 
         __device__ float cuda_log1pexp(float x)
         {
