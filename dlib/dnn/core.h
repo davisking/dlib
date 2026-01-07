@@ -3226,6 +3226,26 @@ namespace dlib
                 data[i] = rnd.get_random_gaussian()*sigma;
         }
 
+        struct test_layer_params
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object allows specifying constraints on tensor dimensions
+                    when testing layers with test_layer().
+
+                    If a member is set to 0 (the default), the dimension is chosen randomly
+                    during testing. If a member is strictly positive, the dimension is fixed
+                    to that value for all iterations.
+
+                    This is useful for layers with intrinsic constraints (e.g., k() must be 1
+                    or nc() must equal a specific d_model).
+            !*/
+            long num_samples = 0;
+            long k = 0;
+            long nr = 0;
+            long nc = 0;
+        };
+
         class test_layer_subnet 
         {
         public:
@@ -3233,21 +3253,15 @@ namespace dlib
                 dlib::rand& rnd_
             ) : rnd(rnd_) 
             {
-                // Output and gradient_input have to have the same dimensions in each
-                // layer.
-                const long num_samples = rnd.get_random_32bit_number()%4+3;
-                const long k  = rnd.get_random_32bit_number()%4+2;
-                const long nr = ((rnd.get_random_32bit_number()%4)/2)*2+2;
-                const long nc = ((rnd.get_random_32bit_number()%4)/2)*2+2;
+                init(test_layer_params());
+            }
 
-                output.set_size(num_samples, k, nr, nc);
-                gradient_input.set_size(num_samples, k, nr, nc);
-
-                // Use a non-zero initial gradient to make sure the layers add to it
-                // rather than assign and blow away the initial value.
-                fill_with_gassuan_random_numbers(gradient_input, rnd, 0.01);
-
-                fill_with_gassuan_random_numbers(output, rnd);
+            test_layer_subnet(
+                dlib::rand& rnd_,
+                const test_layer_params& p
+            ) : rnd(rnd_)
+            {
+                init(p);
             }
 
 
@@ -3288,6 +3302,24 @@ namespace dlib
 
 
         private:
+            void init(const test_layer_params& p)
+            {
+                // If a dimension is fixed in p, use it. Otherwise, generate random dimensions.
+                const long num_samples = p.num_samples != 0 ? p.num_samples : (rnd.get_random_32bit_number() % 4 + 3);
+                const long k = p.k != 0 ? p.k : (rnd.get_random_32bit_number() % 4 + 2);
+                const long nr = p.nr != 0 ? p.nr : (((rnd.get_random_32bit_number() % 4) / 2) * 2 + 2);
+                const long nc = p.nc != 0 ? p.nc : (((rnd.get_random_32bit_number() % 4) / 2) * 2 + 2);
+
+                output.set_size(num_samples, k, nr, nc);
+                gradient_input.set_size(num_samples, k, nr, nc);
+
+                // Use a non-zero initial gradient to make sure the layers add to it
+                // rather than assign and blow away the initial value.
+                fill_with_gassuan_random_numbers(gradient_input, rnd, 0.01);
+
+                fill_with_gassuan_random_numbers(output, rnd);
+            }
+
             // We lazily initialize sub-layers as needed when someone tries to call
             // subnet()
             void init_sub() const
@@ -3326,7 +3358,8 @@ namespace dlib
         >
     layer_test_results impl_test_layer (
         layer_details_type l,
-        const float base_eps 
+        const float base_eps,
+        const timpl::test_layer_params& p
     )
     {
         using namespace timpl;
@@ -3336,7 +3369,8 @@ namespace dlib
         std::ostringstream sout;
         for (int iter = 0; iter < 10; ++iter)
         {
-            test_layer_subnet subnetwork(rnd);
+            // Pass the test_layer_params to the subnet constructor
+            test_layer_subnet subnetwork(rnd, p);
             resizable_tensor output, out2, out3;
             // Run setup() and forward() as well to make sure any calls to subnet() have
             // happened before we start assuming we know how many data elements there are
@@ -3381,7 +3415,7 @@ namespace dlib
             // in in-place mode.
             if (impl::is_inplace_layer(l, subnetwork))
             {
-                test_layer_subnet subnetwork2(rnd);
+                test_layer_subnet subnetwork2(rnd, p);
                 layer_details_type ll(l);
                 ll.setup(subnetwork2);
                 resizable_tensor ip_out;
@@ -3526,21 +3560,33 @@ namespace dlib
 
     template <
         typename layer_details_type
-        >
-    layer_test_results test_layer (
+    >
+    layer_test_results test_layer(
         layer_details_type l
+    )
+    {
+        // Default behavior: use random dimensions (all zeros in params)
+        return test_layer(l, timpl::test_layer_params());
+    }
+
+    template <
+        typename layer_details_type
+    >
+    layer_test_results test_layer(
+        layer_details_type l,
+        const timpl::test_layer_params& params
     )
     {
         // Try a few different derivative step sizes to see if any work. 
         for (float base_eps = 0.0001; base_eps < 0.1; base_eps *= 2)
         {
-            auto result = impl_test_layer(l, base_eps);
+            auto result = impl_test_layer(l, base_eps, params);
             if (result)
                 return result;
         }
         // However, if none of the step sizes worked then try this one and probably result
         // in returning an error.
-        return impl_test_layer(l, 0.01);
+        return impl_test_layer(l, 0.01, params);
     }
 
 // ----------------------------------------------------------------------------------------

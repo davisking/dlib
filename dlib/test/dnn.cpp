@@ -2607,6 +2607,9 @@ namespace
         }
         {
             print_spinner();
+            dlib::timpl::test_layer_params p;
+            p.k = 1;
+            p.nc = 128;
             adaptive_computation_time_<6> l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
