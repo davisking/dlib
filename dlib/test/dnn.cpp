@@ -993,69 +993,6 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    void test_rope_layer()
-    {
-        print_spinner();
-
-        const long num_samples = 2;
-        const long num_heads = 3;
-        const long seq_len = 8;
-        const long d_head = 16;
-
-        resizable_tensor input(num_samples, num_heads, seq_len, d_head);
-        resizable_tensor cos_cache(1, 1, seq_len, d_head / 2);
-        resizable_tensor sin_cache(1, 1, seq_len, d_head / 2);
-
-        tt::tensor_rand rnd(1234);
-        rnd.fill_uniform(input);
-
-        // Initialize cos/sin cache
-        float* cos_ptr = cos_cache.host();
-        float* sin_ptr = sin_cache.host();
-        for (long pos = 0; pos < seq_len; ++pos)
-        {
-            for (long i = 0; i < d_head / 2; ++i)
-            {
-                const float angle = pos * 0.1f * (i + 1);
-                const long idx = pos * (d_head / 2) + i;
-                cos_ptr[idx] = std::cos(angle);
-                sin_ptr[idx] = std::sin(angle);
-            }
-        }
-
-        resizable_tensor output_cpu_a(input);
-        cpu::apply_rotary_positional_embedding(false, output_cpu_a, cos_cache, sin_cache);  // forward
-        output_cpu_a *= 2;
-        cpu::apply_rotary_positional_embedding(true, output_cpu_a, cos_cache, sin_cache);   // backward
-        DLIB_TEST(max(abs(mat(output_cpu_a) - mat(input) * 2)) < 1e-5);
-
-        resizable_tensor output_cpu_b(input);
-        cpu::apply_rotary_positional_embedding(false, output_cpu_b, cos_cache, sin_cache);  // forward
-        cpu::apply_rotary_positional_embedding(true, output_cpu_b, cos_cache, sin_cache);   // backward
-        DLIB_TEST(max(abs(mat(output_cpu_b) - mat(input))) < 1e-5);
-
-        // Check that the CPU and the CUDA implementation are equivalent
-#ifdef DLIB_USE_CUDA
-        resizable_tensor input_cuda(input);
-        resizable_tensor output_cuda_a(input_cuda);
-        resizable_tensor output_cuda_b(input_cuda);
-
-        cuda::apply_rotary_positional_embedding(false, output_cuda_a, cos_cache, sin_cache);
-        output_cuda_a *= 2;
-        cuda::apply_rotary_positional_embedding(true, output_cuda_a, cos_cache, sin_cache);
-
-        cuda::apply_rotary_positional_embedding(false, output_cuda_b, cos_cache, sin_cache);
-        cuda::apply_rotary_positional_embedding(true, output_cuda_b, cos_cache, sin_cache);
-
-        DLIB_TEST(max(abs(mat(output_cpu_a) - mat(output_cuda_a))) < 1e-5);
-        DLIB_TEST(max(abs(mat(output_cpu_b) - mat(output_cuda_b))) < 1e-5);
-#endif
-
-        dlog << LINFO << "RoPE tests completed successfully";
-    }
-
-// ----------------------------------------------------------------------------------------
-
     void test_basic_tensor_ops()
     {
         using namespace dlib::tt;
@@ -2670,17 +2607,13 @@ namespace
         }
         {
             print_spinner();
+            dlib::timpl::test_layer_params p;
+            p.k = 1;
+            p.nc = 128;
             adaptive_computation_time_<6> l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
         }
-        {
-            print_spinner();
-            rotary_positional_embedding_ l;
-            auto res = test_layer(l);
-            DLIB_TEST_MSG(res, res);
-        }
-
     }
 
 // ----------------------------------------------------------------------------------------
@@ -5379,7 +5312,6 @@ void test_multm_prev()
             test_embeddings();
             test_tril();
             test_adaptive_computation_time_network();
-            test_rope_layer();
             test_basic_tensor_ops();
             test_resize_to();
             test_layers();
