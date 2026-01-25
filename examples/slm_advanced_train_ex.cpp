@@ -1265,9 +1265,7 @@ int main(int argc, char** argv)
             while (total_bytes < target_size && next_token != start_of_text && next_token != end_of_text
                 && !g_terminate_flag.load()) {
                 // Predict next token
-                std::vector<matrix<int, 0, 1>> in_tokens = { input_seq, input_seq };
-                auto out_token = net(in_tokens);
-                next_token = static_cast<int>(out_token[0]);
+                next_token = static_cast<int>(net(input_seq));
                 token_buffer.push_back(next_token);
                 token_count++;
 
