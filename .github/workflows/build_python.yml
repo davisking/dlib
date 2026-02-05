@@ -44,8 +44,7 @@ jobs:
     - name: Build
       run: |
         pip3 install cmake==3.24.0
-        python setup.py build
-        python setup.py install --user
+        pip install .
     - name: Test
       run: python -m pytest --ignore docs --ignore dlib
 
@@ -58,8 +57,7 @@ jobs:
       run: pip install pytest numpy
     - name: Build
       run: |
-        python setup.py build
-        python setup.py install --user
+        pip install .
     - name: Test
       run: python -m pytest --ignore docs --ignore dlib
 
@@ -73,8 +71,7 @@ jobs:
 #     run: pip3 install pytest numpy
 #   - name: Build
 #     run: |
-#       python3 setup.py build
-#       python3 setup.py install --user
+#       pip install .
 #   - name: Test
 #     run: python3 -m pytest --ignore docs --ignore dlib
 
