@@ -44,7 +44,7 @@ jobs:
     - name: Build
       run: |
         pip3 install cmake==3.24.0
-        pip install .
+        pip3 install .
     - name: Test
       run: python -m pytest --ignore docs --ignore dlib
 
