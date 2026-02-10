@@ -140,15 +140,15 @@ makedocs ()
     then
         cd ..
         python setup.py build || report_failure
-        python setup.py build_sphinx -c docs/docs/python --build-dir docs/sphinx.$$ || report_failure
+        python -m sphinx -b html -c docs/docs/python docs/docs/python docs/sphinx.$$ || report_failure
         # sphinx will read in the _dlib_pybind11 module and use that to name everything.  But that's
         # not what we want, so we rename that to dlib everywhere.  You would think sphinx would be
         # able to deal with the dlib/__init__.py file and this wouldn't be necessary, but that
         # doesn't seem to be the case.
         find docs/sphinx.$$ -type f | xargs sed -i -e "s/_dlib_pybind11/dlib/g"
         cd docs
-        cp -r sphinx.$$/html docs/web/python
-        mv  sphinx.$$/html docs/chm/docs/python
+        cp -r sphinx.$$ docs/web/python
+        mv  sphinx.$$ docs/chm/docs/python
         rm -rf sphinx.$$
     fi;
 
