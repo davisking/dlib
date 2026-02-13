@@ -12,8 +12,8 @@
 #include <dlib/base64.h>
 
 #ifdef DLIB_USE_MKL_FFT
-#include <dlib/matrix/kiss_fft.h>
-#include <dlib/matrix/mkl_fft.h>
+#include <dlib/fft/kiss_fft.h>
+#include <dlib/fft/mkl_fft.h>
 #endif
 #include "tester.h"
 #include "fftr_good_data.h"
