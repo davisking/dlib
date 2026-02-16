@@ -58,10 +58,16 @@ namespace dlib
             if (dest_offset == 0 && num == dest.size())
             {
                 // copy the memory efficiently based on which copy is current in each object.
-                if (src.device_ready())
+                if (dest.device_id() >= 0 && src.device_ready())
                     CHECK_CUDA(cudaMemcpy(dest.device_write_only(), src.device()+src_offset,  num*sizeof(float), cudaMemcpyDeviceToDevice));
-                else 
+                else if (dest.device_id() < 0 && src.device_ready())
+                    CHECK_CUDA(cudaMemcpy(dest.host_write_only(), src.device()+src_offset,    num*sizeof(float), cudaMemcpyDeviceToHost));
+                else if (dest.device_id() >= 0 && !src.device_ready())
                     CHECK_CUDA(cudaMemcpy(dest.device_write_only(), src.host()+src_offset,    num*sizeof(float), cudaMemcpyHostToDevice));
+                else if (dest.device_id() >= 0 || src.device_id() >= 0)
+                    CHECK_CUDA(cudaMemcpy(dest.host_write_only(), src.host()+src_offset,      num*sizeof(float), cudaMemcpyHostToHost));
+                else
+                    std::memcpy(dest.host_write_only(), src.host()+src_offset,                num*sizeof(float));
             }
             else
             {
@@ -72,8 +78,11 @@ namespace dlib
                     CHECK_CUDA(cudaMemcpy(dest.host()+dest_offset, src.device()+src_offset,   num*sizeof(float), cudaMemcpyDeviceToHost));
                 else if (dest.device_ready() && !src.device_ready())
                     CHECK_CUDA(cudaMemcpy(dest.device()+dest_offset, src.host()+src_offset,   num*sizeof(float), cudaMemcpyHostToDevice));
-                else 
+                else if (dest.device_id() >= 0 || src.device_id() >= 0)
                     CHECK_CUDA(cudaMemcpy(dest.host()+dest_offset, src.host()+src_offset,     num*sizeof(float), cudaMemcpyHostToHost));
+                else
+                    std::memcpy(dest.host()+dest_offset, src.host()+src_offset,               num*sizeof(float));
+
             }
         }
     }
@@ -198,6 +207,13 @@ namespace dlib
             host_current = true;
             device_current = true;
             device_in_use = false;
+
+            if (!cuda::use_cuda())
+            {
+                data_host.reset(new float[new_size], std::default_delete<float[]>());
+                the_device_id = -1;
+                return;
+            }
 
             try
             {

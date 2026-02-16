@@ -9,6 +9,17 @@
 
 namespace dlib 
 { 
+    namespace
+    {
+        bool& use_cuda_impl (
+        )
+        {
+            thread_local bool var(cuda::is_available());
+            return var;
+        }
+
+    }
+
     namespace cuda 
     {
 
@@ -18,14 +29,16 @@ namespace dlib
             int dev
         )
         {
-            CHECK_CUDA(cudaSetDevice(dev));
+            if (is_available())
+                CHECK_CUDA(cudaSetDevice(dev));
         }
 
         int get_device (
         )
         {
-            int dev = 0;
-            CHECK_CUDA(cudaGetDevice(&dev));
+            int dev = -1;
+            if (is_available())
+                CHECK_CUDA(cudaGetDevice(&dev));
             return dev;
         }
 
@@ -42,6 +55,27 @@ namespace dlib
         )
         {
             CHECK_CUDA(cudaSetDeviceFlags(cudaDeviceScheduleBlockingSync));
+        }
+
+        bool is_available(
+        ) 
+        {
+            int num_devices;
+            return cudaGetDeviceCount(&num_devices) == cudaSuccess && num_devices > 0;
+        }
+
+        bool use_cuda(
+        )
+        {
+            return use_cuda_impl();
+        }
+
+        void set_use_cuda(
+            bool flag
+        )
+        {
+            if (is_available())
+                use_cuda_impl() = flag;
         }
 
         int get_num_devices (

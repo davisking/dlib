@@ -2823,11 +2823,13 @@ namespace dlib
             }
 
             double loss;
-#ifdef DLIB_USE_CUDA
-            cuda_compute(truth, output_tensor, grad, loss);
-#else
-            cpu_compute(truth, output_tensor, grad, loss);
-#endif
+            IF_DLIB_USE_CUDA(
+                cuda_compute(truth, output_tensor, grad, loss);
+            )
+
+            IF_DLIB_NOT_USE_CUDA(
+                cpu_compute(truth, output_tensor, grad, loss);
+            )
             return loss;
         }
 
@@ -2859,9 +2861,8 @@ namespace dlib
 
 #ifdef DLIB_USE_CUDA
         cuda::compute_loss_binary_log_per_pixel cuda_compute;
-#else
-        cpu::compute_loss_binary_log_per_pixel cpu_compute;
 #endif
+        cpu::compute_loss_binary_log_per_pixel cpu_compute;
     };
 
     template <typename SUBNET>
@@ -2968,11 +2969,13 @@ namespace dlib
 
 
             double loss;
-#ifdef DLIB_USE_CUDA
-            cuda_compute(truth, output_tensor, grad, loss);
-#else
-            cpu_compute(truth, output_tensor, grad, loss);
-#endif
+            IF_DLIB_USE_CUDA(
+                cuda_compute(truth, output_tensor, grad, loss);
+            )
+
+            IF_DLIB_NOT_USE_CUDA(
+                cpu_compute(truth, output_tensor, grad, loss);
+            )
             return loss;
         }
 
@@ -3004,9 +3007,8 @@ namespace dlib
 
 #ifdef DLIB_USE_CUDA
         cuda::compute_loss_multiclass_log_per_pixel cuda_compute;
-#else
-        cpu::compute_loss_multiclass_log_per_pixel cpu_compute;
 #endif
+        cpu::compute_loss_multiclass_log_per_pixel cpu_compute;
     };
 
     template <typename SUBNET>
@@ -3068,11 +3070,13 @@ namespace dlib
             }
 
             double loss;
-#ifdef DLIB_USE_CUDA
-            cuda_compute(truth, output_tensor, grad, loss);
-#else
-            cpu_compute(truth, output_tensor, grad, loss);
-#endif
+            IF_DLIB_USE_CUDA(
+                cuda_compute(truth, output_tensor, grad, loss);
+            )
+
+            IF_DLIB_NOT_USE_CUDA(
+                cpu_compute(truth, output_tensor, grad, loss);
+            )
             return loss;
         }
 
@@ -3104,9 +3108,8 @@ namespace dlib
 
 #ifdef DLIB_USE_CUDA
         cuda::compute_loss_multiclass_log_per_pixel_weighted cuda_compute;
-#else
-        cpu::compute_loss_multiclass_log_per_pixel_weighted cpu_compute;
 #endif
+        cpu::compute_loss_multiclass_log_per_pixel_weighted cpu_compute;
 
     };
 
@@ -3319,11 +3322,13 @@ namespace dlib
                 }
             }
             double loss;
-#ifdef DLIB_USE_CUDA
-            cuda_compute(truth, output_tensor, grad, loss);
-#else
-            cpu_compute(truth, output_tensor, grad, loss);
-#endif
+            IF_DLIB_USE_CUDA(
+                cuda_compute(truth, output_tensor, grad, loss);
+            )
+
+            IF_DLIB_NOT_USE_CUDA(
+                cpu_compute(truth, output_tensor, grad, loss);
+            )
             return loss;
         }
 
@@ -3355,9 +3360,8 @@ namespace dlib
 
 #ifdef DLIB_USE_CUDA
         cuda::compute_loss_mean_squared_per_channel_and_pixel cuda_compute;
-#else
-        cpu::compute_loss_mean_squared_per_channel_and_pixel cpu_compute;
 #endif
+        cpu::compute_loss_mean_squared_per_channel_and_pixel cpu_compute;
     };
 
     template <long num_channels, typename SUBNET>
