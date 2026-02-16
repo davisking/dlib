@@ -39,33 +39,43 @@ namespace dlib
             labels[i] = i;
 
 
-        for (unsigned long iter = 0; iter < neighbors.size()*num_iterations; ++iter)
+        for (unsigned long iter = 0; iter < num_iterations; ++iter)
         {
-            // Pick a random node.
-            const unsigned long idx = rnd.get_random_64bit_number()%neighbors.size();
+            std::vector<unsigned long> node_order;
+            for (unsigned long i = 0; i < neighbors.size(); ++i)
+                node_order.push_back(i);
 
-            // Count how many times each label happens amongst our neighbors.
-            std::map<unsigned long, double> labels_to_counts;
-            const unsigned long end = neighbors[idx].second;
-            for (unsigned long i = neighbors[idx].first; i != end; ++i)
+            for (unsigned long i = node_order.size(); i > 1; --i)
             {
-                labels_to_counts[labels[edges[i].index2()]] += edges[i].distance();
+                unsigned long j = rnd.get_random_64bit_number() % i;
+                std::swap(node_order[j], node_order[i-1]);
             }
 
-            // find the most common label
-            std::map<unsigned long, double>::iterator i;
-            double best_score = -std::numeric_limits<double>::infinity();
-            unsigned long best_label = labels[idx];
-            for (i = labels_to_counts.begin(); i != labels_to_counts.end(); ++i)
+            for (unsigned long n = 0; n < node_order.size(); ++n)
             {
-                if (i->second > best_score)
+                const unsigned long idx = node_order[n];
+
+                std::map<unsigned long, double> labels_to_counts;
+                const unsigned long end = neighbors[idx].second;
+                for (unsigned long i = neighbors[idx].first; i != end; ++i)
                 {
-                    best_score = i->second;
-                    best_label = i->first;
+                    labels_to_counts[labels[edges[i].index2()]] += edges[i].distance();
                 }
-            }
 
-            labels[idx] = best_label;
+                std::map<unsigned long, double>::iterator i;
+                double best_score = -std::numeric_limits<double>::infinity();
+                unsigned long best_label = labels[idx];
+                for (i = labels_to_counts.begin(); i != labels_to_counts.end(); ++i)
+                {
+                    if (i->second > best_score)
+                    {
+                        best_score = i->second;
+                        best_label = i->first;
+                    }
+                }
+
+                labels[idx] = best_label;
+            }
         }
 
 
