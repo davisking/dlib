@@ -77,6 +77,79 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    // A model where the objective function differs from the quadratic model by a
+    // large constant offset.  The Hessian and gradient reported to the trust region
+    // solver are exact (they describe the quadratic part), but the objective value
+    // returned by operator() includes a huge offset.  This means the quadratic model
+    // predictions are perfect, yet the floating-point subtraction
+    //   measured_improvement = f(x) - f(x+p)
+    // loses all significant digits once the true improvement drops below
+    // |offset| * machine_epsilon.
+    //
+    // To make the optimizer take many small steps (so it actually reaches the regime
+    // where rounding kills the measured improvement), we use a Rosenbrock-like
+    // function which is not spherically symmetric.  The narrow curved valley forces
+    // the trust region to take many constrained steps that only slowly approach the
+    // minimum.
+    template <typename T>
+    struct offset_rosen_model
+    {
+        typedef matrix<T,2,1> column_vector;
+        typedef matrix<T,2,2> general_matrix;
+
+        const T offset;
+        explicit offset_rosen_model(const T off) : offset(off) {}
+
+        T operator()(const column_vector& x) const
+        {
+            return static_cast<T>(rosen<T>(x)) + offset;
+        }
+
+        void get_derivative_and_hessian(
+            const column_vector& x,
+            column_vector& d,
+            general_matrix& h
+        ) const
+        {
+            d = rosen_derivative<T>(x);
+            h = rosen_hessian<T>(x);
+        }
+    };
+
+    void test_rho_with_large_offset()
+    {
+        print_spinner();
+
+        // Rosenbrock + huge offset.  The offset makes the floating-point
+        // subtraction f(x) - f(x+p) lose precision once the true improvement
+        // drops below |offset| * epsilon ≈ 0.22.  Rosenbrock's narrow valley
+        // forces many small trust region steps, so the optimizer inevitably
+        // enters this low-improvement regime.  Without the rho fix, the
+        // optimizer stalls far from the minimum because every step in that
+        // regime produces rho ≈ 0 (or garbage), shrinking the radius to zero.
+        const double offset = 1e15;
+
+        matrix<double,2,1> x;
+        x = -1.2, 1.0;
+
+        const double result = find_min_trust_region(
+            objective_delta_stop_strategy(0, 500),
+            offset_rosen_model<double>(offset),
+            x);
+
+        matrix<double,2,1> ans;
+        ans = 1, 1;
+
+        dlog << LINFO << "offset rosen obj:   " << result - offset;
+        dlog << LINFO << "offset rosen x:     " << trans(x);
+        dlog << LINFO << "offset rosen error: " << length(x - ans);
+
+        DLIB_TEST_MSG(length(x - ans) < 1e-4,
+            "optimizer failed to converge with large offset, error = " << length(x - ans));
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void test_trust_region_sub_problem()
     {
         dlog << LINFO << "subproblem test 1";
@@ -319,6 +392,8 @@ namespace
 
 
             test_trust_region_sub_problem();
+
+            test_rho_with_large_offset();
 
             test_problems();
         }
