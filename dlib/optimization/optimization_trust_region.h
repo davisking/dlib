@@ -453,8 +453,14 @@ namespace dlib
             // predicted_improvement shouldn't be negative but it might be if something went
             // wrong in the trust region solver.  So put abs() here to guard against that.  This
             // way the sign of rho is determined only by the sign of measured_improvement.
-            const type rho = measured_improvement/std::abs(predicted_improvement);
-
+            //
+            // When the predicted improvement is below the floating point resolution of f_value,
+            // the measured improvement (f_value - new_f_value) is dominated by rounding noise
+            // and rho becomes meaningless.  In this case we trust the quadratic model and treat
+            // the step as a perfect match (rho = 1).
+            const type abs_pred = std::abs(predicted_improvement);
+            const type f_eps = std::abs(f_value) * std::numeric_limits<type>::epsilon();
+            const type rho = (abs_pred < f_eps) ? type(1) : measured_improvement/abs_pred;
 
             if (!is_finite(rho))
                 break;
