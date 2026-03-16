@@ -145,9 +145,9 @@ namespace
 
         wstring ws = L"file.txt";
         DLIB_TEST( (left_substr(ws,wstring(L".")) == L"file"));
-        DLIB_TEST_MSG( (left_substr(ws,L".") == L"file"), L"");
+        DLIB_TEST_MSG( (left_substr(ws,L".") == L"file"), "");
         DLIB_TEST( (right_substr(ws,wstring(L".")) == L"txt"));
-        DLIB_TEST_MSG( (right_substr(ws,L".") == L"txt"), L"");
+        DLIB_TEST_MSG( (right_substr(ws,L".") == L"txt"), "");
 
 
         dlog << LTRACE << 8;
