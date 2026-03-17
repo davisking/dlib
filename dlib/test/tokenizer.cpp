@@ -394,10 +394,10 @@ namespace
         deserialize(loaded_test, in_stream);
 
         std::vector<std::string> test_strings = {
-            u8"This is a test of the tokenisation process...\nimplemented in the Dlib library!", // English
-            u8"Ceci est un test du processus de\ntokenisation implémenté dans\nla bibliothèque Dlib!", // French
-            u8"Dette er en test af tokeniseringsprocessen implementeret i Dlib-biblioteket!", // Danish
-            u8"这是对Dlib库中实现的标记化过程的测试！" // Chinese
+            "This is a test of the tokenisation process...\nimplemented in the Dlib library!", // English
+            "Ceci est un test du processus de\ntokenisation implémenté dans\nla bibliothèque Dlib!", // French
+            "Dette er en test af tokeniseringsprocessen implementeret i Dlib-biblioteket!", // Danish
+            "这是对Dlib库中实现的标记化过程的测试！" // Chinese
         };
 
         for (const auto& text : test_strings) {
