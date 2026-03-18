@@ -59,7 +59,12 @@ namespace dlib
             {
                 // copy the memory efficiently based on which copy is current in each object.
                 if (src.device_ready())
-                    CHECK_CUDA(cudaMemcpy(dest.device_write_only(), src.device()+src_offset,  num*sizeof(float), cudaMemcpyDeviceToDevice));
+                {
+                    if (dest.device_id() != src.device_id())
+                        CHECK_CUDA(cudaMemcpyPeer(dest.device_write_only(), dest.device_id(), src.device()+src_offset, src.device_id(), num*sizeof(float)));
+                    else
+                        CHECK_CUDA(cudaMemcpy(dest.device_write_only(), src.device()+src_offset,  num*sizeof(float), cudaMemcpyDeviceToDevice));
+                }
                 else 
                     CHECK_CUDA(cudaMemcpy(dest.device_write_only(), src.host()+src_offset,    num*sizeof(float), cudaMemcpyHostToDevice));
             }
@@ -67,7 +72,12 @@ namespace dlib
             {
                 // copy the memory efficiently based on which copy is current in each object.
                 if (dest.device_ready() && src.device_ready())
-                    CHECK_CUDA(cudaMemcpy(dest.device()+dest_offset, src.device()+src_offset, num*sizeof(float), cudaMemcpyDeviceToDevice));
+                {
+                    if (dest.device_id() != src.device_id())
+                        CHECK_CUDA(cudaMemcpyPeer(dest.device()+dest_offset, dest.device_id(), src.device()+src_offset, src.device_id(), num*sizeof(float)));
+                    else
+                        CHECK_CUDA(cudaMemcpy(dest.device()+dest_offset, src.device()+src_offset, num*sizeof(float), cudaMemcpyDeviceToDevice));
+                }
                 else if (!dest.device_ready() && src.device_ready())
                     CHECK_CUDA(cudaMemcpy(dest.host()+dest_offset, src.device()+src_offset,   num*sizeof(float), cudaMemcpyDeviceToHost));
                 else if (dest.device_ready() && !src.device_ready())
