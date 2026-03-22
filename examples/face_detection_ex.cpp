@@ -41,6 +41,7 @@
 #include <dlib/gui_widgets.h>
 #include <dlib/image_io.h>
 #include <iostream>
+#include <limits>
 
 using namespace dlib;
 using namespace std;
@@ -89,7 +90,8 @@ int main(int argc, char** argv)
             win.add_overlay(dets, rgb_pixel(255,0,0));
 
             cout << "Hit enter to process the next image..." << endl;
-            cin.get();
+          cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+cin.get();
         }
     }
     catch (exception& e)
