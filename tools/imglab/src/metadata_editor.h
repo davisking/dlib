@@ -7,6 +7,7 @@
 #include <dlib/data_io.h>
 #include <dlib/pixel.h>
 #include <map>
+#include <vector>
 
 // ----------------------------------------------------------------------------------------
 
@@ -69,6 +70,8 @@ public:
     );
 
 private:
+    void perform_undo();
+    void perform_redo();
 
     void file_save();
     void file_save_as();
@@ -95,6 +98,10 @@ private:
 
     std::string filename;
     dlib::image_dataset_metadata::dataset metadata;
+
+    std::vector<std::vector<dlib::image_dataset_metadata::box>> undo_history;
+    std::vector<std::vector<dlib::image_dataset_metadata::box>> redo_history;
+    static constexpr size_t MAX_UNDO_HISTORY = 10;
 
     dlib::menu_bar mbar;
     dlib::list_box lb_images;
