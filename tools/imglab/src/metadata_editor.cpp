@@ -21,6 +21,11 @@ extern const char* VERSION;
 
 // ----------------------------------------------------------------------------------------
 
+std::vector<dlib::image_display::overlay_rect> get_overlays (
+    const dlib::image_dataset_metadata::image& data,
+    color_mapper& string_to_color 
+);
+
 metadata_editor::
 metadata_editor(
     const std::string& filename_,
@@ -390,6 +395,25 @@ on_keydown (
             select_image(image_pos);
         }
 
+        if ((key == 'z' || key == 'Z') && (state&base_window::KBD_MOD_CONTROL) && !overlay_label.has_input_focus())
+        {
+            if (state&base_window::KBD_MOD_SHIFT)
+            {
+                perform_redo();
+            }
+            else
+            {
+                perform_undo();
+            }
+            return;
+        }
+
+        if ((key == 'y' || key == 'Y') && (state&base_window::KBD_MOD_CONTROL) && !overlay_label.has_input_focus())
+        {
+            perform_redo();
+            return;
+        }
+
         // Make 'w' and 's' act like KEY_UP and KEY_DOWN
         if ((key == 'w' || key == 'W') && !overlay_label.has_input_focus())
         {
@@ -532,6 +556,12 @@ load_image(
     if (idx >= metadata.images.size())
         return;
 
+    if (image_pos != idx)
+    {
+        undo_history.clear();
+        redo_history.clear();
+    }
+
     image_pos = idx; 
 
     array2d<rgb_pixel> img;
@@ -557,12 +587,52 @@ load_image(
 // ----------------------------------------------------------------------------------------
 
 void metadata_editor::
+perform_undo()
+{
+    if (!undo_history.empty())
+    {
+        redo_history.push_back(metadata.images[image_pos].boxes);
+        if (redo_history.size() > MAX_UNDO_HISTORY) redo_history.erase(redo_history.begin());
+
+        metadata.images[image_pos].boxes = undo_history.back();
+        undo_history.pop_back();
+        display.clear_overlay();
+        display.add_overlay(get_overlays(metadata.images[image_pos], string_to_color));
+    }
+}
+
+// ----------------------------------------------------------------------------------------
+
+void metadata_editor::
+perform_redo()
+{
+    if (!redo_history.empty())
+    {
+        undo_history.push_back(metadata.images[image_pos].boxes);
+        if (undo_history.size() > MAX_UNDO_HISTORY) undo_history.erase(undo_history.begin());
+
+        metadata.images[image_pos].boxes = redo_history.back();
+        redo_history.pop_back();
+        display.clear_overlay();
+        display.add_overlay(get_overlays(metadata.images[image_pos], string_to_color));
+    }
+}
+
+// ----------------------------------------------------------------------------------------
+
+void metadata_editor::
 load_image_and_set_size(
     unsigned long idx
 )
 {
     if (idx >= metadata.images.size())
         return;
+
+    if (image_pos != idx)
+    {
+        undo_history.clear();
+        redo_history.clear();
+    }
 
     image_pos = idx; 
 
@@ -616,6 +686,7 @@ on_overlay_rects_changed(
         const std::vector<image_display::overlay_rect>& rects = display.get_overlay_rects();
 
         std::vector<box>& boxes = metadata.images[image_pos].boxes;
+        std::vector<box> old_boxes = boxes;
 
         boxes.clear();
         for (unsigned long i = 0; i < rects.size(); ++i)
@@ -626,6 +697,14 @@ on_overlay_rects_changed(
             temp.parts = rects[i].parts;
             temp.ignore = rects[i].crossed_out;
             boxes.push_back(temp);
+        }
+
+        if (old_boxes != boxes)
+        {
+            undo_history.push_back(old_boxes);
+            if (undo_history.size() > MAX_UNDO_HISTORY)
+                undo_history.erase(undo_history.begin());
+            redo_history.clear();
         }
     }
 }
