@@ -20,6 +20,7 @@ using namespace dlib;
 extern const char* VERSION;
 
 // ----------------------------------------------------------------------------------------
+constexpr size_t MAX_UNDO_HISTORY = 10;
 
 std::vector<dlib::image_display::overlay_rect> get_overlays (
     const dlib::image_dataset_metadata::image& data,
@@ -176,6 +177,8 @@ file_save_as()
 void metadata_editor::
 remove_selected_images()
 {
+    clear_undo_history();
+
     dlib::queue<unsigned long>::kernel_1a list;
     lb_images.get_selected(list);
     list.reset();
@@ -366,8 +369,7 @@ on_keydown (
             if (keyboard_jump_pos >= metadata.images.size())
                 keyboard_jump_pos = metadata.images.size()-1;
 
-            image_pos = keyboard_jump_pos;
-            select_image(image_pos);
+            select_image(keyboard_jump_pos);
         }
         else
         {
@@ -558,8 +560,7 @@ load_image(
 
     if (image_pos != idx)
     {
-        undo_history.clear();
-        redo_history.clear();
+        clear_undo_history();
     }
 
     image_pos = idx; 
@@ -587,12 +588,35 @@ load_image(
 // ----------------------------------------------------------------------------------------
 
 void metadata_editor::
+clear_undo_history()
+{
+    undo_history.clear();
+    redo_history.clear();
+}
+
+// ----------------------------------------------------------------------------------------
+
+void metadata_editor::
+save_undo_state (
+    const box_history_entry& boxes
+)
+{
+    undo_history.push_back(boxes);
+    if (undo_history.size() > MAX_UNDO_HISTORY)
+        undo_history.erase(undo_history.begin());
+    redo_history.clear();
+}
+
+// ----------------------------------------------------------------------------------------
+
+void metadata_editor::
 perform_undo()
 {
     if (!undo_history.empty())
     {
         redo_history.push_back(metadata.images[image_pos].boxes);
-        if (redo_history.size() > MAX_UNDO_HISTORY) redo_history.erase(redo_history.begin());
+        if (redo_history.size() > MAX_UNDO_HISTORY)
+            redo_history.erase(redo_history.begin());
 
         metadata.images[image_pos].boxes = undo_history.back();
         undo_history.pop_back();
@@ -609,7 +633,8 @@ perform_redo()
     if (!redo_history.empty())
     {
         undo_history.push_back(metadata.images[image_pos].boxes);
-        if (undo_history.size() > MAX_UNDO_HISTORY) undo_history.erase(undo_history.begin());
+        if (undo_history.size() > MAX_UNDO_HISTORY)
+            undo_history.erase(undo_history.begin());
 
         metadata.images[image_pos].boxes = redo_history.back();
         redo_history.pop_back();
@@ -630,8 +655,7 @@ load_image_and_set_size(
 
     if (image_pos != idx)
     {
-        undo_history.clear();
-        redo_history.clear();
+        clear_undo_history();
     }
 
     image_pos = idx; 
@@ -701,10 +725,7 @@ on_overlay_rects_changed(
 
         if (old_boxes != boxes)
         {
-            undo_history.push_back(old_boxes);
-            if (undo_history.size() > MAX_UNDO_HISTORY)
-                undo_history.erase(undo_history.begin());
-            redo_history.clear();
+            save_undo_state(old_boxes);
         }
     }
 }
@@ -777,6 +798,8 @@ display_about(
                         "and drag allows you to navigate around the image.  Holding ctrl and "
                         "left clicking a rectangle will give it the label from the Next Label field. "
                         "Holding shift + right click and then dragging allows you to move things around. "
+                        "Pressing ctrl+z will undo changes to the current image's boxes and pressing "
+                        "ctrl+y or ctrl+shift+z will redo them. "
                         "Holding ctrl and pressing the up or down keyboard keys will propagate "
                         "rectangle labels from one image to the next and also skip empty images. " 
                         "Similarly, holding ctrl+shift will propagate entire boxes via a visual tracking " 
@@ -791,4 +814,3 @@ display_about(
 }
 
 // ----------------------------------------------------------------------------------------
-

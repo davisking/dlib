@@ -21,6 +21,37 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        bool box::
+        operator== (
+            const box& rhs
+        ) const
+        {
+            return rect == rhs.rect &&
+                   parts == rhs.parts &&
+                   label == rhs.label &&
+                   difficult == rhs.difficult &&
+                   truncated == rhs.truncated &&
+                   occluded == rhs.occluded &&
+                   ignore == rhs.ignore &&
+                   pose == rhs.pose &&
+                   detection_score == rhs.detection_score &&
+                   angle == rhs.angle &&
+                   gender == rhs.gender &&
+                   age == rhs.age;
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        bool box::
+        operator!= (
+            const box& rhs
+        ) const
+        {
+            return !(*this == rhs);
+        }
+
+    // ------------------------------------------------------------------------------------
+
         const std::string get_decoded_string();
         void create_image_metadata_stylesheet_file(const std::string& main_filename)
         {
@@ -416,5 +447,4 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
 #endif // DLIB_IMAGE_DAtASET_METADATA_CPPh_
-
 
