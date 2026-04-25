@@ -93,6 +93,27 @@ namespace dlib
                 ensures
                     - returns true if label metadata is present and false otherwise.
             !*/
+
+            bool operator==(const box& rhs) const
+            {
+                return rect == rhs.rect &&
+                       parts == rhs.parts &&
+                       label == rhs.label &&
+                       difficult == rhs.difficult &&
+                       truncated == rhs.truncated &&
+                       occluded == rhs.occluded &&
+                       ignore == rhs.ignore &&
+                       pose == rhs.pose &&
+                       detection_score == rhs.detection_score &&
+                       angle == rhs.angle &&
+                       gender == rhs.gender &&
+                       age == rhs.age;
+            }
+
+            bool operator!=(const box& rhs) const
+            {
+                return !(*this == rhs);
+            }
         };
 
     // ------------------------------------------------------------------------------------
