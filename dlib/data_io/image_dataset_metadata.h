@@ -94,26 +94,22 @@ namespace dlib
                     - returns true if label metadata is present and false otherwise.
             !*/
 
-            bool operator==(const box& rhs) const
-            {
-                return rect == rhs.rect &&
-                       parts == rhs.parts &&
-                       label == rhs.label &&
-                       difficult == rhs.difficult &&
-                       truncated == rhs.truncated &&
-                       occluded == rhs.occluded &&
-                       ignore == rhs.ignore &&
-                       pose == rhs.pose &&
-                       detection_score == rhs.detection_score &&
-                       angle == rhs.angle &&
-                       gender == rhs.gender &&
-                       age == rhs.age;
-            }
+            bool operator== (
+                const box& rhs
+            ) const;
+            /*!
+                ensures
+                    - returns true if and only if all member variables in *this compare
+                      equal to their corresponding member variables in rhs.
+            !*/
 
-            bool operator!=(const box& rhs) const
-            {
-                return !(*this == rhs);
-            }
+            bool operator!= (
+                const box& rhs
+            ) const;
+            /*!
+                ensures
+                    - returns !(*this == rhs)
+            !*/
         };
 
     // ------------------------------------------------------------------------------------
@@ -194,4 +190,3 @@ namespace dlib
 #endif
 
 #endif // DLIB_IMAGE_DAtASET_METADATA_Hh_
-

@@ -204,6 +204,75 @@ namespace
             }
         }
 
+        void test_image_dataset_metadata_box_equality()
+        {
+            using namespace image_dataset_metadata;
+
+            box a(rectangle(1,2,3,4));
+            a.parts["nose"] = point(2,3);
+            a.label = "person";
+            a.difficult = true;
+            a.truncated = true;
+            a.occluded = true;
+            a.ignore = true;
+            a.pose = 1.5;
+            a.detection_score = 0.75;
+            a.angle = 0.25;
+            a.gender = FEMALE;
+            a.age = 34.5;
+
+            box b = a;
+            DLIB_TEST(a == b);
+            DLIB_TEST(!(a != b));
+
+            b.rect = rectangle(2,3,4,5);
+            DLIB_TEST(a != b);
+
+            b = a;
+            b.parts["left_eye"] = point(1,2);
+            DLIB_TEST(a != b);
+
+            b = a;
+            b.label = "car";
+            DLIB_TEST(a != b);
+
+            b = a;
+            b.difficult = false;
+            DLIB_TEST(a != b);
+
+            b = a;
+            b.truncated = false;
+            DLIB_TEST(a != b);
+
+            b = a;
+            b.occluded = false;
+            DLIB_TEST(a != b);
+
+            b = a;
+            b.ignore = false;
+            DLIB_TEST(a != b);
+
+            b = a;
+            b.pose = 2.5;
+            DLIB_TEST(a != b);
+
+            b = a;
+            b.detection_score = 0.5;
+            DLIB_TEST(a != b);
+
+            b = a;
+            b.angle = 0.5;
+            DLIB_TEST(a != b);
+
+            b = a;
+            b.gender = MALE;
+            DLIB_TEST(a != b);
+
+            b = a;
+            b.age = 42.0;
+            DLIB_TEST(a != b);
+        }
+
 
         void perform_test (
         )
@@ -211,6 +280,7 @@ namespace
             print_spinner();
             create_iris_datafile();
 
+            test_image_dataset_metadata_box_equality();
             test_sparse_to_dense();
 
             run_test<std::map<unsigned int, double> >();
@@ -223,5 +293,3 @@ namespace
     test_data_io a;
 
 }
-
-

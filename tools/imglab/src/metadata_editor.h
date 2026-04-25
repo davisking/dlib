@@ -72,6 +72,10 @@ public:
 private:
     void perform_undo();
     void perform_redo();
+    void clear_undo_history();
+    void save_undo_state (
+        const std::vector<dlib::image_dataset_metadata::box>& boxes
+    );
 
     void file_save();
     void file_save_as();
@@ -99,9 +103,9 @@ private:
     std::string filename;
     dlib::image_dataset_metadata::dataset metadata;
 
-    std::vector<std::vector<dlib::image_dataset_metadata::box>> undo_history;
-    std::vector<std::vector<dlib::image_dataset_metadata::box>> redo_history;
-    static constexpr size_t MAX_UNDO_HISTORY = 10;
+    typedef std::vector<dlib::image_dataset_metadata::box> box_history_entry;
+    std::vector<box_history_entry> undo_history;
+    std::vector<box_history_entry> redo_history;
 
     dlib::menu_bar mbar;
     dlib::list_box lb_images;
@@ -123,4 +127,3 @@ private:
 
 
 #endif // DLIB_METADATA_EdITOR_H__
-
