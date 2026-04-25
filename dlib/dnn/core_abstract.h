@@ -196,27 +196,20 @@ namespace dlib
             - #dnn_prefer_fastest_algorithms() == false 
     !*/
 
-    bool use_cuda(
-    );
-    /*!
-        ensures
-            - If dlib should use the CUDA implementation of a deep neural network
-              then this function returns true and false otherwise.
-            - On program startup this function will return true if DLIB_USE_CUDA is defined and
-              there is an available GPU device to use.
-            - This function always returns false if DLIB_USE_CUDA is not defined.
-            - This function sets a thread local variable.  That is, each thread has its own value
-              for use_cuda().  This means that one thread may use cuda while another thread might
-              not, depending on the setting of use_cuda().
-    !*/
-
-    void set_use_cuda(
-        bool flag
-    );
-    /*!
-        ensures
-            - #use_cuda() == flag for the calling thread.
-    !*/
+    namespace cuda
+    {
+        bool use_cuda(
+        );
+        /*!
+            ensures
+                - If dlib should use CUDA then this function returns true and false otherwise.
+                - This function returns true if DLIB_USE_CUDA is defined,
+                  the DLIB_DISABLE_CUDA_USE environment variable is not set to a true value,
+                  and there is an available GPU device to use.
+                - This function always returns false if DLIB_USE_CUDA is not defined.
+                - The value returned by this function is fixed after its first call.
+        !*/
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -2103,4 +2096,3 @@ namespace dlib
 }
 
 #endif // DLIB_DNn_CORE_ABSTRACT_H_ 
-

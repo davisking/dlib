@@ -1585,13 +1585,15 @@ namespace dlib { namespace tt
         long feature_dim
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::compute_act_halt_probabilities(halt_probs, logits, input_data, halt_params,
-            batch_size, seq_len, feature_dim);
-#else
-        cpu::compute_act_halt_probabilities(halt_probs, logits, input_data, halt_params,
-            batch_size, seq_len, feature_dim);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::compute_act_halt_probabilities(halt_probs, logits, input_data, halt_params,
+                batch_size, seq_len, feature_dim);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::compute_act_halt_probabilities(halt_probs, logits, input_data, halt_params,
+                batch_size, seq_len, feature_dim);
+        )
     }
 
     void update_act_state(
@@ -1610,13 +1612,15 @@ namespace dlib { namespace tt
         long current_step
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::update_act_state(output, input_data, halt_probs, cumulative_halting, remainders,
-            n_steps, effective_weights, batch_size, seq_len, d_model, num_channels, halt_threshold, current_step);
-#else
-        cpu::update_act_state(output, input_data, halt_probs, cumulative_halting, remainders,
-            n_steps, effective_weights, batch_size, seq_len, d_model, num_channels, halt_threshold, current_step);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::update_act_state(output, input_data, halt_probs, cumulative_halting, remainders,
+                n_steps, effective_weights, batch_size, seq_len, d_model, num_channels, halt_threshold, current_step);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::update_act_state(output, input_data, halt_probs, cumulative_halting, remainders,
+                n_steps, effective_weights, batch_size, seq_len, d_model, num_channels, halt_threshold, current_step);
+        )
     }
 
     void finalize_act_output(
@@ -1630,13 +1634,15 @@ namespace dlib { namespace tt
         long num_channels
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::finalize_act_output(output, input_data, remainders, effective_weights,
-            batch_size, seq_len, d_model, num_channels);
-#else
-        cpu::finalize_act_output(output, input_data, remainders, effective_weights,
-            batch_size, seq_len, d_model, num_channels);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::finalize_act_output(output, input_data, remainders, effective_weights,
+                batch_size, seq_len, d_model, num_channels);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::finalize_act_output(output, input_data, remainders, effective_weights,
+                batch_size, seq_len, d_model, num_channels);
+        )
     }
 
     void apply_act_depth_scaling(
@@ -1650,13 +1656,15 @@ namespace dlib { namespace tt
         float scale_factor
     )
     {
-#ifdef DLIB_USE_CUDA
-        cuda::apply_act_depth_scaling(gradients, n_steps, batch_size, seq_len,
-            d_model, num_channels, max_steps, scale_factor);
-#else
-        cpu::apply_act_depth_scaling(gradients, n_steps, batch_size, seq_len,
-            d_model, num_channels, max_steps, scale_factor);
-#endif
+        IF_DLIB_USE_CUDA(
+            cuda::apply_act_depth_scaling(gradients, n_steps, batch_size, seq_len,
+                d_model, num_channels, max_steps, scale_factor);
+        )
+
+        IF_DLIB_NOT_USE_CUDA(
+            cpu::apply_act_depth_scaling(gradients, n_steps, batch_size, seq_len,
+                d_model, num_channels, max_steps, scale_factor);
+        )
     }
     
 // ----------------------------------------------------------------------------------------

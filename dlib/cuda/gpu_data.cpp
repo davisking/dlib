@@ -54,20 +54,20 @@ namespace dlib
         }
         else
         {
+            if (!cuda::use_cuda())
+            {
+                std::memcpy(dest.host()+dest_offset, src.host()+src_offset, num*sizeof(float));
+                return;
+            }
+
             // if we write to the entire thing then we can use device_write_only()
             if (dest_offset == 0 && num == dest.size())
             {
                 // copy the memory efficiently based on which copy is current in each object.
-                if (dest.device_id() >= 0 && src.device_ready())
+                if (src.device_ready())
                     CHECK_CUDA(cudaMemcpy(dest.device_write_only(), src.device()+src_offset,  num*sizeof(float), cudaMemcpyDeviceToDevice));
-                else if (dest.device_id() < 0 && src.device_ready())
-                    CHECK_CUDA(cudaMemcpy(dest.host_write_only(), src.device()+src_offset,    num*sizeof(float), cudaMemcpyDeviceToHost));
-                else if (dest.device_id() >= 0 && !src.device_ready())
-                    CHECK_CUDA(cudaMemcpy(dest.device_write_only(), src.host()+src_offset,    num*sizeof(float), cudaMemcpyHostToDevice));
-                else if (dest.device_id() >= 0 || src.device_id() >= 0)
-                    CHECK_CUDA(cudaMemcpy(dest.host_write_only(), src.host()+src_offset,      num*sizeof(float), cudaMemcpyHostToHost));
                 else
-                    std::memcpy(dest.host_write_only(), src.host()+src_offset,                num*sizeof(float));
+                    CHECK_CUDA(cudaMemcpy(dest.device_write_only(), src.host()+src_offset,    num*sizeof(float), cudaMemcpyHostToDevice));
             }
             else
             {
@@ -78,11 +78,8 @@ namespace dlib
                     CHECK_CUDA(cudaMemcpy(dest.host()+dest_offset, src.device()+src_offset,   num*sizeof(float), cudaMemcpyDeviceToHost));
                 else if (dest.device_ready() && !src.device_ready())
                     CHECK_CUDA(cudaMemcpy(dest.device()+dest_offset, src.host()+src_offset,   num*sizeof(float), cudaMemcpyHostToDevice));
-                else if (dest.device_id() >= 0 || src.device_id() >= 0)
-                    CHECK_CUDA(cudaMemcpy(dest.host()+dest_offset, src.host()+src_offset,     num*sizeof(float), cudaMemcpyHostToHost));
                 else
-                    std::memcpy(dest.host()+dest_offset, src.host()+src_offset,               num*sizeof(float));
-
+                    CHECK_CUDA(cudaMemcpy(dest.host()+dest_offset, src.host()+src_offset,     num*sizeof(float), cudaMemcpyHostToHost));
             }
         }
     }
@@ -267,4 +264,3 @@ namespace dlib
 #endif // DLIB_USE_CUDA
 
 #endif // DLIB_GPU_DaTA_CPP_
-

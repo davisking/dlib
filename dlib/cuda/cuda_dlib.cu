@@ -5,16 +5,37 @@
 #include "cuda_dlib.h"
 #include "cudnn_dlibapi.h"
 #include <math_constants.h>
+#include <cstdlib>
+#include <cstring>
 
 
 namespace dlib 
 { 
     namespace
     {
-        bool& use_cuda_impl (
+        bool cuda_device_available (
         )
         {
-            thread_local bool var(cuda::is_available());
+            int num_devices;
+            return cudaGetDeviceCount(&num_devices) == cudaSuccess && num_devices > 0;
+        }
+
+        bool cuda_disabled_by_environment (
+        )
+        {
+            const char* var = std::getenv("DLIB_DISABLE_CUDA_USE");
+            return var != nullptr &&
+                std::strcmp(var, "") != 0 &&
+                std::strcmp(var, "0") != 0 &&
+                std::strcmp(var, "false") != 0 &&
+                std::strcmp(var, "False") != 0 &&
+                std::strcmp(var, "FALSE") != 0;
+        }
+
+        bool use_cuda_impl (
+        )
+        {
+            static const bool var = !cuda_disabled_by_environment() && cuda_device_available();
             return var;
         }
 
@@ -29,7 +50,7 @@ namespace dlib
             int dev
         )
         {
-            if (is_available())
+            if (use_cuda())
                 CHECK_CUDA(cudaSetDevice(dev));
         }
 
@@ -37,7 +58,7 @@ namespace dlib
         )
         {
             int dev = -1;
-            if (is_available())
+            if (use_cuda())
                 CHECK_CUDA(cudaGetDevice(&dev));
             return dev;
         }
@@ -46,6 +67,9 @@ namespace dlib
             int device
         )
         {
+            if (!use_cuda())
+                return "CUDA_DISABLED";
+
             cudaDeviceProp props;
             CHECK_CUDA(cudaGetDeviceProperties(&props, device));
             return props.name;
@@ -54,14 +78,14 @@ namespace dlib
         void set_current_device_blocking_sync(
         )
         {
-            CHECK_CUDA(cudaSetDeviceFlags(cudaDeviceScheduleBlockingSync));
+            if (use_cuda())
+                CHECK_CUDA(cudaSetDeviceFlags(cudaDeviceScheduleBlockingSync));
         }
 
         bool is_available(
         ) 
         {
-            int num_devices;
-            return cudaGetDeviceCount(&num_devices) == cudaSuccess && num_devices > 0;
+            return use_cuda();
         }
 
         bool use_cuda(
@@ -70,17 +94,12 @@ namespace dlib
             return use_cuda_impl();
         }
 
-        void set_use_cuda(
-            bool flag
-        )
-        {
-            if (is_available())
-                use_cuda_impl() = flag;
-        }
-
         int get_num_devices (
         )
         {
+            if (!use_cuda())
+                return 0;
+
             int num_devices;
             CHECK_CUDA(cudaGetDeviceCount(&num_devices));
             return num_devices;
@@ -88,6 +107,9 @@ namespace dlib
 
         bool can_access_peer (int device_id, int peer_device_id)
         {
+            if (!use_cuda())
+                return false;
+
             int can_access;
             CHECK_CUDA(cudaDeviceCanAccessPeer(&can_access, device_id, peer_device_id));
             return can_access != 0;
@@ -99,6 +121,9 @@ namespace dlib
 
         void device_synchronize (int dev) 
         { 
+            if (!use_cuda())
+                return;
+
             raii_set_device set_dev(dev);
             CHECK_CUDA(cudaDeviceSynchronize());
         }
@@ -3254,4 +3279,3 @@ namespace dlib
 
     }
 }
-

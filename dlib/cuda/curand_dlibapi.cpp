@@ -48,7 +48,7 @@ namespace dlib
             unsigned long long seed
         ) : handle(nullptr)
         {
-            if (is_available())
+            if (use_cuda())
             {
                 curandGenerator_t gen;
                 CHECK_CURAND(curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT));
@@ -114,4 +114,3 @@ namespace dlib
 #endif // DLIB_USE_CUDA
 
 #endif // DLIB_DNN_CuRAND_CPP_
-

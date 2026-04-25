@@ -31,10 +31,6 @@ namespace dlib
         bool use_cuda(
         );
 
-        void set_use_cuda(
-            bool flag
-        );
-
         std::string get_device_name (
             int device
         );
@@ -958,10 +954,6 @@ namespace dlib
         inline bool use_cuda(
         ) { return false; }
 
-        inline void set_use_cuda(
-            bool flag
-        ) {}
-
         inline std::string get_device_name (
             int device
         ) 
@@ -999,4 +991,3 @@ namespace dlib
 
 
 #endif // DLIB_DNN_CuDA_H_
-
