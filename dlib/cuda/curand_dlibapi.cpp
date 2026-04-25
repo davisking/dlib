@@ -6,6 +6,7 @@
 #ifdef DLIB_USE_CUDA
 
 #include "curand_dlibapi.h"
+#include "cuda_dlib.h"
 #include <curand.h>
 #include "../string.h"
 
@@ -47,11 +48,14 @@ namespace dlib
             unsigned long long seed
         ) : handle(nullptr)
         {
-            curandGenerator_t gen;
-            CHECK_CURAND(curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT));
-            handle = gen;
+            if (use_cuda())
+            {
+                curandGenerator_t gen;
+                CHECK_CURAND(curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT));
+                handle = gen;
 
-            CHECK_CURAND(curandSetPseudoRandomGeneratorSeed(gen, seed));
+                CHECK_CURAND(curandSetPseudoRandomGeneratorSeed(gen, seed));
+            }
         }
 
         curand_generator::
@@ -110,4 +114,3 @@ namespace dlib
 #endif // DLIB_USE_CUDA
 
 #endif // DLIB_DNN_CuRAND_CPP_
-
