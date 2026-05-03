@@ -153,6 +153,9 @@ namespace dlib
     void gpu_data::
     async_copy_to_device() const
     {
+        if (!cuda::use_cuda())
+            return;
+
         if (!device_current)
         {
             if (device_in_use)

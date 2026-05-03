@@ -58,6 +58,8 @@ namespace
         void perform_test (
         )
         {
+            if (!cuda::use_cuda()) return;
+
             {
                 cuda::cuda_data_ptr<float> nonconst;
                 cuda::cuda_data_ptr<const float> const_ptr(nonconst);

@@ -70,6 +70,8 @@ namespace dlib
         ); 
         /*!
             ensures
+                - if (cuda::use_cuda() == false) then
+                    - this function does nothing.
                 - if (!device_ready()) then
                     - Begins asynchronously copying host data to the device once it is safe
                       to do so.  I.e. This function will wait until any previously

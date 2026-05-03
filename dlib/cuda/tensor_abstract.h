@@ -93,6 +93,8 @@ namespace dlib
         /*!
             ensures
                 - This function does not block.
+                - if (cuda::use_cuda() == false) then
+                    - this function does nothing.
                 - if (the host version of the data is newer than the device's copy) then
                     - Begins asynchronously copying host data to the device.
                     - A call to device() that happens before the transfer completes will
