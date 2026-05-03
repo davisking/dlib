@@ -50,8 +50,13 @@ namespace dlib
             int dev
         )
         {
-            if (use_cuda())
-                CHECK_CUDA(cudaSetDevice(dev));
+            if (!use_cuda())
+            {
+                DLIB_CASSERT(dev == 0, "dlib::cuda::set_device(id) called with an invalid device id.");
+                return;
+            }
+
+            CHECK_CUDA(cudaSetDevice(dev));
         }
 
         int get_device (
@@ -68,7 +73,10 @@ namespace dlib
         )
         {
             if (!use_cuda())
+            {
+                DLIB_CASSERT(device == 0, "dlib::cuda::get_device_name(device) called with an invalid device id.");
                 return "CUDA_DISABLED";
+            }
 
             cudaDeviceProp props;
             CHECK_CUDA(cudaGetDeviceProperties(&props, device));
