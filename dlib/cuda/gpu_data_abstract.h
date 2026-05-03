@@ -108,8 +108,7 @@ namespace dlib
                   The device's data is current if there aren't any modifications to the
                   data which were made on the host side that have yet to be copied to the
                   device.
-                - if (DLIB_USE_CUDA is defined && cuda::use_cuda() == false &&
-                  size() != 0) then
+                - if (DLIB_USE_CUDA is defined && cuda::use_cuda() == false && size() != 0) then
                     - returns false.
         !*/
 
