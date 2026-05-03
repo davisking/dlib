@@ -850,7 +850,7 @@ namespace
 
         IF_DLIB_USE_CUDA(
             input /= 2;
-            resizable_tensor output_cuda_a, output_cuda_b(input);    
+            resizable_tensor output_cuda_a, output_cuda_b(input);
             output_cuda_a.copy_size(output_cpu_a);
             cuda::transpose(false, output_cuda_a, input);
             cuda::transpose(true, output_cuda_b, output_cuda_a);

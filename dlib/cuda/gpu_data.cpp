@@ -187,6 +187,7 @@ namespace dlib
             host_current = true;
             device_current = true;
             device_in_use = false;
+            the_device_id = 0;
             data_host.reset();
             data_device.reset();
         }
@@ -208,7 +209,7 @@ namespace dlib
             if (!cuda::use_cuda())
             {
                 data_host.reset(new float[new_size], std::default_delete<float[]>());
-                the_device_id = -1;
+                the_device_id = 0;
                 return;
             }
 

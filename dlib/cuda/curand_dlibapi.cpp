@@ -114,3 +114,4 @@ namespace dlib
 #endif // DLIB_USE_CUDA
 
 #endif // DLIB_DNN_CuRAND_CPP_
+

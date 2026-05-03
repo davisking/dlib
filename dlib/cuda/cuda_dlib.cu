@@ -82,12 +82,6 @@ namespace dlib
                 CHECK_CUDA(cudaSetDeviceFlags(cudaDeviceScheduleBlockingSync));
         }
 
-        bool is_available(
-        ) 
-        {
-            return use_cuda();
-        }
-
         bool use_cuda(
         )
         {
@@ -3279,3 +3273,4 @@ namespace dlib
 
     }
 }
+

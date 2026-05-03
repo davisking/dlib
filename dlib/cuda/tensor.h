@@ -404,7 +404,10 @@ namespace dlib
             if ((long long)data_instance.size() < m_size)
                 data_instance.set_size(m_size);
 #ifdef DLIB_USE_CUDA
-            cudnn_descriptor.set_size(m_n,m_k,m_nr,m_nc);
+            if (cuda::use_cuda())
+                cudnn_descriptor.set_size(m_n,m_k,m_nr,m_nc);
+            else
+                cudnn_descriptor.set_size(0,0,0,0);
 #endif
         }
 
@@ -640,7 +643,7 @@ namespace dlib
                 "t.size(): "<<t.size() <<"\n");
 
 #ifdef DLIB_USE_CUDA
-            if (!inst.cudnn_descriptor)
+            if (cuda::use_cuda() && !inst.cudnn_descriptor)
             {
                 inst.cudnn_descriptor = std::make_shared<cuda::tensor_descriptor>();
                 inst.cudnn_descriptor->set_size(inst.m_n, inst.m_k, inst.m_nr, inst.m_nc);

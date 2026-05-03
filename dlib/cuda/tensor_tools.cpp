@@ -69,7 +69,7 @@ namespace dlib { namespace tt
         )
 
         IF_DLIB_NOT_USE_CUDA(
-            out = sum_cols(pointwise_multiply(mat(lhs), mat(rhs))); 
+            out = sum_cols(pointwise_multiply(mat(lhs), mat(rhs)));
         )
     }
 
@@ -86,9 +86,9 @@ namespace dlib { namespace tt
 
         IF_DLIB_NOT_USE_CUDA(
             if (add_to)
-                out += sum_cols(pointwise_multiply(mat(lhs), mat(rhs))); 
+                out += sum_cols(pointwise_multiply(mat(lhs), mat(rhs)));
             else
-                out = sum_cols(pointwise_multiply(mat(lhs), mat(rhs))); 
+                out = sum_cols(pointwise_multiply(mat(lhs), mat(rhs)));
         )
     }
 
@@ -351,7 +351,7 @@ namespace dlib { namespace tt
         )
 
         IF_DLIB_NOT_USE_CUDA(
-            for (auto& x : data) 
+            for (auto& x : data)
                 x = cpu_impl.get_random_gaussian()*stddev + mean;
         )
     }
@@ -366,7 +366,7 @@ namespace dlib { namespace tt
         )
 
         IF_DLIB_NOT_USE_CUDA(
-            for (auto& x : data) 
+            for (auto& x : data)
                 x = cpu_impl.get_random_float();
         )
     }

@@ -28,7 +28,10 @@ namespace dlib
                 to the host do not happen before the relevant computations have completed.
 
                 If DLIB_USE_CUDA is not #defined then this object will not use CUDA at all.
-                Instead, it will simply store one host side memory block of floats.  
+                Instead, it will simply store one host side memory block of floats.
+                Similarly, if DLIB_USE_CUDA is #defined but cuda::use_cuda() == false,
+                then this object will be host only and will not allocate a CUDA device
+                memory block.
 
                 Finally, the convention in dlib code is to interpret the tensor as a set of
                 num_samples() 3D arrays, each of dimension k() by nr() by nc().  Also,
@@ -151,6 +154,7 @@ namespace dlib
         /*!
             requires
                 - DLIB_USE_CUDA is #defined
+                - cuda::use_cuda() == true
             ensures
                 - returns a pointer to the device memory block of size() contiguous float
                   values or nullptr if size()==0.
@@ -164,6 +168,7 @@ namespace dlib
         /*!
             requires
                 - DLIB_USE_CUDA is #defined
+                - cuda::use_cuda() == true
             ensures
                 - returns a pointer to the device memory block of size() contiguous float
                   values or nullptr if size()==0.
@@ -179,6 +184,7 @@ namespace dlib
         /*!
             requires
                 - DLIB_USE_CUDA is #defined
+                - cuda::use_cuda() == true
             ensures
                 - This function returns the same pointer as device(), except that it never
                   performs a host to device memory copy.  Instead, it immediately marks the
@@ -731,5 +737,3 @@ namespace dlib
 }
 
 #endif // DLIB_DNn_TENSOR_ABSTRACT_H_
-
-

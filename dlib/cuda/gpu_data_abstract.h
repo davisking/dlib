@@ -28,7 +28,10 @@ namespace dlib
                 to the host do not happen before the relevant computations have completed.
 
                 If DLIB_USE_CUDA is not #defined then this object will not use CUDA at all.
-                Instead, it will simply store one host side memory block of floats.  
+                Instead, it will simply store one host side memory block of floats.
+                Similarly, if DLIB_USE_CUDA is #defined but cuda::use_cuda() == false,
+                then this object will be host only and will not allocate a CUDA device
+                memory block.
 
             THREAD SAFETY
                 Instances of this object are not thread-safe.  So don't touch one from
@@ -99,10 +102,13 @@ namespace dlib
         ) const; 
         /*!
             ensures
-                - returns true if and only if the device's copy of the data is current.
+                - returns true if and only if the device's copy of the data exists and is current.
                   The device's data is current if there aren't any modifications to the
                   data which were made on the host side that have yet to be copied to the
                   device.
+                - if (DLIB_USE_CUDA is defined && cuda::use_cuda() == false &&
+                  size() != 0) then
+                    - returns false.
         !*/
 
         const float* host(
@@ -153,6 +159,7 @@ namespace dlib
         /*!
             requires
                 - DLIB_USE_CUDA is #defined
+                - cuda::use_cuda() == true
             ensures
                 - returns a pointer to the device memory block of size() contiguous float
                   values or nullptr if size()==0.
@@ -167,6 +174,7 @@ namespace dlib
         /*!
             requires
                 - DLIB_USE_CUDA is #defined
+                - cuda::use_cuda() == true
             ensures
                 - returns a pointer to the device memory block of size() contiguous float
                   values or nullptr if size()==0.
@@ -182,6 +190,7 @@ namespace dlib
         /*!
             requires
                 - DLIB_USE_CUDA is #defined
+                - cuda::use_cuda() == true
             ensures
                 - This function returns the same pointer as device(), except that it never
                   performs a host to device memory copy.  Instead, it immediately marks the
@@ -263,4 +272,3 @@ namespace dlib
 }
 
 #endif // DLIB_GPU_DaTA_ABSTRACT_H_
-

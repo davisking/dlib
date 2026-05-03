@@ -25,9 +25,6 @@ namespace dlib
         int get_num_devices (
         );
 
-        bool is_available (
-        );
-
         bool use_cuda(
         );
 
@@ -948,9 +945,6 @@ namespace dlib
         inline int get_num_devices (
         ) { return 1; }
 
-        inline bool is_available (
-        ) { return false; }
-
         inline bool use_cuda(
         ) { return false; }
 
@@ -991,3 +985,4 @@ namespace dlib
 
 
 #endif // DLIB_DNN_CuDA_H_
+

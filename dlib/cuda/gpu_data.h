@@ -101,16 +101,14 @@ namespace dlib
         float* host() 
         {
             copy_to_host();
-            if (device_id() >= 0)
-                device_current = false;
+            device_current = false;
             return data_host.get(); 
         }
 
         float* host_write_only() 
         {
             host_current = true;
-            if (device_id() >= 0)
-                device_current = false;
+            device_current = false;
             return data_host.get(); 
         }
 
@@ -118,8 +116,9 @@ namespace dlib
         { 
 #ifndef DLIB_USE_CUDA
             DLIB_CASSERT(false, "CUDA NOT ENABLED");
+#else
+            DLIB_CASSERT(cuda::use_cuda(), "CUDA disabled");
 #endif
-            DLIB_CASSERT(device_id() >= 0, "This data is host only");
             copy_to_device();
             device_in_use = true;
             return data_device.get(); 
@@ -129,8 +128,9 @@ namespace dlib
         {
 #ifndef DLIB_USE_CUDA
             DLIB_CASSERT(false, "CUDA NOT ENABLED");
+#else
+            DLIB_CASSERT(cuda::use_cuda(), "CUDA disabled");
 #endif
-            DLIB_CASSERT(device_id() >= 0, "This data is host only");
             copy_to_device();
             host_current = false;
             device_in_use = true;
@@ -141,8 +141,9 @@ namespace dlib
         {
 #ifndef DLIB_USE_CUDA
             DLIB_CASSERT(false, "CUDA NOT ENABLED");
+#else
+            DLIB_CASSERT(cuda::use_cuda(), "CUDA disabled");
 #endif
-            DLIB_CASSERT(device_id() >= 0, "This data is host only");
             wait_for_transfer_to_finish();
             host_current = false;
             device_current = true;
@@ -154,7 +155,14 @@ namespace dlib
         ) const { return host_current; }
 
         bool device_ready (
-        ) const { return device_current && !have_active_transfer && device_id() >= 0; }
+        ) const
+        {
+#ifdef DLIB_USE_CUDA
+            if (!cuda::use_cuda() && size() != 0)
+                return false;
+#endif
+            return device_current && !have_active_transfer;
+        }
 
         size_t size() const { return data_size; }
 
@@ -276,4 +284,3 @@ namespace dlib
 }
 
 #endif // DLIB_GPU_DaTA_H_
-
