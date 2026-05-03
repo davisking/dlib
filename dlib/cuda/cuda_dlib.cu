@@ -57,7 +57,7 @@ namespace dlib
         int get_device (
         )
         {
-            int dev = -1;
+            int dev = 0;
             if (use_cuda())
                 CHECK_CUDA(cudaGetDevice(&dev));
             return dev;
@@ -129,6 +129,9 @@ namespace dlib
             int peer_device_id
         ) : call_disable(false), device_id(device_id), peer_device_id(peer_device_id)
         {
+            if (!use_cuda())
+                return;
+
             raii_set_device set_dev(device_id);
 
             auto err = cudaDeviceEnablePeerAccess(peer_device_id, 0);
@@ -3273,4 +3276,3 @@ namespace dlib
 
     }
 }
-
