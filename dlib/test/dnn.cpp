@@ -12,6 +12,7 @@
 #include "../dnn.h"
 
 #include "tester.h"
+#include "onnx_test_helpers.h"
 
 #ifndef __INTELLISENSE__
 
@@ -19,10 +20,469 @@ namespace
 {
 
     using namespace test;
+    using namespace test::onnx;
     using namespace dlib;
     using namespace std;
 
     logger dlog("test.dnn");
+
+// ----------------------------------------------------------------------------------------
+
+    class test_scale_weights_ : public multiply_
+    {
+    public:
+        test_scale_weights_() : multiply_(0.25f) {}
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    void test_onnx_export()
+    {
+        print_spinner();
+
+        {
+            using net_type = loss_multiclass_log<fc<2,relu<max_pool<2,2,2,2,con<3,3,3,1,1,input_tensor>>>>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {1, 3, 8, 8};
+            options.input_name = "data";
+            options.output_name = "scores";
+
+            std::ostringstream sout(std::ios::binary);
+            net_to_onnx(net, sout, options);
+            const std::string model = sout.str();
+
+            DLIB_TEST_MSG(!model.empty(), "empty ONNX export");
+            DLIB_TEST(contains_substring(model, "dlib"));
+            DLIB_TEST(contains_substring(model, "Conv"));
+            DLIB_TEST(contains_substring(model, "MaxPool"));
+            DLIB_TEST(contains_substring(model, "Relu"));
+            DLIB_TEST(contains_substring(model, "Gemm"));
+            DLIB_TEST(contains_substring(model, "data"));
+            DLIB_TEST(contains_substring(model, "scores"));
+        }
+
+        {
+            using net_type = loss_multiclass_log<fc<2,input_rgb_image_sized<8,8>>>;
+            net_type net;
+            onnx_export_options options;
+
+            std::ostringstream sout(std::ios::binary);
+            net_to_onnx(net, sout, options);
+            const std::string model = sout.str();
+
+            DLIB_TEST(contains_substring(model, "Gemm"));
+            DLIB_TEST(contains_substring(model, "input"));
+            DLIB_TEST(contains_substring(model, "output"));
+        }
+
+        {
+            using a1 = sig<input_tensor>;
+            using a2 = htan<a1>;
+            using a3 = leaky_relu<a2>;
+            using a4 = prelu<a3>;
+            using a5 = clipped_relu<a4>;
+            using a6 = elu<a5>;
+            using a7 = gelu<a6>;
+            using a8 = silu<a7>;
+            using a9 = mish<a8>;
+            using net_type = loss_multiclass_log<fc<2,a9>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {1, 3, 4, 4};
+
+            std::ostringstream sout(std::ios::binary);
+            net_to_onnx(net, sout, options);
+            const std::string model = sout.str();
+
+            DLIB_TEST(contains_substring(model, "Sigmoid"));
+            DLIB_TEST(contains_substring(model, "Tanh"));
+            DLIB_TEST(contains_substring(model, "LeakyRelu"));
+            DLIB_TEST(contains_substring(model, "PRelu"));
+            DLIB_TEST(contains_substring(model, "Clip"));
+            DLIB_TEST(contains_substring(model, "Elu"));
+            DLIB_TEST(contains_substring(model, "Erf"));
+            DLIB_TEST(contains_substring(model, "Softplus"));
+        }
+
+        {
+            using net_type = loss_multiclass_log<fc<2,upsample<2,cont<3,2,2,2,2,input_tensor>>>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {1, 2, 4, 4};
+
+            std::ostringstream sout(std::ios::binary);
+            net_to_onnx(net, sout, options);
+            const std::string model = sout.str();
+
+            DLIB_TEST(contains_substring(model, "ConvTranspose"));
+            DLIB_TEST(contains_substring(model, "Resize"));
+        }
+
+        {
+            using net_type = loss_multiclass_log<fc<2,
+                             concat2<tag1, tag2,
+                             tag1<con<2,1,1,1,1,
+                             tag2<con<3,1,1,1,1,input_tensor>>>>>>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {1, 3, 4, 4};
+
+            std::ostringstream sout(std::ios::binary);
+            net_to_onnx(net, sout, options);
+            const std::string model = sout.str();
+
+            DLIB_TEST(contains_substring(model, "Concat"));
+        }
+
+        {
+            using net_type = loss_multiclass_log<fc<2,
+                             extract<0,2,5,3,
+                             transpose<linear<5,
+                             multiply<reshape_to<2,3,4,input_tensor>>>>>>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {1, 2, 3, 4};
+
+            std::ostringstream sout(std::ios::binary);
+            net_to_onnx(net, sout, options);
+            const std::string model = sout.str();
+
+            DLIB_TEST(contains_substring(model, "Reshape"));
+            DLIB_TEST(contains_substring(model, "MatMul"));
+            DLIB_TEST(contains_substring(model, "Transpose"));
+            DLIB_TEST(contains_substring(model, "Slice"));
+        }
+
+        {
+            using net_type = loss_multiclass_log<fc<2,
+                             scale_prev2<skip1<tag2<con<3,1,1,1,1,
+                             avg_pool_everything<tag1<input_tensor>>>>>>>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {1, 3, 4, 4};
+
+            std::ostringstream sout(std::ios::binary);
+            net_to_onnx(net, sout, options);
+            const std::string model = sout.str();
+
+            DLIB_TEST(contains_substring(model, "Mul"));
+        }
+
+        {
+            using transposed = tag1<transpose<tag2<input_tensor>>>;
+            using net_type = loss_multiclass_log<fc<2,multm_prev1<skip2<transposed>>>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {1, 2, 3, 4};
+
+            std::ostringstream sout(std::ios::binary);
+            net_to_onnx(net, sout, options);
+            const std::string model = sout.str();
+
+            DLIB_TEST(contains_substring(model, "MatMul"));
+        }
+
+        {
+            using net_type = loss_multiclass_log<fc<2,
+                             softmax_all<softmaxm<tril_mask<input_tensor>>>>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {1, 1, 4, 4};
+
+            std::ostringstream sout(std::ios::binary);
+            net_to_onnx(net, sout, options);
+            const std::string model = sout.str();
+
+            DLIB_TEST(contains_substring(model, "Softmax"));
+            DLIB_TEST(contains_substring(model, "tril"));
+            DLIB_TEST(contains_substring(model, "Reshape"));
+        }
+
+        {
+            using net_type = loss_multiclass_log<fc<2,tril_mask<input_tensor>>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {1, 1, 4, 4};
+
+            std::ostringstream sout(std::ios::binary);
+            net_to_onnx(net, sout, options);
+            const auto nodes = parse_onnx_nodes(sout.str());
+
+            DLIB_TEST(count_onnx_nodes(nodes, "Trilu") >= 1);
+        }
+
+        {
+            using net_type = loss_multiclass_log<fc<2,max_pool_everything<input_tensor>>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {1, 3, 4, 4};
+
+            std::ostringstream sout(std::ios::binary);
+            net_to_onnx(net, sout, options);
+            const auto nodes = parse_onnx_nodes(sout.str());
+
+            DLIB_TEST(count_onnx_nodes(nodes, "GlobalMaxPool") == 1);
+            DLIB_TEST(count_onnx_nodes(nodes, "MaxPool") == 0);
+        }
+
+        {
+            using net_type = loss_multiclass_log<softmax<input_tensor>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {1, 3, 2, 2};
+
+            std::ostringstream sout(std::ios::binary);
+            net_to_onnx(net, sout, options);
+            const auto nodes = parse_onnx_nodes(sout.str());
+
+            DLIB_TEST(count_onnx_nodes(nodes, "Softmax") == 1);
+            DLIB_TEST(count_onnx_nodes(nodes, "Transpose") == 2);
+            DLIB_TEST(get_onnx_int_attribute(nth_onnx_node(nodes, "Softmax", 0), "axis") == 3);
+            DLIB_TEST(get_onnx_ints_attribute(nth_onnx_node(nodes, "Transpose", 0), "perm") == std::vector<int64_t>({0, 2, 3, 1}));
+            DLIB_TEST(get_onnx_ints_attribute(nth_onnx_node(nodes, "Transpose", 1), "perm") == std::vector<int64_t>({0, 3, 1, 2}));
+        }
+
+        {
+            using net_type = loss_multiclass_log<softmaxm<input_tensor>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {1, 2, 3, 4};
+
+            std::ostringstream sout(std::ios::binary);
+            net_to_onnx(net, sout, options);
+            const auto nodes = parse_onnx_nodes(sout.str());
+
+            DLIB_TEST(count_onnx_nodes(nodes, "Softmax") == 1);
+            DLIB_TEST(count_onnx_nodes(nodes, "Reshape") == 2);
+            DLIB_TEST(get_onnx_int_attribute(nth_onnx_node(nodes, "Softmax", 0), "axis") == 2);
+        }
+
+        {
+            using net_type = loss_multiclass_log<softmax_all<input_tensor>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {2, 1, 2, 2};
+
+            std::ostringstream sout(std::ios::binary);
+            net_to_onnx(net, sout, options);
+            const auto nodes = parse_onnx_nodes(sout.str());
+
+            DLIB_TEST(count_onnx_nodes(nodes, "Softmax") == 1);
+            DLIB_TEST(count_onnx_nodes(nodes, "Reshape") == 2);
+            DLIB_TEST(get_onnx_int_attribute(nth_onnx_node(nodes, "Softmax", 0), "axis") == 1);
+            DLIB_TEST(get_onnx_ints_initializer(sout.str(), "softmax_all_flatten_shape") == std::vector<int64_t>({2, 4}));
+        }
+
+        {
+            using net_type = loss_multiclass_log<fc<2,
+                             layer_norm<rms_norm<input_tensor>>>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {1, 3, 4, 4};
+
+            std::ostringstream sout(std::ios::binary);
+            net_to_onnx(net, sout, options);
+            const std::string model = sout.str();
+
+            DLIB_TEST(contains_substring(model, "ReduceMean"));
+            DLIB_TEST(contains_substring(model, "Sqrt"));
+            DLIB_TEST(contains_substring(model, "Div"));
+        }
+
+        {
+            using net_type = loss_multiclass_log<fc<2,
+                             l2normalize<smelu<input_tensor>>>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {1, 3, 4, 4};
+
+            std::ostringstream sout(std::ios::binary);
+            net_to_onnx(net, sout, options);
+            const std::string model = sout.str();
+
+            DLIB_TEST(contains_substring(model, "Where"));
+            DLIB_TEST(contains_substring(model, "ReduceSum"));
+        }
+
+        {
+            using scale_weights = add_layer<test_scale_weights_, input_tensor>;
+            using net_type = loss_multiclass_log<fc<2,scale_weights>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {1, 3, 4, 4};
+
+            std::ostringstream sout(std::ios::binary);
+            net_to_onnx(net, sout, options);
+            const std::string model = sout.str();
+
+            DLIB_TEST(contains_substring(model, "Mul"));
+            DLIB_TEST(contains_substring(model, "multiply_value"));
+        }
+
+        {
+            using net_type = loss_multiclass_log<fc<2,
+                             positional_encodings<embeddings<10,4,input_tensor>>>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {1, 1, 3, 1};
+
+            std::ostringstream sout(std::ios::binary);
+            net_to_onnx(net, sout, options);
+            const std::string model = sout.str();
+
+            DLIB_TEST(contains_substring(model, "Gather"));
+            DLIB_TEST(contains_substring(model, "Cast"));
+            DLIB_TEST(contains_substring(model, "GreaterOrEqual"));
+        }
+
+        {
+            using net_type = loss_multiclass_log<fc<2,
+                             positional_encodings<embeddings<10,4,input<matrix<int,0,1>>>>>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {1, 1, 3, 1};
+
+            std::ostringstream sout(std::ios::binary);
+            net_to_onnx(net, sout, options);
+            const std::string model = sout.str();
+
+            DLIB_TEST(contains_substring(model, "Gather"));
+            DLIB_TEST(contains_substring(model, "positional_encodings"));
+        }
+
+        {
+            using net_type = loss_multiclass_log<fc<2,
+                             add_prev1<max_pool<2,2,2,2,tag1<input_tensor>>>>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {1, 3, 4, 4};
+
+            std::ostringstream sout(std::ios::binary);
+            net_to_onnx(net, sout, options);
+            const std::string model = sout.str();
+
+            DLIB_TEST(contains_substring(model, "Pad"));
+            DLIB_TEST(contains_substring(model, "Add"));
+        }
+
+        {
+            using net_type = loss_multiclass_log<fc<2,
+                             mult_prev1<max_pool<2,2,2,2,tag1<input_tensor>>>>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {1, 3, 4, 4};
+
+            std::ostringstream sout(std::ios::binary);
+            net_to_onnx(net, sout, options);
+            const std::string model = sout.str();
+
+            DLIB_TEST(contains_substring(model, "Pad"));
+            DLIB_TEST(contains_substring(model, "Mul"));
+        }
+
+        {
+            using net_type = loss_multiclass_log<fc<2,
+                             resize_prev_to_tagged<tag1,
+                             con<2,1,1,1,1,max_pool<2,2,2,2,tag1<input_tensor>>>>>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {1, 3, 8, 8};
+
+            std::ostringstream sout(std::ios::binary);
+            net_to_onnx(net, sout, options);
+            const std::string model = sout.str();
+
+            DLIB_TEST(contains_substring(model, "Resize"));
+        }
+
+        {
+            using net_type = loss_multiclass_log<fc<2,
+                             slice<1,0,0,2,2,2,reorg<input_tensor>>>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {1, 1, 4, 4};
+
+            std::ostringstream sout(std::ios::binary);
+            net_to_onnx(net, sout, options);
+            const std::string model = sout.str();
+
+            DLIB_TEST(contains_substring(model, "Transpose"));
+            DLIB_TEST(contains_substring(model, "Slice"));
+        }
+
+        {
+            using net_type = loss_multiclass_log<fc<2,input_rgb_image_sized<8,8>>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_mode = onnx_export_input_mode::dlib_input_layer;
+
+            std::ostringstream sout(std::ios::binary);
+            net_to_onnx(net, sout, options);
+            const auto nodes = parse_onnx_nodes(sout.str());
+
+            DLIB_TEST(count_onnx_nodes(nodes, "Sub") == 1);
+            DLIB_TEST(count_onnx_nodes(nodes, "Div") == 1);
+            DLIB_TEST(count_onnx_nodes(nodes, "Gemm") == 1);
+        }
+
+        {
+            using net_type = loss_multiclass_log<fc<2,input_tensor>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {-1, 3, 4, 4};
+
+            bool threw = false;
+            try
+            {
+                std::ostringstream sout(std::ios::binary);
+                net_to_onnx(net, sout, options);
+            }
+            catch (const dlib::error& e)
+            {
+                threw = contains_substring(e.what(), "dimensions must be positive");
+            }
+            DLIB_TEST(threw);
+        }
+
+        {
+            using net_type = loss_multiclass_log<dropout<fc<2,input_tensor>>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {1, 3, 4, 4};
+
+            bool threw = false;
+            try
+            {
+                std::ostringstream sout(std::ios::binary);
+                net_to_onnx(net, sout, options);
+            }
+            catch (const dlib::error& e)
+            {
+                threw = contains_substring(e.what(), "doesn't support");
+            }
+            DLIB_TEST(threw);
+        }
+
+        {
+            using net_type = loss_multiclass_log<fc<2,input_tensor>>;
+            net_type net;
+            onnx_export_options options;
+            options.input_tensor_shape = {1, 3, 4};
+
+            bool threw = false;
+            try
+            {
+                std::ostringstream sout(std::ios::binary);
+                net_to_onnx(net, sout, options);
+            }
+            catch (const dlib::error& e)
+            {
+                threw = contains_substring(e.what(), "[N,K,NR,NC]");
+            }
+            DLIB_TEST(threw);
+        }
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -5379,7 +5839,23 @@ void test_multm_prev()
             }
         }
     } a;
+
+// ----------------------------------------------------------------------------------------
+
+    class dnn_onnx_tester : public tester
+    {
+    public:
+        dnn_onnx_tester (
+        ) :
+            tester ("test_dnn_onnx",
+                "Runs tests on the dlib DNN ONNX exporter.")
+        {}
+
+        void perform_test()
+        {
+            test_onnx_export();
+        }
+    } b;
 }
 
 #endif // __INTELLISENSE__
-

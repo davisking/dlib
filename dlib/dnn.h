@@ -32,7 +32,6 @@
 #include "dnn/utilities.h"
 #include "dnn/validation.h"
 #include "dnn/visitors.h"
+#include "dnn/onnx.h"
 
 #endif // DLIB_DNn_
-
-
