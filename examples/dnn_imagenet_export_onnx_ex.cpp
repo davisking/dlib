@@ -81,6 +81,33 @@ int main(int argc, char** argv) try
     cout << "Wrote " << onnx_filename << "\n";
     cout << "Input tensor shape: [1,3,227,227]\n";
     cout << "Input tensor semantics: dlib preprocessed NCHW tensor accepted by net.forward().\n";
+
+    /*
+        Minimal ONNX Runtime call shape for the default export:
+
+            matrix<rgb_pixel> img, resized;
+            load_image(img, image_filename);
+            resized.set_size(227, 227);
+            resize_image(img, resized);
+
+            std::vector<matrix<rgb_pixel> > images(1, resized);
+            resizable_tensor input_tensor;
+            snet.to_tensor(images.begin(), images.end(), input_tensor);
+
+            std::array<int64_t,4> shape = {{1, 3, 227, 227}};
+            Ort::Value input = Ort::Value::CreateTensor<float>(
+                memory_info,
+                input_tensor.host(),
+                input_tensor.size(),
+                shape.data(),
+                shape.size()
+            );
+
+            session.Run(Ort::RunOptions{nullptr}, input_names, &input, 1, output_names, 1);
+
+        If options.input_mode is set to dlib_input_layer above, feed raw RGB
+        values as float NCHW data in the 0-255 range instead of input_tensor.
+    */
 }
 catch (std::exception& e)
 {
