@@ -206,6 +206,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
                     const auto funct_eval_start = steady_clock::now();
                     double y = ymult*call_function_and_expand_args(functions[next->function_idx()], x);
                     const double funct_eval_runtime = duration_cast<nanoseconds>(steady_clock::now() - funct_eval_start).count();
+                    DLIB_CASSERT(!std::isnan(funct_eval_runtime), "Calculation resulted in undefined value (NaN)");
                     this_should_stop.fetch_or(should_stop(y*ymult));
                     next->set(y);
                     
