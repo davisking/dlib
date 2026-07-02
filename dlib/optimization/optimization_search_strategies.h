@@ -257,7 +257,7 @@ namespace dlib
         {
             matrix<double,0,1> s;
             matrix<double,0,1> y;
-            double rho;
+            double rho = 0.0;
 
             friend void swap(data_helper& a, data_helper& b)
             {

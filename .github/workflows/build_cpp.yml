@@ -213,8 +213,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Configure
       run: |
-        # don't use CMake 3.25.0 https://gitlab.kitware.com/cmake/cmake/-/issues/23975
-        pip3 install cmake==3.24.0
+        pip3 install cmake
         cmake . -B build
     - name: Build just tests
       run: cmake --build build --config Release --target dtest --parallel 4

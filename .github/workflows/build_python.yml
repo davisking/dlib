@@ -39,11 +39,10 @@ jobs:
     - name: Install python deps
       run: |
         pip install pytest numpy
-        # don't use CMake 3.25.0 https://gitlab.kitware.com/cmake/cmake/-/issues/23975
-        pip3 install cmake==3.24.0
+        pip3 install cmake
     - name: Build
       run: |
-        pip3 install cmake==3.24.0
+        pip3 install cmake
         pip3 install .
     - name: Test
       run: python -m pytest --ignore docs --ignore dlib

@@ -82,7 +82,7 @@ namespace dlib
                  itr < scanner.get_max_pyramid_levels() && cur.area() < max_area; 
                  ++itr)
             {
-                list_type::iterator i = sorted_rects.begin();
+                auto i = sorted_rects.begin();
                 while (i != sorted_rects.end())
                 {
                     const rectangle temp = move_rect(i->second, cur.tl_corner());
