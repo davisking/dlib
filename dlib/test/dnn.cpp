@@ -114,9 +114,30 @@ namespace
             std::ostringstream sout(std::ios::binary);
             net_to_onnx(net, sout, options);
             const std::string model = sout.str();
+            const auto nodes = parse_onnx_nodes(model);
 
             DLIB_TEST(contains_substring(model, "ConvTranspose"));
-            DLIB_TEST(contains_substring(model, "Resize"));
+            DLIB_TEST(count_onnx_nodes(nodes, "Resize") == 1);
+
+            // Resize must provide only the sizes input.  The optional roi and
+            // scales input slots stay empty because ONNX allows only one of
+            // scales/sizes to be specified.
+            const auto& resize = nth_onnx_node(nodes, "Resize", 0);
+            DLIB_TEST(resize.inputs.size() == 4);
+            DLIB_TEST(!resize.inputs[0].empty());
+            DLIB_TEST(resize.inputs[1].empty());
+            DLIB_TEST(resize.inputs[2].empty());
+            DLIB_TEST(contains_substring(resize.inputs[3], "resize_sizes"));
+            DLIB_TEST(get_onnx_string_attribute(resize, "mode") == "linear");
+            // dlib's bilinear resize maps output pixel x to input pixel
+            // x*(in-1)/(out-1), which is ONNX's align_corners convention.
+            DLIB_TEST(get_onnx_string_attribute(resize, "coordinate_transformation_mode") == "align_corners");
+            DLIB_TEST(get_onnx_ints_initializer(model, "resize_sizes") == std::vector<int64_t>({1, 3, 16, 16}));
+            for (const auto& tensor : parse_onnx_initializers(model))
+            {
+                DLIB_TEST(!contains_substring(tensor.name, "resize_roi"));
+                DLIB_TEST(!contains_substring(tensor.name, "resize_scales"));
+            }
         }
 
         {
@@ -392,8 +413,14 @@ namespace
             std::ostringstream sout(std::ios::binary);
             net_to_onnx(net, sout, options);
             const std::string model = sout.str();
+            const auto nodes = parse_onnx_nodes(model);
 
-            DLIB_TEST(contains_substring(model, "Resize"));
+            DLIB_TEST(count_onnx_nodes(nodes, "Resize") == 1);
+            const auto& resize = nth_onnx_node(nodes, "Resize", 0);
+            DLIB_TEST(resize.inputs.size() == 4);
+            DLIB_TEST(resize.inputs[1].empty());
+            DLIB_TEST(resize.inputs[2].empty());
+            DLIB_TEST(get_onnx_ints_initializer(model, "resize_sizes") == std::vector<int64_t>({1, 2, 8, 8}));
         }
 
         {

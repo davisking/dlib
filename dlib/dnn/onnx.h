@@ -890,17 +890,15 @@ namespace dlib
                 const std::string& mode
             )
             {
-                const std::string roi_name = ctx.next_value_name("resize_roi");
-                const std::string scales_name = ctx.next_value_name("resize_scales");
                 const std::string sizes_name = add_int64_initializer(ctx, "resize_sizes", output_shape);
-                std::vector<float> empty;
-                ctx.add_initializer(roi_name, {0}, empty);
-                ctx.add_initializer(scales_name, {0}, empty);
-                // dlib's bilinear resize samples source pixels with asymmetric
-                // coordinate mapping, not ONNX's half_pixel convention.
-                ctx.add_node("Resize", {input_name, roi_name, scales_name, sizes_name}, {output_name}, {
+                // The optional roi and scales inputs are left unspecified with empty
+                // input names, since ONNX allows only one of scales/sizes to be given.
+                // dlib's bilinear resize maps output pixel x to input pixel
+                // x*(in-1)/(out-1), which is ONNX's align_corners convention,
+                // not half_pixel or asymmetric.
+                ctx.add_node("Resize", {input_name, "", "", sizes_name}, {output_name}, {
                     make_attribute_string("mode", mode),
-                    make_attribute_string("coordinate_transformation_mode", "asymmetric")
+                    make_attribute_string("coordinate_transformation_mode", "align_corners")
                 });
             }
 
