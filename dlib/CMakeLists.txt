@@ -41,7 +41,7 @@ endif()
 # default to a Release build (except if CMAKE_BUILD_TYPE is set)
 include(cmake_utils/release_build_by_default)
 
-# Set DLIB_VERSION in the including CMake file so they can use it to do whatever they want. 
+# Set DLIB_VERSION in the including CMake file so they can use it to do whatever they want.
 get_directory_property(has_parent PARENT_DIRECTORY)
 if(has_parent)
    set(DLIB_VERSION ${VERSION} PARENT_SCOPE)
@@ -65,7 +65,7 @@ endif()
 
 if (DLIB_IN_PROJECT_BUILD)
 
-   # Check if we are being built as part of a pybind11 module. 
+   # Check if we are being built as part of a pybind11 module.
    if (COMMAND pybind11_add_module)
       set(CMAKE_POSITION_INDEPENDENT_CODE True)
       if (CMAKE_COMPILER_IS_GNUCXX)
@@ -101,7 +101,7 @@ if (DLIB_IN_PROJECT_BUILD)
 
 elseif(BUILD_SHARED_LIBS)
    if (MSVC)
-      message(FATAL_ERROR "Building dlib as a standalone dll is not supported when using Visual Studio.  You are highly encouraged to use static linking instead.  See https://github.com/davisking/dlib/issues/1483 for a discussion.") 
+      message(FATAL_ERROR "Building dlib as a standalone dll is not supported when using Visual Studio.  You are highly encouraged to use static linking instead.  See https://github.com/davisking/dlib/issues/1483 for a discussion.")
    endif()
 endif()
 
@@ -140,14 +140,14 @@ endif()
 # because it avoids getting warnings/errors about cmake policy CMP0002.  This
 # happens when a project tries to call add_subdirectory() on dlib more than
 # once.  This most often happens when the top level of a project depends on two
-# or more other things which both depend on dlib. 
+# or more other things which both depend on dlib.
 if (NOT TARGET dlib)
 
-   set (DLIB_ISO_CPP_ONLY_STR 
+   set (DLIB_ISO_CPP_ONLY_STR
       "Enable this if you don't want to compile any non-ISO C++ code (i.e. you don't use any of the API Wrappers)" )
-   set (DLIB_NO_GUI_SUPPORT_STR 
+   set (DLIB_NO_GUI_SUPPORT_STR
       "Enable this if you don't want to compile any of the dlib GUI code" )
-   set (DLIB_ENABLE_STACK_TRACE_STR 
+   set (DLIB_ENABLE_STACK_TRACE_STR
       "Enable this if you want to turn on the DLIB_STACK_TRACE macros" )
    set (DLIB_USE_BLAS_STR
       "Disable this if you don't want to use a BLAS library" )
@@ -195,14 +195,14 @@ if (NOT TARGET dlib)
       # Set these variables so they are set in the config.h.in file when dlib
       # is installed.
       set (DLIB_DISABLE_ASSERTS false)
-      set (ENABLE_ASSERTS true) 
+      set (ENABLE_ASSERTS true)
       enable_preprocessor_switch(ENABLE_ASSERTS)
       disable_preprocessor_switch(DLIB_DISABLE_ASSERTS)
    else()
       # Set these variables so they are set in the config.h.in file when dlib
       # is installed.
       set (DLIB_DISABLE_ASSERTS true)
-      set (ENABLE_ASSERTS false) 
+      set (ENABLE_ASSERTS false)
       disable_preprocessor_switch(ENABLE_ASSERTS)
       # Never force the asserts off when doing an in project build.  The only
       # time this matters is when using visual studio.  The visual studio IDE
@@ -214,7 +214,7 @@ if (NOT TARGET dlib)
       # we make a point to not do that kind of severe disabling when in a
       # project build.  It should also be pointed out that DLIB_DISABLE_ASSERTS
       # is only needed when building and installing dlib as a separately
-      # installed library.  It doesn't matter when doing an in project build. 
+      # installed library.  It doesn't matter when doing an in project build.
       if (NOT DLIB_IN_PROJECT_BUILD)
          enable_preprocessor_switch(DLIB_DISABLE_ASSERTS)
       endif()
@@ -251,10 +251,10 @@ if (NOT TARGET dlib)
    toggle_preprocessor_switch(DLIB_USE_BLAS)
    toggle_preprocessor_switch(DLIB_USE_LAPACK)
    toggle_preprocessor_switch(DLIB_USE_CUDA)
-   toggle_preprocessor_switch(DLIB_PNG_SUPPORT) 
-   toggle_preprocessor_switch(DLIB_GIF_SUPPORT) 
+   toggle_preprocessor_switch(DLIB_PNG_SUPPORT)
+   toggle_preprocessor_switch(DLIB_GIF_SUPPORT)
    toggle_preprocessor_switch(DLIB_WEBP_SUPPORT)
-   toggle_preprocessor_switch(DLIB_JXL_SUPPORT) 
+   toggle_preprocessor_switch(DLIB_JXL_SUPPORT)
    #toggle_preprocessor_switch(DLIB_USE_FFTW)
    toggle_preprocessor_switch(DLIB_USE_MKL_FFT)
    toggle_preprocessor_switch(DLIB_USE_FFMPEG)
@@ -332,7 +332,7 @@ if (NOT TARGET dlib)
          list (APPEND dlib_needed_private_libraries ${CMAKE_THREAD_LIBS_INIT})
       endif()
 
-      # we want to link to the right stuff depending on our platform.  
+      # we want to link to the right stuff depending on our platform.
       if (WIN32 AND NOT CYGWIN) ###############################################################################
          if (DLIB_NO_GUI_SUPPORT)
             list (APPEND dlib_needed_private_libraries ws2_32 winmm)
@@ -359,7 +359,7 @@ if (NOT TARGET dlib)
                # Xlocale.h rather than Xlib.h because it avoids finding a partial
                # copy of the X11 headers on systems with anaconda installed.
                find_path(xlib_path Xlocale.h
-                  PATHS 
+                  PATHS
                   /Developer/SDKs/MacOSX10.4u.sdk/usr/X11R6/include
                   /opt/local/include
                   PATH_SUFFIXES X11
@@ -639,7 +639,7 @@ if (NOT TARGET dlib)
 
       if (DLIB_USE_CUDA)
          find_package(CUDAToolkit)
-      
+
          if (CUDAToolkit_FOUND AND CUDAToolkit_NVCC_EXECUTABLE)
             set(CMAKE_CUDA_COMPILER ${CUDAToolkit_NVCC_EXECUTABLE})
 
@@ -681,8 +681,8 @@ if (NOT TARGET dlib)
             find_package(CUDNN)
 
             if(CUDNN_FOUND)
-               set(source_files ${source_files} 
-                  cuda/cuda_dlib.cu 
+               set(source_files ${source_files}
+                  cuda/cuda_dlib.cu
                   cuda/cudnn_dlibapi.cpp
                   cuda/cublas_dlibapi.cpp
                   cuda/cusolver_dlibapi.cu
@@ -791,7 +791,7 @@ if (NOT TARGET dlib)
       # Do this so that dlib/config.h can record the version of dlib it's configured with
       # and ultimately issue a linker error to people who try to use a binary dlib that is
       # the wrong version.
-      set(DLIB_CHECK_FOR_VERSION_MISMATCH 
+      set(DLIB_CHECK_FOR_VERSION_MISMATCH
          DLIB_VERSION_MISMATCH_CHECK__EXPECTED_VERSION_${CPACK_PACKAGE_VERSION_MAJOR}_${CPACK_PACKAGE_VERSION_MINOR}_${CPACK_PACKAGE_VERSION_PATCH})
       target_compile_options(dlib PRIVATE "-DDLIB_CHECK_FOR_VERSION_MISMATCH=${DLIB_CHECK_FOR_VERSION_MISMATCH}")
    endif()
@@ -799,7 +799,7 @@ if (NOT TARGET dlib)
 
    # Allow the unit tests to ask us to compile the all/source.cpp file just to make sure it compiles.
    if (DLIB_TEST_COMPILE_ALL_SOURCE_CPP)
-      add_library(dlib_all_source_cpp STATIC all/source.cpp) 
+      add_library(dlib_all_source_cpp STATIC all/source.cpp)
       target_link_libraries(dlib_all_source_cpp dlib)
       target_compile_options(dlib_all_source_cpp PUBLIC ${active_preprocessor_switches})
       target_compile_features(dlib_all_source_cpp PUBLIC cxx_std_14)
@@ -824,14 +824,14 @@ if (NOT TARGET dlib)
       set_target_properties(dlib PROPERTIES
          VERSION ${VERSION})
       install(TARGETS dlib
-         EXPORT dlib 
+         EXPORT dlib
          RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # Windows considers .dll to be runtime artifacts
          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
       install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib
-         FILES_MATCHING 
-            PATTERN "*.h" 
+         FILES_MATCHING
+            PATTERN "*.h"
             PATTERN "*.cmake"
             PATTERN "*_tutorial.txt"
             PATTERN "cassert"
@@ -870,9 +870,9 @@ if (NOT TARGET dlib)
          COMPATIBILITY AnyNewerVersion
          )
 
-      install(FILES 
-         "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" 
-         "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake" 
+      install(FILES
+         "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake"
+         "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake"
          DESTINATION ${ConfigPackageLocation})
 
       ## dlib-1.pc generation and installation
@@ -904,7 +904,7 @@ if (MSVC)
    set_target_properties(dlib PROPERTIES RELWITHDEBINFO_POSTFIX "${VERSION}_relwithdebinfo_${numbits}bit_msvc${MSVC_VERSION}")
 endif()
 
-# Check if we are being built as part of a pybind11 module. 
+# Check if we are being built as part of a pybind11 module.
 if (COMMAND pybind11_add_module)
    # Don't export unnecessary symbols.
    set_target_properties(dlib PROPERTIES CXX_VISIBILITY_PRESET "hidden")

@@ -13,7 +13,7 @@ enable_language (Fortran)
 set(CMAKE_POSITION_INDEPENDENT_CODE True)
 add_definitions(-DADD_ -DF77_INT=ptrdiff_t)
 
-add_library(cblas STATIC 
+add_library(cblas STATIC
    cblas_caxpy.c
    #cblas_ccopy.c
    cblas_cdotc_sub.c
