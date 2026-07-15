@@ -774,9 +774,9 @@ namespace dlib
                 return name;
             }
 
-            inline std::string make_scalar_tensor_attribute(float value)
+            inline std::string make_one_element_tensor_attribute(float value)
             {
-                return make_tensor(std::string(), std::vector<int64_t>(), &value, 1);
+                return make_tensor(std::string(), std::vector<int64_t>(1, 1), &value, 1);
             }
 
             inline std::string add_int64_initializer(export_context& ctx, const std::string& prefix, const std::vector<int64_t>& values)
@@ -1978,14 +1978,14 @@ namespace dlib
 
                 ctx.add_node("Shape", {ctx.current_name}, {shape_name});
                 ctx.add_node("ConstantOfShape", {shape_name}, {ones_name}, {
-                    make_attribute_tensor("value", make_scalar_tensor_attribute(1))
+                    make_attribute_tensor("value", make_one_element_tensor_attribute(1))
                 });
                 ctx.add_node("Trilu", {ones_name, diag_name}, {lower_ones_name}, {
                     make_attribute_int("upper", 0)
                 });
                 ctx.add_node("Equal", {lower_ones_name, one_name}, {condition_name});
                 ctx.add_node("ConstantOfShape", {shape_name}, {fill_name}, {
-                    make_attribute_tensor("value", make_scalar_tensor_attribute(diag_value))
+                    make_attribute_tensor("value", make_one_element_tensor_attribute(diag_value))
                 });
                 ctx.add_node("Where", {condition_name, ctx.current_name, fill_name}, {output_name});
                 ctx.current_name = output_name;

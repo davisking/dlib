@@ -231,6 +231,12 @@ namespace
             const auto nodes = parse_onnx_nodes(sout.str());
 
             DLIB_TEST(count_onnx_nodes(nodes, "Trilu") >= 1);
+            DLIB_TEST(count_onnx_nodes(nodes, "ConstantOfShape") == 2);
+            const std::vector<int64_t> one_element_shape(1, 1);
+            const auto& first_fill = nth_onnx_node(nodes, "ConstantOfShape", 0);
+            const auto& second_fill = nth_onnx_node(nodes, "ConstantOfShape", 1);
+            DLIB_TEST(get_onnx_tensor_attribute(first_fill, "value").dims == one_element_shape);
+            DLIB_TEST(get_onnx_tensor_attribute(second_fill, "value").dims == one_element_shape);
         }
 
         {
