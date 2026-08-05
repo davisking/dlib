@@ -4,12 +4,13 @@ project(sse4_test)
 
 set(USE_SSE4_INSTRUCTIONS ON CACHE BOOL "Use SSE4 instructions")
 
-# Pull this in since it sets the SSE4 compile options by putting that kind of stuff into the active_compile_opts list.
+# Pull this in since it sets the SSE4 compile options by putting that kind of stuff into the
+# active_compile_opts_gcc_public / active_compile_opts_msvc_public lists.
 include(../set_compiler_specific_options.cmake)
 
 
 try_run(run_result compile_result ${PROJECT_BINARY_DIR}/sse4_test_try_run_build ${CMAKE_CURRENT_LIST_DIR}/sse4_test.cpp
-   COMPILE_DEFINITIONS ${active_compile_opts})
+   COMPILE_DEFINITIONS ${active_compile_opts_gcc_public} ${active_compile_opts_msvc_public})
 
 message(STATUS "run_result = ${run_result}")
 message(STATUS "compile_result = ${compile_result}")

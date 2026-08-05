@@ -807,10 +807,14 @@ if (NOT TARGET dlib)
 
    target_compile_features(dlib PUBLIC cxx_std_14)
    if((MSVC AND CMAKE_VERSION VERSION_LESS 3.11))
-      target_compile_options(dlib PUBLIC ${active_compile_opts})
+      # Old CMake/VS generators can't evaluate the generator expressions below.
+      target_compile_options(dlib PUBLIC ${active_compile_opts_gcc_public} ${active_compile_opts_msvc_public})
       target_compile_options(dlib PRIVATE ${active_compile_opts_private})
    else()
-      target_compile_options(dlib PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${active_compile_opts}>)
+      # Only forward each bucket of flags to consumers using a matching
+      # compiler (see https://github.com/davisking/dlib/issues/3125).
+      target_compile_options(dlib PUBLIC $<$<COMPILE_LANG_AND_ID:CXX,GNU,Clang,Intel>:${active_compile_opts_gcc_public}>)
+      target_compile_options(dlib PUBLIC $<$<COMPILE_LANG_AND_ID:CXX,MSVC>:${active_compile_opts_msvc_public}>)
       target_compile_options(dlib PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${active_compile_opts_private}>)
    endif()
 

@@ -4,12 +4,13 @@ project(avx_test)
 
 set(USE_AVX_INSTRUCTIONS ON CACHE BOOL "Use AVX instructions")
 
-# Pull this in since it sets the AVX compile options by putting that kind of stuff into the active_compile_opts list.
+# Pull this in since it sets the AVX compile options by putting that kind of stuff into the
+# active_compile_opts_gcc_public / active_compile_opts_msvc_public lists.
 include(../set_compiler_specific_options.cmake)
 
 
 try_run(run_result compile_result ${PROJECT_BINARY_DIR}/avx_test_try_run_build ${CMAKE_CURRENT_LIST_DIR}/avx_test.cpp
-   COMPILE_DEFINITIONS ${active_compile_opts})
+   COMPILE_DEFINITIONS ${active_compile_opts_gcc_public} ${active_compile_opts_msvc_public})
 
 message(STATUS "run_result = ${run_result}")
 message(STATUS "compile_result = ${compile_result}")
