@@ -15,7 +15,7 @@
 
  
 # Our library dependencies (contains definitions for IMPORTED targets)
-if(NOT TARGET dlib-shared AND NOT dlib_BINARY_DIR)
+if(NOT TARGET dlib::dlib AND NOT TARGET dlib-shared AND NOT dlib_BINARY_DIR)
    # Compute paths
    get_filename_component(dlib_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
    include("${dlib_CMAKE_DIR}/dlib.cmake")
@@ -29,6 +29,73 @@ if(NOT TARGET dlib-shared AND NOT dlib_BINARY_DIR)
    endif()
    unset(dlib_deps_threads_idx)
    unset(dlib_deps_threads_check)
+
+   # Compiler options on an imported target are evaluated in the consuming
+   # project, not in the project that built dlib.  Select them here so an
+   # installed package never passes (for example) cl-style options to the
+   # clang++ driver.  MSVC is intentionally used instead of the compiler ID:
+   # CMake also sets it for compilers such as clang-cl that accept cl syntax.
+   set(_dlib_compile_options)
+   set(_dlib_compile_definitions)
+   set(_dlib_simd_level "@DLIB_SIMD_LEVEL@")
+
+   if(MSVC)
+      list(APPEND _dlib_compile_options /bigobj)
+
+      if(_dlib_simd_level STREQUAL "AVX")
+         list(APPEND _dlib_compile_options /arch:AVX)
+      elseif(_dlib_simd_level STREQUAL "SSE4")
+         if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+            list(APPEND _dlib_compile_options /arch:SSE2)
+         endif()
+         list(APPEND _dlib_compile_definitions DLIB_HAVE_SSE2 DLIB_HAVE_SSE3 DLIB_HAVE_SSE41)
+      elseif(_dlib_simd_level STREQUAL "SSE2")
+         if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+            list(APPEND _dlib_compile_options /arch:SSE2)
+         endif()
+         list(APPEND _dlib_compile_definitions DLIB_HAVE_SSE2)
+      endif()
+
+      if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+         if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 3.3)
+            list(APPEND _dlib_compile_options -Xclang -fcxx-exceptions)
+         endif()
+         if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.0.0)
+            list(APPEND _dlib_compile_options -ftemplate-depth=500)
+         endif()
+      endif()
+   elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR
+          CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
+          CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" OR
+          CMAKE_CXX_COMPILER_ID STREQUAL "Intel" OR
+          CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
+      if(_dlib_simd_level STREQUAL "AVX")
+         list(APPEND _dlib_compile_options -mavx)
+      elseif(_dlib_simd_level STREQUAL "SSE4")
+         list(APPEND _dlib_compile_options -msse4)
+      elseif(_dlib_simd_level STREQUAL "SSE2")
+         list(APPEND _dlib_compile_options -msse2)
+      elseif(_dlib_simd_level STREQUAL "NEON")
+         list(APPEND _dlib_compile_options -mfpu=neon)
+      endif()
+
+      if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+         list(APPEND _dlib_compile_options -Wreturn-type)
+      elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.0.0)
+         list(APPEND _dlib_compile_options -ftemplate-depth=500)
+      endif()
+   endif()
+
+   if(_dlib_compile_options)
+      target_compile_options(dlib::dlib INTERFACE "$<$<COMPILE_LANGUAGE:CXX>:${_dlib_compile_options}>")
+   endif()
+   if(_dlib_compile_definitions)
+      target_compile_definitions(dlib::dlib INTERFACE "$<$<COMPILE_LANGUAGE:CXX>:${_dlib_compile_definitions}>")
+   endif()
+
+   unset(_dlib_compile_definitions)
+   unset(_dlib_compile_options)
+   unset(_dlib_simd_level)
 endif()
 
 set(dlib_LIBRARIES dlib::dlib)
@@ -52,6 +119,3 @@ endfunction()
 variable_watch(dlib_LIBRARIES __deprecated_var)
 variable_watch(dlib_LIBS __deprecated_var)
 variable_watch(dlib_INCLUDE_DIRS __deprecated_var)
-
-
-
