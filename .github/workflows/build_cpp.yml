@@ -222,18 +222,22 @@ jobs:
     - name: Build ancillary tools
       run: cmake --build build --config Release --target imglab htmlify dtoc --parallel 4
     - name: Install an AVX-enabled MSVC package
+      working-directory: ${{ github.workspace }}
       run: |
         cmake . -B "${{ runner.temp }}/dlib-package-build" -DCMAKE_INSTALL_PREFIX="${{ runner.temp }}/dlib-package-install" -DDLIB_NO_GUI_SUPPORT=ON -DDLIB_USE_BLAS=OFF -DDLIB_USE_LAPACK=OFF -DDLIB_USE_CUDA=OFF -DUSE_AVX_INSTRUCTIONS=ON
         cmake --build "${{ runner.temp }}/dlib-package-build" --config Release --target install --parallel 4
     - name: Test installed package with MSVC
+      working-directory: ${{ github.workspace }}
       run: |
         cmake dlib/cmake_utils/test_for_dlib_config -B "${{ runner.temp }}/dlib-package-consumer-msvc" -Ddlib_DIR="${{ runner.temp }}/dlib-package-install/lib/cmake/dlib" -DDLIB_CONFIG_TEST_EXPECT_AVX=ON
         cmake --build "${{ runner.temp }}/dlib-package-consumer-msvc" --config Release --parallel 4
     - name: Test installed MSVC package with clang++
+      working-directory: ${{ github.workspace }}
       run: |
         cmake dlib/cmake_utils/test_for_dlib_config -B "${{ runner.temp }}/dlib-package-consumer-clang" -G Ninja -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Release -Ddlib_DIR="${{ runner.temp }}/dlib-package-install/lib/cmake/dlib" -DDLIB_CONFIG_TEST_EXPECT_AVX=ON
         cmake --build "${{ runner.temp }}/dlib-package-consumer-clang" --parallel 4
     - name: Test installed MSVC package with clang-cl
+      working-directory: ${{ github.workspace }}
       run: |
         cmake dlib/cmake_utils/test_for_dlib_config -B "${{ runner.temp }}/dlib-package-consumer-clang-cl" -G "Visual Studio 17 2022" -T ClangCL -Ddlib_DIR="${{ runner.temp }}/dlib-package-install/lib/cmake/dlib" -DDLIB_CONFIG_TEST_EXPECT_AVX=ON
         cmake --build "${{ runner.temp }}/dlib-package-consumer-clang-cl" --config Release --parallel 4
