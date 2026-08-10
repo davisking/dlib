@@ -161,10 +161,9 @@ class CMakeBuild(build_ext):
 
     def run(self):
         cmake_version = self.get_cmake_version()
-        if platform.system() == "Windows":
-            if parse_version(cmake_version) < Version('3.1.0'):
-                sys.stderr.write("\nERROR: CMake >= 3.1.0 is required on Windows\n\n")
-                sys.exit(1)
+        if parse_version(cmake_version) < Version('3.17.0'):
+            sys.stderr.write("\nERROR: CMake >= 3.17.0 is required\n\n")
+            sys.exit(1)
 
         for ext in self.extensions:
             self.build_extension(ext)
@@ -176,7 +175,8 @@ class CMakeBuild(build_ext):
         cmake_args_dict = {
             'CMAKE_LIBRARY_OUTPUT_DIRECTORY': extdir,
             'DLIB_USE_FFMPEG': 'OFF',
-            'PYTHON_EXECUTABLE': sys.executable,
+            'PYBIND11_FINDPYTHON': 'ON',
+            'Python_EXECUTABLE': sys.executable,
         }
         for key, value in os.environ.items():
             if key.startswith("DLIB_"):
@@ -255,6 +255,7 @@ setup(
     license='Boost Software License',
     ext_modules=[CMakeExtension('_dlib_pybind11','tools/python')],
     cmdclass=dict(build_ext=CMakeBuild),
+    python_requires='>=3.8',
     zip_safe=False,
     #install_requires=['cmake'], # removed because the pip cmake package is busted, maybe someday it will be usable.
     packages=find_packages(exclude=['python_examples']),

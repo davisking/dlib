@@ -92,7 +92,7 @@ endif()
 
 # Use the Python interpreter to find the libs.
 if(NOT PythonLibsNew_FIND_VERSION)
-  set(PythonLibsNew_FIND_VERSION "3.6")
+  set(PythonLibsNew_FIND_VERSION "3.8")
 endif()
 
 if(NOT CMAKE_VERSION VERSION_LESS "3.27")
@@ -200,12 +200,22 @@ if(PYBIND11_PYTHONLIBS_OVERWRITE OR NOT DEFINED PYTHON_MODULE_DEBUG_POSTFIX)
 endif()
 if(PYBIND11_PYTHONLIBS_OVERWRITE OR NOT DEFINED PYTHON_MODULE_EXTENSION)
   get_filename_component(PYTHON_MODULE_EXTENSION "${_PYTHON_MODULE_EXT_SUFFIX}" EXT)
+  if((NOT "$ENV{SETUPTOOLS_EXT_SUFFIX}" STREQUAL "") AND (NOT "$ENV{SETUPTOOLS_EXT_SUFFIX}"
+                                                          STREQUAL "${PYTHON_MODULE_EXTENSION}"))
+    message(
+      AUTHOR_WARNING,
+      "SETUPTOOLS_EXT_SUFFIX is set to \"$ENV{SETUPTOOLS_EXT_SUFFIX}\", "
+      "but the auto-calculated Python extension suffix is \"${PYTHON_MODULE_EXTENSION}\". "
+      "This may cause problems when importing the Python extensions. "
+      "If you are using cross-compiling Python, you may need to "
+      "set PYTHON_MODULE_EXTENSION manually.")
+  endif()
 endif()
 
 # Make sure the Python has the same pointer-size as the chosen compiler
 # Skip if CMAKE_SIZEOF_VOID_P is not defined
 # This should be skipped for (non-Apple) cross-compiles (like EMSCRIPTEN)
-if(NOT CMAKE_CROSSCOMPILING
+if(NOT _PYBIND11_CROSSCOMPILING
    AND CMAKE_SIZEOF_VOID_P
    AND (NOT "${PYTHON_SIZEOF_VOID_P}" STREQUAL "${CMAKE_SIZEOF_VOID_P}"))
   if(PythonLibsNew_FIND_REQUIRED)

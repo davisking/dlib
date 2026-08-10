@@ -12,6 +12,7 @@
 #include <dlib/clustering.h>
 #include <pybind11/stl_bind.h>
 #include <pybind11/stl.h>
+#include <mutex>
 
 
 using namespace dlib;
@@ -71,6 +72,7 @@ public:
         float padding = 0.25
     )
     {
+        std::lock_guard<std::mutex> lock(net_mutex);
 
         if (batch_imgs.size() != batch_faces.size())
             throw dlib::error("The array of images and the array of array of locations must be of the same size");
@@ -141,6 +143,8 @@ public:
         const int num_jitters
     )
     {
+        std::lock_guard<std::mutex> lock(net_mutex);
+
         dlib::array<matrix<rgb_pixel>> face_chips;           
         for (auto& img : batch_imgs) {
 
@@ -184,6 +188,7 @@ public:
 
 private:
 
+    std::mutex net_mutex;
     dlib::rand rnd;
 
     std::vector<matrix<rgb_pixel>> jitter_image(
@@ -433,4 +438,3 @@ void bind_face_recognition(py::module &m)
         "Offers direct access to dlib::chinese_whispers."
         );
 }
-

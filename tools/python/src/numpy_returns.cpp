@@ -94,7 +94,7 @@ void save_image(numpy_image<T> img, const std::string &path, const float quality
 
 py::list get_jitter_images(numpy_image<rgb_pixel> img, size_t num_jitters = 1, bool disturb_colors = false)
 {
-    static dlib::rand rnd_jitter;
+    thread_local dlib::rand rnd_jitter;
 
     // The top level list (containing 1 or more images) to return to python
     py::list jitter_list;

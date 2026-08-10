@@ -48,6 +48,9 @@ PYBIND11_NAMESPACE_BEGIN(detail)
 class args_proxy;
 bool isinstance_generic(handle obj, const std::type_info &tp);
 
+template <typename T>
+bool isinstance_native_enum(handle obj, const std::type_info &tp);
+
 // Accessor forward declarations
 template <typename Policy>
 class accessor;
@@ -78,7 +81,9 @@ using is_pyobject = std::is_base_of<pyobject_tag, remove_reference_t<T>>;
 \endrst */
 template <typename Derived>
 class object_api : public pyobject_tag {
+    object_api() = default;
     const Derived &derived() const { return static_cast<const Derived &>(*this); }
+    friend Derived;
 
 public:
     /** \rst
@@ -112,6 +117,17 @@ public:
     obj_attr_accessor attr(object &&key) const;
     /// See above (the only difference is that the key is provided as a string literal)
     str_attr_accessor attr(const char *key) const;
+
+    /** \rst
+         Similar to the above attr functions with the difference that the templated Type
+         is used to set the `__annotations__` dict value to the corresponding key. Worth noting
+         that attr_with_type_hint is implemented in cast.h.
+    \endrst */
+    template <typename T>
+    obj_attr_accessor attr_with_type_hint(handle key) const;
+    /// See above (the only difference is that the key is provided as a string literal)
+    template <typename T>
+    str_attr_accessor attr_with_type_hint(const char *key) const;
 
     /** \rst
         Matches * unpacking in Python, e.g. to unpack arguments out of a ``tuple``
@@ -182,11 +198,21 @@ public:
     /// Get or set the object's docstring, i.e. ``obj.__doc__``.
     str_attr_accessor doc() const;
 
-    /// Return the object's current reference count
-    int ref_count() const { return static_cast<int>(Py_REFCNT(derived().ptr())); }
+    /// Get or set the object's annotations, i.e. ``obj.__annotations__``.
+    object annotations() const;
 
-    // TODO PYBIND11_DEPRECATED(
-    //     "Call py::type::handle_of(h) or py::type::of(h) instead of h.get_type()")
+    /// Return the object's current reference count
+    ssize_t ref_count() const {
+#ifdef PYPY_VERSION
+        // PyPy uses the top few bits for REFCNT_FROM_PYPY & REFCNT_FROM_PYPY_LIGHT
+        // Following pybind11 2.12.1 and older behavior and removing this part
+        return static_cast<ssize_t>(static_cast<int>(Py_REFCNT(derived().ptr())));
+#else
+        return Py_REFCNT(derived().ptr());
+#endif
+    }
+
+    PYBIND11_DEPRECATED("Call py::type::handle_of(h) or py::type::of(h) instead of h.get_type()")
     handle get_type() const;
 
 private:
@@ -233,8 +259,7 @@ public:
         detail::enable_if_t<detail::all_of<detail::none_of<std::is_base_of<handle, T>,
                                                            detail::is_pyobj_ptr_or_nullptr_t<T>>,
                                            std::is_convertible<T, PyObject *>>::value,
-                            int>
-        = 0>
+                            int> = 0>
     // NOLINTNEXTLINE(google-explicit-constructor)
     handle(T &obj) : m_ptr(obj) {}
 
@@ -252,7 +277,7 @@ public:
         inc_ref_counter(1);
 #endif
 #ifdef PYBIND11_ASSERT_GIL_HELD_INCREF_DECREF
-        if (m_ptr != nullptr && !PyGILState_Check()) {
+        if (m_ptr != nullptr && PyGILState_Check() == 0) {
             throw_gilstate_error("pybind11::handle::inc_ref()");
         }
 #endif
@@ -267,7 +292,7 @@ public:
     \endrst */
     const handle &dec_ref() const & {
 #ifdef PYBIND11_ASSERT_GIL_HELD_INCREF_DECREF
-        if (m_ptr != nullptr && !PyGILState_Check()) {
+        if (m_ptr != nullptr && PyGILState_Check() == 0) {
             throw_gilstate_error("pybind11::handle::dec_ref()");
         }
 #endif
@@ -521,8 +546,13 @@ struct error_fetch_and_normalize {
         // The presence of __notes__ is likely due to exception normalization
         // errors, although that is not necessarily true, therefore insert a
         // hint only:
-        if (PyObject_HasAttrString(m_value.ptr(), "__notes__")) {
+        const int has_notes = PyObject_HasAttrString(m_value.ptr(), "__notes__");
+        if (has_notes == 1) {
             m_lazy_error_string += "[WITH __notes__]";
+        } else if (has_notes == -1) {
+            // Ignore secondary errors when probing for __notes__ to avoid leaking a
+            // spurious exception while still reporting the original error.
+            PyErr_Clear();
         }
 #else
         // PyErr_NormalizeException() may change the exception type if there are cascading
@@ -539,12 +569,6 @@ struct error_fetch_and_normalize {
                           + " failed to obtain the name "
                             "of the normalized active exception type.");
         }
-#    if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x07030a00
-        // This behavior runs the risk of masking errors in the error handling, but avoids a
-        // conflict with PyPy, which relies on the normalization here to change OSError to
-        // FileNotFoundError (https://github.com/pybind/pybind11/issues/4075).
-        m_lazy_error_string = exc_type_name_norm;
-#    else
         if (exc_type_name_norm != m_lazy_error_string) {
             std::string msg = std::string(called)
                               + ": MISMATCH of original and normalized "
@@ -556,7 +580,6 @@ struct error_fetch_and_normalize {
             msg += ": " + format_value_and_trace();
             pybind11_fail(msg);
         }
-#    endif
 #endif
     }
 
@@ -635,7 +658,7 @@ struct error_fetch_and_normalize {
 
         bool have_trace = false;
         if (m_trace) {
-#if !defined(PYPY_VERSION)
+#if !defined(PYPY_VERSION) && !defined(GRAALVM_PYTHON)
             auto *tb = reinterpret_cast<PyTracebackObject *>(m_trace.ptr());
 
             // Get the deepest trace possible.
@@ -837,11 +860,12 @@ bool isinstance(handle obj) {
 
 template <typename T, detail::enable_if_t<!std::is_base_of<object, T>::value, int> = 0>
 bool isinstance(handle obj) {
-    return detail::isinstance_generic(obj, typeid(T));
+    return detail::isinstance_native_enum<T>(obj, typeid(T))
+           || detail::isinstance_generic(obj, typeid(T));
 }
 
 template <>
-inline bool isinstance<handle>(handle) = delete;
+bool isinstance<handle>(handle) = delete;
 template <>
 inline bool isinstance<object>(handle obj) {
     return obj.ptr() != nullptr;
@@ -972,6 +996,65 @@ inline PyObject *dict_getitem(PyObject *v, PyObject *key) {
     return rv;
 }
 
+// PyDict_GetItemStringRef was added in Python 3.13.0a1.
+// See also: https://github.com/python/pythoncapi-compat/blob/main/pythoncapi_compat.h
+inline PyObject *dict_getitemstringref(PyObject *v, const char *key) {
+#if PY_VERSION_HEX >= 0x030D00A1
+    PyObject *rv = nullptr;
+    if (PyDict_GetItemStringRef(v, key, &rv) < 0) {
+        throw error_already_set();
+    }
+    return rv;
+#else
+    PyObject *rv = dict_getitemstring(v, key);
+    if (rv == nullptr && PyErr_Occurred()) {
+        throw error_already_set();
+    }
+    Py_XINCREF(rv);
+    return rv;
+#endif
+}
+
+inline PyObject *dict_setdefaultstring(PyObject *v, const char *key, PyObject *defaultobj) {
+    PyObject *kv = PyUnicode_FromString(key);
+    if (kv == nullptr) {
+        throw error_already_set();
+    }
+
+    PyObject *rv = PyDict_SetDefault(v, kv, defaultobj);
+    Py_DECREF(kv);
+    if (rv == nullptr) {
+        throw error_already_set();
+    }
+    return rv;
+}
+
+// PyDict_SetDefaultRef was added in Python 3.13.0a4.
+// See also: https://github.com/python/pythoncapi-compat/blob/main/pythoncapi_compat.h
+inline PyObject *dict_setdefaultstringref(PyObject *v, const char *key, PyObject *defaultobj) {
+#if PY_VERSION_HEX >= 0x030D00A4
+    PyObject *kv = PyUnicode_FromString(key);
+    if (kv == nullptr) {
+        throw error_already_set();
+    }
+
+    PyObject *rv = nullptr;
+    if (PyDict_SetDefaultRef(v, kv, defaultobj, &rv) < 0) {
+        Py_DECREF(kv);
+        throw error_already_set();
+    }
+    Py_DECREF(kv);
+    return rv;
+#else
+    PyObject *rv = dict_setdefaultstring(v, key, defaultobj);
+    if (rv == nullptr || PyErr_Occurred()) {
+        throw error_already_set();
+    }
+    Py_XINCREF(rv);
+    return rv;
+#endif
+}
+
 // Helper aliases/functions to support implicit casting of values given to python
 // accessors/methods. When given a pyobject, this simply returns the pyobject as-is; for other C++
 // type, the value goes through pybind11::cast(obj) to convert it to an `object`.
@@ -1002,11 +1085,11 @@ public:
     void operator=(const accessor &a) & { operator=(handle(a)); }
 
     template <typename T>
-    void operator=(T &&value) && {
+    enable_if_t<!std::is_same<accessor, remove_reference_t<T>>::value> operator=(T &&value) && {
         Policy::set(obj, key, object_or_cast(std::forward<T>(value)));
     }
     template <typename T>
-    void operator=(T &&value) & {
+    enable_if_t<!std::is_same<accessor, remove_reference_t<T>>::value> operator=(T &&value) & {
         get_cache() = ensure_object(object_or_cast(std::forward<T>(value)));
     }
 
@@ -1234,6 +1317,7 @@ protected:
     using pointer = arrow_proxy<const handle>;
 
     sequence_fast_readonly(handle obj, ssize_t n) : ptr(PySequence_Fast_ITEMS(obj.ptr()) + n) {}
+    sequence_fast_readonly() = default;
 
     // NOLINTNEXTLINE(readability-const-return-type) // PR #3263
     reference dereference() const { return *ptr; }
@@ -1256,6 +1340,7 @@ protected:
     using pointer = arrow_proxy<const sequence_accessor>;
 
     sequence_slow_readwrite(handle obj, ssize_t index) : obj(obj), index(index) {}
+    sequence_slow_readwrite() = default;
 
     reference dereference() const { return {obj, static_cast<size_t>(index)}; }
     void increment() { ++index; }
@@ -1329,7 +1414,7 @@ inline bool PyUnicode_Check_Permissive(PyObject *o) {
 #    define PYBIND11_STR_CHECK_FUN PyUnicode_Check
 #endif
 
-inline bool PyStaticMethod_Check(PyObject *o) { return o->ob_type == &PyStaticMethod_Type; }
+inline bool PyStaticMethod_Check(PyObject *o) { return Py_TYPE(o) == &PyStaticMethod_Type; }
 
 class kwargs_proxy : public handle {
 public:
@@ -1359,6 +1444,18 @@ template <return_value_policy policy = return_value_policy::automatic_reference>
 class simple_collector;
 template <return_value_policy policy = return_value_policy::automatic_reference>
 class unpacking_collector;
+
+inline object get_scope_module(handle scope) {
+    if (scope) {
+        if (hasattr(scope, "__module__")) {
+            return scope.attr("__module__");
+        }
+        if (hasattr(scope, "__name__")) {
+            return scope.attr("__name__");
+        }
+    }
+    return object();
+}
 
 PYBIND11_NAMESPACE_END(detail)
 
@@ -1443,11 +1540,17 @@ public:
     PYBIND11_OBJECT_DEFAULT(iterator, object, PyIter_Check)
 
     iterator &operator++() {
+        init();
         advance();
         return *this;
     }
 
     iterator operator++(int) {
+        // Note: We must call init() first so that rv.value is
+        // the same as this->value just before calling advance().
+        // Otherwise, dereferencing the returned iterator may call
+        // advance() again and return the 3rd item instead of the 1st.
+        init();
         auto rv = *this;
         advance();
         return rv;
@@ -1455,15 +1558,12 @@ public:
 
     // NOLINTNEXTLINE(readability-const-return-type) // PR #3263
     reference operator*() const {
-        if (m_ptr && !value.ptr()) {
-            auto &self = const_cast<iterator &>(*this);
-            self.advance();
-        }
+        init();
         return value;
     }
 
     pointer operator->() const {
-        operator*();
+        init();
         return &value;
     }
 
@@ -1486,6 +1586,13 @@ public:
     friend bool operator!=(const iterator &a, const iterator &b) { return a->ptr() != b->ptr(); }
 
 private:
+    void init() const {
+        if (m_ptr && !value.ptr()) {
+            auto &self = const_cast<iterator &>(*this);
+            self.advance();
+        }
+    }
+
     void advance() {
         value = reinterpret_steal<object>(PyIter_Next(m_ptr));
         if (value.ptr() == nullptr && PyErr_Occurred()) {
@@ -1494,7 +1601,7 @@ private:
     }
 
 private:
-    object value = {};
+    object value;
 };
 
 class type : public object {
@@ -1502,7 +1609,9 @@ public:
     PYBIND11_OBJECT(type, object, PyType_Check)
 
     /// Return a type handle from a handle or an object
-    static handle handle_of(handle h) { return handle((PyObject *) Py_TYPE(h.ptr())); }
+    static handle handle_of(handle h) {
+        return handle(reinterpret_cast<PyObject *>(Py_TYPE(h.ptr())));
+    }
 
     /// Return a type object from a handle or an object
     static type of(handle h) { return type(type::handle_of(h), borrowed_t{}); }
@@ -1580,7 +1689,12 @@ public:
         Return a string representation of the object. This is analogous to
         the ``str()`` function in Python.
     \endrst */
-    explicit str(handle h) : object(raw_str(h.ptr()), stolen_t{}) {
+    // Templatized to avoid ambiguity with str(const object&) for object-derived types.
+    template <typename T,
+              detail::enable_if_t<!std::is_base_of<object, detail::remove_cvref_t<T>>::value
+                                      && std::is_constructible<handle, T>::value,
+                                  int> = 0>
+    explicit str(T &&h) : object(raw_str(handle(std::forward<T>(h)).ptr()), stolen_t{}) {
         if (!m_ptr) {
             throw error_already_set();
         }
@@ -1600,7 +1714,7 @@ public:
         if (PyBytes_AsStringAndSize(temp.ptr(), &buffer, &length) != 0) {
             throw error_already_set();
         }
-        return std::string(buffer, (size_t) length);
+        return std::string(buffer, static_cast<size_t>(length));
     }
 
     template <typename... Args>
@@ -1800,10 +1914,12 @@ template <typename Unsigned>
 Unsigned as_unsigned(PyObject *o) {
     if (sizeof(Unsigned) <= sizeof(unsigned long)) {
         unsigned long v = PyLong_AsUnsignedLong(o);
-        return v == (unsigned long) -1 && PyErr_Occurred() ? (Unsigned) -1 : (Unsigned) v;
+        return v == static_cast<unsigned long>(-1) && PyErr_Occurred() ? (Unsigned) -1
+                                                                       : (Unsigned) v;
     }
     unsigned long long v = PyLong_AsUnsignedLongLong(o);
-    return v == (unsigned long long) -1 && PyErr_Occurred() ? (Unsigned) -1 : (Unsigned) v;
+    return v == static_cast<unsigned long long>(-1) && PyErr_Occurred() ? (Unsigned) -1
+                                                                        : (Unsigned) v;
 }
 PYBIND11_NAMESPACE_END(detail)
 
@@ -1847,21 +1963,21 @@ public:
     PYBIND11_OBJECT_CVT(float_, object, PyFloat_Check, PyNumber_Float)
     // Allow implicit conversion from float/double:
     // NOLINTNEXTLINE(google-explicit-constructor)
-    float_(float value) : object(PyFloat_FromDouble((double) value), stolen_t{}) {
+    float_(float value) : object(PyFloat_FromDouble(static_cast<double>(value)), stolen_t{}) {
         if (!m_ptr) {
             pybind11_fail("Could not allocate float object!");
         }
     }
     // NOLINTNEXTLINE(google-explicit-constructor)
-    float_(double value = .0) : object(PyFloat_FromDouble((double) value), stolen_t{}) {
+    float_(double value = .0) : object(PyFloat_FromDouble(value), stolen_t{}) {
         if (!m_ptr) {
             pybind11_fail("Could not allocate float object!");
         }
     }
     // NOLINTNEXTLINE(google-explicit-constructor)
-    operator float() const { return (float) PyFloat_AsDouble(m_ptr); }
+    operator float() const { return static_cast<float>(PyFloat_AsDouble(m_ptr)); }
     // NOLINTNEXTLINE(google-explicit-constructor)
-    operator double() const { return (double) PyFloat_AsDouble(m_ptr); }
+    operator double() const { return PyFloat_AsDouble(m_ptr); }
 };
 
 class weakref : public object {
@@ -1883,13 +1999,14 @@ private:
 
 class slice : public object {
 public:
-    PYBIND11_OBJECT_DEFAULT(slice, object, PySlice_Check)
+    PYBIND11_OBJECT(slice, object, PySlice_Check)
     slice(handle start, handle stop, handle step)
         : object(PySlice_New(start.ptr(), stop.ptr(), step.ptr()), stolen_t{}) {
         if (!m_ptr) {
             pybind11_fail("Could not allocate slice object!");
         }
     }
+    slice() : slice(none(), none(), none()) {}
 
 #ifdef PYBIND11_HAS_OPTIONAL
     slice(std::optional<ssize_t> start, std::optional<ssize_t> stop, std::optional<ssize_t> step)
@@ -2060,7 +2177,7 @@ public:
             pybind11_fail("Could not allocate tuple object!");
         }
     }
-    size_t size() const { return (size_t) PyTuple_Size(m_ptr); }
+    size_t size() const { return static_cast<size_t>(PyTuple_Size(m_ptr)); }
     bool empty() const { return size() == 0; }
     detail::tuple_accessor operator[](size_t index) const { return {*this, index}; }
     template <typename T, detail::enable_if_t<detail::is_pyobject<T>::value, int> = 0>
@@ -2094,7 +2211,7 @@ public:
               typename collector = detail::deferred_t<detail::unpacking_collector<>, Args...>>
     explicit dict(Args &&...args) : dict(collector(std::forward<Args>(args)...).kwargs()) {}
 
-    size_t size() const { return (size_t) PyDict_Size(m_ptr); }
+    size_t size() const { return static_cast<size_t>(PyDict_Size(m_ptr)); }
     bool empty() const { return size() == 0; }
     detail::dict_iterator begin() const { return {*this, 0}; }
     detail::dict_iterator end() const { return {}; }
@@ -2114,7 +2231,8 @@ private:
         if (PyDict_Check(op)) {
             return handle(op).inc_ref().ptr();
         }
-        return PyObject_CallFunctionObjArgs((PyObject *) &PyDict_Type, op, nullptr);
+        return PyObject_CallFunctionObjArgs(
+            reinterpret_cast<PyObject *>(&PyDict_Type), op, nullptr);
     }
 };
 
@@ -2126,7 +2244,7 @@ public:
         if (result == -1) {
             throw error_already_set();
         }
-        return (size_t) result;
+        return static_cast<size_t>(result);
     }
     bool empty() const { return size() == 0; }
     detail::sequence_accessor operator[](size_t index) const { return {*this, index}; }
@@ -2149,7 +2267,7 @@ public:
             pybind11_fail("Could not allocate list object!");
         }
     }
-    size_t size() const { return (size_t) PyList_Size(m_ptr); }
+    size_t size() const { return static_cast<size_t>(PyList_Size(m_ptr)); }
     bool empty() const { return size() == 0; }
     detail::list_accessor operator[](size_t index) const { return {*this, index}; }
     template <typename T, detail::enable_if_t<detail::is_pyobject<T>::value, int> = 0>
@@ -2175,6 +2293,11 @@ public:
             throw error_already_set();
         }
     }
+    void clear() /* py-non-const */ {
+        if (PyList_SetSlice(m_ptr, 0, PyList_Size(m_ptr), nullptr) == -1) {
+            throw error_already_set();
+        }
+    }
 };
 
 class args : public tuple {
@@ -2182,6 +2305,18 @@ class args : public tuple {
 };
 class kwargs : public dict {
     PYBIND11_OBJECT_DEFAULT(kwargs, dict, PyDict_Check)
+};
+
+// Subclasses of args and kwargs to support type hinting
+// as defined in PEP 484. See #5357 for more info.
+template <typename T>
+class Args : public args {
+    using args::args;
+};
+
+template <typename T>
+class KWArgs : public kwargs {
+    using kwargs::kwargs;
 };
 
 class anyset : public object {
@@ -2418,7 +2553,7 @@ inline size_t len(handle h) {
     if (result < 0) {
         throw error_already_set();
     }
-    return (size_t) result;
+    return static_cast<size_t>(result);
 }
 
 /// Get the length hint of a Python object.
@@ -2431,7 +2566,7 @@ inline size_t len_hint(handle h) {
         PyErr_Clear();
         return 0;
     }
-    return (size_t) result;
+    return static_cast<size_t>(result);
 }
 
 inline str repr(handle h) {
@@ -2505,6 +2640,20 @@ str_attr_accessor object_api<D>::doc() const {
 }
 
 template <typename D>
+object object_api<D>::annotations() const {
+// This is needed again because of the lazy annotations added in 3.14+
+#if PY_VERSION_HEX < 0x030A0000 || PY_VERSION_HEX >= 0x030E0000
+    // https://docs.python.org/3/howto/annotations.html#accessing-the-annotations-dict-of-an-object-in-python-3-9-and-older
+    if (!hasattr(derived(), "__annotations__")) {
+        setattr(derived(), "__annotations__", dict());
+    }
+    return attr("__annotations__");
+#else
+    return getattr(derived(), "__annotations__", dict());
+#endif
+}
+
+template <typename D>
 handle object_api<D>::get_type() const {
     return type::handle_of(derived());
 }
@@ -2569,6 +2718,19 @@ PYBIND11_MATH_OPERATOR_BINARY_INPLACE(operator>>=, PyNumber_InPlaceRshift)
 #undef PYBIND11_MATH_OPERATOR_UNARY
 #undef PYBIND11_MATH_OPERATOR_BINARY
 #undef PYBIND11_MATH_OPERATOR_BINARY_INPLACE
+
+// Meant to return a Python str, but this is not checked.
+inline object get_module_name_if_available(handle scope) {
+    if (scope) {
+        if (hasattr(scope, "__module__")) {
+            return scope.attr("__module__");
+        }
+        if (hasattr(scope, "__name__")) {
+            return scope.attr("__name__");
+        }
+    }
+    return object();
+}
 
 PYBIND11_NAMESPACE_END(detail)
 PYBIND11_NAMESPACE_END(PYBIND11_NAMESPACE)

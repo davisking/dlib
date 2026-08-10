@@ -66,10 +66,11 @@ struct buffer_info {
                 bool readonly = false)
         : ptr(ptr), itemsize(itemsize), size(1), format(format), ndim(ndim),
           shape(std::move(shape_in)), strides(std::move(strides_in)), readonly(readonly) {
-        if (ndim != (ssize_t) shape.size() || ndim != (ssize_t) strides.size()) {
+        if (ndim != static_cast<ssize_t>(shape.size())
+            || ndim != static_cast<ssize_t>(strides.size())) {
             pybind11_fail("buffer_info: ndim doesn't match shape and/or strides length");
         }
-        for (size_t i = 0; i < (size_t) ndim; ++i) {
+        for (size_t i = 0; i < static_cast<size_t>(ndim); ++i) {
             size *= shape[i];
         }
     }
@@ -102,22 +103,22 @@ struct buffer_info {
     template <typename T>
     buffer_info(const T *ptr, ssize_t size, bool readonly = true)
         : buffer_info(
-            const_cast<T *>(ptr), sizeof(T), format_descriptor<T>::format(), size, readonly) {}
+              const_cast<T *>(ptr), sizeof(T), format_descriptor<T>::format(), size, readonly) {}
 
     explicit buffer_info(Py_buffer *view, bool ownview = true)
         : buffer_info(
-            view->buf,
-            view->itemsize,
-            view->format,
-            view->ndim,
-            {view->shape, view->shape + view->ndim},
-            /* Though buffer::request() requests PyBUF_STRIDES, ctypes objects
-             * ignore this flag and return a view with NULL strides.
-             * When strides are NULL, build them manually.  */
-            view->strides
-                ? std::vector<ssize_t>(view->strides, view->strides + view->ndim)
-                : detail::c_strides({view->shape, view->shape + view->ndim}, view->itemsize),
-            (view->readonly != 0)) {
+              view->buf,
+              view->itemsize,
+              view->format,
+              view->ndim,
+              {view->shape, view->shape + view->ndim},
+              /* Though buffer::request() requests PyBUF_STRIDES, ctypes objects
+               * ignore this flag and return a view with NULL strides.
+               * When strides are NULL, build them manually.  */
+              view->strides
+                  ? std::vector<ssize_t>(view->strides, view->strides + view->ndim)
+                  : detail::c_strides({view->shape, view->shape + view->ndim}, view->itemsize),
+              (view->readonly != 0)) {
         // NOLINTNEXTLINE(cppcoreguidelines-prefer-member-initializer)
         this->m_view = view;
         // NOLINTNEXTLINE(cppcoreguidelines-prefer-member-initializer)
@@ -176,7 +177,7 @@ private:
                 detail::any_container<ssize_t> &&strides_in,
                 bool readonly)
         : buffer_info(
-            ptr, itemsize, format, ndim, std::move(shape_in), std::move(strides_in), readonly) {}
+              ptr, itemsize, format, ndim, std::move(shape_in), std::move(strides_in), readonly) {}
 
     Py_buffer *m_view = nullptr;
     bool ownview = false;
@@ -195,7 +196,7 @@ struct compare_buffer_info {
 template <typename T>
 struct compare_buffer_info<T, detail::enable_if_t<std::is_integral<T>::value>> {
     static bool compare(const buffer_info &b) {
-        return (size_t) b.itemsize == sizeof(T)
+        return static_cast<size_t>(b.itemsize) == sizeof(T)
                && (b.format == format_descriptor<T>::value
                    || ((sizeof(T) == sizeof(long))
                        && b.format == (std::is_unsigned<T>::value ? "L" : "l"))

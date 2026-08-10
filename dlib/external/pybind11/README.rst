@@ -1,9 +1,11 @@
 .. figure:: https://github.com/pybind/pybind11/raw/master/docs/pybind11-logo.png
    :alt: pybind11 logo
 
-**pybind11 — Seamless operability between C++11 and Python**
+**pybind11 (v3)  — Seamless interoperability between C++ and Python**
 
-|Latest Documentation Status| |Stable Documentation Status| |Gitter chat| |GitHub Discussions| |CI| |Build status|
+|Latest Documentation Status| |Stable Documentation Status| |Gitter chat| |GitHub Discussions|
+
+|CI| |Build status| |SPEC 4 — Using and Creating Nightly Wheels|
 
 |Repology| |PyPI package| |Conda-forge| |Python Versions|
 
@@ -34,12 +36,12 @@ dependency.
 Think of this library as a tiny self-contained version of Boost.Python
 with everything stripped away that isn't relevant for binding
 generation. Without comments, the core header files only require ~4K
-lines of code and depend on Python (3.6+, or PyPy) and the C++
-standard library. This compact implementation was possible thanks to
-some C++11 language features (specifically: tuples, lambda functions and
-variadic templates). Since its creation, this library has grown beyond
-Boost.Python in many ways, leading to dramatically simpler binding code in many
-common situations.
+lines of code and depend on Python (CPython 3.8+, PyPy, or GraalPy) and the C++
+standard library. This compact implementation was possible thanks to some C++11
+language features (specifically: tuples, lambda functions and variadic
+templates). Since its creation, this library has grown beyond Boost.Python in
+many ways, leading to dramatically simpler binding code in many common
+situations.
 
 Tutorial and reference documentation is provided at
 `pybind11.readthedocs.io <https://pybind11.readthedocs.io/en/latest>`_.
@@ -79,8 +81,9 @@ Goodies
 In addition to the core functionality, pybind11 provides some extra
 goodies:
 
-- Python 3.6+, and PyPy3 7.3 are supported with an implementation-agnostic
-  interface (pybind11 2.9 was the last version to support Python 2 and 3.5).
+- CPython 3.8+, PyPy3 7.3.17+, and GraalPy 24.1+ are supported with an
+  implementation-agnostic interface (see older versions for older CPython
+  and PyPy versions).
 
 - It is possible to bind C++11 lambda functions with captured
   variables. The lambda capture data is stored inside the resulting
@@ -117,28 +120,57 @@ goodies:
 - With little extra effort, C++ types can be pickled and unpickled
   similar to regular Python objects.
 
-Supported compilers
--------------------
+Supported platforms & compilers
+-------------------------------
 
-1. Clang/LLVM 3.3 or newer (for Apple Xcode's clang, this is 5.0.0 or
-   newer)
-2. GCC 4.8 or newer
-3. Microsoft Visual Studio 2017 or newer
-4. Intel classic C++ compiler 18 or newer (ICC 20.2 tested in CI)
-5. Cygwin/GCC (previously tested on 2.5.1)
-6. NVCC (CUDA 11.0 tested in CI)
-7. NVIDIA PGI (20.9 tested in CI)
+pybind11 is exercised in continuous integration across a range of operating
+systems, Python versions, C++ standards, and toolchains. For an up-to-date
+view of the combinations we currently test, please see the
+`pybind11 GitHub Actions <https://github.com/pybind/pybind11/actions?query=branch%3Amaster>`_
+logs.
+
+The test matrix naturally evolves over time as older platforms and compilers
+fall out of use and new ones are added by the community. Closely related
+versions of a tested compiler or platform will often work as well in practice,
+but we cannot promise to validate every possible combination. If a
+configuration you rely on is missing from the matrix or regresses, issues and
+pull requests to extend coverage are very welcome. At the same time, we need
+to balance the size of the test matrix with the available CI resources,
+such as GitHub's limits on concurrent jobs under the free tier.
 
 About
 -----
 
 This project was created by `Wenzel
 Jakob <http://rgl.epfl.ch/people/wjakob>`_. Significant features and/or
-improvements to the code were contributed by Jonas Adler, Lori A. Burns,
-Sylvain Corlay, Eric Cousineau, Aaron Gokaslan, Ralf Grosse-Kunstleve, Trent Houliston, Axel
-Huebl, @hulucc, Yannick Jadoul, Sergey Lyskov, Johan Mabille, Tomasz Miąsko,
-Dean Moldovan, Ben Pritchard, Jason Rhinelander, Boris Schäling, Pim
-Schellart, Henry Schreiner, Ivan Smirnov, Boris Staletic, and Patrick Stewart.
+improvements to the code were contributed by
+Jonas Adler,
+Lori A. Burns,
+Sylvain Corlay,
+Eric Cousineau,
+Aaron Gokaslan,
+Ralf Grosse-Kunstleve,
+Trent Houliston,
+Axel Huebl,
+@hulucc,
+Yannick Jadoul,
+Sergey Lyskov,
+Johan Mabille,
+Tomasz Miąsko,
+Dean Moldovan,
+Ben Pritchard,
+Jason Rhinelander,
+Boris Schäling,
+Pim Schellart,
+Henry Schreiner,
+Ivan Smirnov,
+Dustin Spicuzza,
+Boris Staletic,
+Ethan Steinberg,
+Patrick Stewart,
+Ivor Wanders,
+and
+Xiaofei Wang.
 
 We thank Google for a generous financial contribution to the continuous
 integration infrastructure used by this project.
@@ -179,3 +211,5 @@ to the terms and conditions of this license.
    :target: https://pypi.org/project/pybind11/
 .. |GitHub Discussions| image:: https://img.shields.io/static/v1?label=Discussions&message=Ask&color=blue&logo=github
    :target: https://github.com/pybind/pybind11/discussions
+.. |SPEC 4 — Using and Creating Nightly Wheels| image:: https://img.shields.io/badge/SPEC-4-green?labelColor=%23004811&color=%235CA038
+   :target: https://scientific-python.org/specs/spec-0004/

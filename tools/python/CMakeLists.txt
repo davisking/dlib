@@ -1,5 +1,5 @@
 
-CMAKE_MINIMUM_REQUIRED(VERSION 3.10.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.17.0)
 
 if (WIN32 AND NOT "${CMAKE_GENERATOR}" MATCHES "Visual Studio") 
    message(FATAL_ERROR "\n"
@@ -12,13 +12,6 @@ if (WIN32 AND NOT "${CMAKE_GENERATOR}" MATCHES "Visual Studio")
 endif()
 
 project(dlib_python_bindings)
-
-# Pybind11's cmake scripts enable link time optimization by default.  However,
-# it makes linking take a really long time and doesn't seem to substantively
-# improve runtime performance.  So we disable LTO here to make building dlib
-# faster.
-set(PYBIND11_LTO_CXX_FLAGS "")
-
 
 # Avoid cmake warnings about changes in behavior of some Mac OS X path 
 # variable we don't care about.
@@ -67,6 +60,11 @@ if(NOT ${DLIB_NO_GUI_SUPPORT})
    list(APPEND python_srcs src/gui.cpp)
 endif()
 
+# Pybind11 enables link time optimization by default.  It makes linking take a
+# long time and doesn't substantively improve runtime performance for dlib's
+# Python module, so explicitly disable it while retaining pybind11's other
+# platform-specific build extras.
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION OFF)
 pybind11_add_module(_dlib_pybind11 ${python_srcs})
 target_link_libraries(_dlib_pybind11 PRIVATE dlib::dlib)
 

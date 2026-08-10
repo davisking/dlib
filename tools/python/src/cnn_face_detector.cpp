@@ -8,6 +8,7 @@
 #include <dlib/image_transforms.h>
 #include "indexing.h"
 #include <pybind11/stl_bind.h>
+#include <mutex>
 
 using namespace dlib;
 using namespace std;
@@ -51,6 +52,7 @@ public:
             pyramid_up(image, pyr);
         }
 
+        std::lock_guard<std::mutex> lock(net_mutex);
         auto dets = net(image);
 
         // Scale the detection locations back to the original image size
@@ -99,6 +101,7 @@ public:
             
         }        
 
+        std::lock_guard<std::mutex> lock(net_mutex);
         auto dets = net(dimgs, batch_size);
         std::vector<std::vector<mmod_rect> > all_rects;
 
@@ -117,6 +120,8 @@ public:
     }
 
 private:
+
+    std::mutex net_mutex;
 
     template <long num_filters, typename SUBNET> using con5d = con<num_filters,5,5,2,2,SUBNET>;
     template <long num_filters, typename SUBNET> using con5  = con<num_filters,5,5,1,1,SUBNET>;

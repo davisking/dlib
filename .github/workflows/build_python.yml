@@ -60,6 +60,36 @@ jobs:
     - name: Test
       run: python -m pytest --ignore docs --ignore dlib
 
+  Ubuntu-Free-Threaded:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v6
+    - uses: actions/setup-python@v6
+      with:
+        python-version: '3.13t'
+    - name: Install python deps
+      run: pip install pytest numpy
+    - name: Build
+      run: pip install .
+    - name: Verify free-threading
+      run: python -c "import sys; assert not sys._is_gil_enabled()"
+    - name: Test
+      run: python -m pytest --ignore docs --ignore dlib
+
+  Ubuntu-Python-3-8:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v6
+    - uses: actions/setup-python@v6
+      with:
+        python-version: '3.8'
+    - name: Install python deps
+      run: pip install pytest numpy
+    - name: Build
+      run: pip install .
+    - name: Test
+      run: python -m pytest --ignore docs --ignore dlib
+
 # Disabled for now since something is going sideways with python packages on github actions
 # MacOS:
 #   runs-on: 'macos-latest'
@@ -73,4 +103,3 @@ jobs:
 #       pip install .
 #   - name: Test
 #     run: python3 -m pytest --ignore docs --ignore dlib
-

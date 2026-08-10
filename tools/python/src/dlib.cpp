@@ -37,7 +37,7 @@ void bind_line(py::module& m);
 void bind_gui(py::module& m);
 #endif
 
-PYBIND11_MODULE(_dlib_pybind11, m)
+PYBIND11_MODULE(_dlib_pybind11, m, py::mod_gil_not_used())
 {
     // Attempt to give users that have compiled dlib to use SIMD instructions but then tried to use
     // it on a CPU that doesn't support them a more informative warning that many systems generate

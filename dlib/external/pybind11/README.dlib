@@ -1,0 +1,13 @@
+This directory vendors pybind11 v3.0.4 from commit
+d03662f0984f652b60e7ddce53d3868002275197.
+
+The following paths are copied unchanged from the upstream release tag:
+
+- CMakeLists.txt
+- LICENSE
+- README.rst
+- include/
+- tools/
+
+When updating pybind11, replace all of those paths from one tagged upstream
+release.  Do not mix headers or CMake helpers from different revisions.
