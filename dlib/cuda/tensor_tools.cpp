@@ -17,6 +17,13 @@ namespace dlib
             static std::atomic<bool> var(true);
             return var;
         }
+
+        std::atomic<bool>& dnn_choose_algos_per_input_shape (
+        )
+        {
+            static std::atomic<bool> var(false);
+            return var;
+        }
     }
 
     bool dnn_prefer_fastest_algorithms (
@@ -35,6 +42,19 @@ namespace dlib
     )
     {
         dnn_prefer_fastest_algo() = false;
+    }
+
+    bool dnn_choose_algorithms_per_input_shape (
+    )
+    {
+        return dnn_choose_algos_per_input_shape();
+    }
+
+    void set_dnn_choose_algorithms_per_input_shape(
+        bool choose_per_input_shape
+    )
+    {
+        dnn_choose_algos_per_input_shape() = choose_per_input_shape;
     }
 }
 

@@ -196,6 +196,28 @@ namespace dlib
             - #dnn_prefer_fastest_algorithms() == false 
     !*/
 
+    bool dnn_choose_algorithms_per_input_shape(
+    );
+    /*!
+        ensures
+            - If dlib should choose the cuDNN convolution algorithms separately for each input
+              shape then this function returns true and false otherwise.
+            - On program startup this function will default to false.  Then the algorithms
+              chosen for the first input of a given stride, padding and filter size are also used
+              for its later inputs of other shapes, even though an algorithm may need much more
+              memory for a larger input.
+    !*/
+
+    void set_dnn_choose_algorithms_per_input_shape(
+        bool choose_per_input_shape
+    );
+    /*!
+        ensures
+            - #dnn_choose_algorithms_per_input_shape() == choose_per_input_shape
+            - When true, each new input shape is benchmarked, which takes time.  Each thread
+              remembers the algorithms of its most recently used shapes only.
+    !*/
+
     namespace cuda
     {
         bool use_cuda(

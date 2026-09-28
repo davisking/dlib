@@ -9,6 +9,7 @@
 #include "tensor.h"
 #include <cudnn.h>
 #include <tuple>
+#include <list>
 #include <map>
 #include <iostream>
 #include <string>
@@ -784,6 +785,51 @@ namespace dlib
             return best_alg;
         }
 
+        // The algorithms chosen for each convolution configuration.  Once it has max_size
+        // configurations, it forgets the least recently used one for each new one.
+        class algorithm_cache
+        {
+        public:
+            using key_type = std::tuple<int,int,int,int,long,long,long,long,long,long,long>;
+            using value_type = std::tuple<int,int,int>;
+
+            explicit algorithm_cache(size_t max_size) : max_size(max_size) {}
+
+            const value_type* find(const key_type& key)
+            {
+                const auto i = index.find(key);
+                if (i == index.end())
+                    return nullptr;
+                entries.splice(entries.begin(), entries, i->second);
+                return &i->second->second;
+            }
+
+            void insert(const key_type& key, const value_type& value)
+            {
+                const auto i = index.find(key);
+                if (i != index.end())
+                {
+                    i->second->second = value;
+                    entries.splice(entries.begin(), entries, i->second);
+                    return;
+                }
+                entries.emplace_front(key, value);
+                index[key] = entries.begin();
+                if (entries.size() > max_size)
+                {
+                    index.erase(entries.back().first);
+                    entries.pop_back();
+                }
+            }
+
+        private:
+            using entry_list = std::list<std::pair<key_type, value_type>>;
+
+            const size_t max_size;
+            entry_list entries;  // the most recently used first
+            std::map<key_type, entry_list::iterator> index;
+        };
+
         void tensor_conv::
         select_best_algorithms (
             const tensor& data,
@@ -792,17 +838,22 @@ namespace dlib
         ) 
         {
             // Calling the cuDNN "find the best algorithm" functions is really slow.  So we keep a
-            // cache that tells us what method was best for a particular configuration.
-            thread_local std::map<std::tuple<int,int,int,int,long,long>,
-                                  std::tuple<int,int,int>> config_to_algo_cache;
+            // cache that tells us what method was best for a particular configuration.  Unless
+            // chosen per input shape, the configuration is just the stride, padding and filter
+            // size.
+            thread_local algorithm_cache config_to_algo_cache(1000);
 
             // If we have already found good algorithms for this setting then just pull them from
             // the cache.
-            const auto cache_key = std::make_tuple(stride_y, stride_x, padding_y, padding_x, filters_nr, filters_nc);
-            const auto iter = config_to_algo_cache.find(cache_key);
-            if (iter != config_to_algo_cache.end() && allow_cache_use_ == allow_cache_use::yes)
+            const auto cache_key = dnn_choose_algorithms_per_input_shape()
+                ? std::make_tuple(stride_y, stride_x, padding_y, padding_x, filters_nr, filters_nc,
+                                  data_num_samples, data_k, data_nr, data_nc, filters_num_samples)
+                : std::make_tuple(stride_y, stride_x, padding_y, padding_x, filters_nr, filters_nc,
+                                  0L, 0L, 0L, 0L, 0L);
+            const auto cached = config_to_algo_cache.find(cache_key);
+            if (cached && allow_cache_use_ == allow_cache_use::yes)
             {
-                std::tie(forward_algo, backward_data_algo, backward_filters_algo) = iter->second;
+                std::tie(forward_algo, backward_data_algo, backward_filters_algo) = *cached;
                 return;
             }
 
@@ -931,7 +982,7 @@ namespace dlib
             backward_filters_algo = backward_filters_best_algo;
 
             // Save this algorithm selection in the cache
-            config_to_algo_cache[cache_key] = std::make_tuple(forward_algo, backward_data_algo, backward_filters_algo);
+            config_to_algo_cache.insert(cache_key, std::make_tuple(forward_algo, backward_data_algo, backward_filters_algo));
         }
 
         void tensor_conv::
