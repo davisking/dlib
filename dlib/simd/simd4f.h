@@ -146,7 +146,12 @@ namespace dlib
         inline simd4f(float f) { x = vdupq_n_f32(f); }
         inline simd4f(float r0, float r1, float r2, float r3)
         {
+#ifdef _MSC_VER
+            // MSVC doesn't support GCC's __attribute__
+            float data[4] = { r0, r1, r2, r3 };
+#else
             float __attribute__ ((aligned (16))) data[4] = { r0, r1, r2, r3 };
+#endif
             x = vld1q_f32(data);
         }
         inline simd4f(const float32x4_t& val):x(val) {}

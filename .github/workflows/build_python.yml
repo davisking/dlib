@@ -32,7 +32,12 @@ defaults:
 
 jobs:
   Windows:
-    runs-on: 'windows-latest'
+    strategy:
+      matrix:
+        os:
+          - windows-latest
+          - windows-11-arm
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4

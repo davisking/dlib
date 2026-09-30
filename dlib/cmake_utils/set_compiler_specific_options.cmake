@@ -46,6 +46,13 @@ if ((";${gcc_like_compilers};" MATCHES ";${CMAKE_CXX_COMPILER_ID};")  AND
       list(APPEND active_compile_opts -msse2)
       message(STATUS "Enabling SSE2 instructions")
    endif()
+elseif ((MSVC OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC") AND
+        "${CMAKE_SYSTEM_PROCESSOR}" MATCHES "^(arm64|ARM64|aarch64)$")
+   option(USE_NEON_INSTRUCTIONS "Compile your program with ARM-NEON instructions" ON)
+   if (USE_NEON_INSTRUCTIONS)
+      set(DLIB_SIMD_LEVEL NEON)
+      message(STATUS "Enabling ARM-NEON instructions")
+   endif()
 elseif (MSVC OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC") # else if using Visual Studio
    # Use SSE2 by default when using Visual Studio.
    option(USE_SSE2_INSTRUCTIONS "Compile your program with SSE2 instructions" ON)
