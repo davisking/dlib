@@ -176,9 +176,10 @@ namespace dlib
         }
 
         inline operator float32x4_t() const { return x; }
-
+#ifndef _MSC_VER
         // truncate to 32bit integers
         inline operator int32x4_t() const { return vcvtq_s32_f32(x); }
+#endif
 
         inline void load_aligned(const type* ptr)  { x = vld1q_f32(ptr); }
         inline void store_aligned(type* ptr) const { vst1q_f32(ptr, x); }
