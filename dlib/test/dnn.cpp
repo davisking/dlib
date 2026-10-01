@@ -10,6 +10,7 @@
 #include <random>
 #include <numeric>
 #include "../dnn.h"
+#include "../scope.h"
 
 #include "tester.h"
 #include "onnx_test_helpers.h"
@@ -2073,6 +2074,83 @@ namespace
             DLIB_TEST_MSG(max(abs(mat(filter_gradient1)-mat(filter_gradient2))) < 2e-3, max(abs(mat(filter_gradient1)-mat(filter_gradient2))));
         }
     }
+
+    class dnn_convolution_algorithms_tester : public tester
+    {
+    public:
+        dnn_convolution_algorithms_tester() :
+            tester("test_dnn_convolution_algorithms",
+                "Tests convolution results when algorithms are chosen per input shape.")
+        {}
+
+        void perform_test()
+        {
+            const bool previous_setting = dnn_choose_algorithms_per_input_shape();
+            auto restore_setting = make_scope_exit([previous_setting] {
+                set_dnn_choose_algorithms_per_input_shape(previous_setting);
+            });
+            set_dnn_choose_algorithms_per_input_shape(true);
+
+            // Vary each part of the shape while keeping stride, padding, and filter size fixed.
+            // Columns are batch size, input channels, rows, columns, and output channels.
+            const long shapes[][5] = {
+                {1, 3, 11, 13, 4},
+                {2, 3, 11, 13, 4},
+                {1, 5, 11, 13, 4},
+                {1, 3, 17, 13, 4},
+                {1, 3, 11, 19, 4},
+                {1, 3, 11, 13, 7}
+            };
+            cuda::tensor_conv gpu_conv;
+            cpu::tensor_conv cpu_conv;
+            dlib::rand rnd("convolution algorithms per input shape");
+
+            // Revisit the shapes to exercise reuse of their cached algorithms.  Generate new
+            // tensor values on each pass so that the expected outputs and gradients also change.
+            for (int pass = 0; pass < 2; ++pass)
+            {
+                for (const auto& shape : shapes)
+                {
+                    resizable_tensor data(shape[0], shape[1], shape[2], shape[3]);
+                    resizable_tensor filters(shape[4], shape[1], 3, 3);
+                    for (auto& value : data)
+                        value = rnd.get_random_float() - 0.5f;
+                    for (auto& value : filters)
+                        value = rnd.get_random_float() - 0.5f;
+
+                    gpu_conv.setup(data, filters, 1, 1, 1, 1);
+                    cpu_conv.setup(data, filters, 1, 1, 1, 1);
+                    resizable_tensor gpu_output, cpu_output;
+                    gpu_conv(false, gpu_output, data, filters);
+                    cpu_conv(false, cpu_output, data, filters);
+                    DLIB_TEST(have_same_dimensions(gpu_output, cpu_output));
+                    DLIB_TEST(max(abs(mat(gpu_output)-mat(cpu_output))) < 1e-3);
+
+                    resizable_tensor gradient_input;
+                    gradient_input.copy_size(cpu_output);
+                    for (auto& value : gradient_input)
+                        value = rnd.get_random_float() - 0.5f;
+
+                    resizable_tensor gpu_data_gradient, cpu_data_gradient;
+                    resizable_tensor gpu_filter_gradient, cpu_filter_gradient;
+                    gpu_data_gradient.copy_size(data);
+                    cpu_data_gradient.copy_size(data);
+                    gpu_filter_gradient.copy_size(filters);
+                    cpu_filter_gradient.copy_size(filters);
+                    for (bool add_to : {false, true})
+                    {
+                        gpu_conv.get_gradient_for_data(add_to, gradient_input, filters, gpu_data_gradient);
+                        cpu_conv.get_gradient_for_data(add_to, gradient_input, filters, cpu_data_gradient);
+                        DLIB_TEST(max(abs(mat(gpu_data_gradient)-mat(cpu_data_gradient))) < 1e-3);
+
+                        gpu_conv.get_gradient_for_filters(add_to, gradient_input, data, gpu_filter_gradient);
+                        cpu_conv.get_gradient_for_filters(add_to, gradient_input, data, cpu_filter_gradient);
+                        DLIB_TEST(max(abs(mat(gpu_filter_gradient)-mat(cpu_filter_gradient))) < 1e-3);
+                    }
+                }
+            }
+        }
+    } convolution_algorithms_test;
 
     void compare_adam()
     {
