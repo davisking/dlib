@@ -214,6 +214,9 @@ namespace dlib
     /*!
         ensures
             - #dnn_choose_algorithms_per_input_shape() == choose_per_input_shape
+            - This setting affects subsequent algorithm selection.  It does not invalidate
+              algorithms already selected by existing convolution objects.  For consistent
+              behavior, set it at program startup, before using any neural networks.
             - When true, each new input shape is benchmarked, which takes time.  Each thread
               remembers the algorithms of its most recently used shapes only.
     !*/

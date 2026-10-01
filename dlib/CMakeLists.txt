@@ -670,10 +670,14 @@ if (NOT TARGET dlib)
                   elseif (CMAKE_CUDA_COMPILER_VERSION VERSION_LESS 12)
                      # CUDA 11.x
                      set(CMAKE_CUDA_ARCHITECTURES 60;61;70;75;80;86)
-                  else()
-                     # CUDA 12.x+
+                  elseif (CMAKE_CUDA_COMPILER_VERSION VERSION_LESS 13)
+                     # CUDA 12.x
                      # (Keep this conservative; add 89/90 only on toolkits that support them.)
                      set(CMAKE_CUDA_ARCHITECTURES 70;75;80;86;89;90)
+                  else()
+                     # CUDA 13.x+
+                     # (Keep this conservative; add 89/90 only on toolkits that support them.)
+                     set(CMAKE_CUDA_ARCHITECTURES 75;80;86;89;90)
                   endif()
                endif()
             endif()
