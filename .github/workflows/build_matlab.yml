@@ -34,9 +34,11 @@ jobs:
   mex-wrapper:
     runs-on: 'ubuntu-22.04'
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v5
     - name: Setup MATLAB
-      uses: matlab-actions/setup-matlab@v1
+      uses: matlab-actions/setup-matlab@v3
+      with:
+        release: R2024a
     - name: Compile mex wrappers 
       run: |
         pwd
@@ -45,7 +47,7 @@ jobs:
         cmake ..
         cmake --build . --config Release --target install --parallel 4
     - name: Run example script
-      uses: matlab-actions/run-command@v1
+      uses: matlab-actions/run-command@v3
       with:
         command: cd dlib/matlab; example
 
