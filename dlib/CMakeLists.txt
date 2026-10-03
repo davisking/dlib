@@ -806,10 +806,13 @@ if (NOT TARGET dlib)
       add_library(dlib_all_source_cpp STATIC all/source.cpp) 
       target_link_libraries(dlib_all_source_cpp dlib)
       target_compile_options(dlib_all_source_cpp PUBLIC ${active_preprocessor_switches})
-      target_compile_features(dlib_all_source_cpp PUBLIC cxx_std_14)
+      target_compile_features(dlib_all_source_cpp PUBLIC cxx_std_17)
    endif()
 
-   target_compile_features(dlib PUBLIC cxx_std_14)
+   target_compile_features(dlib PUBLIC cxx_std_17)
+   if (DLIB_USE_CUDA)
+      target_compile_features(dlib PRIVATE cuda_std_17)
+   endif()
    # Build-tree clients share dlib's compiler, so forward the options detected
    # above to them. Do not put those options in the installed target, where
    # dlibConfig.cmake recreates them for the consuming compiler's frontend.

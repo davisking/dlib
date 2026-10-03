@@ -18,7 +18,7 @@ To exclude certain options in the cmake config use --no:
     --no USE_AVX_INSTRUCTIONS: will set -DUSE_AVX_INSTRUCTIONS=no
 Additional options:
     --compiler-flags: pass flags onto the compiler, e.g. --compiler-flags "-Os -Wall" passes -Os -Wall onto GCC.
-    -G: Set the CMake generator.  E.g. -G "Visual Studio 14 2015"
+    -G: Set the CMake generator.  E.g. -G "Visual Studio 17 2022"
     --clean: delete any previous build folders and rebuild.  You should do this if you change any build options
              by setting --compiler-flags or --no since the last time you ran a build.  This will
              ensure the changes take effect.

@@ -739,7 +739,7 @@
          <spec_file>dlib/optional.h</spec_file>
          <description>
             This is a standard's compliant backport of <a href="https://en.cppreference.com/w/cpp/utility/optional">std::optional</a> 
-            that works with C++14.  It includes C++23 monadic interfaces
+            that works with C++17.  It includes C++23 monadic interfaces
          </description>
       </component>
       

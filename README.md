@@ -6,7 +6,7 @@ Dlib is a modern C++ toolkit containing machine learning algorithms and tools fo
 
 ## Compiling dlib C++ example programs
 
-Go into the examples folder and type:
+You need a C++17 compiler and CMake. Go into the examples folder and type:
 
 ```bash
 mkdir build; cd build; cmake .. ; cmake --build .
@@ -21,9 +21,9 @@ mkdir build; cd build; cmake .. -DUSE_AVX_INSTRUCTIONS=1; cmake --build .
 
 Doing so will make some things run faster.
 
-Finally, Visual Studio users should usually do everything in 64bit mode.  By default Visual Studio is 32bit, both in its outputs and its own execution, so you have to explicitly tell it to use 64bits.  Since it's not the 1990s anymore you probably want to use 64bits.  Do that with a cmake invocation like this:
+Visual Studio users can explicitly select a 64bit target and compiler with a CMake invocation like this:
 ```bash
-cmake .. -G "Visual Studio 14 2015 Win64" -T host=x64
+cmake .. -G "Visual Studio 17 2022" -A x64 -T host=x64
 ```
 
 ## Compiling your own C++ programs that use dlib

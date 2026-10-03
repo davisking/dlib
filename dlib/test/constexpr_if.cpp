@@ -192,7 +192,7 @@ namespace
     public:
         constexpr_if_test (
         ) : tester ("test_constexpr_if",
-                    "Runs tests on the C++14 approximation of C++17 if constexpr() statements but better.")
+                    "Runs tests on dlib's compile time dispatch utilities.")
         {}
 
         void perform_test (
