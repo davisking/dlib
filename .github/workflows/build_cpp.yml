@@ -207,6 +207,21 @@ jobs:
     - name: Build ffmpeg example
       run: cmake --build build --config Release --target ffmpeg_video_muxing_ex --parallel 4
       
+  windows-arm64:
+    runs-on: windows-11-arm
+    steps:
+    - uses: actions/checkout@v4
+    - name: Check SIMD target detection
+      run: cmake -P ../cmake_utils/test_for_simd_options.cmake
+    - name: Configure
+      run: |
+        pip3 install cmake
+        cmake . -B build -A ARM64
+    - name: Build just tests
+      run: cmake --build build --config Release --target dtest --parallel 4
+    - name: Test SIMD and image processing
+      run: build/Release/dtest.exe --test_simd --test_fhog -q
+
   windows-latest:
     runs-on: 'windows-latest'
     steps:

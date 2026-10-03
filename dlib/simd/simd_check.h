@@ -10,7 +10,11 @@
 
 // figure out which SIMD instructions we can use.
 #ifndef DLIB_DO_NOT_USE_SIMD
-    #if defined(_MSC_VER) 
+    #if defined(_MSC_VER) && defined(_M_ARM64)
+        #ifndef DLIB_HAVE_NEON
+            #define DLIB_HAVE_NEON
+        #endif
+    #elif defined(_MSC_VER)
         #ifdef __AVX__
             #ifndef DLIB_HAVE_SSE2
                 #define DLIB_HAVE_SSE2
