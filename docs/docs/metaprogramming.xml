@@ -1002,7 +1002,7 @@ or you can omit the error message and call it like:
          <file>dlib/constexpr_if.h</file>
          <spec_file link="true">dlib/constexpr_if.h</spec_file>
          <description>        
-            This function allows you to do compile time dispatch similar to what you can do with constexpr if in C++17, but only requires a C++14 compiler.
+            This function allows you to do compile time dispatch similar to what you can do with if constexpr in C++17.
          </description>
                                  
       </component>

@@ -10,12 +10,14 @@
 
 // this file contains miscellaneous stuff                      
 
-// Give people who forget the -std=c++14 option a reminder
-#if (defined(__GNUC__) && ((__GNUC__ >= 5 && __GNUC_MINOR__ >= 0) || (__GNUC__ > 5))) || \
-    (defined(__clang__) && ((__clang_major__ >= 3 && __clang_minor__ >= 4) || (__clang_major__ >= 3)))
-    #if __cplusplus < 201402L
-        #error "Dlib requires C++14 support.  Give your compiler the -std=c++14 option to enable it."
+// Give people who forget to enable C++17 a reminder.
+#if defined(_MSC_VER)
+    // MSVC only updates __cplusplus when /Zc:__cplusplus is enabled.
+    #if !defined(_MSVC_LANG) || _MSVC_LANG < 201703L
+        #error "Dlib requires C++17 support.  Give your compiler the /std:c++17 option to enable it."
     #endif
+#elif __cplusplus < 201703L
+    #error "Dlib requires C++17 support.  Give your compiler the -std=c++17 option to enable it."
 #endif
 
 #if defined __NVCC__
@@ -31,10 +33,6 @@
 
 
 #ifdef _MSC_VER
-
-#if  _MSC_VER < 1900
-#error "dlib versions newer than v19.1 use C++11 and therefore require Visual Studio 2015 or newer."
-#endif
 
 // Disable the following warnings for Visual Studio
 

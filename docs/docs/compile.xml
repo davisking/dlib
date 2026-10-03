@@ -13,7 +13,7 @@
                from github, go to the base folder of the dlib repository,
                and run <tt>python setup.py install</tt>.  Once either of these commands
                finishes running you are ready to use dlib from Python.  Note
-               that you need to have CMake and a working C++ compiler
+               that you need to have CMake and a working C++17 compiler
                installed for this to work.  
             </p>
                
@@ -53,7 +53,7 @@ cd build
 cmake ..
 cmake --build . --config Release
 </code_box>
-Note that you need to have a C++14 compiler installed on your system.  There are free C++14 compilers
+Note that you need to have a C++17 compiler installed on your system.  There are free C++17 compilers
 for most operating systems.  For example, Visual Studio is free on Windows and GCC is free and
 works well on Mac OS X and Linux systems.  If you have multiple compilers/IDEs installed then you can
 tell CMake which one you want it to use via the -G option.
@@ -65,10 +65,9 @@ tell CMake which one you want it to use via the -G option.
    makes it run much faster (also see <a href="faq.html#Whyisdlibslow">this FAQ</a>). 
 </p>
 <p>
-   Finally, note that when using Visual Studio, CMake will by default generate a 32bit executable.  
-   This means the programs you compile will only be able to use 2GB of RAM.  To avoid this, you need
-   to tell CMake to generate a 64bit executable.  You do this by using a command like 
-   <code_box>cmake -G "Visual Studio 14 2015 Win64" -T host=x64 ..</code_box> instead of <code_box>cmake ..</code_box>  
+   When using Visual Studio, select a 64bit target to avoid the memory limits of 32bit executables.
+   You can do this by using a command like
+   <code_box>cmake -G "Visual Studio 17 2022" -A x64 -T host=x64 ..</code_box> instead of <code_box>cmake ..</code_box>
    You can see the list of valid arguments to <tt>-G</tt> by running <tt>cmake</tt> with no options.   Note also the <tt>-T host=x64</tt>
    option, which tells Visual Studio to let the compiler use more than 2GB of RAM.  That is important if you don't want the compiler to
    crash from running out of RAM in some situations.
@@ -119,7 +118,7 @@ tell CMake which one you want it to use via the -G option.
         <h3>Compiling on Linux From Command Line</h3>
         From within the examples folder, you can compile nearly all of the examples with a single command like so:
 <code_box>
-g++ -std=c++14 -O3 -I.. ../dlib/all/source.cpp -lpthread -lX11 example_program_name.cpp
+g++ -std=c++17 -O3 -I.. ../dlib/all/source.cpp -lpthread -lX11 example_program_name.cpp
 </code_box>
 
 On non-Linux systems like Solaris, you might have to link to other libraries.  For example, I have seen systems
@@ -136,9 +135,10 @@ sudo apt-get install libx11-dev
             (via the -l option) to the following libraries: gdi32, comctl32, user32, winmm, ws2_32, or imm32.
         </p>
 
-        <h3>Compiling on Windows Using Visual Studio 2015 or Newer</h3>
+        <h3>Compiling on Windows Using Visual Studio</h3>
         <p>
-           All you need to do is create an empty console project. Then add dlib/all/source.cpp to it and add the
+           Create an empty console project and enable C++17 with <tt>/std:c++17</tt>.
+           Then add dlib/all/source.cpp to it and add the
            folder containing the dlib folder to the #include search path.  Then you can compile any example program 
            by adding it to your project.  
         </p>

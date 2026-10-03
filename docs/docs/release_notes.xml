@@ -12,6 +12,17 @@
 
 <current>
 New Features and Improvements:
+
+Non-Backwards Compatible Changes:
+   - Dlib now requires C++17.
+
+Bug fixes:
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="20.0" date="May 27, 2025">
+New Features and Improvements:
    - Machine Learning
       - Added auto_train_multiclass_svm_linear_classifier(), a tool that trains a multiclass
         SVM linear classifier without requiring the user to supply any hyperparameters.
@@ -69,7 +80,7 @@ Bug fixes:
    - Fix pixel saturation in interpolate_quadratic (PR #2806)
    - Fix convolution backward filter cache issue when using cudnn 7 and above (PR #2828)
    - Fix a bug in the gradient computation code for the layer_normalize layer.
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
