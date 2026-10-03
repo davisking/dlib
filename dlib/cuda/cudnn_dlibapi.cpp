@@ -786,6 +786,18 @@ namespace dlib
             return best_alg;
         }
 
+        // Whether cuDNN failed for lack of memory, which benchmarking the algorithms can run into
+        // when the rest of the program is using the GPU at the same time.
+        bool is_out_of_memory(cudnnStatus_t status)
+        {
+#if CUDNN_MAJOR >= 9
+            return status == CUDNN_STATUS_INTERNAL_ERROR_HOST_ALLOCATION_FAILED ||
+                   status == CUDNN_STATUS_INTERNAL_ERROR_DEVICE_ALLOCATION_FAILED;
+#else
+            return status == CUDNN_STATUS_ALLOC_FAILED;
+#endif
+        }
+
         // The forward, backward data and backward filters algorithms chosen for each convolution
         // configuration, with -1 for one not chosen yet.  Once it has max_size configurations, it
         // forgets the least recently used one for each new one.
@@ -841,7 +853,8 @@ namespace dlib
         }
 
         // Returns the algorithm that the cache has for the configuration, if cuDNN tells its workspace
-        // size, or else the one that find() returns, which then goes in the cache.
+        // size, or else the one that find() returns, which then goes in the cache - unless find()
+        // could not benchmark the algorithms and had to guess.
         template <typename find_type, typename get_workspace_size_type>
         int choose_algorithm (
             const algorithm_cache::key_type& key,
@@ -867,9 +880,11 @@ namespace dlib
                     // fresh estimate, instead of using a cached value.
                 }
             }
-            algorithms[which] = find();
+            bool benchmarked = true;
+            algorithms[which] = find(benchmarked);
             workspace_size_in_bytes = get_workspace_size(algorithms[which]);
-            cache.insert(key, algorithms);
+            if (benchmarked)
+                cache.insert(key, algorithms);
             return algorithms[which];
         }
 
@@ -896,14 +911,14 @@ namespace dlib
             if (forward_algo >= 0)
                 return;
 
-            const auto find = [&]() {
+            const auto find = [&](bool& benchmarked) {
                 cudnnConvolutionFwdAlgo_t forward_best_algo;
 #if CUDNN_MAJOR >= 8
                 int num_possible_algorithms = 0;
                 CHECK_CUDNN(cudnnGetConvolutionForwardAlgorithmMaxCount(context(), &num_possible_algorithms));
                 std::vector<cudnnConvolutionFwdAlgoPerf_t> perf_results(num_possible_algorithms);
                 int num_algorithms = 0;
-                CHECK_CUDNN(cudnnFindConvolutionForwardAlgorithm(
+                cudnnStatus_t status = cudnnFindConvolutionForwardAlgorithm(
                         context(),
                         descriptor(data),
                         (const cudnnFilterDescriptor_t)filter_handle,
@@ -911,7 +926,23 @@ namespace dlib
                         descriptor(output),
                         num_possible_algorithms,
                         &num_algorithms,
-                        perf_results.data()));
+                        perf_results.data());
+                // Benchmarking needs memory that the GPU may not have to spare at the moment, so
+                // fall back to the heuristics of cuDNN then.
+                if (is_out_of_memory(status))
+                {
+                    benchmarked = false;
+                    status = cudnnGetConvolutionForwardAlgorithm_v7(
+                            context(),
+                            descriptor(data),
+                            (const cudnnFilterDescriptor_t)filter_handle,
+                            (const cudnnConvolutionDescriptor_t)conv_handle,
+                            descriptor(output),
+                            num_possible_algorithms,
+                            &num_algorithms,
+                            perf_results.data());
+                }
+                CHECK_CUDNN(status);
                 perf_results.resize(num_algorithms);
                 forward_best_algo = pick_best_algorithm(perf_results);
 #else
@@ -953,14 +984,14 @@ namespace dlib
             if (backward_data_algo >= 0)
                 return;
 
-            const auto find = [&]() {
+            const auto find = [&](bool& benchmarked) {
                 cudnnConvolutionBwdDataAlgo_t backward_data_best_algo;
 #if CUDNN_MAJOR >= 8
                 int num_possible_algorithms = 0;
                 CHECK_CUDNN(cudnnGetConvolutionBackwardFilterAlgorithmMaxCount(context(), &num_possible_algorithms));
                 std::vector<cudnnConvolutionBwdDataAlgoPerf_t> perf_results(num_possible_algorithms);
                 int num_algorithms = 0;
-                CHECK_CUDNN(cudnnFindConvolutionBackwardDataAlgorithm(
+                cudnnStatus_t status = cudnnFindConvolutionBackwardDataAlgorithm(
                         context(),
                         (const cudnnFilterDescriptor_t)filter_handle,
                         descriptor(gradient_input),
@@ -968,7 +999,23 @@ namespace dlib
                         descriptor(data_gradient),
                         num_possible_algorithms,
                         &num_algorithms,
-                        perf_results.data()));
+                        perf_results.data());
+                // Benchmarking needs memory that the GPU may not have to spare at the moment, so
+                // fall back to the heuristics of cuDNN then.
+                if (is_out_of_memory(status))
+                {
+                    benchmarked = false;
+                    status = cudnnGetConvolutionBackwardDataAlgorithm_v7(
+                            context(),
+                            (const cudnnFilterDescriptor_t)filter_handle,
+                            descriptor(gradient_input),
+                            (const cudnnConvolutionDescriptor_t)conv_handle,
+                            descriptor(data_gradient),
+                            num_possible_algorithms,
+                            &num_algorithms,
+                            perf_results.data());
+                }
+                CHECK_CUDNN(status);
                 perf_results.resize(num_algorithms);
                 backward_data_best_algo = pick_best_algorithm(perf_results);
 #else
@@ -1010,14 +1057,14 @@ namespace dlib
             if (backward_filters_algo >= 0)
                 return;
 
-            const auto find = [&]() {
+            const auto find = [&](bool& benchmarked) {
                 cudnnConvolutionBwdFilterAlgo_t backward_filters_best_algo;
 #if CUDNN_MAJOR >= 8
                 int num_possible_algorithms = 0;
                 CHECK_CUDNN(cudnnGetConvolutionBackwardFilterAlgorithmMaxCount(context(), &num_possible_algorithms));
                 std::vector<cudnnConvolutionBwdFilterAlgoPerf_t> perf_results(num_possible_algorithms);
                 int num_algorithms = 0;
-                CHECK_CUDNN(cudnnFindConvolutionBackwardFilterAlgorithm(
+                cudnnStatus_t status = cudnnFindConvolutionBackwardFilterAlgorithm(
                         context(),
                         descriptor(data),
                         descriptor(gradient_input),
@@ -1025,7 +1072,23 @@ namespace dlib
                         (const cudnnFilterDescriptor_t)filter_handle,
                         num_possible_algorithms,
                         &num_algorithms,
-                        perf_results.data()));
+                        perf_results.data());
+                // Benchmarking needs memory that the GPU may not have to spare at the moment, so
+                // fall back to the heuristics of cuDNN then.
+                if (is_out_of_memory(status))
+                {
+                    benchmarked = false;
+                    status = cudnnGetConvolutionBackwardFilterAlgorithm_v7(
+                            context(),
+                            descriptor(data),
+                            descriptor(gradient_input),
+                            (const cudnnConvolutionDescriptor_t)conv_handle,
+                            (const cudnnFilterDescriptor_t)filter_handle,
+                            num_possible_algorithms,
+                            &num_algorithms,
+                            perf_results.data());
+                }
+                CHECK_CUDNN(status);
                 perf_results.resize(num_algorithms);
                 backward_filters_best_algo = pick_best_algorithm(perf_results);
 #else
