@@ -66,4 +66,4 @@ def test_on_holder_table():
                             [-10,-10],
                             [10,10],
                             300)       
-    assert (y - -19.2085025679) < 1e-7
+    assert abs(y - -19.2085025679) < 1e-4

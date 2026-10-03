@@ -20,6 +20,8 @@ namespace dlib
     bool dnn_prefer_fastest_algorithms();
     void set_dnn_prefer_fastest_algorithms();
     void set_dnn_prefer_smallest_algorithms();
+    bool dnn_choose_algorithms_per_input_shape();
+    void set_dnn_choose_algorithms_per_input_shape(bool choose_per_input_shape);
 }
 
 namespace dlib { namespace tt
