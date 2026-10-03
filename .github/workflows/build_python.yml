@@ -39,11 +39,13 @@ jobs:
           - windows-11-arm
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v6
+      with:
+        python-version: '3.13'
     - name: Install python deps
       run: |
-        pip install pytest numpy
+        pip install pytest numpy setuptools packaging
         pip3 install cmake
     - name: Build
       run: |
@@ -58,7 +60,7 @@ jobs:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
     - name: Install python deps
-      run: pip install pytest numpy
+      run: pip install pytest numpy setuptools packaging
     - name: Build
       run: |
         pip install .
@@ -73,7 +75,7 @@ jobs:
       with:
         python-version: '3.13t'
     - name: Install python deps
-      run: pip install pytest numpy
+      run: pip install pytest numpy setuptools packaging
     - name: Build
       run: pip install .
     - name: Verify free-threading
@@ -89,7 +91,7 @@ jobs:
       with:
         python-version: '3.8'
     - name: Install python deps
-      run: pip install pytest numpy
+      run: pip install pytest numpy setuptools packaging
     - name: Build
       run: pip install .
     - name: Test

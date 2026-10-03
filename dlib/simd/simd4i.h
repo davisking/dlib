@@ -5,6 +5,7 @@
 
 #include "simd_check.h"
 #include "../uintn.h"
+#include <type_traits>
 
 namespace dlib
 {
@@ -92,6 +93,8 @@ namespace dlib
 
 #elif defined(DLIB_HAVE_NEON)
 
+    class simd4f;
+
     class simd4i
     {
     public:
@@ -101,15 +104,26 @@ namespace dlib
         inline simd4i(int32 f) { x = vdupq_n_s32(f); }
         inline simd4i(int32 r0, int32 r1, int32 r2, int32 r3)
         {
-#ifdef _MSC_VER
-            // MSVC doesn't support GCC's __attribute__
-            int32 data[4] = { r0, r1, r2, r3 };
-#else
-            int32 __attribute__((aligned(16))) data[4] = { r0, r1, r2, r3 };
-#endif
+            alignas(16) int32 data[4] = { r0, r1, r2, r3 };
             x = vld1q_s32(data);
         }
         inline simd4i(const int32x4_t& val):x(val) {}
+
+        inline explicit simd4i(const simd4f& val);
+        /*!
+            requires
+                - Every lane of val is finite and its truncated value fits in int32.
+            ensures
+                - Each lane contains the corresponding value in val truncated toward zero.
+        !*/
+
+        inline simd4i& operator=(const simd4f& val);
+        /*!
+            requires
+                - Every lane of val is finite and its truncated value fits in int32.
+            ensures
+                - Assigns simd4i(val) to *this and returns *this.
+        !*/
 
         inline simd4i& operator=(const int32x4_t& val)
         {
@@ -118,9 +132,12 @@ namespace dlib
         }
 
         inline operator int32x4_t() const { return x; }
-#ifndef _MSC_VER
-        inline operator uint32x4_t() const { return (uint32x4_t)x; }
-#endif
+
+        // Some NEON implementations use the same type for signed and unsigned vectors.
+        template <typename T, typename std::enable_if<
+            std::is_same<T, uint32x4_t>::value &&
+            !std::is_same<T, int32x4_t>::value, int>::type = 0>
+        inline operator T() const { return vreinterpretq_u32_s32(x); }
 
         inline void load_aligned(const type* ptr)  { x = vld1q_s32(ptr); }
         inline void store_aligned(type* ptr) const { vst1q_s32(ptr, x); }
