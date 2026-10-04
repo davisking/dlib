@@ -1383,7 +1383,8 @@ namespace
         }    
 
         auto& net_output = layer<tag1>(net).get_output();
-        DLIB_TEST(max(abs(mat(net_output) - expected_output)) < 1e-5);
+        DLIB_TEST(have_same_dimensions(net_output, input_tensor));
+        DLIB_TEST(max(abs(image_plane(net_output) - expected_output)) < 1e-5);
     }
 
 // ----------------------------------------------------------------------------------------
