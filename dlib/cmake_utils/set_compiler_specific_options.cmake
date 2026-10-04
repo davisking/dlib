@@ -23,13 +23,20 @@ endif()
 
 
 set(gcc_like_compilers GNU Clang  Intel)
-set(intel_archs x86_64 i386 i686 AMD64 amd64 x86)
+set(intel_archs x86_64 i386 i686 AMD64 amd64 x86 x64 X86)
 set(DLIB_SIMD_LEVEL NONE)
+
+# With Visual Studio, CMAKE_SYSTEM_PROCESSOR can describe the host even when
+# -A selects a different target.  Use the architecture identified by the compiler.
+set(dlib_target_processor "${CMAKE_SYSTEM_PROCESSOR}")
+if (MSVC AND CMAKE_CXX_COMPILER_ARCHITECTURE_ID)
+   set(dlib_target_processor "${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}")
+endif()
 
 
 # Setup some options to allow a user to enable SSE and AVX instruction use.
 if ((";${gcc_like_compilers};" MATCHES ";${CMAKE_CXX_COMPILER_ID};")  AND
-   (";${intel_archs};"        MATCHES ";${CMAKE_SYSTEM_PROCESSOR};") AND NOT USE_AUTO_VECTOR)
+   (";${intel_archs};"        MATCHES ";${dlib_target_processor};") AND NOT USE_AUTO_VECTOR)
    option(USE_SSE2_INSTRUCTIONS "Compile your program with SSE2 instructions" OFF)
    option(USE_SSE4_INSTRUCTIONS "Compile your program with SSE4 instructions" OFF)
    option(USE_AVX_INSTRUCTIONS  "Compile your program with AVX instructions"  OFF)
@@ -45,6 +52,13 @@ if ((";${gcc_like_compilers};" MATCHES ";${CMAKE_CXX_COMPILER_ID};")  AND
       set(DLIB_SIMD_LEVEL SSE2)
       list(APPEND active_compile_opts -msse2)
       message(STATUS "Enabling SSE2 instructions")
+   endif()
+elseif ((MSVC OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC") AND
+        "${dlib_target_processor}" MATCHES "^(arm64|ARM64|aarch64)$")
+   option(USE_NEON_INSTRUCTIONS "Compile your program with ARM-NEON instructions" ON)
+   if (USE_NEON_INSTRUCTIONS)
+      set(DLIB_SIMD_LEVEL NEON)
+      message(STATUS "Enabling ARM-NEON instructions")
    endif()
 elseif (MSVC OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC") # else if using Visual Studio
    # Use SSE2 by default when using Visual Studio.

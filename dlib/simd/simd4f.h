@@ -146,7 +146,7 @@ namespace dlib
         inline simd4f(float f) { x = vdupq_n_f32(f); }
         inline simd4f(float r0, float r1, float r2, float r3)
         {
-            float __attribute__ ((aligned (16))) data[4] = { r0, r1, r2, r3 };
+            alignas(16) float data[4] = { r0, r1, r2, r3 };
             x = vld1q_f32(data);
         }
         inline simd4f(const float32x4_t& val):x(val) {}
@@ -172,8 +172,12 @@ namespace dlib
 
         inline operator float32x4_t() const { return x; }
 
-        // truncate to 32bit integers
-        inline operator int32x4_t() const { return vcvtq_s32_f32(x); }
+        // Preserve the raw integer conversion when NEON has distinct vector types.
+        // Conversion to simd4i always uses its numeric constructor below.
+        template <typename T, typename std::enable_if<
+            std::is_same<T, int32x4_t>::value &&
+            !std::is_same<T, float32x4_t>::value, int>::type = 0>
+        inline operator T() const { return vcvtq_s32_f32(x); }
 
         inline void load_aligned(const type* ptr)  { x = vld1q_f32(ptr); }
         inline void store_aligned(type* ptr) const { vst1q_f32(ptr, x); }
@@ -192,6 +196,13 @@ namespace dlib
         float32x4_t x;
     };
 
+    inline simd4i::simd4i(const simd4f& val) : x(vcvtq_s32_f32(val)) {}
+
+    inline simd4i& simd4i::operator=(const simd4f& val)
+    {
+        x = vcvtq_s32_f32(val);
+        return *this;
+    }
 
     typedef simd4i simd4f_bool;
 #else

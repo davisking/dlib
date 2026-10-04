@@ -128,6 +128,7 @@ add_executable(${target_name} main.cpp tester.cpp
    sequence_segmenter.cpp
    serialize.cpp
    set.cpp
+   simd.cpp
    sldf.cpp
    sliding_buffer.cpp
    sockets2.cpp
