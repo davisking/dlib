@@ -363,8 +363,11 @@ namespace dlib
                 << "\n\tyou have to add some numbers to this object first"
                 << "\n\tthis: " << this
                 );
-
-            return covariance() / std::sqrt(variance_x()*variance_y());
+            // NOTE: The variance is always positive
+            auto const variance = std::sqrt(variance_x() * variance_y());
+            return covariance() / (variance < std::numeric_limits<T>::epsilon()
+                                       ? std::numeric_limits<T>::epsilon()
+                                       : variance);
         }
 
         T variance_x (
