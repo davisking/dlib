@@ -216,7 +216,7 @@ namespace dlib
             }
 
             assignments.resize(samples.size());
-
+            std::fill(assignments.begin(), assignments.end(), 0);
             bool assignment_changed = true;
 
             // loop until the centers stabilize 
