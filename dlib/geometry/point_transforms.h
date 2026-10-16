@@ -339,7 +339,7 @@ namespace dlib
         // 43.
 
         dlib::vector<double,2> mean_from, mean_to;
-        double sigma_from = 0, sigma_to = 0;
+        double sigma_from = 0;
         matrix<double,2,2> cov;
         cov = 0;
 
@@ -354,12 +354,10 @@ namespace dlib
         for (unsigned long i = 0; i < from_points.size(); ++i)
         {
             sigma_from += length_squared(from_points[i] - mean_from);
-            sigma_to += length_squared(to_points[i] - mean_to);
             cov += (to_points[i] - mean_to)*trans(from_points[i] - mean_from);
         }
 
         sigma_from /= from_points.size();
-        sigma_to   /= from_points.size();
         cov        /= from_points.size();
 
         matrix<double,2,2> u, v, s, d;
