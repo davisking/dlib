@@ -1191,10 +1191,8 @@ namespace dlib
         // This only matters when T is an integer type.  However, we do it for
         // all types so that the behavior of this function is always relatively
         // the same.
-        while (gaussian(0,sigma)/(gaussian(max_size/2,sigma) +
-                                     std::numeric_limits<double>::epsilon())> 50) {
+        while (gaussian(0,sigma) > 50*gaussian(max_size/2,sigma))
             --max_size;
-        }
 
         matrix<double,0,1> f(max_size);
         for (long i = 0; i < f.size(); ++i)
