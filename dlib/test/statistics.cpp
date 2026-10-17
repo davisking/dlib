@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <dlib/matrix.h>
 #include <cmath>
+#include <limits>
 #include <random>
 
 #include "tester.h"
@@ -305,6 +306,141 @@ namespace
                 }
             }
 
+        }
+
+        template <typename T>
+        void test_correlation_scales (
+            const T x_scale,
+            const T y_scale
+        )
+        {
+            running_scalar_covariance<T> positive, negative, partial;
+            positive.add(-x_scale, -y_scale);
+            positive.add(0, 0);
+            positive.add(x_scale, y_scale);
+            negative.add(-x_scale, y_scale);
+            negative.add(0, 0);
+            negative.add(x_scale, -y_scale);
+            partial.add(-x_scale, 0);
+            partial.add(0, -y_scale);
+            partial.add(x_scale, y_scale);
+
+            const T tolerance = 8*std::numeric_limits<T>::epsilon();
+            DLIB_TEST_MSG(std::abs(positive.correlation()-1) < tolerance,
+                "x_scale: " << x_scale << " y_scale: " << y_scale
+                << " correlation: " << positive.correlation());
+            DLIB_TEST_MSG(std::abs(negative.correlation()+1) < tolerance,
+                "x_scale: " << x_scale << " y_scale: " << y_scale
+                << " correlation: " << negative.correlation());
+            DLIB_TEST_MSG(std::abs(partial.correlation()-T(0.5)) < tolerance,
+                "x_scale: " << x_scale << " y_scale: " << y_scale
+                << " correlation: " << partial.correlation());
+        }
+
+        template <typename T>
+        void test_running_scalar_correlation()
+        {
+            // The middle scales make the product of the variances underflow or
+            // overflow, while each variance and covariance remains representable.
+            const T scales[] = {
+                T(1), T(1e-4),
+                std::ldexp(T(1), std::numeric_limits<T>::min_exponent/3),
+                std::ldexp(T(1), std::numeric_limits<T>::max_exponent/3),
+                std::sqrt(std::numeric_limits<T>::min()),
+                std::ldexp(T(1), (std::numeric_limits<T>::max_exponent-4)/2)
+            };
+            for (const T x_scale : scales)
+            {
+                for (const T y_scale : scales)
+                    test_correlation_scales(x_scale, y_scale);
+            }
+
+            if (std::numeric_limits<T>::has_denorm == std::denorm_present)
+            {
+                // Use enough subnormal units to represent the covariance for
+                // the partial-correlation case as well as the variances.
+                const T scale = 4*std::sqrt(std::numeric_limits<T>::denorm_min());
+                test_correlation_scales(scale, scale);
+
+                running_scalar_covariance<T> smallest;
+                const T tiny = std::sqrt(std::numeric_limits<T>::denorm_min());
+                smallest.add(-tiny, -tiny);
+                smallest.add(0, 0);
+                smallest.add(tiny, tiny);
+                DLIB_TEST(std::abs(smallest.correlation()-1) < 8*std::numeric_limits<T>::epsilon());
+
+                // The moments are 2, 1 and -1 subnormal units, respectively.
+                // Multiplying the standard deviations would round their product
+                // to 1 unit and incorrectly return -1 instead of -1/sqrt(2).
+                running_scalar_covariance<T> subnormal;
+                subnormal.add(-2*tiny, tiny);
+                subnormal.add(0, tiny);
+                subnormal.add(0, -tiny);
+                subnormal.add(2*tiny, -tiny);
+                subnormal.add(0, 0);
+                DLIB_TEST(std::abs(subnormal.correlation()+1/std::sqrt(T(2))) <
+                    8*std::numeric_limits<T>::epsilon());
+            }
+
+            running_scalar_covariance<T> largest, weak;
+            const T large = std::nextafter(std::sqrt(std::numeric_limits<T>::max()/2), T(0));
+            largest.add(-large, -large);
+            largest.add(large, large);
+            DLIB_TEST(std::abs(largest.correlation()-1) < 8*std::numeric_limits<T>::epsilon());
+
+            // Dividing by the larger standard deviation first would underflow
+            // the first quotient and lose this nonzero correlation.
+            const T expected = std::ldexp(T(1), std::numeric_limits<T>::min_exponent+8);
+            const T big = scales[3];
+            const T small = 1/big;
+            const T weak_signal = expected*big;
+            weak.add(big, 0);
+            weak.add(weak_signal, small);
+            weak.add(-big, 0);
+            weak.add(-weak_signal, -small);
+            DLIB_TEST(std::abs(weak.correlation()/expected-1) < 8*std::numeric_limits<T>::epsilon());
+
+            running_scalar_covariance<T> two_samples, constant_x, constant_y, constant_both;
+            const T scale = scales[2];
+            two_samples.add(0, 0);
+            two_samples.add(scale, scale);
+            DLIB_TEST(std::abs(two_samples.correlation()-1) < 8*std::numeric_limits<T>::epsilon());
+            for (const T x : {T(-1), T(0), T(1)})
+            {
+                constant_x.add(1, x);
+                constant_y.add(x, 1);
+                constant_both.add(1, 2);
+            }
+            DLIB_TEST(constant_x.correlation() == 0);
+            DLIB_TEST(constant_y.correlation() == 0);
+            DLIB_TEST(constant_both.correlation() == 0);
+        }
+
+        void test_vector_correlation()
+        {
+            const double scales[] = {1e-9, 1e-100, 1e100};
+            for (const double x_scale : scales)
+            {
+                for (const double y_scale : scales)
+                {
+                    const std::vector<double> x = {-x_scale, 0, x_scale};
+                    const std::vector<double> y = {-y_scale, 0, y_scale};
+                    const std::vector<double> negative = {y_scale, 0, -y_scale};
+                    const std::vector<double> partial = {0, -y_scale, y_scale};
+                    DLIB_TEST(std::abs(correlation(x,y)-1) < 1e-14);
+                    DLIB_TEST(std::abs(r_squared(x,y)-1) < 1e-14);
+                    DLIB_TEST(std::abs(correlation(x,negative)+1) < 1e-14);
+                    DLIB_TEST(std::abs(r_squared(x,negative)-1) < 1e-14);
+                    DLIB_TEST(std::abs(correlation(x,partial)-0.5) < 1e-14);
+                    DLIB_TEST(std::abs(r_squared(x,partial)-0.25) < 1e-14);
+                }
+            }
+            const std::vector<double> constant(3, 1);
+            const std::vector<double> varying = {-1, 0, 1};
+            DLIB_TEST(correlation(constant,varying) == 0);
+            DLIB_TEST(correlation(varying,constant) == 0);
+            DLIB_TEST(correlation(constant,constant) == 0);
+            DLIB_TEST(r_squared(constant,varying) == 0);
         }
 
         void test_running_stats()
@@ -943,6 +1079,10 @@ namespace
             test_running_cross_covariance();
             test_running_cross_covariance_sparse();
             test_running_stats();
+            test_running_scalar_correlation<float>();
+            test_running_scalar_correlation<double>();
+            test_running_scalar_correlation<long double>();
+            test_vector_correlation();
             test_skewness_and_kurtosis_1();
             test_skewness_and_kurtosis_2();
             test_randomize_samples();

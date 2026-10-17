@@ -363,8 +363,15 @@ namespace dlib
                 << "\n\tyou have to add some numbers to this object first"
                 << "\n\tthis: " << this
                 );
+            const T vx = variance_x();
+            const T vy = variance_y();
+            if (vx == 0 || vy == 0)
+                return 0;
 
-            return covariance() / std::sqrt(variance_x()*variance_y());
+            // Avoid forming a product that can underflow or overflow.  Divide by
+            // the smaller standard deviation first to avoid underflowing an
+            // intermediate quotient when the scales are very different.
+            return covariance() / std::sqrt(std::min(vx,vy)) / std::sqrt(std::max(vx,vy));
         }
 
         T variance_x (
