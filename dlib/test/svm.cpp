@@ -7,6 +7,7 @@
 #include <string>
 #include <cstdlib>
 #include <ctime>
+#include <initializer_list>
 #include <vector>
 #include "../stl_checked.h"
 #include "../array.h"
@@ -26,6 +27,102 @@ namespace
     using namespace std;
 
     logger dlog("test.svm");
+
+// ----------------------------------------------------------------------------------------
+
+    void test_kkmeans_initial_assignments (
+    )
+    {
+        typedef matrix<double,1,1> sample_type;
+        typedef linear_kernel<sample_type> kernel_type;
+        kkmeans<kernel_type> kmeans(kcentroid<kernel_type>(kernel_type(), 1e-9));
+
+        const auto make_samples = [](std::initializer_list<double> values)
+        {
+            std::vector<sample_type> samples;
+            for (double value : values)
+            {
+                sample_type sample;
+                sample = value;
+                samples.push_back(sample);
+            }
+            return samples;
+        };
+        const auto check_center = [&](unsigned long index, double value, unsigned long count)
+        {
+            sample_type expected;
+            expected = value;
+            const auto& center = kmeans.get_kcentroid(index);
+            DLIB_TEST(center.samples_trained() == count);
+            DLIB_TEST(center(expected) < 1e-6);
+        };
+
+        // A single cluster must be recomputed from the samples even though every
+        // assignment is zero.  A zero iteration budget still leaves the seed intact.
+        const auto samples = make_samples({2,4});
+        const auto seed = make_samples({10});
+        kmeans.train(samples, seed, 0);
+        check_center(0, 10, 1);
+        kmeans.train(samples, seed, 1);
+        check_center(0, 3, 2);
+        kmeans.train(samples, seed);
+        check_center(0, 3, 2);
+
+        // The same first-pass requirement applies when several centers are present
+        // but all samples initially choose the first one.
+        kmeans.set_number_of_centers(2);
+        kmeans.train(samples, make_samples({0,100}), 1);
+        check_center(0, 3, 2);
+        DLIB_TEST(kmeans.get_kcentroid(1).samples_trained() == 0);
+
+        // Training starts from the supplied seeds each time, including after a
+        // change in the number of samples or a previous run with the same labels.
+        const auto two_clusters = make_samples({0,2,8,10});
+        const auto two_seeds = make_samples({0,10});
+        for (unsigned int i = 0; i < 2; ++i)
+        {
+            kmeans.train(two_clusters, two_seeds);
+            check_center(0, 1, 2);
+            check_center(1, 9, 2);
+        }
+        kmeans.train(make_samples({0,2,8,10,12}), two_seeds);
+        check_center(0, 1, 2);
+        check_center(1, 10, 3);
+        kmeans.train(two_clusters, two_seeds);
+        check_center(0, 1, 2);
+        check_center(1, 9, 2);
+
+        // Only one point initially chooses the second center, below the default
+        // change threshold of two points.  The first pass must nevertheless count
+        // every sample as newly assigned so subsequent refinement can run.
+        std::vector<sample_type> imbalanced(200);
+        for (unsigned long i = 0; i < imbalanced.size(); ++i)
+            imbalanced[i] = i < 100 ? 0 : 40;
+        imbalanced.back() = 60;
+        const auto distant_seeds = make_samples({0,100});
+        kmeans.train(imbalanced, distant_seeds, 1);
+        check_center(0, 3960.0/199, 199);
+        check_center(1, 60, 1);
+        kmeans.train(imbalanced, distant_seeds, 2);
+        check_center(0, 0, 100);
+        check_center(1, 40.2, 100);
+        kmeans.train(imbalanced, distant_seeds);
+        check_center(0, 0, 100);
+        check_center(1, 40.2, 100);
+        for (unsigned long i = 0; i < imbalanced.size(); ++i)
+            DLIB_TEST(kmeans(imbalanced[i]) == (i < 100 ? 0 : 1));
+
+        // Also exercise the general kernel centroid, rather than only its linear
+        // specialization.  Its expected centroid is trained directly on the data.
+        typedef radial_basis_kernel<sample_type> rbf_kernel;
+        kcentroid<rbf_kernel> expected(rbf_kernel(0.1), 1e-9);
+        kkmeans<rbf_kernel> kernel_kmeans(expected);
+        for (const auto& sample : samples)
+            expected.train(sample);
+        kernel_kmeans.train(samples, seed);
+        DLIB_TEST(kernel_kmeans.get_kcentroid(0).samples_trained() == samples.size());
+        DLIB_TEST(kernel_kmeans.get_kcentroid(0)(expected) < 1e-6);
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -649,6 +746,7 @@ namespace
         {
             test_kernel_derivative();
             unittest_binary_classification();
+            test_kkmeans_initial_assignments();
             test_clutering();
             test_regression();
             test_anomaly_detection();

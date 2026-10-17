@@ -215,8 +215,11 @@ namespace dlib
                 centers[i]->train(initial_centers(i));
             }
 
+            // Discard old assignments rather than preserving them while resizing.
+            assignments.set_size(0);
             assignments.resize(samples.size());
-            std::fill(assignments.begin(), assignments.end(), 0);
+            // Force every sample to be assigned on the first iteration.
+            std::fill(assignments.begin(), assignments.end(), number_of_centers());
             bool assignment_changed = true;
 
             // loop until the centers stabilize 
