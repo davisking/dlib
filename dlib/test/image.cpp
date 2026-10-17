@@ -4,6 +4,7 @@
 #include <string>
 #include <cstdlib>
 #include <ctime>
+#include <cfenv>
 #include <dlib/pixel.h>
 #include <dlib/array2d.h>
 #include <dlib/image_transforms.h>
@@ -12,6 +13,7 @@
 #include <dlib/rand.h>
 #include <dlib/compress_stream.h>
 #include <dlib/base64.h>
+#include <dlib/scope.h>
 
 #include "tester.h"
 
@@ -937,6 +939,89 @@ namespace
         }
 
 
+    }
+
+    template <typename T>
+    void test_gaussian_blur()
+    {
+        array2d<T> img(9,11), blurred;
+        assign_all_pixels(img, 100);
+        const double sigmas[] = {1, 0.3575067961838845, 0.357506796183885, 18};
+        const int max_sizes[] = {1001, 3, 3, 5};
+        const int borders[] = {2, 0, 1, 2};
+        for (unsigned long i = 0; i < 4; ++i)
+        {
+            const rectangle rect = gaussian_blur(img, blurred, sigmas[i], max_sizes[i]);
+            DLIB_TEST(rect == shrink_rect(get_rect(img), borders[i]));
+            DLIB_TEST(have_same_dimensions(img, blurred));
+            for (long r = 0; r < img.nr(); ++r)
+            {
+                for (long c = 0; c < img.nc(); ++c)
+                {
+                    if (rect.contains(point(c,r)))
+                    {
+                        // Integer output may truncate a floating-point result at sigma=18.
+                        const double tolerance = is_float_type<T>::value ? 1e-4 : 1;
+                        DLIB_TEST(std::abs(static_cast<double>(blurred[r][c])-100) <= tolerance);
+                    }
+                    else
+                    {
+                        DLIB_TEST(blurred[r][c] == 0);
+                    }
+                }
+            }
+        }
+    }
+
+    void test_gaussian_filter()
+    {
+#if defined(FE_DIVBYZERO) && defined(FE_OVERFLOW)
+        std::fenv_t environment;
+        DLIB_TEST(std::fegetenv(&environment) == 0);
+        auto restore_environment = make_scope_exit([&] { std::fesetenv(&environment); });
+        DLIB_TEST(std::feclearexcept(FE_ALL_EXCEPT) == 0);
+#endif
+
+        // At the default size, the Gaussian tail can underflow to zero.  Selecting a smaller
+        // filter must not divide by that tail or overflow a density ratio.
+        const matrix<int,0,1> integer_filter = create_gaussian_filter<int>(1,1001);
+        const matrix<float,0,1> float_filter = create_gaussian_filter<float>(1,1001);
+        const matrix<double,0,1> double_filter = create_gaussian_filter<double>(1,1001);
+#if defined(FE_DIVBYZERO) && defined(FE_OVERFLOW)
+        DLIB_TEST(std::fetestexcept(FE_DIVBYZERO | FE_OVERFLOW) == 0);
+#endif
+        matrix<int,5,1> expected_integer;
+        expected_integer = 1,4,7,4,1;
+        matrix<double,5,1> expected_double;
+        expected_double = 0.05399096651318806, 0.24197072451914337,
+                          0.3989422804014327,
+                          0.24197072451914337, 0.05399096651318806;
+        DLIB_TEST(integer_filter == expected_integer);
+        DLIB_TEST(max(abs(double_filter-expected_double)) < 1e-15);
+        DLIB_TEST(max(abs(matrix_cast<double>(float_filter)-expected_double)) < 1e-7);
+
+        // These lie on opposite sides of the 50:1 cutoff.  Adding epsilon to
+        // the edge density incorrectly retains three taps for the lower sigma.
+        const double below_cutoff = 0.3575067961838845;
+        const double above_cutoff = 0.357506796183885;
+        DLIB_TEST(create_gaussian_filter<int>(below_cutoff,3).size() == 1);
+        DLIB_TEST(create_gaussian_filter<float>(below_cutoff,3).size() == 1);
+        DLIB_TEST(create_gaussian_filter<double>(below_cutoff,3).size() == 1);
+        matrix<int,3,1> expected_three;
+        expected_three = 1,50,1;
+        DLIB_TEST(create_gaussian_filter<int>(above_cutoff,3) == expected_three);
+        DLIB_TEST(create_gaussian_filter<float>(above_cutoff,3).size() == 3);
+        DLIB_TEST(create_gaussian_filter<double>(above_cutoff,3).size() == 3);
+        DLIB_TEST(create_gaussian_filter<int>(0.1,1001).size() == 1);
+        DLIB_TEST(create_gaussian_filter<double>(1,1).size() == 1);
+
+        test_gaussian_blur<unsigned char>();
+        test_gaussian_blur<float>();
+        test_gaussian_blur<double>();
+#if defined(FE_DIVBYZERO) && defined(FE_OVERFLOW)
+        DLIB_TEST(std::fesetenv(&environment) == 0);
+        restore_environment.release();
+#endif
     }
 
     void test_filtering2(int nr, int nc, dlib::rand& rnd)
@@ -2619,6 +2704,7 @@ namespace
             test_integral_image<double, float>();
 
             test_zero_border_pixels();
+            test_gaussian_filter();
 
             test_filtering<unsigned char>(false,1);
             test_filtering<unsigned char>(true,1);
