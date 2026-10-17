@@ -570,14 +570,15 @@ namespace dlib
         simd4f temp = _mm_hadd_ps(item,item);
         return _mm_cvtss_f32(_mm_hadd_ps(temp,temp));
 #elif defined(DLIB_HAVE_SSE2) && (!defined(_MSC_VER) || _MSC_VER!=1400)
-        simd4f temp = _mm_add_ps(item,_mm_movehl_ps(item,item));
-        simd4f temp2 = _mm_shuffle_ps(temp,temp,1);
+        simd4f temp = _mm_shuffle_ps(item, item, _MM_SHUFFLE(2, 3, 0, 1));
+        temp = _mm_add_ps(temp, item);
+        simd4f temp2 = _mm_shuffle_ps(temp,temp,_MM_SHUFFLE(0, 1, 2, 3));
         return _mm_cvtss_f32(_mm_add_ss(temp,temp2));
 #elif defined(DLIB_HAVE_NEON)
-        float32x2_t r = vadd_f32(vget_high_f32(item), vget_low_f32(item));
+        float32x2_t r = vpadd_f32(vget_high_f32(item), vget_low_f32(item));
         return vget_lane_f32(vpadd_f32(r, r), 0);
 #else
-        return item[0]+item[1]+item[2]+item[3];
+        return (item[0]+item[1])+(item[2]+item[3]);
 #endif
     }
 
