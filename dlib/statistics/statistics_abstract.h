@@ -47,6 +47,7 @@ namespace dlib
         ensures
             - returns the correlation coefficient between all the elements of a and b.
               (i.e. how correlated is a(i) with b(i))
+              Returns 0 if either computed sample variance is 0.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -437,6 +438,7 @@ namespace dlib
             ensures
                 - returns the correlation coefficient between all the x and y samples 
                   presented to this object via add()
+                - returns 0 if variance_x() == 0 or variance_y() == 0.
         !*/
 
         T variance_x (
