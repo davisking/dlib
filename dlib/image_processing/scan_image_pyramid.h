@@ -870,7 +870,6 @@ namespace dlib
 
         array2d<double> saliency_image, sum_img;
 
-        double total_temp_score = 0;
         // convert into feature space.
         object_box = object_box.intersect(get_rect(feats[best_level]));
 
@@ -937,7 +936,6 @@ namespace dlib
             }
             else
             {
-                total_temp_score += max_val;
                 // convert max_loc back into feature image space from our cropped image.
                 max_loc += area.tl_corner();
 
