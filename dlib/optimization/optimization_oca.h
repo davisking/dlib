@@ -264,7 +264,10 @@ namespace dlib
 
             const double prior_norm = have_prior ?  0.5*dot(prior,prior) : 0;
 
-            const auto time_to_stop = std::chrono::steady_clock::now() + max_runtime;
+            const auto now = std::chrono::steady_clock::now();
+            const auto time_to_stop = (max_runtime > std::chrono::steady_clock::time_point::max() - now)
+                ? std::chrono::steady_clock::time_point::max()
+                : now + max_runtime;
 
             unsigned long counter = 0;
             while (true)
