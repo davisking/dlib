@@ -1729,7 +1729,7 @@ escape_banded_detection:
         {
             for (long c = -1; c <= +1; ++c)
             {
-                pix(i) = dlib::impl::magnitude(m(p.y()+r,p.y()+c));
+                pix(i) = dlib::impl::magnitude(m(p.y()+r,p.x()+c));
                 /*
                 A(i,0) = c*c;
                 A(i,1) = c*r;
