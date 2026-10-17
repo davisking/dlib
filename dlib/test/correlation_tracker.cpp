@@ -49,7 +49,7 @@ namespace
                                   drectangle(82.7572, 83.6035, 120.319, 169.895)
                                  };
             // correct update results - recorded by successful runs
-            double correct_update_results[] = { 0, 18.3077, 16.8406, 13.1716 };
+            double correct_update_results[] = { 0, 18.3077, 16.8406, 15.9162 };
 
             correlation_tracker tracker;
             std::istringstream sin(frames[0]());

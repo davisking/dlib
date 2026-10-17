@@ -28,6 +28,68 @@ namespace
 
     logger dlog("test.matrix");
 
+    void test_max_point_interpolated()
+    {
+        struct peak_case
+        {
+            long rows;
+            long columns;
+            double x;
+            double y;
+        };
+        const peak_case cases[] = {
+            {9, 9, 5.25, 2.75},
+            {9, 9, 2.25, 6.125},
+            {4, 10, 7.25, 1.75},
+            {10, 3, 1.25, 7.75}
+        };
+
+        for (const auto& peak : cases)
+        {
+            matrix<double> m(peak.rows, peak.columns);
+            for (long r = 0; r < m.nr(); ++r)
+            {
+                for (long c = 0; c < m.nc(); ++c)
+                {
+                    const double x = c - peak.x;
+                    const double y = r - peak.y;
+                    // A strictly concave quadratic with a known maximum, including
+                    // a cross term so both coordinates contribute to the fit.
+                    m(r,c) = 1000 - 3*x*x - 0.4*x*y - 2*y*y;
+                }
+            }
+
+            const dpoint expected(peak.x, peak.y);
+            DLIB_TEST(length(max_point_interpolated(m) - expected) < 1e-10);
+            DLIB_TEST(length(max_point_interpolated(trans(m)) -
+                             dpoint(peak.y, peak.x)) < 1e-10);
+
+            matrix<double,0,0,default_memory_manager,column_major_layout> column_major = m;
+            DLIB_TEST(length(max_point_interpolated(column_major) - expected) < 1e-10);
+            matrix<float> single_precision = matrix_cast<float>(m);
+            DLIB_TEST(length(max_point_interpolated(single_precision) - expected) < 1e-4);
+        }
+
+        // Border maxima must not require a 3x3 neighborhood.
+        matrix<double> border(4,7);
+        const point corners[] = {point(0,0), point(6,0), point(0,3), point(6,3)};
+        for (const auto& corner : corners)
+        {
+            border = 0;
+            border(corner.y(),corner.x()) = 1;
+            DLIB_TEST(max_point_interpolated(border) == dpoint(corner));
+        }
+
+        matrix<double,1,5> row;
+        for (long c = 0; c < row.nc(); ++c)
+            row(c) = 10 - (c-2.25)*(c-2.25);
+        DLIB_TEST(length(max_point_interpolated(row) - dpoint(2.25,0)) < 1e-10);
+        DLIB_TEST(length(max_point_interpolated(trans(row)) - dpoint(0,2.25)) < 1e-10);
+        matrix<double,1,1> singleton;
+        singleton = 1;
+        DLIB_TEST(max_point_interpolated(singleton) == dpoint(0,0));
+    }
+
     template <typename type>
     const matrix<type> rand_sp_banded(long n, long bw)
     {
@@ -1576,6 +1638,7 @@ namespace
         void perform_test (
         )
         {
+            test_max_point_interpolated();
             matrix_test();
             matrix_test2();
         }
