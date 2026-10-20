@@ -85,6 +85,94 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_upper_bound_candidate_selection()
+    /*!
+        ensures
+            - Checks that candidate selection agrees with exhaustive upper-bound
+              evaluation of the same candidate pool, including ties.
+    !*/
+    {
+        for (long dims : {1, 3, 8})
+        for (int integer_mode : {0, 1, 2})
+        for (double noise : {0.0, 0.01})
+        {
+            print_spinner();
+            matrix<double,0,1> lower(dims), upper(dims);
+            lower = -10;
+            upper = 10;
+            std::vector<bool> integers(dims);
+            for (long j = 0; j < dims; ++j)
+                integers[j] = integer_mode == 2 || (integer_mode == 1 && j%2 == 0);
+            function_spec spec(lower, upper, integers);
+
+            dlib::rand data_rng;
+            std::vector<function_evaluation> samples;
+            for (long i = 0; i < 32; ++i)
+            {
+                matrix<double,0,1> x(dims);
+                for (long j = 0; j < dims; ++j)
+                {
+                    x(j) = data_rng.get_double_in_range(-1, 1);
+                    if (integers[j])
+                        x(j) = std::round(x(j));
+                }
+                samples.emplace_back(x, std::sin(sum(x)) + data_rng.get_random_double()/10);
+            }
+            upper_bound_function bound(samples, noise);
+            double best_observed = -std::numeric_limits<double>::infinity();
+            for (const auto& sample : samples)
+                best_observed = std::max(best_observed, sample.y);
+
+            for (size_t count : {1, 32, 5000})
+            for (time_t seed : {17, 43, 101})
+            {
+                global_function_search opt({spec}, {samples}, noise);
+                opt.set_seed(seed);
+                opt.set_pure_random_search_probability(0);
+                opt.set_solver_epsilon(std::numeric_limits<double>::max());
+                opt.set_monte_carlo_upper_bound_sample_num(count);
+
+                dlib::rand candidate_rng;
+                candidate_rng.set_seed(cast_to_string(seed));
+                candidate_rng.get_random_double(); // The choice to use the upper bound.
+                auto draw_candidate = [&]()
+                {
+                    matrix<double,0,1> x(dims);
+                    for (long j = 0; j < dims; ++j)
+                    {
+                        x(j) = candidate_rng.get_double_in_range(lower(j), upper(j));
+                        if (integers[j])
+                            x(j) = std::round(x(j));
+                    }
+                    return x;
+                };
+
+                double best_bound = -std::numeric_limits<double>::infinity();
+                matrix<double,0,1> expected;
+                for (size_t i = 0; i < count; ++i)
+                {
+                    const auto x = draw_candidate();
+                    const double value = bound(x);
+                    if (value > best_bound)
+                    {
+                        best_bound = value;
+                        expected = x;
+                    }
+                }
+                if (best_bound <= best_observed)
+                {
+                    candidate_rng.get_integer(1); // The single function's random fallback.
+                    expected = draw_candidate();
+                }
+                auto request = opt.get_next_x();
+                DLIB_TEST(request.function_idx() == 0);
+                DLIB_TEST(request.x() == expected);
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     double complex_holder_table ( double x0, double x1)
     {
         // The regular HolderTable function
@@ -327,6 +415,7 @@ namespace
             test_upper_bound_function(0.01, 1e-6);
             test_upper_bound_function(0.0, 1e-6);
             test_upper_bound_function(0.0, 1e-1);
+            test_upper_bound_candidate_selection();
             test_global_function_search();
             test_find_max_global();
             test_find_min_global();

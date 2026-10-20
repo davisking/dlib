@@ -2,6 +2,7 @@
 #include "global_function_search.h"
 #include "upper_bound_function.h"
 #include "../optimization.h"
+#include <numeric>
 
 
 namespace dlib
@@ -11,6 +12,68 @@ namespace dlib
 
     namespace qopt_impl
     {
+
+        struct upper_bound_search
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This is a thresholded evaluator for upper_bound_function, used to
+                    discard search candidates that cannot improve the incumbent value.
+            !*/
+
+            static double evaluate_candidate (
+                const upper_bound_function& bound,
+                const matrix<double,0,1>& x,
+                double incumbent,
+                std::vector<size_t>& order
+            )
+            /*!
+                requires
+                    - bound.num_points() > 1
+                    - x.size() == bound.dimensionality()
+                    - !std::isnan(incumbent)
+                    - order is a permutation of the integers in [0,bound.num_points())
+
+                ensures
+                    - Evaluates bound at x only as far as needed to decide whether it
+                      exceeds incumbent.  order specifies the order of the point bounds
+                      to inspect and may be rearranged to speed up subsequent calls.
+                    - If bound(x) > incumbent then returns bound(x).
+                    - Otherwise returns a value no greater than incumbent.
+                    - #order is a permutation of order.
+            !*/
+            {
+                DLIB_ASSERT(bound.num_points() > 1);
+                DLIB_ASSERT(x.size() == bound.dimensionality());
+                DLIB_ASSERT(!std::isnan(incumbent));
+                DLIB_ASSERT(order.size() == static_cast<size_t>(bound.num_points()));
+
+                for (size_t j = 0; j < order.size(); ++j)
+                {
+                    const size_t i = order[j];
+                    if (bound.points[i].y > incumbent)
+                        continue;
+
+                    const double distance = bound.offsets[i] + dot(bound.slopes, squared(x-bound.points[i].x));
+                    const double height = incumbent-bound.points[i].y;
+                    if (distance <= height*height)
+                    {
+                        // Squaring is only a filter.  Confirm with the original expression
+                        // so rounding cannot discard a candidate that beats the incumbent.
+                        const double value = bound.points[i].y + std::sqrt(distance);
+                        if (value <= incumbent)
+                        {
+                            // Try this rejecting point first on the next candidate.
+                            std::swap(order[0], order[j]);
+                            return value;
+                        }
+                    }
+                }
+                return bound(x);
+            }
+        };
+
+    // ------------------------------------------------------------------------------------
         void fit_quadratic_to_points_mse(
             const matrix<double>& X,
             const matrix<double,0,1>& Y,
@@ -257,13 +320,16 @@ namespace dlib
 
             // now find the N-1 nearest neighbors of best_x
             std::vector<std::pair<double,size_t>> distances;
+            distances.reserve(samples.size());
             for (size_t i = 0; i < samples.size(); ++i)
                 distances.emplace_back(length(best_x-samples[i].x), i);
-            std::sort(distances.begin(), distances.end());
+            std::partial_sort(distances.begin(), distances.begin()+N, distances.end());
             distances.resize(N);
 
             std::vector<matrix<double,0,1>> x;
             std::vector<double> y;
+            x.reserve(N);
+            y.reserve(N);
             for (auto& idx : distances)
             {
                 x.emplace_back(rowm(samples[idx.second].x, active_dims));
@@ -345,11 +411,18 @@ namespace dlib
             // now do a simple random search to find the maximum upper bound
             double best_ub_so_far = -std::numeric_limits<double>::infinity();
             matrix<double,0,1> vtemp(lower.size()), v;
+            std::vector<size_t> order(ub.num_points());
+            std::iota(order.begin(), order.end(), size_t(0));
             for (size_t rounds = 0; rounds < num_random_samples; ++rounds)
             {
-                vtemp = make_random_vector(rnd, lower, upper, is_integer_variable);
+                for (long j = 0; j < vtemp.size(); ++j)
+                {
+                    vtemp(j) = rnd.get_double_in_range(lower(j), upper(j));
+                    if (is_integer_variable[j])
+                        vtemp(j) = std::round(vtemp(j));
+                }
 
-                double bound = ub(vtemp);
+                double bound = upper_bound_search::evaluate_candidate(ub, vtemp, best_ub_so_far, order);
                 if (bound > best_ub_so_far)
                 {
                     best_ub_so_far = bound;
@@ -779,8 +852,15 @@ namespace dlib
             // function with the largest upper bound for evaluation.
             for (auto& info : functions)
             {
+                upper_bound_function augmented_bound;
+                const upper_bound_function* bound = &info->ub;
+                if (!info->outstanding_evals.empty())
+                {
+                    augmented_bound = info->build_upper_bound_with_all_function_evals();
+                    bound = &augmented_bound;
+                }
                 auto tmp = pick_next_sample_as_max_upper_bound(rnd,
-                    info->build_upper_bound_with_all_function_evals(), info->spec.lower, info->spec.upper,
+                    *bound, info->spec.lower, info->spec.upper,
                     info->spec.is_integer_variable,  num_random_samples);
                 if (tmp.predicted_improvement > 0 && tmp.upper_bound > best_upper_bound) 
                 {

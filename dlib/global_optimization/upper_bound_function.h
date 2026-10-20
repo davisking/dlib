@@ -25,6 +25,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace qopt_impl
+    {
+        struct upper_bound_search;
+    }
+
     class upper_bound_function
     {
 
@@ -134,6 +139,8 @@ namespace dlib
         }
 
     private:
+
+        friend struct qopt_impl::upper_bound_search;
 
         void learn_params (
         )
