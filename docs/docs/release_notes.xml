@@ -12,6 +12,9 @@
 
 <current>
 New Features and Improvements:
+   - Machine Learning
+      - Added tfidf_transformer, which learns TF-IDF weights for sparse vectors of
+        term counts (issue #3176).
 
 Non-Backwards Compatible Changes:
    - Dlib now requires C++17.
