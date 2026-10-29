@@ -140,6 +140,41 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_normalize()
+    {
+        using sparse_type = std::vector<std::pair<unsigned long,double>>;
+        const sparse_type a = {{0,3}, {2,4}};
+        const sparse_type n = normalize(a);
+        DLIB_TEST(n.size() == 2);
+        DLIB_TEST(n[0].first == 0 && std::abs(n[0].second - 0.6) < 1e-15);
+        DLIB_TEST(n[1].first == 2 && std::abs(n[1].second - 0.8) < 1e-15);
+        DLIB_TEST(a[0].second == 3);
+
+        sparse_type b = a;
+        normalize_inplace(b);
+        DLIB_TEST(b == n);
+
+        std::map<unsigned long,double> m = {{1,3}, {5,4}};
+        normalize_inplace(m);
+        DLIB_TEST(std::abs(m[1] - 0.6) < 1e-15 && std::abs(m[5] - 0.8) < 1e-15);
+
+        // A zero vector is returned as it is.
+        const sparse_type zero = {{3,0}};
+        DLIB_TEST(normalize(zero) == zero);
+        DLIB_TEST(normalize(sparse_type()).empty());
+
+        // Matrices still go to the dense normalize().
+        matrix<double,2,1> d = {3, 4};
+        DLIB_TEST(max(abs(normalize(d) - matrix<double,2,1>{0.6, 0.8})) < 1e-15);
+        normalize_inplace(d);
+        DLIB_TEST(max(abs(d - matrix<double,2,1>{0.6, 0.8})) < 1e-15);
+        matrix<double,0,1> z = zeros_matrix<double>(3,1);
+        normalize_inplace(z);
+        DLIB_TEST(z == zeros_matrix<double>(3,1));
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class sparse_vector_tester : public tester
     {
     public:
@@ -158,6 +193,7 @@ namespace
         )
         {
             test_make_sparse_vector_inplace();
+            test_normalize();
 
             std::map<unsigned int, double> v;
             v[4] = 8;

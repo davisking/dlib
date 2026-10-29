@@ -201,12 +201,8 @@ namespace dlib
                 const scalar_type tf = sublinear_tf_ ? 1 + std::log(count) : count;
                 out.emplace_back(j, tf * idf_[j]);
             }
-            const scalar_type norm = normalize_ ? length(out) : 0;
-            if (norm > 0)
-            {
-                for (auto& entry : out)
-                    entry.second /= norm;
-            }
+            if (normalize_)
+                normalize_inplace(out);
             return out;
         }
 
