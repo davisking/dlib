@@ -100,8 +100,11 @@ std::vector<assignment> chinese_cluster (
     std::vector<sample_pair> edges;
     for (size_t i = 0; i < feats.size(); ++i) {
         for (size_t j = i; j < feats.size(); ++j) {
-            if (length(feats[i] - feats[j]) < rs.mean()) {
-                edges.push_back(sample_pair(i, j, length(feats[i] - feats[j])));
+            const double dist = length(feats[i] - feats[j]);
+            if (dist < rs.mean()) {
+                // Larger weights mean stronger connections, so convert the
+                // distance into a similarity. Self-loops only declare nodes.
+                edges.push_back(sample_pair(i, j, rs.mean() - dist));
             }
         }
     }

@@ -388,6 +388,18 @@ namespace
             DLIB_TEST(chinese_whispers(edges, labels) == 2);
             DLIB_TEST(labels.size() == 2);
 
+            // Regression test for https://github.com/davisking/dlib/issues/2829:
+            // self-loops declare nodes but must not split a connected chain.
+            edges.clear();
+            edges.push_back(sample_pair(0,0,1));
+            edges.push_back(sample_pair(1,1,1));
+            edges.push_back(sample_pair(2,2,1));
+            edges.push_back(sample_pair(0,1,1));
+            edges.push_back(sample_pair(1,2,1));
+            DLIB_TEST(chinese_whispers(edges, labels) == 1);
+            DLIB_TEST(labels.size() == 3);
+            DLIB_TEST(labels[0] == labels[1] && labels[1] == labels[2]);
+
 
             for (int i = 0; i < 10; ++i)
                 test_modularity(rnd);

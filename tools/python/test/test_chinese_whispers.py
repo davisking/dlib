@@ -1,5 +1,3 @@
-from random import Random
-
 from dlib import chinese_whispers
 from pytest import raises
 
@@ -19,22 +17,38 @@ def test_chinese_whispers():
 
 def test_chinese_whispers_with_distance():
     assert len(chinese_whispers([(0, 0, 1)])) == 1
-    assert len(chinese_whispers([(0, 0, 1), (0, 1, 0.5), (1, 1, 1)])) == 2
 
-    # Test that values from edges and distances are actually used and that correct values are returned
+    # A single edge merges the pair. Self-loops only declare nodes.
     labels = chinese_whispers([(0, 0, 1), (0, 1, 1), (1, 1, 1)])
     assert len(labels) == 2
     assert labels[0] == labels[1]
-    labels = chinese_whispers([(0, 0, 1), (0, 1, 0.0), (1, 1, 1)])
+    labels = chinese_whispers([(0, 0, 1), (0, 1, 0.5), (1, 1, 1)])
     assert len(labels) == 2
-    assert labels[0] != labels[1]
+    assert labels[0] == labels[1]
 
-    # Non-trivial test
-    edges = []
-    r = Random(0)
-    for i in range(100):
-        edges.append((i, i, 1))
-        edges.append((i, r.randint(0, 99), r.random()))
+    # Edge weights decide between competing neighbors. Two strong pairs joined
+    # by a weak bridge stay split, while a strong bridge merges them.
+    weak = [(0, 0, 1), (1, 1, 1), (2, 2, 1), (3, 3, 1),
+            (0, 1, 10), (2, 3, 10), (1, 2, 0.1)]
+    labels = chinese_whispers(weak)
+    assert len(labels) == 4
+    assert labels[0] == labels[1]
+    assert labels[2] == labels[3]
+    assert labels[0] != labels[2]
+
+    strong = [(0, 0, 1), (1, 1, 1), (2, 2, 1), (3, 3, 1),
+              (0, 1, 10), (2, 3, 10), (1, 2, 30)]
+    labels = chinese_whispers(strong)
+    assert len(labels) == 4
+    assert labels[0] == labels[1] == labels[2] == labels[3]
+
+    # Chain with self-loops merges instead of splitting off an endpoint.
+    labels = chinese_whispers([(0, 0), (1, 1), (2, 2), (0, 1), (1, 2)])
+    assert len(labels) == 3
+    assert labels[0] == labels[1] == labels[2]
+
+    # Isolated nodes stay separate.
+    edges = [(i, i, 1) for i in range(100)]
     assert len(chinese_whispers(edges)) == 100
 
 

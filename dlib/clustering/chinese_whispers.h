@@ -45,10 +45,17 @@ namespace dlib
             const unsigned long idx = rnd.get_random_64bit_number()%neighbors.size();
 
             // Count how many times each label happens amongst our neighbors.
+            // Self-loops are skipped for voting.  They still declare that a
+            // node exists (so isolated nodes appear in labels) but they do not
+            // reinforce the node's own label.  Otherwise a self-loop would give
+            // inertia that can split a connected chain (e.g. 4-15-16) into
+            // separate clusters depending on update order.
             std::map<unsigned long, double> labels_to_counts;
             const unsigned long end = neighbors[idx].second;
             for (unsigned long i = neighbors[idx].first; i != end; ++i)
             {
+                if (edges[i].index1() == edges[i].index2())
+                    continue;
                 labels_to_counts[labels[edges[i].index2()]] += edges[i].distance();
             }
 

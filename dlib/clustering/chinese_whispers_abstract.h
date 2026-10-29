@@ -23,24 +23,33 @@ namespace dlib
         requires
             - is_ordered_by_index(edges) == true
         ensures
-            - This function implements the graph clustering algorithm described in the
-              paper: Chinese Whispers - an Efficient Graph Clustering Algorithm and its
-              Application to Natural Language Processing Problems by Chris Biemann.
-            - Interprets edges as a directed graph.  That is, it contains the edges on the
-              said graph and the ordered_sample_pair::distance() values define the edge
-              weights (larger values indicating a stronger edge connection between the
-              nodes).  If an edge has a distance() value of infinity then it is considered
-              a "must link" edge.
+            - Partitions the graph nodes into clusters by label propagation, as
+              described in: Chinese Whispers - an Efficient Graph Clustering
+              Algorithm and its Application to Natural Language Processing
+              Problems by Chris Biemann. Each node starts with its own label
+              and repeatedly adopts the strongest label among its outgoing
+              neighbors.
+            - Interprets edges as a directed graph. edges[i] is an edge from
+              node edges[i].index1() to node edges[i].index2() with weight
+              edges[i].distance(). Larger weights indicate stronger connections.
+              An edge with a distance() of infinity is a "must link" edge.
+            - An edge with index1() == index2() declares that the node exists
+              so it appears in labels, but it does not vote for any label.
+              In particular, a node whose only edges are self-loops keeps its
+              own label.
             - returns the number of clusters found.
             - #labels.size() == max_index_plus_one(edges)
             - for all valid i:
-                - #labels[i] == the cluster ID of the node with index i in the graph.  
+                - #labels[i] == the cluster ID of the node with index i in the graph.
                 - 0 <= #labels[i] < the number of clusters found
-                  (i.e. cluster IDs are assigned contiguously and start at 0) 
+                  (i.e. cluster IDs are assigned contiguously and start at 0)
             - Duplicate edges are interpreted as if there had been just one edge with a
               distance value equal to the sum of all the duplicate edge's distance values.
-            - The algorithm performs exactly num_iterations passes over the graph before
-              terminating.
+              Self-loops are excluded from this summation since they do not vote.
+            - Performs labels.size()*num_iterations random node updates before
+              terminating. Each update picks a node uniformly at random using rnd
+              and sets its label to the label with the largest summed edge weight
+              among its outgoing neighbors. Ties resolve to the smallest label.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -53,12 +62,12 @@ namespace dlib
     );
     /*!
         ensures
-            - This function is identical to the above chinese_whispers() routine except
-              that it operates on a vector of sample_pair objects instead of
-              ordered_sample_pairs.  Therefore, this is simply a convenience routine.  In
-              particular, it is implemented by transforming the given edges into
-              ordered_sample_pairs and then calling the chinese_whispers() routine defined
-              above.  
+            - Partitions the graph nodes into clusters with the label propagation
+              defined above. Each sample_pair (i,j) is an undirected edge with
+              weight distance(). It is interpreted as two directed edges, one
+              from i to j and one from j to i, each carrying the same weight,
+              except a self-loop (i == j) which is a single edge that only
+              declares that the node exists and does not vote.
     !*/
 
 // ----------------------------------------------------------------------------------------
