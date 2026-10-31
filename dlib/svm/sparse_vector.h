@@ -427,6 +427,39 @@ namespace dlib
 // ------------------------------------------------------------------------------------
 
     template <typename T>
+    typename disable_if<is_matrix<T>,void>::type normalize_inplace (
+        T& a
+    )
+    {
+        const auto len = length(a);
+        if (len != 0)
+        {
+            for (auto& entry : a)
+                entry.second /= len;
+        }
+    }
+
+    template <typename T>
+    typename enable_if<is_matrix<T>,void>::type normalize_inplace (
+        T& a
+    )
+    {
+        a = normalize(a);
+    }
+
+    template <typename T>
+    typename disable_if<is_matrix<T>,T>::type normalize (
+        const T& a
+    )
+    {
+        T temp(a);
+        normalize_inplace(temp);
+        return temp;
+    }
+
+// ------------------------------------------------------------------------------------
+
+    template <typename T>
     typename disable_if<is_matrix<T>,T>::type add (
         const T& a,
         const T& b

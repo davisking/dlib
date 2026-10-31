@@ -148,6 +148,7 @@ add_executable(${target_name} main.cpp tester.cpp
    svm_struct.cpp
    svr_linear_trainer.cpp
    symmetric_matrix_cache.cpp
+   tfidf.cpp
    thread_pool.cpp
    threads.cpp
    timer.cpp

@@ -782,6 +782,14 @@
             <link>dlib/svm/sparse_vector_abstract.h.html#scale_by</link>
          </item> 
          <item>
+            <name>normalize</name>
+            <link>dlib/svm/sparse_vector_abstract.h.html#normalize</link>
+         </item> 
+         <item>
+            <name>normalize_inplace</name>
+            <link>dlib/svm/sparse_vector_abstract.h.html#normalize_inplace</link>
+         </item> 
+         <item>
             <name>add</name>
             <link>dlib/svm/sparse_vector_abstract.h.html#add</link>
          </item> 

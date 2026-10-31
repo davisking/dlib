@@ -275,6 +275,37 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
+    T normalize (
+        const T& a
+    );
+    /*!
+        requires
+            - a is a sparse vector
+            - T::value_type::second_type is float, double, or long double
+        ensures
+            - if (length(a) != 0) then
+                - returns a/length(a)
+            - else
+                - returns a
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    void normalize_inplace (
+        T& a
+    );
+    /*!
+        requires
+            - a is a sparse vector or a dlib::matrix
+            - the values of a are float, double, or long double
+        ensures
+            - #a == normalize(a)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
     T add (
         const T& a,
         const T& b
