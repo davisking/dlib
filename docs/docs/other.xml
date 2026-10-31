@@ -166,7 +166,7 @@
       <component>
          <name>uint32</name>
          <file>dlib/uintn.h</file>
-         <spec_file link="true">dlib/uintn.h</spec_file>
+         <spec_file>dlib/uintn.h</spec_file>
          <description>
             This is just a typedef for a 32 bit unsigned integer.
          </description>
@@ -178,7 +178,7 @@
       <component>
          <name>uint8</name>
          <file>dlib/uintn.h</file>
-         <spec_file link="true">dlib/uintn.h</spec_file>
+         <spec_file>dlib/uintn.h</spec_file>
          <description>
             This is just a typedef for an 8 bit unsigned integer.
          </description>
@@ -191,7 +191,7 @@
       <component>
          <name>uint16</name>
          <file>dlib/uintn.h</file>
-         <spec_file link="true">dlib/uintn.h</spec_file>
+         <spec_file>dlib/uintn.h</spec_file>
          <description>
             This is just a typedef for a 16 bit unsigned integer.
          </description>
@@ -203,7 +203,7 @@
       <component>
          <name>int8</name>
          <file>dlib/uintn.h</file>
-         <spec_file link="true">dlib/uintn.h</spec_file>
+         <spec_file>dlib/uintn.h</spec_file>
          <description>
             This is just a typedef for an 8 bit integer.
          </description>
@@ -215,7 +215,7 @@
       <component>
          <name>int16</name>
          <file>dlib/uintn.h</file>
-         <spec_file link="true">dlib/uintn.h</spec_file>
+         <spec_file>dlib/uintn.h</spec_file>
          <description>
             This is just a typedef for a 16 bit integer.
          </description>
@@ -227,7 +227,7 @@
       <component>
          <name>int32</name>
          <file>dlib/uintn.h</file>
-         <spec_file link="true">dlib/uintn.h</spec_file>
+         <spec_file>dlib/uintn.h</spec_file>
          <description>
             This is just a typedef for a 32 bit integer.
          </description>
@@ -239,7 +239,7 @@
       <component>
          <name>int64</name>
          <file>dlib/uintn.h</file>
-         <spec_file link="true">dlib/uintn.h</spec_file>
+         <spec_file>dlib/uintn.h</spec_file>
          <description>
             This is just a typedef for a 64 bit integer.
          </description>
@@ -275,7 +275,7 @@
       <component>
          <name>uint64</name>
          <file>dlib/uintn.h</file>
-         <spec_file link="true">dlib/uintn.h</spec_file>
+         <spec_file>dlib/uintn.h</spec_file>
          <description>
             This is just a typedef for a 64 bit unsigned integer.
          </description>

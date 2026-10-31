@@ -17,10 +17,77 @@ New Features and Improvements:
         term counts (issue #3176).
       - Added normalize() and normalize_inplace() for sparse vectors.
 
+   - Deep learning tooling:
+      - Added an Adaptive Computation Time layer. (PR #3111)
+      - Added slm_advanced_train_ex.cpp, a transformer language model example with
+        rotary positional encodings and mixture-of-experts style components. (PR #3078)
+      - Added net_to_onnx() for exporting networks to ONNX without requiring ONNX or
+        protobuf libraries.  See dnn_imagenet_export_onnx_ex.cpp. (PR #3145)
+      - A CUDA-enabled build can now run on the CPU when no GPU is available, or when
+        DLIB_DISABLE_CUDA_USE is set to 1. (PR #3060)
+      - Added set_dnn_choose_algorithms_per_input_shape() to select cuDNN convolution
+        algorithms separately for each input shape. (PR #3161)
+      - Choose convolution algorithms only when needed, avoiding backward algorithm
+        selection during inference. (PR #3162)
+
+   - Added arc_agi_manager for loading ARC-AGI tasks and preparing token sequences
+     and training batches. (PR #3115)
+   - Added support for free-threaded Python. (PR #3158)
+   - Python builds now accept DLIB_* environment variables as CMake options. (PR #3123)
+   - Updated Python packaging for newer build tools. (PRs #3102, #3134)
+   - Added support for the FFmpeg 7.1 API. (PR #3105)
+   - Added support for Windows ARM64. (PR #3164)
+   - Added support for building with CUDA 13. (PR #3160)
+   - Added Unix domain sockets and support for creating a listener from an existing
+     listening socket. (PR #3152)
+   - Allow setting sockstreambuf's input and output buffer sizes and putback size. (PR #3154)
+   - Added undo and redo for changes to the current image's boxes in imglab. (PR #3143)
+   - Made global_function_search, find_min_global(), and find_max_global() faster by
+     reducing the work needed to select the next point to evaluate.
+
+   - Update libraries in dlib/external:
+      - Update pybind11 to v3.0.4. (PR #3158)
+      - Update libpng to 1.6.58 and zlib to 1.3.2.
+
 Non-Backwards Compatible Changes:
-   - Dlib now requires C++17.
+   - Dlib now requires C++17 and CMake 3.17 or newer.
+   - CUDA builds use CMAKE_CUDA_ARCHITECTURES or the CUDAARCHS environment variable
+     in place of DLIB_USE_CUDA_COMPUTE_CAPABILITIES. (PR #3090)
+   - full_object_detection now stores parts as dpoint, and part() returns a dpoint
+     reference.  OBJECT_PART_NOT_PRESENT is also a dpoint.  Serialized objects use
+     version 2, which older dlib versions cannot read. (PR #3095)
+   - Image width steps now use size_t instead of long. (PR #3091)
+   - bpe_tokenizer::train() now takes max_bytes as its third argument and verbose as
+     its fourth.  Change train(text, size, true) to train(text, size, 0, true). (PR #3078)
+   - The BPE tokenizer serialization format and token IDs have changed.  Saved v20.0
+     tokenizers cannot be loaded.  Special token IDs follow learned merge tokens;
+     query them after training.  encode() no longer inserts paragraph markers. (PR #3078)
+   - The Python bindings now require Python 3.8 or newer. (PR #3158)
 
 Bug fixes:
+   - Fix the bounding box coordinate gradients and loss scaling in loss_yolo. (PR #3088)
+   - Fix ACT layer gradient computation on CUDA. (PR #3128)
+   - Improve the numerical stability of CPU batch normalization. (PR #3113)
+   - Use FP32 convolution math instead of TF32 with cuDNN 8 and newer. (PR #3127)
+   - Improve find_min_trust_region() for objectives with large constant offsets.
+   - Fix Python global optimization with functools.partial and callable objects. (PR #3121)
+   - Fix integer overflow when addressing large images. (PR #3091)
+   - Fix FFT linking in builds using dlib/all/source.cpp.
+   - Fix missing MATLAB ut library linkage. (PR #3089)
+   - Increase the stack size of MSVC DNN examples to avoid cuDNN stack overflows
+     on Blackwell GPUs. (PR #3130)
+   - Handle multibyte string conversion failures. (PR #3110)
+   - Fall back to cuDNN's heuristic algorithm selection when benchmarking runs out
+     of memory. (PR #3166)
+   - Fix compiler-specific options leaking into projects using a different compiler. (PR #3157)
+   - Fix max_point_interpolated() using the row index for both coordinates. (PR #3169)
+   - Fix correlation() for zero sample variance and avoid underflow or overflow in
+     its normalization. (PR #3170)
+   - Fix initial cluster assignments in kkmeans, including when training again. (PR #3175)
+   - Avoid division by zero and overflow when selecting the Gaussian filter size. (PR #3171)
+   - Make sum(simd4f) use the same grouping of additions on all SIMD paths. (PR #3172)
+   - Fix integer overflow when computing oca's stopping time. (PR #3174)
+   - Fix compiler warnings in lbfgs_search_strategy and other tools. (PRs #3144, #3173)
 </current>
 
 <!-- **************************************************************************************  -->

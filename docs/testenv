@@ -16,6 +16,12 @@ bc -h 		> /dev/null || return_error "bc";
 echo nothing | awk '{}' > /dev/null || return_error "awk";
 echo | sed -e "s/s/r/"  > /dev/null || return_error "sed";
 htmlify 		> /dev/null || return_error "htmlify";
+if ! htmlify -h | grep -q '^[[:space:]]*-I '
+then
+    echo "Error: htmlify is outdated. Rebuild and install tools/htmlify before running makedocs."
+    exit 1
+fi
+
 echo | xargs 		> /dev/null || return_error "xargs";
 git --version  		> /dev/null || return_error "git";
 xsltproc -V 		> /dev/null || return_error "xsltproc";

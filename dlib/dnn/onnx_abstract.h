@@ -36,9 +36,10 @@ namespace dlib
             Objects of this type are ordinary value objects.
 
         input_tensor_shape
-            The fixed NCHW tensor shape [N,K,NR,NC] used for export.  This is
-            required for input_tensor and unsized image inputs.  It can be
-            omitted when it can be inferred from a sized dlib input layer.
+            The fixed NCHW tensor shape [N,K,NR,NC] used for export: number of
+            samples, channels, rows, and columns.  All dimensions must be positive.
+            For input_rgb_image_sized<NR,NC>, an empty shape selects [1,3,NR,NC].
+            Other input layers require an explicit shape.
 
         input_mode
             dnn_tensor:
@@ -46,8 +47,8 @@ namespace dlib
                 can be passed to net.forward().
 
             dlib_input_layer:
-                The ONNX graph input is a fixed-shape NCHW tensor in the native
-                value domain of the supported dlib input layer, and supported
+                The ONNX graph input is a fixed-shape float NCHW tensor in the
+                native value domain of the supported dlib input layer, and supported
                 dlib input preprocessing is emitted into the graph.  For
                 input_rgb_image and input_rgb_image_sized this means raw RGB
                 channel values are converted by subtracting the layer means and
@@ -68,18 +69,26 @@ namespace dlib
         requires
             - options.input_tensor_shape == [N,K,NR,NC], unless this shape can
               be inferred from net.input_layer().
-            - all dimensions in options.input_tensor_shape are positive.
+            - all dimensions in options.input_tensor_shape are positive and match
+              net's input layer, including its channel count and any fixed row or
+              column dimensions.  RGB image input layers require K == 3.
             - options.input_name, options.output_name, and options.graph_name
               are non-empty.
             - options.opset_version == 17.
         ensures
             - Writes an ONNX ModelProto representing net to out.
-            - The ONNX graph input is a fixed-shape NCHW tensor.
-            - Loss layers are exported as inference pass-throughs.
-            - net may be run once on a zero input tensor to allocate layer
-              parameters and determine fixed tensor shapes before export.
-            - Throws dlib::error if net contains a layer that cannot be exported
-              exactly by this inference exporter.
+            - The ONNX graph input is a fixed-shape float NCHW tensor, including
+              a fixed number of samples.
+            - Loss layers are exported as inference pass-throughs.  The graph
+              returns the tensor entering the loss layer, without applying its
+              label or detection decoding.
+            - Runs net on zero-valued samples, applying its input preprocessing,
+              to initialize parameters and determine tensor shapes.  This can
+              modify net's parameters and intermediate outputs.
+        throws
+            - dlib::error if net contains an unsupported layer or out reports
+              a failed stream state after writing the model.
+            - Exceptions raised by out are propagated.
 
         Supported layer families:
             - input_tensor, input_rgb_image, input_rgb_image_sized, input<matrix<T>>,
@@ -114,10 +123,15 @@ namespace dlib
         const onnx_export_options& options = onnx_export_options()
     );
     /*!
+        requires
+            - The requirements of net_to_onnx(net, out, options) are satisfied.
         ensures
-            - Opens filename for binary output and writes the ONNX model to it.
-            - Throws dlib::error if the file cannot be opened or written.
-            - Otherwise has the same behavior as net_to_onnx(net, out, options).
+            - Opens filename for binary output and writes the ONNX model to it,
+              with the same export behavior as net_to_onnx(net, out, options).
+        throws
+            - dlib::error if the file cannot be opened or written, or net contains
+              an unsupported layer.  If the file was opened, its previous contents
+              have been discarded, even when export fails.
     !*/
 
 // ----------------------------------------------------------------------------------------

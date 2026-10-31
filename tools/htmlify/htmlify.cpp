@@ -1,6 +1,10 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <filesystem>
+#include <map>
+#include <set>
+#include <vector>
 
 
 #include "dlib/cpp_pretty_printer.h"
@@ -23,6 +27,81 @@ typedef dlib::set<string>::kernel_1a set_of_string;
 typedef dlib::queue<file>::kernel_1a queue_of_files;
 typedef dlib::queue<directory>::kernel_1a queue_of_dirs;
 
+namespace
+{
+    namespace fs = std::filesystem;
+    using source_outputs = std::map<fs::path, fs::path>;
+
+    class source_printer : public cprinter
+    {
+        /*!
+            A source printer whose include links refer to the pages selected for
+            this invocation, using quoted-include search order and output locations.
+        !*/
+    public:
+        source_printer (
+            const fs::path& source,
+            const fs::path& output,
+            const source_outputs& outputs,
+            const std::vector<fs::path>& include_dirs
+        ) : source(source), output(output), outputs(outputs), include_dirs(include_dirs)
+        {
+        }
+        /*!
+            requires
+                - outputs maps canonical source paths to absolute output paths.
+                - outputs and include_dirs outlive this object.
+            ensures
+                - Resolves quoted includes from source to pages in outputs,
+                  relative to output, searching include_dirs after source's directory.
+        !*/
+
+    protected:
+        std::string get_include_url (
+            const std::string& filename
+        ) const override
+        {
+            // Match quoted-include search order.  A header that is found but is
+            // not being rendered must not link to a different, later match.
+            std::vector<fs::path> candidates = {source.parent_path() / filename};
+            for (const auto& dir : include_dirs)
+                candidates.push_back(dir / filename);
+            for (const auto& candidate : candidates)
+            {
+                if (!fs::is_regular_file(candidate))
+                    continue;
+                const auto found = outputs.find(fs::weakly_canonical(candidate));
+                if (found == outputs.end())
+                    return {};
+                const auto relative = found->second.lexically_relative(output.parent_path()).generic_string();
+                std::string url;
+                const char hex[] = "0123456789ABCDEF";
+                for (const unsigned char ch : relative)
+                {
+                    if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') ||
+                        (ch >= '0' && ch <= '9') || std::string("/.-_~").find(ch) != std::string::npos)
+                        url += ch;
+                    else
+                    {
+                        url += '%';
+                        url += hex[ch >> 4];
+                        url += hex[ch & 15];
+                    }
+                }
+                return url;
+            }
+            return {};
+        }
+
+    private:
+        fs::path source;
+        fs::path output;
+        const source_outputs& outputs;
+        const std::vector<fs::path>& include_dirs;
+    };
+}
+
+
 void print_manual (
 );
 /*!
@@ -34,7 +113,8 @@ void htmlify (
     const map_string_to_string& file_map,
     bool colored,
     bool number_lines,
-    const std::string& title
+    const std::string& title,
+    const std::vector<std::filesystem::path>& include_dirs
 );
 /*!
     ensures
@@ -53,7 +133,8 @@ void htmlify (
     ostream& out,
     const std::string& title,
     bool colored,
-    bool number_lines
+    bool number_lines,
+    cprinter& printer
 );
 /*!
     ensures
@@ -72,6 +153,7 @@ void add_files (
     bool cat,
     const set_of_string& filter,
     unsigned long search_depth,
+    const std::set<std::filesystem::path>& explicit_inputs,
     unsigned long cur_depth = 0
 );
 /*!
@@ -100,6 +182,7 @@ int main(int argc, char** argv)
         parser.add_option("man","Display the manual.");
         parser.add_option("f","Specifies a list of file extensions to process when using the -i option.  The list elements should be separated by spaces.  The default is \"cpp h c\".",1);
         parser.add_option("i","Specifies an input directory.",1);
+        parser.add_option("I","Search this include directory after the source directory when linking quoted includes. Repeatable, in search order.",1);
         parser.add_option("cat","Puts all the output into a single html file with the given name.",1);
         parser.add_option("depth","Specifies how many directories deep to search when using the i option.  The default value is 30.",1);
         parser.add_option("o","This option causes all the output files to be created inside the given directory.  If this option is not given then all output goes to the current working directory.",1);
@@ -126,6 +209,7 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("to-xml", "o");
         parser.check_incompatible_options("to-xml", "flatten");
         parser.check_incompatible_options("to-xml", "title");
+        parser.check_incompatible_options("to-xml", "I");
 
         const char* singles[] = {"b","n","h","index","v","man","f","cat","depth","o","flatten","title","to-xml", "t"};
         parser.check_one_time_options(singles);
@@ -238,6 +322,10 @@ int main(int argc, char** argv)
 
         // this is a map of output file names to input file names.  
         map_string_to_string file_map;
+        std::set<fs::path> explicit_inputs;
+        std::vector<fs::path> include_dirs;
+        for (unsigned long i = 0; i < parser.option("I").count(); ++i)
+            include_dirs.push_back(fs::weakly_canonical(parser.option("I").argument(0,i)));
 
 
         // add all the files that are just given on the command line to the 
@@ -246,6 +334,7 @@ int main(int argc, char** argv)
         {
             string in_file, out_file;
             in_file = parser[i];
+            explicit_inputs.insert(fs::weakly_canonical(in_file));
             string::size_type pos = in_file.find_last_of(separator);
             if (pos != string::npos)
             {
@@ -290,7 +379,7 @@ int main(int argc, char** argv)
         for (unsigned long i = 0; i < i_opt.count(); ++i)
         {
             directory dir(i_opt.argument(0,i));
-            add_files(dir, out_dir, file_map, flatten_opt, cat, sfilter, search_depth);
+            add_files(dir, out_dir, file_map, flatten_opt, cat, sfilter, search_depth, explicit_inputs);
         }
 
         if (cat)
@@ -322,7 +411,10 @@ int main(int argc, char** argv)
                 std::string title;
                 if (title_opt)
                     title = title_opt.argument();
-                htmlify(fin, fout, title + file, color, number);
+                const source_outputs no_separate_pages;
+                source_printer printer(fs::weakly_canonical(file_map.element().value()),
+                                       fs::weakly_canonical(cat_opt.argument()), no_separate_pages, include_dirs);
+                htmlify(fin, fout, title + file, color, number, printer);
             }
 
         }
@@ -331,7 +423,7 @@ int main(int argc, char** argv)
             std::string title;
             if (title_opt)
                 title = title_opt.argument();
-            htmlify(file_map,color,number,title);
+            htmlify(file_map,color,number,title,include_dirs);
         }
 
 
@@ -390,12 +482,14 @@ int main(int argc, char** argv)
     {
         cout << "ERROR: unable to write to " << file << endl;
         cout << endl;
+        return 1;
     }
     catch (exception& e)
     {
         cout << e.what() << endl;
         cout << "\nTry the -h option for more information.\n";
         cout << endl;
+        return 1;
     }
 }
 
@@ -406,12 +500,12 @@ void htmlify (
     ostream& out,
     const std::string& title,
     bool colored,
-    bool number_lines
+    bool number_lines,
+    cprinter& cp
 )
 {
     if (colored)
     {
-        static cprinter cp;
         if (number_lines)
         {
             cp.print_and_number(in,out,title);
@@ -441,9 +535,15 @@ void htmlify (
     const map_string_to_string& file_map,
     bool colored,
     bool number_lines,
-    const std::string& title
+    const std::string& title,
+    const std::vector<std::filesystem::path>& include_dirs
 )
 {
+    source_outputs outputs;
+    file_map.reset();
+    while (file_map.move_next())
+        outputs.emplace(fs::weakly_canonical(file_map.element().value()),
+                        fs::weakly_canonical(file_map.element().key()));
     file_map.reset();
     const char separator = directory::get_separator();
     string file;
@@ -468,7 +568,9 @@ void htmlify (
         else 
             file = file_map.element().value();
 
-        htmlify(fin, fout,title + file, colored, number_lines);
+        source_printer printer(fs::weakly_canonical(file_map.element().value()),
+                               fs::weakly_canonical(file_map.element().key()), outputs, include_dirs);
+        htmlify(fin, fout,title + file, colored, number_lines, printer);
     }
 }
 
@@ -482,6 +584,7 @@ void add_files (
     bool cat,
     const set_of_string& filter,
     unsigned long search_depth,
+    const std::set<std::filesystem::path>& explicit_inputs,
     unsigned long cur_depth
 )
 {
@@ -503,6 +606,9 @@ void add_files (
         if (pos != string::npos && filter.is_member(name.substr(pos+1)))
         {
             in_file = files.element().full_name();
+            // Explicit command-line files keep their requested output location.
+            if (explicit_inputs.count(fs::weakly_canonical(in_file)))
+                continue;
 
             if (flatten)
             {
@@ -573,7 +679,7 @@ void add_files (
                 create_directory(out_dir + separator + d);
             }
 
-            add_files(dirs.element(), out_dir, file_map, flatten, cat, filter, search_depth, cur_depth+1);
+            add_files(dirs.element(), out_dir, file_map, flatten, cat, filter, search_depth, explicit_inputs, cur_depth+1);
         }
     }
     
@@ -611,6 +717,13 @@ void print_manual (
          << "then the anchor name you want then more white space and then you can add whatever "
          << "you like.  You would then refer to this anchor with a link address of "
          << "\"file.html#anchor_name\".";
+    cout << "\n\n" << wrap_string(sout.str(),indent,indent);   sout.str("");
+
+    sout << "Quoted includes are linked only when the selected header is also among the input files. "
+         << "Header lookup searches the including file's directory, then each -I directory in order. "
+         << "Unresolved or unrendered headers remain plain text. Explicit command-line files are "
+         << "written at the output root and are not duplicated when also found through -i. "
+         << "Links use those final output locations. Concatenated output has no separate header links.";
     cout << "\n\n" << wrap_string(sout.str(),indent,indent);   sout.str("");
 
     sout << "Htmlify also has the ability to create a simple index of all the files it is given. "

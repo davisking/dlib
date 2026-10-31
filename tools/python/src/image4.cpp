@@ -147,12 +147,12 @@ correspondingly stronger line detections in the final Hough transform.";
 
     const char* doc_constr = 
 "requires \n\
-    - size_ > 0 \n\
+    - ``size_`` > 0 \n\
 ensures \n\
-    - This object will compute Hough transforms that are size_ by size_ pixels.   \n\
+    - This object will compute Hough transforms that are ``size_`` by ``size_`` pixels.   \n\
       This is in terms of both the Hough accumulator array size as well as the \n\
       input image size. \n\
-    - size() == size_";
+    - size() == ``size_``";
         /*!
             requires
                 - size_ > 0

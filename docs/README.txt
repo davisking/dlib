@@ -27,7 +27,7 @@ To begin with, the XML and XSLT is usable on any operating system, however,
 all the scripts I have in the docs folder that automate everything are bash 
 shell scripts.  I also use stuff like wine and other Linux tools and I have 
 only ever tested any of this in Debian.  So if you want to use all the scripts 
-then you should probably run this stuff in Linux.  But if not you can probably 
+then you should probably run this stuff in Linux.  But if not you can probably
 hack something together :)
 
 There are four scripts in the docs folder.  
@@ -38,12 +38,20 @@ There are four scripts in the docs folder.
 		dlib's repository in the tools/htmlify folder.  You should
 		build and install it.  (go into that folder, make a subfolder
 		called build, then cd into build and say:  "cmake ..; make;
-		sudo make install".  You will need to install cmake if you
+		sudo make install".  Rebuild htmlify when updating these scripts,
+                since makedocs uses its include-path and output-layout support.
+                You will need to install cmake if you
 		don't have it already)
+                To test htmlify after building, run from tools/htmlify:
+                python3 test_htmlify.py build/htmlify
 
  - makedocs: This remakes all the HTML documentation by pulling files out
  	     of the dlib repository.  If you want to use this stuff for your
 	     own projects you will need to edit this file a bit.
+
+             C++ sources and examples are copied with git archive HEAD, so their
+             uncommitted changes are not included.  The XML pages are read from
+             the working tree.
 	     
 	     Note that this script puts its output in the docs/web and
 	     docs/chm/docs folders.  I use the chm folder for off-line 
@@ -53,10 +61,12 @@ There are four scripts in the docs folder.
 	     <web></web> tags inside the XML though in cases where the two 
 	     differ.
 	
- - makerel:  Runs makedocs as well as creates tar and zip files of the project.  
-	     It also runs htmlhelp in wine to generate the chm help files.  
-	     Note that you will need to run docs/chm/htmlhelp/setup_htmlhelp.sh 
-	     before it will work in wine.
+ - makerel:  Updates the release version, commits it, and creates a Git tag
+             before running makedocs and creating tar and zip files.  It then
+             records the last changeset, restores the development patch version,
+             and makes another commit.  This script is a release operation, not
+             a documentation preview or dry run.  CHM compilation is currently
+             disabled in makerel.
 
 
 ======================== License for documentation files ========================

@@ -338,6 +338,9 @@
          <div class='include_file_more_details_wrapper'>
             <xsl:if test="spec_file">
                <xsl:choose>
+                  <xsl:when test="spec_file/@anchor">
+                     <a class='more_details' href="{spec_file}.html#{spec_file/@anchor}">More Details...</a>
+                  </xsl:when>
                   <xsl:when test="spec_file/@link = 'true'">
                      <a class='more_details' href="{spec_file}.html#{name}">More Details...</a> 
                   </xsl:when>
@@ -372,6 +375,9 @@
                <BR/>
                <xsl:apply-templates select="examples"/>
                <xsl:choose>
+                  <xsl:when test="spec_file/@anchor">
+                     <a class='more_details_extension' href="{spec_file}.html#{spec_file/@anchor}">More Details...</a>
+                  </xsl:when>
                   <xsl:when test="spec_file/@link = 'true'">
                      <a class='more_details_extension' href="{spec_file}.html#{name}">More Details...</a>
                   </xsl:when>
@@ -789,7 +795,6 @@
    <xsl:template match="video">
       <video controls="true" poster="{@src}.png">
          <source src="{@src}.webm" type="video/webm"/>
-         <source src="{@src}.mp4" type="video/mp4"/>
          <xsl:apply-templates/>
       </video>
    </xsl:template>   

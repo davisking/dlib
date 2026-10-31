@@ -11,10 +11,10 @@
             <p>
                Either run <tt>pip install dlib --verbose</tt> or grab the latest sources
                from github, go to the base folder of the dlib repository,
-               and run <tt>python setup.py install</tt>.  Once either of these commands
+               and run <tt>pip install . --verbose</tt>.  Once either of these commands
                finishes running you are ready to use dlib from Python.  Note
-               that you need to have CMake and a working C++17 compiler
-               installed for this to work.  
+               that you need Python 3.8 or newer, CMake 3.17 or newer, and a working
+               C++17 compiler installed for this to work.
             </p>
                
             <p>
@@ -27,6 +27,16 @@
                OSX users may have to install libX11 to use the GUI tools.  If
                you care about this then read the messages since they tell you
                how to get these optional features installed.
+            </p>
+            <p>
+               Set <tt>DLIB_*</tt> environment variables before building to pass their
+               values as CMake options.  For example, <tt>DLIB_NO_GUI_SUPPORT=ON</tt>
+               disables GUI support and <tt>DLIB_USE_CUDA=OFF</tt> builds without CUDA.
+            </p>
+            <p>
+               Free-threaded Python builds are supported.  When sharing mutable objects
+               between threads, synchronize access to them.  Calls using the same CNN
+               face detector or face recognition model are serialized internally.
             </p>
             <p>
                Alternatively, if you want to add more python bindings to dlib's
@@ -53,7 +63,7 @@ cd build
 cmake ..
 cmake --build . --config Release
 </code_box>
-Note that you need to have a C++17 compiler installed on your system.  There are free C++17 compilers
+Note that you need CMake 3.17 or newer and a C++17 compiler installed on your system.  There are free C++17 compilers
 for most operating systems.  For example, Visual Studio is free on Windows and GCC is free and
 works well on Mac OS X and Linux systems.  If you have multiple compilers/IDEs installed then you can
 tell CMake which one you want it to use via the -G option.
@@ -61,7 +71,7 @@ tell CMake which one you want it to use via the -G option.
    The <a href="examples/CMakeLists.txt.html">examples/CMakeLists.txt</a> file tells CMake how to build
    the examples.  You can create your own projects by starting with this file and editing it however you like.
    You can also perform additional configuration of a cmake project using the cmake-gui or ccmake tool.  For example,
-   if you are using dlib's face detector then you should turn on either SSE4 or AVX instructions since this
+   if you are using dlib's face detector on an x86 processor then you should turn on either SSE4 or AVX instructions since this
    makes it run much faster (also see <a href="faq.html#Whyisdlibslow">this FAQ</a>). 
 </p>
 <p>
@@ -72,7 +82,28 @@ tell CMake which one you want it to use via the -G option.
    option, which tells Visual Studio to let the compiler use more than 2GB of RAM.  That is important if you don't want the compiler to
    crash from running out of RAM in some situations.
 </p>
-            
+<p>
+   To target Windows ARM64, install Visual Studio's ARM64 C++ build tools and select
+   <tt>-A ARM64</tt> in place of <tt>-A x64</tt>.  For Python, the build selects the
+   architecture of the interpreter: native ARM64 Python builds an ARM64 module,
+   while x64 Python running under emulation builds an x64 module.
+</p>
+
+<p>
+   CUDA builds use CMake's <tt>FindCUDAToolkit</tt>.  Select GPU architectures with
+   <tt>CMAKE_CUDA_ARCHITECTURES</tt>, for example
+   <tt>-DCMAKE_CUDA_ARCHITECTURES="75;86"</tt>, or set <tt>CUDAARCHS</tt> before the
+   first CMake configuration.  These replace <tt>DLIB_USE_CUDA_COMPUTE_CAPABILITIES</tt>.
+   If neither is set, CMake 3.24 and newer target the build machine's GPUs with
+   <tt>native</tt>; older CMake versions use a list selected for the CUDA toolkit.
+   Set the architectures explicitly when building for other machines or without a
+   visible GPU.  The CUDA 13 fallback list starts at SM 75 and omits SM 70.
+</p>
+<p>
+   The MSVC <tt>dnn_*_ex</tt> example targets reserve a 16 MiB stack because cuDNN
+   algorithm selection on Blackwell GPUs can exhaust the default stack.  Applications
+   built separately may need the linker option <tt>/STACK:16777216</tt> too.
+</p>
 
 <br/>
 

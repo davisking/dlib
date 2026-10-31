@@ -52,6 +52,15 @@ namespace dlib
             const std::string& title
         ) const;
 
+    protected:
+
+        virtual std::string get_include_url (
+            const std::string& filename
+        ) const
+        {
+            return filename + ".html";
+        }
+
     private:
 
         // data members

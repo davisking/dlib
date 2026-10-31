@@ -221,6 +221,7 @@ namespace dlib
             - if (#create_listener_from_socket() == 0) then
                 - #new_listener == a pointer to a listener object that is listening on
                   the specified socket for an incoming connection
+                - the listener owns sock and closes it when destroyed.
 
             - returns 0 if create_listener_from_socket was successful
             - returns OTHER_ERROR if some other error occurred
@@ -315,7 +316,8 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object represents a TCP connection.
+                This object represents a TCP connection or a Unix domain stream
+                socket connection.
 
                 Instances of this class can only be created by using the 
                 create_connection function or listener class defined below.
@@ -578,7 +580,7 @@ namespace dlib
                 port or Unix domain socket pathname.
 
                 Instances of this class can only be created by using the 
-                create_listener function defined below.
+                create_listener or create_listener_from_socket functions.
 
                 NOTE:  
                     A listener object must ALWAYS be closed (delete the pointer to it) or 
@@ -600,8 +602,11 @@ namespace dlib
             requires
                 - no other threads are using this listener object 
             ensures
-                - closes the listener 
+                - closes the listener
                 - frees the resources used by this object
+                - for a Unix domain socket, does not remove the socket's filesystem
+                  pathname.  The application is responsible for removing it when
+                  it is no longer needed.
         !*/
 
         int accept (

@@ -9,16 +9,26 @@
    <questions group="Python">
 
       <question text="I compiled dlib's Python interface with CUDA enabled, why isn't it using CUDA?">
-         Either you are using a part of dlib that just doesn't use CUDA, of which there
-         are many parts, or you are mistaken about compiling dlib with CUDA enabled.
-         In particular, many users report that "dlib isn't using CUDA even though 
-         I definitely compiled it with CUDA" and in every case either they are not using part of dlib that uses CUDA or they 
-         have installed multiple copies of dlib on their computer, some with CUDA disabled, and
-         they are using a non-CUDA build. 
+         Only some parts of dlib, such as the deep learning tools, use CUDA.  For
+         example, the HOG face detector runs on the CPU.
          <p>
-            You can check if dlib is compiled to use CUDA by looking at the <tt>dlib.DLIB_USE_CUDA</tt>
-            boolean.  <b>If dlib.DLIB_USE_CUDA is false then you didn't compile it with CUDA enabled, but if it's true then
-            dlib is using all the CUDA it's going to use</b>.
+            <tt>dlib.DLIB_USE_CUDA</tt> tells you whether the imported module was compiled
+            with CUDA support.  If it is false, check the build output and make sure you
+            are importing the intended copy of dlib.  You can see its location with
+            <tt>dlib.__file__</tt>.
+         </p>
+         <p>
+            A CUDA-enabled build also runs on the CPU if no CUDA device is available or
+            the environment variable <tt>DLIB_DISABLE_CUDA_USE</tt> is set to a true value.
+            Any value other than an empty string, <tt>0</tt>, <tt>false</tt>,
+            <tt>False</tt>, or <tt>FALSE</tt> counts as true.  Set this variable before
+            starting Python; the choice is fixed when dlib first checks whether to use
+            CUDA.  In a CUDA-enabled build, <tt>dlib.cuda.get_num_devices()</tt> returns
+            zero when CUDA use is disabled or no device is available.
+         </p>
+         <p>
+            CPU execution does not remove the CUDA library dependencies of a CUDA-enabled
+            binary.  The libraries needed to load that binary must still be installed.
          </p>
       </question>
 
@@ -38,7 +48,7 @@
       </question>
 
       <question text="Why is some function missing from the dlib Python module?">
-         If you are missing dlib.image_window then read <a href="#Whyisdlib.imagewindowmissing">the FAQ about that</a>.
+         If you are missing dlib.image_window then read <a href="#Whyisdlib.imagewindowmissingfromthePythonmodule">the FAQ about that</a>.
          If you are missing any other function then <b>it's because you are using an old version of dlib
          that just doesn't have that function</b>.  You need to install a newer version
          of dlib.  Please don't post questions about this on any of dlib's forums or

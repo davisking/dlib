@@ -52,6 +52,15 @@ namespace dlib
             const std::string& title
         ) const;
 
+    protected:
+
+        virtual std::string get_include_url (
+            const std::string& filename
+        ) const
+        {
+            return filename + ".html";
+        }
+
     private:
 
         const std::string htmlify (
@@ -360,7 +369,21 @@ namespace dlib
                     {
                         // this is the name of an included file
                         recently_seen_include = false;
-                        out << "<a style='text-decoration:none' href='" << htmlify(token) << ".html'>" << htmlify(token) << "</a>";                
+                        const std::string url = get_include_url(token);
+                        if (url.empty())
+                            out << htmlify(token);
+                        else
+                        {
+                            out << "<a style='text-decoration:none' href='";
+                            for (const char ch : htmlify(url))
+                            {
+                                if (ch == '\'')
+                                    out << "&#39;";
+                                else
+                                    out << ch;
+                            }
+                            out << "'>" << htmlify(token) << "</a>";
+                        }
                     }
                     else
                     {

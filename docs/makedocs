@@ -49,12 +49,10 @@ htmlify_cmake ()
     echo "</title></head><body bgcolor='white'><pre>" >> $1.html;
 
     #  line 1: make comments green
-    #  line 2: add links into the add_subdirectory directives
-    #  line 3: make literal quotes red
-    #  line 4: make the directives show up blue
-    #  line 5: make variable names show up purple
+    #  line 2: make literal quotes red
+    #  line 3: make the directives show up blue
+    #  line 4: make variable names show up purple
     sed -e "s/^\([ ]*#.*\)/<font color='#009900'>\1<\/font>/" \
-        -e "s/add_subdirectory\([ ]*\)(\([ ]*\)\([^ ]*\)\([ ]*\)\([^ )]*\)/add_subdirectory\1(\2\3\4<a href='\3\/CMakeLists.txt.html'>\5<\/a>/"  \
         -e "s/\"\([^\"]*\)\"/\"<font color='#CC0000'>\1<\/font>\"/g"  \
         -e "s/^\([ ]*[^( ]*[ ]*\)(/<font color='blue'>\1<\/font>(/" \
         -e "s/{\([^}]*\)}/\{<font color='#BB00BB'>\1<\/font>}/g"  \
@@ -125,14 +123,31 @@ makedocs ()
     mkdir docs/chm/docs
 
     echo Creating HTML version of the source
-    htmlify --title "dlib C++ Library - " -i docs/cache -o htmltemp.$$
-    add_links_between_example_programs docs/cache/examples htmltemp.$$/examples cpp
+    # Give example files explicitly so htmlify generates them at their final
+    # location, alongside the documentation pages rather than under examples/.
+    example_files=()
+    for example in docs/cache/examples/*.cpp docs/cache/examples/*.h
+    do
+        if [ -f "$example" ]; then
+            example_files+=("$example")
+        fi
+    done
+    htmlify --title "dlib C++ Library - " -f "cpp h c txt" -i docs/cache -o htmltemp.$$ \
+        -I docs/cache -I docs/cache/dlib/external/zlib "${example_files[@]}" || report_failure
+    add_links_between_example_programs docs/cache/examples htmltemp.$$ cpp
 
     echo Copying files around...
     cp -r htmltemp.$$/dlib docs/web
     cp -r htmltemp.$$/dlib docs/chm/docs
+    # Preserve the auxiliary example text pages as well as the C++ pages below.
     cp -r htmltemp.$$/examples/* docs/web
     cp -r htmltemp.$$/examples/* docs/chm/docs
+    for example in "${example_files[@]}"
+    do
+        example_html=$(basename "$example").html
+        cp "htmltemp.$$/$example_html" docs/web
+        cp "htmltemp.$$/$example_html" docs/chm/docs
+    done
     rm -rf htmltemp.$$
 
     # create python docs unless you say ./makedocs fast

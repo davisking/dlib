@@ -22,7 +22,8 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object represents the location of an object in an image along with the
-                positions of each of its constituent parts.
+                positions of each of its constituent parts as dpoint values, allowing
+                fractional coordinates.
         !*/
 
     public:
@@ -45,8 +46,10 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_rect() == rect
-                - #num_parts() == parts.size()
+                - #get_rect() == rect_
+                - #num_parts() == parts_.size()
+                - for all valid i:
+                    - #part(i) == dpoint(parts_[i])
         !*/
 
         full_object_detection(

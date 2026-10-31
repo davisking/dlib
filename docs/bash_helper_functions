@@ -13,7 +13,7 @@ get_last_modified_date()
 
 get_dlib_version()
 {
-    cat ../dlib/CMakeLists.txt | awk '/set\(CPACK_PACKAGE_VERSION_'$1'/{ match($2,"\"(.*)\"",a); print a[1]}'
+    sed -n 's/^set(CPACK_PACKAGE_VERSION_'"$1"' *"\([^"]*\)").*/\1/p' ../dlib/CMakeLists.txt
 }
 
 # Dump a copy of the repo contents to $1

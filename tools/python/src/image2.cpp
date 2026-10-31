@@ -228,13 +228,13 @@ void register_extract_image_chip (py::module& m)
         .def(py::init<drectangle>(), py::arg("rect"))
         .def(py::init<rectangle>(), py::arg("rect"),
 "ensures \n\
-    - self.rect == rect_ \n\
+    - self.rect == rect \n\
     - self.angle == 0 \n\
     - self.rows == rect.height() \n\
     - self.cols == rect.width()" 
         /*!
             ensures
-                - self.rect == rect_
+                - self.rect == rect
                 - self.angle == 0
                 - self.rows == rect.height()
                 - self.cols == rect.width()

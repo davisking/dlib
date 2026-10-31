@@ -346,7 +346,7 @@
       <component>
          <name>unichar</name>
          <file>dlib/unicode.h</file>
-         <spec_file link="true">dlib/unicode/unicode_abstract.h</spec_file>
+         <spec_file>dlib/unicode/unicode_abstract.h</spec_file>
          <description>        
             This is a typedef for an unsigned 32bit integer which we use to store
             Unicode values.
@@ -382,7 +382,7 @@
       <component>
          <name>ustring</name>
          <file>dlib/unicode.h</file>
-         <spec_file link="true">dlib/unicode/unicode_abstract.h</spec_file>
+         <spec_file>dlib/unicode/unicode_abstract.h</spec_file>
          <description>        
             This is a typedef for a std::basic_string&lt;unichar&gt;.  That is, it is a typedef
             for a string object that stores unichar Unicode characters. 

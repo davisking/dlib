@@ -233,6 +233,10 @@
                   <link>dnn_imagenet_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Exporting a Deep Learning Model to ONNX</name>
+                  <link>dnn_imagenet_export_onnx_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Deep Learning DCGAN</name>
                   <link>dnn_dcgan_train_ex.cpp.html</link>
                </item>
@@ -640,7 +644,7 @@
                </item>
                <item>
                   <name>Cmd Line Parser</name>
-                  <link>compress_stream_ex.cpp.html#_top</link>
+                  <link>compress_stream_ex.cpp.html</link>
                </item>
                <item>
                   <name>Threaded Object</name>

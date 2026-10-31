@@ -1545,7 +1545,7 @@
          <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
          <description>        
             This is a simple template function that returns a rectangle 
-            representing the size of a 2D container (e.g. <a href="containers.html#matrix">matrix</a> or
+            representing the size of a 2D container (e.g. <a href="#matrix">matrix</a> or
             <a href="containers.html#array2d">array2d</a>). 
          </description>
       </component>

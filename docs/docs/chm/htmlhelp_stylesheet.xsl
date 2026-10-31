@@ -93,6 +93,12 @@
          <LI><OBJECT type="text/sitemap">
             <param name="Name" value="{name}"/>
                <xsl:choose>
+                  <xsl:when test="starts-with(link, 'http://') or starts-with(link, 'https://')">
+                     <param name="Local" value="{link}"/>
+                  </xsl:when>
+                  <xsl:when test="starts-with(link, '#')">
+                     <param name="Local" value="{$docs}\{$html_file}{link}"/>
+                  </xsl:when>
                   <xsl:when test="link">
                      <param name="Local" value="{$docs}\{link}"/>
                   </xsl:when>
@@ -142,6 +148,13 @@
                <UL>
                   <xsl:if test="spec_file">
                      <xsl:choose>
+                        <xsl:when test="spec_file/@anchor">
+                           <LI> <OBJECT type="text/sitemap">
+                              <param name="Name" value="specification"/>
+                                 <param name="Local" value="{$docs}\{spec_file}.html#{spec_file/@anchor}"/>
+                              </OBJECT>
+                           </LI>
+                        </xsl:when>
                         <xsl:when test="spec_file/@link = 'true'">
                            <LI> <OBJECT type="text/sitemap">
                               <param name="Name" value="specification"/>

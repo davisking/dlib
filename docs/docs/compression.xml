@@ -190,7 +190,7 @@
                <file>dlib/compress_stream/compress_stream_kernel_3.h</file>
                <description> 
                   This implementation is done using the <a href="#lzp_buffer">lzp_buffer</a> object and
-                  <a href="other.html#crc32">crc32</a> object.  It does not use any sort of entropy coding, instead
+                  <a href="algorithms.html#crc32">crc32</a> object.  It does not use any sort of entropy coding, instead
                   a byte aligned output method is used.
                </description> 
   

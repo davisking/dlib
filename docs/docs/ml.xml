@@ -116,6 +116,8 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                <item>add_skip_layer</item>
                <item>layer</item>
                <item>test_layer</item>
+               <item>net_to_onnx</item>
+               <item>set_dnn_choose_algorithms_per_input_shape</item>
                <item>resizable_tensor</item>
                <item>alias_tensor</item>
             </sub>
@@ -285,7 +287,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
                <item>
                   <name>input_tensor</name>
-                  <link>dlib/dnn/layers_abstract.h.html#input_tensor_</link>
+                  <link>dlib/dnn/input_abstract.h.html#input_tensor</link>
                </item>
                <item>
                   <name>dropout_rate</name>
@@ -326,6 +328,10 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                <item>
                   <name>reshape_to</name>
                   <link>dlib/dnn/layers_abstract.h.html#reshape_to_</link>
+               </item>
+               <item>
+                  <name>adaptive_computation_time</name>
+                  <link>dlib/dnn/layers_abstract.h.html#adaptive_computation_time_</link>
                </item>
             </sub>
          </item>
@@ -598,6 +604,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>learn_platt_scaling</item>
          <item>process_sample</item>
          <item>bpe_tokenizer</item>
+         <item>arc_agi_manager</item>
 
          
 
@@ -1041,6 +1048,81 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
    <!-- ************************************************************************* -->
 
       <component>
+         <name>adaptive_computation_time</name>
+         <file>dlib/dnn.h</file>
+         <spec_file link="true" anchor="adaptive_computation_time_">dlib/dnn/layers_abstract.h</spec_file>
+         <description>
+            An Adaptive Computation Time (ACT) layer with a configurable maximum
+            number of halting steps per sequence position.  Input and output tensor
+            dimensions are the same.  The aliases <tt>act</tt>, <tt>act4</tt>, and
+            <tt>act16</tt> select maximums of 8, 4, and 16 steps respectively.
+            The layer exposes its halting threshold and statistics from the latest
+            forward pass.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>net_to_onnx</name>
+         <file>dlib/dnn.h</file>
+         <spec_file link="true">dlib/dnn/onnx_abstract.h</spec_file>
+         <description>
+            Exports a deep neural network to an ONNX file or output stream for inference
+            in other tools.  The exporter does not require ONNX or protobuf libraries.
+            It uses ONNX opset 17 and a fixed float tensor shape, including a fixed batch size.
+            Supply this shape as <tt>onnx_export_options::input_tensor_shape</tt> in
+            <tt>[samples, channels, rows, columns]</tt> order.  For an
+            <a href="#input_rgb_image_sized">input_rgb_image_sized</a> layer, omitting
+            the shape selects one image of that layer's size.
+            <p>
+               By default, the exported graph accepts the preprocessed tensor produced by
+               the network's <tt>to_tensor()</tt> function.  Setting
+               <tt>options.input_mode = onnx_export_input_mode::dlib_input_layer</tt>
+               includes the supported input layer's preprocessing in the graph.  For RGB
+               image inputs, this mode accepts RGB channel values in the range 0 to 255,
+               stored as floats in NCHW order, and applies dlib's mean subtraction and
+               division by 256.
+            </p>
+            <p>
+               Loss layers pass their input through, so the graph does not decode class
+               labels or detections.  Use a softmax layer when class probabilities are
+               wanted, as in the example.  Unsupported layers cause an error; see the
+               <a href="dlib/dnn/onnx_abstract.h.html#net_to_onnx">specification</a>
+               for the supported layer families and export restrictions.
+            </p>
+         </description>
+         <examples>
+            <example>dnn_imagenet_export_onnx_ex.cpp.html</example>
+         </examples>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>set_dnn_choose_algorithms_per_input_shape</name>
+         <file>dlib/dnn.h</file>
+         <spec_file link="true">dlib/dnn/core_abstract.h</spec_file>
+         <description>
+            Controls whether cuDNN convolution algorithms are selected separately for
+            each input shape.  The default is false, which reuses algorithms selected
+            for the first input with a given stride, padding, and filter size.  Setting
+            this to true can improve algorithm choices when input shapes vary, at the
+            cost of additional algorithm selection time.  Each thread caches a limited
+            number of configurations.
+            <p>
+               Set this option before using any networks.  Changing it does not
+               invalidate algorithms already selected by existing convolution objects.
+               Algorithms are selected only when their forward or backward operation is
+               first needed.  If cuDNN benchmarking runs out of memory, dlib falls back
+               to cuDNN's heuristic selection.
+            </p>
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
          <name>resizable_tensor</name>
          <file>dlib/cuda/tensor.h</file>
          <spec_file link="true">dlib/cuda/tensor_abstract.h</spec_file>
@@ -1061,8 +1143,12 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                </p>
 
                <p>
-                If DLIB_USE_CUDA is not #defined then this object will not use CUDA at all.
-                Instead, it will simply store one host side memory block of floats.  
+                If <a href="dlib/dnn/core_abstract.h.html#use_cuda">cuda::use_cuda()</a>
+                returns false, this object stores only a host side memory block of floats.
+                This happens when dlib was built without CUDA, when no CUDA device is
+                available, or when <tt>DLIB_DISABLE_CUDA_USE</tt> disables CUDA at runtime.
+                Set that environment variable before starting the program, since the
+                choice is fixed after the first check.
                </p>
 
                <p>
@@ -2638,7 +2724,18 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             to form a vocabulary of subword units. This approach is particularly useful for
             handling out-of-vocabulary words and reducing the size of the vocabulary while
             maintaining the ability to represent any text.
+            <p>
+               <tt>train(text, vocab_size, max_bytes, verbose)</tt> can limit training
+               to a prefix of the input bytes; <tt>max_bytes == 0</tt> uses all of them.
+               The vocabulary includes 256 byte tokens, learned merges, and 28 special
+               tokens.  Query special token IDs after training, since they follow the
+               learned merges.  <tt>encode()</tt> encodes the supplied bytes without
+               inserting paragraph markers; add special token IDs explicitly when needed.
+            </p>
          </description>
+         <examples>
+            <example>slm_advanced_train_ex.cpp.html</example>
+         </examples>
       </component>
       
    <!-- ************************************************************************* -->
@@ -3047,6 +3144,22 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
       
    <!-- ************************************************************************* -->
       
+      <component>
+         <name>arc_agi_manager</name>
+         <file>dlib/data_io.h</file>
+         <spec_file link="true">dlib/data_io/arc_agi_abstract.h</spec_file>
+         <description>
+            Loads ARC-AGI reasoning tasks from directories of JSON files, with training
+            and test input/output grid pairs.  Each grid is a matrix of color values
+            from 0 to 9.  The manager provides access by task index or filename stem,
+            serialization, and conversion between grids and token sequences with row
+            and input/output separators.  It can also prepare fixed-length, left-padded
+            context windows and next-token labels for language model training.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
       <component>
          <name>load_mnist_dataset</name>
          <file>dlib/data_io.h</file>

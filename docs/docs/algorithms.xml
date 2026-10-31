@@ -133,16 +133,16 @@
          </item>
          <item>
             <name>fft_size</name>
-            <link>dlib/fft/fft.h.html#fft_size</link>
+            <link>dlib/fft/fft_size.h.html#fft_size</link>
          </item>
 
          <item>
             <name>fft_inplace</name>
-            <link>dlib/fft/fft.h.html#fft_inplace</link>
+            <link>dlib/fft/fft_stl.h.html#fft_inplace</link>
          </item>
          <item>
             <name>ifft_inplace</name>
-            <link>dlib/fft/fft.h.html#ifft_inplace</link>
+            <link>dlib/fft/fft_stl.h.html#ifft_inplace</link>
          </item>
       </section>
 
@@ -842,8 +842,8 @@
          <file>dlib/statistics.h</file>
          <spec_file link="true">dlib/statistics/statistics_abstract.h</spec_file>
          <description>
-                This object is a simple tool for computing the covariance of a 
-                sequence of scalar values.  
+                This object computes the covariance and correlation of pairs of scalar
+                values.
          </description>
       </component>
       
@@ -866,8 +866,8 @@
          <file>dlib/statistics.h</file>
          <spec_file link="true">dlib/statistics/statistics_abstract.h</spec_file>
          <description>
-               This is a function for computing the correlation between 
-               matching elements of two std::vectors.
+               This is a function for computing the correlation between
+               matching elements of two std::vectors. 
          </description>
       </component>
       

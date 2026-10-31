@@ -744,6 +744,14 @@
                         <name>create_listener</name>
                         <link>dlib/sockets/sockets_kernel_abstract.h.html#create_listener</link>
                      </item>
+                     <item>
+                        <name>create_listening_socket</name>
+                        <link>dlib/sockets/sockets_kernel_abstract.h.html#create_listening_socket</link>
+                     </item>
+                     <item>
+                        <name>create_listener_from_socket</name>
+                        <link>dlib/sockets/sockets_kernel_abstract.h.html#create_listener_from_socket</link>
+                     </item>
                      <item>   
                         <name>get_local_hostname</name>
                         <link>dlib/sockets/sockets_kernel_abstract.h.html#get_local_hostname</link>
@@ -891,10 +899,9 @@
          <spec_file>dlib/sockets/sockets_kernel_abstract.h</spec_file>
          <description>
             This is a set of objects that provides an easy to use and object oriented 
-            interface for dealing with TCP networking. There are currently two implementations,
-            one for UNIX and another for all versions of Windows after Windows95.
-            Both provide the exact same interface so programs written with them can be
-            recompiled on either platform without a problem.
+            interface for TCP networking and Unix domain stream sockets.  There are
+            implementations for POSIX systems and Windows.  Unix domain sockets require
+            operating system support for AF_UNIX.
             <p>
               You also may want to take note of the <a href="other.html#timeout">timeout</a> object.
               It provides a mechanism which you can use to add a timeout to a network operation.  

@@ -73,7 +73,8 @@ namespace dlib
         /*!
             ensures
                 - Encodes the input text into a sequence of subword tokens.
-                - Special tokens are automatically added to mark the beginning and end of paragraphs.
+                - Encodes the supplied bytes without adding paragraph boundary tokens.
+                  Special tokens can be inserted explicitly using get_special_token_id().
                 - Returns a vector of token IDs representing the encoded text.
         !*/
 
@@ -102,7 +103,8 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - Returns the ID of the specified special token.
+                - Returns the ID of the specified special token.  Special token IDs start
+                  at get_vocab_without_specials_size() and can change after train().
                 - Throws an exception if the token is not found in the special tokens map.
         !*/
 
@@ -121,7 +123,7 @@ namespace dlib
         size_t get_vocab_without_specials_size() const;
         /*!
             ensures
-                - Returns vocabulary size excluding special tokens
+                - Returns the number of byte and learned merge tokens, excluding special tokens
         */
     };
 

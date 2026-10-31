@@ -74,6 +74,22 @@ namespace dlib
                     This exception may be thrown if there is any other problem. 
         !*/
 
+    protected:
+
+        virtual std::string get_include_url (
+            const std::string& filename
+        ) const;
+        /*!
+            ensures
+                - When the printer emits a hyperlink for a quoted #include, it calls
+                  this function with the included filename (without quotes).
+                - Returns the URL for that hyperlink, or an empty string to print
+                  the filename without a link.  The printer escapes HTML markup
+                  in the returned URL.
+                - The default implementation returns filename + ".html".
+                - The black and white printer does not emit include hyperlinks.
+        !*/
+
     private:
 
         // restricted functions

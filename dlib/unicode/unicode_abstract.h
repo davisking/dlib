@@ -162,6 +162,8 @@ namespace dlib
         ensures
             - converts str into wstring whose encoding is UTF-16 when sizeof(wchar_t) == 2
             - converts str into wstring whose encoding is UTF-32 when sizeof(wchar_t) == 4
+        throws
+            - std::runtime_error if conversion fails under the current locale.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -171,10 +173,12 @@ namespace dlib
     );
     /*!
         requires
-            - str is a valid wide character string string whose encoding is same as current 
+            - src is a valid wide character string whose encoding is same as current
               locale setting
         ensures
             - returns a multibyte encoded version of the given string
+        throws
+            - std::runtime_error if conversion fails under the current locale.
     !*/
 
 // ----------------------------------------------------------------------------------------

@@ -28,8 +28,8 @@
          <term link="dlib/numeric_constants.h.html" name="khinchin"  include="dlib/numeric_constants.h"/>
          <term link="dlib/numeric_constants.h.html" name="apery"     include="dlib/numeric_constants.h"/>
 
-         <term file="dlib/revision.h.html" name="DLIB_MAJOR_VERSION"     include="dlib/revision.h"/>
-         <term file="dlib/revision.h.html" name="DLIB_MINOR_VERSION"     include="dlib/revision.h"/>
+         <term link="dlib/revision.h.html" name="DLIB_MAJOR_VERSION"     include="dlib/revision.h"/>
+         <term link="dlib/revision.h.html" name="DLIB_MINOR_VERSION"     include="dlib/revision.h"/>
 
 
 
@@ -60,27 +60,27 @@
          <term file="ml.html" name="repeat" include="dlib/dnn.h"/>
          <term file="ml.html" name="add_tag_layer" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="tag_id" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/core_abstract.h.html" name="tag1" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/core_abstract.h.html" name="tag2" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/core_abstract.h.html" name="tag3" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/core_abstract.h.html" name="tag4" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/core_abstract.h.html" name="tag5" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/core_abstract.h.html" name="tag6" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/core_abstract.h.html" name="tag7" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/core_abstract.h.html" name="tag8" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/core_abstract.h.html" name="tag9" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/core_abstract.h.html" name="tag10" include="dlib/dnn.h"/>
+         <term link="dlib/dnn/core_abstract.h.html#add_tag_layer" name="tag1" include="dlib/dnn.h"/>
+         <term link="dlib/dnn/core_abstract.h.html#add_tag_layer" name="tag2" include="dlib/dnn.h"/>
+         <term link="dlib/dnn/core_abstract.h.html#add_tag_layer" name="tag3" include="dlib/dnn.h"/>
+         <term link="dlib/dnn/core_abstract.h.html#add_tag_layer" name="tag4" include="dlib/dnn.h"/>
+         <term link="dlib/dnn/core_abstract.h.html#add_tag_layer" name="tag5" include="dlib/dnn.h"/>
+         <term link="dlib/dnn/core_abstract.h.html#add_tag_layer" name="tag6" include="dlib/dnn.h"/>
+         <term link="dlib/dnn/core_abstract.h.html#add_tag_layer" name="tag7" include="dlib/dnn.h"/>
+         <term link="dlib/dnn/core_abstract.h.html#add_tag_layer" name="tag8" include="dlib/dnn.h"/>
+         <term link="dlib/dnn/core_abstract.h.html#add_tag_layer" name="tag9" include="dlib/dnn.h"/>
+         <term link="dlib/dnn/core_abstract.h.html#add_tag_layer" name="tag10" include="dlib/dnn.h"/>
          <term file="ml.html" name="add_skip_layer" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/core_abstract.h.html" name="skip1" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/core_abstract.h.html" name="skip2" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/core_abstract.h.html" name="skip3" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/core_abstract.h.html" name="skip4" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/core_abstract.h.html" name="skip5" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/core_abstract.h.html" name="skip6" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/core_abstract.h.html" name="skip7" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/core_abstract.h.html" name="skip8" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/core_abstract.h.html" name="skip9" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/core_abstract.h.html" name="skip10" include="dlib/dnn.h"/>
+         <term link="dlib/dnn/core_abstract.h.html#add_skip_layer" name="skip1" include="dlib/dnn.h"/>
+         <term link="dlib/dnn/core_abstract.h.html#add_skip_layer" name="skip2" include="dlib/dnn.h"/>
+         <term link="dlib/dnn/core_abstract.h.html#add_skip_layer" name="skip3" include="dlib/dnn.h"/>
+         <term link="dlib/dnn/core_abstract.h.html#add_skip_layer" name="skip4" include="dlib/dnn.h"/>
+         <term link="dlib/dnn/core_abstract.h.html#add_skip_layer" name="skip5" include="dlib/dnn.h"/>
+         <term link="dlib/dnn/core_abstract.h.html#add_skip_layer" name="skip6" include="dlib/dnn.h"/>
+         <term link="dlib/dnn/core_abstract.h.html#add_skip_layer" name="skip7" include="dlib/dnn.h"/>
+         <term link="dlib/dnn/core_abstract.h.html#add_skip_layer" name="skip8" include="dlib/dnn.h"/>
+         <term link="dlib/dnn/core_abstract.h.html#add_skip_layer" name="skip9" include="dlib/dnn.h"/>
+         <term link="dlib/dnn/core_abstract.h.html#add_skip_layer" name="skip10" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="layer" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="input_layer" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="visit_layers" include="dlib/dnn.h"/>
@@ -102,11 +102,11 @@
          <term file="dlib/cuda/cuda_errors.h.html" name="curand_error" include="dlib/cuda/cuda_errors.h"/>
          <term file="dlib/cuda/cuda_errors.h.html" name="cublas_error" include="dlib/cuda/cuda_errors.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="fc_bias_mode" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/layers_abstract.h.html" name="FC_HAS_BIAS" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/layers_abstract.h.html" name="FC_NO_BIAS" include="dlib/dnn.h"/>
+         <term link="dlib/dnn/layers_abstract.h.html#fc_bias_mode" name="FC_HAS_BIAS" include="dlib/dnn.h"/>
+         <term link="dlib/dnn/layers_abstract.h.html#fc_bias_mode" name="FC_NO_BIAS" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="layer_mode" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/layers_abstract.h.html" name="CONV_MODE" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/layers_abstract.h.html" name="FC_MODE" include="dlib/dnn.h"/>
+         <term link="dlib/dnn/layers_abstract.h.html#layer_mode" name="CONV_MODE" include="dlib/dnn.h"/>
+         <term link="dlib/dnn/layers_abstract.h.html#layer_mode" name="FC_MODE" include="dlib/dnn.h"/>
          <term file="dlib/cuda/tensor_abstract.h.html" name="tensor" include="dlib/cuda/tensor.h"/>
          <term file="dlib/cuda/tensor_abstract.h.html" name="resizable_tensor" include="dlib/cuda/tensor.h"/>
          <term file="dlib/cuda/tensor_abstract.h.html" name="alias_tensor_instance" include="dlib/cuda/tensor.h"/>
@@ -168,7 +168,7 @@
          <term file="dlib/dnn/layers_abstract.h.html" name="fc_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="con_" include="dlib/dnn.h"/>
 
-         <term file="dlib/dnn/layers_abstract.h.html" name="input_tensor_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/input_abstract.h.html" name="input_tensor" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="dropout_rate_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="rms_norm_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="transpose_" include="dlib/dnn.h"/>
@@ -221,7 +221,7 @@
          <term file="linear_algebra.html" name="matrix" include="dlib/matrix.h"/>
          <term file="linear_algebra.html" name="move_rect" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="intersect" include="dlib/geometry.h"/>
-         <term file="linear_algebra.html" name="area" include="dlib/geometry.h"/>
+         <term link="dlib/geometry/rectangle_abstract.h.html#area" name="area" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="translate_rect" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="resize_rect" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="resize_rect_width" include="dlib/geometry.h"/>
@@ -256,7 +256,7 @@
          <term file="dlib/error.h.html" name="impossible_labeling_error"    include="dlib/error.h"/>
 
          <term file="dlib/optimization/optimization_abstract.h.html" name="central_differences"    include="dlib/optimization.h"/>
-         <term file="dlib/optimization/optimization_abstract.h.html" name="line_search_funct"      include="dlib/optimization.h"/>
+         <term link="dlib/optimization/optimization_line_search_abstract.h.html#line_search_funct" name="line_search_funct"      include="dlib/optimization.h"/>
          <term file="dlib/optimization/optimization_line_search_abstract.h.html" name="optimize_single_variable_failure"   include="dlib/optimization.h"/>
          <term file="dlib/optimization/optimization_bobyqa_abstract.h.html" name="bobyqa_failure"  include="dlib/optimization.h"/>
          <term file="dlib/optimization/optimization_oca_abstract.h.html" name="oca_problem"        include="dlib/optimization.h"/>
@@ -319,7 +319,7 @@
          <term file="optimization.html" name="global_function_search"           include="dlib/global_optimization.h"/>
          <term file="optimization.html" name="upper_bound_function"             include="dlib/global_optimization.h"/>
          <term file="optimization.html" name="call_function_and_expand_args"    include="dlib/global_optimization.h"/>
-         <term file="dlib/global_optimization/find_max_global_abstract.h.html" name="FOREVER"   include="dlib/global_optimization.h"/>
+         <term link="dlib/global_optimization/find_max_global_abstract.h.html" name="FOREVER"   include="dlib/global_optimization.h"/>
          <term file="dlib/global_optimization/find_max_global_abstract.h.html" name="max_function_calls"   include="dlib/global_optimization.h"/>
          <term file="optimization.html" name="max_cost_assignment"         include="dlib/optimization.h"/>
          <term link="optimization.html#max_cost_assignment" name="Hungarian Algorithm"         include="dlib/optimization.h"/>
@@ -381,7 +381,7 @@
          <term file="optimization.html" name="cg_search_strategy"             include="dlib/optimization.h"/>
          <term file="optimization.html" name="bfgs_search_strategy"           include="dlib/optimization.h"/>
          <term file="optimization.html" name="newton_search_strategy"         include="dlib/optimization.h"/>
-         <term file="optimization.html" name="newton_search_strategy_obj"     include="dlib/optimization.h"/>
+         <term link="dlib/optimization/optimization_search_strategies_abstract.h.html#newton_search_strategy_obj" name="newton_search_strategy_obj"     include="dlib/optimization.h"/>
          <term file="optimization.html" name="lbfgs_search_strategy"          include="dlib/optimization.h"/>
 
          <term file="bayes.html" name="set_node_value"                  include="dlib/bayes_utils.h"/>
@@ -667,7 +667,7 @@
          <term file="ml.html" name="vector_normalizer"                              include="dlib/statistics.h"/>
          <term file="ml.html" name="vector_normalizer_frobmetric"                   include="dlib/statistics.h"/>
          <term file="ml.html" name="compute_lda_transform"                          include="dlib/statistics.h"/>
-         <term file="ml.html" name="frobmetric_training_sample"                     include="dlib/statistics.h"/>
+         <term link="dlib/statistics/vector_normalizer_frobmetric_abstract.h.html#frobmetric_training_sample" name="frobmetric_training_sample"                     include="dlib/statistics.h"/>
          <term file="ml.html" name="vector_normalizer_pca"                          include="dlib/statistics.h"/>
          <term file="ml.html" name="tfidf_transformer"                              include="dlib/statistics.h"/>
          <term file="ml.html" name="discriminant_pca"                               include="dlib/statistics.h"/>
@@ -896,8 +896,8 @@
 
          <term file="metaprogramming.html" name="switch_"          include="dlib/constexpr_if.h"/>
          <term file="dlib/constexpr_if.h.html" name="bools"                  include="dlib/constexpr_if.h"/>
-         <term file="dlib/constexpr_if.h.html" name="true_t"                  include="dlib/constexpr_if.h"/>
-         <term file="dlib/constexpr_if.h.html" name="false_t"                  include="dlib/constexpr_if.h"/>
+         <term link="dlib/constexpr_if.h.html" name="true_t"                  include="dlib/constexpr_if.h"/>
+         <term link="dlib/constexpr_if.h.html" name="false_t"                  include="dlib/constexpr_if.h"/>
 
          <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="rowm"                  include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="rowm_exp"              include="dlib/matrix.h"/>
@@ -998,7 +998,7 @@
          <term file="metaprogramming.html" name="compile_time_integer_list"          include="dlib/metaprogramming.h"/>
          <term file="metaprogramming.html" name="make_compile_time_integer_range"    include="dlib/metaprogramming.h"/>
          <term file="metaprogramming.html" name="enable_if"          include="dlib/enable_if.h"/>
-         <term file="metaprogramming.html" name="disable_if"         include="dlib/enable_if.h"/>
+         <term link="dlib/enable_if.h.html#disable_if" name="disable_if"         include="dlib/enable_if.h"/>
 
          <term file="metaprogramming.html" name="tmin"               include="dlib/algs.h"/>
          <term file="metaprogramming.html" name="tmax"               include="dlib/algs.h"/>
@@ -1011,10 +1011,10 @@
          <term file="metaprogramming.html" name="ASSERT_ARE_NOT_SAME_TYPE"          include="dlib/assert.h"/>
          <term file="metaprogramming.html" name="ASSERT_ARE_SAME_TYPE"              include="dlib/assert.h"/>
          <term file="metaprogramming.html" name="DLIB_CASSERT"                      include="dlib/assert.h"/>
-         <term file="metaprogramming.html" name="COMPILE_TIME_ASSERT"               include="dlib/assert.h"/>
+         <term link="dlib/assert.h.html" name="COMPILE_TIME_ASSERT"               include="dlib/assert.h"/>
          <term file="metaprogramming.html" name="DLIB_ASSERT_HAS_STANDARD_LAYOUT"   include="dlib/assert.h"/>
          <term file="other.html" name="MATLAB"                       />
-         <term file="other.html" name="java"                       />
+         <term link="other.html#Java" name="java"                       />
          <term file="other.html" name="TIME_THIS"                       include="dlib/time_this.h"/>
          <term link="other.html#timing code blocks" name="print"        include="dlib/timing.h"/>
          <term file="other.html" name="timing code blocks"              include="dlib/timing.h"/>
@@ -1048,7 +1048,7 @@
          <term file="metaprogramming.html" name="is_directed_graph"     include="dlib/is_kind.h"/>
          <term file="metaprogramming.html" name="is_built_in_scalar_type" include="dlib/type_traits.h"/>
          <term file="metaprogramming.html" name="promote"               include="dlib/algs.h"/>
-         <term file="metaprogramming.html" name="basic_type"            include="dlib/type_traits.h"/>
+         <term link="dlib/type_traits.h.html#basic_type" name="basic_type"            include="dlib/type_traits.h"/>
          <term file="metaprogramming.html" name="remove_cvref_t"            include="dlib/type_traits.h"/>
          <term file="metaprogramming.html" name="assign_zero_if_built_in_scalar_type" include="dlib/algs.h"/>
 
@@ -1130,7 +1130,7 @@
          <term file="api.html" name="auto_unlock"           include="dlib/threads.h"/>
          <term file="api.html" name="auto_mutex_readonly"   include="dlib/threads.h"/>
          <term file="api.html" name="auto_unlock_readonly"  include="dlib/threads.h"/>
-         <term link="api.html#create_new_thread%20extension" name="create_new_thread extension" include="dlib/threads.h"/> 
+         <term link="api.html#create_new_thread_extension" name="create_new_thread extension" include="dlib/threads.h"/>
          <term file="api.html" name="multithreaded_object"  include="dlib/threads.h"/>
          <term file="api.html" name="rmutex"                include="dlib/threads.h"/>
          <term file="api.html" name="read_write_mutex"      include="dlib/threads.h"/>
@@ -1150,7 +1150,6 @@
 
          <term file="compile.html" name="DLIB_ISO_CPP_ONLY"/>
          <term file="compile.html" name="DLIB_NO_GUI_SUPPORT"/>
-         <term file="compile.html" name="NO_MAKEFILE"/>
          <term file="compile.html" name="DLIB_THREAD_POOL_TIMEOUT"/>
 
          <term file="dlib/threads/threads_kernel_abstract.h.html" name="get_thread_id"    include="dlib/threads.h"/>
@@ -1869,8 +1868,8 @@
 
 
          <term file="parsing.html" name="basic_utf8_ifstream"        include="dlib/unicode.h"/>
-         <term link="parsing.html#utf8_wifstream" name="basic_utf8_ifstream" include="dlib/unicode.h"/>
-         <term link="parsing.html#utf8_uifstream" name="basic_utf8_ifstream" include="dlib/unicode.h"/>
+         <term link="parsing.html#basic_utf8_ifstream" name="utf8_wifstream" include="dlib/unicode.h"/>
+         <term link="parsing.html#basic_utf8_ifstream" name="utf8_uifstream" include="dlib/unicode.h"/>
          <term file="parsing.html" name="base64"                     include="dlib/base64.h"/>
          <term file="parsing.html" name="cmd_line_parser"            include="dlib/cmd_line_parser.h"/>
          <term link="parsing.html#cmd_line_parser" name="command_line_parser" include="dlib/cmd_line_parser.h"/>
@@ -1890,6 +1889,13 @@
          <term link="parsing.html#string_assign" name="sa"           include="dlib/string.h"/>
          <term file="parsing.html" name="tokenizer"                  include="dlib/tokenizer.h"/>
          <term file="ml.html" name="bpe_tokenizer"                  include="dlib/tokenizer.h"/>
+         <term file="ml.html" name="arc_agi_manager"                include="dlib/data_io.h"/>
+         <term file="ml.html" name="adaptive_computation_time"      include="dlib/dnn.h"/>
+         <term file="ml.html" name="net_to_onnx"                    include="dlib/dnn.h"/>
+         <term file="ml.html" name="set_dnn_choose_algorithms_per_input_shape" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="use_cuda" include="dlib/dnn.h"/>
+         <term file="dlib/sockets/sockets_kernel_abstract.h.html" name="create_listening_socket" include="dlib/sockets.h"/>
+         <term file="dlib/sockets/sockets_kernel_abstract.h.html" name="create_listener_from_socket" include="dlib/sockets.h"/>
          <term file="parsing.html" name="wrap_string"                include="dlib/string.h"/>
          <term file="parsing.html" name="xml_parser"                 include="dlib/xml_parser.h"/>
          <term file="dlib/xml_parser/xml_parser_kernel_interfaces.h.html" name="document_handler"  include="dlib/xml_parser.h"/>
@@ -1914,7 +1920,7 @@
          <term file="parsing.html" name="unichar"                    include="dlib/unicode.h"/>
          <term file="parsing.html" name="ustring"                    include="dlib/unicode.h"/>
          <term file="parsing.html" name="convert_to_utf32"      include="dlib/unicode.h"/>
-         <term file="parsing.html" name="convert_mbstring_to_wstring"      include="dlib/unicode.h"/>
+         <term link="dlib/unicode/unicode_abstract.h.html#convert_mbstring_to_wstring" name="convert_mbstring_to_wstring"      include="dlib/unicode.h"/>
          <term file="parsing.html" name="is_combining_char"          include="dlib/unicode.h"/>
          <term file="parsing.html" name="strings_equal_ignore_case"  include="dlib/string.h"/>
          <term file="dlib/unicode/unicode_abstract.h.html" name="invalid_utf8_error" include="dlib/unicode.h"/>
