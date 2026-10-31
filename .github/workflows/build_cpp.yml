@@ -6,6 +6,7 @@ on:
     - master
     paths:
     - ".github/workflows/build_cpp.yml"
+    - "tools/htmlify/test_htmlify.py"
     - "**.cpp"
     - "**.h"
     - "**.c"
@@ -17,6 +18,7 @@ on:
     - master
     paths:
     - ".github/workflows/build_cpp.yml"
+    - "tools/htmlify/test_htmlify.py"
     - "**.cpp"
     - "**.h"
     - "**.c"
@@ -112,6 +114,8 @@ jobs:
       run: build/dtest --runall -q
     - name: Build examples, etc
       run: cmake --build build --config Release --parallel 2
+    - name: Test htmlify
+      run: python3 ../../tools/htmlify/test_htmlify.py build/tools/htmlify_build/htmlify
 
     # Test the BLAS bindings
     - name: Configure BLAS binding tests

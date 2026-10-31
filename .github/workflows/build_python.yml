@@ -52,7 +52,7 @@ jobs:
         pip3 install cmake
         pip3 install .
     - name: Test
-      run: python -m pytest --ignore docs --ignore dlib
+      run: python -m pytest tools/python/test
 
   Ubuntu:
     runs-on: 'ubuntu-latest'
@@ -65,7 +65,7 @@ jobs:
       run: |
         pip install .
     - name: Test
-      run: python -m pytest --ignore docs --ignore dlib
+      run: python -m pytest tools/python/test
 
   Ubuntu-Free-Threaded:
     runs-on: 'ubuntu-latest'
@@ -81,7 +81,7 @@ jobs:
     - name: Verify free-threading
       run: python -c "import sys; assert not sys._is_gil_enabled()"
     - name: Test
-      run: python -m pytest --ignore docs --ignore dlib
+      run: python -m pytest tools/python/test
 
   Ubuntu-Python-3-8:
     runs-on: 'ubuntu-latest'
@@ -95,7 +95,7 @@ jobs:
     - name: Build
       run: pip install .
     - name: Test
-      run: python -m pytest --ignore docs --ignore dlib
+      run: python -m pytest tools/python/test
 
 # Disabled for now since something is going sideways with python packages on github actions
 # MacOS:
