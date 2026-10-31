@@ -127,8 +127,8 @@ namespace dlib
                 - Returns true if train() computes idf()[j] as log((1+n)/(1+df)) + 1,
                   and false if it uses log(n/df) + 1, where n is the number of training
                   documents and df the number of them the term occurs in.  Smoothing
-                  counts one extra document containing every term, which gives a term
-                  found in every training document a weight above 1.
+                  counts one extra document containing every term.  A term found in
+                  every training document has IDF weight 1 with either formula.
         !*/
 
         void normalize_to_unit_length (
