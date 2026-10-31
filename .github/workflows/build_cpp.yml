@@ -114,8 +114,6 @@ jobs:
       run: build/dtest --runall -q
     - name: Build examples, etc
       run: cmake --build build --config Release --parallel 2
-    - name: Test htmlify
-      run: python3 ../../tools/htmlify/test_htmlify.py build/tools/htmlify_build/htmlify
 
     # Test the BLAS bindings
     - name: Configure BLAS binding tests
@@ -240,6 +238,8 @@ jobs:
       run: build/Release/dtest.exe --runall -q
     - name: Build ancillary tools
       run: cmake --build build --config Release --target imglab htmlify dtoc --parallel 4
+    - name: Test htmlify
+      run: python ../../tools/htmlify/test_htmlify.py build/tools/htmlify_build/Release/htmlify.exe
     - name: Install an AVX-enabled MSVC package
       working-directory: ${{ github.workspace }}
       run: |
