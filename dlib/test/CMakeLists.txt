@@ -55,6 +55,7 @@ add_executable(${target_name} main.cpp tester.cpp
    entropy_encoder_model.cpp
    example_args.cpp
    face.cpp
+   feature_hashing.cpp
    fft.cpp
    fhog.cpp
    filtering.cpp

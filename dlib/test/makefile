@@ -61,6 +61,7 @@ SRC += empirical_kernel_map.cpp
 SRC += entropy_coder.cpp
 SRC += entropy_encoder_model.cpp
 SRC += face.cpp
+SRC += feature_hashing.cpp
 SRC += fft.cpp
 SRC += fhog.cpp
 SRC += filtering.cpp
