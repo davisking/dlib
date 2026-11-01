@@ -16,6 +16,7 @@ New Features and Improvements:
       - Added tfidf_transformer, which learns TF-IDF weights for sparse vectors of
         term counts (issue #3176).
       - Added normalize() and normalize_inplace() for sparse vectors.
+      - Added hash_word_ngrams() and hash_char_ngrams() for feature hashing of text.
 
    - Deep learning tooling:
       - Added an Adaptive Computation Time layer. (PR #3111)

@@ -604,6 +604,8 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>learn_platt_scaling</item>
          <item>process_sample</item>
          <item>bpe_tokenizer</item>
+         <item>hash_word_ngrams</item>
+         <item>hash_char_ngrams</item>
          <item>arc_agi_manager</item>
 
          
@@ -1585,6 +1587,33 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                 as sparse vectors of term counts, and applies them to new counts.  It
                 weighs each count by how rare its term is across the training documents
                 and returns a sparse vector over the terms it kept.
+         </description>
+
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>hash_word_ngrams</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/feature_hashing_abstract.h</spec_file>
+         <description>
+                This function counts the word n-grams of a document, hashed into a fixed
+                number of buckets, giving a sparse vector for a
+                <a href="#tfidf_transformer">tfidf_transformer</a> or a sparse linear trainer.
+         </description>
+
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>hash_char_ngrams</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/feature_hashing_abstract.h</spec_file>
+         <description>
+                This function is <a href="#hash_word_ngrams">hash_word_ngrams</a> for the
+                character n-grams within each token.
          </description>
 
       </component>
