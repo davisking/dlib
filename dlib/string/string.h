@@ -71,7 +71,7 @@ namespace dlib
         temp.resize(str.size());
 
         for (typename std::basic_string<char,traits,alloc>::size_type i = 0; i < str.size(); ++i)
-            temp[i] = (char)std::tolower(str[i]);
+            temp[i] = static_cast<char>(std::tolower(static_cast<unsigned char>(str[i])));
 
         return temp;
     }
@@ -91,7 +91,7 @@ namespace dlib
         temp.resize(str.size());
 
         for (typename std::basic_string<char,traits,alloc>::size_type i = 0; i < str.size(); ++i)
-            temp[i] = (char)std::toupper(str[i]);
+            temp[i] = static_cast<char>(std::toupper(static_cast<unsigned char>(str[i])));
 
         return temp;
     }
@@ -112,7 +112,7 @@ namespace dlib
 
         for (typename std::basic_string<char,traits,alloc>::size_type i = 0; i < str1.size(); ++i)
         {
-            if (std::tolower(str1[i]) != std::tolower(str2[i]))
+            if (std::tolower(static_cast<unsigned char>(str1[i])) != std::tolower(static_cast<unsigned char>(str2[i])))
                 return false;
         }
 
@@ -135,7 +135,7 @@ namespace dlib
             if (str2[i] == '\0')
                 return false;
 
-            if (std::tolower(str1[i]) != std::tolower(str2[i]))
+            if (std::tolower(static_cast<unsigned char>(str1[i])) != std::tolower(static_cast<unsigned char>(str2[i])))
                 return false;
         }
 
@@ -175,7 +175,7 @@ namespace dlib
 
         for (typename std::basic_string<char,traits,alloc>::size_type i = 0; i < str1.size() && i < num; ++i)
         {
-            if (std::tolower(str1[i]) != std::tolower(str2[i]))
+            if (std::tolower(static_cast<unsigned char>(str1[i])) != std::tolower(static_cast<unsigned char>(str2[i])))
                 return false;
         }
 
@@ -199,7 +199,7 @@ namespace dlib
             if (str2[i] == '\0')
                 return false;
 
-            if (std::tolower(str1[i]) != std::tolower(str2[i]))
+            if (std::tolower(static_cast<unsigned char>(str1[i])) != std::tolower(static_cast<unsigned char>(str2[i])))
                 return false;
         }
 
