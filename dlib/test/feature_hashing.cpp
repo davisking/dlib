@@ -68,6 +68,12 @@ namespace
                   expected({" a", "ab", "bc", "cd", "d ", " ab", "abc", "bcd", "cd "}, num_buckets));
 
         DLIB_TEST(hash_char_ngrams(std::vector<std::string>(), 3, 5, num_buckets).empty());
+
+        // UTF-8 e-acute has two bytes, so its padded form has two byte trigrams.
+        DLIB_TEST(hash_char_ngrams(std::vector<std::string>{"\xc3\xa9"}, 3, 3, num_buckets) ==
+                  expected({" \xc3\xa9", "\xc3\xa9 "}, num_buckets));
+        DLIB_TEST(hash_char_ngrams(std::vector<std::string>{"\xc3\xa9"}, 1, 1, num_buckets) ==
+                  expected({" ", "\xc3", "\xa9", " "}, num_buckets));
     }
 
 // ----------------------------------------------------------------------------------------

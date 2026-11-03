@@ -5,10 +5,13 @@
 
 #include "feature_hashing_abstract.h"
 #include "../algs.h"
+#include "../error.h"
 #include "../general_hash/murmur_hash3.h"
 #include "../sparse_vector.h"
 #include <algorithm>
+#include <limits>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -26,11 +29,27 @@ namespace dlib
             unsigned long num_buckets,
             sample_type& counts
         )
+        /*!
+            requires
+                - data points to size bytes.
+                - num_buckets > 0
+                - sample_type satisfies the requirements of hash_word_ngrams().
+            ensures
+                - Appends (murmur_hash3(data,size,0) % num_buckets, 1) to counts.
+            throws
+                - dlib::error if size exceeds the length supported by murmur_hash3().
+        !*/
         {
             using index_type = typename sample_type::value_type::first_type;
+            static_assert(std::is_integral_v<index_type> && std::is_unsigned_v<index_type> &&
+                          !std::is_same_v<index_type,bool>, "N-gram indices must be unsigned integers.");
+            DLIB_ASSERT(num_buckets > 0 && num_buckets-1 <= std::numeric_limits<index_type>::max());
+            if (size > static_cast<std::size_t>(std::numeric_limits<int>::max()))
+                throw error("N-gram length exceeds the length supported by murmur_hash3().");
             const auto bucket = murmur_hash3(data, static_cast<int>(size), 0) % num_buckets;
             counts.emplace_back(static_cast<index_type>(bucket), 1);
         }
+
     }
 
 // ----------------------------------------------------------------------------------------
