@@ -13,6 +13,7 @@
 #include "statistics/vector_normalizer_frobmetric.h"
 #include "statistics/lda.h"
 #include "statistics/tfidf.h"
+#include "statistics/feature_hashing.h"
 
 #endif // DLIB_STATISTICs_H_ 
 

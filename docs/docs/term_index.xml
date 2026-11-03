@@ -670,6 +670,8 @@
          <term link="dlib/statistics/vector_normalizer_frobmetric_abstract.h.html#frobmetric_training_sample" name="frobmetric_training_sample"                     include="dlib/statistics.h"/>
          <term file="ml.html" name="vector_normalizer_pca"                          include="dlib/statistics.h"/>
          <term file="ml.html" name="tfidf_transformer"                              include="dlib/statistics.h"/>
+         <term file="ml.html" name="hash_word_ngrams"                               include="dlib/statistics.h"/>
+         <term file="ml.html" name="hash_char_ngrams"                               include="dlib/statistics.h"/>
          <term file="ml.html" name="discriminant_pca"                               include="dlib/statistics.h"/>
          <term file="ml.html" name="sammon_projection"                              include="dlib/statistics.h"/>
          <term file="ml.html" name="cca"                                            include="dlib/statistics.h"/>
