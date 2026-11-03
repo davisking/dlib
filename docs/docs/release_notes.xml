@@ -58,6 +58,8 @@ Non-Backwards Compatible Changes:
      reference.  OBJECT_PART_NOT_PRESENT is also a dpoint.  Serialized objects use
      version 2, which older dlib versions cannot read. (PR #3095)
    - Image width steps now use size_t instead of long. (PR #3091)
+   - train_probabilistic_decision_function() now requires at least as many samples of
+     each class as folds.
    - bpe_tokenizer::train() now takes max_bytes as its third argument and verbose as
      its fourth.  Change train(text, size, true) to train(text, size, 0, true). (PR #3078)
    - The BPE tokenizer serialization format and token IDs have changed.  Saved v20.0

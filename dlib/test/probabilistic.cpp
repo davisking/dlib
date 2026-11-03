@@ -115,6 +115,22 @@ namespace
             rs_pos.clear();
             rs_neg.clear();
 
+            // There can be as many folds as there are samples of the smaller class.
+            print_spinner();
+            std::vector<sample_type> few_x;
+            std::vector<scalar_type> few_y;
+            long num_pos = 0, num_neg = 0;
+            for (unsigned long i = 0; i < x.size(); ++i)
+            {
+                if ((y[i] > 0 && num_pos++ < 3) || (y[i] < 0 && num_neg++ < 47))
+                {
+                    few_x.push_back(x[i]);
+                    few_y.push_back(y[i]);
+                }
+            }
+            df = train_probabilistic_decision_function(krr_trainer, few_x, few_y, 3);
+            DLIB_TEST(std::isfinite(df.alpha) && std::isfinite(df.beta));
+
         }
     } a;
 

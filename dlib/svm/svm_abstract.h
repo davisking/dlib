@@ -315,8 +315,9 @@ namespace dlib
     );
     /*!
         requires
-            - 1 < folds <= x.size()
             - is_binary_classification_problem(x,y) == true
+            - 1 < folds <= std::min(sum(mat(y)>0),sum(mat(y)<0))
+              (i.e. at least as many samples of each class as folds)
             - x and y must be std::vector objects or types with a compatible interface.
             - trainer_type == some kind of batch trainer object (e.g. svm_nu_trainer)
         ensures
@@ -325,6 +326,8 @@ namespace dlib
             - The parameters of the probability model are estimated by performing k-fold 
               cross validation. 
             - The number of folds used is given by the folds argument.
+            - Each fold holds out consecutive samples of each class, in the order of x,
+              so call randomize_samples(x,y) first if similar samples sit together.
             - This function is implemented using learn_platt_scaling()
         throws
             - any exceptions thrown by trainer.train()
@@ -342,11 +345,12 @@ namespace dlib
     );
     /*!
         requires
-            - 1 < folds <= x.size()
+            - 1 < folds
             - trainer_type == some kind of batch trainer object (e.g. svm_nu_trainer)
         ensures
             - returns a trainer adapter TA such that calling TA.train(samples, labels)
               returns the same object as calling train_probabilistic_decision_function(trainer,samples,labels,folds).
+              So TA.train(samples, labels) has the requirements of that function.
     !*/
 
 // ----------------------------------------------------------------------------------------
