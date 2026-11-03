@@ -80,6 +80,13 @@ namespace
         DLIB_TEST(toupper(A) == A);
         DLIB_TEST(tolower(a) == a);
         DLIB_TEST(tolower(A) == a);
+        // Bytes from 0x80 up, here the two bytes of a UTF-8 C cedilla, are left alone.
+        const std::string utf8 = "\xc3\x87" "a VA";
+        DLIB_TEST(tolower(utf8) == "\xc3\x87" "a va");
+        DLIB_TEST(toupper(utf8) == "\xc3\x87" "A VA");
+        DLIB_TEST(strings_equal_ignore_case(utf8, std::string("\xc3\x87" "A va")));
+        DLIB_TEST(strings_equal_ignore_case(utf8, "\xc3\x87" "A va"));
+        DLIB_TEST(!strings_equal_ignore_case(utf8, "\xc3\xa7" "a va"));
         DLIB_TEST(trim(a) == "davis");
         DLIB_TEST(ltrim(a) == "davis  ");
         DLIB_TEST(rtrim(a) == "  davis");

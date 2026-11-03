@@ -3152,9 +3152,9 @@ namespace dlib
                 size = std::min(a.size(),b.size());
                 for (i = 0; i < size; ++i)
                 {
-                    if (std::tolower(a[i]) < std::tolower(b[i]))
+                    if (std::tolower(static_cast<unsigned char>(a[i])) < std::tolower(static_cast<unsigned char>(b[i])))
                         return true;
-                    else if (std::tolower(a[i]) > std::tolower(b[i]))
+                    else if (std::tolower(static_cast<unsigned char>(a[i])) > std::tolower(static_cast<unsigned char>(b[i])))
                         return false;
                 }
                 if (a.size() < b.size())
@@ -3614,7 +3614,7 @@ namespace dlib
                 // if we have found a matching key
                 if (is_printable && 
                     menus[i].underline_pos != std::string::npos &&
-                    std::tolower(menus[i].name[menus[i].underline_pos]) == std::tolower(key))
+                    std::tolower(static_cast<unsigned char>(menus[i].name[menus[i].underline_pos])) == std::tolower(key))
                 {
                     show_menu(i);
                     menus[open_menu].menu.select_first_item();
@@ -6502,7 +6502,7 @@ namespace dlib
                 if (p.first.size() != string_size)
                     return false;
                 for (auto ch : p.first)
-                    if (!std::isdigit(ch))
+                    if (!std::isdigit(static_cast<unsigned char>(ch)))
                         return false;
             }
             return true;

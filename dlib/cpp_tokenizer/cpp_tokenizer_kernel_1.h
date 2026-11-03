@@ -444,7 +444,7 @@ namespace dlib
                     }
                     // or this could be a floating point value or something with an 'e' or 'E' in it.
                     else if ((tokenizer.peek_type() == tok::CHAR && tokenizer.peek_token()[0] == '.') ||
-                             (tokenizer.peek_type() == tok::IDENTIFIER && std::tolower(tokenizer.peek_token()[0]) == 'e'))
+                             (tokenizer.peek_type() == tok::IDENTIFIER && std::tolower(static_cast<unsigned char>(tokenizer.peek_token()[0])) == 'e'))
                     {
                         std::string temp;
                         tokenizer.get_token(type,temp);

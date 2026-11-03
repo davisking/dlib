@@ -203,7 +203,7 @@ namespace dlib
             ++it;
 
             // Skip any leading whitespace
-            while (it != end && std::isspace(*it)) ++it;
+            while (it != end && std::isspace(static_cast<unsigned char>(*it))) ++it;
 
             // Verify we have an array of arrays (second '[')
             if (it == end || *it != '[') return grid;
@@ -212,7 +212,7 @@ namespace dlib
             while (it != end)
             {
                 // Skip whitespace between rows
-                while (it != end && std::isspace(*it)) ++it;
+                while (it != end && std::isspace(static_cast<unsigned char>(*it))) ++it;
 
                 // Check for end of outer array
                 if (it == end || *it == ']') break;
@@ -269,7 +269,7 @@ namespace dlib
                 search_str.begin(), search_str.end());
             if (pos == content.end()) return content.end();
             pos += search_str.length();
-            while (pos != content.end() && std::isspace(*pos)) ++pos;
+            while (pos != content.end() && std::isspace(static_cast<unsigned char>(*pos))) ++pos;
             return pos;
         }
 
@@ -404,7 +404,7 @@ namespace dlib
                     while (it != content.end())
                     {
                         // Skip inter-object whitespace
-                        while (it != content.end() && std::isspace(*it)) ++it;
+                        while (it != content.end() && std::isspace(static_cast<unsigned char>(*it))) ++it;
 
                         // Check if we've reached the end of the array
                         if (it == content.end() || *it == ']') break;

@@ -71,8 +71,8 @@ namespace dlib
             unsigned long i = 0;
             while (i < a.size() && i < b.size())
             {
-                const int cha = std::tolower(a[i]);
-                const int chb = std::tolower(b[i]);
+                const int cha = std::tolower(static_cast<unsigned char>(a[i]));
+                const int chb = std::tolower(static_cast<unsigned char>(b[i]));
                 if (cha < chb)
                     return true;
                 else if (cha > chb)
