@@ -285,9 +285,9 @@ try
     else
         trainer.set_c_candidates({0.01, 0.1, 1.0, 10.0, 100.0});
     trainer.be_verbose();
-    double c = 0;
-    const auto df = trainer.train(samples, labels, c);
-    cout << "using C = " << c << endl;
+    double c_used = 0;
+    const auto df = trainer.train(samples, labels, c_used);
+    cout << "using C = " << c_used << endl;
 
     // C = 0.01 underfits and misses more spam.  From 0.1 up, the candidates differ by a
     // few messages, within the noise of one shuffle: the classes are close to separable,
