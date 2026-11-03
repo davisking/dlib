@@ -200,8 +200,6 @@ private:
     }
 
     // The words of a message are the pieces between whitespace and ASCII punctuation.
-    // Bytes of multi-byte UTF-8 characters are not delimiters, so accented words stay
-    // whole.
     static std::vector<string> tokenize(const string& message)
     {
         return split(dlib::tolower(message), " \t\n\r\v\f!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~");
@@ -217,7 +215,6 @@ private:
 
     tfidf_transformer<sample_type> words = make_tfidf();
     tfidf_transformer<sample_type> chars = make_tfidf();
-    // names[j] holds the n-grams of the training messages behind dimension j.
     std::vector<std::set<string>> names;
 };
 
@@ -291,9 +288,8 @@ try
 
     // C = 0.01 underfits and misses more spam.  From 0.1 up, the candidates differ by a
     // few messages, within the noise of one shuffle: the classes are close to separable,
-    // so past a point C barely matters.  A real filter
-    // would pick C and the threshold knowing that losing a message costs more than
-    // missing a spam.
+    // so past a point C barely matters.  A real filter would pick C and the threshold
+    // knowing that losing a message costs more than missing a spam.
 
     // A linear SVM is one weight per dimension, so we can see what it learned: the
     // dimensions with the largest weights push a message toward spam, and those with the
