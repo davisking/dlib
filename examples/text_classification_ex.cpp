@@ -285,9 +285,9 @@ try
     else
         trainer.set_c_candidates({0.01, 0.1, 1.0, 10.0, 100.0});
     trainer.be_verbose();
-    linear_classifier_report report;
-    const auto df = trainer.train(samples, labels, report);
-    cout << "using C = " << report.c << endl;
+    double c = 0;
+    const auto df = trainer.train(samples, labels, c);
+    cout << "using C = " << c << endl;
 
     // C = 0.01 underfits and misses more spam.  From 0.1 up, the candidates differ by a
     // few messages, within the noise of one shuffle: the classes are close to separable,

@@ -3,6 +3,7 @@
 
 #include <dlib/svm.h>
 #include <dlib/rand.h>
+#include <algorithm>
 #include <vector>
 
 #include "tester.h"
@@ -52,35 +53,24 @@ namespace
         DLIB_TEST(trainer.get_c_candidates() == candidates);
         DLIB_TEST(trainer.get_num_folds() == 4);
 
-        linear_classifier_report report;
-        const auto df = trainer.train(x, y, report);
-        dlog << LINFO << "chosen C: " << report.c;
-
-        // The report has one accuracy per candidate, and c is the first with the best
-        // balanced accuracy.
-        DLIB_TEST(report.cross_validation_accuracy.size() == candidates.size());
-        long best = 0;
-        for (unsigned long k = 0; k < candidates.size(); ++k)
-        {
-            DLIB_TEST(min(report.cross_validation_accuracy[k]) > 0.6);
-            if (mean(report.cross_validation_accuracy[k]) > mean(report.cross_validation_accuracy[best]))
-                best = k;
-        }
-        DLIB_TEST(report.c == candidates[best]);
+        double c_used = -1;
+        const auto df = trainer.train(x, y, c_used);
+        dlog << LINFO << "chosen C: " << c_used;
+        DLIB_TEST(std::find(candidates.begin(), candidates.end(), c_used) != candidates.end());
 
         DLIB_TEST(df(sparse_type{{0, 3.0}}) > 0.9);
         DLIB_TEST(df(sparse_type{{0, -3.0}}) < 0.1);
 
         // The SVM inside is the solver trained on all the samples with balanced C.
         svm_c_linear_dcd_trainer<sparse_linear_kernel<sparse_type>> by_hand;
-        by_hand.set_c_class1(report.c*100/(2*20.0));
-        by_hand.set_c_class2(report.c*100/(2*80.0));
+        by_hand.set_c_class1(c_used*100/(2*20.0));
+        by_hand.set_c_class2(c_used*100/(2*80.0));
         const auto expected = by_hand.train(x, y);
         DLIB_TEST(max(abs(sparse_to_dense(df.decision_funct.basis_vectors(0)) -
                           sparse_to_dense(expected.basis_vectors(0)))) < 1e-9);
         DLIB_TEST(std::abs(df.decision_funct.b - expected.b) < 1e-9);
 
-        // The same data gives the same result, and so does the overload without a report.
+        // The same data gives the same result, and so does the overload without c_used.
         const auto df2 = trainer.train(x, y);
         DLIB_TEST(df2.alpha == df.alpha && df2.beta == df.beta);
 
@@ -101,6 +91,27 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_ties()
+    {
+        // On separable data every candidate classifies all the held out samples
+        // correctly, so train() picks the first one.
+        std::vector<sparse_type> x;
+        std::vector<double> y;
+        for (int i = 0; i < 40; ++i)
+        {
+            const double label = i < 10 ? +1 : -1;
+            x.push_back({{0, 5*label + 0.1*i}});
+            y.push_back(label);
+        }
+        linear_classifier_trainer<sparse_type> trainer;
+        trainer.set_c_candidates({100, 10});
+        double c_used = -1;
+        trainer.train(x, y, c_used);
+        DLIB_TEST(c_used == 100);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void test_dense()
     {
         std::vector<dense_type> x;
@@ -109,10 +120,9 @@ namespace
 
         linear_classifier_trainer<dense_type> trainer;
         trainer.set_c(1);
-        linear_classifier_report report;
-        const auto df = trainer.train(x, y, report);
-        DLIB_TEST(report.c == 1);
-        DLIB_TEST(report.cross_validation_accuracy.size() == 1);
+        double c_used = -1;
+        const auto df = trainer.train(x, y, c_used);
+        DLIB_TEST(c_used == 1);
         DLIB_TEST(df(dense_type{3.0, 0.0}) > 0.9);
         DLIB_TEST(df(dense_type{-3.0, 0.0}) < 0.1);
     }
@@ -133,10 +143,10 @@ namespace
         solver.set_c(1000);
         trainer.set_solver(solver);
         DLIB_TEST(!trainer.get_solver().includes_bias());
-        linear_classifier_report report;
-        const auto df = trainer.train(x, y, report);
+        double c_used = -1;
+        const auto df = trainer.train(x, y, c_used);
         DLIB_TEST(df.decision_funct.b == 0);
-        DLIB_TEST(report.c == 1);
+        DLIB_TEST(c_used == 1);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -152,12 +162,11 @@ namespace
         rare[0] = rare[1] = +1;
         linear_classifier_trainer<sparse_type> trainer;
         trainer.set_num_folds(3);
-        linear_classifier_report report;
-        report.c = 5;
-        const auto df = trainer.train(x, rare, report);
+        double c_used = 5;
+        const auto df = trainer.train(x, rare, c_used);
         DLIB_TEST(std::abs(df(x[0]) - 0.02) < 1e-12);
         DLIB_TEST(std::abs(df(x[50]) - 0.02) < 1e-12);
-        DLIB_TEST(report.c == 0 && report.cross_validation_accuracy.empty());
+        DLIB_TEST(c_used == 0);
 
         // A single class gives a probability of 0 or 1.
         const std::vector<double> all_neg(y.size(), -1);
@@ -181,6 +190,8 @@ namespace
         )
         {
             test_sparse();
+            print_spinner();
+            test_ties();
             print_spinner();
             test_dense();
             print_spinner();

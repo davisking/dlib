@@ -24,14 +24,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    struct linear_classifier_report
-    {
-        double c = 0;
-        std::vector<matrix<double,1,2>> cross_validation_accuracy;
-    };
-
-// ----------------------------------------------------------------------------------------
-
     template <
         typename sample_type_
         >
@@ -114,8 +106,8 @@ namespace dlib
             const in_scalar_vector_type& labels
         ) const
         {
-            linear_classifier_report report;
-            return train(samples, labels, report);
+            scalar_type c_used;
+            return train(samples, labels, c_used);
         }
 
         template <
@@ -125,7 +117,7 @@ namespace dlib
         const trained_function_type train (
             const in_sample_vector_type& samples,
             const in_scalar_vector_type& labels,
-            linear_classifier_report& report
+            scalar_type& c_used
         ) const
         {
             const auto& x = mat(samples);
@@ -138,13 +130,12 @@ namespace dlib
                 << "\n\t y.size(): " << y.size()
             );
 
-            report = linear_classifier_report();
-
             const long num_pos = sum(y > 0);
             const long num_neg = y.size() - num_pos;
             if (std::min(num_pos, num_neg) < num_folds)
             {
                 const double rate = double(num_pos) / y.size();
+                c_used = 0;
                 return trained_function_type(0, std::log((1 - rate) / rate), {});
             }
 
@@ -163,6 +154,7 @@ namespace dlib
             // Keep the held out scores of the best C for Platt scaling.
             std::vector<double> best_scores;
             double best_accuracy = -1;
+            scalar_type best_c = 0;
             for (const scalar_type candidate : candidates)
             {
                 std::vector<double> scores = held_out_scores(x, y, fold, candidate);
@@ -174,7 +166,6 @@ namespace dlib
                 }
                 accuracy(0) /= num_pos;
                 accuracy(1) /= num_neg;
-                report.cross_validation_accuracy.push_back(accuracy);
                 if (verbose)
                 {
                     std::cout << "C: " << std::setw(6) << candidate
@@ -186,13 +177,15 @@ namespace dlib
                 {
                     best_accuracy = balanced_accuracy;
                     best_scores.swap(scores);
-                    report.c = candidate;
+                    best_c = candidate;
                 }
             }
 
             const std::vector<double> held_out_labels(y.begin(), y.end());
             const auto [alpha, beta] = learn_platt_scaling(best_scores, held_out_labels);
-            return trained_function_type(alpha, beta, train_svm(x, y, report.c));
+            const trained_function_type df(alpha, beta, train_svm(x, y, best_c));
+            c_used = best_c;
+            return df;
         }
 
     private:

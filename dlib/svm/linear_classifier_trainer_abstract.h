@@ -13,26 +13,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    struct linear_classifier_report
-    {
-        /*!
-            WHAT THIS OBJECT REPRESENTS
-                This object describes how a call to linear_classifier_trainer::train()
-                chose C.
-
-                cross_validation_accuracy[k] holds the cross-validation accuracy of the
-                k-th C candidate: element 0 is the fraction of +1 samples it classified
-                correctly, and element 1 the fraction of -1 samples.  c is the candidate
-                train() chose.  If train() returned a constant probability, no SVM was
-                trained, cross_validation_accuracy is empty and c is 0.
-        !*/
-
-        double c = 0;
-        std::vector<matrix<double,1,2>> cross_validation_accuracy;
-    };
-
-// ----------------------------------------------------------------------------------------
-
     template <
         typename sample_type_
         >
@@ -170,8 +150,7 @@ namespace dlib
             >
         const trained_function_type train (
             const in_sample_vector_type& x,
-            const in_scalar_vector_type& y,
-            linear_classifier_report& report
+            const in_scalar_vector_type& y
         ) const;
         /*!
             requires
@@ -183,13 +162,12 @@ namespace dlib
             ensures
                 - Trains a class-balanced linear SVM on x and y, choosing C from
                   get_c_candidates() by cross-validation, and returns a function that
-                  outputs the probability that a sample's label is +1.  #report says how
-                  C was chosen.
+                  outputs the probability that a sample's label is +1.
                 - Let N be y.size(), N_pos the number of +1 labels, N_neg the number of -1
                   labels and F == get_num_folds().
                 - If std::min(N_pos, N_neg) < F, the samples are too few to
                   cross-validate.  Then returns a function that gives N_pos/N for every
-                  sample, and sets report to its initial value.
+                  sample.
                 - Otherwise:
                     - Splits the samples into F folds.  The samples of each class are
                       shuffled, and dealt across the folds in turn.  The shuffle is the
@@ -198,21 +176,17 @@ namespace dlib
                       on the other folds, with a C for the +1 class of C*M/(2*M_pos) and
                       a C for the -1 class of C*M/(2*M_neg), where M, M_pos and M_neg are
                       the numbers of samples, +1 samples and -1 samples it is trained on.
-                      A held out sample is classified correctly if its score is >= 0 and
-                      its label is +1, or if its score is < 0 and its label is -1.
-                    - #report.cross_validation_accuracy[k] is the accuracy of the k-th
-                      candidate, as defined in linear_classifier_report.
-                    - #report.c is the candidate with the largest mean of its two
-                      accuracies.  When several have the same, it is the first of them.
+                    - The accuracy of a candidate is the fraction of held out +1 samples
+                      with a score >= 0, and the fraction of held out -1 samples with a
+                      score < 0.  The chosen C is the candidate with the largest mean of
+                      the two.  When several have the same, it is the first of them.
                     - Returns a probabilistic_decision_function whose decision_funct is
-                      the solver trained on all the samples with #report.c, scaled per
+                      the solver trained on all the samples with the chosen C, scaled per
                       class as above, and whose sigmoid is fit by learn_platt_scaling() on
-                      the held out scores of #report.c.
-                    - If this object is verbose, prints one line per C candidate.
+                      the held out scores of the chosen C.
+                    - If this object is verbose, prints the accuracy of each candidate.
             throws
-                - any exception thrown by the solver's train().  Then #report holds the
-                  accuracies of the candidates cross-validated before it, and #report.c is
-                  unspecified.
+                - any exception thrown by the solver's train()
         !*/
 
         template <
@@ -221,13 +195,17 @@ namespace dlib
             >
         const trained_function_type train (
             const in_sample_vector_type& x,
-            const in_scalar_vector_type& y
+            const in_scalar_vector_type& y,
+            scalar_type& c_used
         ) const;
         /*!
             requires
-                - The requirements of train(x,y,report) hold.
+                - The requirements of train(x,y) hold.
             ensures
-                - Returns train(x,y,report) for some report this object discards.
+                - Returns train(x,y).
+                - #c_used == the C that train(x,y) chose, or 0 if it returned a constant
+                  probability without training an SVM.
+                - If an exception is thrown, c_used is unchanged.
         !*/
     };
 
