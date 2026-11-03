@@ -3,6 +3,8 @@
 
 #include <dlib/statistics.h>
 #include <dlib/sparse_vector.h>
+#include <dlib/string.h>
+#include <algorithm>
 #include "tester.h"
 #include <map>
 #include <string>
@@ -132,6 +134,53 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename for_each_type>
+    std::pair<sparse_type, std::vector<std::string>> enumerate (
+        for_each_type for_each,
+        const std::vector<std::string>& tokens,
+        unsigned long min_n,
+        unsigned long max_n,
+        unsigned long num_buckets
+    )
+    {
+        std::map<unsigned long,double> counts;
+        std::vector<std::string> ngrams;
+        for_each(tokens, min_n, max_n, num_buckets, [&](unsigned long b, std::string_view ngram)
+        {
+            DLIB_TEST(b == bucket(std::string(ngram), num_buckets));
+            counts[b] += 1;
+            ngrams.emplace_back(ngram);
+        });
+        return {sparse_type(counts.begin(), counts.end()), ngrams};
+    }
+
+    void test_for_each_ngram()
+    {
+        const auto for_each_word = [](auto&&... args) { for_each_word_ngram(args...); };
+        const auto for_each_char = [](auto&&... args) { for_each_char_ngram(args...); };
+        const unsigned long num_buckets = 1000;
+
+        const std::vector<std::string> tokens = {"a", "b", "a", "b"};
+        auto [counts, ngrams] = enumerate(for_each_word, tokens, 1, 2, num_buckets);
+        DLIB_TEST(counts == hash_word_ngrams(tokens, 1, 2, num_buckets));
+        std::sort(ngrams.begin(), ngrams.end());
+        DLIB_TEST(ngrams == std::vector<std::string>({"a", "a", "a b", "a b", "b", "b", "b a"}));
+
+        std::tie(counts, ngrams) = enumerate(for_each_char, {"abc", "a"}, 3, 4, num_buckets);
+        DLIB_TEST(counts == hash_char_ngrams(std::vector<std::string>{"abc", "a"}, 3, 4, num_buckets));
+        std::sort(ngrams.begin(), ngrams.end());
+        DLIB_TEST(ngrams == std::vector<std::string>({" a ", " ab", " abc", "abc", "abc ", "bc "}));
+
+        // A longer text, against the counting functions.
+        const auto words = split("the quick brown fox jumps over the lazy dog and the quick cat");
+        DLIB_TEST(enumerate(for_each_word, words, 1, 3, num_buckets).first ==
+                  hash_word_ngrams(words, 1, 3, num_buckets));
+        DLIB_TEST(enumerate(for_each_char, words, 2, 5, num_buckets).first ==
+                  hash_char_ngrams(words, 2, 5, num_buckets));
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class feature_hashing_tester : public tester
     {
     public:
@@ -152,6 +201,7 @@ namespace
             test_collisions();
             test_types();
             test_with_tfidf();
+            test_for_each_ngram();
         }
     } a;
 

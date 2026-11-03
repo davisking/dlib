@@ -5,6 +5,7 @@
 
 #include "../general_hash/murmur_hash3_abstract.h"
 #include "../error.h"
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -72,6 +73,57 @@ namespace dlib
               n measures bytes and a window may split a multi-byte character.
         throws
             - The same as hash_word_ngrams().
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename string_type,
+        typename callback_type
+        >
+    void for_each_word_ngram (
+        const std::vector<string_type>& tokens,
+        unsigned long min_n,
+        unsigned long max_n,
+        unsigned long num_buckets,
+        callback_type&& f
+    );
+    /*!
+        requires
+            - string_type satisfies the requirements of hash_word_ngrams().
+            - 1 <= min_n <= max_n
+            - num_buckets > 0
+            - f is callable as f(unsigned long bucket, std::string_view ngram).
+        ensures
+            - Calls f once for each n-gram that hash_word_ngrams(tokens,min_n,max_n,num_buckets)
+              counts, with the n-gram's text and the bucket it goes to.  So the buckets f
+              receives, counted, are that function's result.  This lets a caller find
+              which n-grams a bucket stands for.
+            - ngram is valid only during the call to f.
+        throws
+            - The same as hash_word_ngrams(), and any exception f throws.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename string_type,
+        typename callback_type
+        >
+    void for_each_char_ngram (
+        const std::vector<string_type>& tokens,
+        unsigned long min_n,
+        unsigned long max_n,
+        unsigned long num_buckets,
+        callback_type&& f
+    );
+    /*!
+        requires
+            - The same as for_each_word_ngram().
+        ensures
+            - for_each_word_ngram() for the n-grams that hash_char_ngrams() counts.
+        throws
+            - The same as for_each_word_ngram().
     !*/
 
 // ----------------------------------------------------------------------------------------

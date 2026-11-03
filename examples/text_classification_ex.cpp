@@ -7,6 +7,7 @@
         - Turning each message into hashed word and character n-gram counts
         - Weighting those counts with TF-IDF learned on the training messages
         - Choosing the SVM's C by cross-validation
+        - Finding which n-grams the SVM weighs most
         - Turning the SVM's output into a probability with Platt scaling
         - Saving the whole model to disk and loading it back
 
@@ -30,6 +31,8 @@
 #include <dlib/svm.h>
 #include <fstream>
 #include <iostream>
+#include <map>
+#include <set>
 
 using namespace std;
 using namespace dlib;
@@ -101,6 +104,38 @@ public:
         }
         words.train(word_counts);
         chars.train(char_counts);
+
+        // The hashes can't be undone, so to tell what a column stands for, we record which
+        // n-grams of the training messages went to each bucket the vocabularies kept.
+        const auto record = [](const tfidf_transformer<sample_type>& tfidf, auto& names)
+        {
+            names.clear();
+            for (const auto b : tfidf.vocabulary())
+                names[b];
+            return [&names](unsigned long b, std::string_view ngram)
+            {
+                if (const auto it = names.find(b); it != names.end())
+                    it->second.emplace(ngram);
+            };
+        };
+        const auto record_word = record(words, word_names);
+        const auto record_char = record(chars, char_names);
+        for (const auto& message : messages)
+        {
+            const auto tokens = tokenize(message);
+            for_each_word_ngram(tokens, min_word_n, max_word_n, num_buckets, record_word);
+            for_each_char_ngram(tokens, min_char_n, max_char_n, num_buckets, record_char);
+        }
+    }
+
+    // Returns the n-grams of the training messages behind column j of operator()'s output.
+    // There is more than one when their hashes went to the same bucket.
+    std::vector<string> describe(const unsigned long j) const
+    {
+        const auto& names = j < words.vocabulary_size()
+            ? word_names.at(words.vocabulary()[j])
+            : char_names.at(chars.vocabulary()[j - words.vocabulary_size()]);
+        return std::vector<string>(names.begin(), names.end());
     }
 
     sample_type operator()(const string& message) const
@@ -124,12 +159,16 @@ public:
     {
         serialize(item.words, out);
         serialize(item.chars, out);
+        serialize(item.word_names, out);
+        serialize(item.char_names, out);
     }
 
     friend void deserialize(text_features& item, std::istream& in)
     {
         deserialize(item.words, in);
         deserialize(item.chars, in);
+        deserialize(item.word_names, in);
+        deserialize(item.char_names, in);
     }
 
     friend std::ostream& operator<<(std::ostream& out, const text_features& item)
@@ -163,12 +202,17 @@ private:
         return tfidf;
     }
 
+    // The words of a message are the pieces between whitespace and ASCII punctuation.
+    // Bytes of multi-byte UTF-8 characters are not delimiters, so accented words stay
+    // whole.
+    static std::vector<string> tokenize(const string& message)
+    {
+        return split(dlib::tolower(message), " \t\n\r\v\f!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~");
+    }
+
     std::pair<sample_type, sample_type> count_ngrams(const string& message) const
     {
-        // The words of a message are the pieces between whitespace and ASCII
-        // punctuation.  Bytes of multi-byte UTF-8 characters are not delimiters, so
-        // accented words stay whole.
-        const auto tokens = split(dlib::tolower(message), " \t\n\r\v\f!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~");
+        const auto tokens = tokenize(message);
         return {
             hash_word_ngrams(tokens, min_word_n, max_word_n, num_buckets),
             hash_char_ngrams(tokens, min_char_n, max_char_n, num_buckets)
@@ -177,6 +221,8 @@ private:
 
     tfidf_transformer<sample_type> words = make_tfidf();
     tfidf_transformer<sample_type> chars = make_tfidf();
+    std::map<unsigned long, std::set<string>> word_names;
+    std::map<unsigned long, std::set<string>> char_names;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -286,6 +332,31 @@ try
     // the scores of 3 inner cross-validation folds.  This function cuts its folds in
     // sample order too, which is why we shuffled the messages before splitting them.
     const auto df = train_probabilistic_decision_function(make_trainer(c, labels), samples, labels, 3);
+
+    // A linear SVM is one weight per column, so we can see what it learned: the columns
+    // with the largest weights push a message toward spam, and those with the most
+    // negative weights toward ham.  describe() tells us which n-grams they stand for.
+    std::vector<std::pair<double, unsigned long>> weights;
+    for (const auto& [column, value] : df.decision_funct.basis_vectors(0))
+        weights.emplace_back(value * df.decision_funct.alpha(0), column);
+    std::sort(weights.begin(), weights.end());
+    const auto print_columns = [&](const auto begin, const auto end)
+    {
+        for (auto it = begin; it != end; ++it)
+        {
+            cout << "  " << fixed << setprecision(3) << setw(6) << it->first << "  ";
+            const auto ngrams = features.describe(it->second);
+            for (size_t k = 0; k < ngrams.size(); ++k)
+                cout << (k == 0 ? "" : " | ") << '"' << ngrams[k] << '"';
+            cout << endl;
+        }
+    };
+    const auto old_precision = cout.precision();
+    cout << "\ncolumns pushing toward spam" << endl;
+    print_columns(weights.rbegin(), weights.rbegin() + 10);
+    cout << "\ncolumns pushing toward ham" << endl;
+    print_columns(weights.begin(), weights.begin() + 10);
+    cout << defaultfloat << setprecision(old_precision);
 
     // Now, let's see how the model does on the test messages, which neither the TF-IDF
     // weights nor the SVM have seen.  A message is spam if its probability is above 0.5.
