@@ -80,6 +80,7 @@ add_executable(${target_name} main.cpp tester.cpp
    kmeans.cpp
    learning_to_track.cpp
    least_squares.cpp
+   linear_classifier_trainer.cpp
    linear_manifold_regularizer.cpp
    lspi.cpp
    lz77_buffer.cpp

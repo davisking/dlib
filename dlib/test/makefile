@@ -84,6 +84,7 @@ SRC += kernel_matrix.cpp
 SRC += kmeans.cpp
 SRC += learning_to_track.cpp
 SRC += least_squares.cpp
+SRC += linear_classifier_trainer.cpp
 SRC += linear_manifold_regularizer.cpp
 SRC += lspi.cpp
 SRC += lz77_buffer.cpp

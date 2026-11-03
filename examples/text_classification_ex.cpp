@@ -17,12 +17,10 @@
     Uncompress it and give the path to the SMSSpamCollection file as an argument to this
     program.  Each line of that file is a label, "ham" or "spam", a tab, and the message.
 
-    Text gives very high dimensional and very sparse vectors: there are millions of
-    possible n-grams, and a message only contains a few dozen of them.  Linear models
-    are a very good fit for this kind of data.  With that many dimensions the classes
-    are usually close to linearly separable, so a kernel adds little, and a linear SVM
-    trains in seconds and runs in microseconds, since scoring a message is one sum over
-    its nonzero features.
+    Text gives very sparse, high dimensional vectors: millions of possible n-grams, a few
+    dozen per message.  The classes are then usually close to linearly separable, so a
+    kernel adds little, and a linear SVM trains in seconds and scores a message with one
+    sum over its nonzero features.
 */
 
 #include <dlib/cmd_line_parser.h>
@@ -30,6 +28,7 @@
 #include <dlib/string.h>
 #include <dlib/svm.h>
 #include <algorithm>
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <set>
@@ -76,20 +75,15 @@ void load_sms_spam_collection(
 // families of features:
 //   - Word unigrams and bigrams, e.g. "free" and "call now".
 //   - Character n-grams of 3 to 5 bytes within each word, e.g. " fre", "free", "ree ".
-//     They still match when a word is misspelled or abbreviated, which is common in
-//     text messages and in spam in particular: "free", "freee" and "freebies" share
-//     some of them.
+//     They still match misspelled or abbreviated words: "free", "freee" and "freebies"
+//     share some of them.
 //
-// hash_word_ngrams() and hash_char_ngrams() map each n-gram to one of num_buckets
-// buckets with MurmurHash3, so we never build a vocabulary of n-grams.  The price is
-// that two n-grams can share a bucket.  With 2^20 buckets and the n-grams of a few
-// thousand messages, collisions are rare, and when they happen the SVM sees the sum of
-// both n-grams' evidence.
+// hash_word_ngrams() and hash_char_ngrams() hash each n-gram into one of num_buckets
+// buckets, so we never build a vocabulary.  Two n-grams can share a bucket, but with
+// 2^20 buckets that is rare, and then the SVM sees the sum of both.
 //
-// Each family gets its own tfidf_transformer, since a word bigram and a character
-// 4-gram are different kinds of evidence and their document frequencies are not
-// comparable.  We then place the two TF-IDF vectors side by side, shifting the
-// character dimensions past the word dimensions.
+// Each family gets its own tfidf_transformer, since their document frequencies are not
+// comparable, and the char dimensions go after the word dimensions.
 class text_features
 {
 public:
@@ -229,21 +223,6 @@ private:
 
 // ----------------------------------------------------------------------------------------
 
-// Only 13% of the messages are spam.  With a single C, the SVM would pay as much for
-// misclassifying a spam message as a ham one, and there are 6 times more ham messages to
-// get right.  Giving each class a C inversely proportional to its size balances them.
-svm_c_linear_dcd_trainer<kernel_type> make_trainer(const double c, const std::vector<double>& labels)
-{
-    const double num_spam = std::count(labels.begin(), labels.end(), +1);
-    const double num_ham = labels.size() - num_spam;
-    svm_c_linear_dcd_trainer<kernel_type> trainer;
-    trainer.set_c_class1(c * labels.size() / (2 * num_spam));
-    trainer.set_c_class2(c * labels.size() / (2 * num_ham));
-    return trainer;
-}
-
-// ----------------------------------------------------------------------------------------
-
 int main(const int argc, const char** argv)
 try
 {
@@ -273,11 +252,7 @@ try
     const auto num_spam = std::count(labels.begin(), labels.end(), +1);
     cout << "# messages: " << messages.size() << " (" << num_spam << " spam)" << endl;
 
-    // We shuffle the messages before splitting them, since nothing says the file's order
-    // is random.  This matters more than it seems: several of the dlib functions we use
-    // below split their input into folds in sample order.  If similar samples sit
-    // next to each other, e.g. spam from the same campaign, they end up in the same fold,
-    // and the model is tested on samples unlike the ones it was trained on.
+    // Shuffle before splitting, since nothing says the file's order is random.
     randomize_samples(messages, labels);
     const size_t num_test = lround(messages.size() * test_fraction);
     const std::vector<string> test_messages(messages.end() - num_test, messages.end());
@@ -285,11 +260,9 @@ try
     messages.resize(messages.size() - num_test);
     labels.resize(labels.size() - num_test);
 
-    // Learn the TF-IDF weights from the training messages only.  The document frequency
-    // of an n-gram is information about the data set, and if we computed it with the test
-    // messages, they would no longer be unseen data, and the test accuracy we report
-    // would be optimistic.  This is the same reason why you would not fit a
-    // vector_normalizer on the test samples.
+    // Learn the TF-IDF weights from the training messages only.  Document frequencies are
+    // information about the data set, and computing them on the test messages would make
+    // the test accuracy optimistic.
     text_features features;
     features.train(messages);
     cout << features << endl;
@@ -297,43 +270,30 @@ try
     for (const auto& message : messages)
         samples.push_back(features(message));
 
-    // Next, we choose C by 5-fold cross-validation on the training messages, as svm_ex.cpp
-    // does.  cross_validate_trainer() returns the accuracy on the +1 class (spam) and on
-    // the -1 class (ham).  Note that the TF-IDF weights were learned on all the training
-    // messages, so each fold has seen the document frequencies of the messages it is
-    // tested on.  That leak is small, and acceptable to pick C, but it is the reason why
-    // the numbers we report at the end come from the test set.
-    double c = get_option(parser, "c", 0.0);
-    if (c == 0)
-    {
-        double best_accuracy = 0;
-        for (const double candidate : {0.01, 0.1, 1.0, 10.0, 100.0})
-        {
-            const matrix<double> result = cross_validate_trainer(make_trainer(candidate, labels), samples, labels, 5);
-            cout << "C: " << setw(6) << candidate << "   spam accuracy: " << result(0)
-                 << "   ham accuracy: " << result(1) << endl;
-            // Pick the C with the best balanced accuracy, i.e. the mean of both.
-            if (mean(result) > best_accuracy)
-            {
-                best_accuracy = mean(result);
-                c = candidate;
-            }
-        }
-    }
-    cout << "using C = " << c << endl;
+    // Now we train the classifier.  linear_classifier_trainer trains a linear SVM and:
+    //   - gives each class a C inversely proportional to its number of messages, so the
+    //     6 times more ham messages don't outweigh the spam ones,
+    //   - picks C among the candidates by 5-fold cross-validation, printing each one's
+    //     accuracy on spam (+1) and ham (-1),
+    //   - turns the SVM's score into a probability of spam with Platt scaling.
+    // The TF-IDF weights have seen every fold, a small leak that is fine for picking C,
+    // which is why the final numbers come from the test set.
+    linear_classifier_trainer<sample_type> trainer;
+    trainer.set_num_folds(5);
+    if (parser.option("c"))
+        trainer.set_c(get_option(parser, "c", 1.0));
+    else
+        trainer.set_c_candidates({0.01, 0.1, 1.0, 10.0, 100.0});
+    trainer.be_verbose();
+    linear_classifier_report report;
+    const auto df = trainer.train(samples, labels, report);
+    cout << "using C = " << report.c << endl;
 
-    // The differences above are a few messages out of thousands, within the noise of one
-    // shuffle: with TF-IDF vectors the classes are close to separable, so past a point C
-    // barely matters.  Also note that cross_validate_trainer() judges the raw SVM by its
-    // sign, while the final model below decides by its Platt-scaled probability, and that
-    // balanced accuracy counts a lost message as much as a missed spam.  A real filter
-    // would pick C and the threshold knowing that losing a message costs more.
-
-    // The SVM outputs a score whose sign is its decision, and whose size has no units.  To
-    // get a probability of spam instead, we use Platt scaling, which fits a sigmoid to
-    // the scores of 3 inner cross-validation folds.  This function cuts its folds in
-    // sample order too, which is why we shuffled the messages before splitting them.
-    const auto df = train_probabilistic_decision_function(make_trainer(c, labels), samples, labels, 3);
+    // C = 0.01 underfits and misses more spam.  From 0.1 up, the candidates differ by a
+    // few messages, within the noise of one shuffle: the classes are close to separable,
+    // so past a point C barely matters.  A real filter
+    // would pick C and the threshold knowing that losing a message costs more than
+    // missing a spam.
 
     // A linear SVM is one weight per dimension, so we can see what it learned: the
     // dimensions with the largest weights push a message toward spam, and those with the
@@ -379,8 +339,8 @@ try
             ++true_ham;
     }
     // With the default settings, cross-validation picks C = 0.1, and the model gets
-    // 98.7% of the 1115 test messages right: 5 ham messages are marked as spam and 9
-    // spam messages are missed, i.e. a spam precision of 96.5% and a recall of 93.9%.
+    // 98.7% of the 1115 test messages right: 5 ham messages are marked as spam and 10
+    // spam messages are missed, i.e. a spam precision of 96.5% and a recall of 93.2%.
     cout << "\ntesting results on " << test_messages.size() << " messages" << endl;
     cout << "  accuracy:         " << double(true_spam + true_ham) / test_messages.size() << endl;
     cout << "  spam precision:   " << double(true_spam) / (true_spam + false_spam) << endl;
@@ -397,10 +357,9 @@ try
     probabilistic_decision_function<kernel_type> df2;
     deserialize("sms_spam_classifier.dat") >> features2 >> df2;
 
-    // The third message has words we would expect in spam, "free" and "call me", but the
-    // rest of it reads like a message between friends, and the model gives it a spam
-    // probability of 0.04.  The fourth has no prize or phone number, but "credited",
-    // "bonus points" and "Reply STOP" are what automated messages say, and it gets 0.998.
+    // The third message has "free" and "call me", but reads like a message between
+    // friends, and gets 0.035.  The fourth has no prize or phone number, but "credited",
+    // "bonus points" and "Reply STOP" sound automated, and it gets 0.997.
     cout << "\nprobability of spam for new messages" << endl;
     for (const string message : {
         "WINNER!! You have been selected to receive a £900 prize reward. Call 09061701461 to claim",

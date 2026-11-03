@@ -325,9 +325,6 @@ namespace dlib
             - The parameters of the probability model are estimated by performing k-fold 
               cross validation. 
             - The number of folds used is given by the folds argument.
-            - Each fold holds out a run of consecutive +1 samples and a run of
-              consecutive -1 samples, in the order they appear in x.  So if similar
-              samples are next to each other in x, call randomize_samples(x,y) first.
             - This function is implemented using learn_platt_scaling()
         throws
             - any exceptions thrown by trainer.train()
