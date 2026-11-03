@@ -43,13 +43,11 @@ namespace dlib
             using index_type = typename sample_type::value_type::first_type;
             static_assert(std::is_integral_v<index_type> && std::is_unsigned_v<index_type> &&
                           !std::is_same_v<index_type,bool>, "N-gram indices must be unsigned integers.");
-            DLIB_ASSERT(num_buckets > 0 && num_buckets-1 <= std::numeric_limits<index_type>::max());
             if (size > static_cast<std::size_t>(std::numeric_limits<int>::max()))
                 throw error("N-gram length exceeds the length supported by murmur_hash3().");
             const auto bucket = murmur_hash3(data, static_cast<int>(size), 0) % num_buckets;
             counts.emplace_back(static_cast<index_type>(bucket), 1);
         }
-
     }
 
 // ----------------------------------------------------------------------------------------
@@ -65,7 +63,8 @@ namespace dlib
         unsigned long num_buckets
     )
     {
-        DLIB_ASSERT(1 <= min_n && min_n <= max_n && num_buckets > 0,
+        DLIB_ASSERT(1 <= min_n && min_n <= max_n && num_buckets > 0 &&
+                    num_buckets-1 <= std::numeric_limits<typename sample_type::value_type::first_type>::max(),
             "\t sample_type hash_word_ngrams()"
             << "\n\t Invalid arguments were given to this function."
             << "\n\t min_n:       " << min_n
@@ -104,7 +103,8 @@ namespace dlib
         unsigned long num_buckets
     )
     {
-        DLIB_ASSERT(1 <= min_n && min_n <= max_n && num_buckets > 0,
+        DLIB_ASSERT(1 <= min_n && min_n <= max_n && num_buckets > 0 &&
+                    num_buckets-1 <= std::numeric_limits<typename sample_type::value_type::first_type>::max(),
             "\t sample_type hash_char_ngrams()"
             << "\n\t Invalid arguments were given to this function."
             << "\n\t min_n:       " << min_n
