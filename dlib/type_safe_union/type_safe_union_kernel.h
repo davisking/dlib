@@ -4,6 +4,7 @@
 #define DLIB_TYPE_SAFE_UNIOn_h_
 
 #include "type_safe_union_kernel_abstract.h"
+#include <algorithm>
 #include <new>
 #include <iostream>
 #include <functional>
@@ -120,7 +121,7 @@ namespace dlib
         template <size_t I>
         using get_type_t = type_safe_union_alternative_t<I, type_safe_union>;
 
-        typename std::aligned_union<0, Types...>::type mem;
+        alignas(Types...) unsigned char mem[std::max({sizeof(Types)...})];
         int type_identity = 0;
 
         template<typename F, typename TSU>
