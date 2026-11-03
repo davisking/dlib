@@ -89,7 +89,7 @@ void load_sms_spam_collection(
 // Each family gets its own tfidf_transformer, since a word bigram and a character
 // 4-gram are different kinds of evidence and their document frequencies are not
 // comparable.  We then place the two TF-IDF vectors side by side, shifting the
-// character columns past the word columns.
+// character dimensions past the word dimensions.
 class text_features
 {
 public:
@@ -105,8 +105,8 @@ public:
         words.train(word_counts);
         chars.train(char_counts);
 
-        // The hashes can't be undone, so to tell what a column stands for, we record which
-        // n-grams of the training messages went to each bucket the vocabularies kept.
+        // The hashes can't be undone, so to tell what a dimension stands for, we record
+        // which n-grams of the training messages went to each bucket the vocabularies kept.
         const auto record = [](const tfidf_transformer<sample_type>& tfidf, auto& names)
         {
             names.clear();
@@ -128,7 +128,8 @@ public:
         }
     }
 
-    // Returns the n-grams of the training messages behind column j of operator()'s output.
+    // Returns the n-grams of the training messages behind dimension j of operator()'s
+    // output.
     // There is more than one when their hashes went to the same bucket.
     std::vector<string> describe(const unsigned long j) const
     {
@@ -142,8 +143,8 @@ public:
     {
         const auto [w, c] = count_ngrams(message);
         sample_type x = words(w);
-        for (const auto& [column, value] : chars(c))
-            x.emplace_back(words.vocabulary_size() + column, value);
+        for (const auto& [dimension, value] : chars(c))
+            x.emplace_back(words.vocabulary_size() + dimension, value);
         return x;
     }
 
@@ -333,14 +334,14 @@ try
     // sample order too, which is why we shuffled the messages before splitting them.
     const auto df = train_probabilistic_decision_function(make_trainer(c, labels), samples, labels, 3);
 
-    // A linear SVM is one weight per column, so we can see what it learned: the columns
-    // with the largest weights push a message toward spam, and those with the most
-    // negative weights toward ham.  describe() tells us which n-grams they stand for.
+    // A linear SVM is one weight per dimension, so we can see what it learned: the
+    // dimensions with the largest weights push a message toward spam, and those with the
+    // most negative weights toward ham.  describe() tells us which n-grams they stand for.
     std::vector<std::pair<double, unsigned long>> weights;
-    for (const auto& [column, value] : df.decision_funct.basis_vectors(0))
-        weights.emplace_back(value * df.decision_funct.alpha(0), column);
+    for (const auto& [dimension, value] : df.decision_funct.basis_vectors(0))
+        weights.emplace_back(value * df.decision_funct.alpha(0), dimension);
     std::sort(weights.begin(), weights.end());
-    const auto print_columns = [&](const auto begin, const auto end)
+    const auto print_dimensions = [&](const auto begin, const auto end)
     {
         for (auto it = begin; it != end; ++it)
         {
@@ -352,12 +353,11 @@ try
         }
     };
     const auto old_precision = cout.precision();
-    cout << "\ncolumns pushing toward spam" << endl;
-    print_columns(weights.rbegin(), weights.rbegin() + 10);
-    cout << "\ncolumns pushing toward ham" << endl;
-    print_columns(weights.begin(), weights.begin() + 10);
+    cout << "\ndimensions pushing toward spam" << endl;
+    print_dimensions(weights.rbegin(), weights.rbegin() + 10);
+    cout << "\ndimensions pushing toward ham" << endl;
+    print_dimensions(weights.begin(), weights.begin() + 10);
     cout << defaultfloat << setprecision(old_precision);
-
     // Now, let's see how the model does on the test messages, which neither the TF-IDF
     // weights nor the SVM have seen.  A message is spam if its probability is above 0.5.
     long true_spam = 0, false_spam = 0, true_ham = 0, false_ham = 0;
@@ -381,7 +381,7 @@ try
     cout << "  spam missed:      " << false_ham << endl;
 
     // Finally, we save the model to disk.  Remember that the SVM's weights refer to the
-    // columns of the TF-IDF vectors, so the features object must be saved with it.
+    // dimensions of the TF-IDF vectors, so the features object must be saved with it.
     serialize("sms_spam_classifier.dat") << features << df;
 
     // And we can load it back and classify new messages.
