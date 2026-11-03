@@ -1588,6 +1588,9 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                 weighs each count by how rare its term is across the training documents
                 and returns a sparse vector over the terms it kept.
          </description>
+         <examples>
+            <example>text_classification_ex.cpp.html</example>
+         </examples>
 
       </component>
 
@@ -1602,6 +1605,9 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                 number of buckets, giving a sparse vector for a
                 <a href="#tfidf_transformer">tfidf_transformer</a> or a sparse linear trainer.
          </description>
+         <examples>
+            <example>text_classification_ex.cpp.html</example>
+         </examples>
 
       </component>
 
@@ -1615,6 +1621,9 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                 This function is <a href="#hash_word_ngrams">hash_word_ngrams</a> for the
                 character n-grams within each token.
          </description>
+         <examples>
+            <example>text_classification_ex.cpp.html</example>
+         </examples>
 
       </component>
 
@@ -1991,6 +2000,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          </description>
          <examples>
             <example>svm_ex.cpp.html</example>
+            <example>text_classification_ex.cpp.html</example>
          </examples>
                                  
       </component>

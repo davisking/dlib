@@ -17,6 +17,8 @@ New Features and Improvements:
         term counts (issue #3176).
       - Added normalize() and normalize_inplace() for sparse vectors.
       - Added hash_word_ngrams() and hash_char_ngrams() for feature hashing of text.
+      - Added text_classification_ex.cpp, a spam filter built from hashed n-grams,
+        TF-IDF and a Platt-scaled linear SVM.
 
    - Deep learning tooling:
       - Added an Adaptive Computation Time layer. (PR #3111)
