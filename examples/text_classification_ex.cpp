@@ -29,9 +29,9 @@
 #include <dlib/statistics.h>
 #include <dlib/string.h>
 #include <dlib/svm.h>
+#include <algorithm>
 #include <fstream>
 #include <iostream>
-#include <map>
 #include <set>
 
 using namespace std;
@@ -95,53 +95,40 @@ class text_features
 public:
     void train(const std::vector<string>& messages)
     {
+        std::vector<std::vector<string>> tokens;
         std::vector<sample_type> word_counts, char_counts;
         for (const auto& message : messages)
         {
-            const auto [w, c] = count_ngrams(message);
-            word_counts.push_back(w);
-            char_counts.push_back(c);
+            tokens.push_back(tokenize(message));
+            auto [w, c] = count_ngrams(tokens.back());
+            word_counts.push_back(std::move(w));
+            char_counts.push_back(std::move(c));
         }
         words.train(word_counts);
         chars.train(char_counts);
 
         // The hashes can't be undone, so to tell what a dimension stands for, we record
-        // which n-grams of the training messages went to each bucket the vocabularies kept.
-        const auto record = [](const tfidf_transformer<sample_type>& tfidf, auto& names)
+        // which n-grams of the training messages ended up in it.
+        names.assign(dimensions(), {});
+        for (const auto& message_tokens : tokens)
         {
-            names.clear();
-            for (const auto b : tfidf.vocabulary())
-                names[b];
-            return [&names](unsigned long b, std::string_view ngram)
-            {
-                if (const auto it = names.find(b); it != names.end())
-                    it->second.emplace(ngram);
-            };
-        };
-        const auto record_word = record(words, word_names);
-        const auto record_char = record(chars, char_names);
-        for (const auto& message : messages)
-        {
-            const auto tokens = tokenize(message);
-            for_each_word_ngram(tokens, min_word_n, max_word_n, num_buckets, record_word);
-            for_each_char_ngram(tokens, min_char_n, max_char_n, num_buckets, record_char);
+            for (const auto& ngram : word_ngrams(message_tokens, min_word_n, max_word_n))
+                add_name(words, 0, ngram);
+            for (const auto& ngram : char_ngrams(message_tokens, min_char_n, max_char_n))
+                add_name(chars, words.vocabulary_size(), ngram);
         }
     }
 
     // Returns the n-grams of the training messages behind dimension j of operator()'s
-    // output.
-    // There is more than one when their hashes went to the same bucket.
-    std::vector<string> describe(const unsigned long j) const
+    // output.  There is more than one when their hashes went to the same bucket.
+    const std::set<string>& describe(const unsigned long j) const
     {
-        const auto& names = j < words.vocabulary_size()
-            ? word_names.at(words.vocabulary()[j])
-            : char_names.at(chars.vocabulary()[j - words.vocabulary_size()]);
-        return std::vector<string>(names.begin(), names.end());
+        return names.at(j);
     }
 
     sample_type operator()(const string& message) const
     {
-        const auto [w, c] = count_ngrams(message);
+        const auto [w, c] = count_ngrams(tokenize(message));
         sample_type x = words(w);
         for (const auto& [dimension, value] : chars(c))
             x.emplace_back(words.vocabulary_size() + dimension, value);
@@ -160,16 +147,14 @@ public:
     {
         serialize(item.words, out);
         serialize(item.chars, out);
-        serialize(item.word_names, out);
-        serialize(item.char_names, out);
+        serialize(item.names, out);
     }
 
     friend void deserialize(text_features& item, std::istream& in)
     {
         deserialize(item.words, in);
         deserialize(item.chars, in);
-        deserialize(item.word_names, in);
-        deserialize(item.char_names, in);
+        deserialize(item.names, in);
     }
 
     friend std::ostream& operator<<(std::ostream& out, const text_features& item)
@@ -187,6 +172,23 @@ public:
     }
 
 private:
+    // Adds ngram to the names of its dimension, if tfidf kept its bucket.  The bucket is
+    // the one hash_word_ngrams() and hash_char_ngrams() count it in, and since
+    // vocabulary() lists the kept buckets in increasing order, its position there is the
+    // dimension, counted from offset.
+    void add_name(
+        const tfidf_transformer<sample_type>& tfidf,
+        const unsigned long offset,
+        const string& ngram
+    )
+    {
+        const unsigned long b = murmur_hash3(ngram.data(), ngram.size(), 0) % num_buckets;
+        const auto& vocabulary = tfidf.vocabulary();
+        const auto it = std::lower_bound(vocabulary.begin(), vocabulary.end(), b);
+        if (it != vocabulary.end() && *it == b)
+            names[offset + (it - vocabulary.begin())].insert(ngram);
+    }
+
     static constexpr unsigned long num_buckets = 1 << 20;
     static constexpr unsigned long min_word_n = 1, max_word_n = 2;
     static constexpr unsigned long min_char_n = 3, max_char_n = 5;
@@ -211,9 +213,8 @@ private:
         return split(dlib::tolower(message), " \t\n\r\v\f!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~");
     }
 
-    std::pair<sample_type, sample_type> count_ngrams(const string& message) const
+    static std::pair<sample_type, sample_type> count_ngrams(const std::vector<string>& tokens)
     {
-        const auto tokens = tokenize(message);
         return {
             hash_word_ngrams(tokens, min_word_n, max_word_n, num_buckets),
             hash_char_ngrams(tokens, min_char_n, max_char_n, num_buckets)
@@ -222,8 +223,8 @@ private:
 
     tfidf_transformer<sample_type> words = make_tfidf();
     tfidf_transformer<sample_type> chars = make_tfidf();
-    std::map<unsigned long, std::set<string>> word_names;
-    std::map<unsigned long, std::set<string>> char_names;
+    // names[j] holds the n-grams of the training messages behind dimension j.
+    std::vector<std::set<string>> names;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -345,19 +346,22 @@ try
     {
         for (auto it = begin; it != end; ++it)
         {
-            cout << "  " << fixed << setprecision(3) << setw(6) << it->first << "  ";
-            const auto ngrams = features.describe(it->second);
-            for (size_t k = 0; k < ngrams.size(); ++k)
-                cout << (k == 0 ? "" : " | ") << '"' << ngrams[k] << '"';
+            cout << "  " << setw(6) << it->first << "  ";
+            const char* separator = "";
+            for (const auto& ngram : features.describe(it->second))
+            {
+                cout << separator << '"' << ngram << '"';
+                separator = " | ";
+            }
             cout << endl;
         }
     };
-    const auto old_precision = cout.precision();
+    cout << fixed << setprecision(3);
     cout << "\ndimensions pushing toward spam" << endl;
     print_dimensions(weights.rbegin(), weights.rbegin() + 10);
     cout << "\ndimensions pushing toward ham" << endl;
     print_dimensions(weights.begin(), weights.begin() + 10);
-    cout << defaultfloat << setprecision(old_precision);
+
     // Now, let's see how the model does on the test messages, which neither the TF-IDF
     // weights nor the SVM have seen.  A message is spam if its probability is above 0.5.
     long true_spam = 0, false_spam = 0, true_ham = 0, false_ham = 0;
@@ -365,10 +369,14 @@ try
     {
         const bool predicted_spam = df(features(test_messages[i])) > 0.5;
         const bool is_spam = test_labels[i] > 0;
-        if (predicted_spam)
-            (is_spam ? true_spam : false_spam)++;
+        if (predicted_spam && is_spam)
+            ++true_spam;
+        else if (predicted_spam)
+            ++false_spam;
+        else if (is_spam)
+            ++false_ham;
         else
-            (is_spam ? false_ham : true_ham)++;
+            ++true_ham;
     }
     // With the default settings, cross-validation picks C = 0.1, and the model gets
     // 98.7% of the 1115 test messages right: 5 ham messages are marked as spam and 9
@@ -394,7 +402,6 @@ try
     // probability of 0.04.  The fourth has no prize or phone number, but "credited",
     // "bonus points" and "Reply STOP" are what automated messages say, and it gets 0.998.
     cout << "\nprobability of spam for new messages" << endl;
-    cout << fixed << setprecision(3);
     for (const string message : {
         "WINNER!! You have been selected to receive a £900 prize reward. Call 09061701461 to claim",
         "Are we still meeting for lunch tomorrow? I can be there at 1",

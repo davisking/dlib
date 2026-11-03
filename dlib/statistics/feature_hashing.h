@@ -11,7 +11,6 @@
 #include <algorithm>
 #include <limits>
 #include <string>
-#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -23,115 +22,144 @@ namespace dlib
 
     namespace impl
     {
-        inline unsigned long ngram_bucket (
+        template <typename sample_type>
+        void add_ngram (
             const char* data,
             std::size_t size,
-            unsigned long num_buckets
+            unsigned long num_buckets,
+            sample_type& counts
         )
         /*!
             requires
                 - data points to size bytes.
                 - num_buckets > 0
+                - sample_type satisfies the requirements of hash_word_ngrams().
             ensures
-                - Returns murmur_hash3(data,size,0) % num_buckets.
+                - Appends (murmur_hash3(data,size,0) % num_buckets, 1) to counts.
             throws
                 - dlib::error if size exceeds the length supported by murmur_hash3().
         !*/
         {
-            if (size > static_cast<std::size_t>(std::numeric_limits<int>::max()))
-                throw error("N-gram length exceeds the length supported by murmur_hash3().");
-            return murmur_hash3(data, static_cast<int>(size), 0) % num_buckets;
-        }
-
-        template <typename sample_type>
-        void check_index_type ()
-        {
             using index_type = typename sample_type::value_type::first_type;
             static_assert(std::is_integral_v<index_type> && std::is_unsigned_v<index_type> &&
                           !std::is_same_v<index_type,bool>, "N-gram indices must be unsigned integers.");
+            if (size > static_cast<std::size_t>(std::numeric_limits<int>::max()))
+                throw error("N-gram length exceeds the length supported by murmur_hash3().");
+            const auto bucket = murmur_hash3(data, static_cast<int>(size), 0) % num_buckets;
+            counts.emplace_back(static_cast<index_type>(bucket), 1);
+        }
+
+        template <typename string_type, typename callback_type>
+        void enumerate_word_ngrams (
+            const std::vector<string_type>& tokens,
+            unsigned long min_n,
+            unsigned long max_n,
+            callback_type&& f
+        )
+        /*!
+            requires
+                - The same as word_ngrams().
+                - f is callable as f(const char* data, std::size_t size).
+            ensures
+                - Calls f once for each n-gram that word_ngrams(tokens,min_n,max_n)
+                  returns, in the same order, with its bytes.  data is valid only
+                  during the call.
+        !*/
+        {
+            std::string ngram;
+            for (unsigned long n = min_n; n <= std::min<unsigned long>(max_n, tokens.size()); ++n)
+            {
+                for (unsigned long i = 0; i + n <= tokens.size(); ++i)
+                {
+                    ngram.assign(tokens[i].data(), tokens[i].size());
+                    for (unsigned long j = i + 1; j < i + n; ++j)
+                    {
+                        ngram += ' ';
+                        ngram.append(tokens[j].data(), tokens[j].size());
+                    }
+                    f(ngram.data(), ngram.size());
+                }
+            }
+        }
+
+        template <typename string_type, typename callback_type>
+        void enumerate_char_ngrams (
+            const std::vector<string_type>& tokens,
+            unsigned long min_n,
+            unsigned long max_n,
+            callback_type&& f
+        )
+        /*!
+            requires
+                - The same as enumerate_word_ngrams().
+            ensures
+                - enumerate_word_ngrams() for the n-grams char_ngrams() returns.
+        !*/
+        {
+            std::string padded;
+            for (const auto& token : tokens)
+            {
+                padded.assign(1, ' ');
+                padded.append(token.data(), token.size());
+                padded += ' ';
+                if (padded.size() < min_n)
+                {
+                    f(padded.data(), padded.size());
+                    continue;
+                }
+                for (unsigned long n = min_n; n <= std::min<unsigned long>(max_n, padded.size()); ++n)
+                {
+                    for (unsigned long i = 0; i + n <= padded.size(); ++i)
+                        f(padded.data() + i, n);
+                }
+            }
         }
     }
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename string_type,
-        typename callback_type
+        typename string_type
         >
-    void for_each_word_ngram (
+    std::vector<std::string> word_ngrams (
         const std::vector<string_type>& tokens,
         unsigned long min_n,
-        unsigned long max_n,
-        unsigned long num_buckets,
-        callback_type&& f
+        unsigned long max_n
     )
     {
-        DLIB_ASSERT(1 <= min_n && min_n <= max_n && num_buckets > 0,
-            "\t void for_each_word_ngram()"
+        DLIB_ASSERT(1 <= min_n && min_n <= max_n,
+            "\t std::vector<std::string> word_ngrams()"
             << "\n\t Invalid arguments were given to this function."
-            << "\n\t min_n:       " << min_n
-            << "\n\t max_n:       " << max_n
-            << "\n\t num_buckets: " << num_buckets
+            << "\n\t min_n: " << min_n
+            << "\n\t max_n: " << max_n
         );
-        std::string ngram;
-        for (unsigned long n = min_n; n <= std::min<unsigned long>(max_n, tokens.size()); ++n)
-        {
-            for (unsigned long i = 0; i + n <= tokens.size(); ++i)
-            {
-                ngram.assign(tokens[i].data(), tokens[i].size());
-                for (unsigned long j = i + 1; j < i + n; ++j)
-                {
-                    ngram += ' ';
-                    ngram.append(tokens[j].data(), tokens[j].size());
-                }
-                f(impl::ngram_bucket(ngram.data(), ngram.size(), num_buckets),
-                  std::string_view(ngram));
-            }
-        }
+        std::vector<std::string> ngrams;
+        impl::enumerate_word_ngrams(tokens, min_n, max_n,
+            [&](const char* data, std::size_t size) { ngrams.emplace_back(data, size); });
+        return ngrams;
     }
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename string_type,
-        typename callback_type
+        typename string_type
         >
-    void for_each_char_ngram (
+    std::vector<std::string> char_ngrams (
         const std::vector<string_type>& tokens,
         unsigned long min_n,
-        unsigned long max_n,
-        unsigned long num_buckets,
-        callback_type&& f
+        unsigned long max_n
     )
     {
-        DLIB_ASSERT(1 <= min_n && min_n <= max_n && num_buckets > 0,
-            "\t void for_each_char_ngram()"
+        DLIB_ASSERT(1 <= min_n && min_n <= max_n,
+            "\t std::vector<std::string> char_ngrams()"
             << "\n\t Invalid arguments were given to this function."
-            << "\n\t min_n:       " << min_n
-            << "\n\t max_n:       " << max_n
-            << "\n\t num_buckets: " << num_buckets
+            << "\n\t min_n: " << min_n
+            << "\n\t max_n: " << max_n
         );
-        std::string padded;
-        for (const auto& token : tokens)
-        {
-            padded.assign(1, ' ');
-            padded.append(token.data(), token.size());
-            padded += ' ';
-            if (padded.size() < min_n)
-            {
-                f(impl::ngram_bucket(padded.data(), padded.size(), num_buckets),
-                  std::string_view(padded));
-                continue;
-            }
-            for (unsigned long n = min_n; n <= std::min<unsigned long>(max_n, padded.size()); ++n)
-            {
-                for (unsigned long i = 0; i + n <= padded.size(); ++i)
-                {
-                    f(impl::ngram_bucket(padded.data() + i, n, num_buckets),
-                      std::string_view(padded.data() + i, n));
-                }
-            }
-        }
+        std::vector<std::string> ngrams;
+        impl::enumerate_char_ngrams(tokens, min_n, max_n,
+            [&](const char* data, std::size_t size) { ngrams.emplace_back(data, size); });
+        return ngrams;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -155,11 +183,9 @@ namespace dlib
             << "\n\t max_n:       " << max_n
             << "\n\t num_buckets: " << num_buckets
         );
-        impl::check_index_type<sample_type>();
-        using index_type = typename sample_type::value_type::first_type;
         sample_type counts;
-        for_each_word_ngram(tokens, min_n, max_n, num_buckets, [&](unsigned long b, std::string_view)
-                            { counts.emplace_back(static_cast<index_type>(b), 1); });
+        impl::enumerate_word_ngrams(tokens, min_n, max_n,
+            [&](const char* data, std::size_t size) { impl::add_ngram(data, size, num_buckets, counts); });
         make_sparse_vector_inplace(counts);
         return counts;
     }
@@ -185,11 +211,9 @@ namespace dlib
             << "\n\t max_n:       " << max_n
             << "\n\t num_buckets: " << num_buckets
         );
-        impl::check_index_type<sample_type>();
-        using index_type = typename sample_type::value_type::first_type;
         sample_type counts;
-        for_each_char_ngram(tokens, min_n, max_n, num_buckets, [&](unsigned long b, std::string_view)
-                            { counts.emplace_back(static_cast<index_type>(b), 1); });
+        impl::enumerate_char_ngrams(tokens, min_n, max_n,
+            [&](const char* data, std::size_t size) { impl::add_ngram(data, size, num_buckets, counts); });
         make_sparse_vector_inplace(counts);
         return counts;
     }

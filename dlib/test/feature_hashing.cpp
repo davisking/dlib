@@ -4,7 +4,6 @@
 #include <dlib/statistics.h>
 #include <dlib/sparse_vector.h>
 #include <dlib/string.h>
-#include <algorithm>
 #include "tester.h"
 #include <map>
 #include <string>
@@ -134,49 +133,32 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename for_each_type>
-    std::pair<sparse_type, std::vector<std::string>> enumerate (
-        for_each_type for_each,
-        const std::vector<std::string>& tokens,
-        unsigned long min_n,
-        unsigned long max_n,
-        unsigned long num_buckets
-    )
+    void test_ngram_lists()
     {
-        std::map<unsigned long,double> counts;
-        std::vector<std::string> ngrams;
-        for_each(tokens, min_n, max_n, num_buckets, [&](unsigned long b, std::string_view ngram)
-        {
-            DLIB_TEST(b == bucket(std::string(ngram), num_buckets));
-            counts[b] += 1;
-            ngrams.emplace_back(ngram);
-        });
-        return {sparse_type(counts.begin(), counts.end()), ngrams};
-    }
-
-    void test_for_each_ngram()
-    {
-        const auto for_each_word = [](auto&&... args) { for_each_word_ngram(args...); };
-        const auto for_each_char = [](auto&&... args) { for_each_char_ngram(args...); };
-        const unsigned long num_buckets = 1000;
-
         const std::vector<std::string> tokens = {"a", "b", "a", "b"};
-        auto [counts, ngrams] = enumerate(for_each_word, tokens, 1, 2, num_buckets);
-        DLIB_TEST(counts == hash_word_ngrams(tokens, 1, 2, num_buckets));
-        std::sort(ngrams.begin(), ngrams.end());
-        DLIB_TEST(ngrams == std::vector<std::string>({"a", "a", "a b", "a b", "b", "b", "b a"}));
+        DLIB_TEST(word_ngrams(tokens, 1, 2) ==
+                  std::vector<std::string>({"a", "b", "a", "b", "a b", "b a", "a b"}));
+        DLIB_TEST(word_ngrams(tokens, 3, 3) == std::vector<std::string>({"a b a", "b a b"}));
+        DLIB_TEST(word_ngrams(tokens, 5, 6).empty());
 
-        std::tie(counts, ngrams) = enumerate(for_each_char, {"abc", "a"}, 3, 4, num_buckets);
-        DLIB_TEST(counts == hash_char_ngrams(std::vector<std::string>{"abc", "a"}, 3, 4, num_buckets));
-        std::sort(ngrams.begin(), ngrams.end());
-        DLIB_TEST(ngrams == std::vector<std::string>({" a ", " ab", " abc", "abc", "abc ", "bc "}));
+        DLIB_TEST(char_ngrams(std::vector<std::string>{"abc", "a"}, 3, 4) ==
+                  std::vector<std::string>({" ab", "abc", "bc ", " abc", "abc ", " a "}));
+        DLIB_TEST(char_ngrams(std::vector<std::string>{"a"}, 4, 5) == std::vector<std::string>({" a "}));
+        DLIB_TEST(char_ngrams(std::vector<std::string>(), 3, 5).empty());
 
-        // A longer text, against the counting functions.
-        const auto words = split("the quick brown fox jumps over the lazy dog and the quick cat");
-        DLIB_TEST(enumerate(for_each_word, words, 1, 3, num_buckets).first ==
-                  hash_word_ngrams(words, 1, 3, num_buckets));
-        DLIB_TEST(enumerate(for_each_char, words, 2, 5, num_buckets).first ==
-                  hash_char_ngrams(words, 2, 5, num_buckets));
+        const std::vector<std::string> words = {"to", "be", "or", "not", "to", "be"};
+        const std::vector<std::string_view> views(words.begin(), words.end());
+        DLIB_TEST(word_ngrams(views, 1, 3) == word_ngrams(words, 1, 3));
+        DLIB_TEST(char_ngrams(views, 2, 4) == char_ngrams(words, 2, 4));
+
+        // The hashing functions count exactly these n-grams.
+        const auto text = split("the quick brown fox jumps over the lazy dog and the quick cat");
+        for (const unsigned long num_buckets : {1ul, 1000ul, 1ul << 20})
+        {
+            DLIB_TEST(hash_word_ngrams(text, 1, 3, num_buckets) == expected(word_ngrams(text, 1, 3), num_buckets));
+            DLIB_TEST(hash_char_ngrams(text, 2, 5, num_buckets) == expected(char_ngrams(text, 2, 5), num_buckets));
+            DLIB_TEST(hash_char_ngrams(text, 6, 8, num_buckets) == expected(char_ngrams(text, 6, 8), num_buckets));
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -201,7 +183,7 @@ namespace
             test_collisions();
             test_types();
             test_with_tfidf();
-            test_for_each_ngram();
+            test_ngram_lists();
         }
     } a;
 

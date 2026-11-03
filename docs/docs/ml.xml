@@ -606,8 +606,8 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>bpe_tokenizer</item>
          <item>hash_word_ngrams</item>
          <item>hash_char_ngrams</item>
-         <item>for_each_word_ngram</item>
-         <item>for_each_char_ngram</item>
+         <item>word_ngrams</item>
+         <item>char_ngrams</item>
          <item>arc_agi_manager</item>
 
          
@@ -1632,13 +1632,12 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
    <!-- ************************************************************************* -->
 
       <component>
-         <name>for_each_word_ngram</name>
+         <name>word_ngrams</name>
          <file>dlib/statistics.h</file>
          <spec_file link="true">dlib/statistics/feature_hashing_abstract.h</spec_file>
          <description>
-                This function calls a function for each word n-gram that
-                <a href="#hash_word_ngrams">hash_word_ngrams</a> counts, with its text and
-                the bucket it goes to, so you can tell which n-grams a bucket stands for.
+                This function returns the word n-grams of a tokenized document, the
+                strings that <a href="#hash_word_ngrams">hash_word_ngrams</a> counts.
          </description>
          <examples>
             <example>text_classification_ex.cpp.html</example>
@@ -1649,12 +1648,13 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
    <!-- ************************************************************************* -->
 
       <component>
-         <name>for_each_char_ngram</name>
+         <name>char_ngrams</name>
          <file>dlib/statistics.h</file>
          <spec_file link="true">dlib/statistics/feature_hashing_abstract.h</spec_file>
          <description>
-                This function is <a href="#for_each_word_ngram">for_each_word_ngram</a> for the
-                character n-grams that <a href="#hash_char_ngrams">hash_char_ngrams</a> counts.
+                This function is <a href="#word_ngrams">word_ngrams</a> for the character
+                n-grams within each token, the strings that
+                <a href="#hash_char_ngrams">hash_char_ngrams</a> counts.
          </description>
          <examples>
             <example>text_classification_ex.cpp.html</example>
