@@ -939,6 +939,11 @@ namespace dlib
         const long folds
     )
     {
+        DLIB_ASSERT(folds > 1,
+            "\t trainer_adapter_probabilistic probabilistic()"
+            << "\n\t folds must be greater than 1"
+            << "\n\t folds: " << folds
+        );
         return trainer_adapter_probabilistic<trainer_type>(trainer,folds); 
     }
 

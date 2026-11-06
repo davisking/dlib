@@ -128,8 +128,23 @@ namespace
                     few_y.push_back(y[i]);
                 }
             }
-            df = train_probabilistic_decision_function(krr_trainer, few_x, few_y, 3);
-            DLIB_TEST(std::isfinite(df.alpha) && std::isfinite(df.beta));
+            DLIB_TEST(sum(mat(few_y) > 0) == 3);
+            DLIB_TEST(sum(mat(few_y) < 0) == 47);
+            for (int sign : {1, -1})
+            {
+                std::vector<scalar_type> labels = few_y;
+                for (auto& label : labels)
+                    label *= sign;
+                df = train_probabilistic_decision_function(krr_trainer, few_x, labels, 3);
+                DLIB_TEST(std::isfinite(df.alpha) && std::isfinite(df.beta));
+                const auto adapted = probabilistic(krr_trainer, 3).train(few_x, labels);
+                for (const auto& sample : few_x)
+                {
+                    const auto probability = df(sample);
+                    DLIB_TEST(probability >= 0 && probability <= 1);
+                    DLIB_TEST(std::abs(probability - adapted(sample)) < 1e-12);
+                }
+            }
 
         }
     } a;
