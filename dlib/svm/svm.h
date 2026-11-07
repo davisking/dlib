@@ -788,20 +788,22 @@ namespace dlib
                 by Hsuan-Tien Lin, Chih-Jen Lin, and Ruby C. Weng
         */
 
+        // count the number of positive and negative examples
+        const long num_pos = (long)sum(mat(y) > 0);
+        const long num_neg = (long)sum(mat(y) < 0);
+
         // make sure requires clause is not broken
         DLIB_ASSERT(is_binary_classification_problem(x,y) == true &&
-                    1 < folds && folds <= (long)x.size(),
+                    1 < folds && folds <= std::min(num_pos,num_neg),
             "\tprobabilistic_decision_function train_probabilistic_decision_function()"
             << "\n\t invalid inputs were given to this function"
             << "\n\t x.size(): " << x.size() 
             << "\n\t y.size(): " << y.size() 
             << "\n\t folds:  " << folds 
+            << "\n\t num_pos:  " << num_pos
+            << "\n\t num_neg:  " << num_neg
             << "\n\t is_binary_classification_problem(x,y): " << is_binary_classification_problem(x,y)
             );
-
-        // count the number of positive and negative examples
-        const long num_pos = (long)sum(mat(y) > 0);
-        const long num_neg = (long)sum(mat(y) < 0);
 
         // figure out how many positive and negative examples we will have in each fold
         const long num_pos_test_samples = num_pos/folds; 
@@ -937,6 +939,11 @@ namespace dlib
         const long folds
     )
     {
+        DLIB_ASSERT(folds > 1,
+            "\t trainer_adapter_probabilistic probabilistic()"
+            << "\n\t folds must be greater than 1"
+            << "\n\t folds: " << folds
+        );
         return trainer_adapter_probabilistic<trainer_type>(trainer,folds); 
     }
 
