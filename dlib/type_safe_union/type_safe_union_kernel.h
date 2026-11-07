@@ -4,6 +4,7 @@
 #define DLIB_TYPE_SAFE_UNIOn_h_
 
 #include "type_safe_union_kernel_abstract.h"
+#include <algorithm>
 #include <new>
 #include <iostream>
 #include <functional>
@@ -120,7 +121,13 @@ namespace dlib
         template <size_t I>
         using get_type_t = type_safe_union_alternative_t<I, type_safe_union>;
 
-        typename std::aligned_union<0, Types...>::type mem;
+        // Keep the storage's size rounded up to its alignment, as aligned_union did,
+        // so type_identity does not move into its trailing padding.
+        struct storage_type
+        {
+            alignas(Types...) unsigned char data[std::max({sizeof(Types)...})];
+        };
+        storage_type mem;
         int type_identity = 0;
 
         template<typename F, typename TSU>
