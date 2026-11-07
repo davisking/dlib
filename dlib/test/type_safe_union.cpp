@@ -6,6 +6,8 @@
 #include <string>
 #include <cstdlib>
 #include <ctime>
+#include <cstdint>
+#include <memory>
 #include <dlib/type_safe_union.h>
 
 #include "tester.h"
@@ -815,6 +817,61 @@ namespace
     }
 
 
+    void test_aligned_storage()
+    {
+        struct alignas(64) aligned_value
+        {
+            int value = 0;
+        };
+        struct large_value
+        {
+            char bytes[65] = {};
+        };
+        using tsu = type_safe_union<aligned_value, large_value, std::string>;
+
+        // The largest and most aligned alternatives are different types.  Preserve
+        // the layout of an aligned_union storage member followed by the type tag.
+        union old_storage
+        {
+            aligned_value aligned;
+            large_value large;
+            std::string text;
+        };
+        struct old_layout
+        {
+            old_storage storage;
+            int type_identity;
+        };
+        static_assert(alignof(tsu) == alignof(old_storage), "Wrong storage alignment");
+        static_assert(sizeof(tsu) == sizeof(old_layout), "Storage layout changed");
+
+        tsu values[2];
+        for (auto& value : values)
+        {
+            auto& aligned = value.get<aligned_value>();
+            DLIB_TEST(reinterpret_cast<std::uintptr_t>(&aligned) % alignof(aligned_value) == 0);
+            aligned.value = 123;
+            tsu copied(value);
+            DLIB_TEST(copied.cast_to<aligned_value>().value == 123);
+            value.get<large_value>().bytes[64] = 'x';
+            DLIB_TEST(value.contains<large_value>());
+            value.swap(copied);
+            DLIB_TEST(value.cast_to<aligned_value>().value == 123);
+            DLIB_TEST(copied.cast_to<large_value>().bytes[64] == 'x');
+            value = std::string("reuse storage");
+            DLIB_TEST(value.cast_to<std::string>() == "reuse storage");
+            value.clear();
+            DLIB_TEST(value.is_empty());
+        }
+
+        auto allocated = std::make_unique<tsu>();
+        auto& aligned = allocated->get<aligned_value>();
+        DLIB_TEST(reinterpret_cast<std::uintptr_t>(&aligned) % alignof(aligned_value) == 0);
+        aligned.value = 456;
+        tsu moved(std::move(*allocated));
+        DLIB_TEST(moved.cast_to<aligned_value>().value == 456);
+    }
+
     class type_safe_union_tester : public tester
     {
     public:
@@ -827,6 +884,7 @@ namespace
         void perform_test (
         )
         {
+            test_aligned_storage();
             for (int i = 0; i < 10; ++i)
             {
                 test a;
