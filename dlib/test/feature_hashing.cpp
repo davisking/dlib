@@ -3,6 +3,7 @@
 
 #include <dlib/statistics.h>
 #include <dlib/sparse_vector.h>
+#include <dlib/string.h>
 #include "tester.h"
 #include <map>
 #include <string>
@@ -132,6 +133,36 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_ngram_lists()
+    {
+        const std::vector<std::string> tokens = {"a", "b", "a", "b"};
+        DLIB_TEST(word_ngrams(tokens, 1, 2) ==
+                  std::vector<std::string>({"a", "b", "a", "b", "a b", "b a", "a b"}));
+        DLIB_TEST(word_ngrams(tokens, 3, 3) == std::vector<std::string>({"a b a", "b a b"}));
+        DLIB_TEST(word_ngrams(tokens, 5, 6).empty());
+
+        DLIB_TEST(char_ngrams(std::vector<std::string>{"abc", "a"}, 3, 4) ==
+                  std::vector<std::string>({" ab", "abc", "bc ", " abc", "abc ", " a "}));
+        DLIB_TEST(char_ngrams(std::vector<std::string>{"a"}, 4, 5) == std::vector<std::string>({" a "}));
+        DLIB_TEST(char_ngrams(std::vector<std::string>(), 3, 5).empty());
+
+        const std::vector<std::string> words = {"to", "be", "or", "not", "to", "be"};
+        const std::vector<std::string_view> views(words.begin(), words.end());
+        DLIB_TEST(word_ngrams(views, 1, 3) == word_ngrams(words, 1, 3));
+        DLIB_TEST(char_ngrams(views, 2, 4) == char_ngrams(words, 2, 4));
+
+        // The hashing functions count exactly these n-grams.
+        const auto text = split("the quick brown fox jumps over the lazy dog and the quick cat");
+        for (const unsigned long num_buckets : {1ul, 1000ul, 1ul << 20})
+        {
+            DLIB_TEST(hash_word_ngrams(text, 1, 3, num_buckets) == expected(word_ngrams(text, 1, 3), num_buckets));
+            DLIB_TEST(hash_char_ngrams(text, 2, 5, num_buckets) == expected(char_ngrams(text, 2, 5), num_buckets));
+            DLIB_TEST(hash_char_ngrams(text, 6, 8, num_buckets) == expected(char_ngrams(text, 6, 8), num_buckets));
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class feature_hashing_tester : public tester
     {
     public:
@@ -152,6 +183,7 @@ namespace
             test_collisions();
             test_types();
             test_with_tfidf();
+            test_ngram_lists();
         }
     } a;
 
