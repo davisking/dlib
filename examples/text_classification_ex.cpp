@@ -225,7 +225,6 @@ try
 {
     command_line_parser parser;
     parser.add_option("test-fraction", "fraction of messages kept for testing (default: 0.2)", 1);
-    parser.add_option("c", "use this C instead of choosing it by cross-validation", 1);
     parser.set_group_name("Help Options");
     parser.add_option("h", "alias for --help");
     parser.add_option("help", "display this message and exit");
@@ -240,7 +239,6 @@ try
         return EXIT_SUCCESS;
     }
     parser.check_option_arg_range("test-fraction", 0.01, 0.99);
-    parser.check_option_arg_range("c", 1e-6, 1e6);
     const double test_fraction = get_option(parser, "test-fraction", 0.2);
 
     std::vector<string> messages;
@@ -267,29 +265,14 @@ try
     for (const auto& message : messages)
         samples.push_back(features(message));
 
-    // Now we train the classifier.  linear_classifier_trainer trains a linear SVM and:
+    // Now we train the classifier.  auto_train_linear_classifier() trains a linear SVM and:
     //   - gives each class a C inversely proportional to its number of messages, so the
     //     6 times more ham messages don't outweigh the spam ones,
-    //   - picks C among the candidates by 5-fold cross-validation, printing each one's
-    //     accuracy on spam (+1) and ham (-1),
+    //   - picks C by 5-fold cross-validation,
     //   - turns the SVM's score into a probability of spam with Platt scaling.
     // The TF-IDF weights have seen every fold, a small leak that is fine for picking C,
     // which is why the final numbers come from the test set.
-    linear_classifier_trainer<sample_type> trainer;
-    trainer.set_num_folds(5);
-    if (parser.option("c"))
-        trainer.set_c(get_option(parser, "c", 1.0));
-    else
-        trainer.set_c_candidates({0.01, 0.1, 1.0, 10.0, 100.0});
-    trainer.be_verbose();
-    double c_used = 0;
-    const auto df = trainer.train(samples, labels, c_used);
-    cout << "using C = " << c_used << endl;
-
-    // C = 0.01 underfits and misses more spam.  From 0.1 up, the candidates differ by a
-    // few messages, within the noise of one shuffle: the classes are close to separable,
-    // so past a point C barely matters.  A real filter would pick C and the threshold
-    // knowing that losing a message costs more than missing a spam.
+    const auto df = auto_train_linear_classifier(samples, labels);
 
     // A linear SVM is one weight per dimension, so we can see what it learned: the
     // dimensions with the largest weights push a message toward spam, and those with the
@@ -319,7 +302,9 @@ try
     print_dimensions(weights.begin(), weights.begin() + 10);
 
     // Now, let's see how the model does on the test messages, which neither the TF-IDF
-    // weights nor the SVM have seen.  A message is spam if its probability is above 0.5.
+    // weights nor the SVM have seen.  A message is spam if its probability is above 0.5,
+    // but a real filter would raise that threshold, since losing a message costs more than
+    // missing a spam.
     long true_spam = 0, false_spam = 0, true_ham = 0, false_ham = 0;
     for (size_t i = 0; i < test_messages.size(); ++i)
     {
@@ -334,9 +319,7 @@ try
         else
             ++true_ham;
     }
-    // With the default settings, cross-validation picks C = 0.1, and the model gets
-    // 98.7% of the 1115 test messages right: 5 ham messages are marked as spam and 10
-    // spam messages are missed, i.e. a spam precision of 96.5% and a recall of 93.2%.
+    // With the default settings, the model gets 98.7% of the 1115 test messages right.
     cout << "\ntesting results on " << test_messages.size() << " messages" << endl;
     cout << "  accuracy:         " << double(true_spam + true_ham) / test_messages.size() << endl;
     cout << "  spam precision:   " << double(true_spam) / (true_spam + false_spam) << endl;
@@ -353,9 +336,6 @@ try
     probabilistic_decision_function<kernel_type> df2;
     deserialize("sms_spam_classifier.dat") >> features2 >> df2;
 
-    // The third message has "free" and "call me", but reads like a message between
-    // friends, and gets 0.035.  The fourth has no prize or phone number, but "credited",
-    // "bonus points" and "Reply STOP" sound automated, and it gets 0.997.
     cout << "\nprobability of spam for new messages" << endl;
     for (const string message : {
         "WINNER!! You have been selected to receive a £900 prize reward. Call 09061701461 to claim",

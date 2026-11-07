@@ -19,8 +19,8 @@ New Features and Improvements:
       - Added hash_word_ngrams() and hash_char_ngrams() for feature hashing of text.
       - Added word_ngrams() and char_ngrams(), which list the n-grams that
         hash_word_ngrams() and hash_char_ngrams() count.
-      - Added linear_classifier_trainer, which trains a linear SVM with class-balanced
-        C, chooses C by cross-validation and outputs probabilities.
+      - Added auto_train_linear_classifier(), which trains a linear SVM with
+        class-balanced C, chooses C by cross-validation and outputs probabilities.
       - Added text_classification_ex.cpp, a spam filter built from hashed n-grams,
         TF-IDF and a Platt-scaled linear SVM.
 

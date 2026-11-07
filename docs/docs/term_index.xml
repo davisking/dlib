@@ -600,7 +600,6 @@
          <term file="ml.html" name="svm_one_class_trainer"                          include="dlib/svm.h"/>
          <term file="ml.html" name="svm_c_linear_trainer"                           include="dlib/svm.h"/>
          <term file="ml.html" name="svm_c_linear_dcd_trainer"                       include="dlib/svm.h"/>
-         <term file="ml.html" name="linear_classifier_trainer"                      include="dlib/svm.h"/>
          <term file="ml.html" name="svm_rank_trainer"                               include="dlib/svm.h"/>
          <term file="ml.html" name="shape_predictor_trainer"                        include="dlib/image_processing.h"/>
          <term file="ml.html" name="make_bounding_box_regression_training_data"     include="dlib/image_processing.h"/>
@@ -715,6 +714,7 @@
          <term file="ml.html" name="sigmoid_kernel"                  include="dlib/svm.h"/>
          <term file="ml.html" name="radial_basis_kernel"             include="dlib/svm.h"/>
          <term file="ml.html" name="auto_train_rbf_classifier"       include="dlib/svm.h"/>
+         <term file="ml.html" name="auto_train_linear_classifier"       include="dlib/svm.h"/>
          <term file="ml.html" name="auto_train_multiclass_svm_linear_classifier"       include="dlib/svm.h"/>
 
 
