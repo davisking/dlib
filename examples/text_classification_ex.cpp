@@ -296,11 +296,12 @@ try
             cout << endl;
         }
     };
+    const auto num_dimensions = std::min<size_t>(10, weights.size());
     cout << fixed << setprecision(3);
     cout << "\ndimensions pushing toward spam" << endl;
-    print_dimensions(weights.rbegin(), weights.rbegin() + 10);
+    print_dimensions(weights.rbegin(), weights.rbegin() + num_dimensions);
     cout << "\ndimensions pushing toward ham" << endl;
-    print_dimensions(weights.begin(), weights.begin() + 10);
+    print_dimensions(weights.begin(), weights.begin() + num_dimensions);
 
     // Now, let's see how the model does on the test messages, which neither the TF-IDF
     // weights nor the SVM have seen.  A message is spam if its probability is above 0.5,
