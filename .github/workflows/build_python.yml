@@ -92,7 +92,8 @@ jobs:
       run: python -m pytest tools/python/test
 
   Ubuntu-Python-3-8:
-    runs-on: 'ubuntu-latest'
+    # Python 3.8 builds are unavailable for Ubuntu 26.04.
+    runs-on: 'ubuntu-24.04'
     steps:
     - uses: actions/checkout@v6
     - uses: actions/setup-python@v6
