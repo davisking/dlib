@@ -47,10 +47,18 @@ jobs:
       run: |
         pip install pytest numpy setuptools packaging
         pip3 install cmake
+    # MSVC 14.52 in the November 2026 ARM image crashes while building the bindings.
+    # https://github.com/actions/runner-images/issues/15328
+    # Keep this workaround local to ARM CI until the runner toolchain is fixed.
+    - name: Select ARM64 compiler toolset
+      if: matrix.os == 'windows-11-arm'
+      run: |
+        echo 'CMAKE_GENERATOR=Visual Studio 18 2026' >> "$GITHUB_ENV"
+        echo 'CMAKE_GENERATOR_TOOLSET=v143,version=14.44' >> "$GITHUB_ENV"
     - name: Build
       run: |
         pip3 install cmake
-        pip3 install .
+        pip3 install --verbose .
     - name: Test
       run: python -m pytest tools/python/test
 
